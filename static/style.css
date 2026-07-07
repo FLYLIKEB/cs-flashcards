@@ -344,6 +344,16 @@ h2 {
   box-shadow: 0 10px 24px rgba(29, 25, 20, .07);
   transform: translateY(0);
 }
+.search-link {
+  width: 1.8rem;
+  min-width: 1.8rem;
+  padding: 0;
+}
+.search-icon {
+  width: .96rem;
+  height: .96rem;
+  fill: currentColor;
+}
 .front-term-line .external-link { margin-top: .45rem; }
 .back-term-line .external-link { margin-top: .18rem; }
 
@@ -3354,4 +3364,14 @@ select,
     min-height: 2.75rem !important;
     margin: -.28rem 0 -.2rem -.18rem;
   }
+}
+
+/* Google search action: keep the icon centered across later responsive overrides. */
+.search-link {
+  padding: 0 !important;
+}
+.search-link .search-icon {
+  width: .96rem;
+  height: .96rem;
+  fill: currentColor;
 }
