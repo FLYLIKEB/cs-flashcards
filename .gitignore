@@ -1,9 +1,8 @@
 .DS_Store
 .venv/
 .omx/
+.omc/
 __pycache__/
 *.pyc
 backups/
 vercel-proxy/.vercel/
-
-.omx/
