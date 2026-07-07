@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS 개념 플래시카드</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="apple-touch-icon" href="/static/favicon.svg" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <button id="logoRefreshBtn" class="logo-refresh" type="button" title="새로고침" aria-label="새로고침">CS</button>
+      <p id="csvPath" class="muted">CSV 로딩 중...</p>
+    </div>
+    <div class="header-search" title="검색">
+      <span>⌕</span>
+      <input id="searchInput" type="search" placeholder="검색" />
+    </div>
+    <div class="stats" aria-live="polite">
+      <button id="filterAllBtn" class="stat-filter active has-tip" type="button" data-status-filter="" title="전체" data-tip="전체">Σ <strong id="statTotal">0</strong></button>
+      <button id="filterKnownBtn" class="stat-filter has-tip" type="button" data-status-filter="O" title="안다" data-tip="안다">O <strong id="statKnown">0</strong></button>
+      <button id="filterUnknownBtn" class="stat-filter has-tip" type="button" data-status-filter="X" title="모른다" data-tip="모른다">X <strong id="statUnknown">0</strong></button>
+      <button id="filterUnreviewedBtn" class="stat-filter has-tip" type="button" data-status-filter="unreviewed" title="미학습" data-tip="미학습">– <strong id="statUnreviewed">0</strong></button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside id="controlsPanel" class="panel controls">
+      <div class="collapsed-quick-actions" aria-label="빠른 자동 듣기">
+        <button id="collapsedPlayBtn" class="has-tip collapsed-audio-main" type="button" title="재생" data-tip="자동 듣기 재생">▶</button>
+        <button id="collapsedStopBtn" class="has-tip collapsed-audio-main" type="button" title="정지" data-tip="자동 듣기 정지">■</button>
+      </div>
+      <button id="controlsToggle" class="controls-toggle has-tip" type="button" aria-expanded="true" aria-controls="controlsBody" data-tip="듣기 설정">검색/필터 접기</button>
+      <div id="controlsBody" class="controls-body">
+      <div class="audio-panel" aria-label="자동 음성 재생 설정">
+        <div class="audio-title" title="자동 듣기">▶</div>
+        <div class="audio-options">
+          <label title="카드명"><input id="speakTerm" type="checkbox" checked /> 앞</label>
+          <label title="간단 설명"><input id="speakDefinition" type="checkbox" checked /> 간단</label>
+          <label title="상세 설명"><input id="speakDetail" type="checkbox" /> 상세</label>
+          <label title="관련 개념"><input id="speakRelated" type="checkbox" /> 관련</label>
+          <label title="시험 포인트"><input id="speakExam" type="checkbox" /> 시험</label>
+        </div>
+        <label class="audio-rate-label" title="재생 속도">속도
+          <select id="speechRate">
+            <option value="1">1.0x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2.0x</option>
+          </select>
+        </label>
+        <div id="audioEstimate" class="audio-estimate" aria-live="polite">예상 재생시간 계산 중...</div>
+        <div class="audio-buttons">
+          <button id="playAudioBtn" class="has-tip" type="button" title="재생" data-tip="자동 듣기 재생">▶</button>
+          <button id="stopAudioBtn" class="has-tip" type="button" title="정지" data-tip="자동 듣기 정지">■</button>
+        </div>
+      </div>
+
+      <p class="hint">Space · ←/→ · ↑/↓ · O/X</p>
+      <p id="message" class="message" role="status"></p>
+      </div>
+    </aside>
+
+    <section class="study-area">
+      <div class="progress-line">
+        <label class="position-jump" title="카드 번호 이동">
+          <input id="positionInput" type="number" min="1" value="0" />
+          <span>/ <span id="positionTotal">0</span></span>
+        </label>
+        <select id="categorySelect" class="category-filter" title="카테고리">
+          <option value="">▦ *</option>
+        </select>
+        <div class="study-toggles" aria-label="학습 토글">
+          <button id="shuffleBtn" class="has-tip study-toggle" type="button" title="랜덤 모드" data-tip="랜덤 모드">↯</button>
+        </div>
+      </div>
+
+      <article id="card" class="flashcard" tabindex="0" aria-label="플래시카드. 클릭하면 뒤집힙니다.">
+        <div class="card-inner">
+          <div class="card-face front">
+            <div class="badges">
+              <span id="frontCategory" class="badge"></span>
+              <span id="frontStatus" class="badge status"></span>
+            </div>
+            <div class="term-line front-term-line">
+              <h2 id="frontTerm">로딩 중...</h2>
+              <span class="external-links" aria-label="나무위키 검색 링크">
+                <a id="frontNamuKoLink" class="external-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="나무위키에서 한글 개념 검색" title="나무위키 한글 검색">한</a>
+                <a id="frontNamuEnLink" class="external-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="나무위키에서 영어 개념 검색" title="나무위키 영어 검색">En</a>
+              </span>
+            </div>
+            <p id="frontEnglish" class="english"></p>
+          </div>
+          <div class="card-face back">
+            <div class="back-scroll">
+              <div class="badges">
+                <span id="backCategory" class="badge"></span>
+                <span id="backId" class="badge"></span>
+              </div>
+              <div class="term-line back-term-line">
+                <h2 id="backTerm"></h2>
+                <span class="external-links" aria-label="나무위키 검색 링크">
+                  <a id="backNamuKoLink" class="external-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="나무위키에서 한글 개념 검색" title="나무위키 한글 검색">한</a>
+                  <a id="backNamuEnLink" class="external-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="나무위키에서 영어 개념 검색" title="나무위키 영어 검색">En</a>
+                </span>
+              </div>
+              <div class="back-page-toolbar" aria-label="카드 뒷면 페이지 이동">
+                <button id="backPagePrev" class="has-tip" type="button" aria-label="이전 뒷면 페이지" data-tip="윗 페이지">↑</button>
+                <span id="backPageText">1 / 2</span>
+                <button id="backPageNext" class="has-tip" type="button" aria-label="다음 뒷면 페이지" data-tip="아랫 페이지">↓</button>
+              </div>
+              <div id="backPageOne" class="back-page active" data-page="1">
+                <section>
+                  <h3 title="간단 설명">—</h3>
+                  <p id="definition"></p>
+                </section>
+                <section>
+                  <h3 title="상세 설명">⋯</h3>
+                  <div id="detail" class="detail-grid"></div>
+                </section>
+                <section>
+                  <h3 title="관련 개념">↔</h3>
+                  <div id="conceptGraph" class="concept-graph" aria-label="현재 카드와 관련 개념의 연결 그래프"></div>
+                </section>
+                <div id="related" class="chips hidden-related" aria-hidden="true"></div>
+              </div>
+              <div id="backPageTwo" class="back-page" data-page="2">
+                <details class="source-details" open>
+                  <summary title="출처 파일">⌁</summary>
+                  <p id="sources" class="small"></p>
+                </details>
+                <section>
+                  <h3 title="시험 포인트">✓</h3>
+                  <p id="examNote"></p>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <div class="mark-row">
+        <button id="knownBtn" class="mark known has-tip" type="button" title="안다" data-tip="안다">O</button>
+        <button id="unknownBtn" class="mark unknown has-tip" type="button" title="모른다" data-tip="모른다">X</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

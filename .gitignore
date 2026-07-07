@@ -1,0 +1,7 @@
+.DS_Store
+.venv/
+.omx/
+__pycache__/
+*.pyc
+cs_flashcards/backups/
+cs_flashcards/vercel-proxy/.vercel/
