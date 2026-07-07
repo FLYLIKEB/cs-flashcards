@@ -4,10 +4,10 @@
 
 - 공개 도메인: `cs.chamung.com` -> Vercel `A 76.76.21.21`
 - 원본 도메인: `cs-origin.chamung.com` -> Lightsail `A 3.39.48.139`
-- 원본 서버 CSV: `/home/ubuntu/cs-flashcards/cs_flashcards/data/CS_encyclopedia_300plus.csv`
+- 원본 서버 CSV: `/home/ubuntu/cs-flashcards/data/CS_encyclopedia_300plus.csv`
 
 재배포:
 
 ```bash
-vercel --cwd cs_flashcards/vercel-proxy --prod --yes
+vercel --cwd vercel-proxy --prod --yes
 ```

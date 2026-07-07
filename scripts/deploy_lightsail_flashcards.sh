@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT_DIR"
 
 DOMAIN="${CS_FLASHCARDS_DOMAIN:-cs.chamung.com}"
@@ -14,7 +14,7 @@ REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:-/home/ubuntu/cs-flashcards}"
 REMOTE_PORT="${CS_FLASHCARDS_REMOTE_PORT:-8010}"
 USERNAME="${CS_FLASHCARDS_USERNAME:-cs}"
 PASSWORD="${CS_FLASHCARDS_PASSWORD:-}"
-STATE_DIR="$ROOT_DIR/cs_flashcards/.omx"
+STATE_DIR="$ROOT_DIR/.omx"
 PASSWORD_FILE="$STATE_DIR/cs_flashcards_public_password"
 CHALOG_CONFIG="/Users/jwp/Developer/ChaLog/.ec2-config"
 
@@ -51,10 +51,10 @@ echo "도메인: http://$DOMAIN (443 개방 시 https://$DOMAIN)"
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" \
-  cs_flashcards/app.py \
-  cs_flashcards/requirements.txt \
-  cs_flashcards/static \
-  cs_flashcards/data/CS_encyclopedia_300plus.csv
+  app.py \
+  requirements.txt \
+  static \
+  data/CS_encyclopedia_300plus.csv
 
 "${SSH[@]}" "mkdir -p '$REMOTE_DIR' '$REMOTE_DIR/backups'"
 "${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards.tar.gz"
@@ -79,7 +79,7 @@ rm -f /tmp/cs-flashcards.tar.gz
 cd "$REMOTE_DIR"
 python3 -m venv .venv
 .venv/bin/python -m pip install -q --upgrade pip
-.venv/bin/python -m pip install -q -r cs_flashcards/requirements.txt
+.venv/bin/python -m pip install -q -r requirements.txt
 
 sudo tee /etc/systemd/system/cs-flashcards.service >/dev/null <<EOF
 [Unit]
@@ -92,9 +92,9 @@ User=ubuntu
 WorkingDirectory=$REMOTE_DIR
 Environment=CS_FLASHCARDS_USERNAME=$USERNAME
 Environment=CS_FLASHCARDS_PASSWORD=$PASSWORD
-Environment=CS_FLASHCARD_CSV=$REMOTE_DIR/cs_flashcards/data/CS_encyclopedia_300plus.csv
+Environment=CS_FLASHCARD_CSV=$REMOTE_DIR/data/CS_encyclopedia_300plus.csv
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
-ExecStart=$REMOTE_DIR/.venv/bin/uvicorn cs_flashcards.app:app --host 127.0.0.1 --port $REMOTE_PORT
+ExecStart=$REMOTE_DIR/.venv/bin/uvicorn app:app --host 127.0.0.1 --port $REMOTE_PORT
 Restart=always
 RestartSec=3
 

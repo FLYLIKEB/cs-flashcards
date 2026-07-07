@@ -3,8 +3,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import cs_flashcards.app as flashcard_app
-from cs_flashcards.app import mark_card, read_cards, summarize
+import app as flashcard_app
+from app import mark_card, read_cards, summarize
 
 
 def write_sample(path: Path):

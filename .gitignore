@@ -3,7 +3,7 @@
 .omx/
 __pycache__/
 *.pyc
-cs_flashcards/backups/
-cs_flashcards/vercel-proxy/.vercel/
+backups/
+vercel-proxy/.vercel/
 
-cs_flashcards/.omx/
+.omx/

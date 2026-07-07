@@ -38,7 +38,7 @@ jobs:
           CS_FLASHCARDS_ORIGIN_DOMAIN: cs-origin.chamung.com
         run: |
           set -euo pipefail
-          ./cs_flashcards/scripts/deploy_lightsail_flashcards.sh
+          ./scripts/deploy_lightsail_flashcards.sh
 
       - name: Verify public endpoint
         shell: bash

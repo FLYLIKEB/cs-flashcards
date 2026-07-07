@@ -2,12 +2,12 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT_DIR"
 
 HOSTNAME="${1:-${CS_FLASHCARDS_PUBLIC_HOSTNAME:-}}"
 TUNNEL_NAME="${2:-${CS_FLASHCARDS_TUNNEL_NAME:-cs-flashcards}}"
-PID_DIR="$ROOT_DIR/cs_flashcards/.omx"
+PID_DIR="$ROOT_DIR/.omx"
 CONFIG_FILE="$PID_DIR/cs_flashcards_tunnel.env"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 USERNAME="${CS_FLASHCARDS_USERNAME:-cs}"
@@ -19,8 +19,8 @@ CNAME_TARGET=""
 if [[ -z "$HOSTNAME" ]]; then
   cat >&2 <<'EOF'
 사용법:
-  ./cs_flashcards/scripts/setup_fixed_flashcards_tunnel.sh cards.example.com
-  ./cs_flashcards/scripts/setup_chamung_flashcards_tunnel.sh
+  ./scripts/setup_fixed_flashcards_tunnel.sh cards.example.com
+  ./scripts/setup_chamung_flashcards_tunnel.sh
 
 필수 조건:
   - Cloudflare 계정이 있어야 합니다.
@@ -147,14 +147,14 @@ configure_dns() {
 따라서 아래 중 하나가 필요합니다.
 
 1) chamung.com 네임서버를 Cloudflare로 이전한 뒤 다시 실행
-   ./cs_flashcards/scripts/setup_chamung_flashcards_tunnel.sh $HOSTNAME
+   ./scripts/setup_chamung_flashcards_tunnel.sh $HOSTNAME
 
 2) Cloudflare가 DNS를 관리하는 다른 도메인/서브도메인 사용
-   ./cs_flashcards/scripts/setup_fixed_flashcards_tunnel.sh cards.your-cloudflare-domain.com
+   ./scripts/setup_fixed_flashcards_tunnel.sh cards.your-cloudflare-domain.com
 
 3) 고정주소를 포기하고 임시 주소 사용
-   rm -f cs_flashcards/.omx/cs_flashcards_tunnel.env
-   ./cs_flashcards/scripts/run_public_flashcards.sh
+   rm -f .omx/cs_flashcards_tunnel.env
+   ./scripts/run_public_flashcards.sh
 EOF
       exit 1
       ;;
@@ -207,5 +207,5 @@ CNAME: ${CNAME_TARGET:-Cloudflare route dns}
 설정파일: $CONFIG_FILE
 
 앞으로는 아래 명령만 실행하면 같은 주소로 열립니다:
-  ./cs_flashcards/scripts/run_public_flashcards.sh
+  ./scripts/run_public_flashcards.sh
 EOF

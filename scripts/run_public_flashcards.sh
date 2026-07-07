@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT_DIR"
 
 HOST="${CS_FLASHCARDS_HOST:-127.0.0.1}"
@@ -10,7 +10,7 @@ PORT="${CS_FLASHCARDS_PORT:-8010}"
 URL="http://${HOST}:${PORT}"
 VENV_DIR="${CS_FLASHCARDS_VENV:-.venv}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
-STATE_DIR="$ROOT_DIR/cs_flashcards/.omx"
+STATE_DIR="$ROOT_DIR/.omx"
 LOG_DIR="$STATE_DIR/logs"
 PID_DIR="$STATE_DIR"
 APP_LOG="$LOG_DIR/cs_flashcards_public_app.log"
@@ -105,7 +105,7 @@ fi
 
 printf '의존성 확인/설치 중...\n'
 "$VENV_DIR/bin/python" -m pip install -q --upgrade pip
-"$VENV_DIR/bin/python" -m pip install -q -r cs_flashcards/requirements.txt
+"$VENV_DIR/bin/python" -m pip install -q -r requirements.txt
 
 if ! is_running; then
   if [[ -f "$APP_PID_FILE" ]]; then
@@ -118,7 +118,7 @@ if ! is_running; then
   printf '비밀번호 보호 서버 시작 중: %s\n' "$URL"
   CS_FLASHCARDS_USERNAME="$USERNAME" \
   CS_FLASHCARDS_PASSWORD="$PASSWORD" \
-  nohup "$VENV_DIR/bin/uvicorn" cs_flashcards.app:app --host "$HOST" --port "$PORT" >"$APP_LOG" 2>&1 &
+  nohup "$VENV_DIR/bin/uvicorn" app:app --host "$HOST" --port "$PORT" >"$APP_LOG" 2>&1 &
   echo $! > "$APP_PID_FILE"
   for _ in {1..50}; do
     if is_running; then
