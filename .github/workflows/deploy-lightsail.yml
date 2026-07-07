@@ -1,0 +1,53 @@
+name: Deploy to Lightsail
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: lightsail-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare SSH key
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ssh"
+          printf '%s' "${{ secrets.LIGHTSAIL_SSH_KEY }}" > "$RUNNER_TEMP/ssh/lightsail.pem"
+          chmod 600 "$RUNNER_TEMP/ssh/lightsail.pem"
+
+      - name: Deploy app and CSV to Lightsail
+        shell: bash
+        env:
+          CS_FLASHCARDS_LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+          CS_FLASHCARDS_LIGHTSAIL_USER: ${{ secrets.LIGHTSAIL_USER }}
+          CS_FLASHCARDS_LIGHTSAIL_KEY: ${{ runner.temp }}/ssh/lightsail.pem
+          CS_FLASHCARDS_USERNAME: ${{ secrets.CS_FLASHCARDS_USERNAME }}
+          CS_FLASHCARDS_PASSWORD: ${{ secrets.CS_FLASHCARDS_PASSWORD }}
+          CS_FLASHCARDS_DOMAIN: cs.chamung.com
+          CS_FLASHCARDS_ORIGIN_DOMAIN: cs-origin.chamung.com
+        run: |
+          set -euo pipefail
+          ./cs_flashcards/scripts/deploy_lightsail_flashcards.sh
+
+      - name: Verify public endpoint
+        shell: bash
+        env:
+          CS_FLASHCARDS_USERNAME: ${{ secrets.CS_FLASHCARDS_USERNAME }}
+          CS_FLASHCARDS_PASSWORD: ${{ secrets.CS_FLASHCARDS_PASSWORD }}
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent \
+            --user "$CS_FLASHCARDS_USERNAME:$CS_FLASHCARDS_PASSWORD" \
+            https://cs.chamung.com/api/health
+          echo
