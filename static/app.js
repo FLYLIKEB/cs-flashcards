@@ -106,8 +106,12 @@ function applyFrontIllustration(card) {
 }
 
 
-function namuSearchUrl(query) {
-  return `https://namu.wiki/Search?q=${encodeURIComponent(query || '')}`;
+function googleSearchQuery(card) {
+  return [card?.category, card?.term, card?.english].filter(Boolean).join(' ');
+}
+
+function googleSearchUrl(card) {
+  return `https://www.google.com/search?q=${encodeURIComponent(googleSearchQuery(card))}`;
 }
 
 function normalizeTerm(value) {
@@ -893,7 +897,7 @@ function renderCard() {
     applyCategoryTheme('');
     applyFrontIllustration({term: '카드 없음', english: '', category: ''});
     $('conceptGraph').innerHTML = '<div class="graph-empty muted">표시할 그래프가 없습니다.</div>';
-    ['frontNamuKoLink', 'frontNamuEnLink', 'backNamuKoLink', 'backNamuEnLink'].forEach((id) => { $(id).href = '#'; });
+    ['frontGoogleSearchLink', 'backGoogleSearchLink'].forEach((id) => { $(id).href = '#'; });
     return;
   }
 
@@ -907,16 +911,12 @@ function renderCard() {
   $('frontStatus').className = `badge status ${c.known_status === 'O' ? 'o' : c.known_status === 'X' ? 'x' : ''}`;
   $('frontTerm').innerHTML = currentWordHtml(c.term, 'term');
   $('frontEnglish').textContent = c.english || '';
-  const namuKoUrl = namuSearchUrl(c.term);
-  const namuEnUrl = namuSearchUrl(c.english || c.term);
-  $('frontNamuKoLink').href = namuKoUrl;
-  $('frontNamuKoLink').title = `${c.term} 나무위키 검색`;
-  $('backNamuKoLink').href = namuKoUrl;
-  $('backNamuKoLink').title = `${c.term} 나무위키 검색`;
-  $('frontNamuEnLink').href = namuEnUrl;
-  $('frontNamuEnLink').title = `${c.english || c.term} 나무위키 검색`;
-  $('backNamuEnLink').href = namuEnUrl;
-  $('backNamuEnLink').title = `${c.english || c.term} 나무위키 검색`;
+  const googleUrl = googleSearchUrl(c);
+  const googleQuery = googleSearchQuery(c);
+  $('frontGoogleSearchLink').href = googleUrl;
+  $('frontGoogleSearchLink').title = `${googleQuery} 구글 검색`;
+  $('backGoogleSearchLink').href = googleUrl;
+  $('backGoogleSearchLink').title = `${googleQuery} 구글 검색`;
 
   $('backCategory').textContent = categoryLabel(c.category);
   $('backId').textContent = c.id;
