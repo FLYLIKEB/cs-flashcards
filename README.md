@@ -1,6 +1,8 @@
 # CS 개념 플래시카드
 
-CSV 기반 CS 개념 플래시카드 웹앱입니다. 카드 원본과 O/X 학습 상태는 `cs_flashcards/data/CS_encyclopedia_300plus.csv`에 저장됩니다.
+CSV 기반 CS 개념 플래시카드 웹앱입니다.
+
+- GitHub 저장소: https://github.com/FLYLIKEB/cs-flashcards 카드 원본과 O/X 학습 상태는 `cs_flashcards/data/CS_encyclopedia_300plus.csv`에 저장됩니다.
 
 ## 폴더 구조
 
