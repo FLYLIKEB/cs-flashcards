@@ -5,3 +5,5 @@ __pycache__/
 *.pyc
 cs_flashcards/backups/
 cs_flashcards/vercel-proxy/.vercel/
+
+cs_flashcards/.omx/

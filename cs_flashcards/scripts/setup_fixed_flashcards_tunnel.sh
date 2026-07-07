@@ -7,7 +7,7 @@ cd "$ROOT_DIR"
 
 HOSTNAME="${1:-${CS_FLASHCARDS_PUBLIC_HOSTNAME:-}}"
 TUNNEL_NAME="${2:-${CS_FLASHCARDS_TUNNEL_NAME:-cs-flashcards}}"
-PID_DIR="$ROOT_DIR/.omx"
+PID_DIR="$ROOT_DIR/cs_flashcards/.omx"
 CONFIG_FILE="$PID_DIR/cs_flashcards_tunnel.env"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 USERNAME="${CS_FLASHCARDS_USERNAME:-cs}"
@@ -153,7 +153,7 @@ configure_dns() {
    ./cs_flashcards/scripts/setup_fixed_flashcards_tunnel.sh cards.your-cloudflare-domain.com
 
 3) 고정주소를 포기하고 임시 주소 사용
-   rm -f .omx/cs_flashcards_tunnel.env
+   rm -f cs_flashcards/.omx/cs_flashcards_tunnel.env
    ./cs_flashcards/scripts/run_public_flashcards.sh
 EOF
       exit 1

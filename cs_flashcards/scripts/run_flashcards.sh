@@ -10,9 +10,10 @@ PORT="${CS_FLASHCARDS_PORT:-8000}"
 URL="http://${HOST}:${PORT}"
 VENV_DIR="${CS_FLASHCARDS_VENV:-.venv}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
-LOG_DIR="$ROOT_DIR/.omx/logs"
+STATE_DIR="$ROOT_DIR/cs_flashcards/.omx"
+LOG_DIR="$STATE_DIR/logs"
 LOG_FILE="$LOG_DIR/cs_flashcards.log"
-PID_FILE="$ROOT_DIR/.omx/cs_flashcards.pid"
+PID_FILE="$STATE_DIR/cs_flashcards.pid"
 
 mkdir -p "$LOG_DIR"
 

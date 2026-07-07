@@ -14,7 +14,8 @@ REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:-/home/ubuntu/cs-flashcards}"
 REMOTE_PORT="${CS_FLASHCARDS_REMOTE_PORT:-8010}"
 USERNAME="${CS_FLASHCARDS_USERNAME:-cs}"
 PASSWORD="${CS_FLASHCARDS_PASSWORD:-}"
-PASSWORD_FILE="$ROOT_DIR/.omx/cs_flashcards_public_password"
+STATE_DIR="$ROOT_DIR/cs_flashcards/.omx"
+PASSWORD_FILE="$STATE_DIR/cs_flashcards_public_password"
 CHALOG_CONFIG="/Users/jwp/Developer/ChaLog/.ec2-config"
 
 if [[ -f "$CHALOG_CONFIG" ]]; then
