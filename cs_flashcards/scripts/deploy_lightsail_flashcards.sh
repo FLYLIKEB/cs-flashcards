@@ -32,10 +32,8 @@ if [[ -z "$PASSWORD" && -f "$PASSWORD_FILE" ]]; then
   PASSWORD="$(cat "$PASSWORD_FILE")"
 fi
 if [[ -z "$PASSWORD" ]]; then
-  PASSWORD="az980831"
-  mkdir -p "$ROOT_DIR/.omx"
-  printf '%s' "$PASSWORD" > "$PASSWORD_FILE"
-  chmod 600 "$PASSWORD_FILE" 2>/dev/null || true
+  echo "CS_FLASHCARDS_PASSWORD 또는 $PASSWORD_FILE 이 필요합니다." >&2
+  exit 1
 fi
 
 if [[ -z "${REMOTE_HOST:-}" || ! -f "${SSH_KEY:-}" ]]; then
@@ -185,4 +183,3 @@ echo "✅ Lightsail 배포 완료"
 echo "주소: http://$DOMAIN"
 echo "HTTPS: https://$DOMAIN (Lightsail 네트워크 방화벽 443 개방 시)"
 echo "아이디: $USERNAME"
-echo "비밀번호: $PASSWORD"
