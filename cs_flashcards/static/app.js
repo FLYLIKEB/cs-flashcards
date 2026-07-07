@@ -238,22 +238,17 @@ function speechItemsForCard(card) {
 }
 
 
-function preferredVoiceForItem(item) {
+function preferredVoiceForItem(_item) {
   const voices = window.speechSynthesis?.getVoices?.() || [];
   if (!voices.length) return null;
   const koreanVoices = voices.filter((voice) => /ko|Korean|한국|한국어/i.test(`${voice.lang} ${voice.name}`));
   const pool = koreanVoices.length ? koreanVoices : voices;
-  if (item.key === 'term') {
-    return pool.find((voice) => /male|남성|man|injoon|준|yuna male/i.test(voice.name))
-      || pool.find((voice) => !/female|여성|woman|heami|yuna|유나/i.test(voice.name))
-      || pool[0];
-  }
   return pool.find((voice) => /female|여성|woman|heami|yuna|유나/i.test(voice.name))
     || pool[0];
 }
 
-function speechPitchForItem(item) {
-  return item.key === 'term' ? 0.88 : 1;
+function speechPitchForItem(_item) {
+  return 1;
 }
 
 function speechRateForItem(item) {
@@ -365,7 +360,6 @@ function speakQueue(items, done) {
   state.flipped = item.key !== 'term';
   state.backPage = item.key === 'exam' ? 1 : 0;
   renderCard();
-  scheduleFallbackWordHighlight(item, token);
 
   const utterance = new SpeechSynthesisUtterance(item.text);
   utterance.lang = 'ko-KR';
@@ -384,11 +378,33 @@ function speakQueue(items, done) {
     finish();
   };
 
-  setSpeechTimer(finish, estimatedItemDurationMs(item) + 900);
-  try {
-    window.speechSynthesis.speak(utterance);
-  } catch (_error) {
+  let watchdogExtensions = 0;
+  const finishWhenSpeechIsIdle = () => {
+    if (finished || !state.audioPlaying || state.speechToken !== token) return;
+    const synthesis = window.speechSynthesis;
+    if ((synthesis?.speaking || synthesis?.pending) && watchdogExtensions < 16) {
+      watchdogExtensions += 1;
+      setSpeechTimer(finishWhenSpeechIsIdle, 500);
+      return;
+    }
     finish();
+  };
+
+  const speak = () => {
+    if (!state.audioPlaying || state.speechToken !== token) return;
+    scheduleFallbackWordHighlight(item, token);
+    setSpeechTimer(finishWhenSpeechIsIdle, estimatedItemDurationMs(item) + 1400);
+    try {
+      window.speechSynthesis.speak(utterance);
+    } catch (_error) {
+      finish();
+    }
+  };
+
+  if (item.key === 'term') {
+    setSpeechTimer(speak, 320);
+  } else {
+    speak();
   }
 }
 
