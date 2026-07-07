@@ -74,6 +74,8 @@ sudo apt-get update -y >/dev/null
 sudo apt-get install -y python3 python3-venv python3-pip nginx certbot python3-certbot-nginx >/dev/null
 
 mkdir -p "$REMOTE_DIR"
+# Remove stale pre-flattened layout from older deployments.
+rm -rf "$REMOTE_DIR/cs_flashcards"
 tar -xzf /tmp/cs-flashcards.tar.gz -C "$REMOTE_DIR"
 rm -f /tmp/cs-flashcards.tar.gz
 cd "$REMOTE_DIR"
