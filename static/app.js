@@ -7,6 +7,7 @@ const state = {
   audioPlaying: false,
   speechHighlight: null,
   speechCurrent: null,
+  speechUtterance: null,
   audioContext: null,
   speechTimers: [],
   speechToken: 0,
@@ -339,6 +340,40 @@ function scheduleFallbackWordHighlight(item, token) {
   });
 }
 
+function speechStartFailureMessage() {
+  const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isAppleMobile) return '모바일에서 음성이 시작되지 않았습니다. 화면의 ▶ 버튼을 다시 눌러 음성을 허용해 주세요.';
+  return '음성이 시작되지 않아 자동 듣기를 멈췄습니다. 다시 재생해 주세요.';
+}
+
+function createUtterance(item, token, markStarted, finish, fail) {
+  const utterance = new SpeechSynthesisUtterance(item.text);
+  utterance.lang = 'ko-KR';
+  const preferredVoice = preferredVoiceForItem(item);
+  if (preferredVoice) utterance.voice = preferredVoice;
+  utterance.rate = speechRateForItem(item);
+  utterance.pitch = speechPitchForItem(item);
+  utterance.onstart = () => {
+    markStarted();
+    if (item.key === 'term') playCardStartSound();
+  };
+  utterance.onboundary = (event) => {
+    markStarted();
+    if (!state.audioPlaying || !state.speechCurrent || state.speechToken !== token) return;
+    state.speechCurrent.charIndex = Math.max(0, (event.charIndex || 0) - item.prefixLength);
+    renderCard();
+  };
+  utterance.onend = () => {
+    markStarted();
+    finish();
+  };
+  utterance.onerror = (event) => {
+    if (event.error === 'interrupted' || event.error === 'canceled') return;
+    fail();
+  };
+  return utterance;
+}
+
 function speakQueue(items, done) {
   if (!state.audioPlaying) return;
   clearSpeechTimers();
@@ -346,17 +381,30 @@ function speakQueue(items, done) {
   if (!item) {
     state.speechHighlight = null;
     state.speechCurrent = null;
+    state.speechUtterance = null;
     renderCard();
     done();
     return;
   }
   const token = ++state.speechToken;
   let finished = false;
+  let started = false;
+  let attempts = 0;
+  let watchdogExtensions = 0;
+  const maxAttempts = 2;
+
+  const isCurrentSpeech = () => state.audioPlaying && state.speechToken === token;
+  const markStarted = () => { started = true; };
   const finish = () => {
-    if (finished || !state.audioPlaying || state.speechToken !== token) return;
+    if (finished || !isCurrentSpeech()) return;
     finished = true;
     clearSpeechTimers();
+    state.speechUtterance = null;
     speakQueue(items, done);
+  };
+  const fail = () => {
+    if (finished || !isCurrentSpeech()) return;
+    stopAudioPlayback(speechStartFailureMessage());
   };
 
   state.speechHighlight = item.key;
@@ -365,51 +413,62 @@ function speakQueue(items, done) {
   state.backPage = item.key === 'exam' ? 1 : 0;
   renderCard();
 
-  const utterance = new SpeechSynthesisUtterance(item.text);
-  utterance.lang = 'ko-KR';
-  const preferredVoice = preferredVoiceForItem(item);
-  if (preferredVoice) utterance.voice = preferredVoice;
-  utterance.rate = speechRateForItem(item);
-  utterance.pitch = speechPitchForItem(item);
-  utterance.onboundary = (event) => {
-    if (!state.audioPlaying || !state.speechCurrent || state.speechToken !== token) return;
-    state.speechCurrent.charIndex = Math.max(0, (event.charIndex || 0) - item.prefixLength);
-    renderCard();
-  };
-  utterance.onend = finish;
-  utterance.onerror = (event) => {
-    if (event.error === 'interrupted' || event.error === 'canceled') return;
-    finish();
-  };
-
-  let watchdogExtensions = 0;
   const finishWhenSpeechIsIdle = () => {
-    if (finished || !state.audioPlaying || state.speechToken !== token) return;
+    if (finished || !isCurrentSpeech()) return;
     const synthesis = window.speechSynthesis;
-    if ((synthesis?.speaking || synthesis?.pending) && watchdogExtensions < 16) {
+    if (synthesis?.speaking && !started) markStarted();
+    if ((synthesis?.speaking || synthesis?.pending) && watchdogExtensions < 24) {
       watchdogExtensions += 1;
       setSpeechTimer(finishWhenSpeechIsIdle, 500);
+      return;
+    }
+    if (!started) {
+      if (attempts < maxAttempts) {
+        speak();
+      } else {
+        fail();
+      }
       return;
     }
     finish();
   };
 
-  const speak = () => {
-    if (!state.audioPlaying || state.speechToken !== token) return;
-    scheduleFallbackWordHighlight(item, token);
-    setSpeechTimer(finishWhenSpeechIsIdle, estimatedItemDurationMs(item) + 1400);
-    try {
-      window.speechSynthesis.speak(utterance);
-    } catch (_error) {
-      finish();
+  const verifySpeechStarted = () => {
+    if (finished || !isCurrentSpeech() || started) return;
+    const synthesis = window.speechSynthesis;
+    if (synthesis?.speaking || synthesis?.pending) {
+      if (synthesis.speaking) markStarted();
+      setSpeechTimer(verifySpeechStarted, 500);
+      return;
+    }
+    if (attempts < maxAttempts) {
+      speak();
+    } else {
+      fail();
     }
   };
 
-  if (item.key === 'term') {
-    setSpeechTimer(speak, 320);
-  } else {
-    speak();
+  function speak() {
+    if (!isCurrentSpeech()) return;
+    attempts += 1;
+    watchdogExtensions = 0;
+    started = false;
+    scheduleFallbackWordHighlight(item, token);
+    setSpeechTimer(verifySpeechStarted, 900);
+    setSpeechTimer(finishWhenSpeechIsIdle, estimatedItemDurationMs(item) + 1800);
+    try {
+      window.speechSynthesis.resume?.();
+      const utterance = createUtterance(item, token, markStarted, finish, fail);
+      state.speechUtterance = utterance;
+      window.speechSynthesis.speak(utterance);
+    } catch (_error) {
+      fail();
+    }
   }
+
+  // 모바일 Safari/Chrome은 사용자 탭 직후가 아니면 첫 utterance를 무시할 수 있다.
+  // 특히 앞면(용어)은 딜레이 없이 즉시 speak()를 호출해야 무음 스킵이 줄어든다.
+  speak();
 }
 
 function setAudioButtons() {
@@ -432,7 +491,6 @@ function speakCurrentAndAdvance() {
   state.backPage = 0;
   state.speechHighlight = null;
   renderCard();
-  if (selectedSpeechParts().term) playCardStartSound();
   if (!items.length) {
     window.setTimeout(moveAudioNext, 220);
     return;
@@ -613,6 +671,7 @@ function stopAudioPlayback(message = '자동 듣기를 정지했습니다.') {
   stopSpeechKeepAlive();
   state.speechHighlight = null;
   state.speechCurrent = null;
+  state.speechUtterance = null;
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   setAudioButtons();
   setMessage(message);
