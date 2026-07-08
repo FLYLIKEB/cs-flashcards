@@ -137,7 +137,7 @@ python3 scripts/generate_concept_images.py --write-csv
 | 서술형 | `definition`, `detailed_explanation`, `exam_note` | 면접식 설명 연습 |
 | 논술형 | 관련 개념 비교와 채점 포인트 포함 | 긴 답안 구조화 |
 
-백엔드 API는 `/api/questions/generate`이며, 문제는 CSV 원본을 수정하지 않고 즉석 생성합니다. 정답률 저장은 아직 카드 O/X와 분리되어 있으며, 필요하면 추후 별도 SQLite 테이블로 확장합니다.
+백엔드 API는 `/api/questions/generate`이며, 문제는 CSV 원본을 수정하지 않고 즉석 생성합니다. `AI 검색` 버튼은 선택한 문제 유형과 문제 수를 바탕으로 현재 필터된 카드 개념명 목록을 Google AI 검색 프롬프트로 열어 외부 AI 퀴즈 생성도 바로 요청할 수 있게 합니다. 정답률 저장은 아직 카드 O/X와 분리되어 있으며, 필요하면 추후 별도 SQLite 테이블로 확장합니다.
 
 ## 내용을 수정하고 반영하기
 

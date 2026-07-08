@@ -43,6 +43,9 @@ const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
 const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate', 'speechVoice'];
+const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
+const AI_QUIZ_PROMPT_TYPE_ORDER = ['multiple_choice', 'short', 'subjective', 'essay'];
+const AI_QUIZ_TERM_LIMIT = 80;
 
 function readSavedViewState() {
   try {
@@ -178,6 +181,11 @@ function googleSearchUrl(card) {
     q: googleSearchQuery(card),
     udm: '50',
   });
+  return `https://www.google.com/search?${params.toString()}`;
+}
+
+function googleAiSearchUrl(query) {
+  const params = new URLSearchParams({q: String(query || ''), udm: '50'});
   return `https://www.google.com/search?${params.toString()}`;
 }
 
@@ -1968,22 +1976,72 @@ function selectedQuestionTypes() {
   return checked.length ? checked : ['short', 'subjective', 'multiple_choice', 'essay'];
 }
 
+
+function selectedQuestionTypeLabelsForPrompt() {
+  const selected = new Set(selectedQuestionTypes());
+  return AI_QUIZ_PROMPT_TYPE_ORDER
+    .filter((type) => selected.has(type))
+    .map((type) => QUESTION_TYPE_LABELS[type] || type);
+}
+
+function questionCountValue() {
+  return Number.parseInt($('questionCountSelect')?.value || '10', 10) || 10;
+}
+
+function filteredQuestionTerms() {
+  const seen = new Set();
+  const terms = [];
+  (state.filtered.length ? state.filtered : state.cards).forEach((card) => {
+    const term = String(card?.term || card?.english || '').trim();
+    const key = term.toLowerCase();
+    if (!term || seen.has(key)) return;
+    seen.add(key);
+    terms.push(term);
+  });
+  return terms;
+}
+
+function aiQuizSearchPrompt() {
+  const allTerms = filteredQuestionTerms();
+  const visibleTerms = allTerms.slice(0, AI_QUIZ_TERM_LIMIT);
+  const hasMore = allTerms.length > visibleTerms.length;
+  const termText = visibleTerms.join(', ') + (hasMore ? ` 등 현재 선택된 카드 개념 ${allTerms.length}개` : '');
+  const typeText = selectedQuestionTypeLabelsForPrompt().join('/') || '객관식/주관식/서술형/논술형';
+  return `${termText} 로 ${typeText} 문제 ${questionCountValue()}개 만들어줘. 자체 퀴즈생성 기능을 활용해줘.`;
+}
+
+function aiQuizSearchUrl() {
+  return googleAiSearchUrl(aiQuizSearchPrompt());
+}
+
+function openAiQuizSearch(event = null) {
+  if (!state.filtered.length) {
+    setMessage('AI 검색에 보낼 카드가 없습니다. 필터를 바꿔주세요.', true);
+    return;
+  }
+  event?.preventDefault?.();
+  event?.currentTarget?.blur?.();
+  const url = aiQuizSearchUrl();
+  const opened = window.open(url, 'cs-google-ai-quiz-search', 'popup,width=1120,height=820');
+  restoreAppFocusAfterSearch(opened);
+  window.setTimeout(() => {
+    try { if (opened) opened.opener = null; } catch (_error) {}
+  }, 800);
+  const termCount = filteredQuestionTerms().length;
+  setMessage(`선택한 ${termCount}개 개념 기준 AI 퀴즈 검색을 열었습니다.`);
+}
+
 function currentQuestion() {
   return state.questions[state.questionIndex] || null;
 }
 
 function questionTypeBadge(question) {
   if (!question) return '';
-  return question.type_label || ({
-    short: '주관식',
-    subjective: '서술형',
-    multiple_choice: '객관식',
-    essay: '논술형',
-  }[question.type] || question.type || '문제');
+  return question.type_label || (QUESTION_TYPE_LABELS[question.type] || question.type || '문제');
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -2076,7 +2134,7 @@ async function generateQuestionsFromCurrentFilter() {
       body: JSON.stringify({
         card_ids: state.filtered.map((card) => card.id),
         types: selectedQuestionTypes(),
-        count: Number.parseInt($('questionCountSelect')?.value || '10', 10) || 10,
+        count: questionCountValue(),
         seed: Date.now(),
       }),
     });
@@ -2448,6 +2506,7 @@ $('conceptBackBtn')?.addEventListener('click', (event) => {
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
 $('questionModeBtn')?.addEventListener('click', () => toggleQuestionMode());
 $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
+$('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);
 $('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(false));
 $('prevQuestionBtn')?.addEventListener('click', () => moveQuestion(-1));
 $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));

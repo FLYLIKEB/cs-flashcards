@@ -145,6 +145,7 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionTypeMultipleChoice"',
             'id="questionTypeEssay"',
             'id="generateQuestionsBtn"',
+            'id="openAiQuizSearchBtn"',
             'id="revealAnswerBtn"',
             'id="openQuestionCardBtn"',
         ]:
@@ -156,6 +157,11 @@ class StaticFrontendTests(unittest.TestCase):
             'function renderQuestionPanel()',
             'function revealQuestionAnswer()',
             'function openQuestionSourceCard()',
+            'function aiQuizSearchPrompt()',
+            'function openAiQuizSearch(event = null)',
+            '자체 퀴즈생성 기능을 활용해줘',
+            'AI_QUIZ_PROMPT_TYPE_ORDER',
+            'googleAiSearchUrl(aiQuizSearchPrompt())',
             'question-mode-active',
         ]:
             self.assertIn(snippet, APP_JS)
