@@ -219,16 +219,27 @@ function returnFocusFromSearchInput(event) {
   focusAppCard();
 }
 
+function restoreAppFocusAfterSearch(openedWindow = null) {
+  [0, 80, 240, 600].forEach((delay) => {
+    window.setTimeout(() => {
+      try { openedWindow?.blur?.(); } catch (_error) {}
+      try { window.focus(); } catch (_error) {}
+      focusAppCard();
+    }, delay);
+  });
+}
+
 function openCurrentGoogleSearch(event = null) {
   const link = state.flipped ? $('backGoogleSearchLink') : $('frontGoogleSearchLink');
   if (!link || !link.href || link.getAttribute('href') === '#') return;
   event?.preventDefault?.();
-  const opened = window.open(link.href, '_blank', 'noopener,noreferrer');
+  event?.currentTarget?.blur?.();
+  const opened = window.open(link.href, 'cs-google-ai-search', 'popup,width=1120,height=820');
+  restoreAppFocusAfterSearch(opened);
   window.setTimeout(() => {
-    try { window.focus(); } catch (_error) {}
-    focusAppCard();
-  }, opened ? 120 : 0);
-  setMessage('검색을 열고 앱 포커스로 돌아갑니다.');
+    try { if (opened) opened.opener = null; } catch (_error) {}
+  }, 800);
+  setMessage('검색을 열고 CS 카드로 포커스를 되돌렸습니다.');
 }
 
 
