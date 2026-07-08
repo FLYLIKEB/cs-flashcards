@@ -939,6 +939,39 @@ function cardTerms(card) {
   return [card?.term, card?.english].filter(Boolean);
 }
 
+function speechChunkSizeForKey(key) {
+  return ['definition', 'detail', 'exam'].includes(key) ? 3 : 2;
+}
+
+function isHardPhraseEnd(word) {
+  return /[.!?。！？]"?'?$/.test(String(word || ''));
+}
+
+function speechChunkRange(matches, activeIndex, key) {
+  if (!matches.length || activeIndex < 0) return null;
+  const chunkSize = speechChunkSizeForKey(key);
+  let start = Math.floor(activeIndex / chunkSize) * chunkSize;
+  let end = Math.min(matches.length - 1, start + chunkSize - 1);
+
+  for (let index = activeIndex - 1; index >= start; index -= 1) {
+    if (isHardPhraseEnd(matches[index][0])) {
+      start = index + 1;
+      break;
+    }
+  }
+  for (let index = activeIndex; index < end; index += 1) {
+    if (isHardPhraseEnd(matches[index][0])) {
+      end = index;
+      break;
+    }
+  }
+
+  return {
+    start: matches[start].index,
+    end: matches[end].index + matches[end][0].length,
+  };
+}
+
 function currentWordHtml(text, key, detailLabel = null, terms = []) {
   const source = String(text || '');
   const current = state.speechCurrent;
@@ -954,17 +987,10 @@ function currentWordHtml(text, key, detailLabel = null, terms = []) {
     activeIndex = matches.findIndex((match) => charIndex < match.index);
     if (activeIndex < 0 && matches.length) activeIndex = matches.length - 1;
   }
+  const range = speechChunkRange(matches, activeIndex, key);
+  if (!range) return highlightTermsHtml(source, terms);
 
-  let html = '';
-  let cursor = 0;
-  matches.forEach((match, index) => {
-    html += escapeHtml(source.slice(cursor, match.index));
-    const word = escapeHtml(match[0]);
-    html += index === activeIndex ? `<span class="current-word">${word}</span>` : word;
-    cursor = match.index + match[0].length;
-  });
-  html += escapeHtml(source.slice(cursor));
-  return html;
+  return `${escapeHtml(source.slice(0, range.start))}<span class="current-word">${escapeHtml(source.slice(range.start, range.end))}</span>${escapeHtml(source.slice(range.end))}`;
 }
 
 function detailMeta(label) {
