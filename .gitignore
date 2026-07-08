@@ -6,3 +6,7 @@ __pycache__/
 *.pyc
 backups/
 vercel-proxy/.vercel/
+
+state/
+*.sqlite
+*.sqlite-*

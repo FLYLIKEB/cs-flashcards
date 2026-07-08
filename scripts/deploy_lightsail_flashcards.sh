@@ -73,7 +73,75 @@ export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
 sudo apt-get install -y python3 python3-venv python3-pip nginx certbot python3-certbot-nginx >/dev/null
 
-mkdir -p "$REMOTE_DIR"
+mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
+
+# Preserve learning progress before the content CSV is replaced by deployment.
+# Existing SQLite rows win; old CSV progress is imported only for cards not yet in the DB.
+python3 - "$REMOTE_DIR/data/CS_encyclopedia_300plus.csv" "$REMOTE_DIR/state/progress.sqlite" <<'PY'
+from __future__ import annotations
+import csv
+import sqlite3
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+csv_path = Path(sys.argv[1])
+db_path = Path(sys.argv[2])
+valid = {"O", "X", ""}
+
+def review_count(value: str | None) -> int:
+    try:
+        return max(0, int(value or "0"))
+    except ValueError:
+        return 0
+
+if csv_path.exists():
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS card_progress (
+                card_id TEXT PRIMARY KEY,
+                known_status TEXT NOT NULL DEFAULT '' CHECK (known_status IN ('O', 'X', '')),
+                last_reviewed TEXT NOT NULL DEFAULT '',
+                review_count INTEGER NOT NULL DEFAULT 0 CHECK (review_count >= 0),
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
+        now = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+        imported = 0
+        with csv_path.open(encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                card_id = row.get("id") or ""
+                status = row.get("known_status") or ""
+                if status not in valid:
+                    status = ""
+                last_reviewed = row.get("last_reviewed") or ""
+                count = review_count(row.get("review_count"))
+                if not card_id or not (status or last_reviewed or count > 0):
+                    continue
+                before = conn.total_changes
+                conn.execute(
+                    """
+                    INSERT OR IGNORE INTO card_progress
+                        (card_id, known_status, last_reviewed, review_count, updated_at)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (card_id, status, last_reviewed, count, now),
+                )
+                imported += conn.total_changes - before
+        conn.commit()
+        print(f"progress migration: imported {imported} row(s) from existing remote CSV")
+    finally:
+        conn.close()
+else:
+    print("progress migration: no existing remote CSV")
+PY
+
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
 tar -xzf /tmp/cs-flashcards.tar.gz -C "$REMOTE_DIR"
@@ -96,6 +164,7 @@ Environment=CS_FLASHCARDS_USERNAME=$USERNAME
 Environment=CS_FLASHCARDS_PASSWORD=$PASSWORD
 Environment=CS_FLASHCARD_CSV=$REMOTE_DIR/data/CS_encyclopedia_300plus.csv
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
+Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DIR/state/progress.sqlite
 ExecStart=$REMOTE_DIR/.venv/bin/uvicorn app:app --host 127.0.0.1 --port $REMOTE_PORT
 Restart=always
 RestartSec=3

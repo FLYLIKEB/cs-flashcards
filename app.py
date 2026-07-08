@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import base64
 import csv
+from contextlib import closing
 import hmac
 import os
 import shutil
+import sqlite3
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,7 +19,9 @@ from pydantic import BaseModel, Field
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_CSV_PATH = ROOT / "data" / "CS_encyclopedia_300plus.csv"
+DEFAULT_PROGRESS_DB_PATH = ROOT / "state" / "progress.sqlite"
 CSV_PATH = Path(os.environ.get("CS_FLASHCARD_CSV", DEFAULT_CSV_PATH)).expanduser().resolve()
+PROGRESS_DB_PATH = Path(os.environ.get("CS_FLASHCARD_PROGRESS_DB", DEFAULT_PROGRESS_DB_PATH)).expanduser().resolve()
 BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).expanduser().resolve()
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 REVIEW_COLUMNS = ["known_status", "last_reviewed", "review_count"]
@@ -73,7 +77,23 @@ def ensure_review_columns(fieldnames: list[str] | None) -> list[str]:
     return fields
 
 
-def read_cards(csv_path: Path = CSV_PATH) -> tuple[list[dict[str, str]], list[str]]:
+def normalized_review_count(value: str | None) -> str:
+    try:
+        count = int(value or "0")
+    except ValueError:
+        count = 0
+    return str(max(0, count))
+
+
+def progress_db_for(csv_path: Path, progress_db_path: Path | None = None) -> Path:
+    if progress_db_path is not None:
+        return progress_db_path.expanduser().resolve()
+    if csv_path.resolve() == CSV_PATH:
+        return PROGRESS_DB_PATH
+    return csv_path.with_suffix(".progress.sqlite").resolve()
+
+
+def read_csv_cards(csv_path: Path = CSV_PATH, *, keep_csv_progress: bool = False) -> tuple[list[dict[str, str]], list[str]]:
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
     with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
@@ -84,9 +104,101 @@ def read_cards(csv_path: Path = CSV_PATH) -> tuple[list[dict[str, str]], list[st
             normalized = {field: (row.get(field) or "") for field in fieldnames}
             if normalized.get("known_status") not in VALID_STATUSES:
                 normalized["known_status"] = ""
-            if not normalized.get("review_count"):
+            normalized["review_count"] = normalized_review_count(normalized.get("review_count"))
+            if not keep_csv_progress:
+                normalized["known_status"] = ""
+                normalized["last_reviewed"] = ""
                 normalized["review_count"] = "0"
             rows.append(normalized)
+    return rows, fieldnames
+
+
+def progress_row_is_meaningful(row: dict[str, str]) -> bool:
+    return bool(
+        row.get("known_status") in {"O", "X"}
+        or (row.get("last_reviewed") or "").strip()
+        or int(normalized_review_count(row.get("review_count"))) > 0
+    )
+
+
+def connect_progress_db(progress_db_path: Path) -> sqlite3.Connection:
+    progress_db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(progress_db_path)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA foreign_keys=ON")
+    return conn
+
+
+def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] | None = None) -> None:
+    existed = progress_db_path.exists()
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS card_progress (
+                card_id TEXT PRIMARY KEY,
+                known_status TEXT NOT NULL DEFAULT '' CHECK (known_status IN ('O', 'X', '')),
+                last_reviewed TEXT NOT NULL DEFAULT '',
+                review_count INTEGER NOT NULL DEFAULT 0 CHECK (review_count >= 0),
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
+        if not existed and seed_rows:
+            now = utc_now_iso()
+            conn.executemany(
+                """
+                INSERT OR REPLACE INTO card_progress
+                    (card_id, known_status, last_reviewed, review_count, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                [
+                    (
+                        row["id"],
+                        row.get("known_status") if row.get("known_status") in VALID_STATUSES else "",
+                        row.get("last_reviewed") or "",
+                        int(normalized_review_count(row.get("review_count"))),
+                        now,
+                    )
+                    for row in seed_rows
+                    if row.get("id") and progress_row_is_meaningful(row)
+                ],
+            )
+        conn.commit()
+
+
+def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
+    ensure_progress_db(progress_db_path)
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        rows = conn.execute(
+            "SELECT card_id, known_status, last_reviewed, review_count FROM card_progress"
+        ).fetchall()
+    return {
+        row["card_id"]: {
+            "known_status": row["known_status"] if row["known_status"] in VALID_STATUSES else "",
+            "last_reviewed": row["last_reviewed"] or "",
+            "review_count": normalized_review_count(str(row["review_count"])),
+        }
+        for row in rows
+    }
+
+
+def merge_progress(rows: list[dict[str, str]], progress: dict[str, dict[str, str]]) -> list[dict[str, str]]:
+    merged: list[dict[str, str]] = []
+    for row in rows:
+        item = dict(row)
+        item.update(progress.get(row.get("id", ""), {}))
+        merged.append(item)
+    return merged
+
+
+def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
+    raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
+    clean_rows, _ = read_csv_cards(csv_path, keep_csv_progress=False)
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path, raw_rows)
+    rows = merge_progress(clean_rows, read_progress(db_path))
     return rows, fieldnames
 
 
@@ -117,32 +229,55 @@ def backup_csv(csv_path: Path = CSV_PATH, backup_dir: Path = BACKUP_DIR) -> Path
     return dest
 
 
-def mark_card(card_id: str, status: str, csv_path: Path = CSV_PATH, backup_dir: Path = BACKUP_DIR) -> dict[str, str]:
+def mark_card(
+    card_id: str,
+    status: str,
+    csv_path: Path = CSV_PATH,
+    backup_dir: Path = BACKUP_DIR,
+    progress_db_path: Path | None = None,
+) -> dict[str, str]:
+    del backup_dir  # Progress is stored in SQLite; CSV backup is kept only for backwards-compatible signature.
     if status not in VALID_STATUSES:
         raise ValueError("known_status must be O, X, or empty")
-    rows, fieldnames = read_cards(csv_path)
-    target: dict[str, str] | None = None
-    for row in rows:
-        if row.get("id") == card_id:
-            target = row
-            break
-    if target is None:
+
+    rows, _ = read_cards(csv_path, progress_db_path)
+    if not any(row.get("id") == card_id for row in rows):
         raise KeyError(card_id)
 
-    target["known_status"] = status
-    if status:
-        target["last_reviewed"] = utc_now_iso()
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        existing = conn.execute(
+            "SELECT review_count FROM card_progress WHERE card_id = ?",
+            (card_id,),
+        ).fetchone()
         try:
-            count = int(target.get("review_count") or "0")
-        except ValueError:
+            count = int(existing["review_count"] if existing else 0)
+        except (TypeError, ValueError):
             count = 0
-        target["review_count"] = str(count + 1)
-    else:
-        target["last_reviewed"] = ""
+        last_reviewed = ""
+        if status:
+            count += 1
+            last_reviewed = utc_now_iso()
+        conn.execute(
+            """
+            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, updated_at)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(card_id) DO UPDATE SET
+                known_status = excluded.known_status,
+                last_reviewed = excluded.last_reviewed,
+                review_count = excluded.review_count,
+                updated_at = excluded.updated_at
+            """,
+            (card_id, status, last_reviewed, max(0, count), utc_now_iso()),
+        )
+        conn.commit()
 
-    backup_csv(csv_path, backup_dir)
-    write_cards(rows, fieldnames, csv_path)
-    return target
+    updated_rows, _ = read_cards(csv_path, db_path)
+    for row in updated_rows:
+        if row.get("id") == card_id:
+            return row
+    raise KeyError(card_id)
 
 
 def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
@@ -158,6 +293,7 @@ def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         "unreviewed": unreviewed,
         "categories": categories,
         "csv_path": str(CSV_PATH),
+        "progress_db_path": str(PROGRESS_DB_PATH),
     }
 
 
@@ -169,7 +305,7 @@ def index() -> FileResponse:
 @app.get("/api/cards")
 def api_cards() -> dict[str, Any]:
     try:
-        rows, _ = read_cards(CSV_PATH)
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
@@ -180,8 +316,8 @@ def api_cards() -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/mark")
 def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
     try:
-        card = mark_card(card_id, payload.known_status, CSV_PATH, BACKUP_DIR)
-        rows, _ = read_cards(CSV_PATH)
+        card = mark_card(card_id, payload.known_status, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
@@ -191,4 +327,10 @@ def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
-    return {"ok": True, "csv_path": str(CSV_PATH), "csv_exists": CSV_PATH.exists()}
+    return {
+        "ok": True,
+        "csv_path": str(CSV_PATH),
+        "csv_exists": CSV_PATH.exists(),
+        "progress_db_path": str(PROGRESS_DB_PATH),
+        "progress_db_exists": PROGRESS_DB_PATH.exists(),
+    }
