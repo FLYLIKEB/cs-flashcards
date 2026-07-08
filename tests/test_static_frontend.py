@@ -25,6 +25,7 @@ class StaticFrontendTests(unittest.TestCase):
             'difficulty',
             'bok',
             'statusFilter',
+            'bookmarkFilter',
         ]:
             self.assertIn(field, APP_JS)
         self.assertIn('state.conceptHistory.push(snapshot)', APP_JS)
@@ -47,6 +48,10 @@ class StaticFrontendTests(unittest.TestCase):
             'id="menuBtn"',
             'id="memoListBtn"',
             'id="memoListDialog"',
+            'id="bookmarkListBtn"',
+            'id="bookmarkFilterBtn"',
+            'id="bookmarkListDialog"',
+            'id="bookmarkListBody"',
         ]:
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
@@ -57,6 +62,11 @@ class StaticFrontendTests(unittest.TestCase):
             'function saveMemo()',
             '/memo',
             'function renderMemoList()',
+            'function renderBookmarkList()',
+            'function toggleBookmarkFilter()',
+            'function jumpToBookmarkCard(cardId)',
+            'state.bookmarkFilter',
+            'bookmarkOk',
         ]:
             self.assertIn(snippet, APP_JS)
 

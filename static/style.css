@@ -3799,3 +3799,12 @@ select,
   padding: 0;
   accent-color: var(--accent);
 }
+
+/* Bookmark list/filter menu state. */
+.menu-popover button.active {
+  background: var(--accent);
+  color: #fff;
+}
+.bookmark-list-item .memo-list-term {
+  color: #92400e;
+}

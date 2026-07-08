@@ -21,6 +21,7 @@ const state = {
   controlsCollapsed: localStorage.getItem('controlsCollapsed') !== '0',
   backPage: 0,
   statusFilter: '',
+  bookmarkFilter: false,
   importanceFilter: '',
   difficultyFilter: '',
   bokFilter: '',
@@ -54,6 +55,7 @@ function restoreViewState() {
   if ($('difficultySelect')) $('difficultySelect').value = saved.difficulty || '';
   if ($('bokSelect')) $('bokSelect').value = saved.bok || '';
   state.statusFilter = saved.statusFilter || '';
+  state.bookmarkFilter = Boolean(saved.bookmarkFilter);
   const savedIndex = Number(saved.index);
   state.index = Number.isInteger(savedIndex) && savedIndex >= 0 ? savedIndex : 0;
   updateStatFilterButtons();
@@ -68,6 +70,7 @@ function saveViewState() {
       difficulty: $('difficultySelect')?.value || '',
       bok: $('bokSelect')?.value || '',
       statusFilter: state.statusFilter || '',
+      bookmarkFilter: Boolean(state.bookmarkFilter),
       index: state.index || 0,
     }));
   } catch (_error) {}
@@ -197,6 +200,7 @@ function currentViewSnapshot() {
     difficulty: $('difficultySelect')?.value || '',
     bok: $('bokSelect')?.value || '',
     statusFilter: state.statusFilter || '',
+    bookmarkFilter: Boolean(state.bookmarkFilter),
   };
 }
 
@@ -222,6 +226,7 @@ function restoreViewSnapshot(snapshot) {
   if ($('difficultySelect')) $('difficultySelect').value = snapshot.difficulty || '';
   if ($('bokSelect')) $('bokSelect').value = snapshot.bok || '';
   state.statusFilter = snapshot.statusFilter || '';
+  state.bookmarkFilter = Boolean(snapshot.bookmarkFilter);
   state.index = Number.isInteger(snapshot.index) ? snapshot.index : 0;
   updateStatFilterButtons();
   applyFilters(snapshot.cardId || null);
@@ -268,6 +273,7 @@ function jumpToCard(card, {rememberCurrent = false} = {}) {
   state.difficultyFilter = '';
   state.bokFilter = '';
   state.statusFilter = '';
+  state.bookmarkFilter = false;
   updateStatFilterButtons();
   state.filtered = [...state.cards];
   const found = state.filtered.findIndex((item) => item.id === card.id);
@@ -1400,6 +1406,7 @@ function cardMatchesCurrentFilters(card, {includeStatus = true} = {}) {
   const difficulty = $('difficultySelect')?.value || '';
   const bok = $('bokSelect')?.value || '';
   const status = includeStatus ? state.statusFilter : '';
+  const bookmarkOk = !state.bookmarkFilter || isCardBookmarked(card);
   const haystack = [card.id, card.term, card.english, card.category, card.bok_appeared === 'O' ? '한국은행 한은 BOK' : '', card.importance, card.difficulty, card.definition, card.detailed_explanation, card.related_concepts, card.exam_note, card.memo].join(' ').toLowerCase();
   const statusOk = !status || (status === 'unreviewed' ? !card.known_status : card.known_status === status);
   const bokOk = !bok || (bok === 'O' ? isBokAppeared(card) : !isBokAppeared(card));
@@ -1408,7 +1415,8 @@ function cardMatchesCurrentFilters(card, {includeStatus = true} = {}) {
     && (!importance || card.importance === importance)
     && (!difficulty || card.difficulty === difficulty)
     && bokOk
-    && statusOk;
+    && statusOk
+    && bookmarkOk;
 }
 
 function rowsForHeaderStats() {
@@ -1421,6 +1429,7 @@ function renderStats(summary) {
   $('statUnknown').textContent = summary.unknown;
   $('statUnreviewed').textContent = summary.unreviewed;
   updateStatFilterButtons();
+  updateBookmarkFilterButton();
 }
 
 function isCardBookmarked(card) {
@@ -1435,6 +1444,10 @@ function bookmarkValue(bookmarked) {
 
 function bookmarkedCards() {
   return state.cards.filter((card) => isCardBookmarked(card));
+}
+
+function bookmarkFilteredCards() {
+  return rowsForHeaderStats().filter((card) => isCardBookmarked(card));
 }
 
 function bookmarkedTermsPlainText() {
@@ -1562,8 +1575,13 @@ async function toggleBookmark() {
     const data = await res.json();
     updateCardInCollections(data.card);
     state.summary = data.summary;
-    renderStats(summaryFromRows(rowsForHeaderStats()));
-    renderPersonalControls(data.card);
+    if (state.bookmarkFilter) {
+      applyFilters(data.card.id);
+    } else {
+      renderStats(summaryFromRows(rowsForHeaderStats()));
+      renderPersonalControls(data.card);
+    }
+    if ($('bookmarkListDialog') && !$('bookmarkListDialog').hidden) renderBookmarkList();
     setMessage(`${data.card.term}: 북마크 ${isCardBookmarked(data.card) ? '저장 완료' : '해제 완료'}`);
   } catch (error) {
     updateCardInCollections(previous);
@@ -1621,6 +1639,27 @@ function toggleMenu(open = !state.menuOpen) {
   const button = $('menuBtn');
   if (popover) popover.hidden = !state.menuOpen;
   if (button) button.setAttribute('aria-expanded', String(state.menuOpen));
+  updateBookmarkFilterButton();
+}
+
+function updateBookmarkFilterButton() {
+  const button = $('bookmarkFilterBtn');
+  if (!button) return;
+  const count = bookmarkFilteredCards().length;
+  button.textContent = state.bookmarkFilter ? `북마크 필터 해제 (${count})` : `북마크만 보기 (${count})`;
+  button.classList.toggle('active', state.bookmarkFilter);
+}
+
+function setBookmarkFilter(enabled) {
+  state.bookmarkFilter = Boolean(enabled);
+  state.index = 0;
+  toggleMenu(false);
+  applyFilters();
+  setMessage(state.bookmarkFilter ? '북마크 카드만 표시합니다.' : '북마크 필터를 해제했습니다.');
+}
+
+function toggleBookmarkFilter() {
+  setBookmarkFilter(!state.bookmarkFilter);
 }
 
 function renderMemoList() {
@@ -1652,6 +1691,35 @@ function closeMemoList() {
   if (dialog) dialog.hidden = true;
 }
 
+function renderBookmarkList() {
+  const body = $('bookmarkListBody');
+  if (!body) return;
+  const cards = bookmarkedCards();
+  if (!cards.length) {
+    body.innerHTML = '<p class="muted empty-list">저장된 북마크가 없습니다.</p>';
+    return;
+  }
+  body.innerHTML = cards.map((card) => `
+    <button class="memo-list-item bookmark-list-item" type="button" data-card-id="${escapeHtml(card.id)}">
+      <span class="memo-list-term">★ ${escapeHtml(card.term || card.id)}</span>
+      <span class="memo-list-meta">${escapeHtml(card.category || '')}${card.english ? ' · ' + escapeHtml(card.english) : ''}</span>
+      <span class="memo-list-text">${escapeHtml(card.definition || '')}</span>
+    </button>
+  `).join('');
+}
+
+function openBookmarkList() {
+  toggleMenu(false);
+  renderBookmarkList();
+  const dialog = $('bookmarkListDialog');
+  if (dialog) dialog.hidden = false;
+}
+
+function closeBookmarkList() {
+  const dialog = $('bookmarkListDialog');
+  if (dialog) dialog.hidden = true;
+}
+
 function jumpToMemoCard(cardId) {
   const card = state.cards.find((item) => item.id === cardId);
   if (!card) return;
@@ -1661,6 +1729,15 @@ function jumpToMemoCard(cardId) {
     state.backPage = 1;
     renderCard();
     setMessage(`${card.term} 메모로 이동했습니다.`);
+  }
+}
+
+function jumpToBookmarkCard(cardId) {
+  const card = state.cards.find((item) => item.id === cardId);
+  if (!card) return;
+  closeBookmarkList();
+  if (jumpToCard(card)) {
+    setMessage(`${card.term} 북마크로 이동했습니다.`);
   }
 }
 
@@ -1979,13 +2056,23 @@ $('menuBtn').addEventListener('click', (event) => {
   toggleMenu();
 });
 $('memoListBtn').addEventListener('click', openMemoList);
+$('bookmarkListBtn').addEventListener('click', openBookmarkList);
+$('bookmarkFilterBtn').addEventListener('click', toggleBookmarkFilter);
 $('memoListCloseBtn').addEventListener('click', closeMemoList);
+$('bookmarkListCloseBtn').addEventListener('click', closeBookmarkList);
 $('memoListDialog').addEventListener('click', (event) => {
   if (event.target === $('memoListDialog')) closeMemoList();
+});
+$('bookmarkListDialog').addEventListener('click', (event) => {
+  if (event.target === $('bookmarkListDialog')) closeBookmarkList();
 });
 $('memoListBody').addEventListener('click', (event) => {
   const item = event.target.closest('[data-card-id]');
   if (item) jumpToMemoCard(item.dataset.cardId);
+});
+$('bookmarkListBody').addEventListener('click', (event) => {
+  const item = event.target.closest('[data-card-id]');
+  if (item) jumpToBookmarkCard(item.dataset.cardId);
 });
 document.addEventListener('click', (event) => {
   if (state.menuOpen && !event.target.closest('.header-actions')) toggleMenu(false);
