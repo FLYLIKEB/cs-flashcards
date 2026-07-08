@@ -538,7 +538,7 @@ def api_concept_image(card_id: str) -> Response:
     return Response(
         build_concept_image_svg(card),
         media_type="image/svg+xml",
-        headers={"Cache-Control": "public, max-age=3600"},
+        headers={"Cache-Control": "no-store, max-age=0"},
     )
 
 
