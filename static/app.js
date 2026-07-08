@@ -1124,6 +1124,16 @@ function speakCurrentAndAdvance() {
   speakQueue([...items], moveAudioNext);
 }
 
+function restartCurrentCardSpeech() {
+  if (!state.audioPlaying) return;
+  // Invalidate whatever watchdog/timer chain was scheduled before the
+  // suspension so its late callbacks can't interleave with the fresh one.
+  state.speechToken += 1;
+  clearSpeechTimers();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  speakCurrentAndAdvance();
+}
+
 
 
 function ensureAudioContext() {
@@ -2757,6 +2767,33 @@ document.addEventListener('keydown', (e) => {
   else if (key === 'f' || e.key === '/') { e.preventDefault(); focusSearchInput(); }
   else if (key === 'g') { e.preventDefault(); openCurrentGoogleSearch(e); }
   else if (key === 'b') { e.preventDefault(); toggleBookmark(); }
+});
+
+// iOS Safari (even installed as a home-screen PWA) suspends speechSynthesis
+// itself somewhere around 1-2 minutes after the screen locks, regardless of
+// the background-audio keep-alive trick above -- that part is an OS policy,
+// not something a web page can override. The best available mitigation is
+// to notice on wake that the queue died mid-card and pick back up
+// automatically instead of leaving auto-listen silently stopped.
+let hiddenSinceMs = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    hiddenSinceMs = Date.now();
+    if (state.audioPlaying) ensureBackgroundKeepAliveAudio().play().catch(() => {});
+    return;
+  }
+  if (!state.audioPlaying) return;
+  const wasHiddenMs = hiddenSinceMs ? Date.now() - hiddenSinceMs : 0;
+  hiddenSinceMs = 0;
+  window.speechSynthesis.resume?.();
+  ensureBackgroundKeepAliveAudio().play().catch(() => {});
+  if (wasHiddenMs < 3000) return;
+  window.setTimeout(() => {
+    if (!state.audioPlaying) return;
+    const synth = window.speechSynthesis;
+    if (synth.speaking || synth.pending) return;
+    restartCurrentCardSpeech();
+  }, 400);
 });
 
 applyControlsCollapsed();
