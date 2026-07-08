@@ -1,4 +1,16 @@
 {
+  "redirects": [
+    {
+      "source": "/api/concept-images/:path*",
+      "destination": "/api/health?removed=concept-images",
+      "permanent": false
+    },
+    {
+      "source": "/static/generated/:path*",
+      "destination": "/api/health?removed=static-generated",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/",
