@@ -10,3 +10,6 @@ vercel-proxy/.vercel/
 state/
 *.sqlite
 *.sqlite-*
+
+# Generated concept image assets are rendered dynamically from CSV links.
+static/generated/

@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 import app as flashcard_app
-from app import mark_card, read_cards, read_csv_cards, summarize
+from app import build_concept_image_svg, mark_card, read_cards, read_csv_cards, summarize
 
 
 BASE_FIELDS = [
@@ -45,7 +45,7 @@ def write_sample(
         }
         if include_image:
             row.update({
-                'concept_image_url': '/static/generated/concepts/CS-001.svg',
+                'concept_image_url': '/api/concept-images/CS-001.svg',
                 'concept_image_alt': '테스트 개념 이해 이미지',
             })
         if include_review:
@@ -97,8 +97,22 @@ class FlashcardProgressTests(unittest.TestCase):
             rows, fields = read_cards(csv_path, db_path)
             self.assertIn('concept_image_url', fields)
             self.assertIn('concept_image_alt', fields)
-            self.assertEqual(rows[0]['concept_image_url'], '/static/generated/concepts/CS-001.svg')
+            self.assertEqual(rows[0]['concept_image_url'], '/api/concept-images/CS-001.svg')
             self.assertEqual(rows[0]['concept_image_alt'], '테스트 개념 이해 이미지')
+
+    def test_build_concept_image_svg_uses_card_content(self):
+        svg = build_concept_image_svg({
+            'id': 'CS-001',
+            'term': '테스트',
+            'english': 'Test',
+            'category': '소프트웨어공학',
+            'definition': '요구사항 충족 여부를 검증합니다.',
+            'related_concepts': '[[검증]], [[품질]]',
+        })
+        self.assertIn('<svg', svg)
+        self.assertIn('테스트', svg)
+        self.assertIn('요구사항 충족 여부', svg)
+        self.assertIn('검증', svg)
 
     def test_read_cards_migrates_existing_csv_progress_once(self):
         with tempfile.TemporaryDirectory() as td:
