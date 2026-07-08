@@ -46,6 +46,11 @@ const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speak
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const AI_QUIZ_PROMPT_TYPE_ORDER = ['multiple_choice', 'short', 'subjective', 'essay'];
 const AI_QUIZ_TERM_LIMIT = 80;
+// Silent looping WAV: keeps an <audio> element "audible" while auto-listen is
+// active so mobile browsers treat the tab as playing media and don't freeze
+// its JS timers (which drive the speech queue) when the screen locks or the
+// app is backgrounded.
+const SILENT_KEEP_ALIVE_AUDIO_SRC = 'data:audio/wav;base64,UklGRvQHAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YdAHAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
 
 function readSavedViewState() {
   try {
@@ -1083,6 +1088,7 @@ function speakCurrentAndAdvance() {
   state.backPage = 0;
   state.speechHighlight = null;
   renderCard();
+  updateMediaSessionForCurrentCard();
   if (!items.length) {
     window.setTimeout(moveAudioNext, 220);
     return;
@@ -1247,6 +1253,63 @@ function stopSpeechKeepAlive() {
   }
 }
 
+let backgroundKeepAliveAudio = null;
+
+function ensureBackgroundKeepAliveAudio() {
+  if (backgroundKeepAliveAudio) return backgroundKeepAliveAudio;
+  const audio = new Audio(SILENT_KEEP_ALIVE_AUDIO_SRC);
+  audio.loop = true;
+  // A tiny nonzero volume (not muted, not zero) keeps mobile browsers from
+  // treating the tab as inaudible, which is what lets them exempt it from
+  // background-tab JS throttling/suspension once the screen locks.
+  audio.volume = 0.01;
+  audio.setAttribute('playsinline', 'true');
+  backgroundKeepAliveAudio = audio;
+  return audio;
+}
+
+function startBackgroundPlaybackKeepAlive() {
+  ensureBackgroundKeepAliveAudio().play().catch(() => {});
+  updateMediaSessionForCurrentCard();
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'playing';
+    navigator.mediaSession.setActionHandler('play', () => {
+      if (!state.audioPlaying) startAudioPlayback();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => stopAudioPlayback());
+    navigator.mediaSession.setActionHandler('stop', () => stopAudioPlayback());
+  }
+}
+
+function stopBackgroundPlaybackKeepAlive() {
+  if (backgroundKeepAliveAudio) backgroundKeepAliveAudio.pause();
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'paused';
+    navigator.mediaSession.setActionHandler('play', null);
+    navigator.mediaSession.setActionHandler('pause', null);
+    navigator.mediaSession.setActionHandler('stop', null);
+  }
+}
+
+function updateMediaSessionForCurrentCard() {
+  if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
+  const card = state.filtered[state.index];
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: card?.term || 'CS 플래시카드',
+    artist: `${state.index + 1} / ${state.filtered.length}`,
+    album: 'CS 개념 플래시카드 자동 듣기',
+  });
+}
+
+function scrollCardIntoViewOnMobile() {
+  if (window.innerWidth > 720) return;
+  const card = $('card');
+  if (!card) return;
+  window.requestAnimationFrame(() => {
+    card.scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
+}
+
 function startAudioPlayback() {
   if (!('speechSynthesis' in window)) {
     setMessage('이 브라우저는 음성 합성을 지원하지 않습니다.', true);
@@ -1272,6 +1335,8 @@ function startAudioPlayback() {
   state.audioPlaying = true;
   state.audioListRepeatIndex = 0;
   startSpeechKeepAlive();
+  startBackgroundPlaybackKeepAlive();
+  scrollCardIntoViewOnMobile();
   setAudioButtons();
   speakCurrentAndAdvance();
 }
@@ -1281,6 +1346,7 @@ function stopAudioPlayback(message = '자동 듣기를 정지했습니다.') {
   state.speechToken += 1;
   clearSpeechTimers();
   stopSpeechKeepAlive();
+  stopBackgroundPlaybackKeepAlive();
   state.speechHighlight = null;
   state.speechCurrent = null;
   state.speechUtterance = null;
