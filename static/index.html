@@ -106,7 +106,13 @@
               <option value="2">2.0x</option>
             </select>
           </label>
+          <label class="audio-rate-label audio-voice-label" title="브라우저/기기에 설치된 무료 음성 중 선택">음성
+            <select id="speechVoice">
+              <option value="auto">자동 선택</option>
+            </select>
+          </label>
         </div>
+        <p class="voice-install-hint">더 자연스럽게: 기기 설정에서 한국어 고품질/Siri/Google/Microsoft 음성을 무료로 설치한 뒤 새로고침하세요.</p>
         <div id="audioEstimate" class="audio-estimate" aria-live="polite">예상 재생시간 계산 중...</div>
         <div class="audio-buttons">
           <button id="playAudioBtn" class="has-tip" type="button" title="재생" data-tip="자동 듣기 재생">▶</button>

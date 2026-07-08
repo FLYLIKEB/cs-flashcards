@@ -112,6 +112,15 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertNotIn('id="bookmarkBtn"', mark_row)
         self.assertNotIn('id="copyBookmarksBtn"', mark_row)
 
+    def test_free_tts_naturalness_controls_are_present(self):
+        self.assertIn('id="speechVoice"', INDEX_HTML)
+        self.assertIn('한국어 고품질/Siri/Google/Microsoft 음성', INDEX_HTML)
+        self.assertIn('function populateSpeechVoiceSelect()', APP_JS)
+        self.assertIn('function splitSpeechText(text)', APP_JS)
+        self.assertIn('function expandSpeechItemForPauses(item)', APP_JS)
+        self.assertIn('isPause: true', APP_JS)
+        self.assertIn('window.speechSynthesis.onvoiceschanged = populateSpeechVoiceSelect', APP_JS)
+
 
 if __name__ == '__main__':
     unittest.main()

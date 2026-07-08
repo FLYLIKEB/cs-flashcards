@@ -35,7 +35,7 @@ const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
-const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate'];
+const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate', 'speechVoice'];
 
 function readSavedViewState() {
   try {
@@ -517,31 +517,144 @@ function baseSpeechItemsForCard(card) {
   return items.filter((item) => item.text.replace(/[.\s]/g, '').length > 0);
 }
 
+function speechSegmentPauseMs(segment, item) {
+  if (item.key === 'term') return 0;
+  const text = String(segment || '').trim();
+  if (!text) return 0;
+  if (/[:：]$/.test(text)) return 260;
+  if (/[.!?。！？]$/.test(text)) return isMobileSpeechDevice() ? 460 : 340;
+  if (/[,;，；]$/.test(text)) return 240;
+  return 300;
+}
+
+function splitLongSpeechSegment(segment, maxLength = 120) {
+  const source = String(segment || '').trim();
+  if (source.length <= maxLength) return source ? [source] : [];
+  const clauses = source.split(/(?<=[,;:，；：])\s+/).filter(Boolean);
+  if (clauses.length <= 1) return [source];
+  const chunks = [];
+  let current = '';
+  clauses.forEach((clause) => {
+    const next = current ? `${current} ${clause}` : clause;
+    if (next.length > maxLength && current) {
+      chunks.push(current);
+      current = clause;
+    } else {
+      current = next;
+    }
+  });
+  if (current) chunks.push(current);
+  return chunks;
+}
+
+function splitSpeechText(text) {
+  const source = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!source) return [];
+  const sentenceMatches = source.match(/[^.!?。！？]+[.!?。！？]+|[^.!?。！？]+$/g) || [source];
+  return sentenceMatches.flatMap((sentence) => splitLongSpeechSegment(sentence.trim())).filter(Boolean);
+}
+
+function expandSpeechItemForPauses(item) {
+  if (item.key === 'term') return [item];
+  const fullTargetText = String(item.targetText || item.text || '').trim();
+  const segments = splitSpeechText(fullTargetText);
+  if (segments.length <= 1) return [item];
+  const prefix = String(item.text || '').slice(0, item.prefixLength || 0);
+  const expanded = [];
+  let targetOffset = 0;
+  segments.forEach((segment, index) => {
+    const offset = fullTargetText.indexOf(segment, targetOffset);
+    const safeOffset = offset >= 0 ? offset : targetOffset;
+    expanded.push({
+      ...item,
+      text: `${index === 0 ? prefix : ''}${segment}`,
+      targetText: segment,
+      fullTargetText,
+      targetOffset: safeOffset,
+      prefixLength: index === 0 ? prefix.length : 0,
+      speechSegmentIndex: index,
+    });
+    targetOffset = safeOffset + segment.length;
+    if (index < segments.length - 1) {
+      expanded.push({isPause: true, pauseMs: speechSegmentPauseMs(segment, item), key: item.key, detailLabel: item.detailLabel});
+    }
+  });
+  return expanded;
+}
+
 function speechItemsForCard(card) {
   const baseItems = baseSpeechItemsForCard(card);
   const items = [];
   for (let repeat = 0; repeat < cardRepeatCount(); repeat += 1) {
-    baseItems.forEach((item) => items.push({...item, cardRepeatIndex: repeat}));
+    baseItems.forEach((item) => {
+      expandSpeechItemForPauses({...item, cardRepeatIndex: repeat}).forEach((expanded) => items.push(expanded));
+    });
   }
   return items;
 }
 
 function hasPlayableSpeechItems() {
-  return state.filtered.some((card) => speechItemsForCard(card).length > 0);
+  return state.filtered.some((card) => speechItemsForCard(card).some((item) => !item.isPause));
 }
 
+function voiceIdentity(voice) {
+  return [voice.voiceURI, voice.name, voice.lang].filter(Boolean).join('||');
+}
+
+function isKoreanVoice(voice) {
+  return /ko|Korean|한국|한국어/i.test(`${voice.lang} ${voice.name}`);
+}
+
+function selectedSpeechVoiceId() {
+  return $('speechVoice')?.value || 'auto';
+}
+
+function populateSpeechVoiceSelect() {
+  const select = $('speechVoice');
+  if (!select || !('speechSynthesis' in window)) return;
+  const saved = (() => {
+    try { return JSON.parse(localStorage.getItem(AUDIO_SETTINGS_KEY) || '{}').speechVoice; } catch (_error) { return null; }
+  })();
+  const previous = select.value && select.value !== 'auto' ? select.value : saved;
+  const voices = window.speechSynthesis.getVoices?.() || [];
+  const sorted = [...voices].sort((a, b) => {
+    const ak = isKoreanVoice(a) ? 0 : 1;
+    const bk = isKoreanVoice(b) ? 0 : 1;
+    if (ak !== bk) return ak - bk;
+    return `${a.lang} ${a.name}`.localeCompare(`${b.lang} ${b.name}`, 'ko');
+  });
+  select.innerHTML = '<option value="auto">자동 선택</option>';
+  sorted.forEach((voice) => {
+    const option = document.createElement('option');
+    option.value = voiceIdentity(voice);
+    const qualityHint = voice.localService ? '기기' : '브라우저';
+    option.textContent = `${isKoreanVoice(voice) ? '🇰🇷 ' : ''}${voice.name} · ${voice.lang || '언어 미상'} · ${qualityHint}`;
+    select.appendChild(option);
+  });
+  if (previous && [...select.options].some((option) => option.value === String(previous))) {
+    select.value = String(previous);
+  }
+}
 
 function preferredVoiceForItem(_item) {
   const voices = window.speechSynthesis?.getVoices?.() || [];
   if (!voices.length) return null;
-  const koreanVoices = voices.filter((voice) => /ko|Korean|한국|한국어/i.test(`${voice.lang} ${voice.name}`));
+  const selected = selectedSpeechVoiceId();
+  if (selected && selected !== 'auto') {
+    const exact = voices.find((voice) => voiceIdentity(voice) === selected)
+      || voices.find((voice) => voice.voiceURI === selected || voice.name === selected);
+    if (exact) return exact;
+  }
+  const koreanVoices = voices.filter(isKoreanVoice);
   const pool = koreanVoices.length ? koreanVoices : voices;
-  return pool.find((voice) => /female|여성|woman|heami|yuna|유나/i.test(voice.name))
+  return pool.find((voice) => /female|여성|woman|heami|yuna|유나|siri|google|microsoft/i.test(voice.name))
     || pool[0];
 }
 
-function speechPitchForItem(_item) {
-  return 1;
+function speechPitchForItem(item) {
+  if (item.key === 'term') return 1;
+  if (item.key === 'definition') return 0.98;
+  return 0.96;
 }
 
 function speechRateForItem(item) {
@@ -551,11 +664,18 @@ function speechRateForItem(item) {
 
 function estimateSpeechSecondsForOneListPass() {
   if (!state.filtered.length) return 0;
+  let pauseSeconds = 0;
   const chars = state.filtered.reduce((total, card) => {
-    return total + speechItemsForCard(card).reduce((sum, item) => sum + item.text.replace(/\s+/g, '').length, 0);
+    return total + speechItemsForCard(card).reduce((sum, item) => {
+      if (item.isPause) {
+        pauseSeconds += (item.pauseMs || 0) / 1000;
+        return sum;
+      }
+      return sum + String(item.text || '').replace(/\s+/g, '').length;
+    }, 0);
   }, 0);
   const baseCharsPerSecond = 7.2;
-  const speechSeconds = chars / (baseCharsPerSecond * speechRate());
+  const speechSeconds = chars / (baseCharsPerSecond * speechRate()) + pauseSeconds;
   const transitionSeconds = Math.max(0, state.filtered.length - 1) * 0.62;
   const chimeSeconds = state.filtered.length * 0.26;
   return Math.ceil(speechSeconds + transitionSeconds + chimeSeconds);
@@ -646,6 +766,7 @@ function setSpeechFallbackTimer(callback, delay) {
 }
 
 function estimatedItemDurationMs(item) {
+  if (item.isPause) return item.pauseMs || 0;
   const compactLength = Math.max(1, String(item.text || '').replace(/\s+/g, '').length);
   const charsPerSecond = item.key === 'term' ? 5.8 : 6.8;
   const seconds = compactLength / (charsPerSecond * speechRateForItem(item));
@@ -667,10 +788,11 @@ function setSpeechCurrentCharIndex(charIndex, {nativeBoundary = false} = {}) {
   const current = state.speechCurrent;
   if (!current) return false;
   const nextCharIndex = Math.max(0, charIndex || 0);
-  const source = String(current.targetText || current.text || '');
-  const nextWordStart = speechWordStartForCharIndex(source, nextCharIndex);
+  const source = String(current.fullTargetText || current.targetText || current.text || '');
+  const absoluteCharIndex = (current.targetOffset || 0) + nextCharIndex;
+  const nextWordStart = speechWordStartForCharIndex(source, absoluteCharIndex);
   const previousWordStart = current.wordStart;
-  current.charIndex = nextCharIndex;
+  current.charIndex = absoluteCharIndex;
   current.wordStart = nextWordStart;
   if (nativeBoundary && !current.usesNativeBoundary) {
     current.usesNativeBoundary = true;
@@ -745,6 +867,11 @@ function speakQueue(items, done) {
     done();
     return;
   }
+  if (item.isPause) {
+    const pauseMs = Math.max(0, item.pauseMs || 0);
+    setSpeechTimer(() => speakQueue(items, done), pauseMs);
+    return;
+  }
   const token = ++state.speechToken;
   let finished = false;
   let started = false;
@@ -769,8 +896,8 @@ function speakQueue(items, done) {
   state.speechHighlight = item.key;
   state.speechCurrent = {
     ...item,
-    charIndex: 0,
-    wordStart: speechWordStartForCharIndex(item.targetText || item.text || '', 0),
+    charIndex: item.targetOffset || 0,
+    wordStart: speechWordStartForCharIndex(item.fullTargetText || item.targetText || item.text || '', item.targetOffset || 0),
     usesNativeBoundary: false,
   };
   state.flipped = item.key !== 'term';
@@ -1026,6 +1153,7 @@ function startAudioPlayback() {
   }
   unlockAudioContext();
   window.speechSynthesis.cancel();
+  populateSpeechVoiceSelect();
   window.speechSynthesis.getVoices();
   if (!state.filtered.length) {
     setMessage('재생할 카드가 없습니다.', true);
@@ -2084,6 +2212,10 @@ $('collapsedStopBtn').addEventListener('click', () => stopAudioPlayback());
 AUDIO_SETTING_IDS.forEach((id) => {
   $(id)?.addEventListener('change', onAudioSettingChanged);
 });
+if ('speechSynthesis' in window) {
+  populateSpeechVoiceSelect();
+  window.speechSynthesis.onvoiceschanged = populateSpeechVoiceSelect;
+}
 $('searchInput').addEventListener('input', () => { state.index = 0; applyFilters(); });
 $('searchInput').addEventListener('keydown', returnFocusFromSearchInput);
 ['frontGoogleSearchLink', 'backGoogleSearchLink'].forEach((id) => {
@@ -2159,6 +2291,7 @@ document.addEventListener('keydown', (e) => {
 
 applyControlsCollapsed();
 restoreAudioSettings();
+populateSpeechVoiceSelect();
 updateRandomButtons();
 
 loadCards().catch((err) => {

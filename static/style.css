@@ -144,6 +144,17 @@ input:focus, select:focus {
   background: var(--surface-soft);
 }
 
+
+.audio-voice-label {
+  grid-column: 1 / -1;
+}
+.voice-install-hint {
+  margin: -.18rem 0 .04rem;
+  color: rgba(60, 60, 67, .68);
+  font-size: .74rem;
+  line-height: 1.42;
+}
+
 .audio-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
 .audio-buttons button {
   color: var(--text);
