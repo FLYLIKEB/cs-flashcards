@@ -21,6 +21,10 @@ const state = {
   difficultyFilter: '',
   bokFilter: '',
   randomMode: false,
+  bottomSearchGesture: null,
+  lastBottomSearchAt: 0,
+  renderedCardId: null,
+  renderedFlipped: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -240,6 +244,67 @@ function openCurrentGoogleSearch(event = null) {
     try { if (opened) opened.opener = null; } catch (_error) {}
   }, 800);
   setMessage('검색을 열고 CS 카드로 포커스를 되돌렸습니다.');
+}
+
+function bottomSearchScrollTarget(target) {
+  const scrollArea = target?.closest?.('.back-scroll');
+  return scrollArea || document.scrollingElement || document.documentElement;
+}
+
+function isAtScrollBottom(element) {
+  if (!element) return false;
+  if (element === document.scrollingElement || element === document.documentElement || element === document.body) {
+    return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+  }
+  return element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
+}
+
+function isBottomSearchGestureTarget(target) {
+  if (!target?.closest) return false;
+  if (target.closest('input, select, textarea, button, a')) return false;
+  return Boolean(target.closest('.study-area, #card, .back-scroll'));
+}
+
+function handleBottomSearchTouchStart(event) {
+  if (!isMobileSpeechDevice() || event.touches.length !== 1 || !isBottomSearchGestureTarget(event.target)) {
+    state.bottomSearchGesture = null;
+    return;
+  }
+  const touch = event.touches[0];
+  state.bottomSearchGesture = {
+    startY: touch.clientY,
+    lastY: touch.clientY,
+    startAt: Date.now(),
+    scrollTarget: bottomSearchScrollTarget(event.target),
+    armed: false,
+  };
+}
+
+function handleBottomSearchTouchMove(event) {
+  const gesture = state.bottomSearchGesture;
+  if (!gesture || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  gesture.lastY = touch.clientY;
+  const upwardDistance = gesture.startY - touch.clientY;
+  const elapsed = Math.max(1, Date.now() - gesture.startAt);
+  const fastEnough = upwardDistance / elapsed > 0.34 || upwardDistance > 180;
+  if (upwardDistance > 115 && fastEnough && isAtScrollBottom(gesture.scrollTarget)) {
+    gesture.armed = true;
+  }
+}
+
+function handleBottomSearchTouchEnd() {
+  const gesture = state.bottomSearchGesture;
+  state.bottomSearchGesture = null;
+  if (!gesture) return;
+  const upwardDistance = gesture.startY - gesture.lastY;
+  const elapsed = Math.max(1, Date.now() - gesture.startAt);
+  const strongFinalPull = upwardDistance > 115 && (upwardDistance / elapsed > 0.34 || upwardDistance > 180);
+  if (!gesture.armed && !(strongFinalPull && isAtScrollBottom(gesture.scrollTarget))) return;
+  const now = Date.now();
+  if (now - state.lastBottomSearchAt < 1800) return;
+  state.lastBottomSearchAt = now;
+  openCurrentGoogleSearch();
 }
 
 
@@ -1142,13 +1207,17 @@ function advanceAfterMark(markedId) {
   renderCard();
 }
 
+function resetBackScroll() {
+  const scrollArea = document.querySelector('.back-scroll');
+  if (scrollArea) scrollArea.scrollTop = 0;
+}
+
 function setBackPage(page) {
   const nextPage = Math.max(0, Math.min(1, page));
   if (nextPage === state.backPage) return;
   state.backPage = nextPage;
   renderBackPage();
-  const scrollArea = document.querySelector('.back-scroll');
-  if (scrollArea) scrollArea.scrollTop = 0;
+  resetBackScroll();
 }
 
 function renderBackPage() {
@@ -1216,10 +1285,14 @@ function renderCard() {
     renderConceptImage(null);
     $('conceptGraph').innerHTML = '<div class="graph-empty muted">표시할 그래프가 없습니다.</div>';
     ['frontGoogleSearchLink', 'backGoogleSearchLink'].forEach((id) => { $(id).href = '#'; });
+    state.renderedCardId = null;
+    state.renderedFlipped = false;
+    resetBackScroll();
     return;
   }
 
   const c = state.filtered[state.index];
+  const shouldResetBackScroll = state.renderedCardId !== c.id || (state.flipped && !state.renderedFlipped);
   applyCategoryTheme(c.category);
   applyFrontIllustration(c);
   $('frontCategory').textContent = categoryLabel(c.category);
@@ -1264,6 +1337,9 @@ function renderCard() {
   $('conceptGraph').innerHTML = renderConceptGraph(c);
   bindConceptGraphNodes();
   applySpeechHighlight();
+  if (shouldResetBackScroll) resetBackScroll();
+  state.renderedCardId = c.id;
+  state.renderedFlipped = state.flipped;
 }
 
 
@@ -1412,6 +1488,10 @@ function reloadFromLogo(event) {
 
 $('logoRefreshBtn').addEventListener('click', reloadFromLogo);
 $('logoRefreshBtn').addEventListener('touchend', reloadFromLogo, {passive: false});
+document.addEventListener('touchstart', handleBottomSearchTouchStart, {passive: true});
+document.addEventListener('touchmove', handleBottomSearchTouchMove, {passive: true});
+document.addEventListener('touchend', handleBottomSearchTouchEnd, {passive: true});
+document.addEventListener('touchcancel', () => { state.bottomSearchGesture = null; }, {passive: true});
 document.querySelectorAll('[data-status-filter]').forEach((button) => button.addEventListener('click', () => setStatusFilter(button.dataset.statusFilter)));
 $('controlsToggle').addEventListener('click', toggleControlsPanel);
 $('positionInput').addEventListener('change', () => jumpFromInput());
