@@ -3466,5 +3466,4 @@ select,
 @media (max-width: 720px) {
   .concept-image-wrap { margin: .42rem 0 .55rem; border-radius: 14px; }
   .concept-image { max-height: 180px; }
-  .concept-image-caption { font-size: .72rem; padding: .34rem .55rem .42rem; }
 }
