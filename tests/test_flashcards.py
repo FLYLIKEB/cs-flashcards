@@ -43,6 +43,23 @@ class FlashcardCsvTests(unittest.TestCase):
             self.assertEqual(summary['unknown'], 0)
             self.assertEqual(summary['unreviewed'], 0)
 
+    def test_mark_card_can_reset_to_unreviewed(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            backup_dir = root / 'backups'
+            write_sample(csv_path)
+            marked = mark_card('CS-001', 'X', csv_path, backup_dir)
+            self.assertEqual(marked['known_status'], 'X')
+            reset = mark_card('CS-001', '', csv_path, backup_dir)
+            self.assertEqual(reset['known_status'], '')
+            self.assertEqual(reset['last_reviewed'], '')
+            rows, _ = read_cards(csv_path)
+            summary = summarize(rows)
+            self.assertEqual(summary['known'], 0)
+            self.assertEqual(summary['unknown'], 0)
+            self.assertEqual(summary['unreviewed'], 1)
+
 
     def test_optional_basic_auth_helper(self):
         original_user = flashcard_app.PUBLIC_USERNAME

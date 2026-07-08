@@ -3375,3 +3375,46 @@ select,
   height: .96rem;
   fill: currentColor;
 }
+
+
+/* Stable speech underline: avoid layout shifts while the current word changes. */
+.current-word {
+  display: inline;
+  font-weight: inherit;
+  line-height: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(rgba(36, 54, 79, .36), rgba(36, 54, 79, .36));
+  background-repeat: no-repeat;
+  background-size: 100% .12em;
+  background-position: 0 calc(100% - .04em);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.front-term-line.speaking-section,
+.back-term-line.speaking-section {
+  padding: 0;
+  min-height: unset;
+}
+.term-line h2,
+.detail-card p,
+#definition,
+#examNote,
+.chip {
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+
+/* Three-way review marking: O / X / unreviewed. */
+.mark-row {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.unreviewed {
+  color: #475569;
+  background: linear-gradient(180deg, rgba(241, 245, 249, .96), rgba(226, 232, 240, .92));
+}
+.mark:disabled {
+  cursor: wait;
+  opacity: .62;
+  transform: none !important;
+}

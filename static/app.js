@@ -5,6 +5,7 @@ const state = {
   flipped: false,
   summary: null,
   audioPlaying: false,
+  markSaving: false,
   speechHighlight: null,
   speechCurrent: null,
   speechUtterance: null,
@@ -302,6 +303,18 @@ function updateAudioEstimate() {
   el.textContent = `≈ ${formatDuration(seconds)} · ${state.filtered.length}`;
 }
 
+function isMobileSpeechDevice() {
+  const ua = navigator.userAgent || '';
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(ua)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function nextSpeechDelayMs() {
+  // Mobile browsers can keep ducking TTS for a moment after a WebAudio cue.
+  // Leave a wider quiet gap before advancing to the next card name.
+  return isMobileSpeechDevice() ? 540 : 360;
+}
+
 
 function clearSpeechTimers() {
   state.speechTimers.forEach((timer) => window.clearTimeout(timer));
@@ -355,7 +368,9 @@ function createUtterance(item, token, markStarted, finish, fail) {
   utterance.pitch = speechPitchForItem(item);
   utterance.onstart = () => {
     markStarted();
-    if (item.key === 'term') playCardStartSound();
+    // Do not overlap WebAudio chimes with short term utterances on mobile;
+    // iOS/Android commonly duck or clip the beginning of TTS in that case.
+    if (item.key === 'term' && !isMobileSpeechDevice()) playCardStartSound();
   };
   utterance.onboundary = (event) => {
     markStarted();
@@ -617,7 +632,7 @@ function moveAudioNext() {
     return;
   }
   state.index += 1;
-  window.setTimeout(speakCurrentAndAdvance, 360);
+  window.setTimeout(speakCurrentAndAdvance, nextSpeechDelayMs());
 }
 
 function startSpeechKeepAlive() {
@@ -698,7 +713,7 @@ function parseRelated(text) {
 function detailedSections(text) {
   const source = String(text || '').trim();
   if (!source) return [];
-  const labels = ['의미', '동작/활용', '관련 개념', '구분 포인트', '시험 대비'];
+  const labels = ['의미', '동작/활용', '활용', '관련 개념', '구분 포인트', '시험 대비'];
   return labels.map((label, index) => {
     const start = source.indexOf(`${label}:`);
     if (start < 0) return null;
@@ -767,6 +782,7 @@ function currentWordHtml(text, key, detailLabel = null, terms = []) {
 function detailMeta(label) {
   return {
     '의미': {icon: '○', title: '의미'},
+    '활용': {icon: '⌁', title: '활용'},
     '동작/활용': {icon: '⌁', title: '활용'},
     '관련 개념': {icon: '↔', title: '연결'},
     '구분 포인트': {icon: '◇', title: '구분'},
@@ -899,6 +915,38 @@ function renderStats(summary) {
   $('statUnknown').textContent = summary.unknown;
   $('statUnreviewed').textContent = summary.unreviewed;
   updateStatFilterButtons();
+}
+
+function localSummary() {
+  const known = state.cards.filter((card) => card.known_status === 'O').length;
+  const unknown = state.cards.filter((card) => card.known_status === 'X').length;
+  return {
+    ...(state.summary || {}),
+    total: state.cards.length,
+    known,
+    unknown,
+    unreviewed: state.cards.length - known - unknown,
+  };
+}
+
+function setMarkButtonsDisabled(disabled) {
+  ['knownBtn', 'unknownBtn', 'unreviewedBtn'].forEach((id) => {
+    const button = $(id);
+    if (button) button.disabled = disabled;
+  });
+}
+
+function advanceAfterMark(markedId) {
+  if (!state.filtered.length) return;
+  const currentIndex = state.filtered.findIndex((card) => card.id === markedId);
+  if (currentIndex >= 0 && state.filtered.length > 1) {
+    state.index = (currentIndex + 1) % state.filtered.length;
+  } else {
+    state.index = Math.min(state.index, state.filtered.length - 1);
+  }
+  state.flipped = false;
+  state.backPage = 0;
+  renderCard();
 }
 
 function setBackPage(page) {
@@ -1057,25 +1105,54 @@ function randomCard() {
 }
 
 async function mark(status) {
-  if (!state.filtered.length) return;
+  if (!state.filtered.length || state.markSaving) return;
   const current = state.filtered[state.index];
-  setMessage('CSV 저장 중...');
-  const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/mark`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({known_status: status}),
-  });
-  if (!res.ok) {
-    setMessage(`저장 실패: ${await res.text()}`, true);
-    return;
-  }
-  const data = await res.json();
   const idx = state.cards.findIndex((c) => c.id === current.id);
-  if (idx >= 0) state.cards[idx] = data.card;
-  renderStats(data.summary);
-  applyFilters(data.card.id);
+  const previous = idx >= 0 ? {...state.cards[idx]} : {...current};
+  const optimistic = {...previous, known_status: status};
+  if (status) {
+    optimistic.last_reviewed = new Date().toISOString();
+    optimistic.review_count = String((Number.parseInt(previous.review_count || '0', 10) || 0) + 1);
+  } else {
+    optimistic.last_reviewed = '';
+  }
+
+  state.markSaving = true;
+  setMarkButtonsDisabled(true);
+  if (idx >= 0) state.cards[idx] = optimistic;
+  const filteredIdx = state.filtered.findIndex((c) => c.id === current.id);
+  if (filteredIdx >= 0) state.filtered[filteredIdx] = optimistic;
+  renderStats(localSummary());
+  applyFilters(current.id);
+  advanceAfterMark(current.id);
   playMarkSound(status);
-  setMessage(`${data.card.term}: ${statusLabel(status)}`);
+  setMessage(`${optimistic.term}: ${statusLabel(status)} 저장 중...`);
+
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/mark`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({known_status: status}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const savedIdx = state.cards.findIndex((c) => c.id === current.id);
+    if (savedIdx >= 0) state.cards[savedIdx] = data.card;
+    state.summary = data.summary;
+    renderStats(data.summary);
+    applyFilters(data.card.id);
+    advanceAfterMark(data.card.id);
+    setMessage(`${data.card.term}: ${statusLabel(status)} 저장 완료`);
+  } catch (error) {
+    const restoreIdx = state.cards.findIndex((c) => c.id === current.id);
+    if (restoreIdx >= 0) state.cards[restoreIdx] = previous;
+    renderStats(localSummary());
+    applyFilters(current.id);
+    setMessage(`저장 실패: ${error.message || error}`, true);
+  } finally {
+    state.markSaving = false;
+    setMarkButtonsDisabled(false);
+  }
 }
 
 cardEl.addEventListener('click', (e) => {
@@ -1121,6 +1198,7 @@ $('backPageNext').addEventListener('click', () => setBackPage(state.backPage + 1
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
 $('knownBtn').addEventListener('click', () => mark('O'));
 $('unknownBtn').addEventListener('click', () => mark('X'));
+$('unreviewedBtn').addEventListener('click', () => mark(''));
 $('playAudioBtn').addEventListener('click', startAudioPlayback);
 $('stopAudioBtn').addEventListener('click', () => stopAudioPlayback());
 $('collapsedPlayBtn').addEventListener('click', startAudioPlayback);
@@ -1171,8 +1249,8 @@ document.addEventListener('keydown', (e) => {
   else if (state.flipped && e.key === 'ArrowDown') { e.preventDefault(); setBackPage(state.backPage + 1); }
   else if (e.key === 'ArrowLeft') move(-1);
   else if (e.key === 'ArrowRight') move(1);
-  else if (e.key.toLowerCase() === 'o') mark('O');
-  else if (e.key.toLowerCase() === 'x') mark('X');
+  else if (e.key.toLowerCase() === 'o' || e.key === '.') mark('O');
+  else if (e.key.toLowerCase() === 'x' || e.key === '/') { e.preventDefault(); mark('X'); }
   else if (e.key.toLowerCase() === 'r') toggleRandomMode();
   else if (e.key.toLowerCase() === 'f') { e.preventDefault(); $('searchInput').focus(); }
 });

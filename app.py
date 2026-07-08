@@ -30,7 +30,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 class MarkRequest(BaseModel):
-    known_status: str = Field(pattern="^(O|X)$")
+    known_status: str = Field(pattern="^(O|X|)$")
 
 
 def is_authorized(authorization: str | None) -> bool:
@@ -118,8 +118,8 @@ def backup_csv(csv_path: Path = CSV_PATH, backup_dir: Path = BACKUP_DIR) -> Path
 
 
 def mark_card(card_id: str, status: str, csv_path: Path = CSV_PATH, backup_dir: Path = BACKUP_DIR) -> dict[str, str]:
-    if status not in {"O", "X"}:
-        raise ValueError("known_status must be O or X")
+    if status not in VALID_STATUSES:
+        raise ValueError("known_status must be O, X, or empty")
     rows, fieldnames = read_cards(csv_path)
     target: dict[str, str] | None = None
     for row in rows:
@@ -130,12 +130,15 @@ def mark_card(card_id: str, status: str, csv_path: Path = CSV_PATH, backup_dir: 
         raise KeyError(card_id)
 
     target["known_status"] = status
-    target["last_reviewed"] = utc_now_iso()
-    try:
-        count = int(target.get("review_count") or "0")
-    except ValueError:
-        count = 0
-    target["review_count"] = str(count + 1)
+    if status:
+        target["last_reviewed"] = utc_now_iso()
+        try:
+            count = int(target.get("review_count") or "0")
+        except ValueError:
+            count = 0
+        target["review_count"] = str(count + 1)
+    else:
+        target["last_reviewed"] = ""
 
     backup_csv(csv_path, backup_dir)
     write_cards(rows, fieldnames, csv_path)
