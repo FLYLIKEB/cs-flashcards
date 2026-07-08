@@ -17,6 +17,8 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions
+
 ROOT = Path(__file__).resolve().parent
 DEFAULT_CSV_PATH = ROOT / "data" / "CS_encyclopedia_300plus.csv"
 DEFAULT_PROGRESS_DB_PATH = ROOT / "state" / "progress.sqlite"
@@ -43,6 +45,13 @@ class BookmarkRequest(BaseModel):
 
 class MemoRequest(BaseModel):
     memo: str = Field(default="", max_length=20000)
+
+
+class QuestionGenerateRequest(BaseModel):
+    card_ids: list[str] | None = None
+    types: list[str] | None = None
+    count: int = Field(default=10, ge=1, le=100)
+    seed: int | None = None
 
 
 def is_authorized(authorization: str | None) -> bool:
@@ -460,6 +469,38 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {"card": card, "summary": summarize(rows)}
+
+
+@app.post("/api/questions/generate")
+def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
+    try:
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        return generate_questions(
+            rows,
+            card_ids=payload.card_ids,
+            types=payload.types,
+            count=payload.count,
+            seed=payload.seed,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {exc}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.get("/api/questions/types")
+def api_question_types() -> dict[str, Any]:
+    return {
+        "types": [
+            {"value": "short", "label": "주관식"},
+            {"value": "subjective", "label": "서술형"},
+            {"value": "multiple_choice", "label": "객관식"},
+            {"value": "essay", "label": "논술형"},
+        ],
+        "supported": list(SUPPORTED_QUESTION_TYPES),
+    }
 
 
 @app.get("/api/health")

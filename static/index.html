@@ -163,8 +163,47 @@
         </select>
         <div class="study-toggles" aria-label="학습 토글">
           <button id="shuffleBtn" class="has-tip study-toggle" type="button" title="랜덤 모드" data-tip="랜덤 모드">↯</button>
+          <button id="questionModeBtn" class="has-tip study-toggle" type="button" title="문제 풀이 모드" data-tip="문제 풀이">문제</button>
         </div>
       </div>
+
+      <section id="questionPanel" class="question-panel" aria-label="문제 풀이" hidden>
+        <div class="question-toolbar">
+          <div>
+            <strong>문제 풀이</strong>
+            <p id="questionSummary" class="muted">현재 필터 기준으로 문제를 생성합니다.</p>
+          </div>
+          <div class="question-toolbar-actions">
+            <label class="question-count-label" title="문제 수">
+              <span>문제 수</span>
+              <select id="questionCountSelect">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="40">40</option>
+              </select>
+            </label>
+            <button id="generateQuestionsBtn" type="button">생성</button>
+            <button id="closeQuestionModeBtn" type="button" aria-label="문제 풀이 닫기">닫기</button>
+          </div>
+        </div>
+        <div class="question-type-row" aria-label="문제 유형 선택">
+          <label><input id="questionTypeShort" type="checkbox" value="short" checked /> 주관식</label>
+          <label><input id="questionTypeSubjective" type="checkbox" value="subjective" checked /> 서술형</label>
+          <label><input id="questionTypeMultipleChoice" type="checkbox" value="multiple_choice" checked /> 객관식</label>
+          <label><input id="questionTypeEssay" type="checkbox" value="essay" checked /> 논술형</label>
+        </div>
+        <article id="questionCard" class="question-card" aria-live="polite">
+          <div class="question-card-empty muted">문제 생성을 누르면 현재 필터의 카드들로 문제가 만들어집니다.</div>
+        </article>
+        <div class="question-actions">
+          <button id="prevQuestionBtn" type="button">이전</button>
+          <button id="revealAnswerBtn" type="button">정답/해설 보기</button>
+          <button id="nextQuestionBtn" type="button">다음</button>
+          <button id="openQuestionCardBtn" type="button">원본 카드 보기</button>
+        </div>
+      </section>
+
 
       <article id="card" class="flashcard" tabindex="0" aria-label="플래시카드. 클릭하면 뒤집힙니다.">
         <div class="card-quick-actions" aria-label="카드 빠른 작업">

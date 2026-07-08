@@ -29,6 +29,12 @@ const state = {
   conceptHistory: [],
   renderedCardId: null,
   renderedFlipped: false,
+  questionMode: false,
+  questionLoading: false,
+  questions: [],
+  questionIndex: 0,
+  answerRevealed: false,
+  selectedChoiceIndex: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -1956,6 +1962,186 @@ function jumpToBookmarkCard(cardId) {
   }
 }
 
+
+function selectedQuestionTypes() {
+  const checked = [...document.querySelectorAll('.question-type-row input[type="checkbox"]:checked')].map((input) => input.value);
+  return checked.length ? checked : ['short', 'subjective', 'multiple_choice', 'essay'];
+}
+
+function currentQuestion() {
+  return state.questions[state.questionIndex] || null;
+}
+
+function questionTypeBadge(question) {
+  if (!question) return '';
+  return question.type_label || ({
+    short: '주관식',
+    subjective: '서술형',
+    multiple_choice: '객관식',
+    essay: '논술형',
+  }[question.type] || question.type || '문제');
+}
+
+function setQuestionControlsDisabled(disabled) {
+  ['generateQuestionsBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect'].forEach((id) => {
+    const element = $(id);
+    if (element) element.disabled = disabled;
+  });
+  document.querySelectorAll('.question-type-row input').forEach((input) => { input.disabled = disabled; });
+}
+
+function renderQuestionPanel() {
+  const panel = $('questionPanel');
+  if (!panel) return;
+  panel.hidden = !state.questionMode;
+  document.body.classList.toggle('question-mode-active', state.questionMode);
+  const summary = $('questionSummary');
+  const card = $('questionCard');
+  updateRandomButtons();
+  if (!state.questionMode) return;
+  setQuestionControlsDisabled(state.questionLoading);
+  const total = state.questions.length;
+  const question = currentQuestion();
+  if (summary) {
+    const filterCount = state.filtered.length;
+    summary.textContent = state.questionLoading
+      ? '문제 생성 중...'
+      : total
+        ? `${state.questionIndex + 1} / ${total} · 현재 필터 카드 ${filterCount}개 기준`
+        : `현재 필터 카드 ${filterCount}개 기준 · 생성 버튼을 누르세요.`;
+  }
+  if (!card) return;
+  if (state.questionLoading) {
+    card.innerHTML = '<div class="question-card-empty muted">문제를 생성하는 중입니다...</div>';
+    return;
+  }
+  if (!question) {
+    card.innerHTML = '<div class="question-card-empty muted">문제 생성을 누르면 현재 필터의 카드들로 문제가 만들어집니다.</div>';
+    return;
+  }
+
+  const choices = Array.isArray(question.choices) ? question.choices : [];
+  const choiceHtml = choices.length ? `
+    <ol class="question-choices">
+      ${choices.map((choice, index) => {
+        const isAnswer = state.answerRevealed && index === question.answer_index;
+        const isSelected = index === state.selectedChoiceIndex;
+        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}">${escapeHtml(choice)}</button></li>`;
+      }).join('')}
+    </ol>` : '';
+  const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
+    <div class="question-rubric">
+      <strong>채점 포인트</strong>
+      <ul>${question.rubric.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>` : '';
+  const answer = state.answerRevealed ? `
+    <div class="question-answer">
+      <strong>정답/모범답안</strong>
+      <p>${escapeHtml(question.answer || '')}</p>
+      ${question.explanation ? `<p class="question-explanation">${escapeHtml(question.explanation)}</p>` : ''}
+      ${rubric}
+    </div>` : '';
+  card.innerHTML = `
+    <div class="question-meta">
+      <span class="badge">${escapeHtml(questionTypeBadge(question))}</span>
+      <span class="badge">${escapeHtml(question.category || '미분류')}</span>
+      <span class="badge">${escapeHtml(question.card_id || '')}</span>
+    </div>
+    <h2>${escapeHtml(question.prompt || '문제')}</h2>
+    <p class="question-body">${escapeHtml(question.body || '')}</p>
+    ${choiceHtml}
+    ${answer}
+  `;
+  $('prevQuestionBtn').disabled = state.questionLoading || state.questionIndex <= 0;
+  $('nextQuestionBtn').disabled = state.questionLoading || state.questionIndex >= total - 1;
+  $('revealAnswerBtn').disabled = state.questionLoading || !question;
+  $('openQuestionCardBtn').disabled = state.questionLoading || !question;
+}
+
+async function generateQuestionsFromCurrentFilter() {
+  if (state.questionLoading) return;
+  if (!state.filtered.length) {
+    setMessage('문제를 만들 카드가 없습니다. 필터를 바꿔주세요.', true);
+    return;
+  }
+  state.questionMode = true;
+  state.questionLoading = true;
+  state.answerRevealed = false;
+  state.selectedChoiceIndex = null;
+  renderQuestionPanel();
+  try {
+    const res = await fetch('/api/questions/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        card_ids: state.filtered.map((card) => card.id),
+        types: selectedQuestionTypes(),
+        count: Number.parseInt($('questionCountSelect')?.value || '10', 10) || 10,
+        seed: Date.now(),
+      }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    state.questions = data.questions || [];
+    state.questionIndex = 0;
+    setMessage(`문제 ${state.questions.length}개 생성 완료`);
+  } catch (error) {
+    state.questions = [];
+    setMessage(`문제 생성 실패: ${error.message || error}`, true);
+  } finally {
+    state.questionLoading = false;
+    renderQuestionPanel();
+  }
+}
+
+function toggleQuestionMode(force = !state.questionMode) {
+  if (state.audioPlaying) stopAudioPlayback('문제 풀이 모드로 전환해 자동 듣기를 정지했습니다.');
+  state.questionMode = Boolean(force);
+  if (!state.questionMode) {
+    renderQuestionPanel();
+    setMessage('문제 풀이 모드를 닫았습니다.');
+    return;
+  }
+  renderQuestionPanel();
+  if (!state.questions.length) generateQuestionsFromCurrentFilter();
+}
+
+function revealQuestionAnswer() {
+  if (!currentQuestion()) return;
+  state.answerRevealed = true;
+  renderQuestionPanel();
+}
+
+function moveQuestion(delta) {
+  if (!state.questions.length) return;
+  state.questionIndex = Math.max(0, Math.min(state.questions.length - 1, state.questionIndex + delta));
+  state.answerRevealed = false;
+  state.selectedChoiceIndex = null;
+  renderQuestionPanel();
+}
+
+function openQuestionSourceCard() {
+  const question = currentQuestion();
+  if (!question) return;
+  const card = state.cards.find((item) => item.id === question.card_id);
+  if (!card) {
+    setMessage('원본 카드를 찾지 못했습니다.', true);
+    return;
+  }
+  toggleQuestionMode(false);
+  jumpToCard(card);
+  state.flipped = true;
+  renderCard();
+  setMessage(`${card.term} 원본 카드로 이동했습니다.`);
+}
+
+function selectQuestionChoice(index) {
+  state.selectedChoiceIndex = index;
+  const question = currentQuestion();
+  if (question?.type === 'multiple_choice') state.answerRevealed = true;
+  renderQuestionPanel();
+}
+
 function advanceAfterMark(markedId) {
   if (!state.filtered.length) return;
   const currentIndex = state.filtered.findIndex((card) => card.id === markedId);
@@ -2007,6 +2193,13 @@ function applyFilters(keepCurrentId = null) {
   state.backPage = 0;
   renderCard();
   renderStats(summaryFromRows(rowsForHeaderStats()));
+  if (state.questionMode) {
+    state.questions = [];
+    state.questionIndex = 0;
+    state.answerRevealed = false;
+    state.selectedChoiceIndex = null;
+    renderQuestionPanel();
+  }
   updateAudioEstimate();
 }
 
@@ -2116,11 +2309,12 @@ function escapeHtml(value) {
 }
 
 function updateRandomButtons() {
-  ['shuffleBtn'].forEach((id) => {
+  ['shuffleBtn', 'questionModeBtn'].forEach((id) => {
     const button = $(id);
     if (!button) return;
-    button.classList.toggle('active', state.randomMode);
-    button.setAttribute('aria-pressed', String(state.randomMode));
+    const active = id === 'shuffleBtn' ? state.randomMode : state.questionMode;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
   });
 }
 
@@ -2252,6 +2446,17 @@ $('conceptBackBtn')?.addEventListener('click', (event) => {
   goBackToPreviousConcept();
 });
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
+$('questionModeBtn')?.addEventListener('click', () => toggleQuestionMode());
+$('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
+$('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(false));
+$('prevQuestionBtn')?.addEventListener('click', () => moveQuestion(-1));
+$('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
+$('revealAnswerBtn')?.addEventListener('click', revealQuestionAnswer);
+$('openQuestionCardBtn')?.addEventListener('click', openQuestionSourceCard);
+$('questionCard')?.addEventListener('click', (event) => {
+  const choice = event.target.closest('[data-choice-index]');
+  if (choice) selectQuestionChoice(Number.parseInt(choice.dataset.choiceIndex, 10));
+});
 $('knownBtn').addEventListener('click', () => mark('O'));
 $('unknownBtn').addEventListener('click', () => mark('X'));
 $('unreviewedBtn').addEventListener('click', () => mark(''));
@@ -2378,6 +2583,12 @@ document.addEventListener('keydown', (e) => {
   }
 
   const key = e.key.toLowerCase();
+  if (state.questionMode) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); moveQuestion(-1); return; }
+    if (e.key === 'ArrowRight') { e.preventDefault(); moveQuestion(1); return; }
+    if (e.key === ' ') { e.preventDefault(); revealQuestionAnswer(); return; }
+    if (key === 'q') { e.preventDefault(); toggleQuestionMode(false); return; }
+  }
   if (e.key === ' ') { e.preventDefault(); state.flipped = !state.flipped; if (state.flipped) state.backPage = 0; renderCard(); }
   else if (state.flipped && e.key === 'ArrowUp') { e.preventDefault(); setBackPage(state.backPage - 1); }
   else if (state.flipped && e.key === 'ArrowDown') { e.preventDefault(); setBackPage(state.backPage + 1); }

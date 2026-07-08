@@ -124,6 +124,21 @@ python3 scripts/generate_concept_images.py --write-csv
 
 `CS_FLASHCARD_IMAGE_PUBLIC_BASE_URL`을 생략하면 스크립트는 `https://<bucket>.s3.<region>.amazonaws.com/<prefix>` 형식의 URL을 사용합니다. GitHub Actions 배포에서도 같은 이름의 secret/variable을 설정하면 배포 전 이미지 생성·S3 업로드·CSV URL 갱신을 자동 수행합니다.
 
+## 문제 풀이 모드
+
+앱 상단의 `문제` 버튼을 누르면 현재 검색·카테고리·중요도·난이도·한은·O/X·북마크 필터 결과를 기준으로 문제를 생성합니다.
+
+지원 유형:
+
+| 유형 | 생성 기준 | 용도 |
+| --- | --- | --- |
+| 주관식 | `definition`을 보고 `term` 맞히기 | 개념명 회상 |
+| 객관식 | 정답 카드 1개와 관련/동일 카테고리 오답 3개 | 빠른 확인 |
+| 서술형 | `definition`, `detailed_explanation`, `exam_note` | 면접식 설명 연습 |
+| 논술형 | 관련 개념 비교와 채점 포인트 포함 | 긴 답안 구조화 |
+
+백엔드 API는 `/api/questions/generate`이며, 문제는 CSV 원본을 수정하지 않고 즉석 생성합니다. 정답률 저장은 아직 카드 O/X와 분리되어 있으며, 필요하면 추후 별도 SQLite 테이블로 확장합니다.
+
 ## 내용을 수정하고 반영하기
 
 카드의 용어, 요약, 상세설명, 한국은행 출제 여부, 중요도, 난이도 같은 콘텐츠는 아래 CSV에 있습니다. O/X, 마지막 학습 시각, 복습 횟수는 SQLite 진행상태 DB에 따로 저장되므로 CSV를 수정/배포해도 학습 상태가 원복되지 않습니다.

@@ -136,5 +136,30 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('window.speechSynthesis.onvoiceschanged = populateSpeechVoiceSelect', APP_JS)
 
 
+    def test_question_practice_controls_are_present(self):
+        for snippet in [
+            'id="questionModeBtn"',
+            'id="questionPanel"',
+            'id="questionTypeShort"',
+            'id="questionTypeSubjective"',
+            'id="questionTypeMultipleChoice"',
+            'id="questionTypeEssay"',
+            'id="generateQuestionsBtn"',
+            'id="revealAnswerBtn"',
+            'id="openQuestionCardBtn"',
+        ]:
+            self.assertIn(snippet, INDEX_HTML)
+        for snippet in [
+            'questionMode: false',
+            'function generateQuestionsFromCurrentFilter()',
+            '/api/questions/generate',
+            'function renderQuestionPanel()',
+            'function revealQuestionAnswer()',
+            'function openQuestionSourceCard()',
+            'question-mode-active',
+        ]:
+            self.assertIn(snippet, APP_JS)
+
+
 if __name__ == '__main__':
     unittest.main()
