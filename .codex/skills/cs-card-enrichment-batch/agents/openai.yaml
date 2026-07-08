@@ -1,0 +1,6 @@
+interface:
+  display_name: "CS 카드 대량 고도화"
+  short_description: "친절한 학습형 설명으로 플래시카드 보강·검증"
+  default_prompt: "Use $cs-card-enrichment-batch 로 CS 플래시카드를 친절한 학습형 설명으로 보강하고 JSONL 결과를 검증해줘."
+policy:
+  allow_implicit_invocation: true
