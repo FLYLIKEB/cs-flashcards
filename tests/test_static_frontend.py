@@ -111,6 +111,7 @@ class StaticFrontendTests(unittest.TestCase):
             'function saveCurrentAudioPreset()',
             'function applyAudioPreset(presetId)',
             'function deleteAudioPreset(presetId)',
+            'renderAudioPresets();',
             "$('audioPresetSaveBtn')?.addEventListener('click', saveCurrentAudioPreset)",
             "$('audioPresetNameInput')?.addEventListener('keydown'",
             "$('audioPresetList')?.addEventListener('click'",

@@ -2664,6 +2664,7 @@ document.addEventListener('keydown', (e) => {
 
 applyControlsCollapsed();
 restoreAudioSettings();
+renderAudioPresets();
 populateSpeechVoiceSelect();
 updateRandomButtons();
 
