@@ -3819,3 +3819,73 @@ select,
 .bookmark-list-item .memo-list-term {
   color: #92400e;
 }
+
+/* Audio setting presets shown at the bottom of the open playback sidebar. */
+.audio-preset-panel {
+  display: grid;
+  gap: .48rem;
+  padding: .56rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+.audio-preset-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  color: var(--accent);
+  font-size: .82rem;
+  font-weight: 850;
+}
+.audio-preset-header button {
+  padding: .38rem .56rem;
+  border-radius: 10px;
+  border: 1px solid rgba(31, 58, 95, .16);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: .76rem;
+  font-weight: 820;
+}
+.audio-preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .38rem;
+  min-height: 1.8rem;
+}
+.audio-preset-empty {
+  color: var(--muted);
+  font-size: .78rem;
+  align-self: center;
+}
+.audio-preset-item {
+  display: inline-flex;
+  align-items: stretch;
+}
+.audio-preset-apply,
+.audio-preset-delete {
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--text);
+  font-size: .78rem;
+  font-weight: 760;
+}
+.audio-preset-apply {
+  padding: .42rem .58rem;
+  border-radius: 999px 0 0 999px;
+}
+.audio-preset-delete {
+  min-width: 1.7rem;
+  padding: .42rem .48rem;
+  border-left: 0;
+  border-radius: 0 999px 999px 0;
+  color: var(--muted);
+}
+.audio-preset-apply:hover,
+.audio-preset-delete:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.controls.collapsed .audio-preset-panel {
+  display: none;
+}

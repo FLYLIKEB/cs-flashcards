@@ -118,6 +118,13 @@
           <button id="playAudioBtn" class="has-tip" type="button" title="재생" data-tip="자동 듣기 재생">▶</button>
           <button id="stopAudioBtn" class="has-tip" type="button" title="정지" data-tip="자동 듣기 정지">■</button>
         </div>
+        <div class="audio-preset-panel" aria-label="재생 설정 프리셋">
+          <div class="audio-preset-header">
+            <span>프리셋</span>
+            <button id="audioPresetSaveBtn" type="button">현재 설정 저장</button>
+          </div>
+          <div id="audioPresetList" class="audio-preset-list" aria-live="polite"></div>
+        </div>
       </div>
 
       <p class="hint">Space · ←/→ · ↑/↓ · O/X · Enter 재생/중지 · / 검색 · G 구글</p>

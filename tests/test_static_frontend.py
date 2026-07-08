@@ -80,6 +80,8 @@ class StaticFrontendTests(unittest.TestCase):
             'value="infinite"',
             'id="speakDetailMeaning"',
             'id="speakDetailUsage"',
+            'id="audioPresetSaveBtn"',
+            'id="audioPresetList"',
         ]:
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
@@ -100,6 +102,13 @@ class StaticFrontendTests(unittest.TestCase):
             'hasPlayableSpeechItems()',
             'state.index = 0',
             'restoreAudioSettings()',
+            'AUDIO_PRESETS_KEY',
+            'function collectAudioSettings()',
+            'function applyAudioSettings(settings = {})',
+            'function renderAudioPresets()',
+            'function saveCurrentAudioPreset()',
+            'function applyAudioPreset(presetId)',
+            'function deleteAudioPreset(presetId)',
         ]:
             self.assertIn(snippet, APP_JS)
 

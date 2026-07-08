@@ -35,6 +35,7 @@ const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
+const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
 const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate', 'speechVoice'];
 
 function readSavedViewState() {
@@ -445,31 +446,111 @@ function termSpeechText(card) {
   return korean;
 }
 
+function collectAudioSettings() {
+  const settings = {};
+  AUDIO_SETTING_IDS.forEach((id) => {
+    const element = $(id);
+    if (!element) return;
+    settings[id] = element.type === 'checkbox' ? element.checked : element.value;
+  });
+  return settings;
+}
+
+function applyAudioSettings(settings = {}) {
+  AUDIO_SETTING_IDS.forEach((id) => {
+    const element = $(id);
+    if (!element || !(id in settings)) return;
+    if (element.type === 'checkbox') {
+      element.checked = Boolean(settings[id]);
+    } else if ([...element.options].some((option) => option.value === String(settings[id]))) {
+      element.value = String(settings[id]);
+    }
+  });
+}
+
 function saveAudioSettings() {
   try {
-    const settings = {};
-    AUDIO_SETTING_IDS.forEach((id) => {
-      const element = $(id);
-      if (!element) return;
-      settings[id] = element.type === 'checkbox' ? element.checked : element.value;
-    });
-    localStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(settings));
+    localStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(collectAudioSettings()));
   } catch (_error) {}
 }
 
 function restoreAudioSettings() {
   try {
-    const settings = JSON.parse(localStorage.getItem(AUDIO_SETTINGS_KEY) || '{}');
-    AUDIO_SETTING_IDS.forEach((id) => {
-      const element = $(id);
-      if (!element || !(id in settings)) return;
-      if (element.type === 'checkbox') {
-        element.checked = Boolean(settings[id]);
-      } else if ([...element.options].some((option) => option.value === String(settings[id]))) {
-        element.value = String(settings[id]);
-      }
-    });
+    applyAudioSettings(JSON.parse(localStorage.getItem(AUDIO_SETTINGS_KEY) || '{}'));
   } catch (_error) {}
+}
+
+function loadAudioPresets() {
+  try {
+    const presets = JSON.parse(localStorage.getItem(AUDIO_PRESETS_KEY) || '[]');
+    return Array.isArray(presets) ? presets.filter((preset) => preset && preset.id && preset.name && preset.settings) : [];
+  } catch (_error) {
+    return [];
+  }
+}
+
+function saveAudioPresets(presets) {
+  try {
+    localStorage.setItem(AUDIO_PRESETS_KEY, JSON.stringify(presets));
+  } catch (_error) {}
+}
+
+function renderAudioPresets() {
+  const list = $('audioPresetList');
+  if (!list) return;
+  const presets = loadAudioPresets();
+  if (!presets.length) {
+    list.innerHTML = '<span class="audio-preset-empty">저장된 프리셋 없음</span>';
+    return;
+  }
+  list.innerHTML = presets.map((preset) => `
+    <span class="audio-preset-item">
+      <button class="audio-preset-apply" type="button" data-preset-id="${escapeHtml(preset.id)}">${escapeHtml(preset.name)}</button>
+      <button class="audio-preset-delete" type="button" data-preset-delete="${escapeHtml(preset.id)}" aria-label="${escapeHtml(preset.name)} 프리셋 삭제">×</button>
+    </span>
+  `).join('');
+}
+
+function saveCurrentAudioPreset() {
+  const presets = loadAudioPresets();
+  const defaultName = `프리셋 ${presets.length + 1}`;
+  const rawName = window.prompt('저장할 재생 설정 프리셋 이름을 입력하세요.', defaultName);
+  const name = String(rawName || '').trim();
+  if (!name) return;
+  const nextPreset = {
+    id: `preset-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name,
+    settings: collectAudioSettings(),
+    updatedAt: new Date().toISOString(),
+  };
+  const existingIndex = presets.findIndex((preset) => preset.name === name);
+  if (existingIndex >= 0) {
+    nextPreset.id = presets[existingIndex].id;
+    presets[existingIndex] = nextPreset;
+  } else {
+    presets.push(nextPreset);
+  }
+  saveAudioPresets(presets.slice(-20));
+  renderAudioPresets();
+  setMessage(`${name} 프리셋을 저장했습니다.`);
+}
+
+function applyAudioPreset(presetId) {
+  const preset = loadAudioPresets().find((item) => item.id === presetId);
+  if (!preset) return;
+  applyAudioSettings(preset.settings || {});
+  saveAudioSettings();
+  updateAudioEstimate();
+  setMessage(`${preset.name} 프리셋을 적용했습니다.`);
+}
+
+function deleteAudioPreset(presetId) {
+  const presets = loadAudioPresets();
+  const target = presets.find((preset) => preset.id === presetId);
+  const next = presets.filter((preset) => preset.id !== presetId);
+  saveAudioPresets(next);
+  renderAudioPresets();
+  if (target) setMessage(`${target.name} 프리셋을 삭제했습니다.`);
 }
 
 function onAudioSettingChanged() {
