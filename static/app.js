@@ -1052,36 +1052,20 @@ function conceptImageAlt(card) {
 function renderConceptImage(card) {
   const wrap = $('backConceptImageWrap');
   const image = $('backConceptImage');
-  const caption = $('backConceptImageCaption');
   if (!wrap || !image) return;
 
   const url = conceptImageUrl(card);
-  if (!url) {
+  if (!url || !isDirectImageUrl(url)) {
     wrap.hidden = true;
-    wrap.classList.remove('concept-link-only');
     image.removeAttribute('src');
     image.alt = '';
     image.hidden = false;
-    if (caption) caption.textContent = '';
     return;
   }
 
-  const label = `${card.term || card.english || '개념'} 이미지 검색`;
-  if (isDirectImageUrl(url)) {
-    wrap.classList.remove('concept-link-only');
-    image.hidden = false;
-    image.src = url;
-    image.alt = conceptImageAlt(card);
-    if (caption) caption.textContent = `${card.term || card.english || '개념'} 핵심 이미지`;
-  } else {
-    wrap.classList.add('concept-link-only');
-    image.hidden = true;
-    image.removeAttribute('src');
-    image.alt = '';
-    if (caption) {
-      caption.innerHTML = `<a class="concept-image-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)} ↗</a>`;
-    }
-  }
+  image.hidden = false;
+  image.src = url;
+  image.alt = conceptImageAlt(card);
   wrap.hidden = false;
 }
 

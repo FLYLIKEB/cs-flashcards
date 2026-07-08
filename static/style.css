@@ -3463,33 +3463,6 @@ select,
   object-fit: contain;
   background: #fff;
 }
-.concept-image-wrap.concept-link-only {
-  background: linear-gradient(135deg, #fff, var(--cat-bg, var(--surface-soft)) 125%);
-}
-.concept-image-wrap.concept-link-only .concept-image {
-  display: none;
-}
-.concept-image-caption {
-  padding: .42rem .7rem .5rem;
-  color: var(--muted);
-  border-top: 1px solid rgba(31, 58, 95, .08);
-  font-size: .78rem;
-  font-weight: 760;
-  letter-spacing: -.02em;
-}
-.concept-link-only .concept-image-caption {
-  border-top: 0;
-  padding: .7rem .8rem;
-}
-.concept-image-link {
-  display: block;
-  color: var(--accent);
-  text-decoration: none;
-}
-.concept-image-link:hover {
-  text-decoration: underline;
-}
-
 @media (max-width: 720px) {
   .concept-image-wrap { margin: .42rem 0 .55rem; border-radius: 14px; }
   .concept-image { max-height: 180px; }
