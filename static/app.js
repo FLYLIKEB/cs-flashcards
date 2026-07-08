@@ -801,7 +801,7 @@ function estimateSpeechSecondsForOneListPass() {
         pauseSeconds += (item.pauseMs || 0) / 1000;
         return sum;
       }
-      return sum + String(item.text || '').replace(/\s+/g, '').length;
+      return sum + spellOutUppercaseAcronyms(item.text).replace(/\s+/g, '').length;
     }, 0);
   }, 0);
   const baseCharsPerSecond = 7.2;
@@ -897,7 +897,7 @@ function setSpeechFallbackTimer(callback, delay) {
 
 function estimatedItemDurationMs(item) {
   if (item.isPause) return item.pauseMs || 0;
-  const compactLength = Math.max(1, String(item.text || '').replace(/\s+/g, '').length);
+  const compactLength = Math.max(1, spellOutUppercaseAcronyms(item.text).replace(/\s+/g, '').length);
   const charsPerSecond = item.key === 'term' ? 5.8 : 6.8;
   const seconds = compactLength / (charsPerSecond * speechRateForItem(item));
   return Math.max(850, Math.ceil(seconds * 1000) + 450);
@@ -946,6 +946,12 @@ function scheduleFallbackWordHighlight(item, token) {
   });
 }
 
+function spellOutUppercaseAcronyms(text) {
+  // "TCP" as a whole word gets mangled or skipped by most Korean TTS
+  // voices; reading each letter separately ("T. C. P.") is intelligible.
+  return String(text || '').replace(/\b[A-Z]{2,}\b/g, (word) => `${word.split('').join('. ')}.`);
+}
+
 function speechStartFailureMessage() {
   const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   if (isAppleMobile) return '모바일에서 음성이 시작되지 않았습니다. 화면의 ▶ 버튼을 다시 눌러 음성을 허용해 주세요.';
@@ -953,7 +959,7 @@ function speechStartFailureMessage() {
 }
 
 function createUtterance(item, token, markStarted, finish, fail) {
-  const utterance = new SpeechSynthesisUtterance(item.text);
+  const utterance = new SpeechSynthesisUtterance(spellOutUppercaseAcronyms(item.text));
   utterance.lang = 'ko-KR';
   const preferredVoice = preferredVoiceForItem(item);
   if (preferredVoice) utterance.voice = preferredVoice;
