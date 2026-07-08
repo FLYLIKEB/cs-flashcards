@@ -300,6 +300,13 @@ input:focus, select:focus {
 .status.o { color: var(--known); background: var(--known-soft); border-color: rgba(23, 107, 77, .18); }
 .status.x { color: var(--unknown); background: var(--unknown-soft); border-color: rgba(159, 47, 63, .18); }
 
+.bok-badge {
+  color: #0f766e;
+  background: #ecfdf5;
+  border-color: rgba(15, 118, 110, .22);
+  font-weight: 900;
+}
+
 .rating {
   font-weight: 900;
   letter-spacing: -.02em;

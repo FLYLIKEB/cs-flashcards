@@ -16,6 +16,9 @@ const state = {
   controlsCollapsed: localStorage.getItem('controlsCollapsed') !== '0',
   backPage: 0,
   statusFilter: '',
+  importanceFilter: '',
+  difficultyFilter: '',
+  bokFilter: '',
   randomMode: false,
 };
 
@@ -132,6 +135,12 @@ function jumpToCard(card) {
   if (!card) return false;
   $('searchInput').value = '';
   if ($('categorySelect')) $('categorySelect').value = '';
+  if ($('importanceSelect')) $('importanceSelect').value = '';
+  if ($('difficultySelect')) $('difficultySelect').value = '';
+  if ($('bokSelect')) $('bokSelect').value = '';
+  state.importanceFilter = '';
+  state.difficultyFilter = '';
+  state.bokFilter = '';
   state.statusFilter = '';
   updateStatFilterButtons();
   state.filtered = [...state.cards];
@@ -692,6 +701,18 @@ function stopAudioPlayback(message = '자동 듣기를 정지했습니다.') {
   setMessage(message);
 }
 
+function isBokAppeared(card) {
+  return String(card?.bok_appeared || '').trim().toUpperCase() === 'O';
+}
+
+function setBokBadge(id, card) {
+  const el = $(id);
+  if (!el) return;
+  const visible = isBokAppeared(card);
+  el.hidden = !visible;
+  el.textContent = '한은';
+  el.title = '한국은행 기출/면접 출처 포함';
+}
 
 function ratingValue(value) {
   return ['상', '중', '하'].includes(String(value || '').trim()) ? String(value).trim() : '중';
@@ -906,7 +927,6 @@ async function loadCards() {
   state.summary = data.summary;
   buildCategoryOptions(data.summary.categories || []);
   applyFilters();
-  renderStats(data.summary);
   $('csvPath').textContent = data.summary.csv_path;
   setAudioButtons();
   updateAudioEstimate();
@@ -932,24 +952,24 @@ function buildCategoryOptions(categories) {
   $('categorySelect').value = categories.includes(current) ? current : '';
 }
 
+function summaryFromRows(rows) {
+  const known = rows.filter((card) => card.known_status === 'O').length;
+  const unknown = rows.filter((card) => card.known_status === 'X').length;
+  return {
+    ...(state.summary || {}),
+    total: rows.length,
+    known,
+    unknown,
+    unreviewed: rows.length - known - unknown,
+  };
+}
+
 function renderStats(summary) {
   $('statTotal').textContent = summary.total;
   $('statKnown').textContent = summary.known;
   $('statUnknown').textContent = summary.unknown;
   $('statUnreviewed').textContent = summary.unreviewed;
   updateStatFilterButtons();
-}
-
-function localSummary() {
-  const known = state.cards.filter((card) => card.known_status === 'O').length;
-  const unknown = state.cards.filter((card) => card.known_status === 'X').length;
-  return {
-    ...(state.summary || {}),
-    total: state.cards.length,
-    known,
-    unknown,
-    unreviewed: state.cards.length - known - unknown,
-  };
 }
 
 function setMarkButtonsDisabled(disabled) {
@@ -994,11 +1014,23 @@ function applyFilters(keepCurrentId = null) {
   if (state.audioPlaying) stopAudioPlayback('필터가 바뀌어 자동 듣기를 정지했습니다.');
   const query = $('searchInput').value.trim().toLowerCase();
   const category = $('categorySelect')?.value || '';
+  state.importanceFilter = $('importanceSelect')?.value || '';
+  state.difficultyFilter = $('difficultySelect')?.value || '';
+  state.bokFilter = $('bokSelect')?.value || '';
   const status = state.statusFilter;
+  const importance = state.importanceFilter;
+  const difficulty = state.difficultyFilter;
+  const bok = state.bokFilter;
   state.filtered = state.cards.filter((c) => {
-    const haystack = [c.id, c.term, c.english, c.category, c.importance, c.difficulty, c.definition, c.detailed_explanation, c.related_concepts, c.exam_note].join(' ').toLowerCase();
+    const haystack = [c.id, c.term, c.english, c.category, c.bok_appeared === 'O' ? '한국은행 한은 BOK' : '', c.importance, c.difficulty, c.definition, c.detailed_explanation, c.related_concepts, c.exam_note].join(' ').toLowerCase();
     const statusOk = !status || (status === 'unreviewed' ? !c.known_status : c.known_status === status);
-    return (!query || haystack.includes(query)) && (!category || c.category === category) && statusOk;
+    const bokOk = !bok || (bok === 'O' ? isBokAppeared(c) : !isBokAppeared(c));
+    return (!query || haystack.includes(query))
+      && (!category || c.category === category)
+      && (!importance || c.importance === importance)
+      && (!difficulty || c.difficulty === difficulty)
+      && bokOk
+      && statusOk;
   });
   if (keepCurrentId) {
     const found = state.filtered.findIndex((c) => c.id === keepCurrentId);
@@ -1009,6 +1041,7 @@ function applyFilters(keepCurrentId = null) {
   state.flipped = false;
   state.backPage = 0;
   renderCard();
+  renderStats(summaryFromRows(state.filtered));
   updateAudioEstimate();
 }
 
@@ -1026,6 +1059,8 @@ function renderCard() {
     $('frontStatus').textContent = '-';
     $('frontImportance').textContent = '-';
     $('frontDifficulty').textContent = '-';
+    setBokBadge('frontBok', null);
+    setBokBadge('backBok', null);
     applyCategoryTheme('');
     applyFrontIllustration({term: '카드 없음', english: '', category: ''});
     $('conceptGraph').innerHTML = '<div class="graph-empty muted">표시할 그래프가 없습니다.</div>';
@@ -1038,6 +1073,8 @@ function renderCard() {
   applyFrontIllustration(c);
   $('frontCategory').textContent = categoryLabel(c.category);
   $('frontStatus').textContent = statusLabel(c.known_status);
+  setBokBadge('frontBok', c);
+  setBokBadge('backBok', c);
   $('frontImportance').textContent = importanceLabel(c.importance);
   $('frontDifficulty').textContent = difficultyLabel(c.difficulty);
   $('frontCategory').className = `badge category-badge ${categoryMeta(c.category).className}`;
@@ -1159,7 +1196,6 @@ async function mark(status) {
   if (idx >= 0) state.cards[idx] = optimistic;
   const filteredIdx = state.filtered.findIndex((c) => c.id === current.id);
   if (filteredIdx >= 0) state.filtered[filteredIdx] = optimistic;
-  renderStats(localSummary());
   applyFilters(current.id);
   advanceAfterMark(current.id);
   playMarkSound(status);
@@ -1176,14 +1212,12 @@ async function mark(status) {
     const savedIdx = state.cards.findIndex((c) => c.id === current.id);
     if (savedIdx >= 0) state.cards[savedIdx] = data.card;
     state.summary = data.summary;
-    renderStats(data.summary);
     applyFilters(data.card.id);
     advanceAfterMark(data.card.id);
     setMessage(`${data.card.term}: ${statusLabel(status)} 저장 완료`);
   } catch (error) {
     const restoreIdx = state.cards.findIndex((c) => c.id === current.id);
     if (restoreIdx >= 0) state.cards[restoreIdx] = previous;
-    renderStats(localSummary());
     applyFilters(current.id);
     setMessage(`저장 실패: ${error.message || error}`, true);
   } finally {
@@ -1244,7 +1278,9 @@ $('collapsedStopBtn').addEventListener('click', () => stopAudioPlayback());
   $(id).addEventListener('change', updateAudioEstimate);
 });
 $('searchInput').addEventListener('input', () => { state.index = 0; applyFilters(); });
-$('categorySelect').addEventListener('change', () => { state.index = 0; applyFilters(); });
+['categorySelect', 'importanceSelect', 'difficultySelect', 'bokSelect'].forEach((id) => {
+  $(id)?.addEventListener('change', () => { state.index = 0; applyFilters(); });
+});
 function goToConceptTerm(term) {
   const card = findCardByConcept(term);
   if (!jumpToCard(card)) {

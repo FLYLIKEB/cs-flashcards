@@ -11,7 +11,7 @@ from app import mark_card, read_cards, read_csv_cards, summarize
 
 BASE_FIELDS = [
     'id', 'term', 'english', 'category', 'definition', 'detailed_explanation',
-    'related_concepts', 'source_files', 'exam_note', 'importance', 'difficulty',
+    'related_concepts', 'source_files', 'exam_note', 'bok_appeared', 'importance', 'difficulty',
 ]
 REVIEW_FIELDS = ['known_status', 'last_reviewed', 'review_count']
 
@@ -31,6 +31,7 @@ def write_sample(path: Path, *, include_review: bool = False, status: str = '', 
             'related_concepts': '[[검증]]',
             'source_files': 'sample.md',
             'exam_note': '포인트',
+            'bok_appeared': 'O',
             'importance': '상',
             'difficulty': '중',
         }
@@ -68,8 +69,10 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = Path(td) / 'progress.sqlite'
             write_sample(csv_path)
             rows, fields = read_cards(csv_path, db_path)
+            self.assertIn('bok_appeared', fields)
             self.assertIn('importance', fields)
             self.assertIn('difficulty', fields)
+            self.assertEqual(rows[0]['bok_appeared'], 'O')
             self.assertEqual(rows[0]['importance'], '상')
             self.assertEqual(rows[0]['difficulty'], '중')
 

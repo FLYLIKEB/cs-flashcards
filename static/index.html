@@ -71,6 +71,23 @@
         <select id="categorySelect" class="category-filter" title="카테고리">
           <option value="">▦ *</option>
         </select>
+        <select id="importanceSelect" class="category-filter" title="중요도">
+          <option value="">⭐ *</option>
+          <option value="상">⭐⭐⭐</option>
+          <option value="중">⭐⭐</option>
+          <option value="하">⭐</option>
+        </select>
+        <select id="difficultySelect" class="category-filter" title="난이도">
+          <option value="">▲ *</option>
+          <option value="상">▲▲▲</option>
+          <option value="중">▲▲</option>
+          <option value="하">▲</option>
+        </select>
+        <select id="bokSelect" class="category-filter" title="한국은행 기출 여부">
+          <option value="">한은 *</option>
+          <option value="O">한은 O</option>
+          <option value="-">한은 –</option>
+        </select>
         <div class="study-toggles" aria-label="학습 토글">
           <button id="shuffleBtn" class="has-tip study-toggle" type="button" title="랜덤 모드" data-tip="랜덤 모드">↯</button>
         </div>
@@ -81,6 +98,7 @@
           <div class="card-face front">
             <div class="badges">
               <span id="frontCategory" class="badge"></span>
+              <span id="frontBok" class="badge bok-badge" title="한국은행 기출/면접 출처 포함">한은</span>
               <span id="frontImportance" class="badge rating importance"></span>
               <span id="frontDifficulty" class="badge rating difficulty"></span>
               <span id="frontStatus" class="badge status"></span>
@@ -97,6 +115,7 @@
             <div class="back-scroll">
               <div class="badges">
                 <span id="backCategory" class="badge"></span>
+                <span id="backBok" class="badge bok-badge" title="한국은행 기출/면접 출처 포함">한은</span>
                 <span id="backImportance" class="badge rating importance"></span>
                 <span id="backDifficulty" class="badge rating difficulty"></span>
                 <span id="backId" class="badge"></span>
