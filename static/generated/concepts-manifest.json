@@ -1,0 +1,3701 @@
+{
+  "count": 616,
+  "images": [
+    {
+      "card_id": "CS-001",
+      "url": "/static/generated/concepts/CS-001.svg",
+      "alt": "인수 테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 통합 테스트, 시스템 테스트, 블랙박스 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-001.svg"
+    },
+    {
+      "card_id": "CS-002",
+      "url": "/static/generated/concepts/CS-002.svg",
+      "alt": "접근통제(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인증, 인가, DAC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-002.svg"
+    },
+    {
+      "card_id": "CS-003",
+      "url": "/static/generated/concepts/CS-003.svg",
+      "alt": "정확도(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 테스트 데이터, 혼동 행렬, 정밀도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-003.svg"
+    },
+    {
+      "card_id": "CS-004",
+      "url": "/static/generated/concepts/CS-004.svg",
+      "alt": "ACID(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 종속성 보존, 트랜잭션, 원자성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-004.svg"
+    },
+    {
+      "card_id": "CS-005",
+      "url": "/static/generated/concepts/CS-005.svg",
+      "alt": "AES(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 대칭키 암호화, 비대칭키 암호화, RSA",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-005.svg"
+    },
+    {
+      "card_id": "CS-006",
+      "url": "/static/generated/concepts/CS-006.svg",
+      "alt": "애자일(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프로토타입 모델, 나선형 모델, 스크럼",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-006.svg"
+    },
+    {
+      "card_id": "CS-007",
+      "url": "/static/generated/concepts/CS-007.svg",
+      "alt": "AIMD(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Go-Back-N, Selective Repeat, Slow Start",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-007.svg"
+    },
+    {
+      "card_id": "CS-008",
+      "url": "/static/generated/concepts/CS-008.svg",
+      "alt": "대체키(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 후보키, 기본키, 외래키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-008.svg"
+    },
+    {
+      "card_id": "CS-009",
+      "url": "/static/generated/concepts/CS-009.svg",
+      "alt": "ALU(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 컴퓨터구조, CPU, 제어장치",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-009.svg"
+    },
+    {
+      "card_id": "CS-010",
+      "url": "/static/generated/concepts/CS-010.svg",
+      "alt": "AML(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 로보어드바이저, 이상거래탐지, KYC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-010.svg"
+    },
+    {
+      "card_id": "CS-011",
+      "url": "/static/generated/concepts/CS-011.svg",
+      "alt": "API 게이트웨이(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 서버리스, 마이크로서비스, 서비스 메시",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-011.svg"
+    },
+    {
+      "card_id": "CS-012",
+      "url": "/static/generated/concepts/CS-012.svg",
+      "alt": "API 경제(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 메타버스, RPA, 오픈 API",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-012.svg"
+    },
+    {
+      "card_id": "CS-013",
+      "url": "/static/generated/concepts/CS-013.svg",
+      "alt": "ARP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이더넷, MAC 주소, RARP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-013.svg"
+    },
+    {
+      "card_id": "CS-014",
+      "url": "/static/generated/concepts/CS-014.svg",
+      "alt": "ARP 스푸핑(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SYN Flood, 스머프 공격, DNS 스푸핑",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-014.svg"
+    },
+    {
+      "card_id": "CS-015",
+      "url": "/static/generated/concepts/CS-015.svg",
+      "alt": "배열(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 자료구조, 연결 리스트, 단일 연결 리스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-015.svg"
+    },
+    {
+      "card_id": "CS-016",
+      "url": "/static/generated/concepts/CS-016.svg",
+      "alt": "비대칭키 암호화(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 공개키 기반구조, 대칭키 암호화, AES",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-016.svg"
+    },
+    {
+      "card_id": "CS-017",
+      "url": "/static/generated/concepts/CS-017.svg",
+      "alt": "어텐션(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: LSTM, Transformer, 임베딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-017.svg"
+    },
+    {
+      "card_id": "CS-018",
+      "url": "/static/generated/concepts/CS-018.svg",
+      "alt": "속성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 릴레이션, 튜플, 도메인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-018.svg"
+    },
+    {
+      "card_id": "CS-019",
+      "url": "/static/generated/concepts/CS-019.svg",
+      "alt": "인증(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 무결성, 가용성, 인가",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-019.svg"
+    },
+    {
+      "card_id": "CS-020",
+      "url": "/static/generated/concepts/CS-020.svg",
+      "alt": "인가(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 가용성, 인증, 접근통제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-020.svg"
+    },
+    {
+      "card_id": "CS-021",
+      "url": "/static/generated/concepts/CS-021.svg",
+      "alt": "가용성(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기밀성, 무결성, 인증",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-021.svg"
+    },
+    {
+      "card_id": "CS-022",
+      "url": "/static/generated/concepts/CS-022.svg",
+      "alt": "AVL 트리(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이진 트리, 이진 탐색 트리, 레드블랙 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-022.svg"
+    },
+    {
+      "card_id": "CS-023",
+      "url": "/static/generated/concepts/CS-023.svg",
+      "alt": "오픈 API(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RPA, API 경제, 양자컴퓨팅",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-023.svg"
+    },
+    {
+      "card_id": "CS-024",
+      "url": "/static/generated/concepts/CS-024.svg",
+      "alt": "B+트리(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인덱스, B-트리, 해시 인덱스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-024.svg"
+    },
+    {
+      "card_id": "CS-025",
+      "url": "/static/generated/concepts/CS-025.svg",
+      "alt": "B-트리(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 체크포인트, 인덱스, B+트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-025.svg"
+    },
+    {
+      "card_id": "CS-026",
+      "url": "/static/generated/concepts/CS-026.svg",
+      "alt": "역전파(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 학습률, 손실 함수, 특성 공학",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-026.svg"
+    },
+    {
+      "card_id": "CS-027",
+      "url": "/static/generated/concepts/CS-027.svg",
+      "alt": "BASE(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 가용성, 분할 허용성, 최종 일관성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-027.svg"
+    },
+    {
+      "card_id": "CS-028",
+      "url": "/static/generated/concepts/CS-028.svg",
+      "alt": "BCNF(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제2정규형, 제3정규형, 함수 종속",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-028.svg"
+    },
+    {
+      "card_id": "CS-029",
+      "url": "/static/generated/concepts/CS-029.svg",
+      "alt": "BFS(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인접 리스트, DFS, 위상 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-029.svg"
+    },
+    {
+      "card_id": "CS-030",
+      "url": "/static/generated/concepts/CS-030.svg",
+      "alt": "BGP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RIP, OSPF, NAT",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-030.svg"
+    },
+    {
+      "card_id": "CS-031",
+      "url": "/static/generated/concepts/CS-031.svg",
+      "alt": "빅데이터(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이상치, 결측치, 3V",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-031.svg"
+    },
+    {
+      "card_id": "CS-032",
+      "url": "/static/generated/concepts/CS-032.svg",
+      "alt": "블랙박스 테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 시스템 테스트, 인수 테스트, 화이트박스 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-032.svg"
+    },
+    {
+      "card_id": "CS-033",
+      "url": "/static/generated/concepts/CS-033.svg",
+      "alt": "블록체인(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DNS 차액결제, CBDC, 분산원장",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-033.svg"
+    },
+    {
+      "card_id": "CS-034",
+      "url": "/static/generated/concepts/CS-034.svg",
+      "alt": "경계값 분석(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 블랙박스 테스트, 화이트박스 테스트, 동등 분할",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-034.svg"
+    },
+    {
+      "card_id": "CS-035",
+      "url": "/static/generated/concepts/CS-035.svg",
+      "alt": "브랜치(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 형상 관리, Git, 리베이스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-035.svg"
+    },
+    {
+      "card_id": "CS-036",
+      "url": "/static/generated/concepts/CS-036.svg",
+      "alt": "C 언어(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 바이트코드, JIT 컴파일, static 변수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-036.svg"
+    },
+    {
+      "card_id": "CS-037",
+      "url": "/static/generated/concepts/CS-037.svg",
+      "alt": "CA(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 공개키 암호, 인증서, 쿠키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-037.svg"
+    },
+    {
+      "card_id": "CS-038",
+      "url": "/static/generated/concepts/CS-038.svg",
+      "alt": "캐시(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 간접 주소 지정, 상대 주소 지정, 캐시 히트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-038.svg"
+    },
+    {
+      "card_id": "CS-039",
+      "url": "/static/generated/concepts/CS-039.svg",
+      "alt": "후보키(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 키, 슈퍼키, 기본키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-039.svg"
+    },
+    {
+      "card_id": "CS-040",
+      "url": "/static/generated/concepts/CS-040.svg",
+      "alt": "CAP 정리(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 서비스 메시, 분산 시스템, 일관성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-040.svg"
+    },
+    {
+      "card_id": "CS-041",
+      "url": "/static/generated/concepts/CS-041.svg",
+      "alt": "카디널리티(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 도메인, 차수, 키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-041.svg"
+    },
+    {
+      "card_id": "CS-042",
+      "url": "/static/generated/concepts/CS-042.svg",
+      "alt": "CDN(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프록시, 캐시 서버, VPN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-042.svg"
+    },
+    {
+      "card_id": "CS-043",
+      "url": "/static/generated/concepts/CS-043.svg",
+      "alt": "CBDC(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RTGS, DNS 차액결제, 블록체인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-043.svg"
+    },
+    {
+      "card_id": "CS-044",
+      "url": "/static/generated/concepts/CS-044.svg",
+      "alt": "CPU(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 컴퓨터구조, ALU, 제어장치",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-044.svg"
+    },
+    {
+      "card_id": "CS-045",
+      "url": "/static/generated/concepts/CS-045.svg",
+      "alt": "CI/CD(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 칸반, DevOps, 요구사항 분석",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-045.svg"
+    },
+    {
+      "card_id": "CS-046",
+      "url": "/static/generated/concepts/CS-046.svg",
+      "alt": "CIDR(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 서브넷, 서브넷 마스크, 라우팅",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-046.svg"
+    },
+    {
+      "card_id": "CS-047",
+      "url": "/static/generated/concepts/CS-047.svg",
+      "alt": "서킷 브레이커(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 멱등성, 장애 격리, 관측성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-047.svg"
+    },
+    {
+      "card_id": "CS-048",
+      "url": "/static/generated/concepts/CS-048.svg",
+      "alt": "CISC(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 구조적 해저드, 슈퍼스칼라, RISC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-048.svg"
+    },
+    {
+      "card_id": "CS-049",
+      "url": "/static/generated/concepts/CS-049.svg",
+      "alt": "클래스(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 힙 메모리, 가비지 컬렉션, 객체",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-049.svg"
+    },
+    {
+      "card_id": "CS-050",
+      "url": "/static/generated/concepts/CS-050.svg",
+      "alt": "클래스 다이어그램(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 유스케이스, UML, 시퀀스 다이어그램",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-050.svg"
+    },
+    {
+      "card_id": "CS-051",
+      "url": "/static/generated/concepts/CS-051.svg",
+      "alt": "분류(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 비지도학습, 강화학습, 회귀",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-051.svg"
+    },
+    {
+      "card_id": "CS-052",
+      "url": "/static/generated/concepts/CS-052.svg",
+      "alt": "청산(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 전자금융, 지급결제, 결제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-052.svg"
+    },
+    {
+      "card_id": "CS-053",
+      "url": "/static/generated/concepts/CS-053.svg",
+      "alt": "클라우드 컴퓨팅(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 가상화, 하이퍼바이저, 분산 시스템",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-053.svg"
+    },
+    {
+      "card_id": "CS-054",
+      "url": "/static/generated/concepts/CS-054.svg",
+      "alt": "군집화(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 분류, 회귀, 차원 축소",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-054.svg"
+    },
+    {
+      "card_id": "CS-055",
+      "url": "/static/generated/concepts/CS-055.svg",
+      "alt": "CNN(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 퍼셉트론, 딥러닝, RNN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-055.svg"
+    },
+    {
+      "card_id": "CS-056",
+      "url": "/static/generated/concepts/CS-056.svg",
+      "alt": "COCOMO(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기술 부채, 기능 점수, CPM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-056.svg"
+    },
+    {
+      "card_id": "CS-057",
+      "url": "/static/generated/concepts/CS-057.svg",
+      "alt": "코드 리뷰(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 브랜치, 리베이스, 리팩터링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-057.svg"
+    },
+    {
+      "card_id": "CS-058",
+      "url": "/static/generated/concepts/CS-058.svg",
+      "alt": "응집도(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 모듈화, 결합도, 정보 은닉",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-058.svg"
+    },
+    {
+      "card_id": "CS-059",
+      "url": "/static/generated/concepts/CS-059.svg",
+      "alt": "컴파일러(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프로그래밍 언어, 인터프리터, 어셈블러",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-059.svg"
+    },
+    {
+      "card_id": "CS-060",
+      "url": "/static/generated/concepts/CS-060.svg",
+      "alt": "복합키(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 대체키, 외래키, 무결성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-060.svg"
+    },
+    {
+      "card_id": "CS-061",
+      "url": "/static/generated/concepts/CS-061.svg",
+      "alt": "컴퓨터구조(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CPU, ALU, 캐시",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-061.svg"
+    },
+    {
+      "card_id": "CS-062",
+      "url": "/static/generated/concepts/CS-062.svg",
+      "alt": "기밀성(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정보보호, 무결성, 가용성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-062.svg"
+    },
+    {
+      "card_id": "CS-063",
+      "url": "/static/generated/concepts/CS-063.svg",
+      "alt": "형상 관리(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 동등 분할, 회귀 테스트, Git",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-063.svg"
+    },
+    {
+      "card_id": "CS-064",
+      "url": "/static/generated/concepts/CS-064.svg",
+      "alt": "혼동 행렬(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 검증 데이터, 테스트 데이터, 정확도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-064.svg"
+    },
+    {
+      "card_id": "CS-065",
+      "url": "/static/generated/concepts/CS-065.svg",
+      "alt": "합의 알고리즘(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 해시 체인, 머클 트리, 작업증명",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-065.svg"
+    },
+    {
+      "card_id": "CS-066",
+      "url": "/static/generated/concepts/CS-066.svg",
+      "alt": "컨테이너(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 하이퍼바이저, VM, Docker",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-066.svg"
+    },
+    {
+      "card_id": "CS-067",
+      "url": "/static/generated/concepts/CS-067.svg",
+      "alt": "문맥 교환(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 멀티스레딩, PCB, 프로세스 상태",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-067.svg"
+    },
+    {
+      "card_id": "CS-068",
+      "url": "/static/generated/concepts/CS-068.svg",
+      "alt": "결합도(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 아키텍처, 모듈화, 응집도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-068.svg"
+    },
+    {
+      "card_id": "CS-069",
+      "url": "/static/generated/concepts/CS-069.svg",
+      "alt": "CPM(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기능 점수, COCOMO, PERT",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-069.svg"
+    },
+    {
+      "card_id": "CS-070",
+      "url": "/static/generated/concepts/CS-070.svg",
+      "alt": "CSRF(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: XSS, SQL Injection, 세션 하이재킹",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-070.svg"
+    },
+    {
+      "card_id": "CS-071",
+      "url": "/static/generated/concepts/CS-071.svg",
+      "alt": "DAC(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인가, 접근통제, MAC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-071.svg"
+    },
+    {
+      "card_id": "CS-072",
+      "url": "/static/generated/concepts/CS-072.svg",
+      "alt": "데이터 마이닝(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 빅데이터, 3V, 머신러닝",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-072.svg"
+    },
+    {
+      "card_id": "CS-073",
+      "url": "/static/generated/concepts/CS-073.svg",
+      "alt": "데이터 전처리(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 역전파, 특성 공학, 이상치",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-073.svg"
+    },
+    {
+      "card_id": "CS-074",
+      "url": "/static/generated/concepts/CS-074.svg",
+      "alt": "자료구조(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 배열, 연결 리스트, 시간 복잡도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-074.svg"
+    },
+    {
+      "card_id": "CS-075",
+      "url": "/static/generated/concepts/CS-075.svg",
+      "alt": "데이터베이스(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DBMS, 스키마, SQL",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-075.svg"
+    },
+    {
+      "card_id": "CS-076",
+      "url": "/static/generated/concepts/CS-076.svg",
+      "alt": "DBMS(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 데이터베이스, 스키마, 인스턴스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-076.svg"
+    },
+    {
+      "card_id": "CS-077",
+      "url": "/static/generated/concepts/CS-077.svg",
+      "alt": "DCL(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DDL, DML, TCL",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-077.svg"
+    },
+    {
+      "card_id": "CS-078",
+      "url": "/static/generated/concepts/CS-078.svg",
+      "alt": "DDL(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 비클러스터드 인덱스, SQL, DML",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-078.svg"
+    },
+    {
+      "card_id": "CS-079",
+      "url": "/static/generated/concepts/CS-079.svg",
+      "alt": "DDoS(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CSRF, 세션 하이재킹, SYN Flood",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-079.svg"
+    },
+    {
+      "card_id": "CS-080",
+      "url": "/static/generated/concepts/CS-080.svg",
+      "alt": "결정 트리(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 선형 회귀, 로지스틱 회귀, 랜덤 포레스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-080.svg"
+    },
+    {
+      "card_id": "CS-081",
+      "url": "/static/generated/concepts/CS-081.svg",
+      "alt": "딥러닝(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 신경망, 퍼셉트론, CNN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-081.svg"
+    },
+    {
+      "card_id": "CS-082",
+      "url": "/static/generated/concepts/CS-082.svg",
+      "alt": "DeFi(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 퍼블릭 블록체인, 스마트 컨트랙트, 디지털 자산",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-082.svg"
+    },
+    {
+      "card_id": "CS-083",
+      "url": "/static/generated/concepts/CS-083.svg",
+      "alt": "차수(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 속성, 도메인, 카디널리티",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-083.svg"
+    },
+    {
+      "card_id": "CS-084",
+      "url": "/static/generated/concepts/CS-084.svg",
+      "alt": "디자인 패턴(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인터페이스 분리 원칙, 의존성 역전 원칙, 싱글턴 패턴",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-084.svg"
+    },
+    {
+      "card_id": "CS-085",
+      "url": "/static/generated/concepts/CS-085.svg",
+      "alt": "DevOps(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스프린트, 칸반, CI/CD",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-085.svg"
+    },
+    {
+      "card_id": "CS-086",
+      "url": "/static/generated/concepts/CS-086.svg",
+      "alt": "DFS(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인접 행렬, 인접 리스트, BFS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-086.svg"
+    },
+    {
+      "card_id": "CS-087",
+      "url": "/static/generated/concepts/CS-087.svg",
+      "alt": "디지털 자산(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스마트 컨트랙트, DeFi, 토큰화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-087.svg"
+    },
+    {
+      "card_id": "CS-088",
+      "url": "/static/generated/concepts/CS-088.svg",
+      "alt": "전자서명(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 암호화, 해시, PKI",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-088.svg"
+    },
+    {
+      "card_id": "CS-089",
+      "url": "/static/generated/concepts/CS-089.svg",
+      "alt": "디지털 트윈(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: AML, KYC, 메타버스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-089.svg"
+    },
+    {
+      "card_id": "CS-090",
+      "url": "/static/generated/concepts/CS-090.svg",
+      "alt": "차원 축소(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 회귀, 군집화, 선형 회귀",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-090.svg"
+    },
+    {
+      "card_id": "CS-091",
+      "url": "/static/generated/concepts/CS-091.svg",
+      "alt": "분산원장(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CBDC, 블록체인, 해시 체인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-091.svg"
+    },
+    {
+      "card_id": "CS-092",
+      "url": "/static/generated/concepts/CS-092.svg",
+      "alt": "분산 시스템(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: API 게이트웨이, 서비스 메시, CAP 정리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-092.svg"
+    },
+    {
+      "card_id": "CS-093",
+      "url": "/static/generated/concepts/CS-093.svg",
+      "alt": "DMA(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RAID 1, RAID 5, 인터럽트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-093.svg"
+    },
+    {
+      "card_id": "CS-094",
+      "url": "/static/generated/concepts/CS-094.svg",
+      "alt": "DML(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SQL, DDL, DCL",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-094.svg"
+    },
+    {
+      "card_id": "CS-095",
+      "url": "/static/generated/concepts/CS-095.svg",
+      "alt": "DNS 스푸핑(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스머프 공격, ARP 스푸핑, 중간자 공격",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-095.svg"
+    },
+    {
+      "card_id": "CS-096",
+      "url": "/static/generated/concepts/CS-096.svg",
+      "alt": "DNS 차액결제(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 결제, RTGS, CBDC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-096.svg"
+    },
+    {
+      "card_id": "CS-097",
+      "url": "/static/generated/concepts/CS-097.svg",
+      "alt": "Docker(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: VM, 컨테이너, Kubernetes",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-097.svg"
+    },
+    {
+      "card_id": "CS-098",
+      "url": "/static/generated/concepts/CS-098.svg",
+      "alt": "도메인(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 튜플, 속성, 차수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-098.svg"
+    },
+    {
+      "card_id": "CS-099",
+      "url": "/static/generated/concepts/CS-099.svg",
+      "alt": "DNS(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: HTTP, HTTPS, 재귀 질의",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-099.svg"
+    },
+    {
+      "card_id": "CS-100",
+      "url": "/static/generated/concepts/CS-100.svg",
+      "alt": "DRAM(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ROM, SRAM, 플래시 메모리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-100.svg"
+    },
+    {
+      "card_id": "CS-101",
+      "url": "/static/generated/concepts/CS-101.svg",
+      "alt": "동적 계획법(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 해시 탐색, 분할 정복, 탐욕 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-101.svg"
+    },
+    {
+      "card_id": "CS-102",
+      "url": "/static/generated/concepts/CS-102.svg",
+      "alt": "전자금융(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 오픈뱅킹, 마이데이터, 지급결제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-102.svg"
+    },
+    {
+      "card_id": "CS-103",
+      "url": "/static/generated/concepts/CS-103.svg",
+      "alt": "임베딩(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Transformer, 어텐션, 자연어 처리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-103.svg"
+    },
+    {
+      "card_id": "CS-104",
+      "url": "/static/generated/concepts/CS-104.svg",
+      "alt": "암호화(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: MAC, RBAC, 해시",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-104.svg"
+    },
+    {
+      "card_id": "CS-105",
+      "url": "/static/generated/concepts/CS-105.svg",
+      "alt": "동등 분할(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 화이트박스 테스트, 경계값 분석, 회귀 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-105.svg"
+    },
+    {
+      "card_id": "CS-106",
+      "url": "/static/generated/concepts/CS-106.svg",
+      "alt": "F1 점수(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정밀도, 재현율, ROC-AUC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-106.svg"
+    },
+    {
+      "card_id": "CS-107",
+      "url": "/static/generated/concepts/CS-107.svg",
+      "alt": "팩토리 패턴(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 디자인 패턴, 싱글턴 패턴, 전략 패턴",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-107.svg"
+    },
+    {
+      "card_id": "CS-108",
+      "url": "/static/generated/concepts/CS-108.svg",
+      "alt": "장애 격리(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 사가 패턴, 멱등성, 서킷 브레이커",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-108.svg"
+    },
+    {
+      "card_id": "CS-109",
+      "url": "/static/generated/concepts/CS-109.svg",
+      "alt": "FCFS(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 선점형 스케줄링, 비선점형 스케줄링, SJF",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-109.svg"
+    },
+    {
+      "card_id": "CS-110",
+      "url": "/static/generated/concepts/CS-110.svg",
+      "alt": "FIFO 페이지 교체(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 페이지 폴트, 페이지 교체, LRU",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-110.svg"
+    },
+    {
+      "card_id": "CS-111",
+      "url": "/static/generated/concepts/CS-111.svg",
+      "alt": "핀테크(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 오픈뱅킹, 마이데이터, 전자금융",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-111.svg"
+    },
+    {
+      "card_id": "CS-112",
+      "url": "/static/generated/concepts/CS-112.svg",
+      "alt": "방화벽(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 솔트, 키 스트레칭, IDS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-112.svg"
+    },
+    {
+      "card_id": "CS-113",
+      "url": "/static/generated/concepts/CS-113.svg",
+      "alt": "외래키(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기본키, 대체키, 복합키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-113.svg"
+    },
+    {
+      "card_id": "CS-114",
+      "url": "/static/generated/concepts/CS-114.svg",
+      "alt": "이상거래탐지(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SupTech, 로보어드바이저, AML",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-114.svg"
+    },
+    {
+      "card_id": "CS-115",
+      "url": "/static/generated/concepts/CS-115.svg",
+      "alt": "Git(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 회귀 테스트, 형상 관리, 브랜치",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-115.svg"
+    },
+    {
+      "card_id": "CS-116",
+      "url": "/static/generated/concepts/CS-116.svg",
+      "alt": "Go-Back-N(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 슬라이딩 윈도우, Stop-and-Wait, Selective Repeat",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-116.svg"
+    },
+    {
+      "card_id": "CS-117",
+      "url": "/static/generated/concepts/CS-117.svg",
+      "alt": "경사하강법(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: F1 점수, ROC-AUC, 학습률",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-117.svg"
+    },
+    {
+      "card_id": "CS-118",
+      "url": "/static/generated/concepts/CS-118.svg",
+      "alt": "그래프(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: B-트리, B+트리, 정점",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-118.svg"
+    },
+    {
+      "card_id": "CS-119",
+      "url": "/static/generated/concepts/CS-119.svg",
+      "alt": "GROUP BY(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SELECT, WHERE, HAVING",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-119.svg"
+    },
+    {
+      "card_id": "CS-120",
+      "url": "/static/generated/concepts/CS-120.svg",
+      "alt": "해시(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RBAC, 암호화, 전자서명",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-120.svg"
+    },
+    {
+      "card_id": "CS-121",
+      "url": "/static/generated/concepts/CS-121.svg",
+      "alt": "해시 체인(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 블록체인, 분산원장, 머클 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-121.svg"
+    },
+    {
+      "card_id": "CS-122",
+      "url": "/static/generated/concepts/CS-122.svg",
+      "alt": "HAVING(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: WHERE, GROUP BY, ORDER BY",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-122.svg"
+    },
+    {
+      "card_id": "CS-123",
+      "url": "/static/generated/concepts/CS-123.svg",
+      "alt": "힙(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 덱, 우선순위 큐, 최대 힙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-123.svg"
+    },
+    {
+      "card_id": "CS-124",
+      "url": "/static/generated/concepts/CS-124.svg",
+      "alt": "동형암호(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 양자컴퓨팅, 양자내성암호, 영지식 증명",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-124.svg"
+    },
+    {
+      "card_id": "CS-125",
+      "url": "/static/generated/concepts/CS-125.svg",
+      "alt": "HRN(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SJF, SRTF, Round Robin",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-125.svg"
+    },
+    {
+      "card_id": "CS-126",
+      "url": "/static/generated/concepts/CS-126.svg",
+      "alt": "HTTPS(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Slow Start, HTTP, DNS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-126.svg"
+    },
+    {
+      "card_id": "CS-127",
+      "url": "/static/generated/concepts/CS-127.svg",
+      "alt": "하이브리드 클라우드(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 퍼블릭 클라우드, 프라이빗 클라우드, 오토스케일링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-127.svg"
+    },
+    {
+      "card_id": "CS-128",
+      "url": "/static/generated/concepts/CS-128.svg",
+      "alt": "HTTP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: AIMD, Slow Start, HTTPS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-128.svg"
+    },
+    {
+      "card_id": "CS-129",
+      "url": "/static/generated/concepts/CS-129.svg",
+      "alt": "하이퍼바이저(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 클라우드 컴퓨팅, 가상화, VM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-129.svg"
+    },
+    {
+      "card_id": "CS-130",
+      "url": "/static/generated/concepts/CS-130.svg",
+      "alt": "IaaS(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Kubernetes, 오케스트레이션, PaaS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-130.svg"
+    },
+    {
+      "card_id": "CS-131",
+      "url": "/static/generated/concepts/CS-131.svg",
+      "alt": "ICMP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: BGP, NAT, Ping",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-131.svg"
+    },
+    {
+      "card_id": "CS-132",
+      "url": "/static/generated/concepts/CS-132.svg",
+      "alt": "멱등성(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 2PC, 사가 패턴, 장애 격리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-132.svg"
+    },
+    {
+      "card_id": "CS-133",
+      "url": "/static/generated/concepts/CS-133.svg",
+      "alt": "IDS(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 키 스트레칭, 방화벽, IPS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-133.svg"
+    },
+    {
+      "card_id": "CS-134",
+      "url": "/static/generated/concepts/CS-134.svg",
+      "alt": "인덱스(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: REDO, 체크포인트, B-트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-134.svg"
+    },
+    {
+      "card_id": "CS-135",
+      "url": "/static/generated/concepts/CS-135.svg",
+      "alt": "정보보호(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기밀성, 무결성, 인증",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-135.svg"
+    },
+    {
+      "card_id": "CS-136",
+      "url": "/static/generated/concepts/CS-136.svg",
+      "alt": "상속(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 객체, 캡슐화, 다형성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-136.svg"
+    },
+    {
+      "card_id": "CS-137",
+      "url": "/static/generated/concepts/CS-137.svg",
+      "alt": "입력 검증(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: TLS, 보안 코딩, 출력 인코딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-137.svg"
+    },
+    {
+      "card_id": "CS-138",
+      "url": "/static/generated/concepts/CS-138.svg",
+      "alt": "통합 테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 테스트, 단위 테스트, 시스템 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-138.svg"
+    },
+    {
+      "card_id": "CS-139",
+      "url": "/static/generated/concepts/CS-139.svg",
+      "alt": "무결성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 외래키, 복합키, 개체 무결성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-139.svg"
+    },
+    {
+      "card_id": "CS-140",
+      "url": "/static/generated/concepts/CS-140.svg",
+      "alt": "인터프리터(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프로그래밍 언어, 컴파일러, 어셈블러",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-140.svg"
+    },
+    {
+      "card_id": "CS-141",
+      "url": "/static/generated/concepts/CS-141.svg",
+      "alt": "IP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ARP, RARP, IPv4",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-141.svg"
+    },
+    {
+      "card_id": "CS-142",
+      "url": "/static/generated/concepts/CS-142.svg",
+      "alt": "IPS(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 방화벽, IDS, SIEM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-142.svg"
+    },
+    {
+      "card_id": "CS-143",
+      "url": "/static/generated/concepts/CS-143.svg",
+      "alt": "IPv4(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RARP, IP, IPv6",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-143.svg"
+    },
+    {
+      "card_id": "CS-144",
+      "url": "/static/generated/concepts/CS-144.svg",
+      "alt": "IPv6(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: IP, IPv4, 서브넷",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-144.svg"
+    },
+    {
+      "card_id": "CS-145",
+      "url": "/static/generated/concepts/CS-145.svg",
+      "alt": "ISA(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CISC, RISC, 주소 지정 방식",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-145.svg"
+    },
+    {
+      "card_id": "CS-146",
+      "url": "/static/generated/concepts/CS-146.svg",
+      "alt": "Java(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 고차 함수, 불변성, JVM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-146.svg"
+    },
+    {
+      "card_id": "CS-147",
+      "url": "/static/generated/concepts/CS-147.svg",
+      "alt": "JIT 컴파일(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: JVM, 바이트코드, C 언어",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-147.svg"
+    },
+    {
+      "card_id": "CS-148",
+      "url": "/static/generated/concepts/CS-148.svg",
+      "alt": "JOIN(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: HAVING, ORDER BY, 서브쿼리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-148.svg"
+    },
+    {
+      "card_id": "CS-149",
+      "url": "/static/generated/concepts/CS-149.svg",
+      "alt": "JVM(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 불변성, Java, 바이트코드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-149.svg"
+    },
+    {
+      "card_id": "CS-150",
+      "url": "/static/generated/concepts/CS-150.svg",
+      "alt": "Kafka(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 로드 밸런싱, 메시지 큐, RabbitMQ",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-150.svg"
+    },
+    {
+      "card_id": "CS-151",
+      "url": "/static/generated/concepts/CS-151.svg",
+      "alt": "칸반(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스크럼, 스프린트, DevOps",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-151.svg"
+    },
+    {
+      "card_id": "CS-152",
+      "url": "/static/generated/concepts/CS-152.svg",
+      "alt": "커널(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 운영체제, 시스템 콜, 프로세스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-152.svg"
+    },
+    {
+      "card_id": "CS-153",
+      "url": "/static/generated/concepts/CS-153.svg",
+      "alt": "키(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 차수, 카디널리티, 슈퍼키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-153.svg"
+    },
+    {
+      "card_id": "CS-154",
+      "url": "/static/generated/concepts/CS-154.svg",
+      "alt": "키 스트레칭(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SHA, 솔트, 방화벽",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-154.svg"
+    },
+    {
+      "card_id": "CS-155",
+      "url": "/static/generated/concepts/CS-155.svg",
+      "alt": "KNN(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 랜덤 포레스트, SVM, 나이브 베이즈",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-155.svg"
+    },
+    {
+      "card_id": "CS-156",
+      "url": "/static/generated/concepts/CS-156.svg",
+      "alt": "Kubernetes(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 컨테이너, Docker, 오케스트레이션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-156.svg"
+    },
+    {
+      "card_id": "CS-157",
+      "url": "/static/generated/concepts/CS-157.svg",
+      "alt": "KYC(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이상거래탐지, AML, 디지털 트윈",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-157.svg"
+    },
+    {
+      "card_id": "CS-158",
+      "url": "/static/generated/concepts/CS-158.svg",
+      "alt": "연결 리스트(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 자료구조, 배열, 단일 연결 리스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-158.svg"
+    },
+    {
+      "card_id": "CS-159",
+      "url": "/static/generated/concepts/CS-159.svg",
+      "alt": "로그 감사(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: IPS, SIEM, 취약점",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-159.svg"
+    },
+    {
+      "card_id": "CS-160",
+      "url": "/static/generated/concepts/CS-160.svg",
+      "alt": "손실 함수(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 경사하강법, 학습률, 역전파",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-160.svg"
+    },
+    {
+      "card_id": "CS-161",
+      "url": "/static/generated/concepts/CS-161.svg",
+      "alt": "LRU(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 페이지 교체, FIFO 페이지 교체, Optimal 페이지 교체",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-161.svg"
+    },
+    {
+      "card_id": "CS-162",
+      "url": "/static/generated/concepts/CS-162.svg",
+      "alt": "LSTM(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CNN, RNN, Transformer",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-162.svg"
+    },
+    {
+      "card_id": "CS-163",
+      "url": "/static/generated/concepts/CS-163.svg",
+      "alt": "MAC(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 접근통제, DAC, RBAC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-163.svg"
+    },
+    {
+      "card_id": "CS-164",
+      "url": "/static/generated/concepts/CS-164.svg",
+      "alt": "MAC 주소(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 응용 계층, 이더넷, ARP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-164.svg"
+    },
+    {
+      "card_id": "CS-165",
+      "url": "/static/generated/concepts/CS-165.svg",
+      "alt": "머신러닝(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인공지능, 지도학습, 비지도학습",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-165.svg"
+    },
+    {
+      "card_id": "CS-166",
+      "url": "/static/generated/concepts/CS-166.svg",
+      "alt": "악성코드(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 위협, 위험, 바이러스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-166.svg"
+    },
+    {
+      "card_id": "CS-167",
+      "url": "/static/generated/concepts/CS-167.svg",
+      "alt": "중간자 공격(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ARP 스푸핑, DNS 스푸핑, 제로 트러스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-167.svg"
+    },
+    {
+      "card_id": "CS-168",
+      "url": "/static/generated/concepts/CS-168.svg",
+      "alt": "메모리 계층(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 쓰기 스루, 쓰기 백, RAM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-168.svg"
+    },
+    {
+      "card_id": "CS-169",
+      "url": "/static/generated/concepts/CS-169.svg",
+      "alt": "머클 트리(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 분산원장, 해시 체인, 합의 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-169.svg"
+    },
+    {
+      "card_id": "CS-170",
+      "url": "/static/generated/concepts/CS-170.svg",
+      "alt": "메시지 큐(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 파티셔닝, 로드 밸런싱, Kafka",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-170.svg"
+    },
+    {
+      "card_id": "CS-171",
+      "url": "/static/generated/concepts/CS-171.svg",
+      "alt": "메타버스(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: KYC, 디지털 트윈, RPA",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-171.svg"
+    },
+    {
+      "card_id": "CS-172",
+      "url": "/static/generated/concepts/CS-172.svg",
+      "alt": "메트릭(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 관측성, 로그, 트레이싱",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-172.svg"
+    },
+    {
+      "card_id": "CS-173",
+      "url": "/static/generated/concepts/CS-173.svg",
+      "alt": "마이크로서비스(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 오토스케일링, 서버리스, API 게이트웨이",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-173.svg"
+    },
+    {
+      "card_id": "CS-174",
+      "url": "/static/generated/concepts/CS-174.svg",
+      "alt": "결측치(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 데이터 전처리, 이상치, 빅데이터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-174.svg"
+    },
+    {
+      "card_id": "CS-175",
+      "url": "/static/generated/concepts/CS-175.svg",
+      "alt": "MVC(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 팩토리 패턴, 전략 패턴, 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-175.svg"
+    },
+    {
+      "card_id": "CS-176",
+      "url": "/static/generated/concepts/CS-176.svg",
+      "alt": "MVCC(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 타임스탬프 기법, 낙관적 병행제어, 회복",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-176.svg"
+    },
+    {
+      "card_id": "CS-177",
+      "url": "/static/generated/concepts/CS-177.svg",
+      "alt": "마이데이터(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 핀테크, 오픈뱅킹, 전자금융",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-177.svg"
+    },
+    {
+      "card_id": "CS-178",
+      "url": "/static/generated/concepts/CS-178.svg",
+      "alt": "NAT(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: OSPF, BGP, ICMP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-178.svg"
+    },
+    {
+      "card_id": "CS-179",
+      "url": "/static/generated/concepts/CS-179.svg",
+      "alt": "신경망(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: KNN, 나이브 베이즈, 퍼셉트론",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-179.svg"
+    },
+    {
+      "card_id": "CS-180",
+      "url": "/static/generated/concepts/CS-180.svg",
+      "alt": "정규화(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 자연 조인, 외부 조인, 제1정규형",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-180.svg"
+    },
+    {
+      "card_id": "CS-181",
+      "url": "/static/generated/concepts/CS-181.svg",
+      "alt": "NP-완전(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 공간 복잡도, 빅오 표기법, 시간 복잡도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-181.svg"
+    },
+    {
+      "card_id": "CS-182",
+      "url": "/static/generated/concepts/CS-182.svg",
+      "alt": "객체(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 가비지 컬렉션, 클래스, 캡슐화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-182.svg"
+    },
+    {
+      "card_id": "CS-183",
+      "url": "/static/generated/concepts/CS-183.svg",
+      "alt": "관측성(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 장애 격리, 서킷 브레이커, 로그",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-183.svg"
+    },
+    {
+      "card_id": "CS-184",
+      "url": "/static/generated/concepts/CS-184.svg",
+      "alt": "오픈뱅킹(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 핀테크, 마이데이터, 전자금융",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-184.svg"
+    },
+    {
+      "card_id": "CS-185",
+      "url": "/static/generated/concepts/CS-185.svg",
+      "alt": "운영체제(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 커널, 시스템 콜, 프로세스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-185.svg"
+    },
+    {
+      "card_id": "CS-186",
+      "url": "/static/generated/concepts/CS-186.svg",
+      "alt": "Optimal 페이지 교체(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: FIFO 페이지 교체, LRU, 스래싱",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-186.svg"
+    },
+    {
+      "card_id": "CS-187",
+      "url": "/static/generated/concepts/CS-187.svg",
+      "alt": "오케스트레이션(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Docker, Kubernetes, IaaS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-187.svg"
+    },
+    {
+      "card_id": "CS-188",
+      "url": "/static/generated/concepts/CS-188.svg",
+      "alt": "ORDER BY(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: GROUP BY, HAVING, JOIN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-188.svg"
+    },
+    {
+      "card_id": "CS-189",
+      "url": "/static/generated/concepts/CS-189.svg",
+      "alt": "OSI 7계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: TCP/IP 모델, 물리 계층, TCP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-189.svg"
+    },
+    {
+      "card_id": "CS-190",
+      "url": "/static/generated/concepts/CS-190.svg",
+      "alt": "OSPF(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 동적 라우팅, RIP, BGP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-190.svg"
+    },
+    {
+      "card_id": "CS-191",
+      "url": "/static/generated/concepts/CS-191.svg",
+      "alt": "이상치(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 특성 공학, 데이터 전처리, 결측치",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-191.svg"
+    },
+    {
+      "card_id": "CS-192",
+      "url": "/static/generated/concepts/CS-192.svg",
+      "alt": "출력 인코딩(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 보안 코딩, 입력 검증, 최소 권한 원칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-192.svg"
+    },
+    {
+      "card_id": "CS-193",
+      "url": "/static/generated/concepts/CS-193.svg",
+      "alt": "과적합(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 텍스트 마이닝, 추천 시스템, 과소적합",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-193.svg"
+    },
+    {
+      "card_id": "CS-194",
+      "url": "/static/generated/concepts/CS-194.svg",
+      "alt": "2PC(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이벤트 기반 아키텍처, 분산 트랜잭션, 사가 패턴",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-194.svg"
+    },
+    {
+      "card_id": "CS-195",
+      "url": "/static/generated/concepts/CS-195.svg",
+      "alt": "PaaS(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 오케스트레이션, IaaS, SaaS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-195.svg"
+    },
+    {
+      "card_id": "CS-196",
+      "url": "/static/generated/concepts/CS-196.svg",
+      "alt": "페이지 폴트(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 가상 메모리, 요구 페이징, 페이지 교체",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-196.svg"
+    },
+    {
+      "card_id": "CS-197",
+      "url": "/static/generated/concepts/CS-197.svg",
+      "alt": "페이징(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 논리 주소, 물리 주소, 페이지",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-197.svg"
+    },
+    {
+      "card_id": "CS-198",
+      "url": "/static/generated/concepts/CS-198.svg",
+      "alt": "파티셔닝(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 복제, 샤딩, 로드 밸런싱",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-198.svg"
+    },
+    {
+      "card_id": "CS-199",
+      "url": "/static/generated/concepts/CS-199.svg",
+      "alt": "지급결제(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 마이데이터, 전자금융, 청산",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-199.svg"
+    },
+    {
+      "card_id": "CS-200",
+      "url": "/static/generated/concepts/CS-200.svg",
+      "alt": "PCB(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스레드, 멀티스레딩, 문맥 교환",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-200.svg"
+    },
+    {
+      "card_id": "CS-201",
+      "url": "/static/generated/concepts/CS-201.svg",
+      "alt": "퍼셉트론(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 나이브 베이즈, 신경망, 딥러닝",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-201.svg"
+    },
+    {
+      "card_id": "CS-202",
+      "url": "/static/generated/concepts/CS-202.svg",
+      "alt": "PERT(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: COCOMO, CPM, 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-202.svg"
+    },
+    {
+      "card_id": "CS-203",
+      "url": "/static/generated/concepts/CS-203.svg",
+      "alt": "파밍(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 피싱, 스미싱, 사회공학",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-203.svg"
+    },
+    {
+      "card_id": "CS-204",
+      "url": "/static/generated/concepts/CS-204.svg",
+      "alt": "피싱(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 트로이목마, 랜섬웨어, 스미싱",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-204.svg"
+    },
+    {
+      "card_id": "CS-205",
+      "url": "/static/generated/concepts/CS-205.svg",
+      "alt": "Ping(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: NAT, ICMP, TCP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-205.svg"
+    },
+    {
+      "card_id": "CS-206",
+      "url": "/static/generated/concepts/CS-206.svg",
+      "alt": "PKI(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 해시, 전자서명, 공개키 기반구조",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-206.svg"
+    },
+    {
+      "card_id": "CS-207",
+      "url": "/static/generated/concepts/CS-207.svg",
+      "alt": "다형성(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 캡슐화, 상속, 추상화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-207.svg"
+    },
+    {
+      "card_id": "CS-208",
+      "url": "/static/generated/concepts/CS-208.svg",
+      "alt": "양자내성암호(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 오픈 API, 양자컴퓨팅, 동형암호",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-208.svg"
+    },
+    {
+      "card_id": "CS-209",
+      "url": "/static/generated/concepts/CS-209.svg",
+      "alt": "정밀도(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 혼동 행렬, 정확도, 재현율",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-209.svg"
+    },
+    {
+      "card_id": "CS-210",
+      "url": "/static/generated/concepts/CS-210.svg",
+      "alt": "기본키(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 슈퍼키, 후보키, 대체키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-210.svg"
+    },
+    {
+      "card_id": "CS-211",
+      "url": "/static/generated/concepts/CS-211.svg",
+      "alt": "최소 권한 원칙(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 입력 검증, 출력 인코딩, 인증",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-211.svg"
+    },
+    {
+      "card_id": "CS-212",
+      "url": "/static/generated/concepts/CS-212.svg",
+      "alt": "프라이빗 블록체인(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 작업증명, 지분증명, 퍼블릭 블록체인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-212.svg"
+    },
+    {
+      "card_id": "CS-213",
+      "url": "/static/generated/concepts/CS-213.svg",
+      "alt": "프라이빗 클라우드(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SaaS, 퍼블릭 클라우드, 하이브리드 클라우드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-213.svg"
+    },
+    {
+      "card_id": "CS-214",
+      "url": "/static/generated/concepts/CS-214.svg",
+      "alt": "프로세스(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 커널, 시스템 콜, 스레드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-214.svg"
+    },
+    {
+      "card_id": "CS-215",
+      "url": "/static/generated/concepts/CS-215.svg",
+      "alt": "프로그래밍 언어(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 컴파일러, 인터프리터, 객체",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-215.svg"
+    },
+    {
+      "card_id": "CS-216",
+      "url": "/static/generated/concepts/CS-216.svg",
+      "alt": "지분증명(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 합의 알고리즘, 작업증명, 프라이빗 블록체인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-216.svg"
+    },
+    {
+      "card_id": "CS-217",
+      "url": "/static/generated/concepts/CS-217.svg",
+      "alt": "작업증명(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 머클 트리, 합의 알고리즘, 지분증명",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-217.svg"
+    },
+    {
+      "card_id": "CS-218",
+      "url": "/static/generated/concepts/CS-218.svg",
+      "alt": "프로토타입 모델(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 소프트웨어 생명주기, 폭포수 모델, 나선형 모델",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-218.svg"
+    },
+    {
+      "card_id": "CS-219",
+      "url": "/static/generated/concepts/CS-219.svg",
+      "alt": "퍼블릭 블록체인(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 지분증명, 프라이빗 블록체인, 스마트 컨트랙트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-219.svg"
+    },
+    {
+      "card_id": "CS-220",
+      "url": "/static/generated/concepts/CS-220.svg",
+      "alt": "퍼블릭 클라우드(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: PaaS, SaaS, 프라이빗 클라우드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-220.svg"
+    },
+    {
+      "card_id": "CS-221",
+      "url": "/static/generated/concepts/CS-221.svg",
+      "alt": "공개키 기반구조(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 전자서명, PKI, 대칭키 암호화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-221.svg"
+    },
+    {
+      "card_id": "CS-222",
+      "url": "/static/generated/concepts/CS-222.svg",
+      "alt": "QoS(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: VPN, 터널링, 로드 밸런서",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-222.svg"
+    },
+    {
+      "card_id": "CS-223",
+      "url": "/static/generated/concepts/CS-223.svg",
+      "alt": "양자컴퓨팅(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: API 경제, 오픈 API, 양자내성암호",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-223.svg"
+    },
+    {
+      "card_id": "CS-224",
+      "url": "/static/generated/concepts/CS-224.svg",
+      "alt": "큐(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 원형 연결 리스트, 스택, 원형 큐",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-224.svg"
+    },
+    {
+      "card_id": "CS-225",
+      "url": "/static/generated/concepts/CS-225.svg",
+      "alt": "RabbitMQ(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 메시지 큐, Kafka, 이벤트 기반 아키텍처",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-225.svg"
+    },
+    {
+      "card_id": "CS-226",
+      "url": "/static/generated/concepts/CS-226.svg",
+      "alt": "RAID(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 아이노드, 저널링 파일 시스템, RAID 0",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-226.svg"
+    },
+    {
+      "card_id": "CS-227",
+      "url": "/static/generated/concepts/CS-227.svg",
+      "alt": "RAID 0(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 저널링 파일 시스템, RAID, RAID 1",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-227.svg"
+    },
+    {
+      "card_id": "CS-228",
+      "url": "/static/generated/concepts/CS-228.svg",
+      "alt": "RAID 1(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RAID, RAID 0, RAID 5",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-228.svg"
+    },
+    {
+      "card_id": "CS-229",
+      "url": "/static/generated/concepts/CS-229.svg",
+      "alt": "RAID 5(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RAID 0, RAID 1, DMA",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-229.svg"
+    },
+    {
+      "card_id": "CS-230",
+      "url": "/static/generated/concepts/CS-230.svg",
+      "alt": "RAM(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 쓰기 백, 메모리 계층, ROM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-230.svg"
+    },
+    {
+      "card_id": "CS-231",
+      "url": "/static/generated/concepts/CS-231.svg",
+      "alt": "랜덤 포레스트(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 로지스틱 회귀, 결정 트리, SVM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-231.svg"
+    },
+    {
+      "card_id": "CS-232",
+      "url": "/static/generated/concepts/CS-232.svg",
+      "alt": "랜섬웨어(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 웜, 트로이목마, 피싱",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-232.svg"
+    },
+    {
+      "card_id": "CS-233",
+      "url": "/static/generated/concepts/CS-233.svg",
+      "alt": "RARP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: MAC 주소, ARP, IP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-233.svg"
+    },
+    {
+      "card_id": "CS-234",
+      "url": "/static/generated/concepts/CS-234.svg",
+      "alt": "RBAC(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DAC, MAC, 암호화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-234.svg"
+    },
+    {
+      "card_id": "CS-235",
+      "url": "/static/generated/concepts/CS-235.svg",
+      "alt": "리베이스(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Git, 브랜치, 코드 리뷰",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-235.svg"
+    },
+    {
+      "card_id": "CS-236",
+      "url": "/static/generated/concepts/CS-236.svg",
+      "alt": "재현율(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정확도, 정밀도, F1 점수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-236.svg"
+    },
+    {
+      "card_id": "CS-237",
+      "url": "/static/generated/concepts/CS-237.svg",
+      "alt": "추천 시스템(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정규화, 텍스트 마이닝, 과적합",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-237.svg"
+    },
+    {
+      "card_id": "CS-238",
+      "url": "/static/generated/concepts/CS-238.svg",
+      "alt": "REDO(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 로그, UNDO, 체크포인트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-238.svg"
+    },
+    {
+      "card_id": "CS-239",
+      "url": "/static/generated/concepts/CS-239.svg",
+      "alt": "리팩터링(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 리베이스, 코드 리뷰, 기술 부채",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-239.svg"
+    },
+    {
+      "card_id": "CS-240",
+      "url": "/static/generated/concepts/CS-240.svg",
+      "alt": "회귀(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 강화학습, 분류, 군집화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-240.svg"
+    },
+    {
+      "card_id": "CS-241",
+      "url": "/static/generated/concepts/CS-241.svg",
+      "alt": "회귀 테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 경계값 분석, 동등 분할, 형상 관리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-241.svg"
+    },
+    {
+      "card_id": "CS-242",
+      "url": "/static/generated/concepts/CS-242.svg",
+      "alt": "RegTech(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 디지털 자산, 토큰화, SupTech",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-242.svg"
+    },
+    {
+      "card_id": "CS-243",
+      "url": "/static/generated/concepts/CS-243.svg",
+      "alt": "강화학습(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 지도학습, 비지도학습, 분류",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-243.svg"
+    },
+    {
+      "card_id": "CS-244",
+      "url": "/static/generated/concepts/CS-244.svg",
+      "alt": "릴레이션(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스키마, 인스턴스, 튜플",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-244.svg"
+    },
+    {
+      "card_id": "CS-245",
+      "url": "/static/generated/concepts/CS-245.svg",
+      "alt": "복제(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: BASE, 최종 일관성, 샤딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-245.svg"
+    },
+    {
+      "card_id": "CS-246",
+      "url": "/static/generated/concepts/CS-246.svg",
+      "alt": "요구사항 분석(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DevOps, CI/CD, 기능 요구사항",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-246.svg"
+    },
+    {
+      "card_id": "CS-247",
+      "url": "/static/generated/concepts/CS-247.svg",
+      "alt": "REST(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 쿠키, 세션, WebSocket",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-247.svg"
+    },
+    {
+      "card_id": "CS-248",
+      "url": "/static/generated/concepts/CS-248.svg",
+      "alt": "RIP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정적 라우팅, 동적 라우팅, OSPF",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-248.svg"
+    },
+    {
+      "card_id": "CS-249",
+      "url": "/static/generated/concepts/CS-249.svg",
+      "alt": "RISC(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 슈퍼스칼라, CISC, ISA",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-249.svg"
+    },
+    {
+      "card_id": "CS-250",
+      "url": "/static/generated/concepts/CS-250.svg",
+      "alt": "위험(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 취약점, 위협, 악성코드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-250.svg"
+    },
+    {
+      "card_id": "CS-251",
+      "url": "/static/generated/concepts/CS-251.svg",
+      "alt": "RNN(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 딥러닝, CNN, LSTM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-251.svg"
+    },
+    {
+      "card_id": "CS-252",
+      "url": "/static/generated/concepts/CS-252.svg",
+      "alt": "로보어드바이저(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RegTech, SupTech, 이상거래탐지",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-252.svg"
+    },
+    {
+      "card_id": "CS-253",
+      "url": "/static/generated/concepts/CS-253.svg",
+      "alt": "ROC-AUC(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 재현율, F1 점수, 경사하강법",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-253.svg"
+    },
+    {
+      "card_id": "CS-254",
+      "url": "/static/generated/concepts/CS-254.svg",
+      "alt": "ROM(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 메모리 계층, RAM, SRAM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-254.svg"
+    },
+    {
+      "card_id": "CS-255",
+      "url": "/static/generated/concepts/CS-255.svg",
+      "alt": "Round Robin(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SRTF, HRN, 우선순위 스케줄링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-255.svg"
+    },
+    {
+      "card_id": "CS-256",
+      "url": "/static/generated/concepts/CS-256.svg",
+      "alt": "라우팅(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 서브넷 마스크, CIDR, 정적 라우팅",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-256.svg"
+    },
+    {
+      "card_id": "CS-257",
+      "url": "/static/generated/concepts/CS-257.svg",
+      "alt": "RPA(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 디지털 트윈, 메타버스, API 경제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-257.svg"
+    },
+    {
+      "card_id": "CS-258",
+      "url": "/static/generated/concepts/CS-258.svg",
+      "alt": "RSA(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 비대칭키 암호화, AES, SHA",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-258.svg"
+    },
+    {
+      "card_id": "CS-259",
+      "url": "/static/generated/concepts/CS-259.svg",
+      "alt": "RTGS(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 청산, 결제, DNS 차액결제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-259.svg"
+    },
+    {
+      "card_id": "CS-260",
+      "url": "/static/generated/concepts/CS-260.svg",
+      "alt": "SaaS(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: IaaS, PaaS, 퍼블릭 클라우드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-260.svg"
+    },
+    {
+      "card_id": "CS-261",
+      "url": "/static/generated/concepts/CS-261.svg",
+      "alt": "솔트(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RSA, SHA, 키 스트레칭",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-261.svg"
+    },
+    {
+      "card_id": "CS-262",
+      "url": "/static/generated/concepts/CS-262.svg",
+      "alt": "스케줄링(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프로세스 상태, 준비 큐, 장기 스케줄러",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-262.svg"
+    },
+    {
+      "card_id": "CS-263",
+      "url": "/static/generated/concepts/CS-263.svg",
+      "alt": "스키마(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 데이터베이스, DBMS, 인스턴스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-263.svg"
+    },
+    {
+      "card_id": "CS-264",
+      "url": "/static/generated/concepts/CS-264.svg",
+      "alt": "스크럼(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 나선형 모델, 애자일, 스프린트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-264.svg"
+    },
+    {
+      "card_id": "CS-265",
+      "url": "/static/generated/concepts/CS-265.svg",
+      "alt": "보안 코딩(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SSH, TLS, 입력 검증",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-265.svg"
+    },
+    {
+      "card_id": "CS-266",
+      "url": "/static/generated/concepts/CS-266.svg",
+      "alt": "SELECT(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DCL, TCL, WHERE",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-266.svg"
+    },
+    {
+      "card_id": "CS-267",
+      "url": "/static/generated/concepts/CS-267.svg",
+      "alt": "Selective Repeat(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Stop-and-Wait, Go-Back-N, AIMD",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-267.svg"
+    },
+    {
+      "card_id": "CS-268",
+      "url": "/static/generated/concepts/CS-268.svg",
+      "alt": "시퀀스 다이어그램(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: UML, 클래스 다이어그램, 아키텍처",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-268.svg"
+    },
+    {
+      "card_id": "CS-269",
+      "url": "/static/generated/concepts/CS-269.svg",
+      "alt": "서버리스(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 하이브리드 클라우드, 오토스케일링, 마이크로서비스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-269.svg"
+    },
+    {
+      "card_id": "CS-270",
+      "url": "/static/generated/concepts/CS-270.svg",
+      "alt": "세션 하이재킹(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SQL Injection, CSRF, DDoS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-270.svg"
+    },
+    {
+      "card_id": "CS-271",
+      "url": "/static/generated/concepts/CS-271.svg",
+      "alt": "결제(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 지급결제, 청산, RTGS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-271.svg"
+    },
+    {
+      "card_id": "CS-272",
+      "url": "/static/generated/concepts/CS-272.svg",
+      "alt": "SHA(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: AES, RSA, 솔트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-272.svg"
+    },
+    {
+      "card_id": "CS-273",
+      "url": "/static/generated/concepts/CS-273.svg",
+      "alt": "샤딩(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 최종 일관성, 복제, 파티셔닝",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-273.svg"
+    },
+    {
+      "card_id": "CS-274",
+      "url": "/static/generated/concepts/CS-274.svg",
+      "alt": "SIEM(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: IDS, IPS, 로그 감사",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-274.svg"
+    },
+    {
+      "card_id": "CS-275",
+      "url": "/static/generated/concepts/CS-275.svg",
+      "alt": "싱글턴 패턴(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 의존성 역전 원칙, 디자인 패턴, 팩토리 패턴",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-275.svg"
+    },
+    {
+      "card_id": "CS-276",
+      "url": "/static/generated/concepts/CS-276.svg",
+      "alt": "SJF(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 비선점형 스케줄링, FCFS, SRTF",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-276.svg"
+    },
+    {
+      "card_id": "CS-277",
+      "url": "/static/generated/concepts/CS-277.svg",
+      "alt": "Slow Start(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Selective Repeat, AIMD, HTTP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-277.svg"
+    },
+    {
+      "card_id": "CS-278",
+      "url": "/static/generated/concepts/CS-278.svg",
+      "alt": "스마트 컨트랙트(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프라이빗 블록체인, 퍼블릭 블록체인, DeFi",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-278.svg"
+    },
+    {
+      "card_id": "CS-279",
+      "url": "/static/generated/concepts/CS-279.svg",
+      "alt": "스미싱(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 랜섬웨어, 피싱, 파밍",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-279.svg"
+    },
+    {
+      "card_id": "CS-280",
+      "url": "/static/generated/concepts/CS-280.svg",
+      "alt": "스머프 공격(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DDoS, SYN Flood, ARP 스푸핑",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-280.svg"
+    },
+    {
+      "card_id": "CS-281",
+      "url": "/static/generated/concepts/CS-281.svg",
+      "alt": "사회공학(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스미싱, 파밍, XSS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-281.svg"
+    },
+    {
+      "card_id": "CS-282",
+      "url": "/static/generated/concepts/CS-282.svg",
+      "alt": "소프트웨어공학(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 소프트웨어 생명주기, 폭포수 모델, 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-282.svg"
+    },
+    {
+      "card_id": "CS-283",
+      "url": "/static/generated/concepts/CS-283.svg",
+      "alt": "SOLID(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 응집도, 정보 은닉, 단일 책임 원칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-283.svg"
+    },
+    {
+      "card_id": "CS-284",
+      "url": "/static/generated/concepts/CS-284.svg",
+      "alt": "정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 크루스칼 알고리즘, 프림 알고리즘, 버블 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-284.svg"
+    },
+    {
+      "card_id": "CS-285",
+      "url": "/static/generated/concepts/CS-285.svg",
+      "alt": "나선형 모델(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 폭포수 모델, 프로토타입 모델, 애자일",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-285.svg"
+    },
+    {
+      "card_id": "CS-286",
+      "url": "/static/generated/concepts/CS-286.svg",
+      "alt": "스프린트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 애자일, 스크럼, 칸반",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-286.svg"
+    },
+    {
+      "card_id": "CS-287",
+      "url": "/static/generated/concepts/CS-287.svg",
+      "alt": "SQL(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 클러스터드 인덱스, 비클러스터드 인덱스, DDL",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-287.svg"
+    },
+    {
+      "card_id": "CS-288",
+      "url": "/static/generated/concepts/CS-288.svg",
+      "alt": "SQL Injection(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 사회공학, XSS, CSRF",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-288.svg"
+    },
+    {
+      "card_id": "CS-289",
+      "url": "/static/generated/concepts/CS-289.svg",
+      "alt": "SRAM(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RAM, ROM, DRAM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-289.svg"
+    },
+    {
+      "card_id": "CS-290",
+      "url": "/static/generated/concepts/CS-290.svg",
+      "alt": "SRTF(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: FCFS, SJF, HRN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-290.svg"
+    },
+    {
+      "card_id": "CS-291",
+      "url": "/static/generated/concepts/CS-291.svg",
+      "alt": "SSH(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제로 트러스트, VPN, TLS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-291.svg"
+    },
+    {
+      "card_id": "CS-292",
+      "url": "/static/generated/concepts/CS-292.svg",
+      "alt": "SSL(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 반복 질의, TLS, 대칭키 암호",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-292.svg"
+    },
+    {
+      "card_id": "CS-293",
+      "url": "/static/generated/concepts/CS-293.svg",
+      "alt": "스택(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이중 연결 리스트, 원형 연결 리스트, 큐",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-293.svg"
+    },
+    {
+      "card_id": "CS-294",
+      "url": "/static/generated/concepts/CS-294.svg",
+      "alt": "static 변수(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: JIT 컴파일, C 언어, 전역 변수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-294.svg"
+    },
+    {
+      "card_id": "CS-295",
+      "url": "/static/generated/concepts/CS-295.svg",
+      "alt": "Stop-and-Wait(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 혼잡 제어, 슬라이딩 윈도우, Go-Back-N",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-295.svg"
+    },
+    {
+      "card_id": "CS-296",
+      "url": "/static/generated/concepts/CS-296.svg",
+      "alt": "전략 패턴(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 싱글턴 패턴, 팩토리 패턴, MVC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-296.svg"
+    },
+    {
+      "card_id": "CS-297",
+      "url": "/static/generated/concepts/CS-297.svg",
+      "alt": "서브넷(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: IPv4, IPv6, 서브넷 마스크",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-297.svg"
+    },
+    {
+      "card_id": "CS-298",
+      "url": "/static/generated/concepts/CS-298.svg",
+      "alt": "슈퍼키(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 카디널리티, 키, 후보키",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-298.svg"
+    },
+    {
+      "card_id": "CS-299",
+      "url": "/static/generated/concepts/CS-299.svg",
+      "alt": "지도학습(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인공지능, 머신러닝, 비지도학습",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-299.svg"
+    },
+    {
+      "card_id": "CS-300",
+      "url": "/static/generated/concepts/CS-300.svg",
+      "alt": "SupTech(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 토큰화, RegTech, 로보어드바이저",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-300.svg"
+    },
+    {
+      "card_id": "CS-301",
+      "url": "/static/generated/concepts/CS-301.svg",
+      "alt": "SVM(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 결정 트리, 랜덤 포레스트, KNN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-301.svg"
+    },
+    {
+      "card_id": "CS-302",
+      "url": "/static/generated/concepts/CS-302.svg",
+      "alt": "대칭키 암호화(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: PKI, 공개키 기반구조, 비대칭키 암호화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-302.svg"
+    },
+    {
+      "card_id": "CS-303",
+      "url": "/static/generated/concepts/CS-303.svg",
+      "alt": "SYN Flood(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 세션 하이재킹, DDoS, 스머프 공격",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-303.svg"
+    },
+    {
+      "card_id": "CS-304",
+      "url": "/static/generated/concepts/CS-304.svg",
+      "alt": "시스템 콜(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 운영체제, 커널, 프로세스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-304.svg"
+    },
+    {
+      "card_id": "CS-305",
+      "url": "/static/generated/concepts/CS-305.svg",
+      "alt": "시스템 테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 단위 테스트, 통합 테스트, 인수 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-305.svg"
+    },
+    {
+      "card_id": "CS-306",
+      "url": "/static/generated/concepts/CS-306.svg",
+      "alt": "TCL(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DML, DCL, SELECT",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-306.svg"
+    },
+    {
+      "card_id": "CS-307",
+      "url": "/static/generated/concepts/CS-307.svg",
+      "alt": "TCP/IP 모델(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: OSI 7계층, 물리 계층, 데이터링크 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-307.svg"
+    },
+    {
+      "card_id": "CS-308",
+      "url": "/static/generated/concepts/CS-308.svg",
+      "alt": "기술 부채(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 코드 리뷰, 리팩터링, 기능 점수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-308.svg"
+    },
+    {
+      "card_id": "CS-309",
+      "url": "/static/generated/concepts/CS-309.svg",
+      "alt": "테스트 데이터(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 훈련 데이터, 검증 데이터, 혼동 행렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-309.svg"
+    },
+    {
+      "card_id": "CS-310",
+      "url": "/static/generated/concepts/CS-310.svg",
+      "alt": "테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 전략 패턴, MVC, 단위 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-310.svg"
+    },
+    {
+      "card_id": "CS-311",
+      "url": "/static/generated/concepts/CS-311.svg",
+      "alt": "스레드(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 시스템 콜, 프로세스, 멀티스레딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-311.svg"
+    },
+    {
+      "card_id": "CS-312",
+      "url": "/static/generated/concepts/CS-312.svg",
+      "alt": "위협(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 로그 감사, 취약점, 위험",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-312.svg"
+    },
+    {
+      "card_id": "CS-313",
+      "url": "/static/generated/concepts/CS-313.svg",
+      "alt": "TLB(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프레임, 페이지 테이블, 다단계 페이지 테이블",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-313.svg"
+    },
+    {
+      "card_id": "CS-314",
+      "url": "/static/generated/concepts/CS-314.svg",
+      "alt": "토큰화(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 임베딩, 자연어 처리, 정규화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-314.svg"
+    },
+    {
+      "card_id": "CS-315",
+      "url": "/static/generated/concepts/CS-315.svg",
+      "alt": "트레이싱(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 로그, 메트릭, 분산 시스템",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-315.svg"
+    },
+    {
+      "card_id": "CS-316",
+      "url": "/static/generated/concepts/CS-316.svg",
+      "alt": "훈련 데이터(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정규화 기법, 교차 검증, 검증 데이터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-316.svg"
+    },
+    {
+      "card_id": "CS-317",
+      "url": "/static/generated/concepts/CS-317.svg",
+      "alt": "트랜잭션(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 무손실 분해, 종속성 보존, ACID",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-317.svg"
+    },
+    {
+      "card_id": "CS-318",
+      "url": "/static/generated/concepts/CS-318.svg",
+      "alt": "Transformer(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RNN, LSTM, 어텐션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-318.svg"
+    },
+    {
+      "card_id": "CS-319",
+      "url": "/static/generated/concepts/CS-319.svg",
+      "alt": "TCP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ICMP, Ping, UDP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-319.svg"
+    },
+    {
+      "card_id": "CS-320",
+      "url": "/static/generated/concepts/CS-320.svg",
+      "alt": "TLS(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 재귀 질의, 반복 질의, SSL",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-320.svg"
+    },
+    {
+      "card_id": "CS-321",
+      "url": "/static/generated/concepts/CS-321.svg",
+      "alt": "트로이목마(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 바이러스, 웜, 랜섬웨어",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-321.svg"
+    },
+    {
+      "card_id": "CS-322",
+      "url": "/static/generated/concepts/CS-322.svg",
+      "alt": "튜플(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인스턴스, 릴레이션, 속성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-322.svg"
+    },
+    {
+      "card_id": "CS-323",
+      "url": "/static/generated/concepts/CS-323.svg",
+      "alt": "UML(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 비기능 요구사항, 유스케이스, 클래스 다이어그램",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-323.svg"
+    },
+    {
+      "card_id": "CS-324",
+      "url": "/static/generated/concepts/CS-324.svg",
+      "alt": "과소적합(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 추천 시스템, 과적합, 정규화 기법",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-324.svg"
+    },
+    {
+      "card_id": "CS-325",
+      "url": "/static/generated/concepts/CS-325.svg",
+      "alt": "UNDO(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 회복, 로그, REDO",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-325.svg"
+    },
+    {
+      "card_id": "CS-326",
+      "url": "/static/generated/concepts/CS-326.svg",
+      "alt": "단위 테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: MVC, 테스트, 통합 테스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-326.svg"
+    },
+    {
+      "card_id": "CS-327",
+      "url": "/static/generated/concepts/CS-327.svg",
+      "alt": "비지도학습(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 머신러닝, 지도학습, 강화학습",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-327.svg"
+    },
+    {
+      "card_id": "CS-328",
+      "url": "/static/generated/concepts/CS-328.svg",
+      "alt": "유스케이스(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기능 요구사항, 비기능 요구사항, UML",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-328.svg"
+    },
+    {
+      "card_id": "CS-329",
+      "url": "/static/generated/concepts/CS-329.svg",
+      "alt": "UDP(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Ping, TCP, 3-Way Handshake",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-329.svg"
+    },
+    {
+      "card_id": "CS-330",
+      "url": "/static/generated/concepts/CS-330.svg",
+      "alt": "타뷸레이션(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 재귀, 메모이제이션, 시간 복잡도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-330.svg"
+    },
+    {
+      "card_id": "CS-331",
+      "url": "/static/generated/concepts/CS-331.svg",
+      "alt": "3V(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 결측치, 빅데이터, 데이터 마이닝",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-331.svg"
+    },
+    {
+      "card_id": "CS-332",
+      "url": "/static/generated/concepts/CS-332.svg",
+      "alt": "검증 데이터(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 교차 검증, 훈련 데이터, 테스트 데이터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-332.svg"
+    },
+    {
+      "card_id": "CS-333",
+      "url": "/static/generated/concepts/CS-333.svg",
+      "alt": "가상 메모리(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 역페이지 테이블, 세그멘테이션, 요구 페이징",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-333.svg"
+    },
+    {
+      "card_id": "CS-334",
+      "url": "/static/generated/concepts/CS-334.svg",
+      "alt": "가상화(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 클라우드 컴퓨팅, 하이퍼바이저, VM",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-334.svg"
+    },
+    {
+      "card_id": "CS-335",
+      "url": "/static/generated/concepts/CS-335.svg",
+      "alt": "바이러스(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 위험, 악성코드, 웜",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-335.svg"
+    },
+    {
+      "card_id": "CS-336",
+      "url": "/static/generated/concepts/CS-336.svg",
+      "alt": "VM(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 가상화, 하이퍼바이저, 컨테이너",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-336.svg"
+    },
+    {
+      "card_id": "CS-337",
+      "url": "/static/generated/concepts/CS-337.svg",
+      "alt": "VPN(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 캐시 서버, CDN, 터널링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-337.svg"
+    },
+    {
+      "card_id": "CS-338",
+      "url": "/static/generated/concepts/CS-338.svg",
+      "alt": "취약점(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SIEM, 로그 감사, 위협",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-338.svg"
+    },
+    {
+      "card_id": "CS-339",
+      "url": "/static/generated/concepts/CS-339.svg",
+      "alt": "3-Way Handshake(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: TCP, UDP, 4-Way Handshake",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-339.svg"
+    },
+    {
+      "card_id": "CS-340",
+      "url": "/static/generated/concepts/CS-340.svg",
+      "alt": "4-Way Handshake(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: UDP, 3-Way Handshake, 흐름 제어",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-340.svg"
+    },
+    {
+      "card_id": "CS-341",
+      "url": "/static/generated/concepts/CS-341.svg",
+      "alt": "폭포수 모델(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 소프트웨어공학, 소프트웨어 생명주기, 프로토타입 모델",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-341.svg"
+    },
+    {
+      "card_id": "CS-342",
+      "url": "/static/generated/concepts/CS-342.svg",
+      "alt": "WebSocket(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 세션, REST, 프록시",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-342.svg"
+    },
+    {
+      "card_id": "CS-343",
+      "url": "/static/generated/concepts/CS-343.svg",
+      "alt": "WHERE(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: TCL, SELECT, GROUP BY",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-343.svg"
+    },
+    {
+      "card_id": "CS-344",
+      "url": "/static/generated/concepts/CS-344.svg",
+      "alt": "화이트박스 테스트(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인수 테스트, 블랙박스 테스트, 경계값 분석",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-344.svg"
+    },
+    {
+      "card_id": "CS-345",
+      "url": "/static/generated/concepts/CS-345.svg",
+      "alt": "웜(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 악성코드, 바이러스, 트로이목마",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-345.svg"
+    },
+    {
+      "card_id": "CS-346",
+      "url": "/static/generated/concepts/CS-346.svg",
+      "alt": "XML(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: JSON, HTML, 정규 표현식",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-346.svg"
+    },
+    {
+      "card_id": "CS-347",
+      "url": "/static/generated/concepts/CS-347.svg",
+      "alt": "XSS(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 파밍, 사회공학, SQL Injection",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-347.svg"
+    },
+    {
+      "card_id": "CS-348",
+      "url": "/static/generated/concepts/CS-348.svg",
+      "alt": "YAML(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: JSON, DevOps, Kubernetes",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-348.svg"
+    },
+    {
+      "card_id": "CS-349",
+      "url": "/static/generated/concepts/CS-349.svg",
+      "alt": "Zero Trust(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제로 트러스트, 접근통제, 최소 권한 원칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-349.svg"
+    },
+    {
+      "card_id": "CS-350",
+      "url": "/static/generated/concepts/CS-350.svg",
+      "alt": "제로 트러스트(보안)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DNS 스푸핑, 중간자 공격, VPN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-350.svg"
+    },
+    {
+      "card_id": "CS-351",
+      "url": "/static/generated/concepts/CS-351.svg",
+      "alt": "영지식 증명(금융IT·신기술)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 양자내성암호, 동형암호, 전자금융",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-351.svg"
+    },
+    {
+      "card_id": "CS-352",
+      "url": "/static/generated/concepts/CS-352.svg",
+      "alt": "2단계 락킹(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 동시성 제어, 락, 교착상태",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-352.svg"
+    },
+    {
+      "card_id": "CS-353",
+      "url": "/static/generated/concepts/CS-353.svg",
+      "alt": "가비지 컬렉션(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스택 메모리, 힙 메모리, 클래스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-353.svg"
+    },
+    {
+      "card_id": "CS-354",
+      "url": "/static/generated/concepts/CS-354.svg",
+      "alt": "간선(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 그래프, 정점, 인접 행렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-354.svg"
+    },
+    {
+      "card_id": "CS-355",
+      "url": "/static/generated/concepts/CS-355.svg",
+      "alt": "간접 주소 지정(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 즉시 주소 지정, 직접 주소 지정, 상대 주소 지정",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-355.svg"
+    },
+    {
+      "card_id": "CS-356",
+      "url": "/static/generated/concepts/CS-356.svg",
+      "alt": "강한 타입(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정적 타입, 동적 타입, 약한 타입",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-356.svg"
+    },
+    {
+      "card_id": "CS-357",
+      "url": "/static/generated/concepts/CS-357.svg",
+      "alt": "개방 주소법(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 충돌, 체이닝, 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-357.svg"
+    },
+    {
+      "card_id": "CS-358",
+      "url": "/static/generated/concepts/CS-358.svg",
+      "alt": "개방-폐쇄 원칙(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SOLID, 단일 책임 원칙, 리스코프 치환 원칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-358.svg"
+    },
+    {
+      "card_id": "CS-359",
+      "url": "/static/generated/concepts/CS-359.svg",
+      "alt": "개체 무결성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 복합키, 무결성, 참조 무결성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-359.svg"
+    },
+    {
+      "card_id": "CS-360",
+      "url": "/static/generated/concepts/CS-360.svg",
+      "alt": "계수 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 퀵 정렬, 힙 정렬, 기수 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-360.svg"
+    },
+    {
+      "card_id": "CS-361",
+      "url": "/static/generated/concepts/CS-361.svg",
+      "alt": "고립성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 원자성, 일관성, 지속성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-361.svg"
+    },
+    {
+      "card_id": "CS-362",
+      "url": "/static/generated/concepts/CS-362.svg",
+      "alt": "고차 함수(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 함수형 프로그래밍, 순수 함수, 불변성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-362.svg"
+    },
+    {
+      "card_id": "CS-363",
+      "url": "/static/generated/concepts/CS-363.svg",
+      "alt": "공간 복잡도(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 타뷸레이션, 시간 복잡도, 빅오 표기법",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-363.svg"
+    },
+    {
+      "card_id": "CS-364",
+      "url": "/static/generated/concepts/CS-364.svg",
+      "alt": "공간 지역성(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 지역성, 시간 지역성, 캐시 매핑",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-364.svg"
+    },
+    {
+      "card_id": "CS-365",
+      "url": "/static/generated/concepts/CS-365.svg",
+      "alt": "공개키 암호(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SSL, 대칭키 암호, 인증서",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-365.svg"
+    },
+    {
+      "card_id": "CS-366",
+      "url": "/static/generated/concepts/CS-366.svg",
+      "alt": "관계 대수(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 개체 무결성, 참조 무결성, 셀렉션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-366.svg"
+    },
+    {
+      "card_id": "CS-367",
+      "url": "/static/generated/concepts/CS-367.svg",
+      "alt": "교차 검증(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 과소적합, 정규화 기법, 훈련 데이터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-367.svg"
+    },
+    {
+      "card_id": "CS-368",
+      "url": "/static/generated/concepts/CS-368.svg",
+      "alt": "교착상태(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 락, 2단계 락킹, 타임스탬프 기법",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-368.svg"
+    },
+    {
+      "card_id": "CS-369",
+      "url": "/static/generated/concepts/CS-369.svg",
+      "alt": "구조적 해저드(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 데이터 해저드, 제어 해저드, 슈퍼스칼라",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-369.svg"
+    },
+    {
+      "card_id": "CS-370",
+      "url": "/static/generated/concepts/CS-370.svg",
+      "alt": "기능 요구사항(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CI/CD, 요구사항 분석, 비기능 요구사항",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-370.svg"
+    },
+    {
+      "card_id": "CS-371",
+      "url": "/static/generated/concepts/CS-371.svg",
+      "alt": "기능 점수(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 리팩터링, 기술 부채, COCOMO",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-371.svg"
+    },
+    {
+      "card_id": "CS-372",
+      "url": "/static/generated/concepts/CS-372.svg",
+      "alt": "기수 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 힙 정렬, 계수 정렬, 이진 탐색",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-372.svg"
+    },
+    {
+      "card_id": "CS-373",
+      "url": "/static/generated/concepts/CS-373.svg",
+      "alt": "기아(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 멀티레벨 큐, 멀티레벨 피드백 큐, 에이징",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-373.svg"
+    },
+    {
+      "card_id": "CS-374",
+      "url": "/static/generated/concepts/CS-374.svg",
+      "alt": "나이브 베이즈(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SVM, KNN, 신경망",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-374.svg"
+    },
+    {
+      "card_id": "CS-375",
+      "url": "/static/generated/concepts/CS-375.svg",
+      "alt": "낙관적 병행제어(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 교착상태, 타임스탬프 기법, MVCC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-375.svg"
+    },
+    {
+      "card_id": "CS-376",
+      "url": "/static/generated/concepts/CS-376.svg",
+      "alt": "네트워크 계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 물리 계층, 데이터링크 계층, 전송 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-376.svg"
+    },
+    {
+      "card_id": "CS-377",
+      "url": "/static/generated/concepts/CS-377.svg",
+      "alt": "논리 주소(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 메모리 관리, 주소 바인딩, 물리 주소",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-377.svg"
+    },
+    {
+      "card_id": "CS-378",
+      "url": "/static/generated/concepts/CS-378.svg",
+      "alt": "다단계 페이지 테이블(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 페이지 테이블, TLB, 역페이지 테이블",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-378.svg"
+    },
+    {
+      "card_id": "CS-379",
+      "url": "/static/generated/concepts/CS-379.svg",
+      "alt": "다익스트라 알고리즘(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 위상 정렬, 최단 경로, 벨만-포드 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-379.svg"
+    },
+    {
+      "card_id": "CS-380",
+      "url": "/static/generated/concepts/CS-380.svg",
+      "alt": "단기 스케줄러(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스케줄링, 장기 스케줄러, 중기 스케줄러",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-380.svg"
+    },
+    {
+      "card_id": "CS-381",
+      "url": "/static/generated/concepts/CS-381.svg",
+      "alt": "단일 연결 리스트(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 배열, 연결 리스트, 이중 연결 리스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-381.svg"
+    },
+    {
+      "card_id": "CS-382",
+      "url": "/static/generated/concepts/CS-382.svg",
+      "alt": "단일 책임 원칙(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정보 은닉, SOLID, 개방-폐쇄 원칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-382.svg"
+    },
+    {
+      "card_id": "CS-383",
+      "url": "/static/generated/concepts/CS-383.svg",
+      "alt": "대칭키 암호(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: TLS, SSL, 공개키 암호",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-383.svg"
+    },
+    {
+      "card_id": "CS-384",
+      "url": "/static/generated/concepts/CS-384.svg",
+      "alt": "데이터 해저드(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 파이프라이닝, 파이프라인 해저드, 제어 해저드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-384.svg"
+    },
+    {
+      "card_id": "CS-385",
+      "url": "/static/generated/concepts/CS-385.svg",
+      "alt": "데이터링크 계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: TCP/IP 모델, 물리 계층, 네트워크 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-385.svg"
+    },
+    {
+      "card_id": "CS-386",
+      "url": "/static/generated/concepts/CS-386.svg",
+      "alt": "덱(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 큐, 원형 큐, 우선순위 큐",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-386.svg"
+    },
+    {
+      "card_id": "CS-387",
+      "url": "/static/generated/concepts/CS-387.svg",
+      "alt": "동시성 제어(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 고립성, 지속성, 락",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-387.svg"
+    },
+    {
+      "card_id": "CS-388",
+      "url": "/static/generated/concepts/CS-388.svg",
+      "alt": "동적 라우팅(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 라우팅, 정적 라우팅, RIP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-388.svg"
+    },
+    {
+      "card_id": "CS-389",
+      "url": "/static/generated/concepts/CS-389.svg",
+      "alt": "동적 바인딩(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 로더, 정적 바인딩, 자료형",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-389.svg"
+    },
+    {
+      "card_id": "CS-390",
+      "url": "/static/generated/concepts/CS-390.svg",
+      "alt": "동적 타입(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 자료형, 정적 타입, 강한 타입",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-390.svg"
+    },
+    {
+      "card_id": "CS-391",
+      "url": "/static/generated/concepts/CS-391.svg",
+      "alt": "디렉터리(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 워킹 세트, 파일 시스템, 아이노드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-391.svg"
+    },
+    {
+      "card_id": "CS-392",
+      "url": "/static/generated/concepts/CS-392.svg",
+      "alt": "락(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 지속성, 동시성 제어, 2단계 락킹",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-392.svg"
+    },
+    {
+      "card_id": "CS-393",
+      "url": "/static/generated/concepts/CS-393.svg",
+      "alt": "람다식(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제네릭, 템플릿, 클로저",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-393.svg"
+    },
+    {
+      "card_id": "CS-394",
+      "url": "/static/generated/concepts/CS-394.svg",
+      "alt": "레드블랙 트리(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이진 탐색 트리, AVL 트리, B-트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-394.svg"
+    },
+    {
+      "card_id": "CS-395",
+      "url": "/static/generated/concepts/CS-395.svg",
+      "alt": "레지스터(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ALU, 제어장치, 프로그램 카운터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-395.svg"
+    },
+    {
+      "card_id": "CS-396",
+      "url": "/static/generated/concepts/CS-396.svg",
+      "alt": "로그(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: MVCC, 회복, UNDO",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-396.svg"
+    },
+    {
+      "card_id": "CS-397",
+      "url": "/static/generated/concepts/CS-397.svg",
+      "alt": "로더(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 어셈블러, 링커, 정적 바인딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-397.svg"
+    },
+    {
+      "card_id": "CS-398",
+      "url": "/static/generated/concepts/CS-398.svg",
+      "alt": "로드 밸런서(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 터널링, QoS, TCP",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-398.svg"
+    },
+    {
+      "card_id": "CS-399",
+      "url": "/static/generated/concepts/CS-399.svg",
+      "alt": "로드 밸런싱(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 샤딩, 파티셔닝, 메시지 큐",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-399.svg"
+    },
+    {
+      "card_id": "CS-400",
+      "url": "/static/generated/concepts/CS-400.svg",
+      "alt": "로지스틱 회귀(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 차원 축소, 선형 회귀, 결정 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-400.svg"
+    },
+    {
+      "card_id": "CS-401",
+      "url": "/static/generated/concepts/CS-401.svg",
+      "alt": "리스코프 치환 원칙(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 단일 책임 원칙, 개방-폐쇄 원칙, 인터페이스 분리 원칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-401.svg"
+    },
+    {
+      "card_id": "CS-402",
+      "url": "/static/generated/concepts/CS-402.svg",
+      "alt": "링커(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인터프리터, 어셈블러, 로더",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-402.svg"
+    },
+    {
+      "card_id": "CS-403",
+      "url": "/static/generated/concepts/CS-403.svg",
+      "alt": "멀티레벨 큐(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Round Robin, 우선순위 스케줄링, 멀티레벨 피드백 큐",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-403.svg"
+    },
+    {
+      "card_id": "CS-404",
+      "url": "/static/generated/concepts/CS-404.svg",
+      "alt": "멀티레벨 피드백 큐(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 우선순위 스케줄링, 멀티레벨 큐, 기아",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-404.svg"
+    },
+    {
+      "card_id": "CS-405",
+      "url": "/static/generated/concepts/CS-405.svg",
+      "alt": "멀티스레딩(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프로세스, 스레드, PCB",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-405.svg"
+    },
+    {
+      "card_id": "CS-406",
+      "url": "/static/generated/concepts/CS-406.svg",
+      "alt": "메모리 관리(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 환형대기 조건, 은행가 알고리즘, 주소 바인딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-406.svg"
+    },
+    {
+      "card_id": "CS-407",
+      "url": "/static/generated/concepts/CS-407.svg",
+      "alt": "메모이제이션(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 백트래킹, 재귀, 타뷸레이션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-407.svg"
+    },
+    {
+      "card_id": "CS-408",
+      "url": "/static/generated/concepts/CS-408.svg",
+      "alt": "명령어 레지스터(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 레지스터, 프로그램 카운터, 명령어 사이클",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-408.svg"
+    },
+    {
+      "card_id": "CS-409",
+      "url": "/static/generated/concepts/CS-409.svg",
+      "alt": "명령어 사이클(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프로그램 카운터, 명령어 레지스터, 인출",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-409.svg"
+    },
+    {
+      "card_id": "CS-410",
+      "url": "/static/generated/concepts/CS-410.svg",
+      "alt": "모니터(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 세마포어, 뮤텍스, 스핀락",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-410.svg"
+    },
+    {
+      "card_id": "CS-411",
+      "url": "/static/generated/concepts/CS-411.svg",
+      "alt": "모듈화(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 시퀀스 다이어그램, 아키텍처, 결합도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-411.svg"
+    },
+    {
+      "card_id": "CS-412",
+      "url": "/static/generated/concepts/CS-412.svg",
+      "alt": "무손실 분해(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이행 함수 종속, 이상 현상, 종속성 보존",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-412.svg"
+    },
+    {
+      "card_id": "CS-413",
+      "url": "/static/generated/concepts/CS-413.svg",
+      "alt": "물리 계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: OSI 7계층, TCP/IP 모델, 데이터링크 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-413.svg"
+    },
+    {
+      "card_id": "CS-414",
+      "url": "/static/generated/concepts/CS-414.svg",
+      "alt": "물리 주소(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 주소 바인딩, 논리 주소, 페이징",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-414.svg"
+    },
+    {
+      "card_id": "CS-415",
+      "url": "/static/generated/concepts/CS-415.svg",
+      "alt": "뮤텍스(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 상호배제, 세마포어, 모니터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-415.svg"
+    },
+    {
+      "card_id": "CS-416",
+      "url": "/static/generated/concepts/CS-416.svg",
+      "alt": "바쁜 대기(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 모니터, 스핀락, 생산자-소비자 문제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-416.svg"
+    },
+    {
+      "card_id": "CS-417",
+      "url": "/static/generated/concepts/CS-417.svg",
+      "alt": "바이트코드(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Java, JVM, JIT 컴파일",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-417.svg"
+    },
+    {
+      "card_id": "CS-418",
+      "url": "/static/generated/concepts/CS-418.svg",
+      "alt": "반복 질의(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DNS, 재귀 질의, TLS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-418.svg"
+    },
+    {
+      "card_id": "CS-419",
+      "url": "/static/generated/concepts/CS-419.svg",
+      "alt": "백트래킹(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 동적 계획법, 탐욕 알고리즘, 재귀",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-419.svg"
+    },
+    {
+      "card_id": "CS-420",
+      "url": "/static/generated/concepts/CS-420.svg",
+      "alt": "버블 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프림 알고리즘, 정렬, 선택 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-420.svg"
+    },
+    {
+      "card_id": "CS-421",
+      "url": "/static/generated/concepts/CS-421.svg",
+      "alt": "버스(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DRAM, 플래시 메모리, 입출력",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-421.svg"
+    },
+    {
+      "card_id": "CS-422",
+      "url": "/static/generated/concepts/CS-422.svg",
+      "alt": "벨만-포드 알고리즘(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 최단 경로, 다익스트라 알고리즘, 플로이드-워셜 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-422.svg"
+    },
+    {
+      "card_id": "CS-423",
+      "url": "/static/generated/concepts/CS-423.svg",
+      "alt": "변수(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 강한 타입, 약한 타입, 상수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-423.svg"
+    },
+    {
+      "card_id": "CS-424",
+      "url": "/static/generated/concepts/CS-424.svg",
+      "alt": "병렬 처리(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인터럽트, DMA, 암달의 법칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-424.svg"
+    },
+    {
+      "card_id": "CS-425",
+      "url": "/static/generated/concepts/CS-425.svg",
+      "alt": "병합 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 선택 정렬, 삽입 정렬, 퀵 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-425.svg"
+    },
+    {
+      "card_id": "CS-426",
+      "url": "/static/generated/concepts/CS-426.svg",
+      "alt": "부분 함수 종속(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 함수 종속, 완전 함수 종속, 이행 함수 종속",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-426.svg"
+    },
+    {
+      "card_id": "CS-427",
+      "url": "/static/generated/concepts/CS-427.svg",
+      "alt": "분산 트랜잭션(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RabbitMQ, 이벤트 기반 아키텍처, 2PC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-427.svg"
+    },
+    {
+      "card_id": "CS-428",
+      "url": "/static/generated/concepts/CS-428.svg",
+      "alt": "분할 정복(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이진 탐색, 해시 탐색, 동적 계획법",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-428.svg"
+    },
+    {
+      "card_id": "CS-429",
+      "url": "/static/generated/concepts/CS-429.svg",
+      "alt": "분할 허용성(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 일관성, 가용성, BASE",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-429.svg"
+    },
+    {
+      "card_id": "CS-430",
+      "url": "/static/generated/concepts/CS-430.svg",
+      "alt": "불변성(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 순수 함수, 고차 함수, Java",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-430.svg"
+    },
+    {
+      "card_id": "CS-431",
+      "url": "/static/generated/concepts/CS-431.svg",
+      "alt": "뷰(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: JOIN, 서브쿼리, 저장 프로시저",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-431.svg"
+    },
+    {
+      "card_id": "CS-432",
+      "url": "/static/generated/concepts/CS-432.svg",
+      "alt": "비기능 요구사항(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 요구사항 분석, 기능 요구사항, 유스케이스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-432.svg"
+    },
+    {
+      "card_id": "CS-433",
+      "url": "/static/generated/concepts/CS-433.svg",
+      "alt": "비선점 조건(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 상호배제 조건, 점유대기 조건, 환형대기 조건",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-433.svg"
+    },
+    {
+      "card_id": "CS-434",
+      "url": "/static/generated/concepts/CS-434.svg",
+      "alt": "비선점형 스케줄링(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 중기 스케줄러, 선점형 스케줄링, FCFS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-434.svg"
+    },
+    {
+      "card_id": "CS-435",
+      "url": "/static/generated/concepts/CS-435.svg",
+      "alt": "비클러스터드 인덱스(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 해시 인덱스, 클러스터드 인덱스, SQL",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-435.svg"
+    },
+    {
+      "card_id": "CS-436",
+      "url": "/static/generated/concepts/CS-436.svg",
+      "alt": "빅오 표기법(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 시간 복잡도, 공간 복잡도, NP-완전",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-436.svg"
+    },
+    {
+      "card_id": "CS-437",
+      "url": "/static/generated/concepts/CS-437.svg",
+      "alt": "사가 패턴(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 분산 트랜잭션, 2PC, 멱등성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-437.svg"
+    },
+    {
+      "card_id": "CS-438",
+      "url": "/static/generated/concepts/CS-438.svg",
+      "alt": "삽입 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 버블 정렬, 선택 정렬, 병합 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-438.svg"
+    },
+    {
+      "card_id": "CS-439",
+      "url": "/static/generated/concepts/CS-439.svg",
+      "alt": "상대 주소 지정(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 직접 주소 지정, 간접 주소 지정, 캐시",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-439.svg"
+    },
+    {
+      "card_id": "CS-440",
+      "url": "/static/generated/concepts/CS-440.svg",
+      "alt": "상수(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 약한 타입, 변수, 포인터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-440.svg"
+    },
+    {
+      "card_id": "CS-441",
+      "url": "/static/generated/concepts/CS-441.svg",
+      "alt": "상호배제(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 에이징, 임계구역, 세마포어",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-441.svg"
+    },
+    {
+      "card_id": "CS-442",
+      "url": "/static/generated/concepts/CS-442.svg",
+      "alt": "상호배제 조건(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 식사하는 철학자 문제, 교착상태, 점유대기 조건",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-442.svg"
+    },
+    {
+      "card_id": "CS-443",
+      "url": "/static/generated/concepts/CS-443.svg",
+      "alt": "생산자-소비자 문제(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스핀락, 바쁜 대기, 식사하는 철학자 문제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-443.svg"
+    },
+    {
+      "card_id": "CS-444",
+      "url": "/static/generated/concepts/CS-444.svg",
+      "alt": "생성자(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인터페이스, 추상 클래스, 소멸자",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-444.svg"
+    },
+    {
+      "card_id": "CS-445",
+      "url": "/static/generated/concepts/CS-445.svg",
+      "alt": "서브넷 마스크(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: IPv6, 서브넷, CIDR",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-445.svg"
+    },
+    {
+      "card_id": "CS-446",
+      "url": "/static/generated/concepts/CS-446.svg",
+      "alt": "서브쿼리(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ORDER BY, JOIN, 뷰",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-446.svg"
+    },
+    {
+      "card_id": "CS-447",
+      "url": "/static/generated/concepts/CS-447.svg",
+      "alt": "서비스 메시(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 마이크로서비스, API 게이트웨이, 분산 시스템",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-447.svg"
+    },
+    {
+      "card_id": "CS-448",
+      "url": "/static/generated/concepts/CS-448.svg",
+      "alt": "선점형 스케줄링(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 단기 스케줄러, 중기 스케줄러, 비선점형 스케줄링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-448.svg"
+    },
+    {
+      "card_id": "CS-449",
+      "url": "/static/generated/concepts/CS-449.svg",
+      "alt": "선택 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정렬, 버블 정렬, 삽입 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-449.svg"
+    },
+    {
+      "card_id": "CS-450",
+      "url": "/static/generated/concepts/CS-450.svg",
+      "alt": "선형 회귀(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 군집화, 차원 축소, 로지스틱 회귀",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-450.svg"
+    },
+    {
+      "card_id": "CS-451",
+      "url": "/static/generated/concepts/CS-451.svg",
+      "alt": "세그멘테이션(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 다단계 페이지 테이블, 역페이지 테이블, 가상 메모리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-451.svg"
+    },
+    {
+      "card_id": "CS-452",
+      "url": "/static/generated/concepts/CS-452.svg",
+      "alt": "세마포어(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 임계구역, 상호배제, 뮤텍스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-452.svg"
+    },
+    {
+      "card_id": "CS-453",
+      "url": "/static/generated/concepts/CS-453.svg",
+      "alt": "세션(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CA, 쿠키, REST",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-453.svg"
+    },
+    {
+      "card_id": "CS-454",
+      "url": "/static/generated/concepts/CS-454.svg",
+      "alt": "세션 계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 네트워크 계층, 전송 계층, 표현 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-454.svg"
+    },
+    {
+      "card_id": "CS-455",
+      "url": "/static/generated/concepts/CS-455.svg",
+      "alt": "세타 조인(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프로젝션, 조인, 자연 조인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-455.svg"
+    },
+    {
+      "card_id": "CS-456",
+      "url": "/static/generated/concepts/CS-456.svg",
+      "alt": "세트 연관 매핑(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 직접 매핑, 완전 연관 매핑, 쓰기 스루",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-456.svg"
+    },
+    {
+      "card_id": "CS-457",
+      "url": "/static/generated/concepts/CS-457.svg",
+      "alt": "셀렉션(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 참조 무결성, 관계 대수, 프로젝션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-457.svg"
+    },
+    {
+      "card_id": "CS-458",
+      "url": "/static/generated/concepts/CS-458.svg",
+      "alt": "소멸자(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 추상 클래스, 생성자, 예외 처리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-458.svg"
+    },
+    {
+      "card_id": "CS-459",
+      "url": "/static/generated/concepts/CS-459.svg",
+      "alt": "소프트웨어 생명주기(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 소프트웨어공학, 폭포수 모델, 프로토타입 모델",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-459.svg"
+    },
+    {
+      "card_id": "CS-460",
+      "url": "/static/generated/concepts/CS-460.svg",
+      "alt": "수명(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 참조, 스코프, 스택 메모리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-460.svg"
+    },
+    {
+      "card_id": "CS-461",
+      "url": "/static/generated/concepts/CS-461.svg",
+      "alt": "순수 함수(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 클로저, 함수형 프로그래밍, 고차 함수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-461.svg"
+    },
+    {
+      "card_id": "CS-462",
+      "url": "/static/generated/concepts/CS-462.svg",
+      "alt": "슈퍼스칼라(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제어 해저드, 구조적 해저드, CISC",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-462.svg"
+    },
+    {
+      "card_id": "CS-463",
+      "url": "/static/generated/concepts/CS-463.svg",
+      "alt": "스래싱(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: LRU, Optimal 페이지 교체, 워킹 세트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-463.svg"
+    },
+    {
+      "card_id": "CS-464",
+      "url": "/static/generated/concepts/CS-464.svg",
+      "alt": "스코프(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 포인터, 참조, 수명",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-464.svg"
+    },
+    {
+      "card_id": "CS-465",
+      "url": "/static/generated/concepts/CS-465.svg",
+      "alt": "스택 메모리(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스코프, 수명, 힙 메모리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-465.svg"
+    },
+    {
+      "card_id": "CS-466",
+      "url": "/static/generated/concepts/CS-466.svg",
+      "alt": "스핀락(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 뮤텍스, 모니터, 바쁜 대기",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-466.svg"
+    },
+    {
+      "card_id": "CS-467",
+      "url": "/static/generated/concepts/CS-467.svg",
+      "alt": "슬라이딩 윈도우(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 흐름 제어, 혼잡 제어, Stop-and-Wait",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-467.svg"
+    },
+    {
+      "card_id": "CS-468",
+      "url": "/static/generated/concepts/CS-468.svg",
+      "alt": "시간 복잡도(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 메모이제이션, 타뷸레이션, 공간 복잡도",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-468.svg"
+    },
+    {
+      "card_id": "CS-469",
+      "url": "/static/generated/concepts/CS-469.svg",
+      "alt": "시간 지역성(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 캐시 미스, 지역성, 공간 지역성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-469.svg"
+    },
+    {
+      "card_id": "CS-470",
+      "url": "/static/generated/concepts/CS-470.svg",
+      "alt": "식사하는 철학자 문제(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 바쁜 대기, 생산자-소비자 문제, 교착상태",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-470.svg"
+    },
+    {
+      "card_id": "CS-471",
+      "url": "/static/generated/concepts/CS-471.svg",
+      "alt": "실행(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인출, 해독, 파이프라이닝",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-471.svg"
+    },
+    {
+      "card_id": "CS-472",
+      "url": "/static/generated/concepts/CS-472.svg",
+      "alt": "쓰기 백(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 세트 연관 매핑, 쓰기 스루, 메모리 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-472.svg"
+    },
+    {
+      "card_id": "CS-473",
+      "url": "/static/generated/concepts/CS-473.svg",
+      "alt": "쓰기 스루(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 완전 연관 매핑, 세트 연관 매핑, 쓰기 백",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-473.svg"
+    },
+    {
+      "card_id": "CS-474",
+      "url": "/static/generated/concepts/CS-474.svg",
+      "alt": "아이노드(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 파일 시스템, 디렉터리, 저널링 파일 시스템",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-474.svg"
+    },
+    {
+      "card_id": "CS-475",
+      "url": "/static/generated/concepts/CS-475.svg",
+      "alt": "아키텍처(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 클래스 다이어그램, 시퀀스 다이어그램, 모듈화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-475.svg"
+    },
+    {
+      "card_id": "CS-476",
+      "url": "/static/generated/concepts/CS-476.svg",
+      "alt": "암달의 법칙(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DMA, 병렬 처리, CPU",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-476.svg"
+    },
+    {
+      "card_id": "CS-477",
+      "url": "/static/generated/concepts/CS-477.svg",
+      "alt": "약한 타입(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 동적 타입, 강한 타입, 변수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-477.svg"
+    },
+    {
+      "card_id": "CS-478",
+      "url": "/static/generated/concepts/CS-478.svg",
+      "alt": "어셈블러(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 컴파일러, 인터프리터, 링커",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-478.svg"
+    },
+    {
+      "card_id": "CS-479",
+      "url": "/static/generated/concepts/CS-479.svg",
+      "alt": "에이징(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 멀티레벨 피드백 큐, 기아, 임계구역",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-479.svg"
+    },
+    {
+      "card_id": "CS-480",
+      "url": "/static/generated/concepts/CS-480.svg",
+      "alt": "역페이지 테이블(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: TLB, 다단계 페이지 테이블, 세그멘테이션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-480.svg"
+    },
+    {
+      "card_id": "CS-481",
+      "url": "/static/generated/concepts/CS-481.svg",
+      "alt": "예외 처리(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 생성자, 소멸자, 제네릭",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-481.svg"
+    },
+    {
+      "card_id": "CS-482",
+      "url": "/static/generated/concepts/CS-482.svg",
+      "alt": "오버라이딩(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 추상화, 오버로딩, 인터페이스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-482.svg"
+    },
+    {
+      "card_id": "CS-483",
+      "url": "/static/generated/concepts/CS-483.svg",
+      "alt": "오버로딩(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 다형성, 추상화, 오버라이딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-483.svg"
+    },
+    {
+      "card_id": "CS-484",
+      "url": "/static/generated/concepts/CS-484.svg",
+      "alt": "오토스케일링(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 프라이빗 클라우드, 하이브리드 클라우드, 서버리스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-484.svg"
+    },
+    {
+      "card_id": "CS-485",
+      "url": "/static/generated/concepts/CS-485.svg",
+      "alt": "완전 연관 매핑(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 캐시 매핑, 직접 매핑, 세트 연관 매핑",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-485.svg"
+    },
+    {
+      "card_id": "CS-486",
+      "url": "/static/generated/concepts/CS-486.svg",
+      "alt": "완전 함수 종속(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: BCNF, 함수 종속, 부분 함수 종속",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-486.svg"
+    },
+    {
+      "card_id": "CS-487",
+      "url": "/static/generated/concepts/CS-487.svg",
+      "alt": "외부 조인(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 세타 조인, 자연 조인, 정규화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-487.svg"
+    },
+    {
+      "card_id": "CS-488",
+      "url": "/static/generated/concepts/CS-488.svg",
+      "alt": "요구 페이징(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 세그멘테이션, 가상 메모리, 페이지 폴트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-488.svg"
+    },
+    {
+      "card_id": "CS-489",
+      "url": "/static/generated/concepts/CS-489.svg",
+      "alt": "우선순위 스케줄링(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: HRN, Round Robin, 멀티레벨 큐",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-489.svg"
+    },
+    {
+      "card_id": "CS-490",
+      "url": "/static/generated/concepts/CS-490.svg",
+      "alt": "우선순위 큐(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 원형 큐, 덱, 힙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-490.svg"
+    },
+    {
+      "card_id": "CS-491",
+      "url": "/static/generated/concepts/CS-491.svg",
+      "alt": "워킹 세트(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Optimal 페이지 교체, 스래싱, 파일 시스템",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-491.svg"
+    },
+    {
+      "card_id": "CS-492",
+      "url": "/static/generated/concepts/CS-492.svg",
+      "alt": "원자성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 트랜잭션, ACID, 일관성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-492.svg"
+    },
+    {
+      "card_id": "CS-493",
+      "url": "/static/generated/concepts/CS-493.svg",
+      "alt": "원형 연결 리스트(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 단일 연결 리스트, 이중 연결 리스트, 스택",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-493.svg"
+    },
+    {
+      "card_id": "CS-494",
+      "url": "/static/generated/concepts/CS-494.svg",
+      "alt": "원형 큐(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스택, 큐, 덱",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-494.svg"
+    },
+    {
+      "card_id": "CS-495",
+      "url": "/static/generated/concepts/CS-495.svg",
+      "alt": "위상 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DFS, BFS, 최단 경로",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-495.svg"
+    },
+    {
+      "card_id": "CS-496",
+      "url": "/static/generated/concepts/CS-496.svg",
+      "alt": "은행가 알고리즘(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 비선점 조건, 환형대기 조건, 메모리 관리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-496.svg"
+    },
+    {
+      "card_id": "CS-497",
+      "url": "/static/generated/concepts/CS-497.svg",
+      "alt": "응용 계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 세션 계층, 표현 계층, 이더넷",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-497.svg"
+    },
+    {
+      "card_id": "CS-498",
+      "url": "/static/generated/concepts/CS-498.svg",
+      "alt": "의존성 역전 원칙(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 리스코프 치환 원칙, 인터페이스 분리 원칙, 디자인 패턴",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-498.svg"
+    },
+    {
+      "card_id": "CS-499",
+      "url": "/static/generated/concepts/CS-499.svg",
+      "alt": "이더넷(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 표현 계층, 응용 계층, MAC 주소",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-499.svg"
+    },
+    {
+      "card_id": "CS-500",
+      "url": "/static/generated/concepts/CS-500.svg",
+      "alt": "이벤트 기반 아키텍처(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: Kafka, RabbitMQ, 분산 트랜잭션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-500.svg"
+    },
+    {
+      "card_id": "CS-501",
+      "url": "/static/generated/concepts/CS-501.svg",
+      "alt": "이상 현상(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 부분 함수 종속, 이행 함수 종속, 무손실 분해",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-501.svg"
+    },
+    {
+      "card_id": "CS-502",
+      "url": "/static/generated/concepts/CS-502.svg",
+      "alt": "이중 연결 리스트(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 연결 리스트, 단일 연결 리스트, 원형 연결 리스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-502.svg"
+    },
+    {
+      "card_id": "CS-503",
+      "url": "/static/generated/concepts/CS-503.svg",
+      "alt": "이진 탐색(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 계수 정렬, 기수 정렬, 해시 탐색",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-503.svg"
+    },
+    {
+      "card_id": "CS-504",
+      "url": "/static/generated/concepts/CS-504.svg",
+      "alt": "이진 탐색 트리(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 트리, 이진 트리, AVL 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-504.svg"
+    },
+    {
+      "card_id": "CS-505",
+      "url": "/static/generated/concepts/CS-505.svg",
+      "alt": "이진 트리(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 개방 주소법, 트리, 이진 탐색 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-505.svg"
+    },
+    {
+      "card_id": "CS-506",
+      "url": "/static/generated/concepts/CS-506.svg",
+      "alt": "이행 함수 종속(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 완전 함수 종속, 부분 함수 종속, 이상 현상",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-506.svg"
+    },
+    {
+      "card_id": "CS-507",
+      "url": "/static/generated/concepts/CS-507.svg",
+      "alt": "인공지능(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 머신러닝, 지도학습, 훈련 데이터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-507.svg"
+    },
+    {
+      "card_id": "CS-508",
+      "url": "/static/generated/concepts/CS-508.svg",
+      "alt": "인스턴스(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DBMS, 스키마, 릴레이션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-508.svg"
+    },
+    {
+      "card_id": "CS-509",
+      "url": "/static/generated/concepts/CS-509.svg",
+      "alt": "인접 리스트(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 간선, 인접 행렬, DFS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-509.svg"
+    },
+    {
+      "card_id": "CS-510",
+      "url": "/static/generated/concepts/CS-510.svg",
+      "alt": "인접 행렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정점, 간선, 인접 리스트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-510.svg"
+    },
+    {
+      "card_id": "CS-511",
+      "url": "/static/generated/concepts/CS-511.svg",
+      "alt": "인증서(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 대칭키 암호, 공개키 암호, CA",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-511.svg"
+    },
+    {
+      "card_id": "CS-512",
+      "url": "/static/generated/concepts/CS-512.svg",
+      "alt": "인출(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 명령어 레지스터, 명령어 사이클, 해독",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-512.svg"
+    },
+    {
+      "card_id": "CS-513",
+      "url": "/static/generated/concepts/CS-513.svg",
+      "alt": "인터럽트(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RAID 5, DMA, 캐시 일관성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-513.svg"
+    },
+    {
+      "card_id": "CS-514",
+      "url": "/static/generated/concepts/CS-514.svg",
+      "alt": "인터페이스(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 오버로딩, 오버라이딩, 추상 클래스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-514.svg"
+    },
+    {
+      "card_id": "CS-515",
+      "url": "/static/generated/concepts/CS-515.svg",
+      "alt": "인터페이스 분리 원칙(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 개방-폐쇄 원칙, 리스코프 치환 원칙, 의존성 역전 원칙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-515.svg"
+    },
+    {
+      "card_id": "CS-516",
+      "url": "/static/generated/concepts/CS-516.svg",
+      "alt": "일관성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ACID, 원자성, 고립성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-516.svg"
+    },
+    {
+      "card_id": "CS-517",
+      "url": "/static/generated/concepts/CS-517.svg",
+      "alt": "임계구역(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기아, 에이징, 상호배제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-517.svg"
+    },
+    {
+      "card_id": "CS-518",
+      "url": "/static/generated/concepts/CS-518.svg",
+      "alt": "입출력(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 플래시 메모리, 버스, 폴링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-518.svg"
+    },
+    {
+      "card_id": "CS-519",
+      "url": "/static/generated/concepts/CS-519.svg",
+      "alt": "자료형(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정적 바인딩, 동적 바인딩, 정적 타입",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-519.svg"
+    },
+    {
+      "card_id": "CS-520",
+      "url": "/static/generated/concepts/CS-520.svg",
+      "alt": "자연 조인(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 조인, 세타 조인, 외부 조인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-520.svg"
+    },
+    {
+      "card_id": "CS-521",
+      "url": "/static/generated/concepts/CS-521.svg",
+      "alt": "자연어 처리(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 어텐션, 임베딩, 토큰화",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-521.svg"
+    },
+    {
+      "card_id": "CS-522",
+      "url": "/static/generated/concepts/CS-522.svg",
+      "alt": "장기 스케줄러(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 준비 큐, 스케줄링, 단기 스케줄러",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-522.svg"
+    },
+    {
+      "card_id": "CS-523",
+      "url": "/static/generated/concepts/CS-523.svg",
+      "alt": "재귀(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 탐욕 알고리즘, 백트래킹, 메모이제이션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-523.svg"
+    },
+    {
+      "card_id": "CS-524",
+      "url": "/static/generated/concepts/CS-524.svg",
+      "alt": "재귀 질의(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: HTTPS, DNS, 반복 질의",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-524.svg"
+    },
+    {
+      "card_id": "CS-525",
+      "url": "/static/generated/concepts/CS-525.svg",
+      "alt": "재귀 함수(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: static 변수, 전역 변수, 정규 표현식",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-525.svg"
+    },
+    {
+      "card_id": "CS-526",
+      "url": "/static/generated/concepts/CS-526.svg",
+      "alt": "저널링 파일 시스템(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 디렉터리, 아이노드, RAID",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-526.svg"
+    },
+    {
+      "card_id": "CS-527",
+      "url": "/static/generated/concepts/CS-527.svg",
+      "alt": "저장 프로시저(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 서브쿼리, 뷰, 트리거",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-527.svg"
+    },
+    {
+      "card_id": "CS-528",
+      "url": "/static/generated/concepts/CS-528.svg",
+      "alt": "전송 계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 데이터링크 계층, 네트워크 계층, 세션 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-528.svg"
+    },
+    {
+      "card_id": "CS-529",
+      "url": "/static/generated/concepts/CS-529.svg",
+      "alt": "전역 변수(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: C 언어, static 변수, 재귀 함수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-529.svg"
+    },
+    {
+      "card_id": "CS-530",
+      "url": "/static/generated/concepts/CS-530.svg",
+      "alt": "점유대기 조건(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 교착상태, 상호배제 조건, 비선점 조건",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-530.svg"
+    },
+    {
+      "card_id": "CS-531",
+      "url": "/static/generated/concepts/CS-531.svg",
+      "alt": "정규 표현식(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 전역 변수, 재귀 함수, 컴파일러",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-531.svg"
+    },
+    {
+      "card_id": "CS-532",
+      "url": "/static/generated/concepts/CS-532.svg",
+      "alt": "정규화 기법(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 과적합, 과소적합, 교차 검증",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-532.svg"
+    },
+    {
+      "card_id": "CS-533",
+      "url": "/static/generated/concepts/CS-533.svg",
+      "alt": "정보 은닉(소프트웨어공학)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 결합도, 응집도, SOLID",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-533.svg"
+    },
+    {
+      "card_id": "CS-534",
+      "url": "/static/generated/concepts/CS-534.svg",
+      "alt": "정적 라우팅(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CIDR, 라우팅, 동적 라우팅",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-534.svg"
+    },
+    {
+      "card_id": "CS-535",
+      "url": "/static/generated/concepts/CS-535.svg",
+      "alt": "정적 바인딩(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 링커, 로더, 동적 바인딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-535.svg"
+    },
+    {
+      "card_id": "CS-536",
+      "url": "/static/generated/concepts/CS-536.svg",
+      "alt": "정적 타입(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 동적 바인딩, 자료형, 동적 타입",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-536.svg"
+    },
+    {
+      "card_id": "CS-537",
+      "url": "/static/generated/concepts/CS-537.svg",
+      "alt": "정점(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: B+트리, 그래프, 간선",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-537.svg"
+    },
+    {
+      "card_id": "CS-538",
+      "url": "/static/generated/concepts/CS-538.svg",
+      "alt": "제1정규형(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 외부 조인, 정규화, 제2정규형",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-538.svg"
+    },
+    {
+      "card_id": "CS-539",
+      "url": "/static/generated/concepts/CS-539.svg",
+      "alt": "제2정규형(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 정규화, 제1정규형, 제3정규형",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-539.svg"
+    },
+    {
+      "card_id": "CS-540",
+      "url": "/static/generated/concepts/CS-540.svg",
+      "alt": "제3정규형(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제1정규형, 제2정규형, BCNF",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-540.svg"
+    },
+    {
+      "card_id": "CS-541",
+      "url": "/static/generated/concepts/CS-541.svg",
+      "alt": "제네릭(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 소멸자, 예외 처리, 템플릿",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-541.svg"
+    },
+    {
+      "card_id": "CS-542",
+      "url": "/static/generated/concepts/CS-542.svg",
+      "alt": "제어 해저드(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 파이프라인 해저드, 데이터 해저드, 구조적 해저드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-542.svg"
+    },
+    {
+      "card_id": "CS-543",
+      "url": "/static/generated/concepts/CS-543.svg",
+      "alt": "제어장치(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CPU, ALU, 레지스터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-543.svg"
+    },
+    {
+      "card_id": "CS-544",
+      "url": "/static/generated/concepts/CS-544.svg",
+      "alt": "조인(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 셀렉션, 프로젝션, 세타 조인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-544.svg"
+    },
+    {
+      "card_id": "CS-545",
+      "url": "/static/generated/concepts/CS-545.svg",
+      "alt": "종속성 보존(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 이상 현상, 무손실 분해, 트랜잭션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-545.svg"
+    },
+    {
+      "card_id": "CS-546",
+      "url": "/static/generated/concepts/CS-546.svg",
+      "alt": "주소 바인딩(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 은행가 알고리즘, 메모리 관리, 논리 주소",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-546.svg"
+    },
+    {
+      "card_id": "CS-547",
+      "url": "/static/generated/concepts/CS-547.svg",
+      "alt": "주소 지정 방식(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: RISC, ISA, 즉시 주소 지정",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-547.svg"
+    },
+    {
+      "card_id": "CS-548",
+      "url": "/static/generated/concepts/CS-548.svg",
+      "alt": "준비 큐(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 문맥 교환, 프로세스 상태, 스케줄링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-548.svg"
+    },
+    {
+      "card_id": "CS-549",
+      "url": "/static/generated/concepts/CS-549.svg",
+      "alt": "중기 스케줄러(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 장기 스케줄러, 단기 스케줄러, 선점형 스케줄링",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-549.svg"
+    },
+    {
+      "card_id": "CS-550",
+      "url": "/static/generated/concepts/CS-550.svg",
+      "alt": "즉시 주소 지정(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ISA, 주소 지정 방식, 직접 주소 지정",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-550.svg"
+    },
+    {
+      "card_id": "CS-551",
+      "url": "/static/generated/concepts/CS-551.svg",
+      "alt": "지속성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 일관성, 고립성, 동시성 제어",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-551.svg"
+    },
+    {
+      "card_id": "CS-552",
+      "url": "/static/generated/concepts/CS-552.svg",
+      "alt": "지역성(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 캐시 히트, 캐시 미스, 시간 지역성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-552.svg"
+    },
+    {
+      "card_id": "CS-553",
+      "url": "/static/generated/concepts/CS-553.svg",
+      "alt": "직접 매핑(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 공간 지역성, 캐시 매핑, 완전 연관 매핑",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-553.svg"
+    },
+    {
+      "card_id": "CS-554",
+      "url": "/static/generated/concepts/CS-554.svg",
+      "alt": "직접 주소 지정(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 주소 지정 방식, 즉시 주소 지정, 간접 주소 지정",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-554.svg"
+    },
+    {
+      "card_id": "CS-555",
+      "url": "/static/generated/concepts/CS-555.svg",
+      "alt": "참조(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 상수, 포인터, 스코프",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-555.svg"
+    },
+    {
+      "card_id": "CS-556",
+      "url": "/static/generated/concepts/CS-556.svg",
+      "alt": "참조 무결성(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 무결성, 개체 무결성, 관계 대수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-556.svg"
+    },
+    {
+      "card_id": "CS-557",
+      "url": "/static/generated/concepts/CS-557.svg",
+      "alt": "체이닝(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 해시 함수, 충돌, 개방 주소법",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-557.svg"
+    },
+    {
+      "card_id": "CS-558",
+      "url": "/static/generated/concepts/CS-558.svg",
+      "alt": "체크포인트(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: UNDO, REDO, 인덱스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-558.svg"
+    },
+    {
+      "card_id": "CS-559",
+      "url": "/static/generated/concepts/CS-559.svg",
+      "alt": "최단 경로(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: BFS, 위상 정렬, 다익스트라 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-559.svg"
+    },
+    {
+      "card_id": "CS-560",
+      "url": "/static/generated/concepts/CS-560.svg",
+      "alt": "최대 힙(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 우선순위 큐, 힙, 최소 힙",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-560.svg"
+    },
+    {
+      "card_id": "CS-561",
+      "url": "/static/generated/concepts/CS-561.svg",
+      "alt": "최소 신장 트리(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 벨만-포드 알고리즘, 플로이드-워셜 알고리즘, 크루스칼 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-561.svg"
+    },
+    {
+      "card_id": "CS-562",
+      "url": "/static/generated/concepts/CS-562.svg",
+      "alt": "최소 힙(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 힙, 최대 힙, 해시 테이블",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-562.svg"
+    },
+    {
+      "card_id": "CS-563",
+      "url": "/static/generated/concepts/CS-563.svg",
+      "alt": "최종 일관성(클라우드·분산시스템)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 분할 허용성, BASE, 복제",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-563.svg"
+    },
+    {
+      "card_id": "CS-564",
+      "url": "/static/generated/concepts/CS-564.svg",
+      "alt": "추상 클래스(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 오버라이딩, 인터페이스, 생성자",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-564.svg"
+    },
+    {
+      "card_id": "CS-565",
+      "url": "/static/generated/concepts/CS-565.svg",
+      "alt": "추상화(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 상속, 다형성, 오버로딩",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-565.svg"
+    },
+    {
+      "card_id": "CS-566",
+      "url": "/static/generated/concepts/CS-566.svg",
+      "alt": "충돌(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 해시 테이블, 해시 함수, 체이닝",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-566.svg"
+    },
+    {
+      "card_id": "CS-567",
+      "url": "/static/generated/concepts/CS-567.svg",
+      "alt": "캐시 매핑(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 시간 지역성, 공간 지역성, 직접 매핑",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-567.svg"
+    },
+    {
+      "card_id": "CS-568",
+      "url": "/static/generated/concepts/CS-568.svg",
+      "alt": "캐시 미스(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 캐시, 캐시 히트, 지역성",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-568.svg"
+    },
+    {
+      "card_id": "CS-569",
+      "url": "/static/generated/concepts/CS-569.svg",
+      "alt": "캐시 서버(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: WebSocket, 프록시, CDN",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-569.svg"
+    },
+    {
+      "card_id": "CS-570",
+      "url": "/static/generated/concepts/CS-570.svg",
+      "alt": "캐시 일관성(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: DMA, 인터럽트, 프로세스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-570.svg"
+    },
+    {
+      "card_id": "CS-571",
+      "url": "/static/generated/concepts/CS-571.svg",
+      "alt": "캐시 히트(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 상대 주소 지정, 캐시, 캐시 미스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-571.svg"
+    },
+    {
+      "card_id": "CS-572",
+      "url": "/static/generated/concepts/CS-572.svg",
+      "alt": "캡슐화(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 클래스, 객체, 상속",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-572.svg"
+    },
+    {
+      "card_id": "CS-573",
+      "url": "/static/generated/concepts/CS-573.svg",
+      "alt": "쿠키(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 인증서, CA, 세션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-573.svg"
+    },
+    {
+      "card_id": "CS-574",
+      "url": "/static/generated/concepts/CS-574.svg",
+      "alt": "퀵 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 삽입 정렬, 병합 정렬, 힙 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-574.svg"
+    },
+    {
+      "card_id": "CS-575",
+      "url": "/static/generated/concepts/CS-575.svg",
+      "alt": "크루스칼 알고리즘(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 플로이드-워셜 알고리즘, 최소 신장 트리, 프림 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-575.svg"
+    },
+    {
+      "card_id": "CS-576",
+      "url": "/static/generated/concepts/CS-576.svg",
+      "alt": "클러스터드 인덱스(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: B+트리, 해시 인덱스, 비클러스터드 인덱스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-576.svg"
+    },
+    {
+      "card_id": "CS-577",
+      "url": "/static/generated/concepts/CS-577.svg",
+      "alt": "클로저(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 템플릿, 람다식, 함수형 프로그래밍",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-577.svg"
+    },
+    {
+      "card_id": "CS-578",
+      "url": "/static/generated/concepts/CS-578.svg",
+      "alt": "타임스탬프 기법(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 2단계 락킹, 교착상태, 낙관적 병행제어",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-578.svg"
+    },
+    {
+      "card_id": "CS-579",
+      "url": "/static/generated/concepts/CS-579.svg",
+      "alt": "탐욕 알고리즘(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 분할 정복, 동적 계획법, 백트래킹",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-579.svg"
+    },
+    {
+      "card_id": "CS-580",
+      "url": "/static/generated/concepts/CS-580.svg",
+      "alt": "터널링(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: CDN, VPN, QoS",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-580.svg"
+    },
+    {
+      "card_id": "CS-581",
+      "url": "/static/generated/concepts/CS-581.svg",
+      "alt": "텍스트 마이닝(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 토큰화, 정규화, 추천 시스템",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-581.svg"
+    },
+    {
+      "card_id": "CS-582",
+      "url": "/static/generated/concepts/CS-582.svg",
+      "alt": "템플릿(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 예외 처리, 제네릭, 람다식",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-582.svg"
+    },
+    {
+      "card_id": "CS-583",
+      "url": "/static/generated/concepts/CS-583.svg",
+      "alt": "트리(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 체이닝, 개방 주소법, 이진 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-583.svg"
+    },
+    {
+      "card_id": "CS-584",
+      "url": "/static/generated/concepts/CS-584.svg",
+      "alt": "트리거(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 뷰, 저장 프로시저, SQL",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-584.svg"
+    },
+    {
+      "card_id": "CS-585",
+      "url": "/static/generated/concepts/CS-585.svg",
+      "alt": "특성 공학(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 손실 함수, 역전파, 데이터 전처리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-585.svg"
+    },
+    {
+      "card_id": "CS-586",
+      "url": "/static/generated/concepts/CS-586.svg",
+      "alt": "파이프라이닝(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 해독, 실행, 파이프라인 해저드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-586.svg"
+    },
+    {
+      "card_id": "CS-587",
+      "url": "/static/generated/concepts/CS-587.svg",
+      "alt": "파이프라인 해저드(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 실행, 파이프라이닝, 데이터 해저드",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-587.svg"
+    },
+    {
+      "card_id": "CS-588",
+      "url": "/static/generated/concepts/CS-588.svg",
+      "alt": "파일 시스템(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 스래싱, 워킹 세트, 디렉터리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-588.svg"
+    },
+    {
+      "card_id": "CS-589",
+      "url": "/static/generated/concepts/CS-589.svg",
+      "alt": "페이지(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 물리 주소, 페이징, 프레임",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-589.svg"
+    },
+    {
+      "card_id": "CS-590",
+      "url": "/static/generated/concepts/CS-590.svg",
+      "alt": "페이지 교체(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 요구 페이징, 페이지 폴트, FIFO 페이지 교체",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-590.svg"
+    },
+    {
+      "card_id": "CS-591",
+      "url": "/static/generated/concepts/CS-591.svg",
+      "alt": "페이지 테이블(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 페이지, 프레임, TLB",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-591.svg"
+    },
+    {
+      "card_id": "CS-592",
+      "url": "/static/generated/concepts/CS-592.svg",
+      "alt": "포인터(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 변수, 상수, 참조",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-592.svg"
+    },
+    {
+      "card_id": "CS-593",
+      "url": "/static/generated/concepts/CS-593.svg",
+      "alt": "폴링(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 버스, 입출력, 인터럽트",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-593.svg"
+    },
+    {
+      "card_id": "CS-594",
+      "url": "/static/generated/concepts/CS-594.svg",
+      "alt": "표현 계층(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 전송 계층, 세션 계층, 응용 계층",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-594.svg"
+    },
+    {
+      "card_id": "CS-595",
+      "url": "/static/generated/concepts/CS-595.svg",
+      "alt": "프레임(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 페이징, 페이지, 페이지 테이블",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-595.svg"
+    },
+    {
+      "card_id": "CS-596",
+      "url": "/static/generated/concepts/CS-596.svg",
+      "alt": "프로그램 카운터(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제어장치, 레지스터, 명령어 레지스터",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-596.svg"
+    },
+    {
+      "card_id": "CS-597",
+      "url": "/static/generated/concepts/CS-597.svg",
+      "alt": "프로세스 상태(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: PCB, 문맥 교환, 준비 큐",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-597.svg"
+    },
+    {
+      "card_id": "CS-598",
+      "url": "/static/generated/concepts/CS-598.svg",
+      "alt": "프로젝션(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 관계 대수, 셀렉션, 조인",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-598.svg"
+    },
+    {
+      "card_id": "CS-599",
+      "url": "/static/generated/concepts/CS-599.svg",
+      "alt": "프록시(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: REST, WebSocket, 캐시 서버",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-599.svg"
+    },
+    {
+      "card_id": "CS-600",
+      "url": "/static/generated/concepts/CS-600.svg",
+      "alt": "프림 알고리즘(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 최소 신장 트리, 크루스칼 알고리즘, 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-600.svg"
+    },
+    {
+      "card_id": "CS-601",
+      "url": "/static/generated/concepts/CS-601.svg",
+      "alt": "플래시 메모리(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: SRAM, DRAM, 버스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-601.svg"
+    },
+    {
+      "card_id": "CS-602",
+      "url": "/static/generated/concepts/CS-602.svg",
+      "alt": "플로이드-워셜 알고리즘(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 다익스트라 알고리즘, 벨만-포드 알고리즘, 최소 신장 트리",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-602.svg"
+    },
+    {
+      "card_id": "CS-603",
+      "url": "/static/generated/concepts/CS-603.svg",
+      "alt": "학습률(인공지능·데이터)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: ROC-AUC, 경사하강법, 손실 함수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-603.svg"
+    },
+    {
+      "card_id": "CS-604",
+      "url": "/static/generated/concepts/CS-604.svg",
+      "alt": "함수 종속(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 제3정규형, BCNF, 완전 함수 종속",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-604.svg"
+    },
+    {
+      "card_id": "CS-605",
+      "url": "/static/generated/concepts/CS-605.svg",
+      "alt": "함수형 프로그래밍(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 람다식, 클로저, 순수 함수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-605.svg"
+    },
+    {
+      "card_id": "CS-606",
+      "url": "/static/generated/concepts/CS-606.svg",
+      "alt": "해독(컴퓨터구조)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 명령어 사이클, 인출, 실행",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-606.svg"
+    },
+    {
+      "card_id": "CS-607",
+      "url": "/static/generated/concepts/CS-607.svg",
+      "alt": "해시 인덱스(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: B-트리, B+트리, 클러스터드 인덱스",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-607.svg"
+    },
+    {
+      "card_id": "CS-608",
+      "url": "/static/generated/concepts/CS-608.svg",
+      "alt": "해시 탐색(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 기수 정렬, 이진 탐색, 분할 정복",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-608.svg"
+    },
+    {
+      "card_id": "CS-609",
+      "url": "/static/generated/concepts/CS-609.svg",
+      "alt": "해시 테이블(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 최대 힙, 최소 힙, 해시 함수",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-609.svg"
+    },
+    {
+      "card_id": "CS-610",
+      "url": "/static/generated/concepts/CS-610.svg",
+      "alt": "해시 함수(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 최소 힙, 해시 테이블, 충돌",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-610.svg"
+    },
+    {
+      "card_id": "CS-611",
+      "url": "/static/generated/concepts/CS-611.svg",
+      "alt": "혼잡 제어(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 4-Way Handshake, 흐름 제어, 슬라이딩 윈도우",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-611.svg"
+    },
+    {
+      "card_id": "CS-612",
+      "url": "/static/generated/concepts/CS-612.svg",
+      "alt": "환형대기 조건(운영체제)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 점유대기 조건, 비선점 조건, 은행가 알고리즘",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-612.svg"
+    },
+    {
+      "card_id": "CS-613",
+      "url": "/static/generated/concepts/CS-613.svg",
+      "alt": "회복(데이터베이스)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 낙관적 병행제어, MVCC, 로그",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-613.svg"
+    },
+    {
+      "card_id": "CS-614",
+      "url": "/static/generated/concepts/CS-614.svg",
+      "alt": "흐름 제어(네트워크)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 3-Way Handshake, 4-Way Handshake, 혼잡 제어",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-614.svg"
+    },
+    {
+      "card_id": "CS-615",
+      "url": "/static/generated/concepts/CS-615.svg",
+      "alt": "힙 메모리(프로그래밍 언어)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 수명, 스택 메모리, 가비지 컬렉션",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-615.svg"
+    },
+    {
+      "card_id": "CS-616",
+      "url": "/static/generated/concepts/CS-616.svg",
+      "alt": "힙 정렬(자료구조·알고리즘)의 정의, 핵심 단서, 관련 개념을 요약한 학습용 개념 이미지; 관련 개념: 병합 정렬, 퀵 정렬, 계수 정렬",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards/static/generated/concepts/CS-616.svg"
+    }
+  ]
+}

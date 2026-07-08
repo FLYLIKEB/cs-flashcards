@@ -42,6 +42,29 @@ if [[ -z "${REMOTE_HOST:-}" || ! -f "${SSH_KEY:-}" ]]; then
   exit 1
 fi
 
+IMAGE_S3_BUCKET="${CS_FLASHCARD_IMAGE_S3_BUCKET:-}"
+IMAGE_S3_PREFIX="${CS_FLASHCARD_IMAGE_S3_PREFIX:-cs-flashcards/concepts}"
+IMAGE_PUBLIC_BASE_URL="${CS_FLASHCARD_IMAGE_PUBLIC_BASE_URL:-}"
+if [[ -n "$IMAGE_S3_BUCKET" ]]; then
+  if ! command -v aws >/dev/null 2>&1; then
+    echo "CS_FLASHCARD_IMAGE_S3_BUCKET이 설정됐지만 aws CLI를 찾을 수 없습니다." >&2
+    exit 1
+  fi
+  echo "개념 이미지 생성 및 S3 업로드: s3://$IMAGE_S3_BUCKET/$IMAGE_S3_PREFIX"
+  IMAGE_GEN_ARGS=(
+    --write-csv
+    --s3-bucket "$IMAGE_S3_BUCKET"
+    --s3-prefix "$IMAGE_S3_PREFIX"
+  )
+  if [[ -n "$IMAGE_PUBLIC_BASE_URL" ]]; then
+    IMAGE_GEN_ARGS+=(--s3-public-base-url "$IMAGE_PUBLIC_BASE_URL")
+  fi
+  python3 scripts/generate_concept_images.py "${IMAGE_GEN_ARGS[@]}"
+else
+  echo "개념 이미지 생성: 로컬 static/generated/concepts 경로 사용"
+  python3 scripts/generate_concept_images.py --write-csv
+fi
+
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new)

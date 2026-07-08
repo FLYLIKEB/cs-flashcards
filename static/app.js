@@ -919,6 +919,39 @@ function renderConceptGraph(card) {
   `;
 }
 
+function conceptImageUrl(card) {
+  return String(card?.concept_image_url || card?.image_url || '').trim();
+}
+
+function conceptImageAlt(card) {
+  const explicit = String(card?.concept_image_alt || card?.image_alt || '').trim();
+  if (explicit) return explicit;
+  const term = card?.term || card?.english || '개념';
+  const category = card?.category ? `(${card.category})` : '';
+  return `${term}${category} 이해를 돕는 학습용 개념 이미지`;
+}
+
+function renderConceptImage(card) {
+  const wrap = $('backConceptImageWrap');
+  const image = $('backConceptImage');
+  const caption = $('backConceptImageCaption');
+  if (!wrap || !image) return;
+
+  const url = conceptImageUrl(card);
+  if (!url) {
+    wrap.hidden = true;
+    image.removeAttribute('src');
+    image.alt = '';
+    if (caption) caption.textContent = '';
+    return;
+  }
+
+  image.src = url;
+  image.alt = conceptImageAlt(card);
+  if (caption) caption.textContent = `${card.term || card.english || '개념'} 핵심 이미지`;
+  wrap.hidden = false;
+}
+
 async function loadCards() {
   const res = await fetch('/api/cards');
   if (!res.ok) throw new Error(await res.text());
@@ -1063,6 +1096,7 @@ function renderCard() {
     setBokBadge('backBok', null);
     applyCategoryTheme('');
     applyFrontIllustration({term: '카드 없음', english: '', category: ''});
+    renderConceptImage(null);
     $('conceptGraph').innerHTML = '<div class="graph-empty muted">표시할 그래프가 없습니다.</div>';
     ['frontGoogleSearchLink', 'backGoogleSearchLink'].forEach((id) => { $(id).href = '#'; });
     return;
@@ -1102,6 +1136,7 @@ function renderCard() {
   $('backDifficulty').title = ratingTitle('difficulty', c.difficulty);
   $('backId').textContent = c.id;
   $('backTerm').innerHTML = `${currentWordHtml(c.term, 'term')}${c.english ? ' / ' + escapeHtml(c.english) : ''}`;
+  renderConceptImage(c);
   const emphasisTerms = cardTerms(c);
   $('definition').innerHTML = currentWordHtml(c.definition || '', 'definition', null, emphasisTerms);
   $('detail').innerHTML = renderDetailedExplanation(c.detailed_explanation, emphasisTerms);

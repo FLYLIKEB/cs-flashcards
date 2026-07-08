@@ -3440,3 +3440,35 @@ select,
   opacity: .62;
   transform: none !important;
 }
+
+/* Generated concept image shown on the back of each flashcard. */
+.concept-image-wrap {
+  margin: .55rem 0 .7rem;
+  border: 1px solid var(--cat-border, var(--line));
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fff, var(--cat-bg, var(--surface-soft)) 160%);
+  box-shadow: 0 10px 24px rgba(29, 25, 20, .055);
+}
+.concept-image-wrap[hidden] { display: none !important; }
+.concept-image {
+  display: block;
+  width: 100%;
+  max-height: clamp(150px, 27vh, 250px);
+  object-fit: contain;
+  background: #fff;
+}
+.concept-image-caption {
+  padding: .42rem .7rem .5rem;
+  color: var(--muted);
+  border-top: 1px solid rgba(31, 58, 95, .08);
+  font-size: .78rem;
+  font-weight: 760;
+  letter-spacing: -.02em;
+}
+
+@media (max-width: 720px) {
+  .concept-image-wrap { margin: .42rem 0 .55rem; border-radius: 14px; }
+  .concept-image { max-height: 180px; }
+  .concept-image-caption { font-size: .72rem; padding: .34rem .55rem .42rem; }
+}

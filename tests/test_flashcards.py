@@ -13,11 +13,19 @@ BASE_FIELDS = [
     'id', 'term', 'english', 'category', 'definition', 'detailed_explanation',
     'related_concepts', 'source_files', 'exam_note', 'bok_appeared', 'importance', 'difficulty',
 ]
+IMAGE_FIELDS = ['concept_image_url', 'concept_image_alt']
 REVIEW_FIELDS = ['known_status', 'last_reviewed', 'review_count']
 
 
-def write_sample(path: Path, *, include_review: bool = False, status: str = '', count: str = '0'):
-    fieldnames = BASE_FIELDS + (REVIEW_FIELDS if include_review else [])
+def write_sample(
+    path: Path,
+    *,
+    include_review: bool = False,
+    include_image: bool = False,
+    status: str = '',
+    count: str = '0',
+):
+    fieldnames = BASE_FIELDS + (IMAGE_FIELDS if include_image else []) + (REVIEW_FIELDS if include_review else [])
     with path.open('w', encoding='utf-8-sig', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -35,6 +43,11 @@ def write_sample(path: Path, *, include_review: bool = False, status: str = '', 
             'importance': '상',
             'difficulty': '중',
         }
+        if include_image:
+            row.update({
+                'concept_image_url': '/static/generated/concepts/CS-001.svg',
+                'concept_image_alt': '테스트 개념 이해 이미지',
+            })
         if include_review:
             row.update({
                 'known_status': status,
@@ -75,6 +88,17 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['bok_appeared'], 'O')
             self.assertEqual(rows[0]['importance'], '상')
             self.assertEqual(rows[0]['difficulty'], '중')
+
+    def test_read_cards_preserves_concept_image_fields(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = Path(td) / 'cards.csv'
+            db_path = Path(td) / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            rows, fields = read_cards(csv_path, db_path)
+            self.assertIn('concept_image_url', fields)
+            self.assertIn('concept_image_alt', fields)
+            self.assertEqual(rows[0]['concept_image_url'], '/static/generated/concepts/CS-001.svg')
+            self.assertEqual(rows[0]['concept_image_alt'], '테스트 개념 이해 이미지')
 
     def test_read_cards_migrates_existing_csv_progress_once(self):
         with tempfile.TemporaryDirectory() as td:
