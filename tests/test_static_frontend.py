@@ -138,6 +138,8 @@ class StaticFrontendTests(unittest.TestCase):
 
 
     def test_question_practice_controls_are_present(self):
+        self.assertIn('.question-panel[hidden]', (ROOT / 'static' / 'style.css').read_text(encoding='utf-8'))
+        self.assertIn('display: none !important', (ROOT / 'static' / 'style.css').read_text(encoding='utf-8'))
         self.assertNotIn('id="questionModeBtn"', INDEX_HTML)
         for snippet in [
             'id="questionPracticeBtn"',
