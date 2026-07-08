@@ -1257,6 +1257,28 @@ function summaryFromRows(rows) {
   };
 }
 
+function cardMatchesCurrentFilters(card, {includeStatus = true} = {}) {
+  const query = $('searchInput').value.trim().toLowerCase();
+  const category = $('categorySelect')?.value || '';
+  const importance = $('importanceSelect')?.value || '';
+  const difficulty = $('difficultySelect')?.value || '';
+  const bok = $('bokSelect')?.value || '';
+  const status = includeStatus ? state.statusFilter : '';
+  const haystack = [card.id, card.term, card.english, card.category, card.bok_appeared === 'O' ? '한국은행 한은 BOK' : '', card.importance, card.difficulty, card.definition, card.detailed_explanation, card.related_concepts, card.exam_note].join(' ').toLowerCase();
+  const statusOk = !status || (status === 'unreviewed' ? !card.known_status : card.known_status === status);
+  const bokOk = !bok || (bok === 'O' ? isBokAppeared(card) : !isBokAppeared(card));
+  return (!query || haystack.includes(query))
+    && (!category || card.category === category)
+    && (!importance || card.importance === importance)
+    && (!difficulty || card.difficulty === difficulty)
+    && bokOk
+    && statusOk;
+}
+
+function rowsForHeaderStats() {
+  return state.cards.filter((card) => cardMatchesCurrentFilters(card, {includeStatus: false}));
+}
+
 function renderStats(summary) {
   $('statTotal').textContent = summary.total;
   $('statKnown').textContent = summary.known;
@@ -1309,26 +1331,10 @@ function renderBackPage() {
 
 function applyFilters(keepCurrentId = null) {
   if (state.audioPlaying) stopAudioPlayback('필터가 바뀌어 자동 듣기를 정지했습니다.');
-  const query = $('searchInput').value.trim().toLowerCase();
-  const category = $('categorySelect')?.value || '';
   state.importanceFilter = $('importanceSelect')?.value || '';
   state.difficultyFilter = $('difficultySelect')?.value || '';
   state.bokFilter = $('bokSelect')?.value || '';
-  const status = state.statusFilter;
-  const importance = state.importanceFilter;
-  const difficulty = state.difficultyFilter;
-  const bok = state.bokFilter;
-  state.filtered = state.cards.filter((c) => {
-    const haystack = [c.id, c.term, c.english, c.category, c.bok_appeared === 'O' ? '한국은행 한은 BOK' : '', c.importance, c.difficulty, c.definition, c.detailed_explanation, c.related_concepts, c.exam_note].join(' ').toLowerCase();
-    const statusOk = !status || (status === 'unreviewed' ? !c.known_status : c.known_status === status);
-    const bokOk = !bok || (bok === 'O' ? isBokAppeared(c) : !isBokAppeared(c));
-    return (!query || haystack.includes(query))
-      && (!category || c.category === category)
-      && (!importance || c.importance === importance)
-      && (!difficulty || c.difficulty === difficulty)
-      && bokOk
-      && statusOk;
-  });
+  state.filtered = state.cards.filter((card) => cardMatchesCurrentFilters(card));
   if (keepCurrentId) {
     const found = state.filtered.findIndex((c) => c.id === keepCurrentId);
     state.index = found >= 0 ? found : Math.min(state.index, Math.max(0, state.filtered.length - 1));
@@ -1338,7 +1344,7 @@ function applyFilters(keepCurrentId = null) {
   state.flipped = false;
   state.backPage = 0;
   renderCard();
-  renderStats(summaryFromRows(state.filtered));
+  renderStats(summaryFromRows(rowsForHeaderStats()));
   updateAudioEstimate();
 }
 
