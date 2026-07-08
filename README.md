@@ -28,6 +28,29 @@ https://cs.chamung.com
 http://127.0.0.1:8000
 ```
 
+## 데이터 저장 구조
+
+카드 콘텐츠와 학습 진행상태를 분리해서 관리합니다.
+
+| 구분 | 저장 위치 | Git 관리 | 배포 시 덮어쓰기 | 용도 |
+| --- | --- | --- | --- | --- |
+| 카드 콘텐츠 | `data/CS_encyclopedia_300plus.csv` | O | O | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트 |
+| 학습 진행상태 | `state/progress.sqlite` | X | X | O/X, 마지막 학습 시각, 복습 횟수 |
+
+앱은 `/api/cards`를 호출할 때 CSV의 카드 콘텐츠와 SQLite의 진행상태를 `id` 기준으로 합쳐서 내려줍니다. 따라서 설명/상세설명을 수정하거나 CSV를 다시 배포해도 기존 O/X 상태는 유지됩니다.
+
+진행상태 SQLite 테이블의 핵심 구조는 다음과 같습니다.
+
+```sql
+CREATE TABLE card_progress (
+  card_id TEXT PRIMARY KEY,
+  known_status TEXT NOT NULL DEFAULT '',
+  last_reviewed TEXT NOT NULL DEFAULT '',
+  review_count INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
+```
+
 ## 내용을 수정하고 반영하기
 
 카드의 용어, 요약, 상세설명 같은 콘텐츠는 아래 CSV에 있습니다. O/X, 마지막 학습 시각, 복습 횟수는 SQLite 진행상태 DB에 따로 저장되므로 CSV를 수정/배포해도 학습 상태가 원복되지 않습니다.
@@ -49,3 +72,85 @@ git push
 ```bash
 CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashcards.sh
 ```
+
+## 개념 추가/수정/삭제 운영 규칙
+
+### 새 개념 추가
+
+CSV에 새 행을 추가하고, 기존에 사용하지 않은 새 `id`를 부여합니다.
+
+```csv
+id,term,english,category,alphabet_index,korean_initial,definition,detailed_explanation,related_concepts,source_files,exam_note,known_status,last_reviewed,review_count
+CS-617,새 개념,New Concept,운영체제,#,ㅅ,요약...,의미: ... 활용: ...,"[[관련 개념]]",보강 개념(페이지 직접 언급 없음),시험 포인트..., , ,0
+```
+
+권장 사항:
+
+- 새 개념은 마지막 번호 다음 `CS-xxx`를 사용합니다.
+- 새 행의 `known_status`, `last_reviewed`, `review_count`는 비워 두거나 `review_count`만 `0`으로 둡니다.
+- 원격 SQLite에 해당 `card_id`가 없으면 앱에서 자동으로 미학습 상태로 보입니다.
+- 카드 순서나 카테고리는 자유롭게 바꿔도 됩니다. 진행상태는 행 번호가 아니라 `id`에 연결됩니다.
+
+### 기존 개념 수정
+
+기존 개념의 설명, 상세설명, 관련개념, 카테고리, 영어명은 수정해도 됩니다.
+
+중요 규칙:
+
+- 기존 개념의 `id`는 유지합니다.
+- `id`를 유지하면 O/X 상태도 그대로 유지됩니다.
+- 예: `CS-001`의 용어명이나 설명을 바꿔도 SQLite의 `CS-001` 진행상태가 계속 붙습니다.
+
+### 개념 삭제
+
+CSV에서 행을 삭제하면 화면/API에는 더 이상 보이지 않습니다.
+
+주의 사항:
+
+- SQLite에는 삭제된 `card_id`의 진행상태가 남을 수 있습니다.
+- 남아 있어도 앱에는 표시되지 않으므로 일반 운영에는 문제가 없습니다.
+- 나중에 필요하면 CSV에 없는 `card_id`를 SQLite에서 정리하는 별도 스크립트를 만들면 됩니다.
+
+### 개념 ID 변경 또는 재사용 금지
+
+가능하면 하지 말아야 합니다.
+
+- `CS-001`을 `CS-700`으로 바꾸면 기존 O/X와 연결이 끊깁니다.
+- 삭제한 `id`를 다른 개념에 재사용하면 예전 O/X가 새 개념에 잘못 붙을 수 있습니다.
+- 대량 정리 시에도 `id`는 안정적인 영구 식별자로 취급합니다.
+
+## 배포 후 확인 방법
+
+원격 배포 후 아래가 맞으면 정상입니다.
+
+```bash
+curl --user "cs:비밀번호" https://cs.chamung.com/api/health
+```
+
+응답에 아래 값이 포함되어야 합니다.
+
+```json
+{
+  "ok": true,
+  "csv_exists": true,
+  "progress_db_exists": true,
+  "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite"
+}
+```
+
+카드 수와 진행상태 요약은 아래 API에서 확인합니다.
+
+```bash
+curl --user "cs:비밀번호" https://cs.chamung.com/api/cards
+```
+
+## O/X 원복 방지 체크리스트
+
+콘텐츠를 수정하거나 개념을 추가하기 전후로 아래만 지키면 됩니다.
+
+- [ ] 기존 개념의 `id`를 바꾸지 않는다.
+- [ ] 삭제한 `id`를 새 개념에 재사용하지 않는다.
+- [ ] 새 개념에는 새 `CS-xxx`를 부여한다.
+- [ ] CSV의 `known_status`, `last_reviewed`, `review_count`를 직접 관리하지 않는다.
+- [ ] `state/progress.sqlite`는 Git에 커밋하지 않는다.
+- [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`를 확인한다.
