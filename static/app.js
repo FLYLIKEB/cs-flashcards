@@ -2056,6 +2056,7 @@ function renderQuestionPanel() {
   const summary = $('questionSummary');
   const card = $('questionCard');
   updateRandomButtons();
+  updateQuestionPracticeButton();
   if (!state.questionMode) return;
   setQuestionControlsDisabled(state.questionLoading);
   const total = state.questions.length;
@@ -2153,15 +2154,16 @@ async function generateQuestionsFromCurrentFilter() {
 }
 
 function toggleQuestionMode(force = !state.questionMode) {
-  if (state.audioPlaying) stopAudioPlayback('문제 풀이 모드로 전환해 자동 듣기를 정지했습니다.');
-  state.questionMode = Boolean(force);
-  if (!state.questionMode) {
-    renderQuestionPanel();
-    setMessage('문제 풀이 모드를 닫았습니다.');
-    return;
-  }
+  const nextMode = Boolean(force);
+  if (nextMode && state.audioPlaying) stopAudioPlayback('문제 풀이 모드로 전환해 자동 듣기를 정지했습니다.');
+  state.questionMode = nextMode;
   renderQuestionPanel();
-  if (!state.questions.length) generateQuestionsFromCurrentFilter();
+  setMessage(state.questionMode ? '문제 풀이를 열었습니다. 생성 버튼으로 문제를 만드세요.' : '문제 풀이를 닫았습니다.');
+}
+
+function openQuestionPracticeFromMenu() {
+  toggleMenu(false);
+  toggleQuestionMode(true);
 }
 
 function revealQuestionAnswer() {
@@ -2367,13 +2369,17 @@ function escapeHtml(value) {
 }
 
 function updateRandomButtons() {
-  ['shuffleBtn', 'questionModeBtn'].forEach((id) => {
-    const button = $(id);
-    if (!button) return;
-    const active = id === 'shuffleBtn' ? state.randomMode : state.questionMode;
-    button.classList.toggle('active', active);
-    button.setAttribute('aria-pressed', String(active));
-  });
+  const button = $('shuffleBtn');
+  if (!button) return;
+  button.classList.toggle('active', state.randomMode);
+  button.setAttribute('aria-pressed', String(state.randomMode));
+}
+
+function updateQuestionPracticeButton() {
+  const button = $('questionPracticeBtn');
+  if (!button) return;
+  button.classList.toggle('active', state.questionMode);
+  button.setAttribute('aria-pressed', String(state.questionMode));
 }
 
 function toggleRandomMode() {
@@ -2504,7 +2510,6 @@ $('conceptBackBtn')?.addEventListener('click', (event) => {
   goBackToPreviousConcept();
 });
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
-$('questionModeBtn')?.addEventListener('click', () => toggleQuestionMode());
 $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
 $('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);
 $('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(false));
@@ -2537,6 +2542,7 @@ $('menuBtn').addEventListener('click', (event) => {
 $('memoListBtn').addEventListener('click', openMemoList);
 $('bookmarkListBtn').addEventListener('click', openBookmarkList);
 $('bookmarkFilterBtn').addEventListener('click', toggleBookmarkFilter);
+$('questionPracticeBtn')?.addEventListener('click', openQuestionPracticeFromMenu);
 $('memoListCloseBtn').addEventListener('click', closeMemoList);
 $('bookmarkListCloseBtn').addEventListener('click', closeBookmarkList);
 $('memoListDialog').addEventListener('click', (event) => {
@@ -2667,6 +2673,7 @@ restoreAudioSettings();
 renderAudioPresets();
 populateSpeechVoiceSelect();
 updateRandomButtons();
+updateQuestionPracticeButton();
 
 loadCards().catch((err) => {
   setMessage(`로딩 실패: ${err.message}`, true);

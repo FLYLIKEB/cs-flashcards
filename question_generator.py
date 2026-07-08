@@ -90,6 +90,22 @@ def card_term(card: dict[str, str]) -> str:
     return clean_text(card.get("term")) or clean_text(card.get("english")) or clean_text(card.get("id"))
 
 
+def mask_answer_terms(text: Any, card: dict[str, str], *, placeholder: str = "[?]") -> str:
+    masked = str(text or "")
+    terms = [card_term(card), clean_text(card.get("english"))]
+    for term in sorted({item for item in terms if item}, key=len, reverse=True):
+        masked = re.sub(re.escape(term), placeholder, masked, flags=re.IGNORECASE)
+    return masked
+
+
+def mask_question_answer_terms(question: dict[str, Any], card: dict[str, str]) -> dict[str, Any]:
+    masked = dict(question)
+    for field in ("prompt", "body"):
+        if field in masked:
+            masked[field] = mask_answer_terms(masked[field], card)
+    return masked
+
+
 def question_id(card: dict[str, str], question_type: QuestionType, seed: int | None) -> str:
     suffix = "auto" if seed is None else str(seed)
     return f"q-{clean_text(card.get('id'))}-{question_type}-{suffix}"
@@ -277,14 +293,16 @@ def generate_question_for_type(
     seed: int | None,
 ) -> dict[str, Any]:
     if question_type == "short":
-        return generate_short_answer(card, seed=seed)
-    if question_type == "subjective":
-        return generate_subjective(card, seed=seed)
-    if question_type == "multiple_choice":
-        return generate_multiple_choice(card, all_cards, rng=rng, seed=seed)
-    if question_type == "essay":
-        return generate_essay(card, seed=seed)
-    raise ValueError(f"Unsupported question type: {question_type}")
+        question = generate_short_answer(card, seed=seed)
+    elif question_type == "subjective":
+        question = generate_subjective(card, seed=seed)
+    elif question_type == "multiple_choice":
+        question = generate_multiple_choice(card, all_cards, rng=rng, seed=seed)
+    elif question_type == "essay":
+        question = generate_essay(card, seed=seed)
+    else:
+        raise ValueError(f"Unsupported question type: {question_type}")
+    return mask_question_answer_terms(question, card)
 
 
 def generate_questions(

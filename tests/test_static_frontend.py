@@ -138,8 +138,9 @@ class StaticFrontendTests(unittest.TestCase):
 
 
     def test_question_practice_controls_are_present(self):
+        self.assertNotIn('id="questionModeBtn"', INDEX_HTML)
         for snippet in [
-            'id="questionModeBtn"',
+            'id="questionPracticeBtn"',
             'id="questionPanel"',
             'id="questionTypeShort"',
             'id="questionTypeSubjective"',
@@ -158,6 +159,8 @@ class StaticFrontendTests(unittest.TestCase):
             'function renderQuestionPanel()',
             'function revealQuestionAnswer()',
             'function openQuestionSourceCard()',
+            'function openQuestionPracticeFromMenu()',
+            'toggleQuestionMode(true)',
             'function aiQuizSearchPrompt()',
             'function openAiQuizSearch(event = null)',
             '자체 퀴즈생성 기능을 활용해줘',
