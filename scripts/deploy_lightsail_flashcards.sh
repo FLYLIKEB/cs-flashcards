@@ -54,6 +54,7 @@ echo "도메인: http://$DOMAIN (443 개방 시 https://$DOMAIN)"
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" \
   app.py \
+  question_generator.py \
   requirements.txt \
   static \
   data/CS_encyclopedia_300plus.csv
