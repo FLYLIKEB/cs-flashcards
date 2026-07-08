@@ -142,6 +142,12 @@
           <input id="positionInput" type="number" min="1" value="0" />
           <span>/ <span id="positionTotal">0</span></span>
         </label>
+        <button id="filterToggleBtn" class="has-tip filter-toggle" type="button" aria-expanded="false" aria-controls="filterRow" title="필터" data-tip="필터 펼치기/접기">필터 ▾</button>
+        <div class="study-toggles" aria-label="학습 토글">
+          <button id="shuffleBtn" class="has-tip study-toggle" type="button" title="랜덤 모드" data-tip="랜덤 모드">↯</button>
+        </div>
+      </div>
+      <div id="filterRow" class="filter-row">
         <select id="categorySelect" class="category-filter" title="카테고리">
           <option value="">▦ *</option>
         </select>
@@ -162,9 +168,6 @@
           <option value="O">한은 O</option>
           <option value="-">한은 –</option>
         </select>
-        <div class="study-toggles" aria-label="학습 토글">
-          <button id="shuffleBtn" class="has-tip study-toggle" type="button" title="랜덤 모드" data-tip="랜덤 모드">↯</button>
-        </div>
       </div>
 
       <section id="questionPanel" class="question-panel" aria-label="문제 풀이" hidden>

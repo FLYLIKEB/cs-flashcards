@@ -19,6 +19,14 @@ const state = {
   speechKeepAlive: null,
   audioListRepeatIndex: 0,
   controlsCollapsed: localStorage.getItem('controlsCollapsed') !== '0',
+  filtersCollapsed: (() => {
+    const saved = localStorage.getItem('filtersCollapsed');
+    if (saved === '0') return false;
+    if (saved === '1') return true;
+    // No saved preference yet: default filters to hidden on mobile so the
+    // card gets as much vertical space as possible; leave desktop as-is.
+    return window.innerWidth <= 720;
+  })(),
   backPage: 0,
   statusFilter: '',
   bookmarkFilter: false,
@@ -404,6 +412,22 @@ function toggleControlsPanel() {
   state.controlsCollapsed = !state.controlsCollapsed;
   localStorage.setItem('controlsCollapsed', state.controlsCollapsed ? '1' : '0');
   applyControlsCollapsed();
+}
+
+function applyFiltersCollapsed() {
+  const row = $('filterRow');
+  const button = $('filterToggleBtn');
+  if (!row || !button) return;
+  row.hidden = state.filtersCollapsed;
+  document.body.classList.toggle('filters-collapsed', state.filtersCollapsed);
+  button.setAttribute('aria-expanded', String(!state.filtersCollapsed));
+  button.textContent = state.filtersCollapsed ? '필터 ▾' : '필터 ▴';
+}
+
+function toggleFiltersPanel() {
+  state.filtersCollapsed = !state.filtersCollapsed;
+  localStorage.setItem('filtersCollapsed', state.filtersCollapsed ? '1' : '0');
+  applyFiltersCollapsed();
 }
 
 function selectedSpeechParts() {
@@ -2566,6 +2590,7 @@ $('logoRefreshBtn').addEventListener('click', reloadFromLogo);
 $('logoRefreshBtn').addEventListener('touchend', reloadFromLogo, {passive: false});
 document.querySelectorAll('[data-status-filter]').forEach((button) => button.addEventListener('click', () => setStatusFilter(button.dataset.statusFilter)));
 $('controlsToggle').addEventListener('click', toggleControlsPanel);
+$('filterToggleBtn').addEventListener('click', toggleFiltersPanel);
 $('positionInput').addEventListener('change', () => jumpFromInput());
 $('positionInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); jumpFromInput(); $('positionInput').blur(); } });
 $('backPagePrev').addEventListener('click', () => setBackPage(state.backPage - 1));
@@ -2735,6 +2760,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 applyControlsCollapsed();
+applyFiltersCollapsed();
 restoreAudioSettings();
 renderAudioPresets();
 populateSpeechVoiceSelect();

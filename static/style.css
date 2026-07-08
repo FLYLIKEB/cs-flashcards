@@ -198,6 +198,23 @@ input:focus, select:focus {
 .message { min-height: 1.5rem; margin: 0; }
 .study-area { display: grid; gap: 1rem; }
 .progress-line { display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-size: .94rem; }
+.filter-toggle {
+  border-radius: 999px;
+  padding: .3rem .7rem;
+  font-size: .82rem;
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: .5rem;
+}
+.filter-row .category-filter {
+  margin-left: 0;
+}
+.filter-row[hidden] {
+  display: none !important;
+}
 
 .flashcard {
   min-height: min(74vh, 760px);
@@ -4069,4 +4086,18 @@ select,
 
 .question-panel[hidden] {
   display: none !important;
+}
+
+/* Filters hidden by default on mobile: give the card the reclaimed space. */
+@media (max-width: 600px) {
+  body.filters-collapsed .flashcard {
+    height: clamp(360px, calc(100svh - 14.6rem), 660px) !important;
+    min-height: clamp(360px, calc(100svh - 14.6rem), 660px) !important;
+  }
+}
+@media (max-width: 380px) {
+  body.filters-collapsed .flashcard {
+    height: clamp(340px, calc(100svh - 13.9rem), 640px) !important;
+    min-height: clamp(340px, calc(100svh - 13.9rem), 640px) !important;
+  }
 }
