@@ -21,6 +21,7 @@ const state = {
   difficultyFilter: '',
   bokFilter: '',
   randomMode: false,
+  conceptHistory: [],
   renderedCardId: null,
   renderedFlipped: false,
 };
@@ -176,8 +177,82 @@ function findCardByConcept(concept) {
     || state.cards.find((card) => normalizeTerm(card.term).includes(target) || target.includes(normalizeTerm(card.term)));
 }
 
-function jumpToCard(card) {
+function currentViewSnapshot() {
+  const current = state.filtered[state.index] || null;
+  return {
+    cardId: current?.id || '',
+    index: state.index || 0,
+    flipped: Boolean(state.flipped),
+    backPage: state.backPage || 0,
+    backScrollTop: document.querySelector('.back-scroll')?.scrollTop || 0,
+    search: $('searchInput')?.value || '',
+    category: $('categorySelect')?.value || '',
+    importance: $('importanceSelect')?.value || '',
+    difficulty: $('difficultySelect')?.value || '',
+    bok: $('bokSelect')?.value || '',
+    statusFilter: state.statusFilter || '',
+  };
+}
+
+function updateConceptBackButton() {
+  const button = $('conceptBackBtn');
+  if (!button) return;
+  const previous = state.conceptHistory[state.conceptHistory.length - 1];
+  button.hidden = !previous;
+  button.disabled = !previous;
+  if (previous) {
+    const target = state.cards.find((card) => card.id === previous.cardId);
+    const label = target ? `${target.term} · 이전 필터로 돌아가기` : '이전 개념과 필터로 돌아가기';
+    button.title = label;
+    button.setAttribute('aria-label', label);
+  }
+}
+
+function restoreViewSnapshot(snapshot) {
+  if (!snapshot) return false;
+  if ($('searchInput')) $('searchInput').value = snapshot.search || '';
+  if ($('categorySelect')) $('categorySelect').value = snapshot.category || '';
+  if ($('importanceSelect')) $('importanceSelect').value = snapshot.importance || '';
+  if ($('difficultySelect')) $('difficultySelect').value = snapshot.difficulty || '';
+  if ($('bokSelect')) $('bokSelect').value = snapshot.bok || '';
+  state.statusFilter = snapshot.statusFilter || '';
+  state.index = Number.isInteger(snapshot.index) ? snapshot.index : 0;
+  updateStatFilterButtons();
+  applyFilters(snapshot.cardId || null);
+  if (snapshot.cardId) {
+    const found = state.filtered.findIndex((card) => card.id === snapshot.cardId);
+    if (found >= 0) state.index = found;
+  }
+  state.flipped = Boolean(snapshot.flipped);
+  state.backPage = snapshot.backPage || 0;
+  renderCard();
+  window.requestAnimationFrame(() => {
+    const scrollArea = document.querySelector('.back-scroll');
+    if (scrollArea) scrollArea.scrollTop = snapshot.backScrollTop || 0;
+  });
+  return true;
+}
+
+function goBackToPreviousConcept() {
+  const previous = state.conceptHistory.pop();
+  if (!restoreViewSnapshot(previous)) {
+    updateConceptBackButton();
+    setMessage('돌아갈 개념 기록이 없습니다.', true);
+    return;
+  }
+  updateConceptBackButton();
+  const restored = state.filtered[state.index];
+  setMessage(restored ? `${restored.term} · 이전 필터 복원` : '이전 필터 복원');
+  focusAppCard();
+}
+
+function jumpToCard(card, {rememberCurrent = false} = {}) {
   if (!card) return false;
+  const snapshot = rememberCurrent ? currentViewSnapshot() : null;
+  if (snapshot && snapshot.cardId === card.id) {
+    setMessage(`${card.term}`);
+    return true;
+  }
   $('searchInput').value = '';
   if ($('categorySelect')) $('categorySelect').value = '';
   if ($('importanceSelect')) $('importanceSelect').value = '';
@@ -191,12 +266,13 @@ function jumpToCard(card) {
   state.filtered = [...state.cards];
   const found = state.filtered.findIndex((item) => item.id === card.id);
   if (found < 0) return false;
+  if (snapshot) state.conceptHistory.push(snapshot);
   state.index = found;
   state.flipped = true;
   state.backPage = 0;
   renderCard();
   setMessage(`${card.term}`);
-  cardEl.focus();
+  focusAppCard();
   return true;
 }
 
@@ -1290,6 +1366,7 @@ function renderCard() {
     state.renderedCardId = null;
     state.renderedFlipped = false;
     resetBackScroll();
+    updateConceptBackButton();
     saveViewState();
     return;
   }
@@ -1343,6 +1420,7 @@ function renderCard() {
   if (shouldResetBackScroll) resetBackScroll();
   state.renderedCardId = c.id;
   state.renderedFlipped = state.flipped;
+  updateConceptBackButton();
   saveViewState();
 }
 
@@ -1498,6 +1576,11 @@ $('positionInput').addEventListener('change', () => jumpFromInput());
 $('positionInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); jumpFromInput(); $('positionInput').blur(); } });
 $('backPagePrev').addEventListener('click', () => setBackPage(state.backPage - 1));
 $('backPageNext').addEventListener('click', () => setBackPage(state.backPage + 1));
+$('conceptBackBtn')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  goBackToPreviousConcept();
+});
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
 $('knownBtn').addEventListener('click', () => mark('O'));
 $('unknownBtn').addEventListener('click', () => mark('X'));
@@ -1524,7 +1607,7 @@ $('backConceptImageWrap')?.addEventListener('click', (event) => {
 });
 function goToConceptTerm(term) {
   const card = findCardByConcept(term);
-  if (!jumpToCard(card)) {
+  if (!jumpToCard(card, {rememberCurrent: true})) {
     setMessage(`${term} 카드를 찾지 못했습니다.`, true);
   }
 }

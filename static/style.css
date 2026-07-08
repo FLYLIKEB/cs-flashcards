@@ -360,6 +360,16 @@ h2 {
   transform: translateY(.1rem);
   transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
 }
+
+.concept-back-link {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.concept-back-link[hidden] {
+  display: none !important;
+}
 .external-link:hover {
   background: var(--accent-soft);
   border-color: rgba(31, 58, 95, .2);
