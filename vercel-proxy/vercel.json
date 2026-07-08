@@ -11,6 +11,20 @@
   ],
   "headers": [
     {
+      "source": "/api/concept-images/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-CS-Flashcards-Proxy", "value": "vercel" }
+      ]
+    },
+    {
+      "source": "/static/generated/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-CS-Flashcards-Proxy", "value": "vercel" }
+      ]
+    },
+    {
       "source": "/:path*",
       "headers": [
         { "key": "X-CS-Flashcards-Proxy", "value": "vercel" }

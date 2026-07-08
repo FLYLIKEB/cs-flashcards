@@ -11,6 +11,7 @@ const state = {
   speechUtterance: null,
   audioContext: null,
   speechTimers: [],
+  speechFallbackTimers: [],
   speechToken: 0,
   speechKeepAlive: null,
   controlsCollapsed: localStorage.getItem('controlsCollapsed') !== '0',
@@ -328,6 +329,12 @@ function nextSpeechDelayMs() {
 function clearSpeechTimers() {
   state.speechTimers.forEach((timer) => window.clearTimeout(timer));
   state.speechTimers = [];
+  clearSpeechFallbackTimers();
+}
+
+function clearSpeechFallbackTimers() {
+  state.speechFallbackTimers.forEach((timer) => window.clearTimeout(timer));
+  state.speechFallbackTimers = [];
 }
 
 function setSpeechTimer(callback, delay) {
@@ -339,11 +346,47 @@ function setSpeechTimer(callback, delay) {
   return timer;
 }
 
+function setSpeechFallbackTimer(callback, delay) {
+  const timer = window.setTimeout(() => {
+    state.speechFallbackTimers = state.speechFallbackTimers.filter((item) => item !== timer);
+    callback();
+  }, delay);
+  state.speechFallbackTimers.push(timer);
+  return timer;
+}
+
 function estimatedItemDurationMs(item) {
   const compactLength = Math.max(1, String(item.text || '').replace(/\s+/g, '').length);
   const charsPerSecond = item.key === 'term' ? 5.8 : 6.8;
   const seconds = compactLength / (charsPerSecond * speechRateForItem(item));
   return Math.max(850, Math.ceil(seconds * 1000) + 450);
+}
+
+
+function speechWordStartForCharIndex(text, charIndex) {
+  const source = String(text || '');
+  const matches = [...source.matchAll(/\S+/g)];
+  if (!matches.length) return -1;
+  const safeCharIndex = Math.max(0, charIndex || 0);
+  let active = matches.find((match) => safeCharIndex >= match.index && safeCharIndex < match.index + match[0].length);
+  if (!active) active = matches.find((match) => safeCharIndex < match.index) || matches[matches.length - 1];
+  return active.index;
+}
+
+function setSpeechCurrentCharIndex(charIndex, {nativeBoundary = false} = {}) {
+  const current = state.speechCurrent;
+  if (!current) return false;
+  const nextCharIndex = Math.max(0, charIndex || 0);
+  const source = String(current.targetText || current.text || '');
+  const nextWordStart = speechWordStartForCharIndex(source, nextCharIndex);
+  const previousWordStart = current.wordStart;
+  current.charIndex = nextCharIndex;
+  current.wordStart = nextWordStart;
+  if (nativeBoundary && !current.usesNativeBoundary) {
+    current.usesNativeBoundary = true;
+    clearSpeechFallbackTimers();
+  }
+  return nextWordStart !== previousWordStart;
 }
 
 function scheduleFallbackWordHighlight(item, token) {
@@ -353,11 +396,10 @@ function scheduleFallbackWordHighlight(item, token) {
   const duration = estimatedItemDurationMs(item);
   words.forEach((match, index) => {
     const at = Math.min(duration - 160, Math.round((index / Math.max(1, words.length)) * duration));
-    setSpeechTimer(() => {
+    setSpeechFallbackTimer(() => {
       if (!state.audioPlaying || state.speechToken !== token || !state.speechCurrent) return;
-      if (state.speechCurrent.key !== item.key) return;
-      state.speechCurrent.charIndex = match.index || 0;
-      renderCard();
+      if (state.speechCurrent.key !== item.key || state.speechCurrent.usesNativeBoundary) return;
+      if (setSpeechCurrentCharIndex(match.index || 0)) renderCard();
     }, at);
   });
 }
@@ -384,8 +426,11 @@ function createUtterance(item, token, markStarted, finish, fail) {
   utterance.onboundary = (event) => {
     markStarted();
     if (!state.audioPlaying || !state.speechCurrent || state.speechToken !== token) return;
-    state.speechCurrent.charIndex = Math.max(0, (event.charIndex || 0) - item.prefixLength);
-    renderCard();
+    if (event.name && event.name !== 'word') return;
+    const rawCharIndex = Number(event.charIndex);
+    if (!Number.isFinite(rawCharIndex) || rawCharIndex < item.prefixLength) return;
+    const nextCharIndex = rawCharIndex - item.prefixLength;
+    if (setSpeechCurrentCharIndex(nextCharIndex, {nativeBoundary: true})) renderCard();
   };
   utterance.onend = () => {
     markStarted();
@@ -432,7 +477,12 @@ function speakQueue(items, done) {
   };
 
   state.speechHighlight = item.key;
-  state.speechCurrent = {...item, charIndex: 0};
+  state.speechCurrent = {
+    ...item,
+    charIndex: 0,
+    wordStart: speechWordStartForCharIndex(item.targetText || item.text || '', 0),
+    usesNativeBoundary: false,
+  };
   state.flipped = item.key !== 'term';
   state.backPage = item.key === 'exam' ? 1 : 0;
   renderCard();
@@ -920,7 +970,10 @@ function renderConceptGraph(card) {
 }
 
 function conceptImageUrl(card) {
-  return String(card?.concept_image_url || card?.image_url || '').trim();
+  const url = String(card?.concept_image_url || card?.image_url || '').trim();
+  if (!url) return '';
+  if (url.startsWith('/static/generated/') || url.startsWith('/api/concept-images/')) return '';
+  return url;
 }
 
 function conceptImageAlt(card) {
