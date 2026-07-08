@@ -42,7 +42,7 @@ if [[ -z "${REMOTE_HOST:-}" || ! -f "${SSH_KEY:-}" ]]; then
   exit 1
 fi
 
-echo "개념 이미지: CSV의 /api/concept-images/{card_id}.svg 링크를 FastAPI가 동적으로 렌더링"
+echo "개념 이미지: CSV concept_image_url 값이 있을 때만 렌더링; 생성 이미지 배포 없음"
 
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")

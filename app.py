@@ -3,13 +3,11 @@ from __future__ import annotations
 import base64
 import csv
 from contextlib import closing
-import html
 import hmac
 import os
 import shutil
 import sqlite3
 import tempfile
-import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -30,20 +28,6 @@ REVIEW_COLUMNS = ["known_status", "last_reviewed", "review_count"]
 VALID_STATUSES = {"O", "X", ""}
 PUBLIC_USERNAME = os.environ.get("CS_FLASHCARDS_USERNAME", "cs")
 PUBLIC_PASSWORD = os.environ.get("CS_FLASHCARDS_PASSWORD", "")
-
-CATEGORY_IMAGE_META: dict[str, dict[str, str]] = {
-    "데이터베이스": {"color": "#2563eb", "emoji": "🗄️", "label": "DB · 정합성"},
-    "운영체제": {"color": "#475569", "emoji": "⚙️", "label": "OS · 자원관리"},
-    "네트워크": {"color": "#0891b2", "emoji": "🌐", "label": "Network · 연결"},
-    "자료구조·알고리즘": {"color": "#7c3aed", "emoji": "🧩", "label": "Algorithm · 구조"},
-    "프로그래밍 언어": {"color": "#16a34a", "emoji": "💻", "label": "Language · 코드"},
-    "소프트웨어공학": {"color": "#ca8a04", "emoji": "🏗️", "label": "SE · 품질"},
-    "컴퓨터구조": {"color": "#9333ea", "emoji": "🧠", "label": "Architecture · 실행"},
-    "보안": {"color": "#dc2626", "emoji": "🛡️", "label": "Security · 통제"},
-    "클라우드·분산시스템": {"color": "#0284c7", "emoji": "☁️", "label": "Cloud · 분산"},
-    "인공지능·데이터": {"color": "#db2777", "emoji": "🤖", "label": "AI/Data · 판단"},
-    "금융IT·신기술": {"color": "#0f766e", "emoji": "💳", "label": "FinTech · 적용"},
-}
 
 app = FastAPI(title="CS Encyclopedia Flashcards", version="1.0.0")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -296,215 +280,6 @@ def mark_card(
     raise KeyError(card_id)
 
 
-def csv_rows_by_id(csv_path: Path = CSV_PATH) -> dict[str, dict[str, str]]:
-    rows, _ = read_csv_cards(csv_path, keep_csv_progress=True)
-    return {row["id"]: row for row in rows if row.get("id")}
-
-
-def escape_svg(value: str | None) -> str:
-    return html.escape(value or "", quote=True)
-
-
-def display_units(value: str) -> int:
-    return sum(2 if unicodedata.east_asian_width(char) in {"F", "W"} else 1 for char in value)
-
-
-def slice_by_units(value: str, limit: int) -> str:
-    used = 0
-    result: list[str] = []
-    for char in value:
-        char_units = 2 if unicodedata.east_asian_width(char) in {"F", "W"} else 1
-        if used + char_units > limit:
-            break
-        result.append(char)
-        used += char_units
-    return "".join(result)
-
-
-def ellipsize(value: str | None, limit: int) -> str:
-    text = " ".join((value or "").split())
-    if display_units(text) <= limit:
-        return text
-    return f"{slice_by_units(text, max(0, limit - 2)).rstrip()}…"
-
-
-def wrap_text(value: str | None, *, limit: int, lines: int) -> list[str]:
-    text = " ".join((value or "").split())
-    if not text:
-        return []
-
-    chunks: list[str] = []
-    remaining = text
-    for _ in range(lines):
-        if display_units(remaining) <= limit:
-            chunks.append(remaining)
-            remaining = ""
-            break
-        candidate = slice_by_units(remaining, limit)
-        cut = candidate.rfind(" ")
-        if cut < max(4, len(candidate) // 2):
-            cut = len(candidate)
-        chunks.append(remaining[:cut].rstrip())
-        remaining = remaining[cut:].lstrip()
-    if remaining and chunks:
-        chunks[-1] = ellipsize(chunks[-1], max(1, limit - 2))
-    return chunks
-
-
-def parse_related_concepts(value: str | None) -> list[str]:
-    text = value or ""
-    concepts: list[str] = []
-    current = ""
-    in_brackets = False
-    i = 0
-    while i < len(text):
-        pair = text[i : i + 2]
-        if pair == "[[":
-            in_brackets = True
-            current = ""
-            i += 2
-            continue
-        if pair == "]]" and in_brackets:
-            concept = current.strip()
-            if concept:
-                concepts.append(concept)
-            in_brackets = False
-            current = ""
-            i += 2
-            continue
-        if in_brackets:
-            current += text[i]
-        i += 1
-    if not concepts:
-        concepts = [item.strip() for item in text.split(",") if item.strip()]
-    return concepts[:4]
-
-
-def category_symbol_svg(category: str, color: str) -> str:
-    stroke = escape_svg(color)
-    common = f'fill="none" stroke="{stroke}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"'
-    symbols = {
-        "데이터베이스": (
-            f'<ellipse cx="120" cy="66" rx="58" ry="20" {common}/>'
-            f'<path d="M62 66v92c0 13 26 24 58 24s58-11 58-24V66" {common}/>'
-            f'<path d="M62 112c0 13 26 24 58 24s58-11 58-24" {common}/>'
-        ),
-        "운영체제": (
-            f'<circle cx="120" cy="118" r="54" {common}/>'
-            f'<path d="M120 38v36M120 162v36M40 118h36M164 118h36M64 62l26 26M150 148l26 26M176 62l-26 26M90 148l-26 26" {common}/>'
-        ),
-        "네트워크": (
-            f'<circle cx="58" cy="72" r="26" {common}/><circle cx="176" cy="66" r="26" {common}/><circle cx="120" cy="172" r="30" {common}/>'
-            f'<path d="M84 76l66-7M72 94l34 53M164 90l-32 55" {common}/>'
-        ),
-        "자료구조·알고리즘": (
-            f'<path d="M38 58h74v54H38zM138 58h74v54h-74zM88 152h74v54H88z" {common}/>'
-            f'<path d="M112 85h26M125 112v40" {common}/>'
-        ),
-        "프로그래밍 언어": f'<path d="M86 68L36 118l50 50M154 68l50 50-50 50M134 50l-28 136" {common}/>',
-        "소프트웨어공학": f'<path d="M44 166l76-90 76 90M74 166v-48h92v48M94 166v-24h52v24" {common}/>',
-        "컴퓨터구조": (
-            f'<rect x="54" y="58" width="132" height="122" rx="22" {common}/>'
-            f'<path d="M78 34v32M120 34v32M162 34v32M78 178v32M120 178v32M162 178v32M30 92h32M30 140h32M178 92h32M178 140h32" {common}/>'
-        ),
-        "보안": f'<path d="M120 36l78 32v54c0 50-30 82-78 106-48-24-78-56-78-106V68zM82 126l25 25 50-58" {common}/>',
-        "클라우드·분산시스템": (
-            f'<path d="M54 154h132c28 0 46-18 46-42s-20-40-46-40c-12-30-36-48-68-48-38 0-66 26-74 62-26 4-42 20-42 40 0 18 16 28 52 28z" {common}/>'
-            f'<path d="M82 200h76M120 154v46" {common}/>'
-        ),
-        "인공지능·데이터": (
-            f'<path d="M66 102c0-38 24-68 54-68s54 30 54 68c0 24-11 40-25 56v34H91v-34c-14-16-25-32-25-56z" {common}/>'
-            f'<path d="M92 212h56M100 232h40M91 112h58M120 82v66" {common}/>'
-        ),
-        "금융IT·신기술": (
-            f'<rect x="38" y="62" width="164" height="112" rx="24" {common}/>'
-            f'<path d="M38 100h164M76 142h48M158 142h18M120 216a20 20 0 1 0 0-40 20 20 0 0 0 0 40z" {common}/>'
-        ),
-    }
-    return symbols.get(category, f'<circle cx="120" cy="120" r="76" {common}/><path d="M78 120h84M120 78v84" {common}/>')
-
-
-def build_concept_image_svg(card: dict[str, str]) -> str:
-    term = card.get("term") or card.get("english") or card.get("id") or "개념"
-    english = card.get("english") or ""
-    category = card.get("category") or "미분류"
-    definition = card.get("definition") or card.get("detailed_explanation") or ""
-    related = parse_related_concepts(card.get("related_concepts"))
-    meta = CATEGORY_IMAGE_META.get(category, {"color": "#1f3a5f", "emoji": "📘", "label": "CS · 개념"})
-    color = meta["color"]
-    soft_color = "#f8fafc"
-
-    definition_lines = wrap_text(definition, limit=34, lines=3)
-    title_lines = wrap_text(term, limit=16, lines=2)
-    related_items = related or [category]
-
-    related_svg = []
-    for index, item in enumerate(related_items[:4]):
-        x = 424 + (index % 2) * 204
-        y = 226 + (index // 2) * 46
-        related_svg.append(
-            f'<rect x="{x}" y="{y}" width="188" height="36" rx="18" fill="#fff" stroke="{escape_svg(color)}" stroke-width="2" opacity="0.96"/>'
-            f'<text x="{x + 94}" y="{y + 24}" text-anchor="middle" class="node">{escape_svg(ellipsize(item, 12))}</text>'
-        )
-
-    definition_svg = []
-    for index, line in enumerate(definition_lines):
-        definition_svg.append(f'<text x="446" y="{342 + index * 30}" class="definition">{escape_svg(line)}</text>')
-
-    title_svg = []
-    for index, line in enumerate(title_lines):
-        title_svg.append(f'<text x="452" y="{142 + index * 48}" class="term">{escape_svg(line)}</text>')
-    english_y = 178 + max(0, len(title_lines) - 1) * 48
-
-    keyword_values = [term, *related_items[:3]]
-    keyword_svg = []
-    for index, item in enumerate(keyword_values[:4]):
-        x = 104 + index * 120
-        keyword_svg.append(
-            f'<rect x="{x}" y="430" width="104" height="34" rx="17" fill="{soft_color}" stroke="{escape_svg(color)}" opacity="0.95"/>'
-            f'<text x="{x + 52}" y="452" text-anchor="middle" class="keyword">{escape_svg(ellipsize(item, 7))}</text>'
-        )
-
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
-  <title id="title">{escape_svg(term)} 개념 이미지</title>
-  <desc id="desc">{escape_svg(ellipsize(definition, 180))}</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.55" stop-color="{soft_color}"/>
-      <stop offset="1" stop-color="#fffaf0"/>
-    </linearGradient>
-    <style>
-      text {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; fill: #1f2937; }}
-      .label {{ font-size: 22px; font-weight: 850; fill: {escape_svg(color)}; letter-spacing: -0.03em; }}
-      .term {{ font-size: 42px; font-weight: 900; letter-spacing: -0.06em; }}
-      .english {{ font-size: 18px; font-weight: 740; fill: #64748b; }}
-      .definition {{ font-size: 22px; font-weight: 650; letter-spacing: -0.04em; }}
-      .node {{ font-size: 20px; font-weight: 860; fill: {escape_svg(color)}; letter-spacing: -0.04em; }}
-      .keyword {{ font-size: 14px; font-weight: 800; fill: {escape_svg(color)}; letter-spacing: -0.04em; }}
-      .watermark {{ font-size: 94px; font-weight: 900; fill: {escape_svg(color)}; opacity: 0.07; }}
-    </style>
-  </defs>
-  <rect width="900" height="520" rx="36" fill="url(#bg)"/>
-  <circle cx="168" cy="168" r="126" fill="{escape_svg(color)}" opacity="0.065"/>
-  <circle cx="742" cy="414" r="174" fill="{escape_svg(color)}" opacity="0.05"/>
-  <rect x="48" y="42" width="804" height="436" rx="32" fill="#ffffff" fill-opacity="0.76" stroke="{escape_svg(color)}" stroke-width="2" opacity="0.78"/>
-  <g transform="translate(76 66) scale(0.92)">{category_symbol_svg(category, color)}</g>
-  <text x="182" y="302" text-anchor="middle" class="watermark">{escape_svg(meta["emoji"])}</text>
-  <rect x="72" y="326" width="220" height="42" rx="21" fill="{soft_color}" stroke="{escape_svg(color)}" opacity="0.95"/>
-  <text x="182" y="354" text-anchor="middle" class="label">{escape_svg(category)}</text>
-  <text x="452" y="92" class="label">{escape_svg(meta["label"])} · {escape_svg(card.get("id") or "")}</text>
-  {''.join(title_svg)}
-  <text x="454" y="{english_y}" class="english">{escape_svg(ellipsize(english, 34))}</text>
-  <rect x="424" y="204" width="390" height="6" rx="3" fill="{escape_svg(color)}" opacity="0.22"/>
-  {''.join(related_svg)}
-  <rect x="424" y="310" width="402" height="116" rx="22" fill="#fff" stroke="{escape_svg(color)}" stroke-width="2" opacity="0.88"/>
-  {''.join(definition_svg)}
-  <text x="104" y="410" class="label">기억 단서</text>
-  {''.join(keyword_svg)}
-</svg>'''
-
-
 def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     total = len(rows)
     known = sum(1 for row in rows if row.get("known_status") == "O")
@@ -526,20 +301,6 @@ def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
 def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
-
-@app.get("/api/concept-images/{card_id}.svg")
-def api_concept_image(card_id: str) -> Response:
-    try:
-        card = csv_rows_by_id(CSV_PATH)[card_id]
-    except FileNotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
-    return Response(
-        build_concept_image_svg(card),
-        media_type="image/svg+xml",
-        headers={"Cache-Control": "no-store, max-age=0"},
-    )
 
 
 @app.get("/api/cards")
