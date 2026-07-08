@@ -24,6 +24,12 @@
       <button id="filterUnknownBtn" class="stat-filter has-tip" type="button" data-status-filter="X" title="모른다" data-tip="모른다">X <strong id="statUnknown">0</strong></button>
       <button id="filterUnreviewedBtn" class="stat-filter has-tip" type="button" data-status-filter="unreviewed" title="미학습" data-tip="미학습">– <strong id="statUnreviewed">0</strong></button>
     </div>
+    <div class="header-actions">
+      <button id="menuBtn" class="menu-button has-tip" type="button" aria-expanded="false" aria-controls="menuPopover" title="메뉴" data-tip="메뉴">☰</button>
+      <div id="menuPopover" class="menu-popover" hidden>
+        <button id="memoListBtn" type="button">메모 목록</button>
+      </div>
+    </div>
   </header>
 
   <main class="layout">
@@ -167,6 +173,16 @@
                   <h3 title="시험 포인트">✓</h3>
                   <p id="examNote"></p>
                 </section>
+                <section class="memo-section">
+                  <div class="memo-heading">
+                    <h3 title="개인 메모">메모</h3>
+                    <span id="memoUpdatedAt" class="small"></span>
+                  </div>
+                  <textarea id="memoInput" class="memo-input" rows="5" maxlength="20000" placeholder="이 개념에 대한 개인 메모를 적고 저장하세요."></textarea>
+                  <div class="memo-actions">
+                    <button id="memoSaveBtn" class="memo-save-button" type="button">메모 저장</button>
+                  </div>
+                </section>
               </div>
             </div>
           </div>
@@ -177,9 +193,21 @@
         <button id="knownBtn" class="mark known has-tip" type="button" title="안다" data-tip="안다">O</button>
         <button id="unknownBtn" class="mark unknown has-tip" type="button" title="모른다" data-tip="모른다">X</button>
         <button id="unreviewedBtn" class="mark unreviewed has-tip" type="button" title="미학습으로 되돌리기" data-tip="미학습">–</button>
+        <button id="bookmarkBtn" class="mark bookmark has-tip" type="button" title="북마크" data-tip="북마크" aria-pressed="false">☆</button>
+        <button id="copyBookmarksBtn" class="mark copy-bookmarks has-tip" type="button" title="북마크 개념명 복사" data-tip="북마크 복사">복사</button>
       </div>
     </section>
   </main>
+
+  <div id="memoListDialog" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="memoListTitle" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="memoListTitle">메모 목록</h2>
+        <button id="memoListCloseBtn" class="modal-close" type="button" aria-label="메모 목록 닫기">×</button>
+      </div>
+      <div id="memoListBody" class="memo-list-body"></div>
+    </div>
+  </div>
 
   <script src="/static/app.js"></script>
 </body>

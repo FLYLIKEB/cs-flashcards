@@ -38,6 +38,28 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('renderStats(summaryFromRows(rowsForHeaderStats()))', APP_JS)
         self.assertNotIn('renderStats(summaryFromRows(state.filtered))', APP_JS)
 
+    def test_bookmark_and_memo_controls_are_present(self):
+        for snippet in [
+            'id="bookmarkBtn"',
+            'id="copyBookmarksBtn"',
+            'id="memoInput"',
+            'id="memoSaveBtn"',
+            'id="menuBtn"',
+            'id="memoListBtn"',
+            'id="memoListDialog"',
+        ]:
+            self.assertIn(snippet, INDEX_HTML)
+        for snippet in [
+            'function toggleBookmark()',
+            '/bookmark',
+            'function copyBookmarkedTerms()',
+            "join(', ')",
+            'function saveMemo()',
+            '/memo',
+            'function renderMemoList()',
+        ]:
+            self.assertIn(snippet, APP_JS)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 import app as flashcard_app
-from app import mark_card, read_cards, read_csv_cards, summarize
+from app import mark_card, read_cards, read_csv_cards, save_memo, set_bookmark, summarize
 
 
 BASE_FIELDS = [
@@ -73,6 +73,9 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIn('known_status', fields)
             self.assertEqual(rows[0]['known_status'], '')
             self.assertEqual(rows[0]['review_count'], '0')
+            self.assertEqual(rows[0]['bookmarked'], '0')
+            self.assertEqual(rows[0]['memo'], '')
+            self.assertEqual(rows[0]['memo_updated_at'], '')
             self.assertTrue(db_path.exists())
 
 
@@ -143,6 +146,55 @@ class FlashcardProgressTests(unittest.TestCase):
                 saved = conn.execute('SELECT known_status, review_count FROM card_progress WHERE card_id=?', ('CS-001',)).fetchone()
             self.assertEqual(saved, ('O', 1))
 
+    def test_bookmark_card_persists_to_sqlite_not_csv(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            updated = set_bookmark('CS-001', True, csv_path, db_path)
+            self.assertEqual(updated['bookmarked'], '1')
+            rows, _ = read_cards(csv_path, db_path)
+            summary = summarize(rows)
+            self.assertEqual(summary['bookmarked'], 1)
+
+            raw = csv_status(csv_path)
+            self.assertNotIn('bookmarked', raw)
+
+            with sqlite3.connect(db_path) as conn:
+                saved = conn.execute('SELECT bookmarked, known_status, review_count FROM card_progress WHERE card_id=?', ('CS-001',)).fetchone()
+            self.assertEqual(saved, (1, '', 0))
+
+            updated = set_bookmark('CS-001', False, csv_path, db_path)
+            self.assertEqual(updated['bookmarked'], '0')
+
+    def test_memo_persists_to_sqlite_not_csv(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            updated = save_memo('CS-001', '헷갈리는 개인 메모', csv_path, db_path)
+            self.assertEqual(updated['memo'], '헷갈리는 개인 메모')
+            self.assertTrue(updated['memo_updated_at'])
+            rows, _ = read_cards(csv_path, db_path)
+            summary = summarize(rows)
+            self.assertEqual(summary['memo_count'], 1)
+
+            raw = csv_status(csv_path)
+            self.assertNotIn('memo', raw)
+
+            with sqlite3.connect(db_path) as conn:
+                saved = conn.execute('SELECT memo, memo_updated_at FROM card_progress WHERE card_id=?', ('CS-001',)).fetchone()
+            self.assertEqual(saved[0], '헷갈리는 개인 메모')
+            self.assertTrue(saved[1])
+
+            cleared = save_memo('CS-001', '', csv_path, db_path)
+            self.assertEqual(cleared['memo'], '')
+            self.assertEqual(cleared['memo_updated_at'], '')
+
     def test_mark_card_survives_csv_replacement(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -156,6 +208,35 @@ class FlashcardProgressTests(unittest.TestCase):
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['known_status'], 'X')
             self.assertEqual(rows[0]['review_count'], '1')
+
+    def test_old_progress_schema_migrates_for_bookmark_and_memo_columns(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            with sqlite3.connect(db_path) as conn:
+                conn.execute('''
+                    CREATE TABLE card_progress (
+                        card_id TEXT PRIMARY KEY,
+                        known_status TEXT NOT NULL DEFAULT '',
+                        last_reviewed TEXT NOT NULL DEFAULT '',
+                        review_count INTEGER NOT NULL DEFAULT 0,
+                        updated_at TEXT NOT NULL
+                    )
+                ''')
+                conn.execute('INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, updated_at) VALUES (?, ?, ?, ?, ?)', ('CS-001', 'X', '2026-07-08T12:00:00+09:00', 2, '2026-07-08T12:00:00+09:00'))
+                conn.commit()
+
+            rows, _ = read_cards(csv_path, db_path)
+            self.assertEqual(rows[0]['known_status'], 'X')
+            self.assertEqual(rows[0]['bookmarked'], '0')
+            self.assertEqual(rows[0]['memo'], '')
+            with sqlite3.connect(db_path) as conn:
+                columns = {row[1] for row in conn.execute('PRAGMA table_info(card_progress)').fetchall()}
+            self.assertIn('bookmarked', columns)
+            self.assertIn('memo', columns)
+            self.assertIn('memo_updated_at', columns)
 
     def test_mark_card_can_reset_to_unreviewed(self):
         with tempfile.TemporaryDirectory() as td:

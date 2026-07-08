@@ -37,6 +37,14 @@ class MarkRequest(BaseModel):
     known_status: str = Field(pattern="^(O|X|)$")
 
 
+class BookmarkRequest(BaseModel):
+    bookmarked: bool
+
+
+class MemoRequest(BaseModel):
+    memo: str = Field(default="", max_length=20000)
+
+
 def is_authorized(authorization: str | None) -> bool:
     if not PUBLIC_PASSWORD:
         return True
@@ -85,6 +93,14 @@ def normalized_review_count(value: str | None) -> str:
     return str(max(0, count))
 
 
+def normalized_bookmarked(value: Any) -> str:
+    if isinstance(value, bool):
+        return "1" if value else "0"
+    if isinstance(value, int):
+        return "1" if value == 1 else "0"
+    return "1" if str(value or "").strip().lower() in {"1", "true", "yes", "y", "o", "on"} else "0"
+
+
 def progress_db_for(csv_path: Path, progress_db_path: Path | None = None) -> Path:
     if progress_db_path is not None:
         return progress_db_path.expanduser().resolve()
@@ -118,6 +134,8 @@ def progress_row_is_meaningful(row: dict[str, str]) -> bool:
         row.get("known_status") in {"O", "X"}
         or (row.get("last_reviewed") or "").strip()
         or int(normalized_review_count(row.get("review_count"))) > 0
+        or normalized_bookmarked(row.get("bookmarked")) == "1"
+        or (row.get("memo") or "").strip()
     )
 
 
@@ -140,18 +158,29 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 known_status TEXT NOT NULL DEFAULT '' CHECK (known_status IN ('O', 'X', '')),
                 last_reviewed TEXT NOT NULL DEFAULT '',
                 review_count INTEGER NOT NULL DEFAULT 0 CHECK (review_count >= 0),
+                bookmarked INTEGER NOT NULL DEFAULT 0 CHECK (bookmarked IN (0, 1)),
+                memo TEXT NOT NULL DEFAULT '',
+                memo_updated_at TEXT NOT NULL DEFAULT '',
                 updated_at TEXT NOT NULL
             )
             """
         )
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(card_progress)").fetchall()}
+        if "bookmarked" not in columns:
+            conn.execute("ALTER TABLE card_progress ADD COLUMN bookmarked INTEGER NOT NULL DEFAULT 0 CHECK (bookmarked IN (0, 1))")
+        if "memo" not in columns:
+            conn.execute("ALTER TABLE card_progress ADD COLUMN memo TEXT NOT NULL DEFAULT ''")
+        if "memo_updated_at" not in columns:
+            conn.execute("ALTER TABLE card_progress ADD COLUMN memo_updated_at TEXT NOT NULL DEFAULT ''")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_bookmarked ON card_progress(bookmarked)")
         if not existed and seed_rows:
             now = utc_now_iso()
             conn.executemany(
                 """
                 INSERT OR REPLACE INTO card_progress
-                    (card_id, known_status, last_reviewed, review_count, updated_at)
-                VALUES (?, ?, ?, ?, ?)
+                    (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 [
                     (
@@ -159,6 +188,9 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                         row.get("known_status") if row.get("known_status") in VALID_STATUSES else "",
                         row.get("last_reviewed") or "",
                         int(normalized_review_count(row.get("review_count"))),
+                        int(normalized_bookmarked(row.get("bookmarked"))),
+                        row.get("memo") or "",
+                        row.get("memo_updated_at") or (now if (row.get("memo") or "").strip() else ""),
                         now,
                     )
                     for row in seed_rows
@@ -172,13 +204,16 @@ def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     ensure_progress_db(progress_db_path)
     with closing(connect_progress_db(progress_db_path)) as conn:
         rows = conn.execute(
-            "SELECT card_id, known_status, last_reviewed, review_count FROM card_progress"
+            "SELECT card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at FROM card_progress"
         ).fetchall()
     return {
         row["card_id"]: {
             "known_status": row["known_status"] if row["known_status"] in VALID_STATUSES else "",
             "last_reviewed": row["last_reviewed"] or "",
             "review_count": normalized_review_count(str(row["review_count"])),
+            "bookmarked": normalized_bookmarked(row["bookmarked"]),
+            "memo": row["memo"] or "",
+            "memo_updated_at": row["memo_updated_at"] or "",
         }
         for row in rows
     }
@@ -188,7 +223,13 @@ def merge_progress(rows: list[dict[str, str]], progress: dict[str, dict[str, str
     merged: list[dict[str, str]] = []
     for row in rows:
         item = dict(row)
+        item.setdefault("bookmarked", "0")
+        item.setdefault("memo", "")
+        item.setdefault("memo_updated_at", "")
         item.update(progress.get(row.get("id", ""), {}))
+        item["bookmarked"] = normalized_bookmarked(item.get("bookmarked"))
+        item["memo"] = item.get("memo") or ""
+        item["memo_updated_at"] = item.get("memo_updated_at") or ""
         merged.append(item)
     return merged
 
@@ -261,8 +302,8 @@ def mark_card(
             last_reviewed = utc_now_iso()
         conn.execute(
             """
-            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, updated_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+            VALUES (?, ?, ?, ?, 0, '', '', ?)
             ON CONFLICT(card_id) DO UPDATE SET
                 known_status = excluded.known_status,
                 last_reviewed = excluded.last_reviewed,
@@ -280,17 +321,88 @@ def mark_card(
     raise KeyError(card_id)
 
 
+def _ensure_card_exists(card_id: str, csv_path: Path, progress_db_path: Path | None = None) -> None:
+    rows, _ = read_cards(csv_path, progress_db_path)
+    if not any(row.get("id") == card_id for row in rows):
+        raise KeyError(card_id)
+
+
+def set_bookmark(
+    card_id: str,
+    bookmarked: bool,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> dict[str, str]:
+    _ensure_card_exists(card_id, csv_path, progress_db_path)
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        conn.execute(
+            """
+            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+            VALUES (?, '', '', 0, ?, '', '', ?)
+            ON CONFLICT(card_id) DO UPDATE SET
+                bookmarked = excluded.bookmarked,
+                updated_at = excluded.updated_at
+            """,
+            (card_id, 1 if bookmarked else 0, utc_now_iso()),
+        )
+        conn.commit()
+
+    updated_rows, _ = read_cards(csv_path, db_path)
+    for row in updated_rows:
+        if row.get("id") == card_id:
+            return row
+    raise KeyError(card_id)
+
+
+def save_memo(
+    card_id: str,
+    memo: str,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> dict[str, str]:
+    _ensure_card_exists(card_id, csv_path, progress_db_path)
+    normalized_memo = str(memo or "")[:20000]
+    memo_updated_at = utc_now_iso() if normalized_memo.strip() else ""
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        conn.execute(
+            """
+            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+            VALUES (?, '', '', 0, 0, ?, ?, ?)
+            ON CONFLICT(card_id) DO UPDATE SET
+                memo = excluded.memo,
+                memo_updated_at = excluded.memo_updated_at,
+                updated_at = excluded.updated_at
+            """,
+            (card_id, normalized_memo, memo_updated_at, utc_now_iso()),
+        )
+        conn.commit()
+
+    updated_rows, _ = read_cards(csv_path, db_path)
+    for row in updated_rows:
+        if row.get("id") == card_id:
+            return row
+    raise KeyError(card_id)
+
+
 def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     total = len(rows)
     known = sum(1 for row in rows if row.get("known_status") == "O")
     unknown = sum(1 for row in rows if row.get("known_status") == "X")
     unreviewed = total - known - unknown
+    bookmarked = sum(1 for row in rows if normalized_bookmarked(row.get("bookmarked")) == "1")
+    memo_count = sum(1 for row in rows if (row.get("memo") or "").strip())
     categories = sorted({row.get("category", "") for row in rows if row.get("category")})
     return {
         "total": total,
         "known": known,
         "unknown": unknown,
         "unreviewed": unreviewed,
+        "bookmarked": bookmarked,
+        "memo_count": memo_count,
         "categories": categories,
         "csv_path": str(CSV_PATH),
         "progress_db_path": str(PROGRESS_DB_PATH),
@@ -318,6 +430,30 @@ def api_cards() -> dict[str, Any]:
 def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
     try:
         card = mark_card(card_id, payload.known_status, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {"card": card, "summary": summarize(rows)}
+
+
+@app.post("/api/cards/{card_id}/bookmark")
+def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
+    try:
+        card = set_bookmark(card_id, payload.bookmarked, CSV_PATH, PROGRESS_DB_PATH)
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {"card": card, "summary": summarize(rows)}
+
+
+@app.post("/api/cards/{card_id}/memo")
+def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
+    try:
+        card = save_memo(card_id, payload.memo, CSV_PATH, PROGRESS_DB_PATH)
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc

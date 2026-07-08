@@ -6,6 +6,9 @@ const state = {
   summary: null,
   audioPlaying: false,
   markSaving: false,
+  bookmarkSaving: false,
+  memoSaving: false,
+  menuOpen: false,
   speechHighlight: null,
   speechCurrent: null,
   speechUtterance: null,
@@ -1254,6 +1257,8 @@ function summaryFromRows(rows) {
     known,
     unknown,
     unreviewed: rows.length - known - unknown,
+    bookmarked: rows.filter((card) => isCardBookmarked(card)).length,
+    memo_count: rows.filter((card) => String(card.memo || '').trim()).length,
   };
 }
 
@@ -1264,7 +1269,7 @@ function cardMatchesCurrentFilters(card, {includeStatus = true} = {}) {
   const difficulty = $('difficultySelect')?.value || '';
   const bok = $('bokSelect')?.value || '';
   const status = includeStatus ? state.statusFilter : '';
-  const haystack = [card.id, card.term, card.english, card.category, card.bok_appeared === 'O' ? '한국은행 한은 BOK' : '', card.importance, card.difficulty, card.definition, card.detailed_explanation, card.related_concepts, card.exam_note].join(' ').toLowerCase();
+  const haystack = [card.id, card.term, card.english, card.category, card.bok_appeared === 'O' ? '한국은행 한은 BOK' : '', card.importance, card.difficulty, card.definition, card.detailed_explanation, card.related_concepts, card.exam_note, card.memo].join(' ').toLowerCase();
   const statusOk = !status || (status === 'unreviewed' ? !card.known_status : card.known_status === status);
   const bokOk = !bok || (bok === 'O' ? isBokAppeared(card) : !isBokAppeared(card));
   return (!query || haystack.includes(query))
@@ -1287,11 +1292,245 @@ function renderStats(summary) {
   updateStatFilterButtons();
 }
 
+function isCardBookmarked(card) {
+  const value = card?.bookmarked;
+  if (value === true || value === 1) return true;
+  return ['1', 'true', 'yes', 'y', 'on', 'o'].includes(String(value || '').trim().toLowerCase());
+}
+
+function bookmarkValue(bookmarked) {
+  return bookmarked ? '1' : '0';
+}
+
+function bookmarkedCards() {
+  return state.cards.filter((card) => isCardBookmarked(card));
+}
+
+function bookmarkedTermsPlainText() {
+  return bookmarkedCards().map((card) => String(card.term || '').trim()).filter(Boolean).join(', ');
+}
+
+function memoCards() {
+  return state.cards.filter((card) => String(card.memo || '').trim());
+}
+
+function updateCardInCollections(card) {
+  const idx = state.cards.findIndex((item) => item.id === card.id);
+  if (idx >= 0) state.cards[idx] = card;
+  const filteredIdx = state.filtered.findIndex((item) => item.id === card.id);
+  if (filteredIdx >= 0) state.filtered[filteredIdx] = card;
+}
+
 function setMarkButtonsDisabled(disabled) {
   ['knownBtn', 'unknownBtn', 'unreviewedBtn'].forEach((id) => {
     const button = $(id);
     if (button) button.disabled = disabled;
   });
+}
+
+function setBookmarkButtonsDisabled(disabled) {
+  const bookmark = $('bookmarkBtn');
+  if (bookmark) bookmark.disabled = disabled || !state.filtered.length;
+  const copy = $('copyBookmarksBtn');
+  if (copy) copy.disabled = disabled || !bookmarkedCards().length;
+}
+
+function setMemoControlsDisabled(disabled) {
+  const input = $('memoInput');
+  const save = $('memoSaveBtn');
+  if (input) input.disabled = disabled || !state.filtered.length;
+  if (save) save.disabled = disabled || !state.filtered.length;
+}
+
+function renderBookmarkControls(card) {
+  const button = $('bookmarkBtn');
+  if (button) {
+    const active = Boolean(card && isCardBookmarked(card));
+    button.textContent = active ? '★' : '☆';
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+    button.title = active ? '북마크 해제' : '북마크';
+    button.dataset.tip = active ? '북마크 해제' : '북마크';
+  }
+  setBookmarkButtonsDisabled(state.bookmarkSaving);
+}
+
+function formatMemoUpdatedAt(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return `저장됨 ${date.toLocaleString('ko-KR', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}`;
+}
+
+function renderMemoControls(card) {
+  const input = $('memoInput');
+  const updated = $('memoUpdatedAt');
+  if (input && document.activeElement !== input) input.value = card?.memo || '';
+  if (updated) updated.textContent = card?.memo ? formatMemoUpdatedAt(card.memo_updated_at) : '';
+  setMemoControlsDisabled(state.memoSaving);
+}
+
+function renderPersonalControls(card) {
+  renderBookmarkControls(card);
+  renderMemoControls(card);
+}
+
+async function writeClipboardText(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    if (!document.execCommand('copy')) throw new Error('copy command failed');
+  } finally {
+    textarea.remove();
+  }
+}
+
+async function copyBookmarkedTerms() {
+  const text = bookmarkedTermsPlainText();
+  if (!text) {
+    setMessage('복사할 북마크가 없습니다.', true);
+    return;
+  }
+  try {
+    await writeClipboardText(text);
+    setMessage(`북마크 ${bookmarkedCards().length}개 개념명을 복사했습니다.`);
+  } catch (error) {
+    setMessage(`복사 실패: ${error.message || error}`, true);
+  }
+}
+
+async function toggleBookmark() {
+  if (!state.filtered.length || state.bookmarkSaving) return;
+  const current = state.filtered[state.index];
+  const previous = {...current};
+  const nextBookmarked = !isCardBookmarked(current);
+  const optimistic = {...current, bookmarked: bookmarkValue(nextBookmarked)};
+
+  state.bookmarkSaving = true;
+  updateCardInCollections(optimistic);
+  renderPersonalControls(optimistic);
+  renderStats(summaryFromRows(rowsForHeaderStats()));
+  setMessage(`${optimistic.term}: 북마크 ${nextBookmarked ? '저장' : '해제'} 중...`);
+
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/bookmark`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({bookmarked: nextBookmarked}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    updateCardInCollections(data.card);
+    state.summary = data.summary;
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    renderPersonalControls(data.card);
+    setMessage(`${data.card.term}: 북마크 ${isCardBookmarked(data.card) ? '저장 완료' : '해제 완료'}`);
+  } catch (error) {
+    updateCardInCollections(previous);
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    renderPersonalControls(previous);
+    setMessage(`북마크 저장 실패: ${error.message || error}`, true);
+  } finally {
+    state.bookmarkSaving = false;
+    renderPersonalControls(state.filtered[state.index] || null);
+  }
+}
+
+async function saveMemo() {
+  if (!state.filtered.length || state.memoSaving) return;
+  const current = state.filtered[state.index];
+  const input = $('memoInput');
+  const memo = input ? input.value : '';
+  const previous = {...current};
+  const optimistic = {...current, memo, memo_updated_at: memo.trim() ? new Date().toISOString() : ''};
+
+  state.memoSaving = true;
+  updateCardInCollections(optimistic);
+  renderMemoControls(optimistic);
+  renderStats(summaryFromRows(rowsForHeaderStats()));
+  setMessage(`${current.term}: 메모 저장 중...`);
+
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/memo`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({memo}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    updateCardInCollections(data.card);
+    state.summary = data.summary;
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    renderMemoControls(data.card);
+    if ($('memoListDialog') && !$('memoListDialog').hidden) renderMemoList();
+    setMessage(`${data.card.term}: 메모 저장 완료`);
+  } catch (error) {
+    updateCardInCollections(previous);
+    renderMemoControls(previous);
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    setMessage(`메모 저장 실패: ${error.message || error}`, true);
+  } finally {
+    state.memoSaving = false;
+    renderMemoControls(state.filtered[state.index] || null);
+  }
+}
+
+function toggleMenu(open = !state.menuOpen) {
+  state.menuOpen = Boolean(open);
+  const popover = $('menuPopover');
+  const button = $('menuBtn');
+  if (popover) popover.hidden = !state.menuOpen;
+  if (button) button.setAttribute('aria-expanded', String(state.menuOpen));
+}
+
+function renderMemoList() {
+  const body = $('memoListBody');
+  if (!body) return;
+  const cards = memoCards();
+  if (!cards.length) {
+    body.innerHTML = '<p class="muted empty-list">저장된 메모가 없습니다.</p>';
+    return;
+  }
+  body.innerHTML = cards.map((card) => `
+    <button class="memo-list-item" type="button" data-card-id="${escapeHtml(card.id)}">
+      <span class="memo-list-term">${escapeHtml(card.term || card.id)}</span>
+      <span class="memo-list-meta">${escapeHtml(card.category || '')}${card.memo_updated_at ? ' · ' + escapeHtml(formatMemoUpdatedAt(card.memo_updated_at)) : ''}</span>
+      <span class="memo-list-text">${escapeHtml(card.memo || '')}</span>
+    </button>
+  `).join('');
+}
+
+function openMemoList() {
+  toggleMenu(false);
+  renderMemoList();
+  const dialog = $('memoListDialog');
+  if (dialog) dialog.hidden = false;
+}
+
+function closeMemoList() {
+  const dialog = $('memoListDialog');
+  if (dialog) dialog.hidden = true;
+}
+
+function jumpToMemoCard(cardId) {
+  const card = state.cards.find((item) => item.id === cardId);
+  if (!card) return;
+  closeMemoList();
+  if (jumpToCard(card)) {
+    state.flipped = true;
+    state.backPage = 1;
+    renderCard();
+    setMessage(`${card.term} 메모로 이동했습니다.`);
+  }
 }
 
 function advanceAfterMark(markedId) {
@@ -1373,6 +1612,7 @@ function renderCard() {
     state.renderedFlipped = false;
     resetBackScroll();
     updateConceptBackButton();
+    renderPersonalControls(null);
     saveViewState();
     return;
   }
@@ -1422,6 +1662,7 @@ function renderCard() {
   $('related').innerHTML = related.map((r) => `<button class="chip" type="button" data-term="${escapeHtml(r)}">${currentWordHtml(r, 'related')}</button>`).join('') || '<span class="muted">없음</span>';
   $('conceptGraph').innerHTML = renderConceptGraph(c);
   bindConceptGraphNodes();
+  renderPersonalControls(c);
   applySpeechHighlight();
   if (shouldResetBackScroll) resetBackScroll();
   state.renderedCardId = c.id;
@@ -1543,7 +1784,7 @@ async function mark(status) {
 }
 
 cardEl.addEventListener('click', (e) => {
-  if (e.target.closest('button, a')) return;
+  if (e.target.closest('button, a, input, textarea, select, label')) return;
   const rect = cardEl.getBoundingClientRect();
   const edge = Math.max(78, rect.width * 0.12);
   if (e.clientX - rect.left <= edge) { move(-1); return; }
@@ -1591,6 +1832,33 @@ $('shuffleBtn').addEventListener('click', toggleRandomMode);
 $('knownBtn').addEventListener('click', () => mark('O'));
 $('unknownBtn').addEventListener('click', () => mark('X'));
 $('unreviewedBtn').addEventListener('click', () => mark(''));
+$('bookmarkBtn').addEventListener('click', toggleBookmark);
+$('copyBookmarksBtn').addEventListener('click', copyBookmarkedTerms);
+$('memoSaveBtn').addEventListener('click', saveMemo);
+$('memoInput').addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    event.preventDefault();
+    event.stopPropagation();
+    saveMemo();
+  }
+});
+$('menuBtn').addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  toggleMenu();
+});
+$('memoListBtn').addEventListener('click', openMemoList);
+$('memoListCloseBtn').addEventListener('click', closeMemoList);
+$('memoListDialog').addEventListener('click', (event) => {
+  if (event.target === $('memoListDialog')) closeMemoList();
+});
+$('memoListBody').addEventListener('click', (event) => {
+  const item = event.target.closest('[data-card-id]');
+  if (item) jumpToMemoCard(item.dataset.cardId);
+});
+document.addEventListener('click', (event) => {
+  if (state.menuOpen && !event.target.closest('.header-actions')) toggleMenu(false);
+});
 $('playAudioBtn').addEventListener('click', startAudioPlayback);
 $('stopAudioBtn').addEventListener('click', () => stopAudioPlayback());
 $('collapsedPlayBtn').addEventListener('click', startAudioPlayback);
@@ -1643,6 +1911,11 @@ $('conceptGraph').addEventListener('mousedown', (e) => {
 }, true);
 
 document.addEventListener('keydown', (e) => {
+  if (document.activeElement?.id === 'memoInput' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    e.preventDefault();
+    saveMemo();
+    return;
+  }
   if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
     if (e.key === 'Escape') {
       document.activeElement.blur();
@@ -1663,6 +1936,7 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'Enter') { e.preventDefault(); state.audioPlaying ? stopAudioPlayback() : startAudioPlayback(); }
   else if (key === 'f' || e.key === '/') { e.preventDefault(); focusSearchInput(); }
   else if (key === 'g') { e.preventDefault(); openCurrentGoogleSearch(e); }
+  else if (key === 'b') { e.preventDefault(); toggleBookmark(); }
 });
 
 applyControlsCollapsed();
