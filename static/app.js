@@ -1502,9 +1502,7 @@ document.addEventListener('keydown', (e) => {
   else if (key === 'o' || e.key === '.') mark('O');
   else if (key === 'x') { e.preventDefault(); mark('X'); }
   else if (key === 'r') toggleRandomMode();
-  else if (key === 'p') { e.preventDefault(); if (!state.audioPlaying) startAudioPlayback(); }
-  else if (key === 's') { e.preventDefault(); if (state.audioPlaying) stopAudioPlayback(); }
-  else if (key === 'k') { e.preventDefault(); state.audioPlaying ? stopAudioPlayback() : startAudioPlayback(); }
+  else if (e.key === 'Enter') { e.preventDefault(); state.audioPlaying ? stopAudioPlayback() : startAudioPlayback(); }
   else if (key === 'f' || e.key === '/') { e.preventDefault(); focusSearchInput(); }
   else if (key === 'g') { e.preventDefault(); openCurrentGoogleSearch(e); }
 });
