@@ -186,6 +186,47 @@ function jumpFromInput(value = null) {
   renderCard();
 }
 
+function focusAppCard() {
+  window.setTimeout(() => {
+    try {
+      cardEl.focus({preventScroll: true});
+    } catch (_error) {
+      cardEl.focus();
+    }
+  }, 0);
+}
+
+function focusSearchInput() {
+  const input = $('searchInput');
+  if (!input) return;
+  try {
+    input.focus({preventScroll: true});
+  } catch (_error) {
+    input.focus();
+  }
+  input.select();
+  setMessage('검색어 입력 후 Enter/Esc로 카드로 돌아가기');
+}
+
+function returnFocusFromSearchInput(event) {
+  if (!['Enter', 'Escape'].includes(event.key)) return;
+  event.preventDefault();
+  event.currentTarget.blur();
+  focusAppCard();
+}
+
+function openCurrentGoogleSearch(event = null) {
+  const link = state.flipped ? $('backGoogleSearchLink') : $('frontGoogleSearchLink');
+  if (!link || !link.href || link.getAttribute('href') === '#') return;
+  event?.preventDefault?.();
+  const opened = window.open(link.href, '_blank', 'noopener,noreferrer');
+  window.setTimeout(() => {
+    try { window.focus(); } catch (_error) {}
+    focusAppCard();
+  }, opened ? 120 : 0);
+  setMessage('검색을 열고 앱 포커스로 돌아갑니다.');
+}
+
 
 
 function applyControlsCollapsed() {
@@ -1390,6 +1431,10 @@ $('collapsedStopBtn').addEventListener('click', () => stopAudioPlayback());
   $(id).addEventListener('change', updateAudioEstimate);
 });
 $('searchInput').addEventListener('input', () => { state.index = 0; applyFilters(); });
+$('searchInput').addEventListener('keydown', returnFocusFromSearchInput);
+['frontGoogleSearchLink', 'backGoogleSearchLink'].forEach((id) => {
+  $(id)?.addEventListener('click', openCurrentGoogleSearch);
+});
 ['categorySelect', 'importanceSelect', 'difficultySelect', 'bokSelect'].forEach((id) => {
   $(id)?.addEventListener('change', () => { state.index = 0; applyFilters(); });
 });
@@ -1426,18 +1471,27 @@ $('conceptGraph').addEventListener('mousedown', (e) => {
 
 document.addEventListener('keydown', (e) => {
   if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-    if (e.key === 'Escape') document.activeElement.blur();
+    if (e.key === 'Escape') {
+      document.activeElement.blur();
+      focusAppCard();
+    }
     return;
   }
+
+  const key = e.key.toLowerCase();
   if (e.key === ' ') { e.preventDefault(); state.flipped = !state.flipped; if (state.flipped) state.backPage = 0; renderCard(); }
   else if (state.flipped && e.key === 'ArrowUp') { e.preventDefault(); setBackPage(state.backPage - 1); }
   else if (state.flipped && e.key === 'ArrowDown') { e.preventDefault(); setBackPage(state.backPage + 1); }
   else if (e.key === 'ArrowLeft') move(-1);
   else if (e.key === 'ArrowRight') move(1);
-  else if (e.key.toLowerCase() === 'o' || e.key === '.') mark('O');
-  else if (e.key.toLowerCase() === 'x' || e.key === '/') { e.preventDefault(); mark('X'); }
-  else if (e.key.toLowerCase() === 'r') toggleRandomMode();
-  else if (e.key.toLowerCase() === 'f') { e.preventDefault(); $('searchInput').focus(); }
+  else if (key === 'o' || e.key === '.') mark('O');
+  else if (key === 'x') { e.preventDefault(); mark('X'); }
+  else if (key === 'r') toggleRandomMode();
+  else if (key === 'p') { e.preventDefault(); if (!state.audioPlaying) startAudioPlayback(); }
+  else if (key === 's') { e.preventDefault(); if (state.audioPlaying) stopAudioPlayback(); }
+  else if (key === 'k') { e.preventDefault(); state.audioPlaying ? stopAudioPlayback() : startAudioPlayback(); }
+  else if (key === 'f' || e.key === '/') { e.preventDefault(); focusSearchInput(); }
+  else if (key === 'g') { e.preventDefault(); openCurrentGoogleSearch(e); }
 });
 
 applyControlsCollapsed();
