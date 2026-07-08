@@ -117,7 +117,11 @@ function googleSearchQuery(card) {
 }
 
 function googleSearchUrl(card) {
-  return `https://www.google.com/search?q=${encodeURIComponent(googleSearchQuery(card))}`;
+  const params = new URLSearchParams({
+    q: googleSearchQuery(card),
+    udm: '50',
+  });
+  return `https://www.google.com/search?${params.toString()}`;
 }
 
 function normalizeTerm(value) {
