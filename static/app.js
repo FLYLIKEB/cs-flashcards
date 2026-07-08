@@ -976,6 +976,15 @@ function conceptImageUrl(card) {
   return url;
 }
 
+function isDirectImageUrl(url) {
+  try {
+    const parsed = new window.URL(url, window.location.origin);
+    return /\.(avif|gif|jpe?g|png|svg|webp)$/i.test(parsed.pathname);
+  } catch (_error) {
+    return /\.(avif|gif|jpe?g|png|svg|webp)(\?.*)?$/i.test(url);
+  }
+}
+
 function conceptImageAlt(card) {
   const explicit = String(card?.concept_image_alt || card?.image_alt || '').trim();
   if (explicit) return explicit;
@@ -993,15 +1002,30 @@ function renderConceptImage(card) {
   const url = conceptImageUrl(card);
   if (!url) {
     wrap.hidden = true;
+    wrap.classList.remove('concept-link-only');
     image.removeAttribute('src');
     image.alt = '';
+    image.hidden = false;
     if (caption) caption.textContent = '';
     return;
   }
 
-  image.src = url;
-  image.alt = conceptImageAlt(card);
-  if (caption) caption.textContent = `${card.term || card.english || '개념'} 핵심 이미지`;
+  const label = `${card.term || card.english || '개념'} 이미지 검색`;
+  if (isDirectImageUrl(url)) {
+    wrap.classList.remove('concept-link-only');
+    image.hidden = false;
+    image.src = url;
+    image.alt = conceptImageAlt(card);
+    if (caption) caption.textContent = `${card.term || card.english || '개념'} 핵심 이미지`;
+  } else {
+    wrap.classList.add('concept-link-only');
+    image.hidden = true;
+    image.removeAttribute('src');
+    image.alt = '';
+    if (caption) {
+      caption.innerHTML = `<a class="concept-image-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)} ↗</a>`;
+    }
+  }
   wrap.hidden = false;
 }
 
