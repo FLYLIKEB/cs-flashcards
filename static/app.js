@@ -511,12 +511,17 @@ function renderAudioPresets() {
   `).join('');
 }
 
+function nextAudioPresetName(presets) {
+  const used = new Set(presets.map((preset) => preset.name));
+  let index = presets.length + 1;
+  while (used.has(`프리셋 ${index}`)) index += 1;
+  return `프리셋 ${index}`;
+}
+
 function saveCurrentAudioPreset() {
   const presets = loadAudioPresets();
-  const defaultName = `프리셋 ${presets.length + 1}`;
-  const rawName = window.prompt('저장할 재생 설정 프리셋 이름을 입력하세요.', defaultName);
-  const name = String(rawName || '').trim();
-  if (!name) return;
+  const input = $('audioPresetNameInput');
+  const name = String(input?.value || '').trim() || nextAudioPresetName(presets);
   const nextPreset = {
     id: `preset-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     name,
@@ -531,6 +536,7 @@ function saveCurrentAudioPreset() {
     presets.push(nextPreset);
   }
   saveAudioPresets(presets.slice(-20));
+  if (input) input.value = '';
   renderAudioPresets();
   setMessage(`${name} 프리셋을 저장했습니다.`);
 }
@@ -2285,6 +2291,22 @@ $('bookmarkListBody').addEventListener('click', (event) => {
 });
 document.addEventListener('click', (event) => {
   if (state.menuOpen && !event.target.closest('.header-actions')) toggleMenu(false);
+});
+$('audioPresetSaveBtn')?.addEventListener('click', saveCurrentAudioPreset);
+$('audioPresetNameInput')?.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    saveCurrentAudioPreset();
+  }
+});
+$('audioPresetList')?.addEventListener('click', (event) => {
+  const applyButton = event.target.closest('[data-preset-id]');
+  if (applyButton) {
+    applyAudioPreset(applyButton.dataset.presetId);
+    return;
+  }
+  const deleteButton = event.target.closest('[data-preset-delete]');
+  if (deleteButton) deleteAudioPreset(deleteButton.dataset.presetDelete);
 });
 $('playAudioBtn').addEventListener('click', startAudioPlayback);
 $('stopAudioBtn').addEventListener('click', () => stopAudioPlayback());

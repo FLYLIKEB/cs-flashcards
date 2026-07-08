@@ -121,7 +121,10 @@
         <div class="audio-preset-panel" aria-label="재생 설정 프리셋">
           <div class="audio-preset-header">
             <span>프리셋</span>
-            <button id="audioPresetSaveBtn" type="button">현재 설정 저장</button>
+          </div>
+          <div class="audio-preset-save-row">
+            <input id="audioPresetNameInput" type="text" maxlength="24" placeholder="프리셋 이름" aria-label="프리셋 이름" />
+            <button id="audioPresetSaveBtn" type="button">저장</button>
           </div>
           <div id="audioPresetList" class="audio-preset-list" aria-live="polite"></div>
         </div>

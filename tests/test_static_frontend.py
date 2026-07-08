@@ -80,6 +80,7 @@ class StaticFrontendTests(unittest.TestCase):
             'value="infinite"',
             'id="speakDetailMeaning"',
             'id="speakDetailUsage"',
+            'id="audioPresetNameInput"',
             'id="audioPresetSaveBtn"',
             'id="audioPresetList"',
         ]:
@@ -106,9 +107,13 @@ class StaticFrontendTests(unittest.TestCase):
             'function collectAudioSettings()',
             'function applyAudioSettings(settings = {})',
             'function renderAudioPresets()',
+            'function nextAudioPresetName(presets)',
             'function saveCurrentAudioPreset()',
             'function applyAudioPreset(presetId)',
             'function deleteAudioPreset(presetId)',
+            "$('audioPresetSaveBtn')?.addEventListener('click', saveCurrentAudioPreset)",
+            "$('audioPresetNameInput')?.addEventListener('keydown'",
+            "$('audioPresetList')?.addEventListener('click'",
         ]:
             self.assertIn(snippet, APP_JS)
 
