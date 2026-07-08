@@ -300,6 +300,19 @@ input:focus, select:focus {
 .status.o { color: var(--known); background: var(--known-soft); border-color: rgba(23, 107, 77, .18); }
 .status.x { color: var(--unknown); background: var(--unknown-soft); border-color: rgba(159, 47, 63, .18); }
 
+.rating {
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+
+.rating.importance.level-high { color: #b45309; background: #fff7ed; border-color: rgba(180, 83, 9, .22); }
+.rating.importance.level-mid { color: #2563eb; background: #eff6ff; border-color: rgba(37, 99, 235, .2); }
+.rating.importance.level-low { color: #64748b; background: #f8fafc; border-color: rgba(100, 116, 139, .18); }
+
+.rating.difficulty.level-high { color: #dc2626; background: #fef2f2; border-color: rgba(220, 38, 38, .22); }
+.rating.difficulty.level-mid { color: #7c3aed; background: #f5f3ff; border-color: rgba(124, 58, 237, .2); }
+.rating.difficulty.level-low { color: #168047; background: #f0fdf4; border-color: rgba(22, 128, 71, .2); }
+
 h2 {
   font-family: ui-serif, Georgia, "Times New Roman", "Noto Serif KR", serif;
   font-size: clamp(1.85rem, 5.2vw, 4rem);

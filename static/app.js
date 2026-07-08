@@ -692,6 +692,24 @@ function stopAudioPlayback(message = '자동 듣기를 정지했습니다.') {
   setMessage(message);
 }
 
+
+function ratingValue(value) {
+  return ['상', '중', '하'].includes(String(value || '').trim()) ? String(value).trim() : '중';
+}
+
+function importanceLabel(value) {
+  return `중요 ${ratingValue(value)}`;
+}
+
+function difficultyLabel(value) {
+  return `난이도 ${ratingValue(value)}`;
+}
+
+function ratingClass(kind, value) {
+  const levelClass = {'상': 'level-high', '중': 'level-mid', '하': 'level-low'}[ratingValue(value)] || 'level-mid';
+  return `badge rating ${kind} ${levelClass}`;
+}
+
 function statusLabel(value) {
   if (value === 'O') return 'O';
   if (value === 'X') return 'X';
@@ -973,7 +991,7 @@ function applyFilters(keepCurrentId = null) {
   const category = $('categorySelect')?.value || '';
   const status = state.statusFilter;
   state.filtered = state.cards.filter((c) => {
-    const haystack = [c.id, c.term, c.english, c.category, c.definition, c.detailed_explanation, c.related_concepts, c.exam_note].join(' ').toLowerCase();
+    const haystack = [c.id, c.term, c.english, c.category, c.importance, c.difficulty, c.definition, c.detailed_explanation, c.related_concepts, c.exam_note].join(' ').toLowerCase();
     const statusOk = !status || (status === 'unreviewed' ? !c.known_status : c.known_status === status);
     return (!query || haystack.includes(query)) && (!category || c.category === category) && statusOk;
   });
@@ -1001,6 +1019,8 @@ function renderCard() {
     $('frontEnglish').textContent = '필터 조건을 바꿔주세요.';
     $('frontCategory').textContent = '-';
     $('frontStatus').textContent = '-';
+    $('frontImportance').textContent = '-';
+    $('frontDifficulty').textContent = '-';
     applyCategoryTheme('');
     applyFrontIllustration({term: '카드 없음', english: '', category: ''});
     $('conceptGraph').innerHTML = '<div class="graph-empty muted">표시할 그래프가 없습니다.</div>';
@@ -1013,9 +1033,13 @@ function renderCard() {
   applyFrontIllustration(c);
   $('frontCategory').textContent = categoryLabel(c.category);
   $('frontStatus').textContent = statusLabel(c.known_status);
+  $('frontImportance').textContent = importanceLabel(c.importance);
+  $('frontDifficulty').textContent = difficultyLabel(c.difficulty);
   $('frontCategory').className = `badge category-badge ${categoryMeta(c.category).className}`;
   $('backCategory').className = `badge category-badge ${categoryMeta(c.category).className}`;
   $('frontStatus').className = `badge status ${c.known_status === 'O' ? 'o' : c.known_status === 'X' ? 'x' : ''}`;
+  $('frontImportance').className = ratingClass('importance', c.importance);
+  $('frontDifficulty').className = ratingClass('difficulty', c.difficulty);
   $('frontTerm').innerHTML = currentWordHtml(c.term, 'term');
   $('frontEnglish').textContent = c.english || '';
   const googleUrl = googleSearchUrl(c);
@@ -1026,6 +1050,10 @@ function renderCard() {
   $('backGoogleSearchLink').title = `${googleQuery} 구글 검색`;
 
   $('backCategory').textContent = categoryLabel(c.category);
+  $('backImportance').textContent = importanceLabel(c.importance);
+  $('backDifficulty').textContent = difficultyLabel(c.difficulty);
+  $('backImportance').className = ratingClass('importance', c.importance);
+  $('backDifficulty').className = ratingClass('difficulty', c.difficulty);
   $('backId').textContent = c.id;
   $('backTerm').innerHTML = `${currentWordHtml(c.term, 'term')}${c.english ? ' / ' + escapeHtml(c.english) : ''}`;
   const emphasisTerms = cardTerms(c);

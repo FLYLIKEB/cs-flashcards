@@ -11,7 +11,7 @@ from app import mark_card, read_cards, read_csv_cards, summarize
 
 BASE_FIELDS = [
     'id', 'term', 'english', 'category', 'definition', 'detailed_explanation',
-    'related_concepts', 'source_files', 'exam_note',
+    'related_concepts', 'source_files', 'exam_note', 'importance', 'difficulty',
 ]
 REVIEW_FIELDS = ['known_status', 'last_reviewed', 'review_count']
 
@@ -31,6 +31,8 @@ def write_sample(path: Path, *, include_review: bool = False, status: str = '', 
             'related_concepts': '[[검증]]',
             'source_files': 'sample.md',
             'exam_note': '포인트',
+            'importance': '상',
+            'difficulty': '중',
         }
         if include_review:
             row.update({
@@ -58,6 +60,18 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['known_status'], '')
             self.assertEqual(rows[0]['review_count'], '0')
             self.assertTrue(db_path.exists())
+
+
+    def test_read_cards_preserves_importance_and_difficulty(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = Path(td) / 'cards.csv'
+            db_path = Path(td) / 'progress.sqlite'
+            write_sample(csv_path)
+            rows, fields = read_cards(csv_path, db_path)
+            self.assertIn('importance', fields)
+            self.assertIn('difficulty', fields)
+            self.assertEqual(rows[0]['importance'], '상')
+            self.assertEqual(rows[0]['difficulty'], '중')
 
     def test_read_cards_migrates_existing_csv_progress_once(self):
         with tempfile.TemporaryDirectory() as td:
