@@ -698,11 +698,16 @@ function ratingValue(value) {
 }
 
 function importanceLabel(value) {
-  return `중요 ${ratingValue(value)}`;
+  return {'상': '⭐⭐⭐', '중': '⭐⭐', '하': '⭐'}[ratingValue(value)] || '⭐⭐';
 }
 
 function difficultyLabel(value) {
-  return `난이도 ${ratingValue(value)}`;
+  return {'상': '▲▲▲', '중': '▲▲', '하': '▲'}[ratingValue(value)] || '▲▲';
+}
+
+function ratingTitle(kind, value) {
+  const label = kind === 'importance' ? '중요도' : '난이도';
+  return `${label} ${ratingValue(value)}`;
 }
 
 function ratingClass(kind, value) {
@@ -1040,6 +1045,8 @@ function renderCard() {
   $('frontStatus').className = `badge status ${c.known_status === 'O' ? 'o' : c.known_status === 'X' ? 'x' : ''}`;
   $('frontImportance').className = ratingClass('importance', c.importance);
   $('frontDifficulty').className = ratingClass('difficulty', c.difficulty);
+  $('frontImportance').title = ratingTitle('importance', c.importance);
+  $('frontDifficulty').title = ratingTitle('difficulty', c.difficulty);
   $('frontTerm').innerHTML = currentWordHtml(c.term, 'term');
   $('frontEnglish').textContent = c.english || '';
   const googleUrl = googleSearchUrl(c);
@@ -1054,6 +1061,8 @@ function renderCard() {
   $('backDifficulty').textContent = difficultyLabel(c.difficulty);
   $('backImportance').className = ratingClass('importance', c.importance);
   $('backDifficulty').className = ratingClass('difficulty', c.difficulty);
+  $('backImportance').title = ratingTitle('importance', c.importance);
+  $('backDifficulty').title = ratingTitle('difficulty', c.difficulty);
   $('backId').textContent = c.id;
   $('backTerm').innerHTML = `${currentWordHtml(c.term, 'term')}${c.english ? ' / ' + escapeHtml(c.english) : ''}`;
   const emphasisTerms = cardTerms(c);

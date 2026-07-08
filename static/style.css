@@ -303,6 +303,8 @@ input:focus, select:focus {
 .rating {
   font-weight: 900;
   letter-spacing: -.02em;
+  min-width: 2.4rem;
+  justify-content: center;
 }
 
 .rating.importance.level-high { color: #b45309; background: #fff7ed; border-color: rgba(180, 83, 9, .22); }
