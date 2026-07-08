@@ -32,6 +32,8 @@ const state = {
 const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
+const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
+const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'speechRate'];
 
 function readSavedViewState() {
   try {
@@ -392,15 +394,76 @@ function speechRate() {
   return Number.isFinite(rate) ? Math.min(2, Math.max(1, rate)) : 1;
 }
 
+function selectIntValue(id, fallback = 1, min = 1, max = 5) {
+  const value = Number($(id)?.value || fallback);
+  if (!Number.isFinite(value)) return fallback;
+  return Math.min(max, Math.max(min, Math.round(value)));
+}
+
+function termSpeechMode() {
+  return $('termSpeechMode')?.value === 'ko_en' ? 'ko_en' : 'ko';
+}
+
+function termRepeatCount() {
+  return selectIntValue('termRepeatCount', 1, 1, 5);
+}
+
+function cardRepeatCount() {
+  return selectIntValue('cardRepeatCount', 1, 1, 5);
+}
+
+function termSpeechText(card) {
+  const korean = String(card?.term || '').trim();
+  const english = String(card?.english || '').trim();
+  if (termSpeechMode() === 'ko_en' && english) return `${korean}. ${english}`.trim();
+  return korean;
+}
+
+function saveAudioSettings() {
+  try {
+    const settings = {};
+    AUDIO_SETTING_IDS.forEach((id) => {
+      const element = $(id);
+      if (!element) return;
+      settings[id] = element.type === 'checkbox' ? element.checked : element.value;
+    });
+    localStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(settings));
+  } catch (_error) {}
+}
+
+function restoreAudioSettings() {
+  try {
+    const settings = JSON.parse(localStorage.getItem(AUDIO_SETTINGS_KEY) || '{}');
+    AUDIO_SETTING_IDS.forEach((id) => {
+      const element = $(id);
+      if (!element || !(id in settings)) return;
+      if (element.type === 'checkbox') {
+        element.checked = Boolean(settings[id]);
+      } else if ([...element.options].some((option) => option.value === String(settings[id]))) {
+        element.value = String(settings[id]);
+      }
+    });
+  } catch (_error) {}
+}
+
+function onAudioSettingChanged() {
+  saveAudioSettings();
+  updateAudioEstimate();
+}
+
 function plainRelated(text) {
   return parseRelated(text).join(', ');
 }
 
-function speechItemsForCard(card) {
+function baseSpeechItemsForCard(card) {
   const parts = selectedSpeechParts();
   const items = [];
   if (parts.term) {
-    items.push({key: 'term', text: card.term, targetText: card.term, prefixLength: 0});
+    const text = termSpeechText(card);
+    const targetText = String(card?.term || '').trim();
+    for (let repeat = 0; repeat < termRepeatCount(); repeat += 1) {
+      items.push({key: 'term', text, targetText, prefixLength: 0, termRepeatIndex: repeat});
+    }
   }
   if (parts.definition) {
     const prefix = '간단설명. ';
@@ -424,6 +487,15 @@ function speechItemsForCard(card) {
     items.push({key: 'exam', text: `${prefix}${targetText}`, targetText, prefixLength: prefix.length});
   }
   return items.filter((item) => item.text.replace(/[.\s]/g, '').length > 0);
+}
+
+function speechItemsForCard(card) {
+  const baseItems = baseSpeechItemsForCard(card);
+  const items = [];
+  for (let repeat = 0; repeat < cardRepeatCount(); repeat += 1) {
+    baseItems.forEach((item) => items.push({...item, cardRepeatIndex: repeat}));
+  }
+  return items;
 }
 
 
@@ -1863,8 +1935,8 @@ $('playAudioBtn').addEventListener('click', startAudioPlayback);
 $('stopAudioBtn').addEventListener('click', () => stopAudioPlayback());
 $('collapsedPlayBtn').addEventListener('click', startAudioPlayback);
 $('collapsedStopBtn').addEventListener('click', () => stopAudioPlayback());
-['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speechRate'].forEach((id) => {
-  $(id).addEventListener('change', updateAudioEstimate);
+AUDIO_SETTING_IDS.forEach((id) => {
+  $(id)?.addEventListener('change', onAudioSettingChanged);
 });
 $('searchInput').addEventListener('input', () => { state.index = 0; applyFilters(); });
 $('searchInput').addEventListener('keydown', returnFocusFromSearchInput);
@@ -1940,6 +2012,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 applyControlsCollapsed();
+restoreAudioSettings();
 updateRandomButtons();
 
 loadCards().catch((err) => {

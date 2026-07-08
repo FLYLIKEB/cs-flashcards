@@ -3671,3 +3671,100 @@ select,
   .copy-bookmarks { grid-column: span 2; }
   .modal-card { max-height: 84vh; }
 }
+
+/* Audio repeat/detail controls. */
+.audio-select-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .52rem;
+}
+.audio-select-grid .audio-rate-label {
+  min-width: 0;
+}
+.audio-select-grid select {
+  padding: .48rem .52rem;
+  border-radius: 12px;
+  font-size: .82rem;
+}
+
+/* Keep bookmark/copy available at the card's top-right corner. */
+.flashcard {
+  position: relative;
+}
+.card-quick-actions {
+  position: absolute;
+  top: .72rem;
+  right: .72rem;
+  z-index: 120;
+  display: flex;
+  gap: .35rem;
+  align-items: center;
+}
+.card-action {
+  min-width: 2.05rem;
+  height: 2.05rem;
+  padding: 0 .52rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .78rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .1);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+.card-action:hover,
+.card-action:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, .14);
+}
+.card-action.bookmark {
+  width: 2.05rem;
+  padding: 0;
+  color: #b45309;
+  background: rgba(255, 251, 235, .96);
+  border-color: rgba(180, 83, 9, .2);
+  font-size: 1.08rem;
+}
+.card-action.bookmark.active {
+  color: #92400e;
+  background: linear-gradient(180deg, #fcd34d, #f59e0b);
+  border-color: rgba(146, 64, 14, .32);
+}
+.card-action.copy-bookmarks {
+  color: var(--accent);
+  background: rgba(241, 245, 249, .96);
+  border-color: rgba(31, 58, 95, .14);
+}
+.card-action.copy-bookmarks:disabled { cursor: not-allowed; opacity: .48; }
+.card-quick-actions .has-tip::after {
+  left: 50%;
+  top: auto;
+  bottom: calc(100% + .42rem);
+  transform: translateX(-50%) translateY(3px);
+}
+.card-quick-actions .has-tip:hover::after,
+.card-quick-actions .has-tip:focus-visible::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Bottom review row remains focused on O / X / unreviewed only. */
+.mark-row {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 720px) {
+  .audio-select-grid { grid-template-columns: 1fr; }
+  .card-quick-actions {
+    top: .56rem;
+    right: .56rem;
+  }
+  .card-action {
+    min-width: 1.92rem;
+    height: 1.92rem;
+    font-size: .72rem;
+  }
+  .card-action.bookmark { width: 1.92rem; font-size: 1rem; }
+}

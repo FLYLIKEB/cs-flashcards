@@ -60,6 +60,36 @@ class StaticFrontendTests(unittest.TestCase):
         ]:
             self.assertIn(snippet, APP_JS)
 
+    def test_audio_playback_repeat_and_term_language_controls_are_present(self):
+        for snippet in [
+            'id="termSpeechMode"',
+            'value="ko_en"',
+            'id="termRepeatCount"',
+            'id="cardRepeatCount"',
+        ]:
+            self.assertIn(snippet, INDEX_HTML)
+        for snippet in [
+            'AUDIO_SETTINGS_KEY',
+            'function termSpeechMode()',
+            'function termRepeatCount()',
+            'function cardRepeatCount()',
+            'function termSpeechText(card)',
+            'function baseSpeechItemsForCard(card)',
+            'termRepeatIndex',
+            'cardRepeatIndex',
+            'restoreAudioSettings()',
+        ]:
+            self.assertIn(snippet, APP_JS)
+
+    def test_bookmark_buttons_are_card_top_actions_not_bottom_mark_row(self):
+        self.assertIn('class="card-quick-actions"', INDEX_HTML)
+        quick_actions = INDEX_HTML.split('class="card-quick-actions"', 1)[1].split('</div>', 1)[0]
+        self.assertIn('id="bookmarkBtn"', quick_actions)
+        self.assertIn('id="copyBookmarksBtn"', quick_actions)
+        mark_row = INDEX_HTML.split('class="mark-row"', 1)[1].split('</div>', 1)[0]
+        self.assertNotIn('id="bookmarkBtn"', mark_row)
+        self.assertNotIn('id="copyBookmarksBtn"', mark_row)
+
 
 if __name__ == '__main__':
     unittest.main()
