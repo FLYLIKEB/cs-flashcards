@@ -266,18 +266,33 @@ function isBottomSearchGestureTarget(target) {
 }
 
 function handleBottomSearchTouchStart(event) {
-  if (!isMobileSpeechDevice() || event.touches.length !== 1 || !isBottomSearchGestureTarget(event.target)) {
+  if (!isTouchGestureDevice() || event.touches.length !== 1 || !isBottomSearchGestureTarget(event.target)) {
     state.bottomSearchGesture = null;
     return;
   }
   const touch = event.touches[0];
+  const scrollTarget = bottomSearchScrollTarget(event.target);
+  const atBottom = isAtScrollBottom(scrollTarget);
   state.bottomSearchGesture = {
     startY: touch.clientY,
     lastY: touch.clientY,
     startAt: Date.now(),
-    scrollTarget: bottomSearchScrollTarget(event.target),
-    armed: false,
+    scrollTarget,
+    bottomY: atBottom ? touch.clientY : null,
+    bottomAt: atBottom ? Date.now() : 0,
+    triggered: false,
   };
+}
+
+function triggerBottomSearch(event, gesture) {
+  if (!gesture || gesture.triggered) return;
+  const now = Date.now();
+  if (now - state.lastBottomSearchAt < 1800) return;
+  gesture.triggered = true;
+  state.lastBottomSearchAt = now;
+  state.bottomSearchGesture = null;
+  event?.preventDefault?.();
+  openCurrentGoogleSearch(event);
 }
 
 function handleBottomSearchTouchMove(event) {
@@ -285,26 +300,25 @@ function handleBottomSearchTouchMove(event) {
   if (!gesture || event.touches.length !== 1) return;
   const touch = event.touches[0];
   gesture.lastY = touch.clientY;
-  const upwardDistance = gesture.startY - touch.clientY;
-  const elapsed = Math.max(1, Date.now() - gesture.startAt);
-  const fastEnough = upwardDistance / elapsed > 0.34 || upwardDistance > 180;
-  if (upwardDistance > 115 && fastEnough && isAtScrollBottom(gesture.scrollTarget)) {
-    gesture.armed = true;
+
+  if (isAtScrollBottom(gesture.scrollTarget) && gesture.bottomY === null) {
+    gesture.bottomY = touch.clientY;
+    gesture.bottomAt = Date.now();
   }
+  if (gesture.bottomY === null) return;
+
+  const extraPull = gesture.bottomY - touch.clientY;
+  const elapsedAfterBottom = Math.max(1, Date.now() - gesture.bottomAt);
+  const strongExtraPull = extraPull > 72 || (extraPull > 46 && extraPull / elapsedAfterBottom > 0.28);
+  if (strongExtraPull) triggerBottomSearch(event, gesture);
 }
 
-function handleBottomSearchTouchEnd() {
+function handleBottomSearchTouchEnd(event) {
   const gesture = state.bottomSearchGesture;
   state.bottomSearchGesture = null;
-  if (!gesture) return;
-  const upwardDistance = gesture.startY - gesture.lastY;
-  const elapsed = Math.max(1, Date.now() - gesture.startAt);
-  const strongFinalPull = upwardDistance > 115 && (upwardDistance / elapsed > 0.34 || upwardDistance > 180);
-  if (!gesture.armed && !(strongFinalPull && isAtScrollBottom(gesture.scrollTarget))) return;
-  const now = Date.now();
-  if (now - state.lastBottomSearchAt < 1800) return;
-  state.lastBottomSearchAt = now;
-  openCurrentGoogleSearch();
+  if (!gesture || gesture.bottomY === null) return;
+  const extraPull = gesture.bottomY - gesture.lastY;
+  if (extraPull > 54) triggerBottomSearch(event, gesture);
 }
 
 
@@ -438,6 +452,12 @@ function isMobileSpeechDevice() {
   const ua = navigator.userAgent || '';
   return /Android|iPhone|iPad|iPod|Mobile/i.test(ua)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function isTouchGestureDevice() {
+  return isMobileSpeechDevice()
+    || navigator.maxTouchPoints > 0
+    || window.matchMedia?.('(pointer: coarse)')?.matches;
 }
 
 function nextSpeechDelayMs() {
@@ -1489,8 +1509,8 @@ function reloadFromLogo(event) {
 $('logoRefreshBtn').addEventListener('click', reloadFromLogo);
 $('logoRefreshBtn').addEventListener('touchend', reloadFromLogo, {passive: false});
 document.addEventListener('touchstart', handleBottomSearchTouchStart, {passive: true});
-document.addEventListener('touchmove', handleBottomSearchTouchMove, {passive: true});
-document.addEventListener('touchend', handleBottomSearchTouchEnd, {passive: true});
+document.addEventListener('touchmove', handleBottomSearchTouchMove, {passive: false});
+document.addEventListener('touchend', handleBottomSearchTouchEnd, {passive: false});
 document.addEventListener('touchcancel', () => { state.bottomSearchGesture = null; }, {passive: true});
 document.querySelectorAll('[data-status-filter]').forEach((button) => button.addEventListener('click', () => setStatusFilter(button.dataset.statusFilter)));
 $('controlsToggle').addEventListener('click', toggleControlsPanel);
