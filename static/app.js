@@ -17,6 +17,7 @@ const state = {
   speechFallbackTimers: [],
   speechToken: 0,
   speechKeepAlive: null,
+  audioListRepeatIndex: 0,
   controlsCollapsed: localStorage.getItem('controlsCollapsed') !== '0',
   backPage: 0,
   statusFilter: '',
@@ -33,7 +34,7 @@ const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
-const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'speechRate'];
+const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate'];
 
 function readSavedViewState() {
   try {
@@ -412,6 +413,11 @@ function cardRepeatCount() {
   return selectIntValue('cardRepeatCount', 1, 1, 5);
 }
 
+function listRepeatCount() {
+  if ($('listRepeatCount')?.value === 'infinite') return Infinity;
+  return selectIntValue('listRepeatCount', 1, 1, 5);
+}
+
 function termSpeechText(card) {
   const korean = String(card?.term || '').trim();
   const english = String(card?.english || '').trim();
@@ -517,7 +523,7 @@ function speechRateForItem(item) {
   return baseRate;
 }
 
-function estimateSpeechSeconds() {
+function estimateSpeechSecondsForOneListPass() {
   if (!state.filtered.length) return 0;
   const chars = state.filtered.reduce((total, card) => {
     return total + speechItemsForCard(card).reduce((sum, item) => sum + item.text.replace(/\s+/g, '').length, 0);
@@ -527,6 +533,13 @@ function estimateSpeechSeconds() {
   const transitionSeconds = Math.max(0, state.filtered.length - 1) * 0.62;
   const chimeSeconds = state.filtered.length * 0.26;
   return Math.ceil(speechSeconds + transitionSeconds + chimeSeconds);
+}
+
+function estimateSpeechSeconds() {
+  const onePassSeconds = estimateSpeechSecondsForOneListPass();
+  const repeatCount = listRepeatCount();
+  if (repeatCount === Infinity) return Infinity;
+  return onePassSeconds * repeatCount;
 }
 
 function formatDuration(seconds) {
@@ -554,8 +567,14 @@ function updateAudioEstimate() {
     el.textContent = '0개';
     return;
   }
+  const repeatCount = listRepeatCount();
+  const onePassSeconds = estimateSpeechSecondsForOneListPass();
+  if (repeatCount === Infinity) {
+    el.textContent = `≈ ${formatDuration(onePassSeconds)} / 1바퀴 · ∞ 반복 · ${state.filtered.length}`;
+    return;
+  }
   const seconds = estimateSpeechSeconds();
-  el.textContent = `≈ ${formatDuration(seconds)} · ${state.filtered.length}`;
+  el.textContent = `≈ ${formatDuration(seconds)} · 전체 ${repeatCount}바퀴 · ${state.filtered.length}`;
 }
 
 function isMobileSpeechDevice() {
@@ -814,7 +833,10 @@ function speakCurrentAndAdvance() {
     window.setTimeout(moveAudioNext, 220);
     return;
   }
-  setMessage(`▶ ${state.index + 1}/${state.filtered.length} · ${card.term}`);
+  const repeatCount = listRepeatCount();
+  const repeatLabel = repeatCount === Infinity ? '∞' : String(repeatCount);
+  const repeatText = repeatCount === 1 ? '' : ` · ${state.audioListRepeatIndex + 1}/${repeatLabel}바퀴`;
+  setMessage(`▶ ${state.index + 1}/${state.filtered.length}${repeatText} · ${card.term}`);
   speakQueue([...items], moveAudioNext);
 }
 
@@ -931,7 +953,18 @@ function playCardDoneSound() {
 function moveAudioNext() {
   if (!state.audioPlaying) return;
   playCardDoneSound();
-  if (!state.filtered.length || state.index >= state.filtered.length - 1) {
+  if (!state.filtered.length) {
+    window.setTimeout(() => stopAudioPlayback('자동 듣기가 끝났습니다.'), 260);
+    return;
+  }
+  if (state.index >= state.filtered.length - 1) {
+    const repeatCount = listRepeatCount();
+    if (repeatCount === Infinity || state.audioListRepeatIndex + 1 < repeatCount) {
+      state.audioListRepeatIndex += 1;
+      state.index = 0;
+      window.setTimeout(speakCurrentAndAdvance, nextSpeechDelayMs());
+      return;
+    }
     window.setTimeout(() => stopAudioPlayback('자동 듣기가 끝났습니다.'), 260);
     return;
   }
@@ -978,6 +1011,7 @@ function startAudioPlayback() {
     return;
   }
   state.audioPlaying = true;
+  state.audioListRepeatIndex = 0;
   startSpeechKeepAlive();
   setAudioButtons();
   speakCurrentAndAdvance();
@@ -991,6 +1025,7 @@ function stopAudioPlayback(message = '자동 듣기를 정지했습니다.') {
   state.speechHighlight = null;
   state.speechCurrent = null;
   state.speechUtterance = null;
+  state.audioListRepeatIndex = 0;
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   setAudioButtons();
   setMessage(message);
