@@ -34,7 +34,7 @@ const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
-const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate'];
+const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate'];
 
 function readSavedViewState() {
   try {
@@ -418,6 +418,20 @@ function listRepeatCount() {
   return selectIntValue('listRepeatCount', 1, 1, 5);
 }
 
+function selectedDetailSpeechSections() {
+  return {
+    meaning: $('speakDetailMeaning')?.checked !== false,
+    usage: $('speakDetailUsage')?.checked !== false,
+  };
+}
+
+function shouldSpeakDetailSection(label) {
+  const sections = selectedDetailSpeechSections();
+  if (label === '의미') return sections.meaning;
+  if (label === '활용' || label === '동작/활용') return sections.usage;
+  return false;
+}
+
 function termSpeechText(card) {
   const korean = String(card?.term || '').trim();
   const english = String(card?.english || '').trim();
@@ -477,10 +491,12 @@ function baseSpeechItemsForCard(card) {
     items.push({key: 'definition', text: `${prefix}${targetText}`, targetText, prefixLength: prefix.length});
   }
   if (parts.detail) {
-    detailedSections(card.detailed_explanation).forEach((section) => {
-      const prefix = `상세설명. ${section.label}. `;
-      items.push({key: 'detail', detailLabel: section.label, text: `${prefix}${section.content}`, targetText: section.content, prefixLength: prefix.length});
-    });
+    detailedSections(card.detailed_explanation)
+      .filter((section) => shouldSpeakDetailSection(section.label))
+      .forEach((section) => {
+        const prefix = `상세설명. ${section.label}. `;
+        items.push({key: 'detail', detailLabel: section.label, text: `${prefix}${section.content}`, targetText: section.content, prefixLength: prefix.length});
+      });
   }
   if (parts.related) {
     const prefix = '관련개념. ';
@@ -502,6 +518,10 @@ function speechItemsForCard(card) {
     baseItems.forEach((item) => items.push({...item, cardRepeatIndex: repeat}));
   }
   return items;
+}
+
+function hasPlayableSpeechItems() {
+  return state.filtered.some((card) => speechItemsForCard(card).length > 0);
 }
 
 
@@ -1008,6 +1028,10 @@ function startAudioPlayback() {
   const parts = selectedSpeechParts();
   if (!Object.values(parts).some(Boolean)) {
     setMessage('들을 항목을 하나 이상 체크하세요.', true);
+    return;
+  }
+  if (!hasPlayableSpeechItems()) {
+    setMessage('재생할 상세 하위 항목 또는 다른 듣기 항목을 선택하세요.', true);
     return;
   }
   state.audioPlaying = true;

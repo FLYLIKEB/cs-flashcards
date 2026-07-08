@@ -3768,3 +3768,34 @@ select,
   }
   .card-action.bookmark { width: 1.92rem; font-size: 1rem; }
 }
+
+/* Detailed explanation speech sub-selection. */
+.audio-detail-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .38rem .62rem;
+  padding: .5rem .56rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: .82rem;
+}
+.audio-detail-options span {
+  color: var(--accent);
+  font-weight: 820;
+}
+.audio-detail-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: .32rem;
+  color: var(--text);
+  font-size: .82rem;
+}
+.audio-detail-options input[type="checkbox"] {
+  width: .95rem;
+  height: .95rem;
+  padding: 0;
+  accent-color: var(--accent);
+}

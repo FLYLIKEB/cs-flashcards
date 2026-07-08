@@ -68,6 +68,8 @@ class StaticFrontendTests(unittest.TestCase):
             'id="cardRepeatCount"',
             'id="listRepeatCount"',
             'value="infinite"',
+            'id="speakDetailMeaning"',
+            'id="speakDetailUsage"',
         ]:
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
@@ -76,12 +78,16 @@ class StaticFrontendTests(unittest.TestCase):
             'function termRepeatCount()',
             'function cardRepeatCount()',
             'function listRepeatCount()',
+            'function selectedDetailSpeechSections()',
+            'function shouldSpeakDetailSection(label)',
             'function termSpeechText(card)',
             'function baseSpeechItemsForCard(card)',
             'termRepeatIndex',
             'cardRepeatIndex',
             'audioListRepeatIndex',
             'estimateSpeechSecondsForOneListPass()',
+            'shouldSpeakDetailSection(section.label)',
+            'hasPlayableSpeechItems()',
             'state.index = 0',
             'restoreAudioSettings()',
         ]:
