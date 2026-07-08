@@ -361,14 +361,23 @@ h2 {
   transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
 }
 
-.concept-back-link {
-  border: 0;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
+.concept-return-button {
+  width: auto !important;
+  min-width: 3.9rem;
+  padding: 0 .78rem;
+  gap: .24rem;
+  color: #fff !important;
+  background: var(--accent) !important;
+  border-color: color-mix(in srgb, var(--accent) 78%, #fff) !important;
+  box-shadow: 0 10px 24px rgba(31, 58, 95, .18);
 }
-.concept-back-link[hidden] {
+.concept-return-button[hidden] {
   display: none !important;
+}
+.concept-return-button:hover,
+.concept-return-button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(31, 58, 95, .24);
 }
 .external-link:hover {
   background: var(--accent-soft);
