@@ -2976,11 +2976,16 @@ select,
 /* Mobile search: icon-only by default, expands only while typing */
 @media (max-width: 600px) {
   .topbar {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
   }
   .stats {
     grid-column: 2;
     grid-row: 1;
+  }
+  .header-actions {
+    grid-column: 4;
+    grid-row: 1;
+    justify-content: flex-end;
   }
   .header-search {
     grid-column: 3;
@@ -3677,7 +3682,6 @@ select,
 
 @media (max-width: 720px) {
   .topbar { align-items: stretch; }
-  .header-actions { justify-content: flex-start; }
   .mark-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .copy-bookmarks { grid-column: span 2; }
   .modal-card { max-height: 84vh; }
