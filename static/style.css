@@ -3458,6 +3458,7 @@ select,
   max-height: clamp(150px, 27vh, 250px);
   object-fit: contain;
   margin: 0 auto;
+  cursor: pointer;
 }
 @media (max-width: 720px) {
   .concept-image-wrap { margin: .42rem 0 .55rem; }

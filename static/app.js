@@ -21,14 +21,50 @@ const state = {
   difficultyFilter: '',
   bokFilter: '',
   randomMode: false,
-  bottomSearchGesture: null,
-  lastBottomSearchAt: 0,
   renderedCardId: null,
   renderedFlipped: false,
 };
 
 const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
+const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
+
+function readSavedViewState() {
+  try {
+    return JSON.parse(localStorage.getItem(VIEW_STATE_KEY) || '{}');
+  } catch (_error) {
+    return {};
+  }
+}
+
+function restoreViewState() {
+  const saved = readSavedViewState();
+  if ($('searchInput')) $('searchInput').value = saved.search || '';
+  if ($('categorySelect') && saved.category && [...$('categorySelect').options].some((option) => option.value === saved.category)) {
+    $('categorySelect').value = saved.category;
+  }
+  if ($('importanceSelect')) $('importanceSelect').value = saved.importance || '';
+  if ($('difficultySelect')) $('difficultySelect').value = saved.difficulty || '';
+  if ($('bokSelect')) $('bokSelect').value = saved.bok || '';
+  state.statusFilter = saved.statusFilter || '';
+  const savedIndex = Number(saved.index);
+  state.index = Number.isInteger(savedIndex) && savedIndex >= 0 ? savedIndex : 0;
+  updateStatFilterButtons();
+}
+
+function saveViewState() {
+  try {
+    localStorage.setItem(VIEW_STATE_KEY, JSON.stringify({
+      search: $('searchInput')?.value || '',
+      category: $('categorySelect')?.value || '',
+      importance: $('importanceSelect')?.value || '',
+      difficulty: $('difficultySelect')?.value || '',
+      bok: $('bokSelect')?.value || '',
+      statusFilter: state.statusFilter || '',
+      index: state.index || 0,
+    }));
+  } catch (_error) {}
+}
 
 
 const CATEGORY_META = {
@@ -246,83 +282,6 @@ function openCurrentGoogleSearch(event = null) {
   setMessage('검색을 열고 CS 카드로 포커스를 되돌렸습니다.');
 }
 
-function bottomSearchScrollTarget(target) {
-  const scrollArea = target?.closest?.('.back-scroll');
-  return scrollArea || document.scrollingElement || document.documentElement;
-}
-
-function isAtScrollBottom(element) {
-  if (!element) return false;
-  if (element === document.scrollingElement || element === document.documentElement || element === document.body) {
-    return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
-  }
-  return element.scrollTop + element.clientHeight >= element.scrollHeight - 8;
-}
-
-function isBottomSearchGestureTarget(target) {
-  if (!target?.closest) return false;
-  if (target.closest('input, select, textarea, button, a')) return false;
-  return Boolean(target.closest('.study-area, #card, .back-scroll'));
-}
-
-function handleBottomSearchTouchStart(event) {
-  if (!isTouchGestureDevice() || event.touches.length !== 1 || !isBottomSearchGestureTarget(event.target)) {
-    state.bottomSearchGesture = null;
-    return;
-  }
-  const touch = event.touches[0];
-  const scrollTarget = bottomSearchScrollTarget(event.target);
-  const atBottom = isAtScrollBottom(scrollTarget);
-  state.bottomSearchGesture = {
-    startY: touch.clientY,
-    lastY: touch.clientY,
-    startAt: Date.now(),
-    scrollTarget,
-    bottomY: atBottom ? touch.clientY : null,
-    bottomAt: atBottom ? Date.now() : 0,
-    triggered: false,
-  };
-}
-
-function triggerBottomSearch(event, gesture) {
-  if (!gesture || gesture.triggered) return;
-  const now = Date.now();
-  if (now - state.lastBottomSearchAt < 1800) return;
-  gesture.triggered = true;
-  state.lastBottomSearchAt = now;
-  state.bottomSearchGesture = null;
-  event?.preventDefault?.();
-  openCurrentGoogleSearch(event);
-}
-
-function handleBottomSearchTouchMove(event) {
-  const gesture = state.bottomSearchGesture;
-  if (!gesture || event.touches.length !== 1) return;
-  const touch = event.touches[0];
-  gesture.lastY = touch.clientY;
-
-  if (isAtScrollBottom(gesture.scrollTarget) && gesture.bottomY === null) {
-    gesture.bottomY = touch.clientY;
-    gesture.bottomAt = Date.now();
-  }
-  if (gesture.bottomY === null) return;
-
-  const extraPull = gesture.bottomY - touch.clientY;
-  const elapsedAfterBottom = Math.max(1, Date.now() - gesture.bottomAt);
-  const strongExtraPull = extraPull > 72 || (extraPull > 46 && extraPull / elapsedAfterBottom > 0.28);
-  if (strongExtraPull) triggerBottomSearch(event, gesture);
-}
-
-function handleBottomSearchTouchEnd(event) {
-  const gesture = state.bottomSearchGesture;
-  state.bottomSearchGesture = null;
-  if (!gesture || gesture.bottomY === null) return;
-  const extraPull = gesture.bottomY - gesture.lastY;
-  if (extraPull > 54) triggerBottomSearch(event, gesture);
-}
-
-
-
 function applyControlsCollapsed() {
   const panel = $('controlsPanel');
   const button = $('controlsToggle');
@@ -452,12 +411,6 @@ function isMobileSpeechDevice() {
   const ua = navigator.userAgent || '';
   return /Android|iPhone|iPad|iPod|Mobile/i.test(ua)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-function isTouchGestureDevice() {
-  return isMobileSpeechDevice()
-    || navigator.maxTouchPoints > 0
-    || window.matchMedia?.('(pointer: coarse)')?.matches;
 }
 
 function nextSpeechDelayMs() {
@@ -1143,6 +1096,7 @@ function renderConceptImage(card) {
   if (!url || !isDirectImageUrl(url)) {
     wrap.hidden = true;
     image.removeAttribute('src');
+    image.removeAttribute('title');
     image.alt = '';
     image.hidden = false;
     return;
@@ -1151,6 +1105,7 @@ function renderConceptImage(card) {
   image.hidden = false;
   image.src = url;
   image.alt = conceptImageAlt(card);
+  image.title = `${googleSearchQuery(card)} 구글 AI 검색`;
   wrap.hidden = false;
 }
 
@@ -1161,6 +1116,7 @@ async function loadCards() {
   state.cards = data.cards;
   state.summary = data.summary;
   buildCategoryOptions(data.summary.categories || []);
+  restoreViewState();
   applyFilters();
   $('csvPath').textContent = data.summary.csv_path;
   setAudioButtons();
@@ -1308,6 +1264,7 @@ function renderCard() {
     state.renderedCardId = null;
     state.renderedFlipped = false;
     resetBackScroll();
+    saveViewState();
     return;
   }
 
@@ -1360,6 +1317,7 @@ function renderCard() {
   if (shouldResetBackScroll) resetBackScroll();
   state.renderedCardId = c.id;
   state.renderedFlipped = state.flipped;
+  saveViewState();
 }
 
 
@@ -1508,10 +1466,6 @@ function reloadFromLogo(event) {
 
 $('logoRefreshBtn').addEventListener('click', reloadFromLogo);
 $('logoRefreshBtn').addEventListener('touchend', reloadFromLogo, {passive: false});
-document.addEventListener('touchstart', handleBottomSearchTouchStart, {passive: true});
-document.addEventListener('touchmove', handleBottomSearchTouchMove, {passive: false});
-document.addEventListener('touchend', handleBottomSearchTouchEnd, {passive: false});
-document.addEventListener('touchcancel', () => { state.bottomSearchGesture = null; }, {passive: true});
 document.querySelectorAll('[data-status-filter]').forEach((button) => button.addEventListener('click', () => setStatusFilter(button.dataset.statusFilter)));
 $('controlsToggle').addEventListener('click', toggleControlsPanel);
 $('positionInput').addEventListener('change', () => jumpFromInput());
@@ -1533,6 +1487,11 @@ $('searchInput').addEventListener('input', () => { state.index = 0; applyFilters
 $('searchInput').addEventListener('keydown', returnFocusFromSearchInput);
 ['frontGoogleSearchLink', 'backGoogleSearchLink'].forEach((id) => {
   $(id)?.addEventListener('click', openCurrentGoogleSearch);
+});
+$('backConceptImageWrap')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  openCurrentGoogleSearch(event);
 });
 ['categorySelect', 'importanceSelect', 'difficultySelect', 'bokSelect'].forEach((id) => {
   $(id)?.addEventListener('change', () => { state.index = 0; applyFilters(); });
