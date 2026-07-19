@@ -3665,72 +3665,45 @@ select,
 }
 .memo-save-button:disabled,
 .memo-input:disabled { opacity: .62; cursor: wait; }
-.ai-rewrite-section {
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fff;
-  padding: .72rem;
-}
-.ai-rewrite-section details { display: grid; gap: .6rem; }
-.ai-rewrite-section summary {
-  cursor: pointer;
-  color: var(--accent);
-  font-weight: 920;
-}
-.ai-rewrite-help {
-  margin: .1rem 0 0;
-  color: var(--muted);
-  font-size: .82rem;
-  line-height: 1.5;
-}
-.ai-rewrite-grid {
-  display: grid;
-  gap: .68rem;
-}
-.ai-rewrite-field {
-  display: grid;
-  gap: .28rem;
-  color: var(--muted);
-  font-size: .82rem;
-}
-.ai-rewrite-field span {
-  color: #223a5d;
-  font-weight: 860;
-}
-.ai-rewrite-field textarea {
-  width: 100%;
-  resize: vertical;
-  line-height: 1.55;
-  font-size: .9rem;
-}
-.ai-rewrite-instruction textarea { min-height: 4.5rem; }
-#aiRewriteDefinition,
-#aiRewriteExam,
-#aiRewriteImageAlt { min-height: 5rem; }
-#aiRewriteDetail { min-height: 10rem; }
-.ai-rewrite-actions {
+.section-title-row {
   display: flex;
-  justify-content: flex-end;
-  gap: .5rem;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .55rem;
 }
-.ai-rewrite-actions button {
-  border: 1px solid rgba(31, 58, 95, .18);
-  border-radius: 12px;
-  padding: .56rem .86rem;
-  font-weight: 820;
+.section-title-row h3 { margin: 0; }
+.section-title-row.ai-previewing h3 { color: var(--accent); }
+.inline-ai-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: .24rem;
+  flex-shrink: 0;
 }
-#aiRewriteApplyBtn {
-  background: var(--accent);
-  color: #fff;
+.inline-ai-btn {
+  min-width: 1.58rem;
+  height: 1.58rem;
+  padding: 0 .4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, .24);
+  background: rgba(255, 255, 255, .96);
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .6rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
 }
-.ai-rewrite-status {
-  margin: 0;
-  white-space: pre-wrap;
-  line-height: 1.45;
+.inline-ai-btn.save {
+  color: #166534;
+  border-color: rgba(34, 197, 94, .22);
 }
-.ai-rewrite-actions button:disabled,
-.ai-rewrite-field textarea:disabled { opacity: .62; cursor: wait; }
+.inline-ai-btn.cancel {
+  color: #7c2d12;
+  border-color: rgba(251, 146, 60, .22);
+}
+.inline-ai-btn:disabled { opacity: .56; cursor: wait; }
 
 .mark-row {
   grid-template-columns: repeat(5, minmax(0, 1fr));

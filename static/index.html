@@ -267,13 +267,28 @@
               </div>
               <div id="backPageOne" class="back-page active" data-page="1">
                 <section>
-                  <h3 title="간단 설명">—</h3>
+                  <div class="section-title-row">
+                    <h3 title="간단 설명">—</h3>
+                    <div class="inline-ai-actions" aria-label="간단 설명 AI 변환">
+                      <button id="definitionAiBtn" class="inline-ai-btn has-tip" type="button" title="간단 설명 AI 변환" data-tip="간단 설명 AI">AI</button>
+                      <button id="definitionAiSaveBtn" class="inline-ai-btn save has-tip" type="button" title="간단 설명 저장" data-tip="저장" hidden>✓</button>
+                      <button id="definitionAiCancelBtn" class="inline-ai-btn cancel has-tip" type="button" title="간단 설명 취소" data-tip="취소" hidden>✕</button>
+                    </div>
+                  </div>
                   <p id="definition"></p>
                 </section>
                 <section>
-                  <h3 title="상세 설명">⋯</h3>
+                  <div class="section-title-row">
+                    <h3 title="상세 설명">⋯</h3>
+                    <div class="inline-ai-actions" aria-label="상세 설명 AI 변환">
+                      <button id="detailAiBtn" class="inline-ai-btn has-tip" type="button" title="상세 설명 AI 변환" data-tip="상세 설명 AI">AI</button>
+                      <button id="detailAiSaveBtn" class="inline-ai-btn save has-tip" type="button" title="상세 설명 저장" data-tip="저장" hidden>✓</button>
+                      <button id="detailAiCancelBtn" class="inline-ai-btn cancel has-tip" type="button" title="상세 설명 취소" data-tip="취소" hidden>✕</button>
+                    </div>
+                  </div>
                   <div id="detail" class="detail-grid"></div>
                 </section>
+
                 <section>
                   <h3 title="관련 개념">↔</h3>
                   <div id="conceptGraph" class="concept-graph" aria-label="현재 카드와 관련 개념의 연결 그래프"></div>
@@ -286,9 +301,17 @@
                   <p id="sources" class="small"></p>
                 </details>
                 <section>
-                  <h3 title="시험 포인트">✓</h3>
+                  <div class="section-title-row">
+                    <h3 title="시험 포인트">✓</h3>
+                    <div class="inline-ai-actions" aria-label="시험 포인트 AI 변환">
+                      <button id="examAiBtn" class="inline-ai-btn has-tip" type="button" title="시험 포인트 AI 변환" data-tip="시험 포인트 AI">AI</button>
+                      <button id="examAiSaveBtn" class="inline-ai-btn save has-tip" type="button" title="시험 포인트 저장" data-tip="저장" hidden>✓</button>
+                      <button id="examAiCancelBtn" class="inline-ai-btn cancel has-tip" type="button" title="시험 포인트 취소" data-tip="취소" hidden>✕</button>
+                    </div>
+                  </div>
                   <p id="examNote"></p>
                 </section>
+
                 <section class="memo-section">
                   <div class="memo-heading">
                     <h3 title="개인 메모">메모</h3>
@@ -298,39 +321,6 @@
                   <div class="memo-actions">
                     <button id="memoSaveBtn" class="memo-save-button" type="button">메모 저장</button>
                   </div>
-                </section>
-                <section id="aiRewriteSection" class="ai-rewrite-section">
-                  <details open>
-                    <summary>Codex AI 교체</summary>
-                    <p class="ai-rewrite-help">원하는 톤이나 길이를 적고 AI 초안을 만든 뒤, 아래 텍스트를 바로 수정해서 적용합니다.</p>
-                    <label class="ai-rewrite-field ai-rewrite-instruction">
-                      <span>지시</span>
-                      <textarea id="aiRewriteInstruction" rows="3" maxlength="4000" placeholder="예: 면접 답변형으로 더 짧고 비교 포인트가 드러나게 정리"></textarea>
-                    </label>
-                    <div class="ai-rewrite-actions">
-                      <button id="aiRewritePreviewBtn" type="button">AI 초안</button>
-                      <button id="aiRewriteApplyBtn" type="button">초안 적용</button>
-                    </div>
-                    <p id="aiRewriteStatus" class="ai-rewrite-status small muted">현재 카드 설명을 AI 초안으로 바꾼 뒤 아래 텍스트를 바로 수정·적용할 수 있습니다.</p>
-                    <div class="ai-rewrite-grid">
-                      <label class="ai-rewrite-field">
-                        <span>간단 설명</span>
-                        <textarea id="aiRewriteDefinition" rows="4" maxlength="12000"></textarea>
-                      </label>
-                      <label class="ai-rewrite-field">
-                        <span>상세 설명</span>
-                        <textarea id="aiRewriteDetail" rows="8" maxlength="50000"></textarea>
-                      </label>
-                      <label class="ai-rewrite-field">
-                        <span>시험 포인트</span>
-                        <textarea id="aiRewriteExam" rows="4" maxlength="20000"></textarea>
-                      </label>
-                      <label class="ai-rewrite-field ai-rewrite-alt">
-                        <span>이미지 설명</span>
-                        <textarea id="aiRewriteImageAlt" rows="3" maxlength="4000"></textarea>
-                      </label>
-                    </div>
-                  </details>
                 </section>
               </div>
             </div>

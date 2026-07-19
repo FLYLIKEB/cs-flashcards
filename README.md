@@ -172,7 +172,7 @@ data/CS_encyclopedia_300plus.csv
 ```
 
 수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 기존 원격 CSV에 남아 있던 진행상태를 최초 1회 SQLite로 이관한 뒤 새 CSV를 반영합니다.
-브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 카드 뒷면의 `Codex AI 교체` 패널은 `definition`, `detailed_explanation`, `exam_note`, `concept_image_alt`를 초안 생성·수정·적용합니다. 개념 이미지는 별도의 작은 `AI` 버튼으로 미리 생성 후 저장하며, 저장 시 서버 `state/ai_images/` 파일과 CSV의 `concept_image_url`/`concept_image_alt`가 함께 갱신됩니다.
+브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션만 바로 AI 초안으로 바꿔 미리 보여주고, `저장`/`취소`로 인라인 확정합니다. 개념 이미지는 별도의 작은 `AI` 버튼으로 미리 생성 후 저장하며, 저장 시 서버 `state/ai_images/` 파일과 CSV의 `concept_image_url`/`concept_image_alt`가 함께 갱신됩니다.
 
 
 ```bash

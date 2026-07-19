@@ -14,6 +14,7 @@ const state = {
   aiRewriteDraft: null,
   aiRewriteStatus: '',
   aiRewriteError: '',
+  aiRewriteActiveField: '',
   aiImageGenerating: false,
   aiImageSaving: false,
   aiImageCardId: '',
@@ -2096,6 +2097,30 @@ function aiRewriteDraftFromCard(card) {
   };
 }
 
+const AI_REWRITE_FIELD_CONFIG = {
+  definition: {
+    label: '간단 설명',
+    previewButtonId: 'definitionAiBtn',
+    saveButtonId: 'definitionAiSaveBtn',
+    cancelButtonId: 'definitionAiCancelBtn',
+    instruction: '현재 카드의 간단 설명만 1~2문장으로 더 명확하고 면접 답변 친화적으로 다듬어 주세요. 다른 필드는 유지해 주세요.',
+  },
+  detailed_explanation: {
+    label: '상세 설명',
+    previewButtonId: 'detailAiBtn',
+    saveButtonId: 'detailAiSaveBtn',
+    cancelButtonId: 'detailAiCancelBtn',
+    instruction: '현재 카드의 상세 설명만 더 이해하기 쉽게 다듬어 주세요. 의미: 와 활용: 구조는 유지하고 다른 필드는 유지해 주세요.',
+  },
+  exam_note: {
+    label: '시험 포인트',
+    previewButtonId: 'examAiBtn',
+    saveButtonId: 'examAiSaveBtn',
+    cancelButtonId: 'examAiCancelBtn',
+    instruction: '현재 카드의 시험 포인트만 더 짧고 비교 포인트가 잘 보이게 다듬어 주세요. 다른 필드는 유지해 주세요.',
+  },
+};
+
 function currentAiRewriteDraft(card) {
   if (!card) return null;
   const changedCard = state.aiRewriteCardId !== card.id || !state.aiRewriteDraft;
@@ -2104,64 +2129,49 @@ function currentAiRewriteDraft(card) {
     state.aiRewriteDraft = aiRewriteDraftFromCard(card);
     state.aiRewriteStatus = '';
     state.aiRewriteError = '';
-    const instructionInput = $('aiRewriteInstruction');
-    if (instructionInput) {
-      instructionInput.value = '';
-      instructionInput.dataset.cardId = card.id;
-    }
+    state.aiRewriteActiveField = '';
   }
   return state.aiRewriteDraft;
 }
 
-function setAiRewriteDraftField(field, value) {
-  if (!state.aiRewriteDraft) return;
-  state.aiRewriteDraft[field] = String(value || '');
+function clearAiRewritePreview(cardId = null) {
+  if (cardId && state.aiRewriteCardId && state.aiRewriteCardId !== cardId) return;
+  state.aiRewriteDraft = null;
+  state.aiRewriteActiveField = '';
+  state.aiRewriteStatus = '';
+  state.aiRewriteError = '';
+}
+
+function aiRewritePreviewActive(card, field) {
+  return Boolean(card?.id) && state.aiRewriteCardId === card.id && state.aiRewriteActiveField === field && state.aiRewriteDraft;
+}
+
+function aiRewriteDisplayText(card, field) {
+  if (aiRewritePreviewActive(card, field)) {
+    return String(state.aiRewriteDraft?.[field] || card?.[field] || '');
+  }
+  return String(card?.[field] || '');
 }
 
 function renderAiRewriteControls(card) {
-  const section = $('aiRewriteSection');
-  const previewBtn = $('aiRewritePreviewBtn');
-  const applyBtn = $('aiRewriteApplyBtn');
-  const instructionInput = $('aiRewriteInstruction');
-  const statusEl = $('aiRewriteStatus');
-  if (!section || !previewBtn || !applyBtn || !instructionInput || !statusEl) return;
-
-  if (!card) {
-    section.hidden = true;
-    previewBtn.disabled = true;
-    applyBtn.disabled = true;
-    statusEl.textContent = 'AI 초안을 만들 카드가 없습니다.';
-    statusEl.classList.remove('error-text');
-    return;
-  }
-
-  section.hidden = false;
-  const draft = currentAiRewriteDraft(card);
   const busy = state.aiRewriteLoading || state.aiRewriteApplying;
-  if (instructionInput.dataset.cardId !== card.id) {
-    instructionInput.value = '';
-    instructionInput.dataset.cardId = card.id;
-  }
-  instructionInput.disabled = busy;
-
-  [
-    ['aiRewriteDefinition', 'definition'],
-    ['aiRewriteDetail', 'detailed_explanation'],
-    ['aiRewriteExam', 'exam_note'],
-    ['aiRewriteImageAlt', 'concept_image_alt'],
-  ].forEach(([id, field]) => {
-    const input = $(id);
-    if (!input) return;
-    if (document.activeElement !== input) input.value = draft?.[field] || '';
-    input.disabled = busy;
+  Object.entries(AI_REWRITE_FIELD_CONFIG).forEach(([field, config]) => {
+    const previewBtn = $(config.previewButtonId);
+    const saveBtn = $(config.saveButtonId);
+    const cancelBtn = $(config.cancelButtonId);
+    const row = previewBtn?.closest('.section-title-row') || null;
+    if (!previewBtn || !saveBtn || !cancelBtn) return;
+    const active = aiRewritePreviewActive(card, field);
+    previewBtn.disabled = busy || !card;
+    previewBtn.textContent = state.aiRewriteLoading && state.aiRewriteActiveField === field ? '…' : 'AI';
+    previewBtn.title = state.aiRewriteLoading && state.aiRewriteActiveField === field ? `${config.label} AI 변환 중` : `${config.label} AI 변환`;
+    previewBtn.dataset.tip = state.aiRewriteLoading && state.aiRewriteActiveField === field ? '변환 중' : `${config.label} AI`;
+    saveBtn.hidden = !active;
+    cancelBtn.hidden = !active;
+    saveBtn.disabled = busy;
+    cancelBtn.disabled = busy;
+    row?.classList.toggle('ai-previewing', Boolean(active));
   });
-
-  previewBtn.disabled = busy;
-  applyBtn.disabled = busy || !draft;
-  previewBtn.textContent = state.aiRewriteLoading ? 'AI 초안 생성 중...' : 'AI 초안';
-  applyBtn.textContent = state.aiRewriteApplying ? '초안 적용 중...' : '초안 적용';
-  statusEl.textContent = state.aiRewriteError || state.aiRewriteStatus || '현재 카드 설명을 AI 초안으로 바꾼 뒤 아래 텍스트를 바로 수정·적용할 수 있습니다.';
-  statusEl.classList.toggle('error-text', Boolean(state.aiRewriteError));
 }
 
 async function responseErrorText(res) {
@@ -2175,20 +2185,21 @@ async function responseErrorText(res) {
   return raw || `${res.status}`;
 }
 
-async function previewAiRewrite() {
-  if (!state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
+async function previewAiRewrite(field) {
+  const config = AI_REWRITE_FIELD_CONFIG[field];
+  if (!config || !state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
   const current = state.filtered[state.index];
-  const instruction = $('aiRewriteInstruction')?.value || '';
+  currentAiRewriteDraft(current);
   state.aiRewriteLoading = true;
   state.aiRewriteError = '';
-  state.aiRewriteStatus = `${current.term}: Codex AI 초안 생성 중...`;
+  state.aiRewriteActiveField = field;
   renderAiRewriteControls(current);
-  setMessage(`${current.term}: AI 초안 생성 중...`);
+  setMessage(`${current.term}: ${config.label} AI 변환 중...`);
   try {
     const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({instruction}),
+      body: JSON.stringify({instruction: config.instruction}),
     });
     if (!res.ok) throw new Error(await responseErrorText(res));
     const data = await res.json();
@@ -2197,57 +2208,56 @@ async function previewAiRewrite() {
       ...aiRewriteDraftFromCard(current),
       ...(data.proposal || {}),
     };
-    state.aiRewriteStatus = `${current.term}: ${(data.model || 'Codex')} 초안을 불러왔습니다.`;
-    renderAiRewriteControls(current);
-    setMessage(`${current.term}: AI 초안 생성 완료`);
+    renderCard();
+    setMessage(`${current.term}: ${config.label} AI 초안 생성 완료`);
   } catch (error) {
-    state.aiRewriteStatus = '';
-    state.aiRewriteError = `AI 초안 생성 실패: ${error.message || error}`;
+    state.aiRewriteActiveField = '';
     renderAiRewriteControls(current);
-    setMessage(state.aiRewriteError, true);
+    setMessage(`AI 초안 생성 실패: ${error.message || error}`, true);
   } finally {
     state.aiRewriteLoading = false;
     renderAiRewriteControls(state.filtered[state.index] || null);
   }
 }
 
-async function applyAiRewrite() {
-  if (!state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
+async function applyAiRewrite(field) {
+  const config = AI_REWRITE_FIELD_CONFIG[field];
+  if (!config || !state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
   const current = state.filtered[state.index];
   const draft = currentAiRewriteDraft(current);
-  if (!draft) return;
+  if (!draft || !aiRewritePreviewActive(current, field)) return;
   state.aiRewriteApplying = true;
-  state.aiRewriteError = '';
-  state.aiRewriteStatus = `${current.term}: AI 초안 적용 중...`;
   renderAiRewriteControls(current);
-  setMessage(`${current.term}: AI 초안 적용 중...`);
+  setMessage(`${current.term}: ${config.label} 저장 중...`);
   try {
     const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/apply`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(draft),
+      body: JSON.stringify({[field]: draft[field]}),
     });
     if (!res.ok) throw new Error(await responseErrorText(res));
     const data = await res.json();
+    clearAiRewritePreview(current.id);
     updateCardInCollections(data.card);
     state.summary = data.summary;
-    state.aiRewriteCardId = data.card.id;
-    state.aiRewriteDraft = aiRewriteDraftFromCard(data.card);
-    state.aiRewriteStatus = data.backup_path
-      ? `${data.card.term}: AI 초안을 적용했고 CSV 백업도 남겼습니다.`
-      : `${data.card.term}: AI 초안을 적용했습니다.`;
     renderStats(summaryFromRows(rowsForHeaderStats()));
     renderCard();
-    setMessage(`${data.card.term}: AI 초안 적용 완료`);
+    setMessage(`${data.card.term}: ${config.label} 저장 완료`);
   } catch (error) {
-    state.aiRewriteStatus = '';
-    state.aiRewriteError = `AI 초안 적용 실패: ${error.message || error}`;
     renderAiRewriteControls(current);
-    setMessage(state.aiRewriteError, true);
+    setMessage(`AI 초안 적용 실패: ${error.message || error}`, true);
   } finally {
     state.aiRewriteApplying = false;
     renderAiRewriteControls(state.filtered[state.index] || null);
   }
+}
+
+function discardAiRewrite(field) {
+  const current = state.filtered[state.index] || null;
+  if (!current || !aiRewritePreviewActive(current, field) || state.aiRewriteLoading || state.aiRewriteApplying) return;
+  clearAiRewritePreview(current.id);
+  renderCard();
+  setMessage(`${current.term}: AI 초안을 취소했습니다.`);
 }
 
 function renderPersonalControls(card) {
@@ -3212,10 +3222,10 @@ function renderCard() {
   $('backTerm').innerHTML = `${currentWordHtml(c.term, 'term')}${c.english ? ' / ' + escapeHtml(c.english) : ''}`;
   renderConceptImage(c);
   const emphasisTerms = cardTerms(c);
-  $('definition').innerHTML = currentWordHtml(c.definition || '', 'definition', null, emphasisTerms);
-  $('detail').innerHTML = renderDetailedExplanation(c.detailed_explanation, emphasisTerms);
+  $('definition').innerHTML = currentWordHtml(aiRewriteDisplayText(c, 'definition'), 'definition', null, emphasisTerms);
+  $('detail').innerHTML = renderDetailedExplanation(aiRewriteDisplayText(c, 'detailed_explanation'), emphasisTerms);
   $('sources').innerHTML = renderSourceLinks(c.source_files);
-  $('examNote').innerHTML = currentWordHtml(c.exam_note || '', 'exam', null, emphasisTerms);
+  $('examNote').innerHTML = currentWordHtml(aiRewriteDisplayText(c, 'exam_note'), 'exam', null, emphasisTerms);
   const related = parseRelated(c.related_concepts);
   $('related').innerHTML = related.map((r) => `<button class="chip" type="button" data-term="${escapeHtml(r)}">${currentWordHtml(r, 'related')}</button>`).join('') || '<span class="muted">없음</span>';
   $('conceptGraph').innerHTML = renderConceptGraph(c);
@@ -3433,15 +3443,18 @@ $('conceptImageGenerateBtn')?.addEventListener('click', previewConceptImage);
 $('conceptImageSaveBtn')?.addEventListener('click', saveConceptImagePreview);
 $('conceptImageCancelBtn')?.addEventListener('click', discardConceptImagePreview);
 
-$('aiRewritePreviewBtn')?.addEventListener('click', previewAiRewrite);
-$('aiRewriteApplyBtn')?.addEventListener('click', applyAiRewrite);
 [
-  ['aiRewriteDefinition', 'definition'],
-  ['aiRewriteDetail', 'detailed_explanation'],
-  ['aiRewriteExam', 'exam_note'],
-  ['aiRewriteImageAlt', 'concept_image_alt'],
-].forEach(([id, field]) => {
-  $(id)?.addEventListener('input', (event) => setAiRewriteDraftField(field, event.target.value));
+  ['definitionAiBtn', () => previewAiRewrite('definition')],
+  ['detailAiBtn', () => previewAiRewrite('detailed_explanation')],
+  ['examAiBtn', () => previewAiRewrite('exam_note')],
+  ['definitionAiSaveBtn', () => applyAiRewrite('definition')],
+  ['detailAiSaveBtn', () => applyAiRewrite('detailed_explanation')],
+  ['examAiSaveBtn', () => applyAiRewrite('exam_note')],
+  ['definitionAiCancelBtn', () => discardAiRewrite('definition')],
+  ['detailAiCancelBtn', () => discardAiRewrite('detailed_explanation')],
+  ['examAiCancelBtn', () => discardAiRewrite('exam_note')],
+].forEach(([id, handler]) => {
+  $(id)?.addEventListener('click', handler);
 });
 $('memoInput').addEventListener('keydown', (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
