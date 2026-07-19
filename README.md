@@ -37,6 +37,9 @@ http://127.0.0.1:8000
   3. 기존 로컬 개발 경로 `../wikidocs-ebook`
 - Lightsail 배포 스크립트는 기본적으로 로컬 `../wikidocs-ebook`를 묶어서 서버의 `/home/ubuntu/cs-flashcards/wiki_book`으로 함께 배포합니다.
 - 다른 위치의 문서를 배포하려면 `CS_FLASHCARDS_WIKI_BOOK_SRC`를 지정합니다.
+- 위키 마크다운의 `- [ ]` / `- [x]` 체크리스트는 `/wiki`에서 실제 체크박스로 렌더링됩니다.
+- 체크를 누르면 배포된 `wiki_book` 마크다운이 바로 갱신됩니다.
+- GitHub에도 같은 체크 상태를 반영하려면 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정합니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
 
 
 ## 데이터 저장 구조
@@ -228,7 +231,6 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
 
 응답에 아래 값이 포함되어야 합니다.
 
-```json
 {
   "ok": true,
   "csv_exists": true,
@@ -236,7 +238,8 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
   "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite",
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
-  "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book"
+  "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book",
+  "wiki_checklist_sync_target": "github"
 }
 ```
 

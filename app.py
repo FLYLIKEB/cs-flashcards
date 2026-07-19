@@ -4,19 +4,21 @@ import base64
 import csv
 import html
 import hashlib
+import json
 
 from contextlib import closing
 import hmac
 import os
+from pathlib import Path, PurePosixPath
+import re
 import shutil
 import sqlite3
 import tempfile
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
-
-import re
+from urllib.error import HTTPError, URLError
 from urllib.parse import quote
+from urllib.request import Request as UrlRequest, urlopen
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -43,6 +45,12 @@ VALID_STATUSES = {"O", "X", ""}
 PUBLIC_USERNAME = os.environ.get("CS_FLASHCARDS_USERNAME", "cs")
 PUBLIC_PASSWORD = os.environ.get("CS_FLASHCARDS_PASSWORD", "")
 AUTH_COOKIE_NAME = "cs_flashcards_auth"
+WIKI_GITHUB_REPO = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_REPO", "")).strip()
+WIKI_GITHUB_BRANCH = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_BRANCH", "main")).strip() or "main"
+WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).strip()
+WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX", "")).strip().strip("/")
+WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
+
 
 
 app = FastAPI(title="CS Encyclopedia Flashcards", version="1.0.0")
@@ -66,6 +74,13 @@ class QuestionGenerateRequest(BaseModel):
     types: list[str] | None = None
     count: int = Field(default=10, ge=1, le=100)
     seed: int | None = None
+
+
+class WikiChecklistRequest(BaseModel):
+    source_path: str = Field(min_length=1, max_length=4096)
+    line_number: int = Field(ge=1, le=200000)
+    checked: bool
+
 
 
 def authorized_cookie_value() -> str:
@@ -464,10 +479,11 @@ def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
 WIKI_TOC_ITEM_RE = re.compile(r"^(?P<indent>\s*)-\s+\[(?P<title>.+?)\]\((?P<href>[^)]+)\)\s*$")
 WIKI_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 WIKI_LIST_RE = re.compile(r"^(?P<indent>\s*)(?P<marker>[-*+]|\d+\.)\s+(?P<body>.*)$")
+WIKI_TASK_BODY_RE = re.compile(r"^\[(?P<checked>[ xX])\]\s+(?P<text>.*)$")
+WIKI_TASK_LINE_RE = re.compile(r"^(?P<prefix>\s*(?:[-*+]|\d+\.)\s+)\[(?P<checked>[ xX])\](?P<suffix>\s+.*)$")
 WIKI_CODE_FENCE_RE = re.compile(r"^```(?P<lang>[\w+-]*)\s*$")
 WIKI_TABLE_SEPARATOR_RE = re.compile(r"^\|?\s*:?[-]{3,}:?(?:\s*\|\s*:?[-]{3,}:?)*\s*\|?$")
 WIKI_INLINE_TOKEN_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*")
-
 
 
 def wiki_book_dir(repo_dir: Path | None = None) -> Path:
@@ -493,20 +509,16 @@ def wiki_book_dir(repo_dir: Path | None = None) -> Path:
     raise FileNotFoundError(f"Wiki book directory not found. Checked: {searched}")
 
 
-
 def wiki_pages_dir(repo_dir: Path) -> Path:
     return repo_dir / WIKI_PAGES_DIRNAME
-
 
 
 def wiki_toc_path(repo_dir: Path) -> Path:
     return repo_dir / WIKI_TOC_NAME
 
 
-
 def wiki_readme_path(repo_dir: Path) -> Path:
     return repo_dir / WIKI_BOOK_README_NAME
-
 
 
 def wiki_page_url(slug: str) -> str:
@@ -514,10 +526,8 @@ def wiki_page_url(slug: str) -> str:
     return f"/wiki/page/{quote(normalized, safe='/')}"
 
 
-
 def wiki_raw_url(relative_path: str) -> str:
     return f"/api/wiki/raw/{quote(str(relative_path).replace(os.sep, '/'), safe='/')}"
-
 
 
 def wiki_heading_id(text: str) -> str:
@@ -525,7 +535,6 @@ def wiki_heading_id(text: str) -> str:
     normalized = re.sub(r"\s+", "-", normalized)
     normalized = re.sub(r"-+", "-", normalized).strip("-")
     return normalized or "section"
-
 
 
 def extract_markdown_title(markdown_text: str, fallback: str) -> str:
@@ -536,7 +545,6 @@ def extract_markdown_title(markdown_text: str, fallback: str) -> str:
     return fallback
 
 
-
 def safe_wiki_path(repo_dir: Path, relative_path: str) -> Path | None:
     root = repo_dir.resolve()
     candidate = (root / str(relative_path or "")).resolve()
@@ -545,7 +553,6 @@ def safe_wiki_path(repo_dir: Path, relative_path: str) -> Path | None:
     except ValueError:
         return None
     return candidate
-
 
 
 def resolve_wiki_reference(repo_dir: Path, href: str, base_path: Path) -> Path | None:
@@ -569,13 +576,11 @@ def resolve_wiki_reference(repo_dir: Path, href: str, base_path: Path) -> Path |
     return None
 
 
-
 def wiki_slug_for_source(repo_dir: Path, source_path: Path) -> str:
     if source_path.resolve() == wiki_readme_path(repo_dir).resolve():
         return WIKI_BOOK_HOME_SLUG
     relative = source_path.resolve().relative_to(wiki_pages_dir(repo_dir).resolve())
     return relative.with_suffix("").as_posix()
-
 
 
 def split_markdown_cells(line: str) -> list[str]:
@@ -586,6 +591,32 @@ def split_markdown_cells(line: str) -> list[str]:
         stripped = stripped[:-1]
     return [cell.strip() for cell in stripped.split("|")]
 
+
+def parse_markdown_task_item(body: str) -> tuple[bool, str] | None:
+    match = WIKI_TASK_BODY_RE.match(str(body or "").strip())
+    if not match:
+        return None
+    return match.group("checked").lower() == "x", match.group("text").strip()
+
+
+def set_markdown_task_state(markdown_text: str, line_number: int, checked: bool) -> tuple[str, dict[str, Any]]:
+    lines = markdown_text.splitlines(keepends=True)
+    if line_number < 1 or line_number > len(lines):
+        raise ValueError(f"Checklist line not found: {line_number}")
+    raw_line = lines[line_number - 1]
+    line_body = raw_line.rstrip("\r\n")
+    newline = raw_line[len(line_body):]
+    match = WIKI_TASK_LINE_RE.match(line_body)
+    if not match:
+        raise ValueError(f"Line {line_number} is not a Markdown checklist item")
+    updated_line = f"{match.group('prefix')}[{'x' if checked else ' '}]{match.group('suffix')}"
+    lines[line_number - 1] = updated_line + newline
+    return "".join(lines), {
+        "checked": checked,
+        "previous_checked": match.group("checked").lower() == "x",
+        "text": match.group("suffix").strip(),
+        "changed": updated_line != line_body,
+    }
 
 
 def rewrite_markdown_href(repo_dir: Path, current_source: Path, href: str) -> str:
@@ -604,7 +635,6 @@ def rewrite_markdown_href(repo_dir: Path, current_source: Path, href: str) -> st
     return f"{wiki_raw_url(relative)}{fragment}"
 
 
-
 def render_inline_markdown(text: str, repo_dir: Path, current_source: Path) -> str:
     parts = re.split(r"(`[^`]+`)", str(text or ""))
     rendered: list[str] = []
@@ -616,7 +646,6 @@ def render_inline_markdown(text: str, repo_dir: Path, current_source: Path) -> s
             continue
         rendered.append(render_inline_markdown_tokens(part, repo_dir, current_source))
     return "".join(rendered)
-
 
 
 def render_inline_markdown_tokens(text: str, repo_dir: Path, current_source: Path) -> str:
@@ -644,18 +673,31 @@ def render_inline_markdown_tokens(text: str, repo_dir: Path, current_source: Pat
     return "".join(rendered)
 
 
-
-def render_markdown_list(lines: list[str], repo_dir: Path, current_source: Path) -> str:
+def render_markdown_list(lines: list[str], line_numbers: list[int], repo_dir: Path, current_source: Path) -> str:
     first_match = WIKI_LIST_RE.match(lines[0])
     tag = "ol" if first_match and first_match.group("marker").endswith(".") else "ul"
+    source_relative = str(current_source.relative_to(repo_dir)).replace(os.sep, "/")
     items: list[str] = []
-    for line in lines:
+    is_task_list = True
+    for line, line_number in zip(lines, line_numbers):
         match = WIKI_LIST_RE.match(line)
         if not match:
             continue
+        task_item = parse_markdown_task_item(match.group("body"))
+        if task_item:
+            item_checked, item_text = task_item
+            checked_attr = " checked" if item_checked else ""
+            items.append(
+                "<li class=\"wiki-task-item\"><label>"
+                f"<input type=\"checkbox\" data-wiki-task-checkbox=\"1\" data-wiki-task-source=\"{html.escape(source_relative, quote=True)}\" data-wiki-task-line=\"{line_number}\"{checked_attr} />"
+                f"<span>{render_inline_markdown(item_text, repo_dir, current_source)}</span>"
+                "</label></li>"
+            )
+            continue
+        is_task_list = False
         items.append(f"<li>{render_inline_markdown(match.group('body').strip(), repo_dir, current_source)}</li>")
-    return f"<{tag}>" + "".join(items) + f"</{tag}>"
-
+    class_attr = ' class="wiki-task-list"' if items and is_task_list else ""
+    return f"<{tag}{class_attr}>" + "".join(items) + f"</{tag}>"
 
 
 def render_markdown_table(lines: list[str], repo_dir: Path, current_source: Path) -> str:
@@ -672,7 +714,6 @@ def render_markdown_table(lines: list[str], repo_dir: Path, current_source: Path
     return "<div class=\"wiki-table-wrap\"><table><thead><tr>" + head_html + "</tr></thead><tbody>" + body_html + "</tbody></table></div>"
 
 
-
 def is_markdown_block_start(line: str) -> bool:
     stripped = line.strip()
     return bool(
@@ -686,8 +727,13 @@ def is_markdown_block_start(line: str) -> bool:
     )
 
 
-
-def render_markdown_blocks(lines: list[str], repo_dir: Path, current_source: Path) -> list[str]:
+def render_markdown_blocks(
+    lines: list[str],
+    repo_dir: Path,
+    current_source: Path,
+    line_numbers: list[int] | None = None,
+) -> list[str]:
+    effective_line_numbers = line_numbers or list(range(1, len(lines) + 1))
     blocks: list[str] = []
     index = 0
     while index < len(lines):
@@ -725,10 +771,12 @@ def render_markdown_blocks(lines: list[str], repo_dir: Path, current_source: Pat
             continue
         if stripped.startswith(">"):
             quote_lines: list[str] = []
+            quote_line_numbers: list[int] = []
             while index < len(lines) and lines[index].lstrip().startswith(">"):
                 quote_lines.append(re.sub(r"^\s*>\s?", "", lines[index]))
+                quote_line_numbers.append(effective_line_numbers[index])
                 index += 1
-            inner = "".join(render_markdown_blocks(quote_lines, repo_dir, current_source))
+            inner = "".join(render_markdown_blocks(quote_lines, repo_dir, current_source, quote_line_numbers))
             blocks.append(f"<blockquote>{inner}</blockquote>")
             continue
         if re.fullmatch(r"[-*_]{3,}", stripped):
@@ -737,10 +785,12 @@ def render_markdown_blocks(lines: list[str], repo_dir: Path, current_source: Pat
             continue
         if WIKI_LIST_RE.match(line):
             list_lines: list[str] = []
+            list_line_numbers: list[int] = []
             while index < len(lines) and WIKI_LIST_RE.match(lines[index]):
                 list_lines.append(lines[index])
+                list_line_numbers.append(effective_line_numbers[index])
                 index += 1
-            blocks.append(render_markdown_list(list_lines, repo_dir, current_source))
+            blocks.append(render_markdown_list(list_lines, list_line_numbers, repo_dir, current_source))
             continue
         paragraph_lines = [stripped]
         index += 1
@@ -751,9 +801,140 @@ def render_markdown_blocks(lines: list[str], repo_dir: Path, current_source: Pat
     return blocks
 
 
-
 def render_markdown_page(markdown_text: str, repo_dir: Path, current_source: Path) -> str:
-    return "".join(render_markdown_blocks(markdown_text.splitlines(), repo_dir, current_source))
+    lines = markdown_text.splitlines()
+    return "".join(render_markdown_blocks(lines, repo_dir, current_source, list(range(1, len(lines) + 1))))
+
+
+def wiki_checklist_sync_target() -> str:
+    return "github" if WIKI_GITHUB_REPO and WIKI_GITHUB_TOKEN else "local"
+
+
+def wiki_github_repo_parts() -> tuple[str, str]:
+    repo_slug = WIKI_GITHUB_REPO.strip().strip("/")
+    if repo_slug.count("/") != 1:
+        raise ValueError(f"Invalid GitHub repo slug: {WIKI_GITHUB_REPO}")
+    owner, repo = repo_slug.split("/", 1)
+    if not owner or not repo:
+        raise ValueError(f"Invalid GitHub repo slug: {WIKI_GITHUB_REPO}")
+    return owner, repo
+
+
+def wiki_github_content_path(relative_path: str) -> str:
+    normalized = PurePosixPath(str(relative_path or "").replace(os.sep, "/").lstrip("/"))
+    if not normalized.parts or any(part in {"", ".", ".."} for part in normalized.parts):
+        raise ValueError(f"Invalid GitHub wiki path: {relative_path}")
+    repo_path = normalized.as_posix()
+    if WIKI_GITHUB_PATH_PREFIX:
+        repo_path = f"{WIKI_GITHUB_PATH_PREFIX}/{repo_path}"
+    return repo_path
+
+
+def wiki_github_contents_api_url(relative_path: str) -> str:
+    owner, repo = wiki_github_repo_parts()
+    content_path = wiki_github_content_path(relative_path)
+    return f"{WIKI_GITHUB_API_BASE}/repos/{quote(owner, safe='')}/{quote(repo, safe='')}/contents/{quote(content_path, safe='/')}"
+
+
+def wiki_github_api_json(method: str, url: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "cs-flashcards/wiki-checklist",
+    }
+    if WIKI_GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {WIKI_GITHUB_TOKEN}"
+    data = None
+    if payload is not None:
+        headers["Content-Type"] = "application/json"
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    request = UrlRequest(url, data=data, headers=headers, method=method)
+    try:
+        with urlopen(request, timeout=20) as response:
+            body = response.read().decode(response.headers.get_content_charset() or "utf-8")
+    except HTTPError as exc:
+        raw_body = exc.read().decode("utf-8", errors="replace")
+        message = raw_body or str(exc)
+        try:
+            parsed = json.loads(raw_body)
+            message = str(parsed.get("message") or message)
+        except json.JSONDecodeError:
+            pass
+        raise RuntimeError(f"GitHub API 요청 실패 ({exc.code}): {message}") from exc
+    except URLError as exc:
+        raise RuntimeError(f"GitHub API 연결 실패: {exc.reason}") from exc
+    if not body:
+        return {}
+    try:
+        return json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("GitHub API 응답을 해석하지 못했습니다.") from exc
+
+
+def github_fetch_wiki_source(relative_path: str) -> tuple[str, str]:
+    url = f"{wiki_github_contents_api_url(relative_path)}?ref={quote(WIKI_GITHUB_BRANCH, safe='')}"
+    payload = wiki_github_api_json("GET", url)
+    if str(payload.get("encoding") or "").lower() != "base64":
+        raise RuntimeError(f"GitHub 파일 인코딩이 예상과 다릅니다: {relative_path}")
+    sha = str(payload.get("sha") or "").strip()
+    if not sha:
+        raise RuntimeError(f"GitHub 파일 SHA를 찾지 못했습니다: {relative_path}")
+    raw_content = str(payload.get("content") or "").replace("\n", "")
+    decoded = base64.b64decode(raw_content.encode("ascii")).decode("utf-8")
+    return decoded, sha
+
+
+def github_update_wiki_source(relative_path: str, content: str, sha: str, message: str) -> dict[str, Any]:
+    return wiki_github_api_json(
+        "PUT",
+        wiki_github_contents_api_url(relative_path),
+        {
+            "message": message,
+            "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+            "sha": sha,
+            "branch": WIKI_GITHUB_BRANCH,
+        },
+    )
+
+
+def update_wiki_checklist_item(
+    source_path: str,
+    line_number: int,
+    checked: bool,
+    repo_dir: Path | None = None,
+) -> dict[str, Any]:
+    repo = wiki_book_dir(repo_dir)
+    target = safe_wiki_path(repo, source_path)
+    if not target or not target.exists() or not target.is_file():
+        raise FileNotFoundError(f"Wiki file not found: {source_path}")
+    if target.suffix.lower() != ".md":
+        raise ValueError(f"Checklist updates support Markdown files only: {source_path}")
+    source_relative = str(target.relative_to(repo)).replace(os.sep, "/")
+    local_content = target.read_text(encoding="utf-8")
+    sync_target = wiki_checklist_sync_target()
+    if sync_target == "github":
+        remote_content, remote_sha = github_fetch_wiki_source(source_relative)
+        if remote_content != local_content:
+            raise RuntimeError("GitHub 위키 원본과 현재 배포본이 달라 체크 동기화를 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.")
+        updated_content, task_meta = set_markdown_task_state(remote_content, line_number, checked)
+        if task_meta["changed"]:
+            github_update_wiki_source(
+                source_relative,
+                updated_content,
+                remote_sha,
+                f"Toggle wiki checklist: {source_relative}#L{line_number}",
+            )
+    else:
+        updated_content, task_meta = set_markdown_task_state(local_content, line_number, checked)
+    if updated_content != local_content:
+        target.write_text(updated_content, encoding="utf-8")
+    return {
+        "source_path": source_relative,
+        "line_number": line_number,
+        "page_slug": wiki_slug_for_source(repo, target),
+        "sync_target": sync_target,
+        **task_meta,
+    }
+
 
 
 
@@ -893,6 +1074,24 @@ def api_wiki_page(page_slug: str) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
+@app.post("/api/wiki/checklist")
+def api_wiki_checklist(payload: WikiChecklistRequest) -> dict[str, Any]:
+    try:
+        updated = update_wiki_checklist_item(payload.source_path, payload.line_number, payload.checked)
+        return {
+            "page": read_wiki_page(updated["page_slug"]),
+            "updated": updated,
+        }
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
 @app.get("/api/wiki/raw/{relative_path:path}")
 def api_wiki_raw(relative_path: str) -> FileResponse:
     try:
@@ -903,6 +1102,7 @@ def api_wiki_raw(relative_path: str) -> FileResponse:
         return FileResponse(target)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
 
 
 
@@ -1002,4 +1202,8 @@ def health() -> dict[str, Any]:
         "wiki_book_dir": str(resolved_wiki_book_dir),
         "wiki_book_exists": wiki_book_exists,
         "wiki_book_configured_dir": str(WIKI_BOOK_DIR),
+        "wiki_checklist_sync_target": wiki_checklist_sync_target(),
+        "wiki_github_repo": WIKI_GITHUB_REPO,
+        "wiki_github_branch": WIKI_GITHUB_BRANCH,
+        "wiki_github_path_prefix": WIKI_GITHUB_PATH_PREFIX,
     }

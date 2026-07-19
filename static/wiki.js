@@ -158,10 +158,20 @@ function wikiApplyPage(page) {
   wikiStatus(`${page.title || '문서'} 열람 중`);
 }
 
-async function wikiFetchJson(url) {
-  const res = await fetch(url);
+async function wikiFetchJson(url, options = null) {
+  const res = await fetch(url, options || undefined);
   if (!res.ok) {
-    throw new Error(await res.text() || `${res.status}`);
+    const raw = await res.text();
+    let message = raw || `${res.status}`;
+    try {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.detail === 'string' && parsed.detail.trim()) {
+        message = parsed.detail.trim();
+      }
+    } catch (_error) {
+      // Fall back to the raw text body.
+    }
+    throw new Error(message);
   }
   return res.json();
 }
@@ -173,6 +183,41 @@ async function wikiLoadPage(slug, {push = false} = {}) {
     window.history.pushState({}, '', wikiPageUrl(page.slug));
   }
   wikiApplyPage(page);
+}
+
+async function wikiToggleChecklist(checkbox) {
+  if (!checkbox || checkbox.dataset.wikiTaskPending === '1') return;
+  const sourcePath = String(checkbox.dataset.wikiTaskSource || '').trim();
+  const lineNumber = Number.parseInt(checkbox.dataset.wikiTaskLine || '', 10);
+  if (!sourcePath || !Number.isInteger(lineNumber) || lineNumber < 1) {
+    checkbox.checked = !checkbox.checked;
+    wikiStatus('체크 저장 실패: 체크리스트 위치 정보를 찾지 못했습니다.', true);
+    return;
+  }
+  const nextChecked = checkbox.checked;
+  checkbox.dataset.wikiTaskPending = '1';
+  checkbox.disabled = true;
+  try {
+    const response = await wikiFetchJson(wikiApiUrl('/api/wiki/checklist'), {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        source_path: sourcePath,
+        line_number: lineNumber,
+        checked: nextChecked,
+      }),
+    });
+    if (response?.page) {
+      wikiApplyPage(response.page);
+    }
+    const syncLabel = response?.updated?.sync_target === 'github' ? 'GitHub 반영 완료' : '로컬 저장 완료';
+    wikiStatus(`${response?.page?.title || '문서'} 체크 저장됨 · ${syncLabel}`);
+  } catch (error) {
+    checkbox.checked = !nextChecked;
+    checkbox.disabled = false;
+    delete checkbox.dataset.wikiTaskPending;
+    wikiStatus(`체크 저장 실패: ${error.message || error}`, true);
+  }
 }
 
 async function wikiInit() {
@@ -223,6 +268,12 @@ document.addEventListener('click', (event) => {
   }).catch((error) => {
     wikiStatus(`문서 이동 실패: ${error.message || error}`, true);
   });
+});
+
+document.addEventListener('change', (event) => {
+  const checkbox = event.target.closest('input[data-wiki-task-checkbox="1"]');
+  if (!checkbox) return;
+  wikiToggleChecklist(checkbox);
 });
 
 wikiInit();

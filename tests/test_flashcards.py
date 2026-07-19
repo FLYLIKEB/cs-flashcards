@@ -4,6 +4,7 @@ import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 
@@ -77,7 +78,7 @@ def write_wiki_book(root: Path) -> Path:
         encoding='utf-8',
     )
     (pages / 'intro.md').write_text(
-        '# 소개 문서\n\n[하위 문서](./child.md)\n\n| 구분 | 내용 |\n| --- | --- |\n| A | B |\n\n```text\nhello\n```\n',
+        '# 소개 문서\n\n- [ ] 체크 항목\n\n[하위 문서](./child.md)\n\n| 구분 | 내용 |\n| --- | --- |\n| A | B |\n\n```text\nhello\n```\n',
         encoding='utf-8',
     )
     (pages / 'child.md').write_text(
@@ -329,8 +330,64 @@ class WikiBookTests(unittest.TestCase):
             page = flashcard_app.read_wiki_page('intro', book)
             self.assertEqual(page['title'], '소개 문서')
             self.assertIn('/wiki/page/child', page['html'])
+            self.assertIn('data-wiki-task-checkbox="1"', page['html'])
+            self.assertIn('data-wiki-task-source="pages/intro.md"', page['html'])
+            self.assertIn('data-wiki-task-line="3"', page['html'])
             self.assertIn('<table>', page['html'])
             self.assertIn('<pre><code class="language-text">hello</code></pre>', page['html'])
+
+    def test_update_wiki_checklist_item_updates_local_markdown(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
+            original_prefix = flashcard_app.WIKI_GITHUB_PATH_PREFIX
+            try:
+                flashcard_app.WIKI_GITHUB_REPO = ''
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = ''
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
+                updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, book)
+                self.assertEqual(updated['sync_target'], 'local')
+                self.assertTrue(updated['checked'])
+                saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                self.assertIn('- [x] 체크 항목', saved)
+                page = flashcard_app.read_wiki_page('intro', book)
+                self.assertIn(' checked />', page['html'])
+            finally:
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
+
+    def test_update_wiki_checklist_item_syncs_github_when_configured(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            local_text = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
+            original_prefix = flashcard_app.WIKI_GITHUB_PATH_PREFIX
+            try:
+                flashcard_app.WIKI_GITHUB_REPO = 'owner/repo'
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = 'token'
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
+                with mock.patch.object(flashcard_app, 'github_fetch_wiki_source', return_value=(local_text, 'sha123')) as fetch_mock:
+                    with mock.patch.object(flashcard_app, 'github_update_wiki_source', return_value={}) as update_mock:
+                        updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, book)
+                fetch_mock.assert_called_once_with('pages/intro.md')
+                update_mock.assert_called_once()
+                self.assertEqual(update_mock.call_args.args[0], 'pages/intro.md')
+                self.assertEqual(updated['sync_target'], 'github')
+                saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                self.assertIn('- [x] 체크 항목', saved)
+            finally:
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
 
     def test_wiki_book_dir_and_health_use_configured_or_fallback_location(self):
         with tempfile.TemporaryDirectory() as td:

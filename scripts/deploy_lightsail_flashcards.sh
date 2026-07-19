@@ -18,6 +18,10 @@ STATE_DIR="$ROOT_DIR/.omx"
 PASSWORD_FILE="$STATE_DIR/cs_flashcards_public_password"
 CHALOG_CONFIG="/Users/jwp/Developer/ChaLog/.ec2-config"
 WIKI_BOOK_SRC="${CS_FLASHCARDS_WIKI_BOOK_SRC:-$ROOT_DIR/../wikidocs-ebook}"
+WIKI_GITHUB_TOKEN="${CS_FLASHCARDS_WIKI_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN:-}}}"
+WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
+WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-}"
+WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
 
 
 if [[ -f "$CHALOG_CONFIG" ]]; then
@@ -27,6 +31,38 @@ if [[ -f "$CHALOG_CONFIG" ]]; then
   REMOTE_USER="${CS_FLASHCARDS_LIGHTSAIL_USER:-${EC2_USER:-ubuntu}}"
   SSH_KEY="${SSH_KEY:-${SSH_KEY_PATH:-${LIGHTSAIL_KEY_PATH:-}}}"
 fi
+
+extract_github_repo() {
+  local remote_url="${1:-}"
+  remote_url="${remote_url%.git}"
+  case "$remote_url" in
+    https://github.com/*)
+      printf '%s\n' "${remote_url#https://github.com/}"
+      ;;
+    git@github.com:*)
+      printf '%s\n' "${remote_url#git@github.com:}"
+      ;;
+    ssh://git@github.com/*)
+      printf '%s\n' "${remote_url#ssh://git@github.com/}"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+if [[ -d "$WIKI_BOOK_SRC/.git" ]]; then
+  if [[ -z "$WIKI_GITHUB_REPO" ]]; then
+    ORIGIN_URL="$(git -C "$WIKI_BOOK_SRC" remote get-url origin 2>/dev/null || true)"
+    if DETECTED_WIKI_GITHUB_REPO="$(extract_github_repo "$ORIGIN_URL")"; then
+      WIKI_GITHUB_REPO="$DETECTED_WIKI_GITHUB_REPO"
+    fi
+  fi
+  if [[ -z "$WIKI_GITHUB_BRANCH" ]]; then
+    WIKI_GITHUB_BRANCH="$(git -C "$WIKI_BOOK_SRC" branch --show-current 2>/dev/null || true)"
+  fi
+fi
+WIKI_GITHUB_BRANCH="${WIKI_GITHUB_BRANCH:-main}"
 
 if [[ ! -f "${SSH_KEY:-}" && -f "/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem" ]]; then
   SSH_KEY="/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem"
@@ -52,6 +88,11 @@ SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChe
 
 echo "배포 대상: $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR"
 echo "도메인: http://$DOMAIN (443 개방 시 https://$DOMAIN)"
+if [[ -n "$WIKI_GITHUB_TOKEN" && -n "$WIKI_GITHUB_REPO" ]]; then
+  echo "위키 체크리스트 GitHub 동기화: $WIKI_GITHUB_REPO@$WIKI_GITHUB_BRANCH"
+else
+  echo "위키 체크리스트 GitHub 동기화: 비활성"
+fi
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
@@ -183,6 +224,10 @@ Environment=CS_FLASHCARD_CSV=$REMOTE_DIR/data/CS_encyclopedia_300plus.csv
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
 Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DIR/state/progress.sqlite
 Environment=CS_FLASHCARDS_WIKI_BOOK_DIR=$REMOTE_DIR/wiki_book
+Environment=CS_FLASHCARDS_WIKI_GITHUB_REPO=$WIKI_GITHUB_REPO
+Environment=CS_FLASHCARDS_WIKI_GITHUB_BRANCH=$WIKI_GITHUB_BRANCH
+Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=$WIKI_GITHUB_TOKEN
+Environment=CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX=$WIKI_GITHUB_PATH_PREFIX
 ExecStart=$REMOTE_DIR/.venv/bin/uvicorn app:app --host 127.0.0.1 --port $REMOTE_PORT
 Restart=always
 RestartSec=3
