@@ -93,9 +93,10 @@ class StaticFrontendTests(unittest.TestCase):
             'function conceptImagePreviewActive(card)',
             'function previewConceptImage()',
             'function saveConceptImagePreview()',
-            'function discardConceptImagePreview()',
+            'async function discardConceptImagePreview()',
             '/ai-image/preview',
             '/ai-image/apply',
+            '/ai-image/discard',
             'AI 이미지 생성 중',
         ]:
             self.assertIn(snippet, APP_JS)

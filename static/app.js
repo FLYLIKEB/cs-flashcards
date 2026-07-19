@@ -1846,9 +1846,26 @@ async function saveConceptImagePreview() {
   }
 }
 
-function discardConceptImagePreview() {
+async function discardConceptImagePreview() {
   const current = state.filtered[state.index] || null;
-  if (!current || !conceptImagePreviewActive(current)) return;
+  if (!current || !conceptImagePreviewActive(current) || state.aiImageGenerating || state.aiImageSaving) return;
+  const previewName = state.aiImagePreviewName;
+  state.aiImageSaving = true;
+  renderConceptImage(current);
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/discard`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({preview_name: previewName}),
+    });
+    if (!res.ok) throw new Error(await responseErrorText(res));
+  } catch (error) {
+    state.aiImageSaving = false;
+    renderConceptImage(current);
+    setMessage(`AI 이미지 취소 실패: ${error.message || error}`, true);
+    return;
+  }
+  state.aiImageSaving = false;
   clearConceptImagePreview(current.id);
   renderConceptImage(current);
   setMessage(`${current.term}: AI 이미지 미리보기를 취소했습니다.`);

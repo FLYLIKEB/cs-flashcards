@@ -488,6 +488,45 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app.AI_IMAGE_DIR = original_image_dir
                 flashcard_app.AI_IMAGE_PREVIEW_DIR = original_preview_dir
                 flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_api_card_ai_image_discard_removes_preview_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            preview_dir = root / 'previews'
+            write_sample(csv_path, include_image=True)
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_preview_dir = flashcard_app.AI_IMAGE_PREVIEW_DIR
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.AI_IMAGE_PREVIEW_DIR = preview_dir
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                png_bytes = b'\x89PNG\r\n\x1a\npreview'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'data': [
+                            {'b64_json': base64.b64encode(png_bytes).decode('ascii')},
+                        ],
+                    }),
+                ):
+                    preview = flashcard_app.api_card_ai_image_preview('CS-001')
+                flashcard_app.api_card_ai_image_discard(
+                    'CS-001',
+                    flashcard_app.CardAiImageApplyRequest(preview_name=preview['preview_name']),
+                )
+                self.assertFalse((preview_dir / preview['preview_name']).exists())
+                self.assertFalse((preview_dir / f"{Path(preview['preview_name']).stem}.json").exists())
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.AI_IMAGE_PREVIEW_DIR = original_preview_dir
+                flashcard_app.OPENAI_API_KEY = original_key
     def test_question_attempt_persists_to_sqlite_and_updates_card_stats(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

@@ -920,6 +920,27 @@ def apply_ai_concept_image(
     raise KeyError(card_id)
 
 
+def discard_ai_concept_image_preview(
+    card_id: str,
+    payload: CardAiImageApplyRequest,
+    *,
+    preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
+) -> None:
+    preview_path, metadata = read_ai_image_preview(payload.preview_name, preview_dir=preview_dir)
+    if str(metadata.get("card_id") or "").strip() != card_id:
+        raise ValueError("다른 카드용 AI 이미지 미리보기입니다.")
+    try:
+        preview_path.unlink(missing_ok=True)
+        preview_path.with_suffix(".json").unlink(missing_ok=True)
+    except TypeError:
+        if preview_path.exists():
+            preview_path.unlink()
+        meta_path = preview_path.with_suffix(".json")
+        if meta_path.exists():
+            meta_path.unlink()
+
+
+
 
 
 
@@ -2055,6 +2076,20 @@ def api_card_ai_image_preview(card_id: str) -> dict[str, Any]:
         "card_id": card_id,
         **preview,
     }
+
+
+@app.post("/api/cards/{card_id}/ai-image/discard")
+def api_card_ai_image_discard(card_id: str, payload: CardAiImageApplyRequest) -> dict[str, Any]:
+    try:
+        discard_ai_concept_image_preview(card_id, payload, preview_dir=AI_IMAGE_PREVIEW_DIR)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {"ok": True, "card_id": card_id}
+
 
 
 @app.post("/api/cards/{card_id}/ai-image/apply")
