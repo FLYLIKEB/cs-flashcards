@@ -101,6 +101,15 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('body.wiki-sidebar-collapsed .wiki-sidebar', STYLE_CSS)
         self.assertIn('.wiki-table-wrap tbody tr:nth-child(even)', STYLE_CSS)
         self.assertIn('.wiki-sidebar-title-row', STYLE_CSS)
+        self.assertIn('expandedToc: {}', WIKI_JS)
+        self.assertIn('function wikiTocBranchExpanded(', WIKI_JS)
+        self.assertIn('function toggleWikiTocBranch(', WIKI_JS)
+        self.assertIn('data-wiki-toc-toggle', WIKI_JS)
+        self.assertIn('data-wiki-has-children="1"', WIKI_JS)
+        self.assertIn("link.dataset.wikiHasChildren === '1'", WIKI_JS)
+        self.assertIn('.wiki-toc-row', STYLE_CSS)
+        self.assertIn('.wiki-toc-toggle', STYLE_CSS)
+        self.assertIn('.wiki-toc-item.open > .wiki-toc-row .wiki-toc-toggle', STYLE_CSS)
     def test_audio_playback_repeat_and_term_language_controls_are_present(self):
         for snippet in [
             'id="termSpeechMode"',
