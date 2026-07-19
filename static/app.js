@@ -1841,11 +1841,9 @@ async function saveConceptImagePreview() {
     if (!res.ok) throw new Error(await responseErrorText(res));
     const data = await res.json();
     clearConceptImagePreview(current.id);
-    updateCardInCollections(data.card);
-    state.summary = data.summary;
-    renderStats(summaryFromRows(rowsForHeaderStats()));
-    renderCard();
+    await refreshCards({cardId: data.card.id, message: null});
     setMessage(`${data.card.term}: AI 이미지를 저장했습니다.`);
+
   } catch (error) {
     renderConceptImage(current);
     setMessage(`AI 이미지 저장 실패: ${error.message || error}`, true);
@@ -1959,17 +1957,18 @@ async function loadCards() {
   updateAudioEstimate();
 }
 
-async function refreshCards() {
+async function refreshCards(options = {}) {
+  const {cardId = state.filtered[state.index]?.id, message = '↻'} = options || {};
   if (state.audioPlaying) stopAudioPlayback('정지');
-  const currentId = state.filtered[state.index]?.id;
   await loadCards();
-  if (currentId) {
-    const found = state.filtered.findIndex((card) => card.id === currentId);
+  if (cardId) {
+    const found = state.filtered.findIndex((card) => card.id === cardId);
     if (found >= 0) state.index = found;
   }
   renderCard();
-  setMessage('↻');
+  if (message) setMessage(message);
 }
+
 
 function buildCategoryOptions(categories) {
   const current = $('categorySelect')?.value || '';
@@ -2258,10 +2257,7 @@ async function applyAiRewrite(field) {
     if (!res.ok) throw new Error(await responseErrorText(res));
     const data = await res.json();
     clearAiRewritePreview(current.id);
-    updateCardInCollections(data.card);
-    state.summary = data.summary;
-    renderStats(summaryFromRows(rowsForHeaderStats()));
-    renderCard();
+    await refreshCards({cardId: data.card.id, message: null});
     setMessage(`${data.card.term}: ${config.label} 저장 완료`);
   } catch (error) {
     renderAiRewriteControls(current);
