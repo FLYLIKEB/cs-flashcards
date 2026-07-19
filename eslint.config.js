@@ -7,6 +7,8 @@ export default [
       globals: {
         document: 'readonly',
         window: 'readonly',
+        Audio: 'readonly',
+        MediaMetadata: 'readonly',
         localStorage: 'readonly',
         navigator: 'readonly',
         SpeechSynthesisUtterance: 'readonly',

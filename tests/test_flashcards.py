@@ -9,7 +9,7 @@ from unittest import mock
 
 
 import app as flashcard_app
-from app import mark_card, read_cards, read_csv_cards, save_memo, set_bookmark, summarize
+from app import mark_card, read_cards, read_csv_cards, save_memo, save_question_attempt, set_bookmark, summarize
 
 
 BASE_FIELDS = [
@@ -27,6 +27,9 @@ def write_sample(
     include_image: bool = False,
     status: str = '',
     count: str = '0',
+    term: str = '테스트',
+    english: str = 'Test',
+    source_files: str = 'sample.md',
 ):
     fieldnames = BASE_FIELDS + (IMAGE_FIELDS if include_image else []) + (REVIEW_FIELDS if include_review else [])
     with path.open('w', encoding='utf-8-sig', newline='') as f:
@@ -34,13 +37,13 @@ def write_sample(
         writer.writeheader()
         row = {
             'id': 'CS-001',
-            'term': '테스트',
-            'english': 'Test',
+            'term': term,
+            'english': english,
             'category': '소프트웨어공학',
             'definition': '정의',
             'detailed_explanation': '상세',
             'related_concepts': '[[검증]]',
-            'source_files': 'sample.md',
+            'source_files': source_files,
             'exam_note': '포인트',
             'bok_appeared': 'O',
             'importance': '상',
@@ -222,6 +225,59 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(cleared['memo'], '')
             self.assertEqual(cleared['memo_updated_at'], '')
 
+    def test_question_attempt_persists_to_sqlite_and_updates_card_stats(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            first = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-short-1',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='검증',
+                    is_correct=False,
+                    wrong_note='정의와 용어를 혼동함',
+                ),
+                csv_path,
+                db_path,
+            )
+            self.assertFalse(first['attempt']['is_correct'])
+            self.assertEqual(first['attempt']['wrong_note'], '정의와 용어를 혼동함')
+
+            second = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-multiple_choice-2',
+                    card_id='CS-001',
+                    question_type='multiple_choice',
+                    prompt='객관식',
+                    body='설명',
+                    user_answer='테스트',
+                    selected_choice_index=1,
+                    is_correct=True,
+                ),
+                csv_path,
+                db_path,
+            )
+            self.assertTrue(second['attempt']['is_correct'])
+
+            rows, _ = read_cards(csv_path, db_path)
+            self.assertEqual(rows[0]['question_attempt_count'], 2)
+            self.assertEqual(rows[0]['question_correct_count'], 1)
+            self.assertEqual(rows[0]['question_wrong_count'], 1)
+            self.assertEqual(rows[0]['latest_wrong_note'], '정의와 용어를 혼동함')
+
+            with sqlite3.connect(db_path) as conn:
+                saved = conn.execute(
+                    'SELECT COUNT(*), SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) FROM question_attempts WHERE card_id=?',
+                    ('CS-001',),
+                ).fetchone()
+            self.assertEqual(saved, (2, 1))
+
     def test_mark_card_survives_csv_replacement(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -335,6 +391,26 @@ class WikiBookTests(unittest.TestCase):
             self.assertIn('data-wiki-task-line="3"', page['html'])
             self.assertIn('<table>', page['html'])
             self.assertIn('<pre><code class="language-text">hello</code></pre>', page['html'])
+
+    def test_read_wiki_page_includes_linked_flashcards(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            book = write_wiki_book(root)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, term='소개 문서', english='Intro Document', source_files='pages/intro.md;pages/child.md')
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            try:
+                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                page = flashcard_app.read_wiki_page('intro', book)
+                self.assertEqual(page['primary_card']['id'], 'CS-001')
+                self.assertTrue(page['primary_card']['card_url'].startswith('/?card=CS-001'))
+                self.assertEqual(page['linked_cards'][0]['term'], '소개 문서')
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
 
     def test_update_wiki_checklist_item_updates_local_markdown(self):
         with tempfile.TemporaryDirectory() as td:

@@ -40,6 +40,8 @@ http://127.0.0.1:8000
 - 위키 마크다운의 `- [ ]` / `- [x]` 체크리스트는 `/wiki`에서 실제 체크박스로 렌더링됩니다.
 - 체크를 누르면 배포된 `wiki_book` 마크다운이 바로 갱신됩니다.
 - GitHub에도 같은 체크 상태를 반영하려면 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정합니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
+- 위키 문서는 제목/출처 파일 기준으로 연결된 플래시카드를 찾아 `대표 카드` 버튼과 관련 카드 칩을 보여줍니다.
+- 위키에서 카드를 열면 URL 쿼리로 해당 카드에 바로 점프합니다.
 
 
 ## 데이터 저장 구조
@@ -151,7 +153,7 @@ python3 scripts/generate_concept_images.py --write-csv
 | 서술형 | `definition`, `detailed_explanation`, `exam_note` | 면접식 설명 연습 |
 | 논술형 | 관련 개념 비교와 채점 포인트 포함 | 긴 답안 구조화 |
 
-백엔드 API는 `/api/questions/generate`이며, 문제는 CSV 원본을 수정하지 않고 즉석 생성합니다. `AI 검색` 버튼은 선택한 문제 유형과 문제 수를 바탕으로 현재 필터된 카드 개념명 목록을 Google AI 검색 프롬프트로 열어 외부 AI 퀴즈 생성도 바로 요청할 수 있게 합니다. 정답률 저장은 아직 카드 O/X와 분리되어 있으며, 필요하면 추후 별도 SQLite 테이블로 확장합니다.
+백엔드 API는 `/api/questions/generate`이며, 문제는 CSV 원본을 수정하지 않고 즉석 생성합니다. `AI 검색` 버튼은 선택한 문제 유형과 문제 수를 바탕으로 현재 필터된 카드 개념명 목록을 Google AI 검색 프롬프트로 열어 외부 AI 퀴즈 생성도 바로 요청할 수 있게 합니다. 객관식은 선택 즉시 채점 결과를 저장하고, 주관식/서술형/논술형은 `정답/해설 보기` 뒤 `맞음 저장`/`틀림 저장`으로 자가 채점할 수 있습니다. 틀린 문제에는 오답노트를 남길 수 있으며, 문제 시도 이력은 같은 SQLite DB 안의 별도 테이블에 저장됩니다.
 
 ## 내용을 수정하고 반영하기
 

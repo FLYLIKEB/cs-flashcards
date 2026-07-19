@@ -83,6 +83,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('function renderSourceLinks(sourceFiles)', APP_JS)
         self.assertIn("$('sources').innerHTML = renderSourceLinks(c.source_files);", APP_JS)
         self.assertIn('/wiki/page/', APP_JS)
+        self.assertIn('id="frontWikiLink"', INDEX_HTML)
+        self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
         self.assertIn('wiki-search-hidden', WIKI_HTML)
         self.assertIn('id="wikiSidebarToggleBtn"', WIKI_HTML)
@@ -90,12 +92,15 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="wikiSidebar"', WIKI_HTML)
         self.assertIn('id="wikiToc"', WIKI_HTML)
         self.assertIn('id="wikiArticle"', WIKI_HTML)
+        self.assertIn('id="wikiFlashcardLink"', WIKI_HTML)
+        self.assertIn('id="wikiLinkedCards"', WIKI_HTML)
         self.assertIn('pretendard.css', WIKI_HTML)
         self.assertIn('WIKI_SIDEBAR_STATE_KEY', WIKI_JS)
         self.assertIn('function applyWikiSidebarState(', WIKI_JS)
         self.assertIn("toggleBtn.textContent = '목차'", WIKI_JS)
         self.assertIn('function toggleWikiSidebar(', WIKI_JS)
         self.assertIn('function wikiApiUrl(path)', WIKI_JS)
+        self.assertIn('function wikiRenderLinkedCards(page)', WIKI_JS)
         self.assertIn('closeWikiSidebarOnMobile()', WIKI_JS)
         self.assertIn("(min-width: 721px)", WIKI_JS)
         self.assertIn("(max-width: 720px)", WIKI_JS)
@@ -106,6 +111,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('body.wiki-sidebar-collapsed .wiki-sidebar', STYLE_CSS)
         self.assertIn('.wiki-table-wrap tbody tr:nth-child(even)', STYLE_CSS)
         self.assertIn('.wiki-sidebar-title-row', STYLE_CSS)
+        self.assertIn('.wiki-linked-cards', STYLE_CSS)
+        self.assertIn('.wiki-linked-card-link', STYLE_CSS)
         self.assertIn('--wiki-font-family: "Pretendard"', STYLE_CSS)
         self.assertIn('.wiki-page-shell :where(h1, h2, h3, h4, h5, h6, pre, code, kbd, samp)', STYLE_CSS)
         self.assertIn('expandedToc: {}', WIKI_JS)
@@ -226,6 +233,13 @@ class StaticFrontendTests(unittest.TestCase):
             'AI_QUIZ_PROMPT_TYPE_ORDER',
             'googleAiSearchUrl(aiQuizSearchPrompt())',
             'question-mode-active',
+            '/api/questions/attempt',
+            'function saveQuestionAttempt(question)',
+            'function markCurrentQuestion(correct)',
+            'function saveCurrentWrongNote()',
+            'question-answer-input',
+            'question-wrong-note',
+            'new URLSearchParams(window.location.search)',
         ]:
             self.assertIn(snippet, APP_JS)
 

@@ -17,7 +17,7 @@ import tempfile
 from datetime import datetime, timezone
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from urllib.request import Request as UrlRequest, urlopen
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
@@ -74,6 +74,17 @@ class QuestionGenerateRequest(BaseModel):
     types: list[str] | None = None
     count: int = Field(default=10, ge=1, le=100)
     seed: int | None = None
+
+class QuestionAttemptRequest(BaseModel):
+    question_id: str = Field(min_length=1, max_length=255)
+    card_id: str = Field(min_length=1, max_length=255)
+    question_type: str = Field(min_length=1, max_length=64)
+    prompt: str = Field(default="", max_length=4000)
+    body: str = Field(default="", max_length=12000)
+    user_answer: str = Field(default="", max_length=20000)
+    selected_choice_index: int | None = Field(default=None, ge=0, le=100)
+    is_correct: bool | None = None
+    wrong_note: str = Field(default="", max_length=20000)
 
 
 class WikiChecklistRequest(BaseModel):
@@ -243,6 +254,26 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
             conn.execute("ALTER TABLE card_progress ADD COLUMN memo_updated_at TEXT NOT NULL DEFAULT ''")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_bookmarked ON card_progress(bookmarked)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS question_attempts (
+                question_id TEXT PRIMARY KEY,
+                card_id TEXT NOT NULL,
+                question_type TEXT NOT NULL,
+                prompt TEXT NOT NULL DEFAULT '',
+                body TEXT NOT NULL DEFAULT '',
+                user_answer TEXT NOT NULL DEFAULT '',
+                selected_choice_index INTEGER,
+                is_correct INTEGER,
+                wrong_note TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_card_id ON question_attempts(card_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         if not existed and seed_rows:
             now = utc_now_iso()
             conn.executemany(
@@ -288,17 +319,33 @@ def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     }
 
 
-def merge_progress(rows: list[dict[str, str]], progress: dict[str, dict[str, str]]) -> list[dict[str, str]]:
+def merge_progress(
+    rows: list[dict[str, str]],
+    progress: dict[str, dict[str, str]],
+    question_stats: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, str]]:
     merged: list[dict[str, str]] = []
+    question_stats = question_stats or {}
     for row in rows:
         item = dict(row)
         item.setdefault("bookmarked", "0")
         item.setdefault("memo", "")
         item.setdefault("memo_updated_at", "")
+        item.setdefault("question_attempt_count", 0)
+        item.setdefault("question_correct_count", 0)
+        item.setdefault("question_wrong_count", 0)
+        item.setdefault("latest_wrong_note", "")
+        item.setdefault("latest_wrong_note_updated_at", "")
         item.update(progress.get(row.get("id", ""), {}))
+        item.update(question_stats.get(row.get("id", ""), {}))
         item["bookmarked"] = normalized_bookmarked(item.get("bookmarked"))
         item["memo"] = item.get("memo") or ""
         item["memo_updated_at"] = item.get("memo_updated_at") or ""
+        item["question_attempt_count"] = int(item.get("question_attempt_count") or 0)
+        item["question_correct_count"] = int(item.get("question_correct_count") or 0)
+        item["question_wrong_count"] = int(item.get("question_wrong_count") or 0)
+        item["latest_wrong_note"] = item.get("latest_wrong_note") or ""
+        item["latest_wrong_note_updated_at"] = item.get("latest_wrong_note_updated_at") or ""
         merged.append(item)
     return merged
 
@@ -308,7 +355,7 @@ def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) 
     clean_rows, _ = read_csv_cards(csv_path, keep_csv_progress=False)
     db_path = progress_db_for(csv_path, progress_db_path)
     ensure_progress_db(db_path, raw_rows)
-    rows = merge_progress(clean_rows, read_progress(db_path))
+    rows = merge_progress(clean_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
 
 
@@ -455,6 +502,162 @@ def save_memo(
         if row.get("id") == card_id:
             return row
     raise KeyError(card_id)
+
+
+def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
+    if row is None:
+        return None
+    raw_result = row["is_correct"]
+    return {
+        "question_id": row["question_id"],
+        "card_id": row["card_id"],
+        "question_type": row["question_type"],
+        "prompt": row["prompt"] or "",
+        "body": row["body"] or "",
+        "user_answer": row["user_answer"] or "",
+        "selected_choice_index": row["selected_choice_index"],
+        "is_correct": None if raw_result is None else bool(int(raw_result)),
+        "wrong_note": row["wrong_note"] or "",
+        "created_at": row["created_at"] or "",
+        "updated_at": row["updated_at"] or "",
+    }
+
+
+def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, Any]]:
+    ensure_progress_db(progress_db_path)
+    stats: dict[str, dict[str, Any]] = {}
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        for row in conn.execute(
+            """
+            SELECT
+                card_id,
+                COUNT(*) AS question_attempt_count,
+                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS question_correct_count,
+                SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS question_wrong_count
+            FROM question_attempts
+            GROUP BY card_id
+            """
+        ).fetchall():
+            stats[row["card_id"]] = {
+                "question_attempt_count": int(row["question_attempt_count"] or 0),
+                "question_correct_count": int(row["question_correct_count"] or 0),
+                "question_wrong_count": int(row["question_wrong_count"] or 0),
+                "latest_wrong_note": "",
+                "latest_wrong_note_updated_at": "",
+            }
+        seen_cards: set[str] = set()
+        for row in conn.execute(
+            """
+            SELECT card_id, wrong_note, updated_at
+            FROM question_attempts
+            WHERE is_correct = 0 AND TRIM(wrong_note) <> ''
+            ORDER BY updated_at DESC
+            """
+        ).fetchall():
+            card_id = row["card_id"]
+            if card_id in seen_cards:
+                continue
+            seen_cards.add(card_id)
+            bucket = stats.setdefault(
+                card_id,
+                {
+                    "question_attempt_count": 0,
+                    "question_correct_count": 0,
+                    "question_wrong_count": 0,
+                    "latest_wrong_note": "",
+                    "latest_wrong_note_updated_at": "",
+                },
+            )
+            bucket["latest_wrong_note"] = row["wrong_note"] or ""
+            bucket["latest_wrong_note_updated_at"] = row["updated_at"] or ""
+    return stats
+
+
+def save_question_attempt(
+    payload: QuestionAttemptRequest,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> dict[str, Any]:
+    _ensure_card_exists(payload.card_id, csv_path, progress_db_path)
+    question_type = str(payload.question_type or "").strip().lower()
+    if question_type not in SUPPORTED_QUESTION_TYPES:
+        raise ValueError(f"Unsupported question type: {payload.question_type}")
+
+    question_id = str(payload.question_id or "").strip()
+    if not question_id:
+        raise ValueError("question_id is required")
+
+    wrong_note = str(payload.wrong_note or "")[:20000]
+    if payload.is_correct is True:
+        wrong_note = ""
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    now = utc_now_iso()
+    with closing(connect_progress_db(db_path)) as conn:
+        conn.execute(
+            """
+            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+            VALUES (?, '', '', 0, 0, '', '', ?)
+            ON CONFLICT(card_id) DO NOTHING
+            """,
+            (payload.card_id, now),
+        )
+        existing = conn.execute(
+            "SELECT created_at FROM question_attempts WHERE question_id = ?",
+            (question_id,),
+        ).fetchone()
+        conn.execute(
+            """
+            INSERT INTO question_attempts (
+                question_id, card_id, question_type, prompt, body,
+                user_answer, selected_choice_index, is_correct, wrong_note,
+                created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(question_id) DO UPDATE SET
+                card_id = excluded.card_id,
+                question_type = excluded.question_type,
+                prompt = excluded.prompt,
+                body = excluded.body,
+                user_answer = excluded.user_answer,
+                selected_choice_index = excluded.selected_choice_index,
+                is_correct = excluded.is_correct,
+                wrong_note = excluded.wrong_note,
+                updated_at = excluded.updated_at
+            """,
+            (
+                question_id,
+                payload.card_id,
+                question_type,
+                str(payload.prompt or "")[:4000],
+                str(payload.body or "")[:12000],
+                str(payload.user_answer or "")[:20000],
+                payload.selected_choice_index,
+                None if payload.is_correct is None else (1 if payload.is_correct else 0),
+                wrong_note,
+                existing["created_at"] if existing else now,
+                now,
+            ),
+        )
+        conn.commit()
+        saved = conn.execute(
+            """
+            SELECT question_id, card_id, question_type, prompt, body, user_answer,
+                   selected_choice_index, is_correct, wrong_note, created_at, updated_at
+            FROM question_attempts
+            WHERE question_id = ?
+            """,
+            (question_id,),
+        ).fetchone()
+
+    updated_rows, _ = read_cards(csv_path, db_path)
+    updated_card = next((row for row in updated_rows if row.get("id") == payload.card_id), None)
+    if updated_card is None:
+        raise KeyError(payload.card_id)
+    return {
+        "attempt": question_attempt_row_to_dict(saved),
+        "card": updated_card,
+    }
 
 
 def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
@@ -1016,6 +1219,88 @@ def resolve_wiki_page_source(repo_dir: Path, page_slug: str, pages: dict[str, di
 
 
 
+
+def normalized_lookup_text(value: Any) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip()).lower()
+
+
+def wiki_source_variants(value: str) -> set[str]:
+    clean = str(value or "").strip().replace(os.sep, "/")
+    clean = clean[2:] if clean.startswith("./") else clean
+    if not clean:
+        return set()
+    variants = {clean}
+    if clean.startswith("pages/"):
+        variants.add(clean.removeprefix("pages/"))
+    if clean.endswith(".md"):
+        without_ext = clean.removesuffix(".md")
+        variants.add(without_ext)
+        if without_ext.startswith("pages/"):
+            variants.add(without_ext.removeprefix("pages/"))
+    return {item for item in variants if item}
+
+
+def parse_card_source_files(value: Any) -> list[str]:
+    return [part.strip() for part in str(value or "").split(";") if part.strip()]
+
+
+def flashcard_card_url(card_id: str, *, side: str = "back") -> str:
+    return "/?" + urlencode({"card": str(card_id or "").strip(), "side": side})
+
+
+def linked_cards_for_wiki_page(
+    page_slug: str,
+    title: str,
+    source_relative: str,
+    *,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+    limit: int = 12,
+) -> list[dict[str, Any]]:
+    rows, _ = read_cards(csv_path, progress_db_path)
+    title_key = normalized_lookup_text(title)
+    slug_key = normalized_lookup_text(page_slug.replace("/", " ").replace("-", " "))
+    page_sources = wiki_source_variants(source_relative) | wiki_source_variants(page_slug) | wiki_source_variants(f"pages/{page_slug}.md")
+    matches: list[tuple[int, str, dict[str, Any]]] = []
+    for row in rows:
+        reason = ""
+        score = 0
+        term_key = normalized_lookup_text(row.get("term"))
+        english_key = normalized_lookup_text(row.get("english"))
+        card_sources = set().union(*(wiki_source_variants(part) for part in parse_card_source_files(row.get("source_files"))))
+        if title_key and title_key in {term_key, english_key}:
+            score = 400
+            reason = "문서 제목과 카드명이 일치합니다."
+        elif page_sources & card_sources:
+            score = 300
+            reason = "문서 출처와 카드 출처가 연결됩니다."
+        elif title_key and ((term_key and (title_key in term_key or term_key in title_key)) or (english_key and (title_key in english_key or english_key in title_key))):
+            score = 220
+            reason = "문서 제목과 카드명이 유사합니다."
+        elif slug_key and slug_key in {term_key, english_key}:
+            score = 180
+            reason = "문서 경로와 카드명이 유사합니다."
+        if score <= 0:
+            continue
+        matches.append(
+            (
+                score,
+                normalized_lookup_text(row.get("term") or row.get("english") or row.get("id")),
+                {
+                    "id": row.get("id") or "",
+                    "term": row.get("term") or row.get("english") or row.get("id") or "",
+                    "english": row.get("english") or "",
+                    "category": row.get("category") or "",
+                    "question_attempt_count": int(row.get("question_attempt_count") or 0),
+                    "question_wrong_count": int(row.get("question_wrong_count") or 0),
+                    "latest_wrong_note": row.get("latest_wrong_note") or "",
+                    "card_url": flashcard_card_url(row.get("id") or ""),
+                    "reason": reason,
+                },
+            )
+        )
+    matches.sort(key=lambda item: (-item[0], item[1]))
+    return [item[2] for item in matches[: max(1, limit)]]
 def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -> dict[str, Any]:
     repo = wiki_book_dir(repo_dir)
     index = read_wiki_index(repo)
@@ -1027,6 +1312,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     source_relative = str(source_path.relative_to(repo)).replace(os.sep, "/")
     page_meta = index["pages"].get(slug, {})
     title = page_meta.get("title") or extract_markdown_title(markdown_text, source_path.stem)
+    linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
     return {
         "slug": slug,
         "title": title,
@@ -1035,6 +1321,8 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
         "url": wiki_page_url(slug),
         "breadcrumbs": index["breadcrumbs"].get(slug, [{"title": title, "slug": slug, "url": wiki_page_url(slug)}]),
         "html": render_markdown_page(markdown_text, repo, source_path),
+        "primary_card": linked_cards[0] if linked_cards else None,
+        "linked_cards": linked_cards,
     }
 
 
@@ -1171,6 +1459,17 @@ def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+
+@app.post("/api/questions/attempt")
+def api_question_attempt(payload: QuestionAttemptRequest) -> dict[str, Any]:
+    try:
+        return save_question_attempt(payload, CSV_PATH, PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {payload.card_id}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 @app.get("/api/questions/types")
 def api_question_types() -> dict[str, Any]:

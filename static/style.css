@@ -4050,6 +4050,79 @@ select,
   color: var(--known);
   font-weight: 780;
 }
+.question-answer-draft {
+  margin-top: .9rem;
+}
+
+.question-answer-label {
+  display: block;
+  margin-bottom: .38rem;
+  color: var(--muted);
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.question-answer-input,
+.question-wrong-note {
+  width: 100%;
+  min-height: 6.4rem;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.question-wrong-note {
+  min-height: 5rem;
+}
+
+.question-grade-row,
+.question-wrong-note-box {
+  margin-top: .9rem;
+  padding-top: .9rem;
+  border-top: 1px solid rgba(31, 58, 95, .1);
+}
+
+.question-grade-actions,
+.question-wrong-note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  margin-top: .55rem;
+}
+
+.question-grade-button {
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: .58rem .78rem;
+}
+
+.question-grade-button.active.correct {
+  border-color: rgba(23, 107, 77, .28);
+  background: var(--known-soft);
+  color: var(--known);
+}
+
+.question-grade-button.active.wrong,
+.question-grade-button.wrong-note-save {
+  border-color: rgba(159, 47, 63, .22);
+  background: var(--unknown-soft);
+  color: var(--unknown);
+}
+
+.question-grade-status {
+  margin: .55rem 0 0;
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.question-grade-status.correct {
+  color: var(--known);
+}
+
+.question-grade-status.wrong {
+  color: var(--unknown);
+}
 .question-answer {
   margin-top: .95rem;
   border: 1px solid rgba(31, 58, 95, .12);
@@ -4532,6 +4605,57 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   font-size: 15px;
   line-height: 1.82;
   word-break: keep-all;
+}
+
+.wiki-linked-cards {
+  margin-bottom: 1rem;
+  padding: .9rem 1rem;
+  border: 1px solid var(--wiki-border-soft);
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.wiki-linked-cards strong {
+  display: block;
+  color: #222222;
+  font-size: .95rem;
+}
+
+.wiki-linked-cards p {
+  margin: .28rem 0 0;
+  color: #666666;
+  font-size: .86rem;
+}
+
+.wiki-linked-card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+  margin-top: .75rem;
+}
+
+.wiki-linked-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .5rem .72rem;
+  border: 1px solid var(--wiki-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #333333;
+  text-decoration: none;
+}
+
+.wiki-linked-card-link:hover,
+.wiki-linked-card-link:focus-visible {
+  background: #ffffff;
+  border-color: #cfcfcf;
+  text-decoration: none;
+}
+
+.wiki-linked-card-meta {
+  color: #888888;
+  font-size: .78rem;
 }
 
 .wiki-article h1,

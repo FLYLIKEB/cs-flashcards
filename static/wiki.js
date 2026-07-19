@@ -149,12 +149,42 @@ function wikiRenderBreadcrumbs(page) {
   el.innerHTML = crumbs.map((crumb) => `<a href="${wikiPageUrl(crumb.slug)}" data-wiki-nav="1">${wikiEscapeHtml(crumb.title)}</a>`).join(' <span>›</span> ');
 }
 
+function wikiRenderLinkedCards(page) {
+  const linkedCards = Array.isArray(page?.linked_cards) ? page.linked_cards : [];
+  const flashcardLink = wiki$('wikiFlashcardLink');
+  if (flashcardLink) {
+    const primary = page?.primary_card || null;
+    flashcardLink.hidden = !primary?.card_url;
+    flashcardLink.href = primary?.card_url || '/';
+    flashcardLink.textContent = primary?.term ? `${primary.term} 카드` : '대표 카드';
+    flashcardLink.title = primary?.term ? `${primary.term} 카드 열기` : '대표 카드 열기';
+  }
+  const box = wiki$('wikiLinkedCards');
+  if (!box) return;
+  if (!linkedCards.length) {
+    box.hidden = true;
+    box.innerHTML = '';
+    return;
+  }
+  box.hidden = false;
+  box.innerHTML = `
+    <strong>연결된 플래시카드 ${linkedCards.length}개</strong>
+    <p>문서 제목이나 출처 파일과 연결된 카드입니다.</p>
+    <div class="wiki-linked-card-list">
+      ${linkedCards.map((card) => {
+        const meta = [card.category || '', Number(card.question_wrong_count || 0) > 0 ? `오답 ${card.question_wrong_count}` : ''].filter(Boolean).join(' · ');
+        return `<a class="wiki-linked-card-link" href="${wikiEscapeHtml(card.card_url || '/')}" target="_blank" rel="noopener noreferrer"><span>${wikiEscapeHtml(card.term || card.id || '카드')}</span>${meta ? `<span class="wiki-linked-card-meta">${wikiEscapeHtml(meta)}</span>` : ''}</a>`;
+      }).join('')}
+    </div>`;
+}
+
 function wikiApplyPage(page) {
   wikiState.currentSlug = page.slug || '';
   wiki$('wikiArticle').innerHTML = page.html || '<p class="muted">문서가 비어 있습니다.</p>';
   wiki$('wikiRawLink').href = page.raw_url || '#';
   document.title = `${page.title || '문서'} · ${wikiState.index?.book?.title || 'CS 학습 위키'}`;
   wikiRenderBreadcrumbs(page);
+  wikiRenderLinkedCards(page);
   wikiRenderToc();
   wikiStatus(`${page.title || '문서'} 열람 중`);
 }

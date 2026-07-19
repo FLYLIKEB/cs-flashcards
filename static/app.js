@@ -39,10 +39,12 @@ const state = {
   renderedFlipped: false,
   questionMode: false,
   questionLoading: false,
+  questionSaving: false,
   questions: [],
   questionIndex: 0,
   answerRevealed: false,
   selectedChoiceIndex: null,
+  initialCardQueryApplied: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -223,6 +225,51 @@ function renderSourceLinks(sourceFiles) {
     const label = escapeHtml(part.replace(/^\.\//, '').replace(/^pages\//, '').replace(/\.md$/i, ''));
     return `<a class="source-link" href="${wikiPageUrl(slug)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
   }).join('<span class="source-sep"> · </span>');
+}
+
+function primaryWikiSlugForCard(card) {
+  const parts = String(card?.source_files || '').split(';').map((part) => part.trim()).filter(Boolean);
+  for (const part of parts) {
+    const slug = wikiSlugFromSourcePath(part);
+    if (slug) return slug;
+  }
+  return '';
+}
+
+function currentCardWikiUrl(card) {
+  const slug = primaryWikiSlugForCard(card);
+  return slug ? wikiPageUrl(slug) : '/wiki';
+}
+
+function renderCardWikiLinks(card) {
+  const wikiUrl = currentCardWikiUrl(card);
+  const hasSpecificWiki = Boolean(primaryWikiSlugForCard(card));
+  ['frontWikiLink', 'backWikiLink'].forEach((id) => {
+    const link = $(id);
+    if (!link) return;
+    link.href = wikiUrl;
+    link.title = hasSpecificWiki ? '연결된 위키 문서 열기' : '학습 위키 열기';
+    link.setAttribute('aria-label', hasSpecificWiki ? '연결된 위키 문서 열기' : '학습 위키 열기');
+  });
+}
+
+function applyInitialCardQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const cardId = String(params.get('card') || '').trim();
+  if (!cardId) return false;
+  const card = state.cards.find((item) => item.id === cardId);
+  if (!card) {
+    setMessage(`URL 카드 ${cardId}를 찾지 못했습니다.`, true);
+    return false;
+  }
+  jumpToCard(card);
+  const side = String(params.get('side') || '').trim().toLowerCase();
+  const page = Number.parseInt(params.get('page') || '', 10);
+  state.flipped = side === 'back';
+  state.backPage = page === 2 ? 1 : 0;
+  renderCard();
+  setMessage(`${card.term} 카드로 바로 이동했습니다.`);
+  return true;
 }
 
 function normalizeTerm(value) {
@@ -1718,6 +1765,10 @@ async function loadCards() {
   buildCategoryOptions(data.summary.categories || []);
   restoreViewState();
   applyFilters();
+  if (!state.initialCardQueryApplied) {
+    state.initialCardQueryApplied = true;
+    applyInitialCardQuery();
+  }
   $('csvPath').textContent = data.summary.csv_path;
   setAudioButtons();
   updateAudioEstimate();
@@ -2164,9 +2215,106 @@ function currentQuestion() {
   return state.questions[state.questionIndex] || null;
 }
 
+function hydrateQuestionState(question) {
+  if (!question) return null;
+  if (typeof question.userAnswer !== 'string') question.userAnswer = '';
+  if (typeof question.wrongNote !== 'string') question.wrongNote = '';
+  if (typeof question.answerRevealed !== 'boolean') question.answerRevealed = false;
+  if (!Number.isInteger(question.selectedChoiceIndex)) question.selectedChoiceIndex = null;
+  if (question.gradedCorrect !== true && question.gradedCorrect !== false) question.gradedCorrect = null;
+  if (typeof question.attemptSavedAt !== 'string') question.attemptSavedAt = '';
+  return question;
+}
+
 function questionTypeBadge(question) {
   if (!question) return '';
   return question.type_label || (QUESTION_TYPE_LABELS[question.type] || question.type || '문제');
+}
+
+function questionNeedsManualGrading(question) {
+  return question?.type !== 'multiple_choice';
+}
+
+function selectedAnswerText(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return '';
+  if (Array.isArray(current.choices) && Number.isInteger(current.selectedChoiceIndex)) {
+    return String(current.choices[current.selectedChoiceIndex] || '');
+  }
+  return String(current.userAnswer || '');
+}
+
+function questionResultText(question) {
+  const current = hydrateQuestionState(question);
+  if (!current || (current.gradedCorrect !== true && current.gradedCorrect !== false)) return '';
+  return current.gradedCorrect ? '정답 저장됨' : '오답 저장됨';
+}
+
+function syncUpdatedCard(card) {
+  if (!card?.id) return;
+  const allIndex = state.cards.findIndex((item) => item.id === card.id);
+  if (allIndex >= 0) state.cards[allIndex] = card;
+  const filteredIndex = state.filtered.findIndex((item) => item.id === card.id);
+  if (filteredIndex >= 0) state.filtered[filteredIndex] = card;
+  if (!state.questionMode && state.renderedCardId === card.id) renderCard();
+}
+
+async function saveQuestionAttempt(question) {
+  const current = hydrateQuestionState(question);
+  if (!current || state.questionLoading || state.questionSaving) return;
+  state.questionSaving = true;
+  renderQuestionPanel();
+  try {
+    const res = await fetch('/api/questions/attempt', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        question_id: current.id,
+        card_id: current.card_id,
+        question_type: current.type,
+        prompt: current.prompt || '',
+        body: current.body || '',
+        user_answer: selectedAnswerText(current),
+        selected_choice_index: Number.isInteger(current.selectedChoiceIndex) ? current.selectedChoiceIndex : null,
+        is_correct: current.gradedCorrect,
+        wrong_note: current.wrongNote || '',
+      }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    current.attemptSavedAt = String(data.attempt?.updated_at || new Date().toISOString());
+    current.gradedCorrect = data.attempt?.is_correct === true ? true : data.attempt?.is_correct === false ? false : null;
+    current.wrongNote = String(data.attempt?.wrong_note || current.wrongNote || '');
+    if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
+    syncUpdatedCard(data.card);
+    setMessage(questionResultText(current) || '문제 채점 저장 완료');
+  } catch (error) {
+    setMessage(`문제 채점 저장 실패: ${error.message || error}`, true);
+  } finally {
+    state.questionSaving = false;
+    renderQuestionPanel();
+  }
+}
+
+function markCurrentQuestion(correct) {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question) return;
+  question.gradedCorrect = Boolean(correct);
+  question.answerRevealed = true;
+  state.answerRevealed = true;
+  if (question.gradedCorrect) question.wrongNote = '';
+  renderQuestionPanel();
+  saveQuestionAttempt(question);
+}
+
+function saveCurrentWrongNote() {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question) return;
+  question.answerRevealed = true;
+  question.gradedCorrect = false;
+  state.answerRevealed = true;
+  renderQuestionPanel();
+  saveQuestionAttempt(question);
 }
 
 function setQuestionControlsDisabled(disabled) {
@@ -2187,16 +2335,25 @@ function renderQuestionPanel() {
   updateRandomButtons();
   updateQuestionPracticeButton();
   if (!state.questionMode) return;
-  setQuestionControlsDisabled(state.questionLoading);
+  setQuestionControlsDisabled(state.questionLoading || state.questionSaving);
   const total = state.questions.length;
-  const question = currentQuestion();
+  const question = hydrateQuestionState(currentQuestion());
+  if (question) {
+    state.answerRevealed = Boolean(question.answerRevealed);
+    state.selectedChoiceIndex = Number.isInteger(question.selectedChoiceIndex) ? question.selectedChoiceIndex : null;
+  } else {
+    state.answerRevealed = false;
+    state.selectedChoiceIndex = null;
+  }
   if (summary) {
     const filterCount = state.filtered.length;
     summary.textContent = state.questionLoading
       ? '문제 생성 중...'
-      : total
-        ? `${state.questionIndex + 1} / ${total} · 현재 필터 카드 ${filterCount}개 기준`
-        : `현재 필터 카드 ${filterCount}개 기준 · 생성 버튼을 누르세요.`;
+      : state.questionSaving
+        ? '채점 저장 중...'
+        : total
+          ? `${state.questionIndex + 1} / ${total} · 현재 필터 카드 ${filterCount}개 기준`
+          : `현재 필터 카드 ${filterCount}개 기준 · 생성 버튼을 누르세요.`;
   }
   if (!card) return;
   if (state.questionLoading) {
@@ -2212,22 +2369,48 @@ function renderQuestionPanel() {
   const choiceHtml = choices.length ? `
     <ol class="question-choices">
       ${choices.map((choice, index) => {
-        const isAnswer = state.answerRevealed && index === question.answer_index;
-        const isSelected = index === state.selectedChoiceIndex;
-        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}">${escapeHtml(choice)}</button></li>`;
+        const isAnswer = question.answerRevealed && index === question.answer_index;
+        const isSelected = index === question.selectedChoiceIndex;
+        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving ? 'disabled' : ''}>${escapeHtml(choice)}</button></li>`;
       }).join('')}
     </ol>` : '';
+  const draftHtml = questionNeedsManualGrading(question) ? `
+    <div class="question-answer-draft">
+      <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
+      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="여기에 답안을 적고 정답/해설을 본 뒤 스스로 채점하세요." ${state.questionSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
+    </div>` : '';
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
     <div class="question-rubric">
       <strong>채점 포인트</strong>
       <ul>${question.rubric.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
     </div>` : '';
-  const answer = state.answerRevealed ? `
+  const resultText = questionResultText(question);
+  const resultHtml = resultText ? `<p class="question-grade-status ${question.gradedCorrect ? 'correct' : 'wrong'}">${escapeHtml(resultText)}</p>` : '';
+  const gradeHtml = question.answerRevealed && questionNeedsManualGrading(question) ? `
+    <div class="question-grade-row">
+      <strong>자가 채점</strong>
+      <div class="question-grade-actions">
+        <button class="question-grade-button${question.gradedCorrect === true ? ' active correct' : ''}" type="button" data-question-grade="correct" ${state.questionSaving ? 'disabled' : ''}>맞음 저장</button>
+        <button class="question-grade-button${question.gradedCorrect === false ? ' active wrong' : ''}" type="button" data-question-grade="wrong" ${state.questionSaving ? 'disabled' : ''}>틀림 저장</button>
+      </div>
+      ${resultHtml}
+    </div>` : resultHtml;
+  const wrongNoteHtml = question.answerRevealed && question.gradedCorrect === false ? `
+    <div class="question-wrong-note-box">
+      <label class="question-answer-label" for="questionWrongNoteInput">오답노트</label>
+      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${state.questionSaving ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
+      <div class="question-wrong-note-actions">
+        <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${state.questionSaving ? 'disabled' : ''}>오답노트 저장</button>
+      </div>
+    </div>` : '';
+  const answer = question.answerRevealed ? `
     <div class="question-answer">
       <strong>정답/모범답안</strong>
       <p>${escapeHtml(question.answer || '')}</p>
       ${question.explanation ? `<p class="question-explanation">${escapeHtml(question.explanation)}</p>` : ''}
       ${rubric}
+      ${gradeHtml}
+      ${wrongNoteHtml}
     </div>` : '';
   card.innerHTML = `
     <div class="question-meta">
@@ -2237,23 +2420,25 @@ function renderQuestionPanel() {
     </div>
     <h2>${escapeHtml(question.prompt || '문제')}</h2>
     <p class="question-body">${escapeHtml(question.body || '')}</p>
+    ${draftHtml}
     ${choiceHtml}
     ${answer}
   `;
-  $('prevQuestionBtn').disabled = state.questionLoading || state.questionIndex <= 0;
-  $('nextQuestionBtn').disabled = state.questionLoading || state.questionIndex >= total - 1;
-  $('revealAnswerBtn').disabled = state.questionLoading || !question;
-  $('openQuestionCardBtn').disabled = state.questionLoading || !question;
+  $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.questionIndex <= 0;
+  $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.questionIndex >= total - 1;
+  $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || !question;
+  $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || !question;
 }
 
 async function generateQuestionsFromCurrentFilter() {
-  if (state.questionLoading) return;
+  if (state.questionLoading || state.questionSaving) return;
   if (!state.filtered.length) {
     setMessage('문제를 만들 카드가 없습니다. 필터를 바꿔주세요.', true);
     return;
   }
   state.questionMode = true;
   state.questionLoading = true;
+  state.questionSaving = false;
   state.answerRevealed = false;
   state.selectedChoiceIndex = null;
   renderQuestionPanel();
@@ -2270,8 +2455,10 @@ async function generateQuestionsFromCurrentFilter() {
     });
     if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
-    state.questions = data.questions || [];
+    state.questions = (data.questions || []).map((item) => hydrateQuestionState({...item}));
     state.questionIndex = 0;
+    state.answerRevealed = false;
+    state.selectedChoiceIndex = null;
     setMessage(`문제 ${state.questions.length}개 생성 완료`);
   } catch (error) {
     state.questions = [];
@@ -2296,7 +2483,9 @@ function openQuestionPracticeFromMenu() {
 }
 
 function revealQuestionAnswer() {
-  if (!currentQuestion()) return;
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question) return;
+  question.answerRevealed = true;
   state.answerRevealed = true;
   renderQuestionPanel();
 }
@@ -2304,8 +2493,9 @@ function revealQuestionAnswer() {
 function moveQuestion(delta) {
   if (!state.questions.length) return;
   state.questionIndex = Math.max(0, Math.min(state.questions.length - 1, state.questionIndex + delta));
-  state.answerRevealed = false;
-  state.selectedChoiceIndex = null;
+  const question = hydrateQuestionState(currentQuestion());
+  state.answerRevealed = Boolean(question?.answerRevealed);
+  state.selectedChoiceIndex = Number.isInteger(question?.selectedChoiceIndex) ? question.selectedChoiceIndex : null;
   renderQuestionPanel();
 }
 
@@ -2325,10 +2515,16 @@ function openQuestionSourceCard() {
 }
 
 function selectQuestionChoice(index) {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question) return;
+  question.selectedChoiceIndex = index;
+  question.answerRevealed = true;
+  question.gradedCorrect = index === question.answer_index;
+  question.userAnswer = Array.isArray(question.choices) ? String(question.choices[index] || '') : '';
   state.selectedChoiceIndex = index;
-  const question = currentQuestion();
-  if (question?.type === 'multiple_choice') state.answerRevealed = true;
+  state.answerRevealed = true;
   renderQuestionPanel();
+  if (question.type === 'multiple_choice') saveQuestionAttempt(question);
 }
 
 function advanceAfterMark(markedId) {
@@ -2387,6 +2583,7 @@ function applyFilters(keepCurrentId = null) {
     state.questionIndex = 0;
     state.answerRevealed = false;
     state.selectedChoiceIndex = null;
+    state.questionSaving = false;
     renderQuestionPanel();
   }
   updateAudioEstimate();
@@ -2413,6 +2610,7 @@ function renderCard() {
     renderConceptImage(null);
     $('conceptGraph').innerHTML = '<div class="graph-empty muted">표시할 그래프가 없습니다.</div>';
     ['frontGoogleSearchLink', 'backGoogleSearchLink'].forEach((id) => { $(id).href = '#'; });
+    renderCardWikiLinks(null);
     state.renderedCardId = null;
     state.renderedFlipped = false;
     resetBackScroll();
@@ -2447,6 +2645,7 @@ function renderCard() {
   $('frontGoogleSearchLink').title = `${googleQuery} 구글 검색`;
   $('backGoogleSearchLink').href = googleUrl;
   $('backGoogleSearchLink').title = `${googleQuery} 구글 검색`;
+  renderCardWikiLinks(c);
 
   $('backCategory').textContent = categoryLabel(c.category);
   $('backImportance').textContent = importanceLabel(c.importance);
@@ -2649,7 +2848,29 @@ $('revealAnswerBtn')?.addEventListener('click', revealQuestionAnswer);
 $('openQuestionCardBtn')?.addEventListener('click', openQuestionSourceCard);
 $('questionCard')?.addEventListener('click', (event) => {
   const choice = event.target.closest('[data-choice-index]');
-  if (choice) selectQuestionChoice(Number.parseInt(choice.dataset.choiceIndex, 10));
+  if (choice) {
+    selectQuestionChoice(Number.parseInt(choice.dataset.choiceIndex, 10));
+    return;
+  }
+  const gradeButton = event.target.closest('[data-question-grade]');
+  if (gradeButton) {
+    markCurrentQuestion(gradeButton.dataset.questionGrade === 'correct');
+    return;
+  }
+  if (event.target.closest('[data-question-wrong-note-save="1"]')) {
+    saveCurrentWrongNote();
+  }
+});
+$('questionCard')?.addEventListener('input', (event) => {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question) return;
+  if (event.target.matches('.question-answer-input')) {
+    question.userAnswer = event.target.value || '';
+    return;
+  }
+  if (event.target.matches('.question-wrong-note')) {
+    question.wrongNote = event.target.value || '';
+  }
 });
 $('knownBtn').addEventListener('click', () => mark('O'));
 $('unknownBtn').addEventListener('click', () => mark('X'));
