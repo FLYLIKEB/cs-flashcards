@@ -10,21 +10,21 @@
   <script defer src="/static/wiki.js"></script>
 </head>
 <body class="wiki-page-shell">
-  <header class="topbar wiki-topbar">
-    <div class="wiki-brand">
-      <a class="logo-refresh wiki-logo" href="/" title="플래시카드로 돌아가기" aria-label="플래시카드로 돌아가기">CS</a>
-      <div>
-        <p class="muted">로컬 위키 UI</p>
+  <header class="wiki-topbar">
+    <div class="wiki-topbar-inner">
+      <a class="wiki-logo" href="/wiki" title="학습 위키 홈" aria-label="학습 위키 홈">WIKI</a>
+      <div class="wiki-brand">
+        <p class="wiki-brand-kicker">온라인 책 형식의 CS 학습 위키</p>
         <h1 id="wikiBookTitle" class="wiki-book-title">불러오는 중...</h1>
       </div>
-    </div>
-    <div class="header-search wiki-search" title="문서 검색">
-      <span>⌕</span>
-      <input id="wikiSearchInput" type="search" placeholder="문서 제목 검색" />
-    </div>
-    <div class="header-actions">
-      <button id="wikiSidebarToggleBtn" class="header-link wiki-sidebar-toggle" type="button" aria-controls="wikiSidebar" aria-expanded="true">목차 닫기</button>
-      <a class="header-link" href="/">플래시카드</a>
+      <label class="wiki-search" title="문서 검색">
+        <span>검색</span>
+        <input id="wikiSearchInput" type="search" placeholder="책/문서 제목 검색" />
+      </label>
+      <div class="wiki-topbar-actions">
+        <button id="wikiSidebarToggleBtn" class="header-link wiki-sidebar-toggle" type="button" aria-controls="wikiSidebar" aria-expanded="true">목차 숨기기</button>
+        <a class="header-link" href="/">플래시카드</a>
+      </div>
     </div>
   </header>
 
@@ -32,8 +32,8 @@
     <aside id="wikiSidebar" class="wiki-sidebar panel">
       <div class="wiki-sidebar-head">
         <div class="wiki-sidebar-title-row">
-          <a id="wikiBookIntroLink" class="header-link" href="/wiki/page/_book">책 소개</a>
-          <span class="wiki-sidebar-caption small muted">목차</span>
+          <span class="wiki-sidebar-caption">목차보기</span>
+          <a id="wikiBookIntroLink" class="wiki-book-home-link" href="/wiki/page/_book">책 소개</a>
         </div>
         <p id="wikiStatus" class="small muted">목차를 불러오는 중...</p>
       </div>
@@ -43,7 +43,9 @@
     <section class="wiki-main panel">
       <div class="wiki-meta-row">
         <p id="wikiBreadcrumbs" class="small muted"></p>
-        <a id="wikiRawLink" class="header-link" href="#" target="_blank" rel="noopener noreferrer">원본</a>
+        <div class="wiki-page-actions">
+          <a id="wikiRawLink" class="header-link" href="#" target="_blank" rel="noopener noreferrer">원본 보기</a>
+        </div>
       </div>
       <article id="wikiArticle" class="wiki-article" aria-live="polite"></article>
     </section>

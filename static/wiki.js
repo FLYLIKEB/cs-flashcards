@@ -61,9 +61,9 @@ function applyWikiSidebarState({persist = true} = {}) {
   wiki$('wikiSidebar')?.setAttribute('aria-hidden', String(!wikiState.sidebarOpen));
   const toggleBtn = wiki$('wikiSidebarToggleBtn');
   if (toggleBtn) {
-    toggleBtn.textContent = wikiState.sidebarOpen ? '목차 닫기' : '목차 열기';
+    toggleBtn.textContent = wikiState.sidebarOpen ? '목차 숨기기' : '목차 보기';
     toggleBtn.setAttribute('aria-expanded', String(wikiState.sidebarOpen));
-    toggleBtn.setAttribute('title', wikiState.sidebarOpen ? '목차 닫기' : '목차 열기');
+    toggleBtn.setAttribute('title', wikiState.sidebarOpen ? '목차 숨기기' : '목차 보기');
   }
   if (persist) saveWikiSidebarState();
 }
@@ -101,9 +101,9 @@ function wikiFilteredTree(items, query) {
 function wikiRenderTocItems(items) {
   if (!items.length) return '<p class="small muted">일치하는 문서가 없습니다.</p>';
   return `<ul>${items.map((item) => {
-    const active = item.slug === wikiState.currentSlug ? ' active' : '';
+    const active = item.slug === wikiState.currentSlug;
     const children = item.children?.length ? wikiRenderTocItems(item.children) : '';
-    return `<li><a class="wiki-toc-link${active}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1">${wikiEscapeHtml(item.title)}</a>${children}</li>`;
+    return `<li><a class="wiki-toc-link${active ? ' active' : ''}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1"${active ? ' aria-current="page"' : ''}>${wikiEscapeHtml(item.title)}</a>${children}</li>`;
   }).join('')}</ul>`;
 }
 
@@ -118,7 +118,7 @@ function wikiRenderBreadcrumbs(page) {
   const el = wiki$('wikiBreadcrumbs');
   if (!el) return;
   const crumbs = Array.isArray(page?.breadcrumbs) ? page.breadcrumbs : [];
-  el.innerHTML = crumbs.map((crumb) => `<a href="${wikiPageUrl(crumb.slug)}" data-wiki-nav="1">${wikiEscapeHtml(crumb.title)}</a>`).join(' <span>/</span> ');
+  el.innerHTML = crumbs.map((crumb) => `<a href="${wikiPageUrl(crumb.slug)}" data-wiki-nav="1">${wikiEscapeHtml(crumb.title)}</a>`).join(' <span>›</span> ');
 }
 
 function wikiApplyPage(page) {
