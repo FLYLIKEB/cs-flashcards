@@ -13,23 +13,21 @@
 <body class="wiki-page-shell">
   <header class="wiki-topbar">
     <div class="wiki-topbar-inner">
-      <a class="wiki-logo" href="/wiki" title="학습 위키 홈" aria-label="학습 위키 홈">WIKI</a>
+      <a class="wiki-logo" href="/wiki" title="학습 위키 홈" aria-label="학습 위키 홈">CS Wiki</a>
       <div class="wiki-brand">
-        <p class="wiki-brand-kicker">온라인 책 형식의 CS 학습 위키</p>
         <h1 id="wikiBookTitle" class="wiki-book-title">불러오는 중...</h1>
       </div>
-      <label class="wiki-search" title="문서 검색">
-        <span>검색</span>
-        <input id="wikiSearchInput" type="search" placeholder="책/문서 제목 검색" />
-      </label>
-      <div class="wiki-topbar-actions">
-        <button id="wikiSidebarToggleBtn" class="header-link wiki-sidebar-toggle" type="button" aria-controls="wikiSidebar" aria-expanded="true">목차 숨기기</button>
-        <a class="header-link" href="/">플래시카드</a>
-      </div>
+      <a class="wiki-home-link" href="/">플래시카드</a>
+    </div>
+    <div class="wiki-search wiki-search-hidden" hidden aria-hidden="true">
+      <input id="wikiSearchInput" type="search" placeholder="책/문서 제목 검색" tabindex="-1" />
     </div>
   </header>
 
   <main class="wiki-shell">
+    <div class="wiki-sidebar-dock">
+      <button id="wikiSidebarToggleBtn" class="wiki-sidebar-toggle" type="button" aria-controls="wikiSidebar" aria-expanded="true">목차</button>
+    </div>
     <aside id="wikiSidebar" class="wiki-sidebar panel">
       <div class="wiki-sidebar-head">
         <div class="wiki-sidebar-title-row">

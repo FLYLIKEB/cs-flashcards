@@ -62,8 +62,9 @@ function applyWikiSidebarState({persist = true} = {}) {
   wiki$('wikiSidebar')?.setAttribute('aria-hidden', String(!wikiState.sidebarOpen));
   const toggleBtn = wiki$('wikiSidebarToggleBtn');
   if (toggleBtn) {
-    toggleBtn.textContent = wikiState.sidebarOpen ? '목차 숨기기' : '목차 보기';
+    toggleBtn.textContent = '목차';
     toggleBtn.setAttribute('aria-expanded', String(wikiState.sidebarOpen));
+    toggleBtn.setAttribute('aria-label', wikiState.sidebarOpen ? '목차 숨기기' : '목차 보기');
     toggleBtn.setAttribute('title', wikiState.sidebarOpen ? '목차 숨기기' : '목차 보기');
   }
   if (persist) saveWikiSidebarState();
