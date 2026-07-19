@@ -36,10 +36,12 @@ http://127.0.0.1:8000
   2. 프로젝트 내부 `wiki_book/`
   3. 기존 로컬 개발 경로 `../wikidocs-ebook`
 - Lightsail 배포 스크립트는 기본적으로 로컬 `../wikidocs-ebook`를 묶어서 서버의 `/home/ubuntu/cs-flashcards/wiki_book`으로 함께 배포합니다.
+- `CS_FLASHCARDS_WIKI_GITHUB_REPO`가 설정되어 있으면 서버에 위키 자동 동기화 타이머도 같이 설치됩니다. 기본값은 5분 주기이며 `CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES`로 조절할 수 있습니다.
+- 따라서 위키 레포에 push만 해도 별도 앱 재배포 없이 `/home/ubuntu/cs-flashcards/wiki_book`가 자동 갱신됩니다.
 - 다른 위치의 문서를 배포하려면 `CS_FLASHCARDS_WIKI_BOOK_SRC`를 지정합니다.
 - 위키 마크다운의 `- [ ]` / `- [x]` 체크리스트는 `/wiki`에서 실제 체크박스로 렌더링됩니다.
 - 체크를 누르면 배포된 `wiki_book` 마크다운이 바로 갱신됩니다.
-- GitHub에도 같은 체크 상태를 반영하려면 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정합니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
+- 체크 상태를 GitHub에도 같이 반영하려면 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정합니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
 - 위키 문서는 제목/출처 파일 기준으로 연결된 플래시카드를 찾아 `대표 카드` 버튼과 관련 카드 칩을 보여줍니다.
 - 위키에서 카드를 열면 URL 쿼리로 해당 카드에 바로 점프합니다.
 
@@ -164,6 +166,8 @@ data/CS_encyclopedia_300plus.csv
 ```
 
 수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 기존 원격 CSV에 남아 있던 진행상태를 최초 1회 SQLite로 이관한 뒤 새 CSV를 반영합니다.
+브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 현재 카드 뒷면의 `Codex AI 교체` 패널은 `definition`, `detailed_explanation`, `exam_note`, `concept_image_alt`를 초안 생성·수정·적용합니다. 실제 이미지 파일이나 `concept_image_url` 자체 생성은 이 패널에서 하지 않으므로, 이미지 URL 교체가 필요하면 별도 생성/업로드 후 CSV 값을 바꿉니다.
+
 
 ```bash
 git add .

@@ -36,6 +36,9 @@ jobs:
           CS_FLASHCARDS_PASSWORD: ${{ secrets.CS_FLASHCARDS_PASSWORD }}
           CS_FLASHCARDS_DOMAIN: cs.chamung.com
           CS_FLASHCARDS_ORIGIN_DOMAIN: cs-origin.chamung.com
+          CS_FLASHCARDS_WIKI_GITHUB_REPO: FLYLIKEB/finance-public-corp-prep-materials
+          CS_FLASHCARDS_WIKI_GITHUB_BRANCH: main
+          CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES: 5
         run: |
           set -euo pipefail
           ./scripts/deploy_lightsail_flashcards.sh

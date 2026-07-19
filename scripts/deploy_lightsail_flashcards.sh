@@ -22,6 +22,11 @@ WIKI_GITHUB_TOKEN="${CS_FLASHCARDS_WIKI_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN
 WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
 WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-}"
 WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
+WIKI_SYNC_INTERVAL_MINUTES="${CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES:-5}"
+if ! [[ "$WIKI_SYNC_INTERVAL_MINUTES" =~ ^[1-9][0-9]*$ ]]; then
+  echo "CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES 는 1 이상의 정수여야 합니다: $WIKI_SYNC_INTERVAL_MINUTES" >&2
+  exit 1
+fi
 
 
 if [[ -f "$CHALOG_CONFIG" ]]; then
@@ -88,8 +93,13 @@ SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChe
 
 echo "배포 대상: $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR"
 echo "도메인: http://$DOMAIN (443 개방 시 https://$DOMAIN)"
+if [[ -n "$WIKI_GITHUB_REPO" ]]; then
+  echo "위키 원본 GitHub 자동 동기화: $WIKI_GITHUB_REPO@$WIKI_GITHUB_BRANCH (${WIKI_SYNC_INTERVAL_MINUTES}분 주기)"
+else
+  echo "위키 원본 GitHub 자동 동기화: 비활성"
+fi
 if [[ -n "$WIKI_GITHUB_TOKEN" && -n "$WIKI_GITHUB_REPO" ]]; then
-  echo "위키 체크리스트 GitHub 동기화: $WIKI_GITHUB_REPO@$WIKI_GITHUB_BRANCH"
+  echo "위키 체크리스트 GitHub 동기화: 활성"
 else
   echo "위키 체크리스트 GitHub 동기화: 비활성"
 fi
@@ -118,7 +128,7 @@ rm -rf "$TMP_STAGE"
 rm -f "$TMP_ARCHIVE"
 WIKI_GITHUB_PATH_PREFIX_ARG="${WIKI_GITHUB_PATH_PREFIX:-__EMPTY__}"
 
-"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN" "$WIKI_GITHUB_PATH_PREFIX_ARG" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$WIKI_SYNC_INTERVAL_MINUTES" <<'REMOTE'
 set -euo pipefail
 REMOTE_DIR="$1"
 REMOTE_PORT="$2"
@@ -130,13 +140,14 @@ WIKI_GITHUB_REPO="${7-}"
 WIKI_GITHUB_BRANCH="${8-}"
 WIKI_GITHUB_TOKEN="${9-}"
 WIKI_GITHUB_PATH_PREFIX="${10-}"
+WIKI_SYNC_INTERVAL_MINUTES="${11-5}"
 if [[ "$WIKI_GITHUB_PATH_PREFIX" == "__EMPTY__" ]]; then
   WIKI_GITHUB_PATH_PREFIX=""
 fi
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
-sudo apt-get install -y python3 python3-venv python3-pip nginx certbot python3-certbot-nginx >/dev/null
+sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot python3-certbot-nginx >/dev/null
 
 mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
 
@@ -244,7 +255,107 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
+if [[ -n "$WIKI_GITHUB_REPO" ]]; then
+  mkdir -p "$REMOTE_DIR/bin"
+  tee "$REMOTE_DIR/bin/sync_wiki_book.sh" >/dev/null <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:?}"
+WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
+WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-main}"
+WIKI_GITHUB_TOKEN="${CS_FLASHCARDS_WIKI_GITHUB_TOKEN:-}"
+WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
+if [[ -z "$WIKI_GITHUB_REPO" ]]; then
+  echo "wiki sync: repo not configured"
+  exit 0
+fi
+REPO_DIR="$REMOTE_DIR/state/wiki_repo"
+SOURCE_DIR="$REPO_DIR"
+if [[ -n "$WIKI_GITHUB_PATH_PREFIX" ]]; then
+  SOURCE_DIR="$REPO_DIR/$WIKI_GITHUB_PATH_PREFIX"
+fi
+AUTH_URL="https://github.com/${WIKI_GITHUB_REPO}.git"
+if [[ -n "$WIKI_GITHUB_TOKEN" ]]; then
+  AUTH_URL="https://x-access-token:${WIKI_GITHUB_TOKEN}@github.com/${WIKI_GITHUB_REPO}.git"
+fi
+PLAIN_URL="https://github.com/${WIKI_GITHUB_REPO}.git"
+if [[ ! -d "$REPO_DIR/.git" ]]; then
+  rm -rf "$REPO_DIR"
+  git clone --depth 1 --branch "$WIKI_GITHUB_BRANCH" "$AUTH_URL" "$REPO_DIR"
+else
+  git -C "$REPO_DIR" remote set-url origin "$AUTH_URL"
+  git -C "$REPO_DIR" fetch --depth 1 origin "$WIKI_GITHUB_BRANCH"
+  git -C "$REPO_DIR" checkout -B "$WIKI_GITHUB_BRANCH" "origin/$WIKI_GITHUB_BRANCH"
+  git -C "$REPO_DIR" reset --hard "origin/$WIKI_GITHUB_BRANCH"
+fi
+git -C "$REPO_DIR" remote set-url origin "$PLAIN_URL"
+if [[ ! -f "$SOURCE_DIR/README.md" || ! -f "$SOURCE_DIR/TOC.md" || ! -d "$SOURCE_DIR/pages" ]]; then
+  echo "wiki sync: expected README.md, TOC.md, pages/ under $SOURCE_DIR" >&2
+  exit 1
+fi
+STAGE_DIR="$(mktemp -d "$REMOTE_DIR/state/wiki_book.stage.XXXXXX")"
+trap 'rm -rf "$STAGE_DIR"' EXIT
+cp "$SOURCE_DIR/README.md" "$STAGE_DIR/README.md"
+cp "$SOURCE_DIR/TOC.md" "$STAGE_DIR/TOC.md"
+cp -R "$SOURCE_DIR/pages" "$STAGE_DIR/"
+git -C "$REPO_DIR" rev-parse HEAD > "$STAGE_DIR/.source-commit"
+PREV_DIR="$REMOTE_DIR/wiki_book.previous"
+rm -rf "$PREV_DIR"
+if [[ -e "$REMOTE_DIR/wiki_book" ]]; then
+  mv "$REMOTE_DIR/wiki_book" "$PREV_DIR"
+fi
+mv "$STAGE_DIR" "$REMOTE_DIR/wiki_book"
+rm -rf "$PREV_DIR"
+trap - EXIT
+echo "wiki sync: $(cat "$REMOTE_DIR/wiki_book/.source-commit")"
+EOF
+  chmod 700 "$REMOTE_DIR/bin/sync_wiki_book.sh"
+
+  sudo tee /etc/systemd/system/cs-flashcards-wiki-sync.service >/dev/null <<EOF
+[Unit]
+Description=Sync CS Flashcards wiki mirror from GitHub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=$REMOTE_DIR
+Environment=CS_FLASHCARDS_REMOTE_DIR=$REMOTE_DIR
+Environment=CS_FLASHCARDS_WIKI_GITHUB_REPO=$WIKI_GITHUB_REPO
+Environment=CS_FLASHCARDS_WIKI_GITHUB_BRANCH=$WIKI_GITHUB_BRANCH
+Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=$WIKI_GITHUB_TOKEN
+Environment=CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX=$WIKI_GITHUB_PATH_PREFIX
+ExecStart=/usr/bin/env bash $REMOTE_DIR/bin/sync_wiki_book.sh
+EOF
+
+  sudo tee /etc/systemd/system/cs-flashcards-wiki-sync.timer >/dev/null <<EOF
+[Unit]
+Description=Periodic wiki mirror sync for CS Flashcards
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=${WIKI_SYNC_INTERVAL_MINUTES}min
+RandomizedDelaySec=30s
+Persistent=true
+Unit=cs-flashcards-wiki-sync.service
+
+[Install]
+WantedBy=timers.target
+EOF
+else
+  sudo systemctl disable --now cs-flashcards-wiki-sync.timer >/dev/null 2>&1 || true
+  sudo rm -f /etc/systemd/system/cs-flashcards-wiki-sync.service /etc/systemd/system/cs-flashcards-wiki-sync.timer
+  rm -f "$REMOTE_DIR/bin/sync_wiki_book.sh"
+fi
+
 sudo systemctl daemon-reload
+if [[ -n "$WIKI_GITHUB_REPO" ]]; then
+  sudo systemctl enable cs-flashcards-wiki-sync.timer >/dev/null
+  sudo systemctl start cs-flashcards-wiki-sync.service
+  sudo systemctl restart cs-flashcards-wiki-sync.timer
+  sudo systemctl --no-pager --full status cs-flashcards-wiki-sync.timer | sed -n '1,12p'
+fi
 sudo systemctl enable cs-flashcards >/dev/null
 sudo systemctl restart cs-flashcards
 sleep 1
