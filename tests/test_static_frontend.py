@@ -91,6 +91,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('WIKI_SIDEBAR_STATE_KEY', WIKI_JS)
         self.assertIn('function applyWikiSidebarState(', WIKI_JS)
         self.assertIn('function toggleWikiSidebar(', WIKI_JS)
+        self.assertIn('function wikiApiUrl(path)', WIKI_JS)
         self.assertIn('closeWikiSidebarOnMobile()', WIKI_JS)
         self.assertIn('.wiki-shell', STYLE_CSS)
         self.assertIn('.wiki-sidebar-toggle', STYLE_CSS)

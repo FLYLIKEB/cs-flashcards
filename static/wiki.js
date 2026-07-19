@@ -19,6 +19,11 @@ function wikiPageUrl(slug) {
   return `/wiki/page/${encodeURIComponent(normalized).replace(/%2F/g, '/')}`;
 }
 
+function wikiApiUrl(path) {
+  return new window.URL(String(path || '/'), window.location.origin).toString();
+}
+
+
 function wikiCurrentSlug() {
   const prefix = '/wiki/page/';
   if (window.location.pathname.startsWith(prefix)) {
@@ -135,7 +140,7 @@ async function wikiFetchJson(url) {
 
 async function wikiLoadPage(slug, {push = false} = {}) {
   const normalized = String(slug || wikiState.index?.default_page_slug || '').trim() || '_book';
-  const page = await wikiFetchJson(`/api/wiki/page/${encodeURIComponent(normalized).replace(/%2F/g, '/')}`);
+  const page = await wikiFetchJson(wikiApiUrl(`/api/wiki/page/${encodeURIComponent(normalized).replace(/%2F/g, '/')}`));
   if (push && window.location.pathname !== wikiPageUrl(page.slug)) {
     window.history.pushState({}, '', wikiPageUrl(page.slug));
   }
@@ -146,7 +151,7 @@ async function wikiInit() {
   wikiState.sidebarOpen = readSavedWikiSidebarState();
   applyWikiSidebarState({persist: false});
   try {
-    wikiState.index = await wikiFetchJson('/api/wiki/index');
+    wikiState.index = await wikiFetchJson(wikiApiUrl('/api/wiki/index'));
     wiki$('wikiBookTitle').textContent = wikiState.index.book?.title || 'CS 학습 위키';
     wiki$('wikiBookIntroLink').href = wikiPageUrl(wikiState.index.book?.slug || '_book');
     wikiRenderToc();
