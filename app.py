@@ -24,7 +24,7 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions
+from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions, normalize_card_ids
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_CSV_PATH = ROOT / "data" / "CS_encyclopedia_300plus.csv"
@@ -42,6 +42,7 @@ WIKI_BOOK_README_NAME = "README.md"
 WIKI_BOOK_HOME_SLUG = "_book"
 REVIEW_COLUMNS = ["known_status", "last_reviewed", "review_count"]
 VALID_STATUSES = {"O", "X", ""}
+QUESTION_ATTEMPT_RESULT_VALUES = {"all", "correct", "wrong", "pending"}
 PUBLIC_USERNAME = os.environ.get("CS_FLASHCARDS_USERNAME", "cs")
 PUBLIC_PASSWORD = os.environ.get("CS_FLASHCARDS_PASSWORD", "")
 AUTH_COOKIE_NAME = "cs_flashcards_auth"
@@ -520,6 +521,116 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
         "wrong_note": row["wrong_note"] or "",
         "created_at": row["created_at"] or "",
         "updated_at": row["updated_at"] or "",
+    }
+
+
+def normalize_question_attempt_result(value: str | None) -> str:
+    raw = str(value or "all").strip().lower()
+    aliases = {
+        "": "all",
+        "all": "all",
+        "전체": "all",
+        "correct": "correct",
+        "right": "correct",
+        "맞음": "correct",
+        "정답": "correct",
+        "wrong": "wrong",
+        "incorrect": "wrong",
+        "틀림": "wrong",
+        "오답": "wrong",
+        "pending": "pending",
+        "ungraded": "pending",
+        "미채점": "pending",
+    }
+    normalized = aliases.get(raw)
+    if normalized not in QUESTION_ATTEMPT_RESULT_VALUES:
+        raise ValueError(f"Unsupported question attempt result: {value}")
+    return normalized
+
+
+def read_question_attempts(
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+    *,
+    card_ids: list[str] | None = None,
+    result: str = "all",
+    limit: int = 200,
+) -> dict[str, Any]:
+    normalized_result = normalize_question_attempt_result(result)
+    selected_ids = sorted(normalize_card_ids(card_ids) or [])
+    safe_limit = max(1, min(int(limit or 200), 500))
+    rows, _ = read_cards(csv_path, progress_db_path)
+    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+
+    where_clauses: list[str] = []
+    where_params: list[Any] = []
+    if selected_ids:
+        placeholders = ", ".join(["?"] * len(selected_ids))
+        where_clauses.append(f"card_id IN ({placeholders})")
+        where_params.extend(selected_ids)
+
+    base_where = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    list_clauses = list(where_clauses)
+    list_params = list(where_params)
+    if normalized_result == "correct":
+        list_clauses.append("is_correct = 1")
+    elif normalized_result == "wrong":
+        list_clauses.append("is_correct = 0")
+    elif normalized_result == "pending":
+        list_clauses.append("is_correct IS NULL")
+    list_where = f"WHERE {' AND '.join(list_clauses)}" if list_clauses else ""
+
+    with closing(connect_progress_db(db_path)) as conn:
+        summary_row = conn.execute(
+            f"""
+            SELECT
+                COUNT(*) AS total_count,
+                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS correct_count,
+                SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS wrong_count,
+                SUM(CASE WHEN is_correct IS NULL THEN 1 ELSE 0 END) AS pending_count
+            FROM question_attempts
+            {base_where}
+            """,
+            tuple(where_params),
+        ).fetchone()
+        attempt_rows = conn.execute(
+            f"""
+            SELECT question_id, card_id, question_type, prompt, body, user_answer,
+                   selected_choice_index, is_correct, wrong_note, created_at, updated_at
+            FROM question_attempts
+            {list_where}
+            ORDER BY updated_at DESC, created_at DESC, question_id DESC
+            LIMIT ?
+            """,
+            tuple(list_params + [safe_limit]),
+        ).fetchall()
+
+    items: list[dict[str, Any]] = []
+    for row in attempt_rows:
+        item = question_attempt_row_to_dict(row) or {}
+        card = card_map.get(item.get("card_id", ""), {})
+        raw_result = item.get("is_correct")
+        item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
+        item["english"] = card.get("english") or ""
+        item["category"] = card.get("category") or ""
+        item["card_url"] = flashcard_card_url(item.get("card_id") or "")
+        item["result_key"] = "correct" if raw_result is True else "wrong" if raw_result is False else "pending"
+        item["result_label"] = "맞음" if raw_result is True else "틀림" if raw_result is False else "미채점"
+        items.append(item)
+
+    return {
+        "items": items,
+        "summary": {
+            "filter": normalized_result,
+            "total": int(summary_row["total_count"] or 0) if summary_row else 0,
+            "correct": int(summary_row["correct_count"] or 0) if summary_row else 0,
+            "wrong": int(summary_row["wrong_count"] or 0) if summary_row else 0,
+            "pending": int(summary_row["pending_count"] or 0) if summary_row else 0,
+            "selected_card_count": len(selected_ids) if selected_ids else len(rows),
+            "returned": len(items),
+        },
     }
 
 
@@ -1466,6 +1577,27 @@ def api_question_attempt(payload: QuestionAttemptRequest) -> dict[str, Any]:
         return save_question_attempt(payload, CSV_PATH, PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {payload.card_id}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.get("/api/questions/attempts")
+def api_question_attempts(request: Request) -> dict[str, Any]:
+    raw_limit = str(request.query_params.get("limit") or "200").strip()
+    try:
+        limit = int(raw_limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid limit: {raw_limit}") from exc
+    try:
+        return read_question_attempts(
+            CSV_PATH,
+            PROGRESS_DB_PATH,
+            card_ids=request.query_params.getlist("card_id"),
+            result=request.query_params.get("result", "all"),
+            limit=limit,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:

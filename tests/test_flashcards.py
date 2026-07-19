@@ -3,6 +3,7 @@ import csv
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 from unittest import mock
 
@@ -172,7 +173,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(summary['unknown'], 0)
             self.assertEqual(summary['unreviewed'], 0)
 
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 saved = conn.execute('SELECT known_status, review_count FROM card_progress WHERE card_id=?', ('CS-001',)).fetchone()
             self.assertEqual(saved, ('O', 1))
 
@@ -192,7 +193,7 @@ class FlashcardProgressTests(unittest.TestCase):
             raw = csv_status(csv_path)
             self.assertNotIn('bookmarked', raw)
 
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 saved = conn.execute('SELECT bookmarked, known_status, review_count FROM card_progress WHERE card_id=?', ('CS-001',)).fetchone()
             self.assertEqual(saved, (1, '', 0))
 
@@ -216,7 +217,7 @@ class FlashcardProgressTests(unittest.TestCase):
             raw = csv_status(csv_path)
             self.assertNotIn('memo', raw)
 
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 saved = conn.execute('SELECT memo, memo_updated_at FROM card_progress WHERE card_id=?', ('CS-001',)).fetchone()
             self.assertEqual(saved[0], '헷갈리는 개인 메모')
             self.assertTrue(saved[1])
@@ -271,12 +272,24 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['question_wrong_count'], 1)
             self.assertEqual(rows[0]['latest_wrong_note'], '정의와 용어를 혼동함')
 
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 saved = conn.execute(
                     'SELECT COUNT(*), SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) FROM question_attempts WHERE card_id=?',
                     ('CS-001',),
                 ).fetchone()
             self.assertEqual(saved, (2, 1))
+
+            history_all = flashcard_app.read_question_attempts(csv_path, db_path, card_ids=['CS-001'], result='all', limit=10)
+            self.assertEqual(history_all['summary']['total'], 2)
+            self.assertEqual(history_all['summary']['correct'], 1)
+            self.assertEqual(history_all['summary']['wrong'], 1)
+            self.assertEqual(history_all['items'][0]['card_id'], 'CS-001')
+
+            history_wrong = flashcard_app.read_question_attempts(csv_path, db_path, card_ids=['CS-001'], result='wrong', limit=10)
+            self.assertEqual(history_wrong['summary']['wrong'], 1)
+            self.assertEqual(len(history_wrong['items']), 1)
+            self.assertFalse(history_wrong['items'][0]['is_correct'])
+            self.assertEqual(history_wrong['items'][0]['wrong_note'], '정의와 용어를 혼동함')
 
     def test_mark_card_survives_csv_replacement(self):
         with tempfile.TemporaryDirectory() as td:
@@ -298,7 +311,7 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path)
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 conn.execute('''
                     CREATE TABLE card_progress (
                         card_id TEXT PRIMARY KEY,
@@ -315,7 +328,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['known_status'], 'X')
             self.assertEqual(rows[0]['bookmarked'], '0')
             self.assertEqual(rows[0]['memo'], '')
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 columns = {row[1] for row in conn.execute('PRAGMA table_info(card_progress)').fetchall()}
             self.assertIn('bookmarked', columns)
             self.assertIn('memo', columns)

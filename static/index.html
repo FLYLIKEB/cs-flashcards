@@ -189,6 +189,7 @@
             </label>
             <button id="generateQuestionsBtn" type="button">생성</button>
             <button id="openAiQuizSearchBtn" type="button" title="선택한 유형과 문제 수로 Google AI 검색 열기">AI 검색</button>
+            <button id="questionHistoryBtn" type="button" title="현재 필터 기준 문제 기록 보기">기록</button>
             <button id="closeQuestionModeBtn" type="button" aria-label="문제 풀이 닫기">닫기</button>
           </div>
         </div>
@@ -323,6 +324,25 @@
         <button id="bookmarkListCloseBtn" class="modal-close" type="button" aria-label="북마크 목록 닫기">×</button>
       </div>
       <div id="bookmarkListBody" class="memo-list-body bookmark-list-body"></div>
+    </div>
+  </div>
+
+  <div id="questionHistoryDialog" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="questionHistoryTitle" hidden>
+    <div class="modal-card question-history-modal">
+      <div class="modal-header">
+        <div>
+          <h2 id="questionHistoryTitle">문제 기록</h2>
+          <p id="questionHistorySummary" class="muted small">현재 필터 기준 문제 기록을 불러옵니다.</p>
+        </div>
+        <button id="questionHistoryCloseBtn" class="modal-close" type="button" aria-label="문제 기록 닫기">×</button>
+      </div>
+      <div class="question-history-filter-row" aria-label="문제 기록 필터">
+        <button type="button" data-question-history-filter="all">전체</button>
+        <button type="button" data-question-history-filter="correct">맞은 문제</button>
+        <button type="button" data-question-history-filter="wrong">틀린 문제</button>
+        <button type="button" data-question-history-filter="pending">미채점</button>
+      </div>
+      <div id="questionHistoryBody" class="question-history-body"></div>
     </div>
   </div>
 

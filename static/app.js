@@ -45,6 +45,12 @@ const state = {
   answerRevealed: false,
   selectedChoiceIndex: null,
   initialCardQueryApplied: false,
+  questionHistoryOpen: false,
+  questionHistoryLoading: false,
+  questionHistoryFilter: 'all',
+  questionHistoryItems: [],
+  questionHistorySummary: null,
+  questionHistoryError: '',
 };
 
 const $ = (id) => document.getElementById(id);
@@ -56,6 +62,7 @@ const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speak
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const AI_QUIZ_PROMPT_TYPE_ORDER = ['multiple_choice', 'short', 'subjective', 'essay'];
 const AI_QUIZ_TERM_LIMIT = 80;
+const QUESTION_HISTORY_FILTER_LABELS = {all: '전체', correct: '맞은 문제', wrong: '틀린 문제', pending: '미채점'};
 // Silent looping WAV: keeps an <audio> element "audible" while auto-listen is
 // active so mobile browsers treat the tab as playing media and don't freeze
 // its JS timers (which drive the speech queue) when the screen locks or the
@@ -1507,6 +1514,19 @@ function statusLabel(value) {
   return '–';
 }
 
+function buildMarkedCardState(card, status) {
+  const previous = {...(card || {})};
+  const optimistic = {...previous, known_status: status};
+  if (status) {
+    optimistic.last_reviewed = new Date().toISOString();
+    optimistic.review_count = String((Number.parseInt(previous.review_count || '0', 10) || 0) + 1);
+  } else {
+    optimistic.last_reviewed = '';
+  }
+  return optimistic;
+}
+
+
 function setMessage(text, isError = false) {
   const el = $('message');
   el.textContent = text;
@@ -2129,6 +2149,153 @@ function closeBookmarkList() {
   if (dialog) dialog.hidden = true;
 }
 
+function formatQuestionAttemptUpdatedAt(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString('ko-KR', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'});
+}
+
+function questionHistoryCardIds() {
+  if (state.cards.length && !state.filtered.length) return [];
+  const pool = state.filtered.length ? state.filtered : state.cards;
+  return [...new Set(pool.map((card) => String(card?.id || '').trim()).filter(Boolean))];
+}
+
+function questionHistoryRequestUrl() {
+  const params = new URLSearchParams({
+    result: state.questionHistoryFilter || 'all',
+    limit: '200',
+  });
+  questionHistoryCardIds().forEach((cardId) => params.append('card_id', cardId));
+  return `/api/questions/attempts?${params.toString()}`;
+}
+
+function renderQuestionHistoryDialog() {
+  const summaryEl = $('questionHistorySummary');
+  const body = $('questionHistoryBody');
+  document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
+    button.classList.toggle('active', button.dataset.questionHistoryFilter === state.questionHistoryFilter);
+  });
+  if (summaryEl) {
+    if (state.questionHistoryLoading) {
+      summaryEl.textContent = '현재 필터 기준 문제 기록을 불러오는 중입니다.';
+    } else if (state.questionHistoryError) {
+      summaryEl.textContent = `문제 기록 로딩 실패: ${state.questionHistoryError}`;
+    } else {
+      const summary = state.questionHistorySummary || {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, wrong: 0, pending: 0};
+      summaryEl.textContent = `현재 필터 카드 ${summary.selected_card_count || 0}개 · 전체 ${summary.total || 0} · 맞음 ${summary.correct || 0} · 틀림 ${summary.wrong || 0} · 미채점 ${summary.pending || 0}`;
+    }
+  }
+  if (!body) return;
+  if (state.questionHistoryLoading) {
+    body.innerHTML = '<p class="muted empty-list">문제 기록을 불러오는 중입니다...</p>';
+    return;
+  }
+  if (state.questionHistoryError) {
+    body.innerHTML = `<p class="error-text empty-list">문제 기록을 불러오지 못했습니다. ${escapeHtml(state.questionHistoryError)}</p>`;
+    return;
+  }
+  const items = Array.isArray(state.questionHistoryItems) ? state.questionHistoryItems : [];
+  if (!items.length) {
+    body.innerHTML = '<p class="muted empty-list">선택한 조건에 해당하는 문제 기록이 없습니다.</p>';
+    return;
+  }
+  body.innerHTML = items.map((item) => {
+    const title = escapeHtml(item.term || item.card_id || '카드');
+    const typeLabel = escapeHtml(QUESTION_TYPE_LABELS[item.question_type] || item.question_type || '문제');
+    const category = escapeHtml(item.category || '미분류');
+    const resultLabel = escapeHtml(item.result_label || QUESTION_HISTORY_FILTER_LABELS[item.result_key] || '기록');
+    const updatedAt = formatQuestionAttemptUpdatedAt(item.updated_at);
+    const answerText = escapeHtml(item.user_answer || '미입력');
+    const wrongNote = String(item.wrong_note || '').trim();
+    return `
+      <article class="question-history-item">
+        <div class="question-history-item-head">
+          <div>
+            <strong>${title}</strong>
+            <p class="question-history-item-meta">${category} · ${typeLabel}${updatedAt ? ` · ${escapeHtml(updatedAt)}` : ''}</p>
+          </div>
+          <span class="question-history-result ${escapeHtml(item.result_key || 'pending')}">${resultLabel}</span>
+        </div>
+        <p class="question-history-item-prompt">${escapeHtml(item.prompt || '')}</p>
+        <p class="question-history-item-body">${escapeHtml(item.body || '')}</p>
+        <p class="question-history-item-answer"><strong>내 답:</strong> ${answerText}</p>
+        ${wrongNote ? `<p class="question-history-item-note"><strong>오답노트:</strong> ${escapeHtml(wrongNote)}</p>` : ''}
+        <div class="question-history-item-actions">
+          <button class="question-history-open-card" type="button" data-question-history-card-id="${escapeHtml(item.card_id || '')}">원본 카드 보기</button>
+        </div>
+      </article>`;
+  }).join('');
+}
+
+async function loadQuestionHistory() {
+  if (state.questionHistoryLoading) return;
+  state.questionHistoryLoading = true;
+  state.questionHistoryError = '';
+  renderQuestionHistoryDialog();
+  const cardIds = questionHistoryCardIds();
+  if (state.cards.length && !cardIds.length) {
+    state.questionHistoryItems = [];
+    state.questionHistorySummary = {selected_card_count: 0, total: 0, correct: 0, wrong: 0, pending: 0, returned: 0, filter: state.questionHistoryFilter || 'all'};
+    state.questionHistoryLoading = false;
+    renderQuestionHistoryDialog();
+    return;
+  }
+  try {
+    const res = await fetch(questionHistoryRequestUrl());
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    state.questionHistoryItems = Array.isArray(data.items) ? data.items : [];
+    state.questionHistorySummary = data.summary || null;
+  } catch (error) {
+    state.questionHistoryItems = [];
+    state.questionHistorySummary = null;
+    state.questionHistoryError = error.message || String(error);
+  } finally {
+    state.questionHistoryLoading = false;
+    renderQuestionHistoryDialog();
+  }
+}
+
+function openQuestionHistory() {
+  toggleMenu(false);
+  state.questionHistoryOpen = true;
+  const dialog = $('questionHistoryDialog');
+  if (dialog) dialog.hidden = false;
+  renderQuestionHistoryDialog();
+  loadQuestionHistory();
+}
+
+function closeQuestionHistory() {
+  state.questionHistoryOpen = false;
+  const dialog = $('questionHistoryDialog');
+  if (dialog) dialog.hidden = true;
+}
+
+function setQuestionHistoryFilter(filter) {
+  const normalized = String(filter || '').trim().toLowerCase();
+  if (!QUESTION_HISTORY_FILTER_LABELS[normalized]) return;
+  state.questionHistoryFilter = normalized;
+  renderQuestionHistoryDialog();
+  if (state.questionHistoryOpen) loadQuestionHistory();
+}
+
+function jumpToQuestionHistoryCard(cardId) {
+  const card = state.cards.find((item) => item.id === cardId);
+  if (!card) {
+    setMessage('원본 카드를 찾지 못했습니다.', true);
+    return;
+  }
+  closeQuestionHistory();
+  toggleQuestionMode(false);
+  if (jumpToCard(card)) {
+    state.flipped = true;
+    renderCard();
+    setMessage(`${card.term} 카드로 이동했습니다.`);
+  }
+}
+
 function jumpToMemoCard(cardId) {
   const card = state.cards.find((item) => item.id === cardId);
   if (!card) return;
@@ -2215,6 +2382,7 @@ function currentQuestion() {
   return state.questions[state.questionIndex] || null;
 }
 
+
 function hydrateQuestionState(question) {
   if (!question) return null;
   if (typeof question.userAnswer !== 'string') question.userAnswer = '';
@@ -2256,7 +2424,7 @@ function syncUpdatedCard(card) {
   if (allIndex >= 0) state.cards[allIndex] = card;
   const filteredIndex = state.filtered.findIndex((item) => item.id === card.id);
   if (filteredIndex >= 0) state.filtered[filteredIndex] = card;
-  if (!state.questionMode && state.renderedCardId === card.id) renderCard();
+  if (state.renderedCardId === card.id) renderCard();
 }
 
 async function saveQuestionAttempt(question) {
@@ -2287,6 +2455,7 @@ async function saveQuestionAttempt(question) {
     current.wrongNote = String(data.attempt?.wrong_note || current.wrongNote || '');
     if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
     syncUpdatedCard(data.card);
+    if (state.questionHistoryOpen) loadQuestionHistory();
     setMessage(questionResultText(current) || '문제 채점 저장 완료');
   } catch (error) {
     setMessage(`문제 채점 저장 실패: ${error.message || error}`, true);
@@ -2318,7 +2487,7 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -2335,7 +2504,7 @@ function renderQuestionPanel() {
   updateRandomButtons();
   updateQuestionPracticeButton();
   if (!state.questionMode) return;
-  setQuestionControlsDisabled(state.questionLoading || state.questionSaving);
+  setQuestionControlsDisabled(state.questionLoading || state.questionSaving || state.markSaving);
   const total = state.questions.length;
   const question = hydrateQuestionState(currentQuestion());
   if (question) {
@@ -2351,9 +2520,11 @@ function renderQuestionPanel() {
       ? '문제 생성 중...'
       : state.questionSaving
         ? '채점 저장 중...'
-        : total
-          ? `${state.questionIndex + 1} / ${total} · 현재 필터 카드 ${filterCount}개 기준`
-          : `현재 필터 카드 ${filterCount}개 기준 · 생성 버튼을 누르세요.`;
+        : state.markSaving
+          ? '카드 상태 저장 중...'
+          : total
+            ? `${state.questionIndex + 1} / ${total} · 현재 필터 카드 ${filterCount}개 기준`
+            : `현재 필터 카드 ${filterCount}개 기준 · 생성 버튼을 누르세요.`;
   }
   if (!card) return;
   if (state.questionLoading) {
@@ -2371,13 +2542,13 @@ function renderQuestionPanel() {
       ${choices.map((choice, index) => {
         const isAnswer = question.answerRevealed && index === question.answer_index;
         const isSelected = index === question.selectedChoiceIndex;
-        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving ? 'disabled' : ''}>${escapeHtml(choice)}</button></li>`;
+        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(choice)}</button></li>`;
       }).join('')}
     </ol>` : '';
   const draftHtml = questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft">
       <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
-      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="여기에 답안을 적고 정답/해설을 본 뒤 스스로 채점하세요." ${state.questionSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
+      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="여기에 답안을 적고 정답/해설을 본 뒤 스스로 채점하세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
     </div>` : '';
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
     <div class="question-rubric">
@@ -2390,17 +2561,17 @@ function renderQuestionPanel() {
     <div class="question-grade-row">
       <strong>자가 채점</strong>
       <div class="question-grade-actions">
-        <button class="question-grade-button${question.gradedCorrect === true ? ' active correct' : ''}" type="button" data-question-grade="correct" ${state.questionSaving ? 'disabled' : ''}>맞음 저장</button>
-        <button class="question-grade-button${question.gradedCorrect === false ? ' active wrong' : ''}" type="button" data-question-grade="wrong" ${state.questionSaving ? 'disabled' : ''}>틀림 저장</button>
+        <button class="question-grade-button${question.gradedCorrect === true ? ' active correct' : ''}" type="button" data-question-grade="correct" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>맞음 저장</button>
+        <button class="question-grade-button${question.gradedCorrect === false ? ' active wrong' : ''}" type="button" data-question-grade="wrong" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>틀림 저장</button>
       </div>
       ${resultHtml}
     </div>` : resultHtml;
   const wrongNoteHtml = question.answerRevealed && question.gradedCorrect === false ? `
     <div class="question-wrong-note-box">
       <label class="question-answer-label" for="questionWrongNoteInput">오답노트</label>
-      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${state.questionSaving ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
+      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
       <div class="question-wrong-note-actions">
-        <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${state.questionSaving ? 'disabled' : ''}>오답노트 저장</button>
+        <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>오답노트 저장</button>
       </div>
     </div>` : '';
   const answer = question.answerRevealed ? `
@@ -2424,10 +2595,10 @@ function renderQuestionPanel() {
     ${choiceHtml}
     ${answer}
   `;
-  $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.questionIndex <= 0;
-  $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.questionIndex >= total - 1;
-  $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || !question;
-  $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || !question;
+  $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex <= 0;
+  $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex >= total - 1;
+  $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question;
+  $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question;
 }
 
 async function generateQuestionsFromCurrentFilter() {
@@ -2472,6 +2643,7 @@ async function generateQuestionsFromCurrentFilter() {
 function toggleQuestionMode(force = !state.questionMode) {
   const nextMode = Boolean(force);
   if (nextMode && state.audioPlaying) stopAudioPlayback('문제 풀이 모드로 전환해 자동 듣기를 정지했습니다.');
+  if (!nextMode) closeQuestionHistory();
   state.questionMode = nextMode;
   renderQuestionPanel();
   setMessage(state.questionMode ? '문제 풀이를 열었습니다. 생성 버튼으로 문제를 만드세요.' : '문제 풀이를 닫았습니다.');
@@ -2586,6 +2758,7 @@ function applyFilters(keepCurrentId = null) {
     state.questionSaving = false;
     renderQuestionPanel();
   }
+  if (state.questionHistoryOpen) loadQuestionHistory();
   updateAudioEstimate();
 }
 
@@ -2747,21 +2920,12 @@ function randomCard() {
 async function mark(status) {
   if (!state.filtered.length || state.markSaving) return;
   const current = state.filtered[state.index];
-  const idx = state.cards.findIndex((c) => c.id === current.id);
-  const previous = idx >= 0 ? {...state.cards[idx]} : {...current};
-  const optimistic = {...previous, known_status: status};
-  if (status) {
-    optimistic.last_reviewed = new Date().toISOString();
-    optimistic.review_count = String((Number.parseInt(previous.review_count || '0', 10) || 0) + 1);
-  } else {
-    optimistic.last_reviewed = '';
-  }
+  const previous = {...current};
+  const optimistic = buildMarkedCardState(previous, status);
 
   state.markSaving = true;
   setMarkButtonsDisabled(true);
-  if (idx >= 0) state.cards[idx] = optimistic;
-  const filteredIdx = state.filtered.findIndex((c) => c.id === current.id);
-  if (filteredIdx >= 0) state.filtered[filteredIdx] = optimistic;
+  syncUpdatedCard(optimistic);
   applyFilters(current.id);
   advanceAfterMark(current.id);
   playMarkSound(status);
@@ -2775,15 +2939,13 @@ async function mark(status) {
     });
     if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
-    const savedIdx = state.cards.findIndex((c) => c.id === current.id);
-    if (savedIdx >= 0) state.cards[savedIdx] = data.card;
     state.summary = data.summary;
+    syncUpdatedCard(data.card);
     applyFilters(data.card.id);
     advanceAfterMark(data.card.id);
     setMessage(`${data.card.term}: ${statusLabel(status)} 저장 완료`);
   } catch (error) {
-    const restoreIdx = state.cards.findIndex((c) => c.id === current.id);
-    if (restoreIdx >= 0) state.cards[restoreIdx] = previous;
+    syncUpdatedCard(previous);
     applyFilters(current.id);
     setMessage(`저장 실패: ${error.message || error}`, true);
   } finally {
@@ -2841,6 +3003,7 @@ $('conceptBackBtn')?.addEventListener('click', (event) => {
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
 $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
 $('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);
+$('questionHistoryBtn')?.addEventListener('click', openQuestionHistory);
 $('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(false));
 $('prevQuestionBtn')?.addEventListener('click', () => moveQuestion(-1));
 $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
@@ -2861,6 +3024,7 @@ $('questionCard')?.addEventListener('click', (event) => {
     saveCurrentWrongNote();
   }
 });
+
 $('questionCard')?.addEventListener('input', (event) => {
   const question = hydrateQuestionState(currentQuestion());
   if (!question) return;
@@ -2896,11 +3060,15 @@ $('bookmarkFilterBtn').addEventListener('click', toggleBookmarkFilter);
 $('questionPracticeBtn')?.addEventListener('click', openQuestionPracticeFromMenu);
 $('memoListCloseBtn').addEventListener('click', closeMemoList);
 $('bookmarkListCloseBtn').addEventListener('click', closeBookmarkList);
+$('questionHistoryCloseBtn')?.addEventListener('click', closeQuestionHistory);
 $('memoListDialog').addEventListener('click', (event) => {
   if (event.target === $('memoListDialog')) closeMemoList();
 });
 $('bookmarkListDialog').addEventListener('click', (event) => {
   if (event.target === $('bookmarkListDialog')) closeBookmarkList();
+});
+$('questionHistoryDialog')?.addEventListener('click', (event) => {
+  if (event.target === $('questionHistoryDialog')) closeQuestionHistory();
 });
 $('memoListBody').addEventListener('click', (event) => {
   const item = event.target.closest('[data-card-id]');
@@ -2910,8 +3078,15 @@ $('bookmarkListBody').addEventListener('click', (event) => {
   const item = event.target.closest('[data-card-id]');
   if (item) jumpToBookmarkCard(item.dataset.cardId);
 });
+$('questionHistoryBody')?.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-question-history-card-id]');
+  if (trigger) jumpToQuestionHistoryCard(trigger.dataset.questionHistoryCardId);
+});
 document.addEventListener('click', (event) => {
   if (state.menuOpen && !event.target.closest('.header-actions')) toggleMenu(false);
+});
+document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
+  button.addEventListener('click', () => setQuestionHistoryFilter(button.dataset.questionHistoryFilter));
 });
 $('audioPresetSaveBtn')?.addEventListener('click', saveCurrentAudioPreset);
 $('audioPresetNameInput')?.addEventListener('keydown', (event) => {
@@ -2998,21 +3173,21 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
-  const key = e.key.toLowerCase();
-  if (state.questionMode) {
-    if (e.key === 'ArrowLeft') { e.preventDefault(); moveQuestion(-1); return; }
-    if (e.key === 'ArrowRight') { e.preventDefault(); moveQuestion(1); return; }
-    if (e.key === ' ') { e.preventDefault(); revealQuestionAnswer(); return; }
-    if (key === 'q') { e.preventDefault(); toggleQuestionMode(false); return; }
-  }
-  if (e.key === ' ') { e.preventDefault(); state.flipped = !state.flipped; if (state.flipped) state.backPage = 0; renderCard(); }
-  else if (state.flipped && e.key === 'ArrowUp') { e.preventDefault(); setBackPage(state.backPage - 1); }
-  else if (state.flipped && e.key === 'ArrowDown') { e.preventDefault(); setBackPage(state.backPage + 1); }
-  else if (e.key === 'ArrowLeft') move(-1);
-  else if (e.key === 'ArrowRight') move(1);
-  else if (key === 'o' || e.key === '.') mark('O');
-  else if (key === 'x') { e.preventDefault(); mark('X'); }
-  else if (key === 'r') toggleRandomMode();
+const key = e.key.toLowerCase();
+if (state.questionMode) {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); moveQuestion(-1); return; }
+  if (e.key === 'ArrowRight') { e.preventDefault(); moveQuestion(1); return; }
+  if (e.key === ' ') { e.preventDefault(); revealQuestionAnswer(); return; }
+  if (key === 'q') { e.preventDefault(); toggleQuestionMode(false); return; }
+}
+if (e.key === ' ') { e.preventDefault(); state.flipped = !state.flipped; if (state.flipped) state.backPage = 0; renderCard(); }
+else if (state.flipped && e.key === 'ArrowUp') { e.preventDefault(); setBackPage(state.backPage - 1); }
+else if (state.flipped && e.key === 'ArrowDown') { e.preventDefault(); setBackPage(state.backPage + 1); }
+else if (e.key === 'ArrowLeft') move(-1);
+else if (e.key === 'ArrowRight') move(1);
+else if (key === 'o' || e.key === '.') mark('O');
+else if (key === 'x') { e.preventDefault(); mark('X'); }
+else if (key === 'r') toggleRandomMode();
   else if (e.key === 'Enter') { e.preventDefault(); state.audioPlaying ? stopAudioPlayback() : startAudioPlayback(); }
   else if (key === 'f' || e.key === '/') { e.preventDefault(); focusSearchInput(); }
   else if (key === 'g') { e.preventDefault(); openCurrentGoogleSearch(e); }

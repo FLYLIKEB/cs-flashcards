@@ -3985,6 +3985,117 @@ select,
   border-color: var(--line-strong);
   box-shadow: 0 10px 24px rgba(29, 25, 20, .07);
 }
+.question-history-modal {
+  width: min(860px, 96vw);
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.question-history-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  padding: 0 1.1rem .9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.question-history-filter-row button {
+  color: var(--text);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: .46rem .74rem;
+}
+
+.question-history-filter-row button.active {
+  border-color: rgba(31, 58, 95, .28);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.question-history-body {
+  overflow: auto;
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.question-history-item + .question-history-item {
+  margin-top: .78rem;
+}
+
+.question-history-item {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff, #fbfaf7);
+  padding: .9rem .95rem;
+}
+
+.question-history-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: .8rem;
+  align-items: flex-start;
+}
+
+.question-history-item-head strong {
+  color: var(--text);
+}
+
+.question-history-item-meta,
+.question-history-item-body,
+.question-history-item-answer,
+.question-history-item-note {
+  margin: .34rem 0 0;
+  color: #44403c;
+  line-height: 1.6;
+}
+
+.question-history-item-prompt {
+  margin: .62rem 0 0;
+  color: #111827;
+  font-weight: 700;
+}
+
+.question-history-result {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.6rem;
+  padding: .34rem .56rem;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 700;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.question-history-result.correct {
+  border-color: rgba(23, 107, 77, .18);
+  background: var(--known-soft);
+  color: var(--known);
+}
+
+.question-history-result.wrong {
+  border-color: rgba(159, 47, 63, .18);
+  background: var(--unknown-soft);
+  color: var(--unknown);
+}
+
+.question-history-result.pending {
+  color: var(--muted);
+}
+
+.question-history-item-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: .7rem;
+}
+
+.question-history-open-card {
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: .52rem .74rem;
+}
 .question-type-row {
   display: flex;
   flex-wrap: wrap;

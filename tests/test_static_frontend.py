@@ -226,6 +226,7 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionTypeEssay"',
             'id="generateQuestionsBtn"',
             'id="openAiQuizSearchBtn"',
+            'id="questionHistoryBtn"',
             'id="revealAnswerBtn"',
             'id="openQuestionCardBtn"',
         ]:
@@ -252,8 +253,18 @@ class StaticFrontendTests(unittest.TestCase):
             'question-answer-input',
             'question-wrong-note',
             'new URLSearchParams(window.location.search)',
+            '/api/questions/attempts',
+            'function openQuestionHistory()',
+            'function loadQuestionHistory()',
+            'function setQuestionHistoryFilter(filter)',
+            'questionHistoryBtn',
+            'data-question-history-filter',
         ]:
             self.assertIn(snippet, APP_JS)
+        self.assertIn('id="questionHistoryDialog"', INDEX_HTML)
+        self.assertIn('id="questionHistoryBody"', INDEX_HTML)
+        self.assertIn('.question-history-filter-row', STYLE_CSS)
+        self.assertIn('.question-history-item', STYLE_CSS)
 
 
 if __name__ == '__main__':
