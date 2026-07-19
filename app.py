@@ -1877,4 +1877,6 @@ def health() -> dict[str, Any]:
         "wiki_github_repo": WIKI_GITHUB_REPO,
         "wiki_github_branch": WIKI_GITHUB_BRANCH,
         "wiki_github_path_prefix": WIKI_GITHUB_PATH_PREFIX,
+        "ai_rewrite_enabled": bool(OPENAI_API_KEY),
+        "codex_model": CODEX_MODEL,
     }

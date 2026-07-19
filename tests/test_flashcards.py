@@ -522,6 +522,19 @@ class FlashcardProgressTests(unittest.TestCase):
             flashcard_app.PUBLIC_USERNAME = original_user
             flashcard_app.PUBLIC_PASSWORD = original_password
 
+    def test_health_reports_ai_rewrite_config(self):
+        original_key = flashcard_app.OPENAI_API_KEY
+        original_model = flashcard_app.CODEX_MODEL
+        try:
+            flashcard_app.OPENAI_API_KEY = 'test-key'
+            flashcard_app.CODEX_MODEL = 'codex-test'
+            payload = flashcard_app.health()
+            self.assertTrue(payload['ai_rewrite_enabled'])
+            self.assertEqual(payload['codex_model'], 'codex-test')
+        finally:
+            flashcard_app.OPENAI_API_KEY = original_key
+            flashcard_app.CODEX_MODEL = original_model
+
 
 
 

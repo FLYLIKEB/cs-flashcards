@@ -39,6 +39,7 @@ jobs:
           CS_FLASHCARDS_WIKI_GITHUB_REPO: FLYLIKEB/finance-public-corp-prep-materials
           CS_FLASHCARDS_WIKI_GITHUB_BRANCH: main
           CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES: 5
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set -euo pipefail
           ./scripts/deploy_lightsail_flashcards.sh

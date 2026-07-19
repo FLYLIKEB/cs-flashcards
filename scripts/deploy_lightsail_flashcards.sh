@@ -23,6 +23,8 @@ WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
 WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-}"
 WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
 WIKI_SYNC_INTERVAL_MINUTES="${CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES:-5}"
+OPENAI_API_KEY_VALUE="${OPENAI_API_KEY:-${CS_FLASHCARDS_OPENAI_API_KEY:-}}"
+
 if ! [[ "$WIKI_SYNC_INTERVAL_MINUTES" =~ ^[1-9][0-9]*$ ]]; then
   echo "CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES 는 1 이상의 정수여야 합니다: $WIKI_SYNC_INTERVAL_MINUTES" >&2
   exit 1
@@ -127,8 +129,12 @@ rm -rf "$TMP_STAGE"
 "${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards.tar.gz"
 rm -f "$TMP_ARCHIVE"
 WIKI_GITHUB_PATH_PREFIX_ARG="${WIKI_GITHUB_PATH_PREFIX:-__EMPTY__}"
+WIKI_GITHUB_TOKEN_ARG="${WIKI_GITHUB_TOKEN:-__EMPTY__}"
 
-"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$WIKI_SYNC_INTERVAL_MINUTES" <<'REMOTE'
+OPENAI_API_KEY_ARG="${OPENAI_API_KEY_VALUE:-__EMPTY__}"
+
+
+"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN_ARG" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$WIKI_SYNC_INTERVAL_MINUTES" "$OPENAI_API_KEY_ARG" <<'REMOTE'
 set -euo pipefail
 REMOTE_DIR="$1"
 REMOTE_PORT="$2"
@@ -141,9 +147,17 @@ WIKI_GITHUB_BRANCH="${8-}"
 WIKI_GITHUB_TOKEN="${9-}"
 WIKI_GITHUB_PATH_PREFIX="${10-}"
 WIKI_SYNC_INTERVAL_MINUTES="${11-5}"
+OPENAI_API_KEY_VALUE="${12-}"
+if [[ "$WIKI_GITHUB_TOKEN" == "__EMPTY__" ]]; then
+  WIKI_GITHUB_TOKEN=""
+fi
 if [[ "$WIKI_GITHUB_PATH_PREFIX" == "__EMPTY__" ]]; then
   WIKI_GITHUB_PATH_PREFIX=""
 fi
+if [[ "$OPENAI_API_KEY_VALUE" == "__EMPTY__" ]]; then
+  OPENAI_API_KEY_VALUE=""
+fi
+
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
@@ -247,6 +261,7 @@ Environment=CS_FLASHCARDS_WIKI_GITHUB_REPO=$WIKI_GITHUB_REPO
 Environment=CS_FLASHCARDS_WIKI_GITHUB_BRANCH=$WIKI_GITHUB_BRANCH
 Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=$WIKI_GITHUB_TOKEN
 Environment=CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX=$WIKI_GITHUB_PATH_PREFIX
+Environment=OPENAI_API_KEY=$OPENAI_API_KEY_VALUE
 ExecStart=$REMOTE_DIR/.venv/bin/uvicorn app:app --host 127.0.0.1 --port $REMOTE_PORT
 Restart=always
 RestartSec=3
@@ -350,16 +365,19 @@ else
 fi
 
 sudo systemctl daemon-reload
-if [[ -n "$WIKI_GITHUB_REPO" ]]; then
-  sudo systemctl enable cs-flashcards-wiki-sync.timer >/dev/null
-  sudo systemctl start cs-flashcards-wiki-sync.service
-  sudo systemctl restart cs-flashcards-wiki-sync.timer
-  sudo systemctl --no-pager --full status cs-flashcards-wiki-sync.timer | sed -n '1,12p'
-fi
 sudo systemctl enable cs-flashcards >/dev/null
 sudo systemctl restart cs-flashcards
 sleep 1
 sudo systemctl --no-pager --full status cs-flashcards | sed -n '1,18p'
+if [[ -n "$WIKI_GITHUB_REPO" ]]; then
+  sudo systemctl enable cs-flashcards-wiki-sync.timer >/dev/null
+  if ! sudo systemctl start cs-flashcards-wiki-sync.service; then
+    echo "경고: 위키 동기화 서비스 시작 실패. 앱 배포는 계속 진행합니다." >&2
+    sudo systemctl --no-pager --full status cs-flashcards-wiki-sync.service | sed -n '1,18p' || true
+  fi
+  sudo systemctl restart cs-flashcards-wiki-sync.timer
+  sudo systemctl --no-pager --full status cs-flashcards-wiki-sync.timer | sed -n '1,12p'
+fi
 
 write_nginx_http() {
   sudo tee /etc/nginx/sites-available/cs-flashcards >/dev/null <<EOF
