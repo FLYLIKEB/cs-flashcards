@@ -4107,6 +4107,9 @@ select,
   body.filters-collapsed .flashcard {
     height: clamp(340px, calc(100svh - 13.9rem), 640px) !important;
     min-height: clamp(340px, calc(100svh - 13.9rem), 640px) !important;
+  }
+}
+
 .header-link {
   display: inline-flex;
   align-items: center;
