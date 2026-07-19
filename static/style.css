@@ -3558,10 +3558,11 @@ select,
   min-height: 8.4rem;
   display: grid;
   place-items: center;
-  color: rgba(71, 85, 105, .82);
-  font-size: .8rem;
-  letter-spacing: -.02em;
+  color: var(--muted);
+  font-size: .82rem;
+  letter-spacing: .01em;
 }
+.concept-image-placeholder[hidden] { display: none !important; }
 @media (max-width: 720px) {
   .concept-image-wrap { margin: .42rem 0 .55rem; }
   .concept-image { max-height: 180px; }
