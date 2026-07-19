@@ -1,7 +1,10 @@
+const WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1';
+
 const wikiState = {
   index: null,
   currentSlug: '',
   query: '',
+  sidebarOpen: true,
 };
 
 const wiki$ = (id) => document.getElementById(id);
@@ -22,6 +25,52 @@ function wikiCurrentSlug() {
     return decodeURIComponent(window.location.pathname.slice(prefix.length)).replace(/^\/+|\/+$/g, '');
   }
   return '';
+}
+
+function wikiDefaultSidebarOpen() {
+  return window.matchMedia('(min-width: 981px)').matches;
+}
+
+function readSavedWikiSidebarState() {
+  try {
+    const saved = window.localStorage.getItem(WIKI_SIDEBAR_STATE_KEY);
+    if (saved === 'open') return true;
+    if (saved === 'closed') return false;
+  } catch (_error) {
+    // Ignore storage failures and fall back to viewport default.
+  }
+  return wikiDefaultSidebarOpen();
+}
+
+function saveWikiSidebarState() {
+  try {
+    window.localStorage.setItem(WIKI_SIDEBAR_STATE_KEY, wikiState.sidebarOpen ? 'open' : 'closed');
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+}
+
+function applyWikiSidebarState({persist = true} = {}) {
+  document.body.classList.toggle('wiki-sidebar-collapsed', !wikiState.sidebarOpen);
+  wiki$('wikiSidebar')?.setAttribute('aria-hidden', String(!wikiState.sidebarOpen));
+  const toggleBtn = wiki$('wikiSidebarToggleBtn');
+  if (toggleBtn) {
+    toggleBtn.textContent = wikiState.sidebarOpen ? '목차 닫기' : '목차 열기';
+    toggleBtn.setAttribute('aria-expanded', String(wikiState.sidebarOpen));
+    toggleBtn.setAttribute('title', wikiState.sidebarOpen ? '목차 닫기' : '목차 열기');
+  }
+  if (persist) saveWikiSidebarState();
+}
+
+function toggleWikiSidebar(force = !wikiState.sidebarOpen) {
+  wikiState.sidebarOpen = Boolean(force);
+  applyWikiSidebarState();
+}
+
+function closeWikiSidebarOnMobile() {
+  if (!window.matchMedia('(max-width: 980px)').matches) return;
+  if (!wikiState.sidebarOpen) return;
+  toggleWikiSidebar(false);
 }
 
 function wikiStatus(text, isError = false) {
@@ -94,6 +143,8 @@ async function wikiLoadPage(slug, {push = false} = {}) {
 }
 
 async function wikiInit() {
+  wikiState.sidebarOpen = readSavedWikiSidebarState();
+  applyWikiSidebarState({persist: false});
   try {
     wikiState.index = await wikiFetchJson('/api/wiki/index');
     wiki$('wikiBookTitle').textContent = wikiState.index.book?.title || 'CS 학습 위키';
@@ -111,6 +162,8 @@ wiki$('wikiSearchInput')?.addEventListener('input', (event) => {
   wikiRenderToc();
 });
 
+wiki$('wikiSidebarToggleBtn')?.addEventListener('click', () => toggleWikiSidebar());
+
 window.addEventListener('popstate', () => {
   if (!wikiState.index) return;
   wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || '_book').catch((error) => {
@@ -125,7 +178,9 @@ document.addEventListener('click', (event) => {
   if (!href.startsWith('/wiki/page/')) return;
   event.preventDefault();
   const slug = decodeURIComponent(href.replace('/wiki/page/', '')).replace(/^\/+|\/+$/g, '');
-  wikiLoadPage(slug, {push: true}).catch((error) => {
+  wikiLoadPage(slug, {push: true}).then(() => {
+    closeWikiSidebarOnMobile();
+  }).catch((error) => {
     wikiStatus(`문서 이동 실패: ${error.message || error}`, true);
   });
 });

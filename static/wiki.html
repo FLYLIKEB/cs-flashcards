@@ -23,14 +23,18 @@
       <input id="wikiSearchInput" type="search" placeholder="문서 제목 검색" />
     </div>
     <div class="header-actions">
+      <button id="wikiSidebarToggleBtn" class="header-link wiki-sidebar-toggle" type="button" aria-controls="wikiSidebar" aria-expanded="true">목차 닫기</button>
       <a class="header-link" href="/">플래시카드</a>
     </div>
   </header>
 
   <main class="wiki-shell">
-    <aside class="wiki-sidebar panel">
+    <aside id="wikiSidebar" class="wiki-sidebar panel">
       <div class="wiki-sidebar-head">
-        <a id="wikiBookIntroLink" class="header-link" href="/wiki/page/_book">책 소개</a>
+        <div class="wiki-sidebar-title-row">
+          <a id="wikiBookIntroLink" class="header-link" href="/wiki/page/_book">책 소개</a>
+          <span class="wiki-sidebar-caption small muted">목차</span>
+        </div>
         <p id="wikiStatus" class="small muted">목차를 불러오는 중...</p>
       </div>
       <nav id="wikiToc" class="wiki-toc" aria-label="위키 목차"></nav>

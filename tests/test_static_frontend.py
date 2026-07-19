@@ -78,16 +78,25 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
         self.assertIn('href="/wiki"', INDEX_HTML)
         self.assertIn('target="_blank"', INDEX_HTML)
+        menu_popover = INDEX_HTML.split('id="menuPopover"', 1)[1].split('</div>', 1)[0]
+        self.assertIn('id="wikiHomeLink"', menu_popover)
         self.assertIn('function renderSourceLinks(sourceFiles)', APP_JS)
         self.assertIn("$('sources').innerHTML = renderSourceLinks(c.source_files);", APP_JS)
         self.assertIn('/wiki/page/', APP_JS)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
+        self.assertIn('id="wikiSidebarToggleBtn"', WIKI_HTML)
+        self.assertIn('id="wikiSidebar"', WIKI_HTML)
         self.assertIn('id="wikiToc"', WIKI_HTML)
         self.assertIn('id="wikiArticle"', WIKI_HTML)
-        self.assertIn('function wikiRenderToc()', WIKI_JS)
-        self.assertIn('function wikiLoadPage(slug', WIKI_JS)
+        self.assertIn('WIKI_SIDEBAR_STATE_KEY', WIKI_JS)
+        self.assertIn('function applyWikiSidebarState(', WIKI_JS)
+        self.assertIn('function toggleWikiSidebar(', WIKI_JS)
+        self.assertIn('closeWikiSidebarOnMobile()', WIKI_JS)
         self.assertIn('.wiki-shell', STYLE_CSS)
-        self.assertIn('.wiki-toc-link', STYLE_CSS)
+        self.assertIn('.wiki-sidebar-toggle', STYLE_CSS)
+        self.assertIn('body.wiki-sidebar-collapsed .wiki-sidebar', STYLE_CSS)
+        self.assertIn('.wiki-table-wrap tbody tr:nth-child(even)', STYLE_CSS)
+        self.assertIn('.wiki-sidebar-title-row', STYLE_CSS)
     def test_audio_playback_repeat_and_term_language_controls_are_present(self):
         for snippet in [
             'id="termSpeechMode"',
