@@ -4328,7 +4328,7 @@ body.wiki-sidebar-collapsed .wiki-shell {
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 6.7rem);
-  padding: 1rem 1.05rem;
+  padding: .74rem .72rem;
   overflow: hidden;
   scrollbar-gutter: stable;
 }
