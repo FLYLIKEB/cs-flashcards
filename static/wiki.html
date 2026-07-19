@@ -17,9 +17,12 @@
       <div class="wiki-brand">
         <h1 id="wikiBookTitle" class="wiki-book-title">불러오는 중...</h1>
       </div>
-      <a class="wiki-home-link" href="/">플래시카드</a>
+      <div class="wiki-topbar-controls">
+        <button id="wikiSearchToggleBtn" class="wiki-search-toggle" type="button" aria-controls="wikiSearch" aria-expanded="false" aria-label="검색 열기" title="검색">⌕</button>
+        <a class="wiki-home-link" href="/">플래시카드</a>
+      </div>
     </div>
-    <div class="wiki-search wiki-search-hidden" hidden aria-hidden="true">
+    <div id="wikiSearch" class="wiki-search" hidden aria-hidden="true">
       <input id="wikiSearchInput" type="search" placeholder="책/문서 제목 검색" tabindex="-1" />
     </div>
   </header>

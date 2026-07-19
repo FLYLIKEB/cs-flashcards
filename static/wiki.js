@@ -5,6 +5,7 @@ const wikiState = {
   currentSlug: '',
   query: '',
   sidebarOpen: true,
+  searchOpen: false,
   expandedToc: {},
 };
 
@@ -79,6 +80,40 @@ function closeWikiSidebarOnMobile() {
   if (!window.matchMedia('(max-width: 720px)').matches) return;
   if (!wikiState.sidebarOpen) return;
   toggleWikiSidebar(false);
+}
+
+function applyWikiSearchState({focus = false} = {}) {
+  const searchWrap = wiki$('wikiSearch');
+  const searchInput = wiki$('wikiSearchInput');
+  const toggleBtn = wiki$('wikiSearchToggleBtn');
+  if (searchWrap) {
+    searchWrap.hidden = !wikiState.searchOpen;
+    searchWrap.setAttribute('aria-hidden', String(!wikiState.searchOpen));
+  }
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-expanded', String(wikiState.searchOpen));
+    toggleBtn.setAttribute('aria-label', wikiState.searchOpen ? '검색 닫기' : '검색 열기');
+    toggleBtn.setAttribute('title', wikiState.searchOpen ? '검색 닫기' : '검색');
+  }
+  if (searchInput) {
+    searchInput.tabIndex = wikiState.searchOpen ? 0 : -1;
+    if (!wikiState.searchOpen) {
+      searchInput.blur();
+    } else if (focus) {
+      searchInput.focus({preventScroll: true});
+      searchInput.select();
+    }
+  }
+}
+
+function toggleWikiSearch(force = !wikiState.searchOpen, {focus = true} = {}) {
+  wikiState.searchOpen = Boolean(force);
+  applyWikiSearchState({focus: wikiState.searchOpen && focus});
+}
+
+function closeWikiSearch() {
+  if (!wikiState.searchOpen) return;
+  toggleWikiSearch(false, {focus: false});
 }
 
 function wikiStatus(text, isError = false) {
@@ -254,6 +289,7 @@ async function wikiToggleChecklist(checkbox) {
 async function wikiInit() {
   wikiState.sidebarOpen = readSavedWikiSidebarState();
   applyWikiSidebarState({persist: false});
+  applyWikiSearchState({focus: false});
   try {
     wikiState.index = await wikiFetchJson(wikiApiUrl('/api/wiki/index'));
     wiki$('wikiBookTitle').textContent = wikiState.index.book?.title || 'CS 학습 위키';
@@ -269,6 +305,17 @@ async function wikiInit() {
 wiki$('wikiSearchInput')?.addEventListener('input', (event) => {
   wikiState.query = event.target.value || '';
   wikiRenderToc();
+});
+
+wiki$('wikiSearchInput')?.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  event.preventDefault();
+  closeWikiSearch();
+  wiki$('wikiSearchToggleBtn')?.focus({preventScroll: true});
+});
+
+wiki$('wikiSearchToggleBtn')?.addEventListener('click', () => {
+  toggleWikiSearch();
 });
 
 wiki$('wikiToc')?.addEventListener('click', (event) => {
@@ -288,6 +335,8 @@ window.addEventListener('popstate', () => {
 });
 
 document.addEventListener('click', (event) => {
+  const insideSearch = event.target.closest('#wikiSearch, #wikiSearchToggleBtn');
+  if (!insideSearch) closeWikiSearch();
   const link = event.target.closest('a[data-wiki-nav="1"], .wiki-article a[href^="/wiki/page/"], #wikiBookIntroLink');
   if (!link) return;
   const href = link.getAttribute('href') || '';
@@ -296,6 +345,7 @@ document.addEventListener('click', (event) => {
   event.preventDefault();
   wikiLoadPage(slug, {push: true}).then(() => {
     closeWikiSidebarOnMobile();
+    closeWikiSearch();
   }).catch((error) => {
     wikiStatus(`문서 이동 실패: ${error.message || error}`, true);
   });
