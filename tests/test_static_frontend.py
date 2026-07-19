@@ -114,7 +114,15 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('max-height: calc(100vh - 6.7rem)', STYLE_CSS)
         self.assertIn('overscroll-behavior: contain;', STYLE_CSS)
         self.assertIn('overflow: hidden;', STYLE_CSS)
+        self.assertIn('font-size: .84rem;', STYLE_CSS)
+        self.assertIn('margin-top: .24rem;', STYLE_CSS)
+        self.assertIn('padding-top: .24rem;', STYLE_CSS)
         self.assertIn('.wiki-toc-item.open > .wiki-toc-row .wiki-toc-toggle', STYLE_CSS)
+        self.assertIn('function wikiToggleChecklist(', WIKI_JS)
+        self.assertIn('/api/wiki/checklist', WIKI_JS)
+        self.assertIn('data-wiki-task-checkbox="1"', WIKI_JS)
+        self.assertIn('.wiki-task-list', STYLE_CSS)
+        self.assertIn('.wiki-task-item', STYLE_CSS)
     def test_audio_playback_repeat_and_term_language_controls_are_present(self):
         for snippet in [
             'id="termSpeechMode"',
