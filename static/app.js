@@ -1762,14 +1762,22 @@ function clearConceptImagePreview(cardId = null) {
   state.aiImagePreviewAlt = '';
 }
 
-function isDirectImageUrl(url) {
-  try {
-    const parsed = new window.URL(url, window.location.origin);
-    return /\.(avif|gif|jpe?g|png|svg|webp)$/i.test(parsed.pathname);
-  } catch (_error) {
-    return /\.(avif|gif|jpe?g|png|svg|webp)(\?.*)?$/i.test(url);
-  }
+function bindConceptImageLoadState() {
+  const image = $('backConceptImage');
+  const placeholder = $('backConceptImagePlaceholder');
+  if (!image || !placeholder || image.dataset.loadBound === '1') return;
+  image.dataset.loadBound = '1';
+  image.addEventListener('load', () => {
+    if (!image.dataset.expectedSrc) return;
+    image.hidden = false;
+    placeholder.hidden = true;
+  });
+  image.addEventListener('error', () => {
+    image.hidden = true;
+    placeholder.hidden = false;
+  });
 }
+
 
 function conceptImageAlt(card) {
   const explicit = String(card?.concept_image_alt || card?.image_alt || '').trim();
@@ -1788,7 +1796,7 @@ function conceptImageDisplayState(card) {
     previewActive,
     url,
     alt: previewActive ? (state.aiImagePreviewAlt || conceptImageAlt(card)) : conceptImageAlt(card),
-    hasImage: Boolean(url && isDirectImageUrl(url)),
+    hasImage: Boolean(url),
   };
 }
 
@@ -1880,11 +1888,14 @@ function renderConceptImage(card) {
   const saveBtn = $('conceptImageSaveBtn');
   const cancelBtn = $('conceptImageCancelBtn');
   if (!wrap || !image || !placeholder || !generateBtn || !saveBtn || !cancelBtn) return;
+  bindConceptImageLoadState();
 
   if (!card) {
     wrap.hidden = true;
     image.removeAttribute('src');
+    image.removeAttribute('title');
     image.alt = '';
+    image.dataset.expectedSrc = '';
     image.hidden = true;
     placeholder.hidden = true;
     generateBtn.disabled = true;
@@ -1898,17 +1909,26 @@ function renderConceptImage(card) {
   wrap.hidden = false;
   wrap.classList.toggle('preview-active', previewActive);
   wrap.classList.toggle('is-empty', !hasImage);
-  image.hidden = !hasImage;
-  placeholder.hidden = hasImage;
 
   if (hasImage) {
-    image.src = url;
+    image.dataset.expectedSrc = url;
     image.alt = alt;
     image.title = previewActive ? `${card.term} AI 이미지 미리보기` : `${googleSearchQuery(card)} 구글 AI 검색`;
+    image.hidden = false;
+    placeholder.hidden = true;
+    if (image.getAttribute('src') !== url) image.src = url;
+    if (image.complete) {
+      const loaded = image.naturalWidth > 0;
+      image.hidden = !loaded;
+      placeholder.hidden = loaded;
+    }
   } else {
     image.removeAttribute('src');
     image.removeAttribute('title');
     image.alt = '';
+    image.dataset.expectedSrc = '';
+    image.hidden = true;
+    placeholder.hidden = false;
   }
 
   generateBtn.disabled = busy;

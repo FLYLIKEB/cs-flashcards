@@ -94,6 +94,8 @@ class StaticFrontendTests(unittest.TestCase):
             '/ai-rewrite/apply',
             'AI 변환 중',
             'function conceptImagePreviewActive(card)',
+            'function bindConceptImageLoadState()',
+            "hasImage: Boolean(url)",
             'function previewConceptImage()',
             'function saveConceptImagePreview()',
             'async function discardConceptImagePreview()',
