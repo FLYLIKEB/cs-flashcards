@@ -97,14 +97,26 @@ class QuestionGeneratorTests(unittest.TestCase):
         self.assertEqual(question['choices'][question['answer_index']], question['answer'])
         self.assertEqual(len(set(question['choices'])), 4)
 
-    def test_generated_question_masks_answer_terms_in_prompt_and_body(self):
-        result = generate_questions(sample_cards(), card_ids=['CS-001'], types=['short', 'subjective', 'essay', 'multiple_choice'], count=4, seed=2)
+    def test_short_and_multiple_choice_mask_answer_terms_in_prompt_and_body(self):
+        result = generate_questions(sample_cards(), card_ids=['CS-001'], types=['short', 'multiple_choice'], count=2, seed=2)
         for question in result['questions']:
             self.assertNotIn('인수 테스트', question['prompt'])
             self.assertNotIn('인수 테스트', question['body'])
             self.assertNotIn('Acceptance Test', question['prompt'])
             self.assertNotIn('Acceptance Test', question['body'])
-        self.assertTrue(any('[?]' in question['prompt'] or '[?]' in question['body'] for question in result['questions']))
+            self.assertTrue('[?]' in question['prompt'] or '[?]' in question['body'])
+
+    def test_subjective_and_essay_keep_answer_terms_visible(self):
+        result = generate_questions(sample_cards(), card_ids=['CS-001'], types=['subjective', 'essay'], count=2, seed=2)
+        by_type = {question['type']: question for question in result['questions']}
+        self.assertIn('인수 테스트', by_type['subjective']['prompt'])
+        self.assertIn('인수 테스트', by_type['subjective']['body'])
+        self.assertIn('인수 테스트', by_type['essay']['prompt'])
+        self.assertIn('인수 테스트', by_type['essay']['body'])
+        self.assertNotIn('[?]', by_type['subjective']['prompt'])
+        self.assertNotIn('[?]', by_type['subjective']['body'])
+        self.assertNotIn('[?]', by_type['essay']['prompt'])
+        self.assertNotIn('[?]', by_type['essay']['body'])
 
     def test_multiple_choice_prefers_related_or_same_category_distractors(self):
         result = generate_questions(sample_cards(), card_ids=['CS-001'], types=['multiple_choice'], count=1, seed=3)

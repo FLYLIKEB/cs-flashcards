@@ -30,6 +30,8 @@ QUESTION_TYPE_LABELS: dict[QuestionType, str] = {
     "essay": "논술형",
 }
 
+MASKED_PROMPT_TYPES: tuple[QuestionType, ...] = ("short", "multiple_choice")
+
 
 def normalize_question_types(types: Iterable[str] | None) -> list[QuestionType]:
     if not types:
@@ -99,6 +101,8 @@ def mask_answer_terms(text: Any, card: dict[str, str], *, placeholder: str = "[?
 
 
 def mask_question_answer_terms(question: dict[str, Any], card: dict[str, str]) -> dict[str, Any]:
+    if question.get("type") not in MASKED_PROMPT_TYPES:
+        return dict(question)
     masked = dict(question)
     for field in ("prompt", "body"):
         if field in masked:
