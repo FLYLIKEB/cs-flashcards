@@ -37,14 +37,15 @@ function wikiDefaultSidebarOpen() {
 }
 
 function readSavedWikiSidebarState() {
+  if (wikiDefaultSidebarOpen()) return true;
   try {
     const saved = window.localStorage.getItem(WIKI_SIDEBAR_STATE_KEY);
     if (saved === 'open') return true;
     if (saved === 'closed') return false;
   } catch (_error) {
-    // Ignore storage failures and fall back to viewport default.
+    // Ignore storage failures and fall back to mobile default.
   }
-  return wikiDefaultSidebarOpen();
+  return false;
 }
 
 function saveWikiSidebarState() {
