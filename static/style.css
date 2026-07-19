@@ -4342,6 +4342,35 @@ select,
   font-size: .78rem;
   line-height: 1.45;
 }
+.question-session-lock,
+.question-session-summary {
+  margin-top: .78rem;
+  border: 1px solid rgba(31, 58, 95, .08);
+  border-radius: 16px;
+  background: rgba(246, 249, 253, .92);
+  padding: .72rem .8rem;
+}
+.question-session-lock {
+  background: rgba(255, 248, 225, .96);
+  border-color: rgba(176, 120, 24, .18);
+}
+.question-session-lock p,
+.question-session-summary p {
+  margin: .36rem 0 0;
+  line-height: 1.55;
+}
+.question-session-summary ul {
+  margin: .48rem 0 0;
+  padding-left: 1.1rem;
+}
+.question-session-review {
+  margin-top: .7rem;
+}
+.question-answer-guide {
+  margin-top: .55rem;
+  color: #516071;
+  font-size: .82rem;
+}
 
 .question-body {
   margin: 0 0 .62rem;

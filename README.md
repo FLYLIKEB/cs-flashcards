@@ -153,7 +153,7 @@ python3 scripts/generate_concept_images.py --write-csv
 
 ## 문제 풀이 모드
 
-햄버거 메뉴(☰)의 `문제 풀이`를 누르면 문제 풀이 박스가 열립니다. `생성` 버튼은 현재 검색·카테고리·중요도·난이도·한은·O/X·북마크 필터 결과를 기준으로 문제를 즉석 생성하고, `가져오기` 버튼은 NotebookLM이나 외부 AI가 만든 JSON 문제 세트를 붙여넣어 현재 카드와 매칭한 뒤 모의 세트로 불러옵니다. 제한 시간을 고르면 총 경과시간·문항 시간·남은 시간을 보면서 풀 수 있고, `종료` 버튼으로 현재 세트를 한 번에 저장합니다. `기록` 버튼으로 현재 필터 기준의 맞음/애매함/틀림/모름/미채점 기록을 모아볼 수 있습니다.
+햄버거 메뉴(☰)의 `문제 풀이`를 누르면 문제 풀이 박스가 열립니다. `모드`를 `한은`으로 바꾸면 기본값이 `전공필기 8 + 전공논술 1 / 150분`으로 고정되고, 세트 종료 전에는 정답·해설이 잠겨 실제 한국은행식 모의 풀이에 가깝게 쓸 수 있습니다. `생성` 버튼은 현재 검색·카테고리·중요도·난이도·한은·O/X·북마크 필터 결과를 기준으로 문제를 즉석 생성하고, `가져오기` 버튼은 NotebookLM이나 외부 AI가 만든 JSON 문제 세트를 붙여넣어 현재 카드와 매칭한 뒤 모의 세트로 불러옵니다. 제한 시간을 고르면 총 경과시간·문항 시간·남은 시간을 보면서 풀 수 있고, `종료` 버튼으로 현재 세트를 한 번에 저장합니다. `기록` 버튼으로 현재 필터 기준의 맞음/애매함/틀림/모름/미채점 기록을 모아볼 수 있습니다.
 
 지원 유형:
 
@@ -164,16 +164,21 @@ python3 scripts/generate_concept_images.py --write-csv
 | 서술형 | `definition`, `detailed_explanation`, `exam_note` | 면접식 설명 연습 |
 | 논술형 | 관련 개념 비교와 채점 포인트 포함 | 긴 답안 구조화 |
 
-가져오기 형식은 JSON 배열 또는 `{"questions": [...]}` 객체입니다. 각 문항에는 최소 `question_type`, `prompt`, 그리고 현재 카드와 연결될 `card_id` 또는 `concept_term`/`term`이 필요합니다. 예시는 다음과 같습니다.
+가져오기 형식은 JSON 배열 또는 `{"questions": [...]}` 객체입니다. 각 문항에는 최소 `question_type`, `prompt`, 그리고 현재 카드와 연결될 `card_id` 또는 `concept_term`/`term`이 필요합니다. 한은형 세트는 최상위 `session_mode: "bok"`와 문항별 `section`, `points`, `expected_time_minutes`, `answer_guide`를 함께 넣으면 화면과 기록에 그대로 반영됩니다. 예시는 다음과 같습니다.
 
 ```json
 {
-  "title": "OS 진단 세트",
-  "time_limit_minutes": 90,
+  "title": "한국은행 OS/DB 모의 세트 1",
+  "session_mode": "bok",
+  "time_limit_minutes": 150,
   "questions": [
     {
       "concept_term": "교착상태",
       "question_type": "subjective",
+      "section": "전공필기",
+      "points": 10,
+      "expected_time_minutes": 12,
+      "answer_guide": "정의 → 발생 조건 → 예방/회피 차이 → 금융IT 적용 순으로 5~7문장",
       "prompt": "교착상태의 발생 조건을 설명하시오.",
       "body": "운영체제 관점에서 답하시오.",
       "answer": "상호배제, 점유와 대기, 비선점, 환형대기가 모두 성립할 때 발생할 수 있다.",

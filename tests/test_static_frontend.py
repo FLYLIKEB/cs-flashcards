@@ -259,6 +259,8 @@ class StaticFrontendTests(unittest.TestCase):
         for snippet in [
             'id="questionPracticeBtn"',
             'id="questionPanel"',
+            'id="questionSessionModeSelect"',
+            'id="questionSessionReview"',
             'id="questionTypeShort"',
             'id="questionTypeSubjective"',
             'id="questionTypeMultipleChoice"',
@@ -278,6 +280,13 @@ class StaticFrontendTests(unittest.TestCase):
             'questionMode: false',
             'questionSessionId:',
             'questionSessionTitle:',
+            "questionSessionMode: 'practice'",
+            'QUESTION_SESSION_MODE_LABELS',
+            'BOK_MOCK_CONFIG',
+            'function applyQuestionSessionModePreset(',
+            'function questionRevealLocked(',
+            'function generateBokExamQuestions(',
+            'function renderQuestionSessionReview(',
             'function generateQuestionsFromCurrentFilter()',
             '/api/questions/generate',
             'function renderQuestionPanel()',
@@ -288,7 +297,10 @@ class StaticFrontendTests(unittest.TestCase):
             'function openQuestionImportDialog()',
             'function importQuestionsFromText()',
             'function importedQuestionSetPayload(rawText)',
+            "sessionMode: normalizeQuestionSessionMode(parsed.session_mode ?? parsed.exam_mode ?? parsed.mode ?? 'practice')",
             'function buildImportedQuestions(rawQuestions)',
+            'expected_time_minutes',
+            'answer_guide',
             'function resolveImportedCard(rawQuestion, index)',
             'questionImportInput',
             'openQuestionImportBtn',
@@ -306,6 +318,9 @@ class StaticFrontendTests(unittest.TestCase):
             'function saveCurrentWrongNote()',
             'question-answer-input',
             'question-wrong-note',
+            'question-session-lock',
+            'question-session-summary',
+            '정답 잠금',
             'questionTimeLimitSelect',
             'finishQuestionSessionBtn',
             'new URLSearchParams(window.location.search)',
@@ -338,6 +353,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-history-filter-row', STYLE_CSS)
         self.assertIn('.question-history-item', STYLE_CSS)
         self.assertIn('.question-session-meta', STYLE_CSS)
+        self.assertIn('.question-session-lock', STYLE_CSS)
+        self.assertIn('.question-session-summary', STYLE_CSS)
+        self.assertIn('.question-session-review', STYLE_CSS)
         self.assertIn('.question-history-session-meta', STYLE_CSS)
         self.assertIn('.question-import-body', STYLE_CSS)
         self.assertIn('.question-import-input', STYLE_CSS)

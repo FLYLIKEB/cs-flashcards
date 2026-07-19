@@ -63,6 +63,7 @@ const state = {
   questionSessionStartMs: 0,
   questionSessionElapsedBaseSeconds: 0,
   questionTimeLimitSeconds: 0,
+  questionSessionMode: 'practice',
   questionSessionFinishedAt: '',
   questionTimerId: 0,
   answerRevealed: false,
@@ -84,6 +85,18 @@ const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
 const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate', 'speechVoice'];
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
+const QUESTION_SESSION_MODE_LABELS = {practice: '일반', bok: '한국은행'};
+const BOK_MOCK_CONFIG = {
+  subjectiveCount: 8,
+  essayCount: 1,
+  timeLimitMinutes: 150,
+  subjectivePoints: 10,
+  essayPoints: 20,
+  subjectiveExpectedSeconds: 12 * 60,
+  essayExpectedSeconds: 54 * 60,
+  subjectiveAnswerGuide: '정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장',
+  essayAnswerGuide: '정의 → 원리 → 비교 → 사례 → 금융IT 적용 → 결론 순으로 12~15문장',
+};
 const AI_QUIZ_PROMPT_TYPE_ORDER = ['multiple_choice', 'short', 'subjective', 'essay'];
 const AI_QUIZ_TERM_LIMIT = 80;
 const QUESTION_HISTORY_FILTER_LABELS = {all: '전체', correct: '맞음', ambiguous: '애매함', wrong: '틀림', unknown: '모름', pending: '미채점'};
@@ -2579,7 +2592,11 @@ function renderQuestionHistoryDialog() {
     const wrongNote = String(item.wrong_note || '').trim();
     const sessionMeta = [
       String(item.session_title || '').trim(),
+      questionSessionModeLabel(item.session_mode || 'practice'),
+      String(item.section || '').trim(),
+      Number.isInteger(item.points) ? `${item.points}점` : '',
       item.question_order ? `문항 ${item.question_order}` : '',
+      Number.isInteger(item.expected_time_seconds) ? `권장 ${formatElapsedClock(item.expected_time_seconds)}` : '',
       Number.isInteger(item.question_elapsed_seconds) ? `문항 ${formatElapsedClock(item.question_elapsed_seconds)}` : '',
       updatedAt ? `저장 ${escapeHtml(updatedAt)}` : '',
     ].filter(Boolean).join(' · ');
@@ -2697,6 +2714,38 @@ function jumpToBookmarkCard(cardId) {
 }
 
 
+function normalizeQuestionSessionMode(value) {
+  return String(value || '').trim().toLowerCase() === 'bok' ? 'bok' : 'practice';
+}
+
+function questionSessionModeValue() {
+  return normalizeQuestionSessionMode($('questionSessionModeSelect')?.value || state.questionSessionMode || 'practice');
+}
+
+function syncQuestionSessionModeSelect(mode) {
+  const select = $('questionSessionModeSelect');
+  const normalized = normalizeQuestionSessionMode(mode);
+  if (select && [...select.options].some((option) => option.value === normalized)) select.value = normalized;
+}
+
+function questionSessionModeLabel(mode = state.questionSessionMode) {
+  return QUESTION_SESSION_MODE_LABELS[normalizeQuestionSessionMode(mode)] || QUESTION_SESSION_MODE_LABELS.practice;
+}
+
+function questionSessionIsBok(mode = state.questionSessionMode) {
+  return normalizeQuestionSessionMode(mode) === 'bok';
+}
+
+function applyQuestionSessionModePreset(mode = questionSessionModeValue()) {
+  if (!questionSessionIsBok(mode)) return;
+  if ($('questionCountSelect')) $('questionCountSelect').value = String(BOK_MOCK_CONFIG.subjectiveCount + BOK_MOCK_CONFIG.essayCount);
+  if ($('questionTimeLimitSelect')) $('questionTimeLimitSelect').value = String(BOK_MOCK_CONFIG.timeLimitMinutes);
+  if ($('questionTypeShort')) $('questionTypeShort').checked = false;
+  if ($('questionTypeSubjective')) $('questionTypeSubjective').checked = true;
+  if ($('questionTypeMultipleChoice')) $('questionTypeMultipleChoice').checked = false;
+  if ($('questionTypeEssay')) $('questionTypeEssay').checked = true;
+}
+
 function selectedQuestionTypes() {
   const checked = [...document.querySelectorAll('.question-type-row input[type="checkbox"]:checked')].map((input) => input.value);
   return checked.length ? checked : ['short', 'subjective', 'multiple_choice', 'essay'];
@@ -2718,6 +2767,11 @@ function syncQuestionTimeLimitSelect(seconds) {
   if (!select || !Number.isFinite(seconds) || seconds < 0 || seconds % 60 !== 0) return;
   const minutes = String(Math.floor(seconds / 60));
   if ([...select.options].some((option) => option.value === minutes)) select.value = minutes;
+}
+
+function questionRevealLocked(question = currentQuestion()) {
+  const current = hydrateQuestionState(question);
+  return Boolean(current) && questionSessionIsBok(current.sessionMode || state.questionSessionMode) && !state.questionSessionFinishedAt;
 }
 
 function questionImportDialog() {
@@ -2784,7 +2838,7 @@ function importedQuestionType(value) {
 function importedQuestionSetPayload(rawText) {
   const parsed = JSON.parse(extractImportJsonText(rawText));
   if (Array.isArray(parsed)) {
-    return {title: '', timeLimitSeconds: null, questions: parsed};
+    return {title: '', timeLimitSeconds: null, sessionMode: 'practice', questions: parsed};
   }
   if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.questions)) {
     throw new Error('최상위 JSON은 문제 배열 또는 questions 배열을 가진 객체여야 합니다.');
@@ -2794,6 +2848,7 @@ function importedQuestionSetPayload(rawText) {
   return {
     title: String(parsed.title || parsed.name || '').trim(),
     timeLimitSeconds: Number.isFinite(seconds) && seconds >= 0 ? seconds : Number.isFinite(minutes) && minutes >= 0 ? minutes * 60 : null,
+    sessionMode: normalizeQuestionSessionMode(parsed.session_mode ?? parsed.exam_mode ?? parsed.mode ?? 'practice'),
     questions: parsed.questions,
   };
 }
@@ -2816,6 +2871,9 @@ function aiQuizSearchPrompt() {
   const visibleTerms = allTerms.slice(0, AI_QUIZ_TERM_LIMIT);
   const hasMore = allTerms.length > visibleTerms.length;
   const termText = visibleTerms.join(', ') + (hasMore ? ` 등 현재 선택된 카드 개념 ${allTerms.length}개` : '');
+  if (questionSessionIsBok(questionSessionModeValue())) {
+    return `${termText} 로 한국은행 컴퓨터공학 직렬 스타일 전공필기 ${BOK_MOCK_CONFIG.subjectiveCount}문항과 전공논술 ${BOK_MOCK_CONFIG.essayCount}문항을 ${BOK_MOCK_CONFIG.timeLimitMinutes}분 모의고사 형식으로 만들어줘. 정답은 별도 구분해줘. 자체 퀴즈생성 기능을 활용해줘.`;
+  }
   const typeText = selectedQuestionTypeLabelsForPrompt().join('/') || '객관식/주관식/서술형/논술형';
   return `${termText} 로 ${typeText} 문제 ${questionCountValue()}개 만들어줘. 자체 퀴즈생성 기능을 활용해줘.`;
 }
@@ -2901,6 +2959,12 @@ function buildImportedQuestions(rawQuestions) {
     const explanation = String(rawQuestion.explanation ?? rawQuestion.commentary ?? rawQuestion.finance_it_application ?? '').trim();
     const rubric = normalizeImportedStringArray(rawQuestion.rubric ?? rawQuestion.scoring_points ?? rawQuestion.grading_points ?? rawQuestion.trap_points);
     const choices = type === 'multiple_choice' ? normalizeImportedStringArray(rawQuestion.choices ?? rawQuestion.options) : [];
+    const section = String(rawQuestion.section ?? rawQuestion.exam_section ?? rawQuestion.part ?? '').trim();
+    const pointsValue = Number.parseInt(rawQuestion.points ?? rawQuestion.score ?? rawQuestion.weight ?? '', 10);
+    const expectedMinutes = Number.parseInt(rawQuestion.expected_time_minutes ?? rawQuestion.estimated_minutes ?? rawQuestion.recommended_minutes ?? '', 10);
+    const expectedSecondsValue = Number.parseInt(rawQuestion.expected_time_seconds ?? rawQuestion.estimated_seconds ?? rawQuestion.recommended_seconds ?? '', 10);
+    const answerGuide = String(rawQuestion.answer_guide ?? rawQuestion.response_guide ?? rawQuestion.length_guide ?? '').trim();
+    const sessionMode = normalizeQuestionSessionMode(rawQuestion.session_mode ?? rawQuestion.exam_mode ?? rawQuestion.mode ?? 'practice');
     if (!prompt) throw new Error(`${index + 1}번 문항의 prompt가 비어 있습니다.`);
     if (type === 'multiple_choice' && choices.length < 2) {
       throw new Error(`${index + 1}번 객관식 문항에는 보기 2개 이상이 필요합니다.`);
@@ -2918,6 +2982,13 @@ function buildImportedQuestions(rawQuestions) {
       explanation,
       rubric,
       choices,
+      section,
+      points: Number.isInteger(pointsValue) ? pointsValue : null,
+      expectedTimeSeconds: Number.isInteger(expectedSecondsValue) && expectedSecondsValue >= 0
+        ? expectedSecondsValue
+        : Number.isInteger(expectedMinutes) && expectedMinutes >= 0 ? expectedMinutes * 60 : null,
+      answerGuide,
+      sessionMode,
       questionOrder: Number.parseInt(rawQuestion.question_order ?? rawQuestion.order ?? '', 10) || index + 1,
       answer_index: type === 'multiple_choice' ? importedAnswerIndex(rawQuestion, choices, answer, index) : null,
     };
@@ -2929,6 +3000,7 @@ function importQuestionsFromText() {
   try {
     const payload = importedQuestionSetPayload($('questionImportInput')?.value || '');
     const questions = buildImportedQuestions(payload.questions);
+    syncQuestionSessionModeSelect(payload.sessionMode);
     if (Number.isFinite(payload.timeLimitSeconds) && payload.timeLimitSeconds >= 0) {
       syncQuestionTimeLimitSelect(payload.timeLimitSeconds);
     }
@@ -2938,6 +3010,7 @@ function importQuestionsFromText() {
     prepareQuestionSession(questions, {
       title: payload.title || `가져온 모의 세트 · 카드 ${questions.length}`,
       timeLimitSeconds: Number.isFinite(payload.timeLimitSeconds) ? payload.timeLimitSeconds : null,
+      mode: payload.sessionMode,
     });
     closeQuestionImportDialog();
     renderQuestionPanel();
@@ -2965,6 +3038,11 @@ function hydrateQuestionState(question) {
   if (!Number.isInteger(question.questionOrder)) question.questionOrder = null;
   if (!Number.isInteger(question.timeLimitSeconds)) question.timeLimitSeconds = state.questionTimeLimitSeconds || 0;
   if (!Number.isInteger(question.sessionElapsedSeconds)) question.sessionElapsedSeconds = null;
+  if (typeof question.sessionMode !== 'string') question.sessionMode = state.questionSessionMode || 'practice';
+  if (typeof question.section !== 'string') question.section = '';
+  if (!Number.isInteger(question.points)) question.points = null;
+  if (!Number.isInteger(question.expectedTimeSeconds)) question.expectedTimeSeconds = null;
+  if (typeof question.answerGuide !== 'string') question.answerGuide = '';
   if (!Number.isFinite(question.questionActiveSinceMs)) question.questionActiveSinceMs = 0;
   return question;
 }
@@ -3045,6 +3123,10 @@ function updateQuestionSummaryLine() {
     return;
   }
   if (!total || !current) {
+    if (questionSessionIsBok(questionSessionModeValue())) {
+      summary.textContent = `한국은행 모드 · 전공필기 ${BOK_MOCK_CONFIG.subjectiveCount}문항 + 전공논술 ${BOK_MOCK_CONFIG.essayCount}문항 · ${BOK_MOCK_CONFIG.timeLimitMinutes}분`;
+      return;
+    }
     const limitSeconds = timeLimitValue();
     summary.textContent = limitSeconds
       ? `현재 필터 기준으로 ${Math.round(limitSeconds / 60)}분 모의 세트를 생성합니다.`
@@ -3053,6 +3135,7 @@ function updateQuestionSummaryLine() {
   }
   const counts = questionJudgmentCounts();
   const parts = [
+    questionSessionModeLabel(current.sessionMode || state.questionSessionMode),
     `${state.questionIndex + 1} / ${total}`,
     `총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())}`,
     `현재 ${formatElapsedClock(currentQuestionElapsedSeconds(current))}`,
@@ -3060,6 +3143,11 @@ function updateQuestionSummaryLine() {
   const limitSeconds = Number.isInteger(current.timeLimitSeconds) ? current.timeLimitSeconds : state.questionTimeLimitSeconds;
   if (limitSeconds > 0) {
     parts.push(`남은 ${formatElapsedClock(Math.max(0, limitSeconds - currentQuestionSessionElapsedSeconds()))}`);
+  }
+  if (current.section) parts.push(current.section);
+  if (Number.isInteger(current.points)) parts.push(`${current.points}점`);
+  if (Number.isInteger(current.expectedTimeSeconds) && current.expectedTimeSeconds > 0) {
+    parts.push(`권장 ${formatElapsedClock(current.expectedTimeSeconds)}`);
   }
   parts.push(`맞음 ${counts.correct}`);
   parts.push(`애매 ${counts.ambiguous}`);
@@ -3100,11 +3188,16 @@ function resetQuestionSessionState() {
   state.questionSessionStartMs = 0;
   state.questionSessionElapsedBaseSeconds = 0;
   state.questionTimeLimitSeconds = 0;
+  state.questionSessionMode = questionSessionModeValue();
   state.questionSessionFinishedAt = '';
 }
 
-function buildQuestionSessionTitle() {
+function buildQuestionSessionTitle(mode = questionSessionModeValue()) {
+  const normalizedMode = normalizeQuestionSessionMode(mode);
   const stamp = new Date().toLocaleString('ko-KR', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'});
+  if (questionSessionIsBok(normalizedMode)) {
+    return `한국은행 모의 세트 ${stamp} · 전공필기 ${BOK_MOCK_CONFIG.subjectiveCount} + 전공논술 ${BOK_MOCK_CONFIG.essayCount} · ${BOK_MOCK_CONFIG.timeLimitMinutes}분`;
+  }
   const typeText = selectedQuestionTypeLabelsForPrompt().join('/') || '혼합형';
   const limitSeconds = timeLimitValue();
   const limitLabel = limitSeconds ? `${Math.round(limitSeconds / 60)}분` : '무제한';
@@ -3117,8 +3210,11 @@ function prepareQuestionSession(questions, options = {}) {
   const importedLimit = Number.isFinite(options.timeLimitSeconds) && options.timeLimitSeconds >= 0
     ? Math.floor(options.timeLimitSeconds)
     : null;
+  const sessionMode = normalizeQuestionSessionMode(options.mode || questionSessionModeValue());
+  syncQuestionSessionModeSelect(sessionMode);
   state.questionSessionId = `mock-${Date.now()}`;
-  state.questionSessionTitle = importedTitle || buildQuestionSessionTitle();
+  state.questionSessionMode = sessionMode;
+  state.questionSessionTitle = importedTitle || buildQuestionSessionTitle(sessionMode);
   state.questionSessionStartedAt = sessionStartedAt;
   state.questionSessionStartMs = Date.now();
   state.questionSessionElapsedBaseSeconds = 0;
@@ -3130,6 +3226,11 @@ function prepareQuestionSession(questions, options = {}) {
     questionElapsedSeconds: 0,
     questionStartedAt: '',
     answeredAt: '',
+    sessionMode: normalizeQuestionSessionMode(item?.sessionMode || sessionMode),
+    section: String(item?.section || '').trim(),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expectedTimeSeconds: Number.isInteger(item?.expectedTimeSeconds) ? item.expectedTimeSeconds : null,
+    answerGuide: String(item?.answerGuide || '').trim(),
     questionOrder: Number.isInteger(item?.questionOrder) ? item.questionOrder : index + 1,
     sessionId: state.questionSessionId,
     sessionTitle: state.questionSessionTitle,
@@ -3183,6 +3284,11 @@ function questionAttemptPayload(question) {
     wrong_note: current.wrongNote || '',
     session_id: current.sessionId || state.questionSessionId || '',
     session_title: current.sessionTitle || state.questionSessionTitle || '',
+    session_mode: current.sessionMode || state.questionSessionMode || 'practice',
+    section: current.section || '',
+    points: Number.isInteger(current.points) ? current.points : null,
+    expected_time_seconds: Number.isInteger(current.expectedTimeSeconds) ? current.expectedTimeSeconds : null,
+    answer_guide: current.answerGuide || '',
     question_order: current.questionOrder || (state.questionIndex + 1),
     question_elapsed_seconds: currentQuestionElapsedSeconds(current),
     session_elapsed_seconds: currentQuestionSessionElapsedSeconds(),
@@ -3218,6 +3324,11 @@ async function saveQuestionAttempt(question, {quiet = false} = {}) {
     current.wrongNote = String(data.attempt?.wrong_note || current.wrongNote || '');
     current.answeredAt = String(data.attempt?.answered_at || current.answeredAt || '');
     current.questionStartedAt = String(data.attempt?.question_started_at || current.questionStartedAt || '');
+    current.sessionMode = String(data.attempt?.session_mode || current.sessionMode || state.questionSessionMode || 'practice');
+    current.section = String(data.attempt?.section || current.section || '');
+    current.points = Number.isInteger(data.attempt?.points) ? data.attempt.points : current.points;
+    current.expectedTimeSeconds = Number.isInteger(data.attempt?.expected_time_seconds) ? data.attempt.expected_time_seconds : current.expectedTimeSeconds;
+    current.answerGuide = String(data.attempt?.answer_guide || current.answerGuide || '');
     current.questionElapsedSeconds = Number.isInteger(data.attempt?.question_elapsed_seconds) ? data.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
     current.sessionElapsedSeconds = Number.isInteger(data.attempt?.session_elapsed_seconds) ? data.attempt.session_elapsed_seconds : current.sessionElapsedSeconds;
     if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
@@ -3260,13 +3371,19 @@ async function finishQuestionSession() {
       current.wrongNote = String(payload.attempt?.wrong_note || current.wrongNote || '');
       current.answeredAt = String(payload.attempt?.answered_at || current.answeredAt || '');
       current.questionStartedAt = String(payload.attempt?.question_started_at || current.questionStartedAt || '');
+      current.sessionMode = String(payload.attempt?.session_mode || current.sessionMode || state.questionSessionMode || 'practice');
+      current.section = String(payload.attempt?.section || current.section || '');
+      current.points = Number.isInteger(payload.attempt?.points) ? payload.attempt.points : current.points;
+      current.expectedTimeSeconds = Number.isInteger(payload.attempt?.expected_time_seconds) ? payload.attempt.expected_time_seconds : current.expectedTimeSeconds;
+      current.answerGuide = String(payload.attempt?.answer_guide || current.answerGuide || '');
       current.questionElapsedSeconds = Number.isInteger(payload.attempt?.question_elapsed_seconds) ? payload.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
       syncUpdatedCard(payload.card);
     });
     if (state.questionHistoryOpen) loadQuestionHistory();
     const counts = questionJudgmentCounts();
     const summaryText = `세트 종료 · 총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())} · 맞음 ${counts.correct} · 애매 ${counts.ambiguous} · 틀림 ${counts.wrong} · 모름 ${counts.unknown} · 미채점 ${counts.pending}`;
-    setMessage(failures ? `${summaryText} · 저장 실패 ${failures}건` : summaryText, failures > 0);
+    const finishMessage = questionSessionIsBok(state.questionSessionMode) ? `${summaryText} · 이제 정답 확인 가능` : summaryText;
+    setMessage(failures ? `${finishMessage} · 저장 실패 ${failures}건` : finishMessage, failures > 0);
   } finally {
     state.questionSaving = false;
     renderQuestionPanel();
@@ -3301,11 +3418,38 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
   document.querySelectorAll('.question-type-row input').forEach((input) => { input.disabled = disabled; });
+}
+
+function renderQuestionSessionReview() {
+  const review = $('questionSessionReview');
+  if (!review) return;
+  if (!state.questionMode || !state.questions.length || !state.questionSessionFinishedAt) {
+    review.hidden = true;
+    review.innerHTML = '';
+    return;
+  }
+  const current = hydrateQuestionState(currentQuestion());
+  const counts = questionJudgmentCounts();
+  const totalPoints = state.questions.reduce((sum, item) => {
+    const question = hydrateQuestionState(item);
+    return sum + (Number.isInteger(question?.points) ? question.points : 0);
+  }, 0);
+  const currentSection = String(current?.section || '').trim();
+  review.hidden = false;
+  review.innerHTML = `
+    <div class="question-session-summary">
+      <strong>${escapeHtml(state.questionSessionTitle || '모의 세트')}</strong>
+      <p>${escapeHtml(questionSessionModeLabel(current?.sessionMode || state.questionSessionMode))} · 총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())}${totalPoints ? ` · 총 ${totalPoints}점` : ''}${currentSection ? ` · 현재 ${escapeHtml(currentSection)}` : ''}</p>
+      <ul>
+        <li>맞음 ${counts.correct} · 애매 ${counts.ambiguous} · 틀림 ${counts.wrong} · 모름 ${counts.unknown} · 미채점 ${counts.pending}</li>
+        <li>${questionSessionIsBok(current?.sessionMode || state.questionSessionMode) ? '정답을 확인하며 문항별 부분점수 관점으로 회고를 남기세요.' : '문항별 채점과 오답노트를 확인하세요.'}</li>
+      </ul>
+    </div>`;
 }
 
 function renderQuestionPanel() {
@@ -3318,6 +3462,7 @@ function renderQuestionPanel() {
   updateQuestionPracticeButton();
   if (!state.questionMode) {
     stopQuestionTimer();
+    renderQuestionSessionReview();
     return;
   }
   setQuestionControlsDisabled(state.questionLoading || state.questionSaving || state.markSaving);
@@ -3334,6 +3479,7 @@ function renderQuestionPanel() {
     stopQuestionTimer();
   }
   updateQuestionSummaryLine();
+  renderQuestionSessionReview();
   if (!card) return;
   if (state.questionLoading) {
     card.innerHTML = '<div class="question-card-empty muted">문제를 생성하는 중입니다...</div>';
@@ -3344,6 +3490,7 @@ function renderQuestionPanel() {
     return;
   }
 
+  const revealLocked = questionRevealLocked(question);
   const reviewDisabled = state.questionLoading || state.questionSaving || state.markSaving || !reviewCard;
   const reviewStatus = reviewCard?.known_status || '';
   const reviewStatusText = reviewCard
@@ -3370,11 +3517,18 @@ function renderQuestionPanel() {
         return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(choice)}</button></li>`;
       }).join('')}
     </ol>` : '';
+  const answerGuideHtml = question.answerGuide
+    ? `<p class="question-answer-guide"><strong>답안 가이드</strong> ${escapeHtml(question.answerGuide)}</p>`
+    : '';
+  const draftPlaceholder = revealLocked
+    ? '세트 종료 전까지 정답이 공개되지 않습니다. 실전처럼 답안을 먼저 작성하세요.'
+    : '여기에 답안을 적고 정답/해설을 본 뒤 결과를 저장하세요.';
   const draftHtml = questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft">
       <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
-      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="여기에 답안을 적고 정답/해설을 본 뒤 결과를 저장하세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
-    </div>` : '';
+      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
+      ${answerGuideHtml}
+    </div>` : answerGuideHtml;
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
     <div class="question-rubric">
       <strong>채점 포인트</strong>
@@ -3413,9 +3567,18 @@ function renderQuestionPanel() {
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+  const lockNoticeHtml = revealLocked ? `
+    <div class="question-session-lock">
+      <strong>한은 모드</strong>
+      <p>세트 종료 전까지 정답과 해설이 잠겨 있습니다. 전 문항을 먼저 풀고 제출한 뒤 문항별로 회고하세요.</p>
+    </div>` : '';
   const sessionMeta = [
     state.questionSessionTitle || question.sessionTitle,
+    questionSessionModeLabel(question.sessionMode || state.questionSessionMode),
+    question.section || '',
+    Number.isInteger(question.points) ? `${question.points}점` : '',
     question.questionOrder ? `문항 ${question.questionOrder}` : '',
+    Number.isInteger(question.expectedTimeSeconds) ? `권장 ${formatElapsedClock(question.expectedTimeSeconds)}` : '',
     `문항 시간 ${formatElapsedClock(currentQuestionElapsedSeconds(question))}`,
   ].filter(Boolean).join(' · ');
   card.innerHTML = `
@@ -3423,11 +3586,14 @@ function renderQuestionPanel() {
       <span class="badge">${escapeHtml(questionTypeBadge(question))}</span>
       <span class="badge">${escapeHtml(question.category || '미분류')}</span>
       <span class="badge">${escapeHtml(question.card_id || '')}</span>
+      ${question.section ? `<span class="badge">${escapeHtml(question.section)}</span>` : ''}
+      ${Number.isInteger(question.points) ? `<span class="badge">${escapeHtml(String(question.points))}점</span>` : ''}
       ${question.judgment !== 'pending' ? `<span class="badge">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>` : ''}
     </div>
     <p class="question-session-meta">${escapeHtml(sessionMeta)}</p>
     <h2>${escapeHtml(question.prompt || '문제')}</h2>
     <p class="question-body">${escapeHtml(question.body || '')}</p>
+    ${lockNoticeHtml}
     ${reviewBoxHtml}
     ${draftHtml}
     ${choiceHtml}
@@ -3435,9 +3601,76 @@ function renderQuestionPanel() {
   `;
   $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex <= 0;
   $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex >= total - 1;
-  $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question;
+  $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question || revealLocked;
+  if ($('revealAnswerBtn')) {
+    $('revealAnswerBtn').textContent = revealLocked ? '정답 잠금' : '정답';
+    $('revealAnswerBtn').title = revealLocked ? '한은 모드는 세트 종료 전 정답이 공개되지 않습니다.' : '정답/해설 보기';
+  }
   $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question;
-  if ($('finishQuestionSessionBtn')) $('finishQuestionSessionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !total;
+  if ($('finishQuestionSessionBtn')) {
+    $('finishQuestionSessionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !total;
+    $('finishQuestionSessionBtn').textContent = questionSessionIsBok(question.sessionMode || state.questionSessionMode) && !state.questionSessionFinishedAt ? '제출' : '종료';
+  }
+}
+
+async function requestGeneratedQuestions({cardIds, types, count, seed}) {
+  const res = await fetch('/api/questions/generate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({card_ids: cardIds, types, count, seed}),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function shuffledQuestionCards(cards) {
+  const items = [...cards];
+  for (let index = items.length - 1; index > 0; index -= 1) {
+    const nextIndex = Math.floor(Math.random() * (index + 1));
+    [items[index], items[nextIndex]] = [items[nextIndex], items[index]];
+  }
+  return items;
+}
+
+function withBokQuestionMeta(question, {section, points, expectedTimeSeconds, answerGuide, order}) {
+  return {
+    ...question,
+    sessionMode: 'bok',
+    section,
+    points,
+    expectedTimeSeconds,
+    answerGuide,
+    questionOrder: order,
+  };
+}
+
+async function generateBokExamQuestions(seed) {
+  const totalNeeded = BOK_MOCK_CONFIG.subjectiveCount + BOK_MOCK_CONFIG.essayCount;
+  if (state.filtered.length < totalNeeded) {
+    throw new Error(`한은 모드는 현재 필터 카드가 최소 ${totalNeeded}개 필요합니다.`);
+  }
+  const shuffled = shuffledQuestionCards(state.filtered);
+  const subjectiveIds = shuffled.slice(0, BOK_MOCK_CONFIG.subjectiveCount).map((card) => card.id);
+  const essayIds = shuffled.slice(BOK_MOCK_CONFIG.subjectiveCount, totalNeeded).map((card) => card.id);
+  const [subjectiveData, essayData] = await Promise.all([
+    requestGeneratedQuestions({cardIds: subjectiveIds, types: ['subjective'], count: BOK_MOCK_CONFIG.subjectiveCount, seed}),
+    requestGeneratedQuestions({cardIds: essayIds, types: ['essay'], count: BOK_MOCK_CONFIG.essayCount, seed: seed + 1}),
+  ]);
+  const subjectiveQuestions = (subjectiveData.questions || []).slice(0, BOK_MOCK_CONFIG.subjectiveCount).map((question, index) => withBokQuestionMeta(question, {
+    section: '전공필기',
+    points: BOK_MOCK_CONFIG.subjectivePoints,
+    expectedTimeSeconds: BOK_MOCK_CONFIG.subjectiveExpectedSeconds,
+    answerGuide: BOK_MOCK_CONFIG.subjectiveAnswerGuide,
+    order: index + 1,
+  }));
+  const essayQuestions = (essayData.questions || []).slice(0, BOK_MOCK_CONFIG.essayCount).map((question, index) => withBokQuestionMeta(question, {
+    section: '전공논술',
+    points: BOK_MOCK_CONFIG.essayPoints,
+    expectedTimeSeconds: BOK_MOCK_CONFIG.essayExpectedSeconds,
+    answerGuide: BOK_MOCK_CONFIG.essayAnswerGuide,
+    order: BOK_MOCK_CONFIG.subjectiveCount + index + 1,
+  }));
+  return [...subjectiveQuestions, ...essayQuestions];
 }
 
 async function generateQuestionsFromCurrentFilter() {
@@ -3455,20 +3688,19 @@ async function generateQuestionsFromCurrentFilter() {
   state.selectedChoiceIndex = null;
   renderQuestionPanel();
   try {
-    const res = await fetch('/api/questions/generate', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        card_ids: state.filtered.map((card) => card.id),
-        types: selectedQuestionTypes(),
-        count: questionCountValue(),
-        seed: Date.now(),
-      }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-    prepareQuestionSession((data.questions || []).map((item) => hydrateQuestionState({...item})));
-    setMessage(`모의 세트 ${state.questions.length}문항 생성 완료`);
+    const seed = Date.now();
+    const mode = questionSessionModeValue();
+    applyQuestionSessionModePreset(mode);
+    const questions = questionSessionIsBok(mode)
+      ? await generateBokExamQuestions(seed)
+      : (await requestGeneratedQuestions({
+          cardIds: state.filtered.map((card) => card.id),
+          types: selectedQuestionTypes(),
+          count: questionCountValue(),
+          seed,
+        })).questions || [];
+    prepareQuestionSession(questions.map((item) => hydrateQuestionState({...item})), {mode});
+    setMessage(questionSessionIsBok(mode) ? '한국은행 모의 세트 9문항 생성 완료' : `모의 세트 ${state.questions.length}문항 생성 완료`);
   } catch (error) {
     state.questions = [];
     resetQuestionSessionState();
@@ -3506,6 +3738,10 @@ function openQuestionPracticeFromMenu() {
 function revealQuestionAnswer() {
   const question = hydrateQuestionState(currentQuestion());
   if (!question) return;
+  if (questionRevealLocked(question)) {
+    setMessage('한은 모드는 세트 종료 전 정답을 공개하지 않습니다. 제출 후 확인하세요.', true);
+    return;
+  }
   question.answerRevealed = true;
   state.answerRevealed = true;
   renderQuestionPanel();
@@ -3584,11 +3820,18 @@ function selectQuestionChoice(index) {
   const question = hydrateQuestionState(currentQuestion());
   if (!question) return;
   question.selectedChoiceIndex = index;
-  question.answerRevealed = true;
-  question.gradedCorrect = index === question.answer_index;
   question.userAnswer = Array.isArray(question.choices) ? String(question.choices[index] || '') : '';
   question.answeredAt = new Date().toISOString();
   state.selectedChoiceIndex = index;
+  if (questionRevealLocked(question)) {
+    question.answerRevealed = false;
+    question.gradedCorrect = null;
+    state.answerRevealed = false;
+    renderQuestionPanel();
+    return;
+  }
+  question.answerRevealed = true;
+  question.gradedCorrect = index === question.answer_index;
   state.answerRevealed = true;
   renderQuestionPanel();
 }
@@ -3898,6 +4141,12 @@ $('conceptBackBtn')?.addEventListener('click', (event) => {
   goBackToPreviousConcept();
 });
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
+$('questionSessionModeSelect')?.addEventListener('change', () => {
+  state.questionSessionMode = questionSessionModeValue();
+  if (questionSessionIsBok(state.questionSessionMode)) applyQuestionSessionModePreset(state.questionSessionMode);
+  if (!state.questions.length || state.questionSessionFinishedAt) updateQuestionSummaryLine();
+  renderQuestionPanel();
+});
 $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
 $('openQuestionImportBtn')?.addEventListener('click', openQuestionImportDialog);
 

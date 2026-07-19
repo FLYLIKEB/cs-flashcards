@@ -112,6 +112,11 @@ class QuestionAttemptRequest(BaseModel):
     wrong_note: str = Field(default="", max_length=20000)
     session_id: str = Field(default="", max_length=255)
     session_title: str = Field(default="", max_length=255)
+    session_mode: str = Field(default="practice", max_length=32)
+    section: str = Field(default="", max_length=64)
+    points: int | None = Field(default=None, ge=0, le=1000)
+    expected_time_seconds: int | None = Field(default=None, ge=0, le=86400)
+    answer_guide: str = Field(default="", max_length=255)
     question_order: int | None = Field(default=None, ge=1, le=1000)
     question_elapsed_seconds: int | None = Field(default=None, ge=0, le=86400)
     session_elapsed_seconds: int | None = Field(default=None, ge=0, le=86400)
@@ -326,6 +331,11 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 wrong_note TEXT NOT NULL DEFAULT '',
                 session_id TEXT NOT NULL DEFAULT '',
                 session_title TEXT NOT NULL DEFAULT '',
+                session_mode TEXT NOT NULL DEFAULT 'practice',
+                section TEXT NOT NULL DEFAULT '',
+                points INTEGER,
+                expected_time_seconds INTEGER,
+                answer_guide TEXT NOT NULL DEFAULT '',
                 question_order INTEGER,
                 question_elapsed_seconds INTEGER,
                 session_elapsed_seconds INTEGER,
@@ -343,6 +353,11 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
             "judgment": "TEXT NOT NULL DEFAULT 'pending'",
             "session_id": "TEXT NOT NULL DEFAULT ''",
             "session_title": "TEXT NOT NULL DEFAULT ''",
+            "session_mode": "TEXT NOT NULL DEFAULT 'practice'",
+            "section": "TEXT NOT NULL DEFAULT ''",
+            "points": "INTEGER",
+            "expected_time_seconds": "INTEGER",
+            "answer_guide": "TEXT NOT NULL DEFAULT ''",
             "question_order": "INTEGER",
             "question_elapsed_seconds": "INTEGER",
             "session_elapsed_seconds": "INTEGER",
@@ -1091,6 +1106,11 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
         "wrong_note": row["wrong_note"] or "",
         "session_id": row["session_id"] if "session_id" in row.keys() else "",
         "session_title": row["session_title"] if "session_title" in row.keys() else "",
+        "session_mode": row["session_mode"] if "session_mode" in row.keys() else "practice",
+        "section": row["section"] if "section" in row.keys() else "",
+        "points": row["points"] if "points" in row.keys() else None,
+        "expected_time_seconds": row["expected_time_seconds"] if "expected_time_seconds" in row.keys() else None,
+        "answer_guide": row["answer_guide"] if "answer_guide" in row.keys() else "",
         "question_order": row["question_order"] if "question_order" in row.keys() else None,
         "question_elapsed_seconds": row["question_elapsed_seconds"] if "question_elapsed_seconds" in row.keys() else None,
         "session_elapsed_seconds": row["session_elapsed_seconds"] if "session_elapsed_seconds" in row.keys() else None,
@@ -1183,7 +1203,8 @@ def read_question_attempts(
             f"""
             SELECT question_id, card_id, question_type, prompt, body, user_answer,
                    selected_choice_index, is_correct, judgment, wrong_note, session_id,
-                   session_title, question_order, question_elapsed_seconds,
+                   session_title, session_mode, section, points, expected_time_seconds,
+                   answer_guide, question_order, question_elapsed_seconds,
                    session_elapsed_seconds, time_limit_seconds, question_started_at,
                    answered_at, created_at, updated_at
             FROM question_attempts
@@ -1298,6 +1319,9 @@ def save_question_attempt(
     question_started_at = str(payload.question_started_at or "")[:64]
     session_id = str(payload.session_id or "")[:255]
     session_title = str(payload.session_title or "")[:255]
+    session_mode = str(payload.session_mode or "practice")[:32] or "practice"
+    section = str(payload.section or "")[:64]
+    answer_guide = str(payload.answer_guide or "")[:255]
     with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
             """
@@ -1316,11 +1340,12 @@ def save_question_attempt(
             INSERT INTO question_attempts (
                 question_id, card_id, question_type, prompt, body,
                 user_answer, selected_choice_index, is_correct, judgment, wrong_note,
-                session_id, session_title, question_order, question_elapsed_seconds,
+                session_id, session_title, session_mode, section, points,
+                expected_time_seconds, answer_guide, question_order, question_elapsed_seconds,
                 session_elapsed_seconds, time_limit_seconds, question_started_at,
                 answered_at, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(question_id) DO UPDATE SET
                 card_id = excluded.card_id,
                 question_type = excluded.question_type,
@@ -1333,6 +1358,11 @@ def save_question_attempt(
                 wrong_note = excluded.wrong_note,
                 session_id = excluded.session_id,
                 session_title = excluded.session_title,
+                session_mode = excluded.session_mode,
+                section = excluded.section,
+                points = excluded.points,
+                expected_time_seconds = excluded.expected_time_seconds,
+                answer_guide = excluded.answer_guide,
                 question_order = excluded.question_order,
                 question_elapsed_seconds = excluded.question_elapsed_seconds,
                 session_elapsed_seconds = excluded.session_elapsed_seconds,
@@ -1354,6 +1384,11 @@ def save_question_attempt(
                 wrong_note,
                 session_id,
                 session_title,
+                session_mode,
+                section,
+                payload.points,
+                payload.expected_time_seconds,
+                answer_guide,
                 payload.question_order,
                 payload.question_elapsed_seconds,
                 payload.session_elapsed_seconds,
@@ -1369,7 +1404,8 @@ def save_question_attempt(
             """
             SELECT question_id, card_id, question_type, prompt, body, user_answer,
                    selected_choice_index, is_correct, judgment, wrong_note, session_id,
-                   session_title, question_order, question_elapsed_seconds,
+                   session_title, session_mode, section, points, expected_time_seconds,
+                   answer_guide, question_order, question_elapsed_seconds,
                    session_elapsed_seconds, time_limit_seconds, question_started_at,
                    answered_at, created_at, updated_at
             FROM question_attempts

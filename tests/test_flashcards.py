@@ -556,6 +556,11 @@ class FlashcardProgressTests(unittest.TestCase):
                     wrong_note='정의와 용어를 혼동함',
                     session_id='mock-001',
                     session_title='OS/DB 모의 세트 1',
+                    session_mode='bok',
+                    section='전공필기',
+                    points=10,
+                    expected_time_seconds=720,
+                    answer_guide='정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장',
                     question_order=1,
                     question_elapsed_seconds=48,
                     session_elapsed_seconds=48,
@@ -571,6 +576,11 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(first['attempt']['wrong_note'], '정의와 용어를 혼동함')
             self.assertEqual(first['attempt']['session_id'], 'mock-001')
             self.assertEqual(first['attempt']['session_title'], 'OS/DB 모의 세트 1')
+            self.assertEqual(first['attempt']['session_mode'], 'bok')
+            self.assertEqual(first['attempt']['section'], '전공필기')
+            self.assertEqual(first['attempt']['points'], 10)
+            self.assertEqual(first['attempt']['expected_time_seconds'], 720)
+            self.assertEqual(first['attempt']['answer_guide'], '정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장')
             self.assertEqual(first['attempt']['question_elapsed_seconds'], 48)
             self.assertEqual(first['attempt']['session_elapsed_seconds'], 48)
 
@@ -587,6 +597,11 @@ class FlashcardProgressTests(unittest.TestCase):
                     judgment='correct',
                     session_id='mock-001',
                     session_title='OS/DB 모의 세트 1',
+                    session_mode='bok',
+                    section='전공필기',
+                    points=10,
+                    expected_time_seconds=720,
+                    answer_guide='정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장',
                     question_order=2,
                     question_elapsed_seconds=22,
                     session_elapsed_seconds=70,
@@ -611,6 +626,11 @@ class FlashcardProgressTests(unittest.TestCase):
                     wrong_note='정의는 맞췄지만 장단점 비교가 빠짐',
                     session_id='mock-001',
                     session_title='OS/DB 모의 세트 1',
+                    session_mode='bok',
+                    section='전공논술',
+                    points=20,
+                    expected_time_seconds=3240,
+                    answer_guide='정의 → 원리 → 비교 → 사례 → 금융IT 적용 → 결론 순으로 12~15문장',
                     question_order=3,
                     question_elapsed_seconds=95,
                     session_elapsed_seconds=165,
@@ -653,6 +673,9 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(len(history_ambiguous['items']), 1)
             self.assertEqual(history_ambiguous['items'][0]['judgment'], 'ambiguous')
             self.assertEqual(history_ambiguous['items'][0]['session_title'], 'OS/DB 모의 세트 1')
+            self.assertEqual(history_ambiguous['items'][0]['session_mode'], 'bok')
+            self.assertEqual(history_ambiguous['items'][0]['section'], '전공논술')
+            self.assertEqual(history_ambiguous['items'][0]['points'], 20)
 
     def test_mark_card_survives_csv_replacement(self):
         with tempfile.TemporaryDirectory() as td:
