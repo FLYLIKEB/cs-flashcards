@@ -197,13 +197,23 @@ if csv_path.exists():
                 known_status TEXT NOT NULL DEFAULT '' CHECK (known_status IN ('O', 'X', '')),
                 last_reviewed TEXT NOT NULL DEFAULT '',
                 review_count INTEGER NOT NULL DEFAULT 0 CHECK (review_count >= 0),
+                definition TEXT NOT NULL DEFAULT '',
+                detailed_explanation TEXT NOT NULL DEFAULT '',
+                exam_note TEXT NOT NULL DEFAULT '',
+                concept_image_url TEXT NOT NULL DEFAULT '',
+                concept_image_alt TEXT NOT NULL DEFAULT '',
                 updated_at TEXT NOT NULL
             )
             """
         )
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(card_progress)").fetchall()}
+        for field in ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt"):
+            if field not in columns:
+                conn.execute(f"ALTER TABLE card_progress ADD COLUMN {field} TEXT NOT NULL DEFAULT ''")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
         now = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
         imported = 0
+        migrated_ai_images = 0
         with csv_path.open(encoding="utf-8-sig", newline="") as f:
             for row in csv.DictReader(f):
                 card_id = row.get("id") or ""
@@ -212,20 +222,35 @@ if csv_path.exists():
                     status = ""
                 last_reviewed = row.get("last_reviewed") or ""
                 count = review_count(row.get("review_count"))
-                if not card_id or not (status or last_reviewed or count > 0):
+                image_url = (row.get("concept_image_url") or "").strip()
+                image_alt = (row.get("concept_image_alt") or "").strip()
+                has_progress = bool(status or last_reviewed or count > 0)
+                has_ai_image = image_url.startswith("/api/ai-images/")
+                if not card_id or not (has_progress or has_ai_image):
                     continue
                 before = conn.total_changes
                 conn.execute(
                     """
-                    INSERT OR IGNORE INTO card_progress
-                        (card_id, known_status, last_reviewed, review_count, updated_at)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO card_progress
+                        (card_id, known_status, last_reviewed, review_count, concept_image_url, concept_image_alt, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(card_id) DO UPDATE SET
+                        known_status=CASE WHEN card_progress.known_status='' THEN excluded.known_status ELSE card_progress.known_status END,
+                        last_reviewed=CASE WHEN card_progress.last_reviewed='' THEN excluded.last_reviewed ELSE card_progress.last_reviewed END,
+                        review_count=CASE WHEN card_progress.review_count=0 THEN excluded.review_count ELSE card_progress.review_count END,
+                        concept_image_url=CASE WHEN card_progress.concept_image_url='' THEN excluded.concept_image_url ELSE card_progress.concept_image_url END,
+                        concept_image_alt=CASE WHEN card_progress.concept_image_url='' AND card_progress.concept_image_alt='' THEN excluded.concept_image_alt ELSE card_progress.concept_image_alt END,
+                        updated_at=CASE WHEN card_progress.updated_at='' THEN excluded.updated_at ELSE card_progress.updated_at END
                     """,
-                    (card_id, status, last_reviewed, count, now),
+                    (card_id, status, last_reviewed, count, image_url if has_ai_image else "", image_alt if has_ai_image else "", now),
                 )
-                imported += conn.total_changes - before
+                delta = conn.total_changes - before
+                if has_progress:
+                    imported += delta
+                if has_ai_image:
+                    migrated_ai_images += delta
         conn.commit()
-        print(f"progress migration: imported {imported} row(s) from existing remote CSV")
+        print(f"progress migration: imported {imported} row(s) from existing remote CSV; migrated {migrated_ai_images} AI image row(s)")
     finally:
         conn.close()
 else:

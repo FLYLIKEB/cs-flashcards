@@ -44,7 +44,16 @@ WIKI_BOOK_README_NAME = "README.md"
 WIKI_BOOK_HOME_SLUG = "_book"
 REVIEW_COLUMNS = ["known_status", "last_reviewed", "review_count"]
 VALID_STATUSES = {"O", "X", ""}
-QUESTION_ATTEMPT_RESULT_VALUES = {"all", "correct", "wrong", "pending"}
+QUESTION_ATTEMPT_RESULT_VALUES = {"all", "correct", "wrong", "pending", "ambiguous", "unknown"}
+QUESTION_ATTEMPT_JUDGMENT_VALUES = {"correct", "ambiguous", "wrong", "unknown", "pending"}
+QUESTION_ATTEMPT_JUDGMENT_LABELS = {
+    "correct": "맞음",
+    "ambiguous": "애매함",
+    "wrong": "틀림",
+    "unknown": "모름",
+    "pending": "미채점",
+}
+
 PUBLIC_USERNAME = os.environ.get("CS_FLASHCARDS_USERNAME", "cs")
 PUBLIC_PASSWORD = os.environ.get("CS_FLASHCARDS_PASSWORD", "")
 AUTH_COOKIE_NAME = "cs_flashcards_auth"
@@ -54,6 +63,7 @@ WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).s
 WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX", "")).strip().strip("/")
 WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
 CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_alt")
+AI_PROGRESS_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt")
 OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
 OPENAI_API_BASE = str(os.environ.get("CS_FLASHCARDS_OPENAI_API_BASE", "https://api.openai.com/v1")).rstrip("/")
 CODEX_MODEL = str(os.environ.get("CS_FLASHCARDS_CODEX_MODEL", "codex-mini-latest")).strip() or "codex-mini-latest"
@@ -98,7 +108,16 @@ class QuestionAttemptRequest(BaseModel):
     user_answer: str = Field(default="", max_length=20000)
     selected_choice_index: int | None = Field(default=None, ge=0, le=100)
     is_correct: bool | None = None
+    judgment: str = Field(default="pending", max_length=32)
     wrong_note: str = Field(default="", max_length=20000)
+    session_id: str = Field(default="", max_length=255)
+    session_title: str = Field(default="", max_length=255)
+    question_order: int | None = Field(default=None, ge=1, le=1000)
+    question_elapsed_seconds: int | None = Field(default=None, ge=0, le=86400)
+    session_elapsed_seconds: int | None = Field(default=None, ge=0, le=86400)
+    time_limit_seconds: int | None = Field(default=None, ge=0, le=86400)
+    question_started_at: str = Field(default="", max_length=64)
+    answered_at: str = Field(default="", max_length=64)
 
 
 class WikiChecklistRequest(BaseModel):
@@ -271,6 +290,11 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 bookmarked INTEGER NOT NULL DEFAULT 0 CHECK (bookmarked IN (0, 1)),
                 memo TEXT NOT NULL DEFAULT '',
                 memo_updated_at TEXT NOT NULL DEFAULT '',
+                definition TEXT NOT NULL DEFAULT '',
+                detailed_explanation TEXT NOT NULL DEFAULT '',
+                exam_note TEXT NOT NULL DEFAULT '',
+                concept_image_url TEXT NOT NULL DEFAULT '',
+                concept_image_alt TEXT NOT NULL DEFAULT '',
                 updated_at TEXT NOT NULL
             )
             """
@@ -282,6 +306,9 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
             conn.execute("ALTER TABLE card_progress ADD COLUMN memo TEXT NOT NULL DEFAULT ''")
         if "memo_updated_at" not in columns:
             conn.execute("ALTER TABLE card_progress ADD COLUMN memo_updated_at TEXT NOT NULL DEFAULT ''")
+        for field in AI_PROGRESS_FIELDS:
+            if field not in columns:
+                conn.execute(f"ALTER TABLE card_progress ADD COLUMN {field} TEXT NOT NULL DEFAULT ''")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_bookmarked ON card_progress(bookmarked)")
         conn.execute(
@@ -295,15 +322,41 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 user_answer TEXT NOT NULL DEFAULT '',
                 selected_choice_index INTEGER,
                 is_correct INTEGER,
+                judgment TEXT NOT NULL DEFAULT 'pending',
                 wrong_note TEXT NOT NULL DEFAULT '',
+                session_id TEXT NOT NULL DEFAULT '',
+                session_title TEXT NOT NULL DEFAULT '',
+                question_order INTEGER,
+                question_elapsed_seconds INTEGER,
+                session_elapsed_seconds INTEGER,
+                time_limit_seconds INTEGER,
+                question_started_at TEXT NOT NULL DEFAULT '',
+                answered_at TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE
             )
             """
         )
+        question_columns = {row["name"] for row in conn.execute("PRAGMA table_info(question_attempts)").fetchall()}
+        question_column_definitions = {
+            "judgment": "TEXT NOT NULL DEFAULT 'pending'",
+            "session_id": "TEXT NOT NULL DEFAULT ''",
+            "session_title": "TEXT NOT NULL DEFAULT ''",
+            "question_order": "INTEGER",
+            "question_elapsed_seconds": "INTEGER",
+            "session_elapsed_seconds": "INTEGER",
+            "time_limit_seconds": "INTEGER",
+            "question_started_at": "TEXT NOT NULL DEFAULT ''",
+            "answered_at": "TEXT NOT NULL DEFAULT ''",
+        }
+        for column, definition in question_column_definitions.items():
+            if column not in question_columns:
+                conn.execute(f"ALTER TABLE question_attempts ADD COLUMN {column} {definition}")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_card_id ON question_attempts(card_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
+
         if not existed and seed_rows:
             now = utc_now_iso()
             conn.executemany(
@@ -332,12 +385,12 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
 
 def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     ensure_progress_db(progress_db_path)
+    select_fields = ["card_id", "known_status", "last_reviewed", "review_count", "bookmarked", "memo", "memo_updated_at", *AI_PROGRESS_FIELDS]
     with closing(connect_progress_db(progress_db_path)) as conn:
-        rows = conn.execute(
-            "SELECT card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at FROM card_progress"
-        ).fetchall()
-    return {
-        row["card_id"]: {
+        rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM card_progress").fetchall()
+    progress: dict[str, dict[str, str]] = {}
+    for row in rows:
+        item = {
             "known_status": row["known_status"] if row["known_status"] in VALID_STATUSES else "",
             "last_reviewed": row["last_reviewed"] or "",
             "review_count": normalized_review_count(str(row["review_count"])),
@@ -345,8 +398,12 @@ def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
             "memo": row["memo"] or "",
             "memo_updated_at": row["memo_updated_at"] or "",
         }
-        for row in rows
-    }
+        for field in AI_PROGRESS_FIELDS:
+            value = str(row[field] or "").strip()
+            if value:
+                item[field] = value
+        progress[row["card_id"]] = item
+    return progress
 
 
 def merge_progress(
@@ -387,6 +444,45 @@ def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) 
     ensure_progress_db(db_path, raw_rows)
     rows = merge_progress(clean_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
+
+
+def save_card_progress_overrides(
+    card_id: str,
+    updates: dict[str, str],
+    progress_db_path: Path,
+) -> bool:
+    effective_updates = {
+        field: normalized_card_text(value, limit=AI_PROGRESS_FIELD_LIMITS[field])
+        for field, value in updates.items()
+        if field in AI_PROGRESS_FIELDS and value is not None
+    }
+    if not effective_updates:
+        return False
+    ensure_progress_db(progress_db_path)
+    now = utc_now_iso()
+    assignments = ", ".join(f"{field}=?" for field in effective_updates)
+    values = list(effective_updates.values())
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        conn.execute(
+            """
+            INSERT INTO card_progress (card_id, updated_at)
+            VALUES (?, ?)
+            ON CONFLICT(card_id) DO NOTHING
+            """,
+            (card_id, now),
+        )
+        before = conn.execute(
+            f"SELECT {', '.join(effective_updates.keys())} FROM card_progress WHERE card_id=?",
+            (card_id,),
+        ).fetchone()
+        changed = any(str((before[field] if before else "") or "") != value for field, value in effective_updates.items())
+        if changed:
+            conn.execute(
+                f"UPDATE card_progress SET {assignments}, updated_at=? WHERE card_id=?",
+                [*values, now, card_id],
+            )
+            conn.commit()
+    return changed
 
 
 def write_cards(rows: list[dict[str, str]], fieldnames: list[str], csv_path: Path = CSV_PATH) -> None:
@@ -538,6 +634,10 @@ AI_REWRITE_FIELD_LIMITS = {
     "exam_note": 20000,
     "concept_image_alt": 4000,
 }
+AI_PROGRESS_FIELD_LIMITS = {
+    **AI_REWRITE_FIELD_LIMITS,
+    "concept_image_url": 4096,
+}
 
 
 def normalized_card_text(value: Any, *, limit: int) -> str:
@@ -685,12 +785,10 @@ def update_card_ai_content(
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
-    raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
-    target: dict[str, str] | None = None
-    for row in raw_rows:
-        if row.get("id") == card_id:
-            target = row
-            break
+    del backup_dir
+    db_path = progress_db_for(csv_path, progress_db_path)
+    rows, _ = read_cards(csv_path, db_path)
+    target = next((row for row in rows if row.get("id") == card_id), None)
     if target is None:
         raise KeyError(card_id)
     updates = {
@@ -699,23 +797,18 @@ def update_card_ai_content(
         "exam_note": payload.exam_note,
         "concept_image_alt": payload.concept_image_alt,
     }
-    changed = False
+    changed_updates: dict[str, str] = {}
     for field, value in updates.items():
         if value is None:
             continue
-        if field not in fieldnames:
-            fieldnames.append(field)
         normalized = normalized_card_text(value, limit=AI_REWRITE_FIELD_LIMITS[field])
         if str(target.get(field, "")) != normalized:
-            target[field] = normalized
-            changed = True
-    backup_path = backup_csv(csv_path, backup_dir) if changed else None
-    if changed:
-        write_cards(raw_rows, fieldnames, csv_path)
-    updated_rows, _ = read_cards(csv_path, progress_db_path)
+            changed_updates[field] = normalized
+    save_card_progress_overrides(card_id, changed_updates, db_path)
+    updated_rows, _ = read_cards(csv_path, db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
-            return row, backup_path
+            return row, None
     raise KeyError(card_id)
 AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
 
@@ -872,12 +965,10 @@ def apply_ai_concept_image(
     image_dir: Path = AI_IMAGE_DIR,
     preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
 ) -> tuple[dict[str, str], Path | None, str]:
-    raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
-    target: dict[str, str] | None = None
-    for row in raw_rows:
-        if row.get("id") == card_id:
-            target = row
-            break
+    del backup_dir
+    db_path = progress_db_for(csv_path, progress_db_path)
+    rows, _ = read_cards(csv_path, db_path)
+    target = next((row for row in rows if row.get("id") == card_id), None)
     if target is None:
         raise KeyError(card_id)
     preview_path, metadata = read_ai_image_preview(payload.preview_name, preview_dir=preview_dir)
@@ -888,22 +979,13 @@ def apply_ai_concept_image(
     final_name = f"{safe_card_id}-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid4().hex[:8]}.png"
     final_path = ai_image_file_path(image_root, final_name)
     shutil.copy2(preview_path, final_path)
-    changed = False
-    if "concept_image_url" not in fieldnames:
-        fieldnames.append("concept_image_url")
-    if "concept_image_alt" not in fieldnames:
-        fieldnames.append("concept_image_alt")
     next_url = f"/api/ai-images/{final_name}"
     next_alt = normalized_card_text(metadata.get("alt", concept_image_alt_text(target)), limit=4000)
-    if str(target.get("concept_image_url") or "") != next_url:
-        target["concept_image_url"] = next_url
-        changed = True
-    if str(target.get("concept_image_alt") or "") != next_alt:
-        target["concept_image_alt"] = next_alt
-        changed = True
-    backup_path = backup_csv(csv_path, backup_dir) if changed else None
-    if changed:
-        write_cards(raw_rows, fieldnames, csv_path)
+    save_card_progress_overrides(
+        card_id,
+        {"concept_image_url": next_url, "concept_image_alt": next_alt},
+        db_path,
+    )
     try:
         preview_path.unlink(missing_ok=True)
         preview_path.with_suffix(".json").unlink(missing_ok=True)
@@ -913,10 +995,10 @@ def apply_ai_concept_image(
         meta_path = preview_path.with_suffix(".json")
         if meta_path.exists():
             meta_path.unlink()
-    updated_rows, _ = read_cards(csv_path, progress_db_path)
+    updated_rows, _ = read_cards(csv_path, db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
-            return row, backup_path, next_url
+            return row, None, next_url
     raise KeyError(card_id)
 
 
@@ -944,10 +1026,57 @@ def discard_ai_concept_image_preview(
 
 
 
+def resolved_question_attempt_judgment(value: str | None, is_correct: bool | None) -> str:
+    normalized = str(value or "").strip().lower()
+    if normalized in QUESTION_ATTEMPT_JUDGMENT_VALUES:
+        return normalized
+    if is_correct is True:
+        return "correct"
+    if is_correct is False:
+        return "wrong"
+    return "pending"
+
+
+def normalize_question_attempt_judgment(value: str | None, is_correct: bool | None = None) -> str:
+    raw = str(value or "").strip().lower()
+    aliases = {
+        "": "pending",
+        "pending": "pending",
+        "ungraded": "pending",
+        "미채점": "pending",
+        "correct": "correct",
+        "right": "correct",
+        "맞음": "correct",
+        "정답": "correct",
+        "ambiguous": "ambiguous",
+        "uncertain": "ambiguous",
+        "애매": "ambiguous",
+        "애매함": "ambiguous",
+        "wrong": "wrong",
+        "incorrect": "wrong",
+        "틀림": "wrong",
+        "오답": "wrong",
+        "unknown": "unknown",
+        "dont_know": "unknown",
+        "don't know": "unknown",
+        "모름": "unknown",
+    }
+    normalized = aliases.get(raw)
+    if normalized is None:
+        raise ValueError(f"Unsupported question attempt judgment: {value}")
+    if normalized == "pending" and is_correct is True:
+        return "correct"
+    if normalized == "pending" and is_correct is False:
+        return "wrong"
+    return normalized
+
+
 def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     if row is None:
         return None
     raw_result = row["is_correct"]
+    is_correct = None if raw_result is None else bool(int(raw_result))
+    judgment = resolved_question_attempt_judgment(row["judgment"] if "judgment" in row.keys() else None, is_correct)
     return {
         "question_id": row["question_id"],
         "card_id": row["card_id"],
@@ -956,8 +1085,18 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
         "body": row["body"] or "",
         "user_answer": row["user_answer"] or "",
         "selected_choice_index": row["selected_choice_index"],
-        "is_correct": None if raw_result is None else bool(int(raw_result)),
+        "is_correct": is_correct,
+        "judgment": judgment,
+        "judgment_label": QUESTION_ATTEMPT_JUDGMENT_LABELS.get(judgment, QUESTION_ATTEMPT_JUDGMENT_LABELS["pending"]),
         "wrong_note": row["wrong_note"] or "",
+        "session_id": row["session_id"] if "session_id" in row.keys() else "",
+        "session_title": row["session_title"] if "session_title" in row.keys() else "",
+        "question_order": row["question_order"] if "question_order" in row.keys() else None,
+        "question_elapsed_seconds": row["question_elapsed_seconds"] if "question_elapsed_seconds" in row.keys() else None,
+        "session_elapsed_seconds": row["session_elapsed_seconds"] if "session_elapsed_seconds" in row.keys() else None,
+        "time_limit_seconds": row["time_limit_seconds"] if "time_limit_seconds" in row.keys() else None,
+        "question_started_at": row["question_started_at"] if "question_started_at" in row.keys() else "",
+        "answered_at": row["answered_at"] if "answered_at" in row.keys() else "",
         "created_at": row["created_at"] or "",
         "updated_at": row["updated_at"] or "",
     }
@@ -973,10 +1112,16 @@ def normalize_question_attempt_result(value: str | None) -> str:
         "right": "correct",
         "맞음": "correct",
         "정답": "correct",
+        "ambiguous": "ambiguous",
+        "uncertain": "ambiguous",
+        "애매": "ambiguous",
+        "애매함": "ambiguous",
         "wrong": "wrong",
         "incorrect": "wrong",
         "틀림": "wrong",
         "오답": "wrong",
+        "unknown": "unknown",
+        "모름": "unknown",
         "pending": "pending",
         "ungraded": "pending",
         "미채점": "pending",
@@ -1010,15 +1155,13 @@ def read_question_attempts(
         where_clauses.append(f"card_id IN ({placeholders})")
         where_params.extend(selected_ids)
 
+    judgment_sql = "CASE WHEN TRIM(COALESCE(judgment, '')) <> '' THEN LOWER(TRIM(judgment)) WHEN is_correct = 1 THEN 'correct' WHEN is_correct = 0 THEN 'wrong' ELSE 'pending' END"
     base_where = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
     list_clauses = list(where_clauses)
     list_params = list(where_params)
-    if normalized_result == "correct":
-        list_clauses.append("is_correct = 1")
-    elif normalized_result == "wrong":
-        list_clauses.append("is_correct = 0")
-    elif normalized_result == "pending":
-        list_clauses.append("is_correct IS NULL")
+    if normalized_result != "all":
+        list_clauses.append(f"{judgment_sql} = ?")
+        list_params.append(normalized_result)
     list_where = f"WHERE {' AND '.join(list_clauses)}" if list_clauses else ""
 
     with closing(connect_progress_db(db_path)) as conn:
@@ -1026,9 +1169,11 @@ def read_question_attempts(
             f"""
             SELECT
                 COUNT(*) AS total_count,
-                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS correct_count,
-                SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS wrong_count,
-                SUM(CASE WHEN is_correct IS NULL THEN 1 ELSE 0 END) AS pending_count
+                SUM(CASE WHEN {judgment_sql} = 'correct' THEN 1 ELSE 0 END) AS correct_count,
+                SUM(CASE WHEN {judgment_sql} = 'ambiguous' THEN 1 ELSE 0 END) AS ambiguous_count,
+                SUM(CASE WHEN {judgment_sql} = 'wrong' THEN 1 ELSE 0 END) AS wrong_count,
+                SUM(CASE WHEN {judgment_sql} = 'unknown' THEN 1 ELSE 0 END) AS unknown_count,
+                SUM(CASE WHEN {judgment_sql} = 'pending' THEN 1 ELSE 0 END) AS pending_count
             FROM question_attempts
             {base_where}
             """,
@@ -1037,7 +1182,10 @@ def read_question_attempts(
         attempt_rows = conn.execute(
             f"""
             SELECT question_id, card_id, question_type, prompt, body, user_answer,
-                   selected_choice_index, is_correct, wrong_note, created_at, updated_at
+                   selected_choice_index, is_correct, judgment, wrong_note, session_id,
+                   session_title, question_order, question_elapsed_seconds,
+                   session_elapsed_seconds, time_limit_seconds, question_started_at,
+                   answered_at, created_at, updated_at
             FROM question_attempts
             {list_where}
             ORDER BY updated_at DESC, created_at DESC, question_id DESC
@@ -1050,13 +1198,12 @@ def read_question_attempts(
     for row in attempt_rows:
         item = question_attempt_row_to_dict(row) or {}
         card = card_map.get(item.get("card_id", ""), {})
-        raw_result = item.get("is_correct")
         item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
         item["english"] = card.get("english") or ""
         item["category"] = card.get("category") or ""
         item["card_url"] = flashcard_card_url(item.get("card_id") or "")
-        item["result_key"] = "correct" if raw_result is True else "wrong" if raw_result is False else "pending"
-        item["result_label"] = "맞음" if raw_result is True else "틀림" if raw_result is False else "미채점"
+        item["result_key"] = item.get("judgment") or "pending"
+        item["result_label"] = QUESTION_ATTEMPT_JUDGMENT_LABELS.get(item["result_key"], QUESTION_ATTEMPT_JUDGMENT_LABELS["pending"])
         items.append(item)
 
     return {
@@ -1065,7 +1212,9 @@ def read_question_attempts(
             "filter": normalized_result,
             "total": int(summary_row["total_count"] or 0) if summary_row else 0,
             "correct": int(summary_row["correct_count"] or 0) if summary_row else 0,
+            "ambiguous": int(summary_row["ambiguous_count"] or 0) if summary_row else 0,
             "wrong": int(summary_row["wrong_count"] or 0) if summary_row else 0,
+            "unknown": int(summary_row["unknown_count"] or 0) if summary_row else 0,
             "pending": int(summary_row["pending_count"] or 0) if summary_row else 0,
             "selected_card_count": len(selected_ids) if selected_ids else len(rows),
             "returned": len(items),
@@ -1137,12 +1286,18 @@ def save_question_attempt(
     if not question_id:
         raise ValueError("question_id is required")
 
+    judgment = normalize_question_attempt_judgment(payload.judgment, payload.is_correct)
+    is_correct_value = 1 if judgment == "correct" else 0 if judgment in {"ambiguous", "wrong", "unknown"} else None
     wrong_note = str(payload.wrong_note or "")[:20000]
-    if payload.is_correct is True:
+    if is_correct_value == 1:
         wrong_note = ""
     db_path = progress_db_for(csv_path, progress_db_path)
     ensure_progress_db(db_path)
     now = utc_now_iso()
+    answered_at = str(payload.answered_at or now)[:64]
+    question_started_at = str(payload.question_started_at or "")[:64]
+    session_id = str(payload.session_id or "")[:255]
+    session_title = str(payload.session_title or "")[:255]
     with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
             """
@@ -1153,17 +1308,19 @@ def save_question_attempt(
             (payload.card_id, now),
         )
         existing = conn.execute(
-            "SELECT created_at FROM question_attempts WHERE question_id = ?",
+            "SELECT created_at, question_started_at FROM question_attempts WHERE question_id = ?",
             (question_id,),
         ).fetchone()
         conn.execute(
             """
             INSERT INTO question_attempts (
                 question_id, card_id, question_type, prompt, body,
-                user_answer, selected_choice_index, is_correct, wrong_note,
-                created_at, updated_at
+                user_answer, selected_choice_index, is_correct, judgment, wrong_note,
+                session_id, session_title, question_order, question_elapsed_seconds,
+                session_elapsed_seconds, time_limit_seconds, question_started_at,
+                answered_at, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(question_id) DO UPDATE SET
                 card_id = excluded.card_id,
                 question_type = excluded.question_type,
@@ -1172,7 +1329,16 @@ def save_question_attempt(
                 user_answer = excluded.user_answer,
                 selected_choice_index = excluded.selected_choice_index,
                 is_correct = excluded.is_correct,
+                judgment = excluded.judgment,
                 wrong_note = excluded.wrong_note,
+                session_id = excluded.session_id,
+                session_title = excluded.session_title,
+                question_order = excluded.question_order,
+                question_elapsed_seconds = excluded.question_elapsed_seconds,
+                session_elapsed_seconds = excluded.session_elapsed_seconds,
+                time_limit_seconds = excluded.time_limit_seconds,
+                question_started_at = excluded.question_started_at,
+                answered_at = excluded.answered_at,
                 updated_at = excluded.updated_at
             """,
             (
@@ -1183,8 +1349,17 @@ def save_question_attempt(
                 str(payload.body or "")[:12000],
                 str(payload.user_answer or "")[:20000],
                 payload.selected_choice_index,
-                None if payload.is_correct is None else (1 if payload.is_correct else 0),
+                is_correct_value,
+                judgment,
                 wrong_note,
+                session_id,
+                session_title,
+                payload.question_order,
+                payload.question_elapsed_seconds,
+                payload.session_elapsed_seconds,
+                payload.time_limit_seconds,
+                question_started_at or (existing["question_started_at"] if existing and existing["question_started_at"] else ""),
+                answered_at,
                 existing["created_at"] if existing else now,
                 now,
             ),
@@ -1193,7 +1368,10 @@ def save_question_attempt(
         saved = conn.execute(
             """
             SELECT question_id, card_id, question_type, prompt, body, user_answer,
-                   selected_choice_index, is_correct, wrong_note, created_at, updated_at
+                   selected_choice_index, is_correct, judgment, wrong_note, session_id,
+                   session_title, question_order, question_elapsed_seconds,
+                   session_elapsed_seconds, time_limit_seconds, question_started_at,
+                   answered_at, created_at, updated_at
             FROM question_attempts
             WHERE question_id = ?
             """,

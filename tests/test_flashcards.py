@@ -241,7 +241,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(cleared['memo'], '')
             self.assertEqual(cleared['memo_updated_at'], '')
 
-    def test_update_card_ai_content_rewrites_csv_fields_and_creates_backup(self):
+    def test_update_card_ai_content_persists_overrides_in_progress_db(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
@@ -263,15 +263,20 @@ class FlashcardProgressTests(unittest.TestCase):
             )
 
             self.assertEqual(updated['definition'], '새 정의')
-            self.assertIsNotNone(backup_path)
-            self.assertTrue(backup_path.exists())
+            self.assertIsNone(backup_path)
             raw = csv_status(csv_path)
-            self.assertEqual(raw['definition'], '새 정의')
-            self.assertEqual(raw['concept_image_alt'], '새 학습 이미지 설명')
+            self.assertEqual(raw['definition'], '정의')
+            self.assertEqual(raw['concept_image_alt'], '테스트 개념 이해 이미지')
             self.assertEqual(raw['known_status'], 'O')
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['definition'], '새 정의')
-
+            with closing(sqlite3.connect(db_path)) as conn:
+                saved = conn.execute(
+                    'SELECT definition, detailed_explanation, exam_note, concept_image_alt FROM card_progress WHERE card_id=?',
+                    ('CS-001',),
+                ).fetchone()
+            self.assertEqual(saved[0], '새 정의')
+            self.assertEqual(saved[3], '새 학습 이미지 설명')
     def test_rewrite_card_with_codex_parses_json_output(self):
         original_key = flashcard_app.OPENAI_API_KEY
         try:
@@ -358,8 +363,10 @@ class FlashcardProgressTests(unittest.TestCase):
                     ),
                 )
                 self.assertEqual(data['card']['definition'], '적용 정의')
-                self.assertTrue(data['backup_path'])
-                self.assertEqual(csv_status(csv_path)['exam_note'], '적용 포인트')
+                self.assertEqual(data['backup_path'], '')
+                self.assertEqual(csv_status(csv_path)['exam_note'], '포인트')
+                rows, _ = read_cards(csv_path, db_path)
+                self.assertEqual(rows[0]['exam_note'], '적용 포인트')
             finally:
                 flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
@@ -428,11 +435,13 @@ class FlashcardProgressTests(unittest.TestCase):
 
             self.assertTrue(image_url.startswith('/api/ai-images/CS-001-'))
             self.assertEqual(updated['concept_image_alt'], 'AI 생성 새 이미지 설명')
-            self.assertIsNotNone(backup_path)
-            self.assertTrue(backup_path.exists())
+            self.assertIsNone(backup_path)
             saved = csv_status(csv_path)
-            self.assertEqual(saved['concept_image_alt'], 'AI 생성 새 이미지 설명')
-            self.assertEqual(saved['concept_image_url'], image_url)
+            self.assertEqual(saved['concept_image_alt'], '테스트 개념 이해 이미지')
+            self.assertEqual(saved['concept_image_url'], 'https://example.com/test-concept.png')
+            rows, _ = read_cards(csv_path, db_path)
+            self.assertEqual(rows[0]['concept_image_url'], image_url)
+            self.assertEqual(rows[0]['concept_image_alt'], 'AI 생성 새 이미지 설명')
             self.assertFalse((preview_dir / preview_name).exists())
             self.assertEqual(len(list(image_dir.glob('*.png'))), 1)
 
