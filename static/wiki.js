@@ -130,7 +130,7 @@ function wikiRenderTocItems(items, activeTrail = wikiActiveTrailSlugs()) {
     const toggle = hasChildren
       ? `<button class="wiki-toc-toggle" type="button" data-wiki-toc-toggle="${wikiEscapeHtml(item.slug)}" aria-expanded="${expanded}" aria-label="${expanded ? '하위 목차 접기' : '하위 목차 펼치기'}">▸</button>`
       : '<span class="wiki-toc-spacer" aria-hidden="true"></span>';
-    return `<li class="wiki-toc-item${hasChildren ? ' has-children' : ''}${expanded ? ' open' : ''}"><div class="wiki-toc-row">${toggle}<a class="wiki-toc-link${active ? ' active' : ''}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1" data-wiki-slug="${wikiEscapeHtml(item.slug)}" data-wiki-expanded="${expanded ? '1' : '0'}"${hasChildren ? ' data-wiki-has-children="1"' : ''}${active ? ' aria-current="page"' : ''}>${wikiEscapeHtml(item.title)}</a></div>${children}</li>`;
+    return `<li class="wiki-toc-item${hasChildren ? ' has-children' : ''}${expanded ? ' open' : ''}"><div class="wiki-toc-row">${toggle}<a class="wiki-toc-link${active ? ' active' : ''}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1"${active ? ' aria-current="page"' : ''}>${wikiEscapeHtml(item.title)}</a></div>${children}</li>`;
   }).join('')}</ul>`;
 }
 
@@ -217,11 +217,6 @@ document.addEventListener('click', (event) => {
   const href = link.getAttribute('href') || '';
   if (!href.startsWith('/wiki/page/')) return;
   const slug = decodeURIComponent(href.replace('/wiki/page/', '')).replace(/^\/+|\/+$/g, '');
-  if (link.dataset.wikiHasChildren === '1' && link.dataset.wikiExpanded !== '1' && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-    event.preventDefault();
-    toggleWikiTocBranch(link.dataset.wikiSlug || slug);
-    return;
-  }
   event.preventDefault();
   wikiLoadPage(slug, {push: true}).then(() => {
     closeWikiSidebarOnMobile();
