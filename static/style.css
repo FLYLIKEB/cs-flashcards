@@ -14,6 +14,7 @@
   --unknown-soft: #fff0f1;
   --shadow: 0 22px 70px rgba(29, 25, 20, .08);
   --radius: 22px;
+  --wiki-font-family: "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -4157,13 +4158,17 @@ select,
   min-height: 100vh;
   background: #f5f5f5;
   color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+  font-family: var(--wiki-font-family);
   --wiki-link: #337ab7;
   --wiki-link-soft: #f5f9fc;
   --wiki-border: #dddddd;
   --wiki-border-soft: #eeeeee;
   --wiki-surface: #ffffff;
   --wiki-muted: #777777;
+}
+
+.wiki-page-shell :where(h1, h2, h3, h4, h5, h6, pre, code, kbd, samp) {
+  font-family: inherit;
 }
 
 .wiki-topbar {
