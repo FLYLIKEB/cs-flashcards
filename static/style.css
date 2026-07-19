@@ -4693,7 +4693,7 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   }
 }
 
-@media (max-width: 980px) {
+@media (max-width: 720px) {
   .wiki-topbar {
     position: static;
   }

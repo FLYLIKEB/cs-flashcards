@@ -33,7 +33,7 @@ function wikiCurrentSlug() {
 }
 
 function wikiDefaultSidebarOpen() {
-  return window.matchMedia('(min-width: 981px)').matches;
+  return window.matchMedia('(min-width: 721px)').matches;
 }
 
 function readSavedWikiSidebarState() {
@@ -74,7 +74,7 @@ function toggleWikiSidebar(force = !wikiState.sidebarOpen) {
 }
 
 function closeWikiSidebarOnMobile() {
-  if (!window.matchMedia('(max-width: 980px)').matches) return;
+  if (!window.matchMedia('(max-width: 720px)').matches) return;
   if (!wikiState.sidebarOpen) return;
   toggleWikiSidebar(false);
 }
