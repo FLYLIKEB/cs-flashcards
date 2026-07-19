@@ -4171,6 +4171,13 @@ select,
   font-size: .77rem;
   line-height: 1.45;
 }
+.question-history-session-meta {
+  margin: .16rem 0 0;
+  color: #516071;
+  font-size: .75rem;
+  line-height: 1.45;
+}
+
 .question-history-copy {
   display: grid;
   gap: .24rem;
@@ -4236,6 +4243,17 @@ select,
 .question-history-result.pending {
   color: var(--muted);
 }
+.question-history-result.ambiguous {
+  border-color: rgba(176, 120, 24, .18);
+  background: rgba(255, 247, 214, .92);
+  color: #8a5a00;
+}
+.question-history-result.unknown {
+  border-color: rgba(93, 64, 132, .18);
+  background: rgba(244, 237, 255, .92);
+  color: #5b3f7f;
+}
+
 .question-history-item-actions {
   display: flex;
   justify-content: flex-end;
@@ -4284,6 +4302,13 @@ select,
   padding: .2rem .44rem;
   font-size: .74rem;
 }
+.question-session-meta {
+  margin: .48rem 0 0;
+  color: #516071;
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
 .question-body {
   margin: 0 0 .62rem;
   color: #2a2a28;
@@ -4353,6 +4378,17 @@ select,
   background: var(--known-soft);
   color: var(--known);
 }
+.question-grade-button.active.ambiguous {
+  border-color: rgba(176, 120, 24, .2);
+  background: rgba(255, 247, 214, .92);
+  color: #8a5a00;
+}
+.question-grade-button.active.unknown {
+  border-color: rgba(93, 64, 132, .2);
+  background: rgba(244, 237, 255, .92);
+  color: #5b3f7f;
+}
+
 .question-grade-button.active.wrong,
 .question-grade-button.wrong-note-save {
   border-color: rgba(159, 47, 63, .2);
@@ -4369,6 +4405,12 @@ select,
 }
 .question-grade-status.wrong {
   color: var(--unknown);
+}
+.question-grade-status.ambiguous {
+  color: #8a5a00;
+}
+.question-grade-status.unknown {
+  color: #5b3f7f;
 }
 .question-answer,
 .question-review-box {

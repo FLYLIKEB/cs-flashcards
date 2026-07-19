@@ -1250,7 +1250,7 @@ def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, A
             SELECT card_id, wrong_note, updated_at
             FROM question_attempts
             WHERE is_correct = 0 AND TRIM(wrong_note) <> ''
-            ORDER BY updated_at DESC
+            ORDER BY updated_at DESC, answered_at DESC, question_order DESC, question_id DESC
             """
         ).fetchall():
             card_id = row["card_id"]

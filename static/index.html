@@ -187,11 +187,23 @@
                 <option value="40">40</option>
               </select>
             </label>
+            <label class="question-count-label" title="제한 시간">
+              <span>시간</span>
+              <select id="questionTimeLimitSelect">
+                <option value="0">무제한</option>
+                <option value="30">30분</option>
+                <option value="60">60분</option>
+                <option value="90" selected>90분</option>
+                <option value="150">150분</option>
+              </select>
+            </label>
             <button id="generateQuestionsBtn" class="question-toolbar-button is-primary" type="button">생성</button>
+            <button id="finishQuestionSessionBtn" class="question-toolbar-button" type="button" title="현재 모의 세트 종료 및 저장">종료</button>
             <button id="openAiQuizSearchBtn" class="question-toolbar-button" type="button" title="선택한 유형과 문제 수로 Google AI 검색 열기">AI</button>
             <button id="questionHistoryBtn" class="question-toolbar-button" type="button" title="현재 필터 기준 문제 기록 보기">기록</button>
             <button id="closeQuestionModeBtn" class="question-toolbar-button is-ghost" type="button" aria-label="문제 풀이 닫기" title="문제 풀이 닫기">×</button>
           </div>
+
         </div>
         <div class="question-type-row" aria-label="문제 유형 선택">
           <label><input id="questionTypeShort" type="checkbox" value="short" checked /> 주관식</label>
@@ -360,7 +372,9 @@
       <div class="question-history-filter-row" aria-label="문제 기록 필터">
         <button type="button" data-question-history-filter="all">전체</button>
         <button type="button" data-question-history-filter="correct">맞음</button>
+        <button type="button" data-question-history-filter="ambiguous">애매함</button>
         <button type="button" data-question-history-filter="wrong">틀림</button>
+        <button type="button" data-question-history-filter="unknown">모름</button>
         <button type="button" data-question-history-filter="pending">미채점</button>
       </div>
       <div id="questionHistoryBody" class="question-history-body"></div>

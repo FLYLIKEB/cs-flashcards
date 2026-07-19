@@ -263,7 +263,10 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionTypeSubjective"',
             'id="questionTypeMultipleChoice"',
             'id="questionTypeEssay"',
+            'id="questionCountSelect"',
+            'id="questionTimeLimitSelect"',
             'id="generateQuestionsBtn"',
+            'id="finishQuestionSessionBtn"',
             'id="openAiQuizSearchBtn"',
             'id="questionHistoryBtn"',
             'id="revealAnswerBtn"',
@@ -272,6 +275,8 @@ class StaticFrontendTests(unittest.TestCase):
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
             'questionMode: false',
+            'questionSessionId:',
+            'questionSessionTitle:',
             'function generateQuestionsFromCurrentFilter()',
             '/api/questions/generate',
             'function renderQuestionPanel()',
@@ -286,11 +291,14 @@ class StaticFrontendTests(unittest.TestCase):
             'googleAiSearchUrl(aiQuizSearchPrompt())',
             'question-mode-active',
             '/api/questions/attempt',
-            'function saveQuestionAttempt(question)',
-            'function markCurrentQuestion(correct)',
+            'function saveQuestionAttempt(question, {quiet = false} = {})',
+            'function setQuestionJudgment(judgment)',
+            'function finishQuestionSession()',
             'function saveCurrentWrongNote()',
             'question-answer-input',
             'question-wrong-note',
+            'questionTimeLimitSelect',
+            'finishQuestionSessionBtn',
             'new URLSearchParams(window.location.search)',
             '/api/questions/attempts',
             'function openQuestionHistory()',
@@ -300,18 +308,25 @@ class StaticFrontendTests(unittest.TestCase):
             'data-question-history-filter',
             'function markQuestionSourceCard(status)',
             'data-question-mark',
+            'data-question-judgment',
             'question-review-box',
             'question-review-actions',
             "markQuestionSourceCard('O')",
             "markQuestionSourceCard('X')",
             'const reviewCard = currentQuestionCard();',
             'question-history-field',
+            'question-session-meta',
+            'question-history-session-meta',
         ]:
             self.assertIn(snippet, APP_JS)
         self.assertIn('id="questionHistoryDialog"', INDEX_HTML)
         self.assertIn('id="questionHistoryBody"', INDEX_HTML)
+        self.assertIn('data-question-history-filter="ambiguous"', INDEX_HTML)
+        self.assertIn('data-question-history-filter="unknown"', INDEX_HTML)
         self.assertIn('.question-history-filter-row', STYLE_CSS)
         self.assertIn('.question-history-item', STYLE_CSS)
+        self.assertIn('.question-session-meta', STYLE_CSS)
+        self.assertIn('.question-history-session-meta', STYLE_CSS)
         self.assertIn('question-toolbar-button', INDEX_HTML)
         self.assertIn('.question-toolbar-button', STYLE_CSS)
 

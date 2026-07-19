@@ -552,13 +552,27 @@ class FlashcardProgressTests(unittest.TestCase):
                     body='정의',
                     user_answer='검증',
                     is_correct=False,
+                    judgment='wrong',
                     wrong_note='정의와 용어를 혼동함',
+                    session_id='mock-001',
+                    session_title='OS/DB 모의 세트 1',
+                    question_order=1,
+                    question_elapsed_seconds=48,
+                    session_elapsed_seconds=48,
+                    time_limit_seconds=5400,
+                    question_started_at='2026-07-19T09:00:00+09:00',
+                    answered_at='2026-07-19T09:00:48+09:00',
                 ),
                 csv_path,
                 db_path,
             )
             self.assertFalse(first['attempt']['is_correct'])
+            self.assertEqual(first['attempt']['judgment'], 'wrong')
             self.assertEqual(first['attempt']['wrong_note'], '정의와 용어를 혼동함')
+            self.assertEqual(first['attempt']['session_id'], 'mock-001')
+            self.assertEqual(first['attempt']['session_title'], 'OS/DB 모의 세트 1')
+            self.assertEqual(first['attempt']['question_elapsed_seconds'], 48)
+            self.assertEqual(first['attempt']['session_elapsed_seconds'], 48)
 
             second = save_question_attempt(
                 flashcard_app.QuestionAttemptRequest(
@@ -570,28 +584,61 @@ class FlashcardProgressTests(unittest.TestCase):
                     user_answer='테스트',
                     selected_choice_index=1,
                     is_correct=True,
+                    judgment='correct',
+                    session_id='mock-001',
+                    session_title='OS/DB 모의 세트 1',
+                    question_order=2,
+                    question_elapsed_seconds=22,
+                    session_elapsed_seconds=70,
+                    time_limit_seconds=5400,
                 ),
                 csv_path,
                 db_path,
             )
             self.assertTrue(second['attempt']['is_correct'])
+            self.assertEqual(second['attempt']['judgment'], 'correct')
+
+            third = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-subjective-3',
+                    card_id='CS-001',
+                    question_type='subjective',
+                    prompt='장단점 서술',
+                    body='비교 설명',
+                    user_answer='애매한 답안',
+                    is_correct=False,
+                    judgment='ambiguous',
+                    wrong_note='정의는 맞췄지만 장단점 비교가 빠짐',
+                    session_id='mock-001',
+                    session_title='OS/DB 모의 세트 1',
+                    question_order=3,
+                    question_elapsed_seconds=95,
+                    session_elapsed_seconds=165,
+                    time_limit_seconds=5400,
+                ),
+                csv_path,
+                db_path,
+            )
+            self.assertFalse(third['attempt']['is_correct'])
+            self.assertEqual(third['attempt']['judgment'], 'ambiguous')
 
             rows, _ = read_cards(csv_path, db_path)
-            self.assertEqual(rows[0]['question_attempt_count'], 2)
+            self.assertEqual(rows[0]['question_attempt_count'], 3)
             self.assertEqual(rows[0]['question_correct_count'], 1)
-            self.assertEqual(rows[0]['question_wrong_count'], 1)
-            self.assertEqual(rows[0]['latest_wrong_note'], '정의와 용어를 혼동함')
+            self.assertEqual(rows[0]['question_wrong_count'], 2)
+            self.assertEqual(rows[0]['latest_wrong_note'], '정의는 맞췄지만 장단점 비교가 빠짐')
 
             with closing(sqlite3.connect(db_path)) as conn:
                 saved = conn.execute(
                     'SELECT COUNT(*), SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) FROM question_attempts WHERE card_id=?',
                     ('CS-001',),
                 ).fetchone()
-            self.assertEqual(saved, (2, 1))
+            self.assertEqual(saved, (3, 2))
 
             history_all = flashcard_app.read_question_attempts(csv_path, db_path, card_ids=['CS-001'], result='all', limit=10)
-            self.assertEqual(history_all['summary']['total'], 2)
+            self.assertEqual(history_all['summary']['total'], 3)
             self.assertEqual(history_all['summary']['correct'], 1)
+            self.assertEqual(history_all['summary']['ambiguous'], 1)
             self.assertEqual(history_all['summary']['wrong'], 1)
             self.assertEqual(history_all['items'][0]['card_id'], 'CS-001')
 
@@ -600,6 +647,12 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(len(history_wrong['items']), 1)
             self.assertFalse(history_wrong['items'][0]['is_correct'])
             self.assertEqual(history_wrong['items'][0]['wrong_note'], '정의와 용어를 혼동함')
+
+            history_ambiguous = flashcard_app.read_question_attempts(csv_path, db_path, card_ids=['CS-001'], result='ambiguous', limit=10)
+            self.assertEqual(history_ambiguous['summary']['ambiguous'], 1)
+            self.assertEqual(len(history_ambiguous['items']), 1)
+            self.assertEqual(history_ambiguous['items'][0]['judgment'], 'ambiguous')
+            self.assertEqual(history_ambiguous['items'][0]['session_title'], 'OS/DB 모의 세트 1')
 
     def test_mark_card_survives_csv_replacement(self):
         with tempfile.TemporaryDirectory() as td:

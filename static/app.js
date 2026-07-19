@@ -57,6 +57,14 @@ const state = {
   questionSaving: false,
   questions: [],
   questionIndex: 0,
+  questionSessionId: '',
+  questionSessionTitle: '',
+  questionSessionStartedAt: '',
+  questionSessionStartMs: 0,
+  questionSessionElapsedBaseSeconds: 0,
+  questionTimeLimitSeconds: 0,
+  questionSessionFinishedAt: '',
+  questionTimerId: 0,
   answerRevealed: false,
   selectedChoiceIndex: null,
   initialCardQueryApplied: false,
@@ -66,6 +74,7 @@ const state = {
   questionHistoryItems: [],
   questionHistorySummary: null,
   questionHistoryError: '',
+
 };
 
 const $ = (id) => document.getElementById(id);
@@ -77,7 +86,7 @@ const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speak
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const AI_QUIZ_PROMPT_TYPE_ORDER = ['multiple_choice', 'short', 'subjective', 'essay'];
 const AI_QUIZ_TERM_LIMIT = 80;
-const QUESTION_HISTORY_FILTER_LABELS = {all: '전체', correct: '맞음', wrong: '틀림', pending: '미채점'};
+const QUESTION_HISTORY_FILTER_LABELS = {all: '전체', correct: '맞음', ambiguous: '애매함', wrong: '틀림', unknown: '모름', pending: '미채점'};
 // Silent looping WAV: keeps an <audio> element "audible" while auto-listen is
 // active so mobile browsers treat the tab as playing media and don't freeze
 // its JS timers (which drive the speech queue) when the screen locks or the
@@ -2524,8 +2533,8 @@ function renderQuestionHistoryDialog() {
     } else if (state.questionHistoryError) {
       summaryEl.textContent = `문제 기록 로딩 실패: ${state.questionHistoryError}`;
     } else {
-      const summary = state.questionHistorySummary || {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, wrong: 0, pending: 0};
-      summaryEl.textContent = `카드 ${summary.selected_card_count || 0} · 전체 ${summary.total || 0} · 맞음 ${summary.correct || 0} · 틀림 ${summary.wrong || 0} · 미채점 ${summary.pending || 0}`;
+      const summary = state.questionHistorySummary || {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0};
+      summaryEl.textContent = `카드 ${summary.selected_card_count || 0} · 전체 ${summary.total || 0} · 맞음 ${summary.correct || 0} · 애매 ${summary.ambiguous || 0} · 틀림 ${summary.wrong || 0} · 모름 ${summary.unknown || 0} · 미채점 ${summary.pending || 0}`;
     }
   }
   if (!body) return;
@@ -2552,12 +2561,19 @@ function renderQuestionHistoryDialog() {
     const bodyText = String(item.body || '').trim();
     const answerText = escapeHtml(item.user_answer || '미입력');
     const wrongNote = String(item.wrong_note || '').trim();
+    const sessionMeta = [
+      String(item.session_title || '').trim(),
+      item.question_order ? `문항 ${item.question_order}` : '',
+      Number.isInteger(item.question_elapsed_seconds) ? `문항 ${formatElapsedClock(item.question_elapsed_seconds)}` : '',
+      updatedAt ? `저장 ${escapeHtml(updatedAt)}` : '',
+    ].filter(Boolean).join(' · ');
     return `
       <article class="question-history-item">
         <div class="question-history-item-head">
           <div class="question-history-item-heading">
             <strong>${title}</strong>
-            <p class="question-history-item-meta">${category} · ${typeLabel}${updatedAt ? ` · ${escapeHtml(updatedAt)}` : ''}</p>
+            <p class="question-history-item-meta">${category} · ${typeLabel}</p>
+            ${sessionMeta ? `<p class="question-history-session-meta">${sessionMeta}</p>` : ''}
           </div>
           <span class="question-history-result ${escapeHtml(item.result_key || 'pending')}">${resultLabel}</span>
         </div>
@@ -2584,7 +2600,7 @@ async function loadQuestionHistory() {
   const cardIds = questionHistoryCardIds();
   if (state.cards.length && !cardIds.length) {
     state.questionHistoryItems = [];
-    state.questionHistorySummary = {selected_card_count: 0, total: 0, correct: 0, wrong: 0, pending: 0, returned: 0, filter: state.questionHistoryFilter || 'all'};
+    state.questionHistorySummary = {selected_card_count: 0, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0, returned: 0, filter: state.questionHistoryFilter || 'all'};
     state.questionHistoryLoading = false;
     renderQuestionHistoryDialog();
     return;
@@ -2746,6 +2762,16 @@ function hydrateQuestionState(question) {
   if (!Number.isInteger(question.selectedChoiceIndex)) question.selectedChoiceIndex = null;
   if (question.gradedCorrect !== true && question.gradedCorrect !== false) question.gradedCorrect = null;
   if (typeof question.attemptSavedAt !== 'string') question.attemptSavedAt = '';
+  if (typeof question.judgment !== 'string' || !QUESTION_HISTORY_FILTER_LABELS[question.judgment]) question.judgment = 'pending';
+  if (!Number.isInteger(question.questionElapsedSeconds)) question.questionElapsedSeconds = 0;
+  if (typeof question.questionStartedAt !== 'string') question.questionStartedAt = '';
+  if (typeof question.answeredAt !== 'string') question.answeredAt = '';
+  if (typeof question.sessionId !== 'string') question.sessionId = '';
+  if (typeof question.sessionTitle !== 'string') question.sessionTitle = '';
+  if (!Number.isInteger(question.questionOrder)) question.questionOrder = null;
+  if (!Number.isInteger(question.timeLimitSeconds)) question.timeLimitSeconds = state.questionTimeLimitSeconds || 0;
+  if (!Number.isInteger(question.sessionElapsedSeconds)) question.sessionElapsedSeconds = null;
+  if (!Number.isFinite(question.questionActiveSinceMs)) question.questionActiveSinceMs = 0;
   return question;
 }
 
@@ -2756,6 +2782,167 @@ function questionTypeBadge(question) {
 
 function questionNeedsManualGrading(question) {
   return question?.type !== 'multiple_choice';
+}
+
+function timeLimitValue() {
+  const minutes = Number.parseInt($('questionTimeLimitSelect')?.value || '90', 10);
+  return Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : 0;
+}
+
+function formatElapsedClock(seconds) {
+  const safeSeconds = Math.max(0, Number.parseInt(seconds || 0, 10) || 0);
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const rest = safeSeconds % 60;
+  return hours > 0
+    ? `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`
+    : `${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`;
+}
+
+function questionJudgmentLabel(judgment) {
+  return QUESTION_HISTORY_FILTER_LABELS[judgment] || QUESTION_HISTORY_FILTER_LABELS.pending;
+}
+
+function questionJudgmentCounts() {
+  const counts = {correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0};
+  state.questions.forEach((item) => {
+    const question = hydrateQuestionState(item);
+    const key = QUESTION_HISTORY_FILTER_LABELS[question?.judgment] ? question.judgment : 'pending';
+    counts[key] += 1;
+  });
+  return counts;
+}
+
+function currentQuestionSessionElapsedSeconds() {
+  const base = Math.max(0, Number.parseInt(state.questionSessionElapsedBaseSeconds || 0, 10) || 0);
+  if (!state.questionSessionStartMs) return base;
+  return base + Math.max(0, Math.floor((Date.now() - state.questionSessionStartMs) / 1000));
+}
+
+function currentQuestionElapsedSeconds(question = currentQuestion()) {
+  const current = hydrateQuestionState(question);
+  if (!current) return 0;
+  const base = Math.max(0, Number.parseInt(current.questionElapsedSeconds || 0, 10) || 0);
+  if (!current.questionActiveSinceMs) return base;
+  return base + Math.max(0, Math.floor((Date.now() - current.questionActiveSinceMs) / 1000));
+}
+
+function stopQuestionTimer() {
+  if (!state.questionTimerId) return;
+  window.clearInterval(state.questionTimerId);
+  state.questionTimerId = 0;
+}
+
+function updateQuestionSummaryLine() {
+  const summary = $('questionSummary');
+  if (!summary) return;
+  const total = state.questions.length;
+  const current = hydrateQuestionState(currentQuestion());
+  if (state.questionLoading) {
+    summary.textContent = '문제 생성 중...';
+    return;
+  }
+  if (state.questionSaving) {
+    summary.textContent = '문제 기록 저장 중...';
+    return;
+  }
+  if (state.markSaving) {
+    summary.textContent = '카드 상태 저장 중...';
+    return;
+  }
+  if (!total || !current) {
+    const limitSeconds = timeLimitValue();
+    summary.textContent = limitSeconds
+      ? `현재 필터 기준으로 ${Math.round(limitSeconds / 60)}분 모의 세트를 생성합니다.`
+      : '현재 필터 기준으로 제한 시간 없이 모의 세트를 생성합니다.';
+    return;
+  }
+  const counts = questionJudgmentCounts();
+  const parts = [
+    `${state.questionIndex + 1} / ${total}`,
+    `총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())}`,
+    `현재 ${formatElapsedClock(currentQuestionElapsedSeconds(current))}`,
+  ];
+  const limitSeconds = Number.isInteger(current.timeLimitSeconds) ? current.timeLimitSeconds : state.questionTimeLimitSeconds;
+  if (limitSeconds > 0) {
+    parts.push(`남은 ${formatElapsedClock(Math.max(0, limitSeconds - currentQuestionSessionElapsedSeconds()))}`);
+  }
+  parts.push(`맞음 ${counts.correct}`);
+  parts.push(`애매 ${counts.ambiguous}`);
+  parts.push(`틀림 ${counts.wrong}`);
+  parts.push(`모름 ${counts.unknown}`);
+  parts.push(`미채점 ${counts.pending}`);
+  if (state.questionSessionFinishedAt) parts.push('세트 종료');
+  summary.textContent = parts.join(' · ');
+}
+
+function startQuestionTimer() {
+  if (state.questionTimerId || !state.questionMode || !state.questions.length || !state.questionSessionStartMs || state.questionSessionFinishedAt) return;
+  state.questionTimerId = window.setInterval(() => {
+    updateQuestionSummaryLine();
+  }, 1000);
+}
+
+function commitCurrentQuestionElapsed() {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question || !question.questionActiveSinceMs) return;
+  question.questionElapsedSeconds = currentQuestionElapsedSeconds(question);
+  question.questionActiveSinceMs = 0;
+}
+
+function activateCurrentQuestionTimer() {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question || !state.questionMode || state.questionSessionFinishedAt) return;
+  if (!question.questionStartedAt) question.questionStartedAt = new Date().toISOString();
+  if (!question.questionActiveSinceMs) question.questionActiveSinceMs = Date.now();
+  startQuestionTimer();
+}
+
+function resetQuestionSessionState() {
+  stopQuestionTimer();
+  state.questionSessionId = '';
+  state.questionSessionTitle = '';
+  state.questionSessionStartedAt = '';
+  state.questionSessionStartMs = 0;
+  state.questionSessionElapsedBaseSeconds = 0;
+  state.questionTimeLimitSeconds = 0;
+  state.questionSessionFinishedAt = '';
+}
+
+function buildQuestionSessionTitle() {
+  const stamp = new Date().toLocaleString('ko-KR', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'});
+  const typeText = selectedQuestionTypeLabelsForPrompt().join('/') || '혼합형';
+  const limitSeconds = timeLimitValue();
+  const limitLabel = limitSeconds ? `${Math.round(limitSeconds / 60)}분` : '무제한';
+  return `모의 세트 ${stamp} · 카드 ${state.filtered.length} · ${typeText} · ${limitLabel}`;
+}
+
+function prepareQuestionSession(questions) {
+  const sessionStartedAt = new Date().toISOString();
+  state.questionSessionId = `mock-${Date.now()}`;
+  state.questionSessionTitle = buildQuestionSessionTitle();
+  state.questionSessionStartedAt = sessionStartedAt;
+  state.questionSessionStartMs = Date.now();
+  state.questionSessionElapsedBaseSeconds = 0;
+  state.questionTimeLimitSeconds = timeLimitValue();
+  state.questionSessionFinishedAt = '';
+  state.questions = questions.map((item, index) => hydrateQuestionState({
+    ...item,
+    judgment: 'pending',
+    questionElapsedSeconds: 0,
+    questionStartedAt: '',
+    answeredAt: '',
+    questionOrder: index + 1,
+    sessionId: state.questionSessionId,
+    sessionTitle: state.questionSessionTitle,
+    timeLimitSeconds: state.questionTimeLimitSeconds,
+    questionActiveSinceMs: 0,
+  }));
+  state.questionIndex = 0;
+  state.answerRevealed = false;
+  state.selectedChoiceIndex = null;
+  activateCurrentQuestionTimer();
+  updateQuestionSummaryLine();
 }
 
 function selectedAnswerText(question) {
@@ -2769,8 +2956,8 @@ function selectedAnswerText(question) {
 
 function questionResultText(question) {
   const current = hydrateQuestionState(question);
-  if (!current || (current.gradedCorrect !== true && current.gradedCorrect !== false)) return '';
-  return current.gradedCorrect ? '정답 저장됨' : '오답 저장됨';
+  if (!current || current.judgment === 'pending') return '';
+  return `${questionJudgmentLabel(current.judgment)} 저장됨`;
 }
 
 function syncUpdatedCard(card) {
@@ -2782,67 +2969,141 @@ function syncUpdatedCard(card) {
   if (state.renderedCardId === card.id) renderCard();
 }
 
-async function saveQuestionAttempt(question) {
+function questionAttemptPayload(question) {
   const current = hydrateQuestionState(question);
-  if (!current || state.questionLoading || state.questionSaving) return;
+  if (!current) return null;
+  return {
+    question_id: current.id,
+    card_id: current.card_id,
+    question_type: current.type,
+    prompt: current.prompt || '',
+    body: current.body || '',
+    user_answer: selectedAnswerText(current),
+    selected_choice_index: Number.isInteger(current.selectedChoiceIndex) ? current.selectedChoiceIndex : null,
+    is_correct: current.judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(current.judgment) ? false : null,
+    judgment: current.judgment || 'pending',
+    wrong_note: current.wrongNote || '',
+    session_id: current.sessionId || state.questionSessionId || '',
+    session_title: current.sessionTitle || state.questionSessionTitle || '',
+    question_order: current.questionOrder || (state.questionIndex + 1),
+    question_elapsed_seconds: currentQuestionElapsedSeconds(current),
+    session_elapsed_seconds: currentQuestionSessionElapsedSeconds(),
+    time_limit_seconds: Number.isInteger(current.timeLimitSeconds) ? current.timeLimitSeconds : state.questionTimeLimitSeconds,
+    question_started_at: current.questionStartedAt || '',
+    answered_at: current.answeredAt || '',
+  };
+}
+
+async function postQuestionAttempt(question) {
+  const payload = questionAttemptPayload(question);
+  if (!payload) throw new Error('문제 저장 데이터가 없습니다.');
+  const res = await fetch('/api/questions/attempt', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function saveQuestionAttempt(question, {quiet = false} = {}) {
+  const current = hydrateQuestionState(question);
+  if (!current || state.questionLoading || state.questionSaving) return null;
+  if (current === currentQuestion()) commitCurrentQuestionElapsed();
   state.questionSaving = true;
   renderQuestionPanel();
   try {
-    const res = await fetch('/api/questions/attempt', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        question_id: current.id,
-        card_id: current.card_id,
-        question_type: current.type,
-        prompt: current.prompt || '',
-        body: current.body || '',
-        user_answer: selectedAnswerText(current),
-        selected_choice_index: Number.isInteger(current.selectedChoiceIndex) ? current.selectedChoiceIndex : null,
-        is_correct: current.gradedCorrect,
-        wrong_note: current.wrongNote || '',
-      }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json();
+    const data = await postQuestionAttempt(current);
     current.attemptSavedAt = String(data.attempt?.updated_at || new Date().toISOString());
     current.gradedCorrect = data.attempt?.is_correct === true ? true : data.attempt?.is_correct === false ? false : null;
+    current.judgment = data.attempt?.judgment || current.judgment || 'pending';
     current.wrongNote = String(data.attempt?.wrong_note || current.wrongNote || '');
+    current.answeredAt = String(data.attempt?.answered_at || current.answeredAt || '');
+    current.questionStartedAt = String(data.attempt?.question_started_at || current.questionStartedAt || '');
+    current.questionElapsedSeconds = Number.isInteger(data.attempt?.question_elapsed_seconds) ? data.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
+    current.sessionElapsedSeconds = Number.isInteger(data.attempt?.session_elapsed_seconds) ? data.attempt.session_elapsed_seconds : current.sessionElapsedSeconds;
     if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
     syncUpdatedCard(data.card);
     if (state.questionHistoryOpen) loadQuestionHistory();
-    setMessage(questionResultText(current) || '문제 채점 저장 완료');
+    if (!quiet) setMessage(questionResultText(current) || '문제 채점 저장 완료');
+    return data;
   } catch (error) {
-    setMessage(`문제 채점 저장 실패: ${error.message || error}`, true);
+    if (!quiet) setMessage(`문제 채점 저장 실패: ${error.message || error}`, true);
+    throw error;
+  } finally {
+    state.questionSaving = false;
+    activateCurrentQuestionTimer();
+    renderQuestionPanel();
+  }
+}
+
+async function finishQuestionSession() {
+  if (!state.questions.length || state.questionLoading || state.questionSaving) return;
+  commitCurrentQuestionElapsed();
+  state.questionSessionElapsedBaseSeconds = currentQuestionSessionElapsedSeconds();
+  state.questionSessionStartMs = 0;
+  state.questionSessionFinishedAt = new Date().toISOString();
+  stopQuestionTimer();
+  state.questionSaving = true;
+  renderQuestionPanel();
+  try {
+    const settled = await Promise.allSettled(state.questions.map((question) => postQuestionAttempt(question)));
+    let failures = 0;
+    settled.forEach((result, index) => {
+      if (result.status !== 'fulfilled') {
+        failures += 1;
+        return;
+      }
+      const current = hydrateQuestionState(state.questions[index]);
+      const payload = result.value || {};
+      current.attemptSavedAt = String(payload.attempt?.updated_at || current.attemptSavedAt || '');
+      current.gradedCorrect = payload.attempt?.is_correct === true ? true : payload.attempt?.is_correct === false ? false : null;
+      current.judgment = payload.attempt?.judgment || current.judgment || 'pending';
+      current.wrongNote = String(payload.attempt?.wrong_note || current.wrongNote || '');
+      current.answeredAt = String(payload.attempt?.answered_at || current.answeredAt || '');
+      current.questionStartedAt = String(payload.attempt?.question_started_at || current.questionStartedAt || '');
+      current.questionElapsedSeconds = Number.isInteger(payload.attempt?.question_elapsed_seconds) ? payload.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
+      syncUpdatedCard(payload.card);
+    });
+    if (state.questionHistoryOpen) loadQuestionHistory();
+    const counts = questionJudgmentCounts();
+    const summaryText = `세트 종료 · 총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())} · 맞음 ${counts.correct} · 애매 ${counts.ambiguous} · 틀림 ${counts.wrong} · 모름 ${counts.unknown} · 미채점 ${counts.pending}`;
+    setMessage(failures ? `${summaryText} · 저장 실패 ${failures}건` : summaryText, failures > 0);
   } finally {
     state.questionSaving = false;
     renderQuestionPanel();
   }
 }
 
-function markCurrentQuestion(correct) {
+function setQuestionJudgment(judgment) {
   const question = hydrateQuestionState(currentQuestion());
   if (!question) return;
-  question.gradedCorrect = Boolean(correct);
   question.answerRevealed = true;
+  question.judgment = QUESTION_HISTORY_FILTER_LABELS[judgment] ? judgment : 'pending';
+  question.answeredAt = new Date().toISOString();
+  question.gradedCorrect = judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(judgment) ? false : null;
+  if (question.judgment === 'correct') question.wrongNote = '';
   state.answerRevealed = true;
-  if (question.gradedCorrect) question.wrongNote = '';
   renderQuestionPanel();
-  saveQuestionAttempt(question);
+  saveQuestionAttempt(question).catch(() => {});
 }
 
 function saveCurrentWrongNote() {
   const question = hydrateQuestionState(currentQuestion());
   if (!question) return;
   question.answerRevealed = true;
-  question.gradedCorrect = false;
+  if (!QUESTION_HISTORY_FILTER_LABELS[question.judgment] || question.judgment === 'pending') {
+    question.judgment = 'wrong';
+  }
+  question.answeredAt = question.answeredAt || new Date().toISOString();
+  question.gradedCorrect = question.judgment === 'correct' ? true : false;
   state.answerRevealed = true;
   renderQuestionPanel();
-  saveQuestionAttempt(question);
+  saveQuestionAttempt(question).catch(() => {});
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'finishQuestionSessionBtn'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -2854,11 +3115,13 @@ function renderQuestionPanel() {
   if (!panel) return;
   panel.hidden = !state.questionMode;
   document.body.classList.toggle('question-mode-active', state.questionMode);
-  const summary = $('questionSummary');
   const card = $('questionCard');
   updateRandomButtons();
   updateQuestionPracticeButton();
-  if (!state.questionMode) return;
+  if (!state.questionMode) {
+    stopQuestionTimer();
+    return;
+  }
   setQuestionControlsDisabled(state.questionLoading || state.questionSaving || state.markSaving);
   const total = state.questions.length;
   const question = hydrateQuestionState(currentQuestion());
@@ -2866,29 +3129,20 @@ function renderQuestionPanel() {
   if (question) {
     state.answerRevealed = Boolean(question.answerRevealed);
     state.selectedChoiceIndex = Number.isInteger(question.selectedChoiceIndex) ? question.selectedChoiceIndex : null;
+    activateCurrentQuestionTimer();
   } else {
     state.answerRevealed = false;
     state.selectedChoiceIndex = null;
+    stopQuestionTimer();
   }
-  if (summary) {
-    const filterCount = state.filtered.length;
-    summary.textContent = state.questionLoading
-      ? '문제 생성 중...'
-      : state.questionSaving
-        ? '채점 저장 중...'
-        : state.markSaving
-          ? '카드 상태 저장 중...'
-          : total
-            ? `${state.questionIndex + 1} / ${total} · 카드 ${filterCount}`
-            : `카드 ${filterCount} · 생성 버튼을 누르세요.`;
-  }
+  updateQuestionSummaryLine();
   if (!card) return;
   if (state.questionLoading) {
     card.innerHTML = '<div class="question-card-empty muted">문제를 생성하는 중입니다...</div>';
     return;
   }
   if (!question) {
-    card.innerHTML = '<div class="question-card-empty muted">문제 생성을 누르면 현재 필터의 카드들로 문제가 만들어집니다.</div>';
+    card.innerHTML = '<div class="question-card-empty muted">문제 생성을 누르면 현재 필터 카드로 모의 세트가 만들어집니다.</div>';
     return;
   }
 
@@ -2921,7 +3175,7 @@ function renderQuestionPanel() {
   const draftHtml = questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft">
       <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
-      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="여기에 답안을 적고 정답/해설을 본 뒤 스스로 채점하세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
+      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="여기에 답안을 적고 정답/해설을 본 뒤 결과를 저장하세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
     </div>` : '';
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
     <div class="question-rubric">
@@ -2929,20 +3183,25 @@ function renderQuestionPanel() {
       <ul>${question.rubric.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
     </div>` : '';
   const resultText = questionResultText(question);
-  const resultHtml = resultText ? `<p class="question-grade-status ${question.gradedCorrect ? 'correct' : 'wrong'}">${escapeHtml(resultText)}</p>` : '';
-  const gradeHtml = question.answerRevealed && questionNeedsManualGrading(question) ? `
+  const resultTone = question.judgment === 'pending' ? '' : question.judgment;
+  const resultHtml = resultText ? `<p class="question-grade-status ${resultTone}">${escapeHtml(resultText)}</p>` : '';
+  const gradeHtml = question.answerRevealed ? `
     <div class="question-grade-row">
-      <strong>자가 채점</strong>
+      <strong>풀이 결과</strong>
       <div class="question-grade-actions">
-        <button class="question-grade-button${question.gradedCorrect === true ? ' active correct' : ''}" type="button" data-question-grade="correct" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>맞음 저장</button>
-        <button class="question-grade-button${question.gradedCorrect === false ? ' active wrong' : ''}" type="button" data-question-grade="wrong" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>틀림 저장</button>
+        ${[
+          ['correct', '맞음'],
+          ['ambiguous', '애매함'],
+          ['wrong', '틀림'],
+          ['unknown', '모름'],
+        ].map(([key, label]) => `<button class="question-grade-button ${key}${question.judgment === key ? ' active' : ''}" type="button" data-question-judgment="${key}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${label} 저장</button>`).join('')}
       </div>
       ${resultHtml}
     </div>` : resultHtml;
-  const wrongNoteHtml = question.answerRevealed && question.gradedCorrect === false ? `
+  const wrongNoteHtml = question.answerRevealed && ['ambiguous', 'wrong', 'unknown'].includes(question.judgment) ? `
     <div class="question-wrong-note-box">
       <label class="question-answer-label" for="questionWrongNoteInput">오답노트</label>
-      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
+      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 애매했는지, 왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
       <div class="question-wrong-note-actions">
         <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>오답노트 저장</button>
       </div>
@@ -2956,12 +3215,19 @@ function renderQuestionPanel() {
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+  const sessionMeta = [
+    state.questionSessionTitle || question.sessionTitle,
+    question.questionOrder ? `문항 ${question.questionOrder}` : '',
+    `문항 시간 ${formatElapsedClock(currentQuestionElapsedSeconds(question))}`,
+  ].filter(Boolean).join(' · ');
   card.innerHTML = `
     <div class="question-meta">
       <span class="badge">${escapeHtml(questionTypeBadge(question))}</span>
       <span class="badge">${escapeHtml(question.category || '미분류')}</span>
       <span class="badge">${escapeHtml(question.card_id || '')}</span>
+      ${question.judgment !== 'pending' ? `<span class="badge">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>` : ''}
     </div>
+    <p class="question-session-meta">${escapeHtml(sessionMeta)}</p>
     <h2>${escapeHtml(question.prompt || '문제')}</h2>
     <p class="question-body">${escapeHtml(question.body || '')}</p>
     ${reviewBoxHtml}
@@ -2973,6 +3239,7 @@ function renderQuestionPanel() {
   $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex >= total - 1;
   $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question;
   $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question;
+  if ($('finishQuestionSessionBtn')) $('finishQuestionSessionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !total;
 }
 
 async function generateQuestionsFromCurrentFilter() {
@@ -2981,6 +3248,8 @@ async function generateQuestionsFromCurrentFilter() {
     setMessage('문제를 만들 카드가 없습니다. 필터를 바꿔주세요.', true);
     return;
   }
+  commitCurrentQuestionElapsed();
+  resetQuestionSessionState();
   state.questionMode = true;
   state.questionLoading = true;
   state.questionSaving = false;
@@ -3000,13 +3269,11 @@ async function generateQuestionsFromCurrentFilter() {
     });
     if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
-    state.questions = (data.questions || []).map((item) => hydrateQuestionState({...item}));
-    state.questionIndex = 0;
-    state.answerRevealed = false;
-    state.selectedChoiceIndex = null;
-    setMessage(`문제 ${state.questions.length}개 생성 완료`);
+    prepareQuestionSession((data.questions || []).map((item) => hydrateQuestionState({...item})));
+    setMessage(`모의 세트 ${state.questions.length}문항 생성 완료`);
   } catch (error) {
     state.questions = [];
+    resetQuestionSessionState();
     setMessage(`문제 생성 실패: ${error.message || error}`, true);
   } finally {
     state.questionLoading = false;
@@ -3017,11 +3284,21 @@ async function generateQuestionsFromCurrentFilter() {
 function toggleQuestionMode(force = !state.questionMode) {
   const nextMode = Boolean(force);
   if (nextMode && state.audioPlaying) stopAudioPlayback('문제 풀이 모드로 전환해 자동 듣기를 정지했습니다.');
-  if (!nextMode) closeQuestionHistory();
+  if (!nextMode) {
+    commitCurrentQuestionElapsed();
+    state.questionSessionElapsedBaseSeconds = currentQuestionSessionElapsedSeconds();
+    state.questionSessionStartMs = 0;
+    stopQuestionTimer();
+    closeQuestionHistory();
+  } else if (state.questions.length && !state.questionSessionFinishedAt && !state.questionSessionStartMs) {
+    state.questionSessionStartMs = Date.now();
+    activateCurrentQuestionTimer();
+  }
   state.questionMode = nextMode;
   renderQuestionPanel();
-  setMessage(state.questionMode ? '문제 풀이를 열었습니다. 생성 버튼으로 문제를 만드세요.' : '문제 풀이를 닫았습니다.');
+  setMessage(state.questionMode ? (state.questions.length ? '모의 세트를 다시 열었습니다.' : '문제 풀이를 열었습니다. 생성 버튼으로 문제를 만드세요.') : '문제 풀이를 닫았습니다.');
 }
+
 
 function openQuestionPracticeFromMenu() {
   toggleMenu(false);
@@ -3038,12 +3315,15 @@ function revealQuestionAnswer() {
 
 function moveQuestion(delta) {
   if (!state.questions.length) return;
+  commitCurrentQuestionElapsed();
   state.questionIndex = Math.max(0, Math.min(state.questions.length - 1, state.questionIndex + delta));
   const question = hydrateQuestionState(currentQuestion());
   state.answerRevealed = Boolean(question?.answerRevealed);
   state.selectedChoiceIndex = Number.isInteger(question?.selectedChoiceIndex) ? question.selectedChoiceIndex : null;
+  activateCurrentQuestionTimer();
   renderQuestionPanel();
 }
+
 
 function openQuestionSourceCard() {
   const question = currentQuestion();
@@ -3053,12 +3333,14 @@ function openQuestionSourceCard() {
     setMessage('원본 카드를 찾지 못했습니다.', true);
     return;
   }
+  commitCurrentQuestionElapsed();
   toggleQuestionMode(false);
   jumpToCard(card);
   state.flipped = true;
   renderCard();
   setMessage(`${card.term} 원본 카드로 이동했습니다.`);
 }
+
 
 async function markQuestionSourceCard(status) {
   const question = currentQuestion();
@@ -3107,11 +3389,12 @@ function selectQuestionChoice(index) {
   question.answerRevealed = true;
   question.gradedCorrect = index === question.answer_index;
   question.userAnswer = Array.isArray(question.choices) ? String(question.choices[index] || '') : '';
+  question.answeredAt = new Date().toISOString();
   state.selectedChoiceIndex = index;
   state.answerRevealed = true;
   renderQuestionPanel();
-  if (question.type === 'multiple_choice') saveQuestionAttempt(question);
 }
+
 
 function advanceAfterMark(markedId) {
   if (!state.filtered.length) return;
@@ -3150,6 +3433,7 @@ function renderBackPage() {
 
 function applyFilters(keepCurrentId = null) {
   if (state.audioPlaying) stopAudioPlayback('필터가 바뀌어 자동 듣기를 정지했습니다.');
+  commitCurrentQuestionElapsed();
   state.importanceFilter = $('importanceSelect')?.value || '';
   state.difficultyFilter = $('difficultySelect')?.value || '';
   state.bokFilter = $('bokSelect')?.value || '';
@@ -3170,6 +3454,7 @@ function applyFilters(keepCurrentId = null) {
     state.answerRevealed = false;
     state.selectedChoiceIndex = null;
     state.questionSaving = false;
+    resetQuestionSessionState();
     renderQuestionPanel();
   }
   if (state.questionHistoryOpen) loadQuestionHistory();
@@ -3419,6 +3704,7 @@ $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurren
 $('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);
 $('questionHistoryBtn')?.addEventListener('click', openQuestionHistory);
 $('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(false));
+$('finishQuestionSessionBtn')?.addEventListener('click', finishQuestionSession);
 $('prevQuestionBtn')?.addEventListener('click', () => moveQuestion(-1));
 $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
 $('revealAnswerBtn')?.addEventListener('click', revealQuestionAnswer);
@@ -3434,15 +3720,16 @@ $('questionCard')?.addEventListener('click', (event) => {
     markQuestionSourceCard(questionMark.dataset.questionMark || '');
     return;
   }
-  const gradeButton = event.target.closest('[data-question-grade]');
-  if (gradeButton) {
-    markCurrentQuestion(gradeButton.dataset.questionGrade === 'correct');
+  const judgmentButton = event.target.closest('[data-question-judgment]');
+  if (judgmentButton) {
+    setQuestionJudgment(judgmentButton.dataset.questionJudgment || 'pending');
     return;
   }
   if (event.target.closest('[data-question-wrong-note-save="1"]')) {
     saveCurrentWrongNote();
   }
 });
+
 
 
 $('questionCard')?.addEventListener('input', (event) => {
