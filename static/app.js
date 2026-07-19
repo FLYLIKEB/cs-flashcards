@@ -1806,52 +1806,42 @@ async function previewConceptImage() {
   state.aiImageGenerating = true;
   renderConceptImage(current);
   setMessage(`${current.term}: AI 이미지 생성 중...`);
+  let previewName = '';
   try {
-    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/preview`, {method: 'POST'});
-    if (!res.ok) throw new Error(await responseErrorText(res));
-    const data = await res.json();
-    state.aiImageCardId = current.id;
-    state.aiImagePreviewName = String(data.preview_name || '');
-    state.aiImagePreviewUrl = String(data.preview_url || '');
-    state.aiImagePreviewAlt = String(data.alt || conceptImageAlt(current));
-    renderConceptImage(current);
-    setMessage(`${current.term}: AI 이미지 미리보기를 불러왔습니다.`);
+    const previewRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/preview`, {method: 'POST'});
+    if (!previewRes.ok) throw new Error(await responseErrorText(previewRes));
+    const previewData = await previewRes.json();
+    previewName = String(previewData.preview_name || '');
+    const applyRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/apply`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({preview_name: previewName}),
+    });
+    if (!applyRes.ok) throw new Error(await responseErrorText(applyRes));
+    const data = await applyRes.json();
+    clearConceptImagePreview(current.id);
+    await refreshCards({cardId: data.card.id, message: null});
+    setMessage(`${data.card.term}: AI 이미지를 저장했습니다.`);
   } catch (error) {
+    if (previewName) {
+      try {
+        await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/discard`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({preview_name: previewName}),
+        });
+      } catch (_discardError) {}
+    }
     renderConceptImage(current);
     setMessage(`AI 이미지 생성 실패: ${error.message || error}`, true);
   } finally {
     state.aiImageGenerating = false;
-    renderConceptImage(state.filtered[state.index] || null);
-  }
-}
-
-async function saveConceptImagePreview() {
-  if (!state.filtered.length || state.aiImageGenerating || state.aiImageSaving) return;
-  const current = state.filtered[state.index];
-  if (!conceptImagePreviewActive(current)) return;
-  state.aiImageSaving = true;
-  renderConceptImage(current);
-  setMessage(`${current.term}: AI 이미지 저장 중...`);
-  try {
-    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/apply`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({preview_name: state.aiImagePreviewName}),
-    });
-    if (!res.ok) throw new Error(await responseErrorText(res));
-    const data = await res.json();
-    clearConceptImagePreview(current.id);
-    await refreshCards({cardId: data.card.id, message: null});
-    setMessage(`${data.card.term}: AI 이미지를 저장했습니다.`);
-
-  } catch (error) {
-    renderConceptImage(current);
-    setMessage(`AI 이미지 저장 실패: ${error.message || error}`, true);
-  } finally {
     state.aiImageSaving = false;
+    clearConceptImagePreview(current.id);
     renderConceptImage(state.filtered[state.index] || null);
   }
 }
+
 
 async function discardConceptImagePreview() {
   const current = state.filtered[state.index] || null;
@@ -1883,9 +1873,7 @@ function renderConceptImage(card) {
   const image = $('backConceptImage');
   const placeholder = $('backConceptImagePlaceholder');
   const generateBtn = $('conceptImageGenerateBtn');
-  const saveBtn = $('conceptImageSaveBtn');
-  const cancelBtn = $('conceptImageCancelBtn');
-  if (!wrap || !image || !placeholder || !generateBtn || !saveBtn || !cancelBtn) return;
+  if (!wrap || !image || !placeholder || !generateBtn) return;
   bindConceptImageLoadState();
 
   if (!card) {
@@ -1897,8 +1885,6 @@ function renderConceptImage(card) {
     image.hidden = true;
     placeholder.hidden = true;
     generateBtn.disabled = true;
-    saveBtn.hidden = true;
-    cancelBtn.hidden = true;
     return;
   }
 
@@ -1933,11 +1919,8 @@ function renderConceptImage(card) {
   generateBtn.textContent = state.aiImageGenerating ? '…' : 'AI';
   generateBtn.title = state.aiImageGenerating ? 'AI 이미지 생성 중' : 'AI 이미지 재생성';
   generateBtn.dataset.tip = state.aiImageGenerating ? '생성 중' : 'AI 이미지 재생성';
-  saveBtn.hidden = !previewActive;
-  cancelBtn.hidden = !previewActive;
-  saveBtn.disabled = busy;
-  cancelBtn.disabled = busy;
 }
+
 
 async function loadCards() {
   const res = await fetch('/api/cards');
@@ -2120,25 +2103,20 @@ const AI_REWRITE_FIELD_CONFIG = {
   definition: {
     label: '간단 설명',
     previewButtonId: 'definitionAiBtn',
-    saveButtonId: 'definitionAiSaveBtn',
-    cancelButtonId: 'definitionAiCancelBtn',
     instruction: '현재 카드의 간단 설명만 1~2문장으로 더 명확하고 면접 답변 친화적으로 다듬어 주세요. 다른 필드는 유지해 주세요.',
   },
   detailed_explanation: {
     label: '상세 설명',
     previewButtonId: 'detailAiBtn',
-    saveButtonId: 'detailAiSaveBtn',
-    cancelButtonId: 'detailAiCancelBtn',
     instruction: '현재 카드의 상세 설명만 더 이해하기 쉽게 다듬어 주세요. 의미: 와 활용: 구조는 유지하고 다른 필드는 유지해 주세요.',
   },
   exam_note: {
     label: '시험 포인트',
     previewButtonId: 'examAiBtn',
-    saveButtonId: 'examAiSaveBtn',
-    cancelButtonId: 'examAiCancelBtn',
     instruction: '현재 카드의 시험 포인트만 더 짧고 비교 포인트가 잘 보이게 다듬어 주세요. 다른 필드는 유지해 주세요.',
   },
 };
+
 
 function currentAiRewriteDraft(card) {
   if (!card) return null;
@@ -2176,22 +2154,17 @@ function renderAiRewriteControls(card) {
   const busy = state.aiRewriteLoading || state.aiRewriteApplying;
   Object.entries(AI_REWRITE_FIELD_CONFIG).forEach(([field, config]) => {
     const previewBtn = $(config.previewButtonId);
-    const saveBtn = $(config.saveButtonId);
-    const cancelBtn = $(config.cancelButtonId);
     const row = previewBtn?.closest('.section-title-row') || null;
-    if (!previewBtn || !saveBtn || !cancelBtn) return;
-    const active = aiRewritePreviewActive(card, field);
+    if (!previewBtn) return;
+    const active = busy && state.aiRewriteActiveField === field;
     previewBtn.disabled = busy || !card;
-    previewBtn.textContent = state.aiRewriteLoading && state.aiRewriteActiveField === field ? '…' : 'AI';
-    previewBtn.title = state.aiRewriteLoading && state.aiRewriteActiveField === field ? `${config.label} AI 변환 중` : `${config.label} AI 변환`;
-    previewBtn.dataset.tip = state.aiRewriteLoading && state.aiRewriteActiveField === field ? '변환 중' : `${config.label} AI`;
-    saveBtn.hidden = !active;
-    cancelBtn.hidden = !active;
-    saveBtn.disabled = busy;
-    cancelBtn.disabled = busy;
-    row?.classList.toggle('ai-previewing', Boolean(active));
+    previewBtn.textContent = active ? '…' : 'AI';
+    previewBtn.title = active ? `${config.label} AI 변환 중` : `${config.label} AI 변환`;
+    previewBtn.dataset.tip = active ? '변환 중' : `${config.label} AI`;
+    row?.classList.toggle('ai-previewing', active);
   });
 }
+
 
 async function responseErrorText(res) {
   const raw = await res.text();
@@ -2208,36 +2181,41 @@ async function previewAiRewrite(field) {
   const config = AI_REWRITE_FIELD_CONFIG[field];
   if (!config || !state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
   const current = state.filtered[state.index];
-  currentAiRewriteDraft(current);
   state.aiRewriteLoading = true;
   state.aiRewriteError = '';
   state.aiRewriteActiveField = field;
   renderAiRewriteControls(current);
   setMessage(`${current.term}: ${config.label} AI 변환 중...`);
   try {
-    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {
+    const previewRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({instruction: config.instruction}),
     });
-    if (!res.ok) throw new Error(await responseErrorText(res));
-    const data = await res.json();
-    state.aiRewriteCardId = current.id;
-    state.aiRewriteDraft = {
-      ...aiRewriteDraftFromCard(current),
-      ...(data.proposal || {}),
-    };
-    renderCard();
-    setMessage(`${current.term}: ${config.label} AI 초안 생성 완료`);
+    if (!previewRes.ok) throw new Error(await responseErrorText(previewRes));
+    const previewData = await previewRes.json();
+    const nextValue = String(previewData?.proposal?.[field] ?? current?.[field] ?? '');
+    const applyRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/apply`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({[field]: nextValue}),
+    });
+    if (!applyRes.ok) throw new Error(await responseErrorText(applyRes));
+    const data = await applyRes.json();
+    clearAiRewritePreview(current.id);
+    await refreshCards({cardId: data.card.id, message: null});
+    setMessage(`${data.card.term}: ${config.label} 저장 완료`);
   } catch (error) {
-    state.aiRewriteActiveField = '';
     renderAiRewriteControls(current);
     setMessage(`AI 초안 생성 실패: ${error.message || error}`, true);
   } finally {
     state.aiRewriteLoading = false;
+    state.aiRewriteApplying = false;
+    state.aiRewriteActiveField = '';
     renderAiRewriteControls(state.filtered[state.index] || null);
   }
 }
+
 
 async function applyAiRewrite(field) {
   const config = AI_REWRITE_FIELD_CONFIG[field];
@@ -3456,19 +3434,11 @@ $('bookmarkBtn').addEventListener('click', toggleBookmark);
 $('copyBookmarksBtn').addEventListener('click', copyBookmarkedTerms);
 $('memoSaveBtn').addEventListener('click', saveMemo);
 $('conceptImageGenerateBtn')?.addEventListener('click', previewConceptImage);
-$('conceptImageSaveBtn')?.addEventListener('click', saveConceptImagePreview);
-$('conceptImageCancelBtn')?.addEventListener('click', discardConceptImagePreview);
 
 [
   ['definitionAiBtn', () => previewAiRewrite('definition')],
   ['detailAiBtn', () => previewAiRewrite('detailed_explanation')],
   ['examAiBtn', () => previewAiRewrite('exam_note')],
-  ['definitionAiSaveBtn', () => applyAiRewrite('definition')],
-  ['detailAiSaveBtn', () => applyAiRewrite('detailed_explanation')],
-  ['examAiSaveBtn', () => applyAiRewrite('exam_note')],
-  ['definitionAiCancelBtn', () => discardAiRewrite('definition')],
-  ['detailAiCancelBtn', () => discardAiRewrite('detailed_explanation')],
-  ['examAiCancelBtn', () => discardAiRewrite('exam_note')],
 ].forEach(([id, handler]) => {
   $(id)?.addEventListener('click', handler);
 });
