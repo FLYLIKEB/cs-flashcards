@@ -21,6 +21,8 @@ const state = {
   aiImagePreviewName: '',
   aiImagePreviewUrl: '',
   aiImagePreviewAlt: '',
+  aiNotificationsRequested: false,
+
   menuOpen: false,
   speechHighlight: null,
   speechCurrent: null,
@@ -1546,6 +1548,25 @@ function setMessage(text, isError = false) {
   el.style.color = isError ? '#fb7185' : '#aab6cf';
 }
 
+function requestAiNotificationPermission() {
+  if (state.aiNotificationsRequested || !('Notification' in window) || window.Notification.permission !== 'default') return;
+  state.aiNotificationsRequested = true;
+  window.Notification.requestPermission().catch(() => {});
+}
+
+function notifyAiCompletion(title, body) {
+  if (document.visibilityState !== 'hidden' || !('Notification' in window) || window.Notification.permission !== 'granted') return;
+  try {
+    new window.Notification(title, {body, tag: 'cs-ai-update'});
+  } catch (_error) {}
+}
+
+function announceAiCompletion(title, body, isError = false) {
+  setMessage(body, isError);
+  notifyAiCompletion(title, body);
+}
+
+
 function parseRelated(text) {
   const matches = [...(text || '').matchAll(/\[\[([^\]]+)\]\]/g)].map((m) => m[1]);
   if (matches.length) return matches;
@@ -1803,9 +1824,11 @@ function conceptImageDisplayState(card) {
 async function previewConceptImage() {
   if (!state.filtered.length || state.aiImageGenerating || state.aiImageSaving) return;
   const current = state.filtered[state.index];
+  requestAiNotificationPermission();
+  state.aiImageCardId = current.id;
   state.aiImageGenerating = true;
   renderConceptImage(current);
-  setMessage(`${current.term}: AI 이미지 생성 중...`);
+  setMessage(`${current.term}: AI 이미지 변경 요청됨. 완료 시 알림합니다.`);
   let previewName = '';
   try {
     const previewRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/preview`, {method: 'POST'});
@@ -1820,8 +1843,8 @@ async function previewConceptImage() {
     if (!applyRes.ok) throw new Error(await responseErrorText(applyRes));
     const data = await applyRes.json();
     clearConceptImagePreview(current.id);
-    await refreshCards({cardId: data.card.id, message: null});
-    setMessage(`${data.card.term}: AI 이미지를 저장했습니다.`);
+    await refreshCards({message: null});
+    announceAiCompletion(`AI 이미지 완료 · ${data.card.term}`, `${data.card.term}: AI 이미지 변경 완료`);
   } catch (error) {
     if (previewName) {
       try {
@@ -1833,7 +1856,7 @@ async function previewConceptImage() {
       } catch (_discardError) {}
     }
     renderConceptImage(current);
-    setMessage(`AI 이미지 생성 실패: ${error.message || error}`, true);
+    announceAiCompletion(`AI 이미지 실패 · ${current.term}`, `${current.term}: AI 이미지 생성 실패 - ${error.message || error}`, true);
   } finally {
     state.aiImageGenerating = false;
     state.aiImageSaving = false;
@@ -1841,6 +1864,7 @@ async function previewConceptImage() {
     renderConceptImage(state.filtered[state.index] || null);
   }
 }
+
 
 
 async function discardConceptImagePreview() {
@@ -1890,6 +1914,7 @@ function renderConceptImage(card) {
 
   const {previewActive, url, alt, hasImage} = conceptImageDisplayState(card);
   const busy = state.aiImageGenerating || state.aiImageSaving;
+  const activeBusy = busy && state.aiImageCardId === card.id;
   wrap.hidden = false;
   wrap.classList.toggle('preview-active', previewActive);
   wrap.classList.toggle('is-empty', !hasImage);
@@ -1916,10 +1941,11 @@ function renderConceptImage(card) {
   }
 
   generateBtn.disabled = busy;
-  generateBtn.textContent = state.aiImageGenerating ? '…' : 'AI';
-  generateBtn.title = state.aiImageGenerating ? 'AI 이미지 생성 중' : 'AI 이미지 재생성';
-  generateBtn.dataset.tip = state.aiImageGenerating ? '생성 중' : 'AI 이미지 재생성';
+  generateBtn.textContent = activeBusy ? '…' : 'AI';
+  generateBtn.title = activeBusy ? 'AI 이미지 생성 중' : 'AI 이미지 재생성';
+  generateBtn.dataset.tip = activeBusy ? '생성 중' : 'AI 이미지 재생성';
 }
+
 
 
 async function loadCards() {
@@ -2156,7 +2182,7 @@ function renderAiRewriteControls(card) {
     const previewBtn = $(config.previewButtonId);
     const row = previewBtn?.closest('.section-title-row') || null;
     if (!previewBtn) return;
-    const active = busy && state.aiRewriteActiveField === field;
+    const active = busy && state.aiRewriteActiveField === field && state.aiRewriteCardId === card?.id;
     previewBtn.disabled = busy || !card;
     previewBtn.textContent = active ? '…' : 'AI';
     previewBtn.title = active ? `${config.label} AI 변환 중` : `${config.label} AI 변환`;
@@ -2164,6 +2190,7 @@ function renderAiRewriteControls(card) {
     row?.classList.toggle('ai-previewing', active);
   });
 }
+
 
 
 async function responseErrorText(res) {
@@ -2181,11 +2208,13 @@ async function previewAiRewrite(field) {
   const config = AI_REWRITE_FIELD_CONFIG[field];
   if (!config || !state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
   const current = state.filtered[state.index];
+  requestAiNotificationPermission();
+  state.aiRewriteCardId = current.id;
   state.aiRewriteLoading = true;
   state.aiRewriteError = '';
   state.aiRewriteActiveField = field;
   renderAiRewriteControls(current);
-  setMessage(`${current.term}: ${config.label} AI 변환 중...`);
+  setMessage(`${current.term}: ${config.label} AI 변경 요청됨. 완료 시 알림합니다.`);
   try {
     const previewRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {
       method: 'POST',
@@ -2203,11 +2232,11 @@ async function previewAiRewrite(field) {
     if (!applyRes.ok) throw new Error(await responseErrorText(applyRes));
     const data = await applyRes.json();
     clearAiRewritePreview(current.id);
-    await refreshCards({cardId: data.card.id, message: null});
-    setMessage(`${data.card.term}: ${config.label} 저장 완료`);
+    await refreshCards({message: null});
+    announceAiCompletion(`AI 변경 완료 · ${data.card.term}`, `${data.card.term}: ${config.label} 변경 완료`);
   } catch (error) {
     renderAiRewriteControls(current);
-    setMessage(`AI 초안 생성 실패: ${error.message || error}`, true);
+    announceAiCompletion(`AI 변경 실패 · ${current.term}`, `${current.term}: ${config.label} 변경 실패 - ${error.message || error}`, true);
   } finally {
     state.aiRewriteLoading = false;
     state.aiRewriteApplying = false;
