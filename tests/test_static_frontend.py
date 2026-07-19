@@ -91,6 +91,10 @@ class StaticFrontendTests(unittest.TestCase):
             '/ai-image/preview',
             '/ai-image/apply',
             '/ai-image/discard',
+            'function openConceptImageDialog()',
+            'function closeConceptImageDialog({restoreFocus = true} = {})',
+            "$('conceptImageZoomBtn')?.addEventListener('click'",
+            'openConceptImageDialog();',
             'AI 이미지 생성 중',
         ]:
             self.assertIn(snippet, APP_JS)
@@ -101,10 +105,14 @@ class StaticFrontendTests(unittest.TestCase):
             '.inline-ai-btn.save',
             '.concept-image-actions',
             '.concept-image-action',
+            '.concept-image-action.zoom',
             '.concept-image-placeholder',
             '.concept-image-wrap.is-empty',
+            '.concept-image-modal-image',
         ]:
             self.assertIn(snippet, STYLE_CSS)
+        self.assertIn('id="conceptImageZoomBtn"', INDEX_HTML)
+        self.assertIn('id="conceptImageDialog"', INDEX_HTML)
 
     def test_wiki_ui_and_flashcard_links_are_present(self):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)

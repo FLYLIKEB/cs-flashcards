@@ -274,7 +274,8 @@
                 </span>
               </div>
               <figure id="backConceptImageWrap" class="concept-image-wrap" hidden>
-                <div class="concept-image-actions" aria-label="AI 이미지 제어">
+                <div class="concept-image-actions" aria-label="개념 이미지 제어">
+                  <button id="conceptImageZoomBtn" class="concept-image-action zoom has-tip" type="button" title="이미지 크게 보기" data-tip="이미지 크게 보기" aria-label="이미지 크게 보기">확대</button>
                   <button id="conceptImageGenerateBtn" class="concept-image-action has-tip" type="button" title="AI 이미지 재생성" data-tip="AI 이미지 재생성">AI</button>
                 </div>
                 <img id="backConceptImage" class="concept-image" alt="" loading="lazy" decoding="async" />
@@ -408,6 +409,18 @@
         <div class="question-import-actions">
           <button id="questionImportApplyBtn" class="question-toolbar-button is-primary" type="button">불러오기</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="conceptImageDialog" class="modal-backdrop concept-image-dialog" role="dialog" aria-modal="true" aria-labelledby="conceptImageDialogTitle" hidden>
+    <div class="modal-card concept-image-modal">
+      <div class="modal-header">
+        <h2 id="conceptImageDialogTitle">확대 이미지</h2>
+        <button id="conceptImageDialogCloseBtn" class="modal-close" type="button" aria-label="확대 이미지 닫기">×</button>
+      </div>
+      <div class="concept-image-modal-body">
+        <img id="conceptImageDialogImage" class="concept-image-modal-image" alt="" loading="eager" decoding="async" />
       </div>
     </div>
   </div>

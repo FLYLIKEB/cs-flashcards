@@ -1930,12 +1930,43 @@ async function discardConceptImagePreview() {
   setMessage(`${current.term}: AI 이미지 미리보기를 취소했습니다.`);
 }
 
+function conceptImageDialogOpen() {
+  const dialog = $('conceptImageDialog');
+  return Boolean(dialog && !dialog.hidden);
+}
+
+function openConceptImageDialog() {
+  const image = $('backConceptImage');
+  const dialog = $('conceptImageDialog');
+  const dialogImage = $('conceptImageDialogImage');
+  if (!image || !dialog || !dialogImage || image.hidden) return;
+  const src = image.currentSrc || image.getAttribute('src') || '';
+  if (!src) return;
+  dialogImage.src = src;
+  dialogImage.alt = image.alt || '';
+  dialog.hidden = false;
+  $('conceptImageDialogCloseBtn')?.focus();
+}
+
+function closeConceptImageDialog({restoreFocus = true} = {}) {
+  const dialog = $('conceptImageDialog');
+  const dialogImage = $('conceptImageDialogImage');
+  if (!dialog || dialog.hidden) return;
+  dialog.hidden = true;
+  if (dialogImage) {
+    dialogImage.removeAttribute('src');
+    dialogImage.alt = '';
+  }
+  if (restoreFocus) focusAppCard();
+}
+
 function renderConceptImage(card) {
   const wrap = $('backConceptImageWrap');
   const image = $('backConceptImage');
   const placeholder = $('backConceptImagePlaceholder');
+  const zoomBtn = $('conceptImageZoomBtn');
   const generateBtn = $('conceptImageGenerateBtn');
-  if (!wrap || !image || !placeholder || !generateBtn) return;
+  if (!wrap || !image || !placeholder || !zoomBtn || !generateBtn) return;
   bindConceptImageLoadState();
 
   if (!card) {
@@ -1946,7 +1977,9 @@ function renderConceptImage(card) {
     image.dataset.expectedSrc = '';
     image.hidden = true;
     placeholder.hidden = true;
+    zoomBtn.disabled = true;
     generateBtn.disabled = true;
+    closeConceptImageDialog({restoreFocus: false});
     return;
   }
 
@@ -1960,7 +1993,7 @@ function renderConceptImage(card) {
   if (hasImage) {
     image.dataset.expectedSrc = url;
     image.alt = alt;
-    image.title = previewActive ? `${card.term} AI 이미지 미리보기` : `${googleSearchQuery(card)} 구글 AI 검색`;
+    image.title = previewActive ? `${card.term} AI 이미지 미리보기 크게 보기` : `${card.term} 이미지 크게 보기`;
     image.hidden = false;
     placeholder.hidden = true;
     if (image.getAttribute('src') !== url) image.src = url;
@@ -1969,6 +2002,13 @@ function renderConceptImage(card) {
       image.hidden = !loaded;
       placeholder.hidden = loaded;
     }
+    if (conceptImageDialogOpen()) {
+      const dialogImage = $('conceptImageDialogImage');
+      if (dialogImage) {
+        if (dialogImage.getAttribute('src') !== url) dialogImage.src = url;
+        dialogImage.alt = alt;
+      }
+    }
   } else {
     image.removeAttribute('src');
     image.removeAttribute('title');
@@ -1976,8 +2016,12 @@ function renderConceptImage(card) {
     image.dataset.expectedSrc = '';
     image.hidden = true;
     placeholder.hidden = false;
+    closeConceptImageDialog({restoreFocus: false});
   }
 
+  zoomBtn.disabled = !hasImage;
+  zoomBtn.title = hasImage ? '이미지 크게 보기' : '확대할 이미지 없음';
+  zoomBtn.dataset.tip = hasImage ? '이미지 크게 보기' : '이미지 없음';
   generateBtn.disabled = busy;
   generateBtn.textContent = activeBusy ? '…' : 'AI';
   generateBtn.title = activeBusy ? 'AI 이미지 생성 중' : 'AI 이미지 재생성';
@@ -4201,6 +4245,11 @@ $('bookmarkBtn').addEventListener('click', toggleBookmark);
 $('copyBookmarksBtn').addEventListener('click', copyBookmarkedTerms);
 $('memoSaveBtn').addEventListener('click', saveMemo);
 $('conceptImageGenerateBtn')?.addEventListener('click', previewConceptImage);
+$('conceptImageZoomBtn')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  openConceptImageDialog();
+});
 
 [
   ['definitionAiBtn', () => previewAiRewrite('definition')],
@@ -4229,6 +4278,7 @@ $('memoListCloseBtn').addEventListener('click', closeMemoList);
 $('bookmarkListCloseBtn').addEventListener('click', closeBookmarkList);
 $('questionHistoryCloseBtn')?.addEventListener('click', closeQuestionHistory);
 $('questionImportCloseBtn')?.addEventListener('click', closeQuestionImportDialog);
+$('conceptImageDialogCloseBtn')?.addEventListener('click', () => closeConceptImageDialog());
 
 $('memoListDialog').addEventListener('click', (event) => {
   if (event.target === $('memoListDialog')) closeMemoList();
@@ -4241,6 +4291,9 @@ $('questionHistoryDialog')?.addEventListener('click', (event) => {
 });
 $('questionImportDialog')?.addEventListener('click', (event) => {
   if (event.target === $('questionImportDialog')) closeQuestionImportDialog();
+});
+$('conceptImageDialog')?.addEventListener('click', (event) => {
+  if (event.target === $('conceptImageDialog')) closeConceptImageDialog();
 });
 $('questionImportInput')?.addEventListener('keydown', (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
@@ -4302,7 +4355,7 @@ $('backConceptImageWrap')?.addEventListener('click', (event) => {
   if (event.target.closest('button')) return;
   event.preventDefault();
   event.stopPropagation();
-  openCurrentGoogleSearch(event);
+  openConceptImageDialog();
 });
 ['categorySelect', 'importanceSelect', 'difficultySelect', 'bokSelect'].forEach((id) => {
   $(id)?.addEventListener('change', () => { state.index = 0; applyFilters(); });
@@ -4342,6 +4395,11 @@ document.addEventListener('keydown', (e) => {
   if (document.activeElement?.id === 'memoInput' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
     e.preventDefault();
     saveMemo();
+    return;
+  }
+  if (e.key === 'Escape' && conceptImageDialogOpen()) {
+    e.preventDefault();
+    closeConceptImageDialog();
     return;
   }
   if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
