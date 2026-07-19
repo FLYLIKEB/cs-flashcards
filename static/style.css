@@ -4249,6 +4249,42 @@ select,
   color: #3b3b37;
 }
 .question-rubric ul { margin: .42rem 0 0; padding-left: 1.2rem; }
+.question-review-box {
+  margin: .9rem 0 1rem;
+  padding: .82rem .92rem;
+  border: 1px solid rgba(31, 58, 95, .12);
+  border-radius: 16px;
+  background: #f8fbff;
+}
+
+.question-review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  margin-bottom: .68rem;
+  flex-wrap: wrap;
+}
+
+.question-review-status {
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.question-review-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .55rem;
+}
+
+.question-review-actions .mark.active {
+  outline: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  outline-offset: 0;
+}
+
+.question-review-actions .mark:disabled {
+  cursor: wait;
+}
 .question-actions {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

@@ -2382,6 +2382,14 @@ function currentQuestion() {
   return state.questions[state.questionIndex] || null;
 }
 
+function currentQuestionCard() {
+  const question = currentQuestion();
+  if (!question?.card_id) return null;
+  return state.cards.find((item) => item.id === question.card_id)
+    || state.filtered.find((item) => item.id === question.card_id)
+    || null;
+}
+
 
 function hydrateQuestionState(question) {
   if (!question) return null;
@@ -2507,6 +2515,7 @@ function renderQuestionPanel() {
   setQuestionControlsDisabled(state.questionLoading || state.questionSaving || state.markSaving);
   const total = state.questions.length;
   const question = hydrateQuestionState(currentQuestion());
+  const reviewCard = currentQuestionCard();
   if (question) {
     state.answerRevealed = Boolean(question.answerRevealed);
     state.selectedChoiceIndex = Number.isInteger(question.selectedChoiceIndex) ? question.selectedChoiceIndex : null;
@@ -2536,6 +2545,23 @@ function renderQuestionPanel() {
     return;
   }
 
+  const reviewDisabled = state.questionLoading || state.questionSaving || state.markSaving || !reviewCard;
+  const reviewStatus = reviewCard?.known_status || '';
+  const reviewStatusText = reviewCard
+    ? `현재 카드 상태: ${statusLabel(reviewStatus)}`
+    : '원본 카드를 찾지 못했습니다.';
+  const reviewBoxHtml = `
+    <div class="question-review-box">
+      <div class="question-review-head">
+        <strong>이 개념 바로 O/X</strong>
+        <span class="question-review-status">${escapeHtml(reviewStatusText)}</span>
+      </div>
+      <div class="question-review-actions">
+        <button class="mark known${reviewStatus === 'O' ? ' active' : ''}" type="button" data-question-mark="O" ${reviewDisabled ? 'disabled' : ''}>O</button>
+        <button class="mark unknown${reviewStatus === 'X' ? ' active' : ''}" type="button" data-question-mark="X" ${reviewDisabled ? 'disabled' : ''}>X</button>
+        <button class="mark unreviewed${!reviewStatus ? ' active' : ''}" type="button" data-question-mark="" ${reviewDisabled ? 'disabled' : ''}>–</button>
+      </div>
+    </div>`;
   const choices = Array.isArray(question.choices) ? question.choices : [];
   const choiceHtml = choices.length ? `
     <ol class="question-choices">
@@ -2591,6 +2617,7 @@ function renderQuestionPanel() {
     </div>
     <h2>${escapeHtml(question.prompt || '문제')}</h2>
     <p class="question-body">${escapeHtml(question.body || '')}</p>
+    ${reviewBoxHtml}
     ${draftHtml}
     ${choiceHtml}
     ${answer}
@@ -2684,6 +2711,46 @@ function openQuestionSourceCard() {
   state.flipped = true;
   renderCard();
   setMessage(`${card.term} 원본 카드로 이동했습니다.`);
+}
+
+async function markQuestionSourceCard(status) {
+  const question = currentQuestion();
+  const current = currentQuestionCard();
+  if (!question) return;
+  if (!current) {
+    setMessage('원본 카드를 찾지 못했습니다.', true);
+    return;
+  }
+  if (state.questionLoading || state.questionSaving || state.markSaving) return;
+  const previous = {...current};
+  const optimistic = buildMarkedCardState(previous, status);
+
+  state.markSaving = true;
+  syncUpdatedCard(optimistic);
+  renderStats(summaryFromRows(rowsForHeaderStats()));
+  renderQuestionPanel();
+  setMessage(`${optimistic.term}: ${statusLabel(status)} 저장 중...`);
+
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/mark`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({known_status: status}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    state.summary = data.summary;
+    syncUpdatedCard(data.card);
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    setMessage(`${data.card.term}: ${statusLabel(status)} 저장 완료`);
+  } catch (error) {
+    syncUpdatedCard(previous);
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    setMessage(`저장 실패: ${error.message || error}`, true);
+  } finally {
+    state.markSaving = false;
+    renderQuestionPanel();
+  }
 }
 
 function selectQuestionChoice(index) {
@@ -3015,6 +3082,11 @@ $('questionCard')?.addEventListener('click', (event) => {
     selectQuestionChoice(Number.parseInt(choice.dataset.choiceIndex, 10));
     return;
   }
+  const questionMark = event.target.closest('[data-question-mark]');
+  if (questionMark) {
+    markQuestionSourceCard(questionMark.dataset.questionMark || '');
+    return;
+  }
   const gradeButton = event.target.closest('[data-question-grade]');
   if (gradeButton) {
     markCurrentQuestion(gradeButton.dataset.questionGrade === 'correct');
@@ -3024,6 +3096,7 @@ $('questionCard')?.addEventListener('click', (event) => {
     saveCurrentWrongNote();
   }
 });
+
 
 $('questionCard')?.addEventListener('input', (event) => {
   const question = hydrateQuestionState(currentQuestion());
@@ -3178,6 +3251,9 @@ if (state.questionMode) {
   if (e.key === 'ArrowLeft') { e.preventDefault(); moveQuestion(-1); return; }
   if (e.key === 'ArrowRight') { e.preventDefault(); moveQuestion(1); return; }
   if (e.key === ' ') { e.preventDefault(); revealQuestionAnswer(); return; }
+  if (key === 'o' || e.key === '.') { e.preventDefault(); markQuestionSourceCard('O'); return; }
+  if (key === 'x') { e.preventDefault(); markQuestionSourceCard('X'); return; }
+  if (e.key === '-') { e.preventDefault(); markQuestionSourceCard(''); return; }
   if (key === 'q') { e.preventDefault(); toggleQuestionMode(false); return; }
 }
 if (e.key === ' ') { e.preventDefault(); state.flipped = !state.flipped; if (state.flipped) state.backPage = 0; renderCard(); }
@@ -3188,10 +3264,10 @@ else if (e.key === 'ArrowRight') move(1);
 else if (key === 'o' || e.key === '.') mark('O');
 else if (key === 'x') { e.preventDefault(); mark('X'); }
 else if (key === 'r') toggleRandomMode();
-  else if (e.key === 'Enter') { e.preventDefault(); state.audioPlaying ? stopAudioPlayback() : startAudioPlayback(); }
-  else if (key === 'f' || e.key === '/') { e.preventDefault(); focusSearchInput(); }
-  else if (key === 'g') { e.preventDefault(); openCurrentGoogleSearch(e); }
-  else if (key === 'b') { e.preventDefault(); toggleBookmark(); }
+else if (e.key === 'Enter') { e.preventDefault(); state.audioPlaying ? stopAudioPlayback() : startAudioPlayback(); }
+else if (key === 'f' || e.key === '/') { e.preventDefault(); focusSearchInput(); }
+else if (key === 'g') { e.preventDefault(); openCurrentGoogleSearch(e); }
+else if (key === 'b') { e.preventDefault(); toggleBookmark(); }
 });
 
 // iOS Safari (even installed as a home-screen PWA) suspends speechSynthesis

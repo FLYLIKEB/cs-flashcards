@@ -259,6 +259,12 @@ class StaticFrontendTests(unittest.TestCase):
             'function setQuestionHistoryFilter(filter)',
             'questionHistoryBtn',
             'data-question-history-filter',
+            'function markQuestionSourceCard(status)',
+            'data-question-mark',
+            'question-review-box',
+            'question-review-actions',
+            "markQuestionSourceCard('O')",
+            "markQuestionSourceCard('X')",
         ]:
             self.assertIn(snippet, APP_JS)
         self.assertIn('id="questionHistoryDialog"', INDEX_HTML)
