@@ -2729,13 +2729,13 @@ function renderQuestionPanel() {
   const reviewBoxHtml = `
     <div class="question-review-box">
       <div class="question-review-head">
-        <strong>바로 O/X</strong>
+        <span class="question-review-label">카드</span>
         <span class="question-review-status">${escapeHtml(reviewStatusText)}</span>
       </div>
       <div class="question-review-actions">
-        <button class="mark known${reviewStatus === 'O' ? ' active' : ''}" type="button" data-question-mark="O" ${reviewDisabled ? 'disabled' : ''}>O</button>
-        <button class="mark unknown${reviewStatus === 'X' ? ' active' : ''}" type="button" data-question-mark="X" ${reviewDisabled ? 'disabled' : ''}>X</button>
-        <button class="mark unreviewed${!reviewStatus ? ' active' : ''}" type="button" data-question-mark="" ${reviewDisabled ? 'disabled' : ''}>–</button>
+        <button class="mark known${reviewStatus === 'O' ? ' active' : ''}" type="button" data-question-mark="O" aria-label="이 개념을 안다로 표시" title="안다 (O)" ${reviewDisabled ? 'disabled' : ''}>O</button>
+        <button class="mark unknown${reviewStatus === 'X' ? ' active' : ''}" type="button" data-question-mark="X" aria-label="이 개념을 모른다로 표시" title="모른다 (X)" ${reviewDisabled ? 'disabled' : ''}>X</button>
+        <button class="mark unreviewed${!reviewStatus ? ' active' : ''}" type="button" data-question-mark="" aria-label="이 개념을 미복습으로 표시" title="미복습 (–)" ${reviewDisabled ? 'disabled' : ''}>–</button>
       </div>
     </div>`;
   const choices = Array.isArray(question.choices) ? question.choices : [];
