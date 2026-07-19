@@ -28,6 +28,17 @@ https://cs.chamung.com
 http://127.0.0.1:8000
 ```
 
+## 학습 위키 문서 열기
+
+- 헤더의 `위키` 버튼과 카드 뒷면 `출처 파일` 링크는 `/wiki` UI로 연결됩니다.
+- 앱은 위키 문서를 아래 순서로 찾습니다.
+  1. `CS_FLASHCARDS_WIKI_BOOK_DIR`
+  2. 프로젝트 내부 `wiki_book/`
+  3. 기존 로컬 개발 경로 `../wikidocs-ebook`
+- Lightsail 배포 스크립트는 기본적으로 로컬 `../wikidocs-ebook`를 묶어서 서버의 `/home/ubuntu/cs-flashcards/wiki_book`으로 함께 배포합니다.
+- 다른 위치의 문서를 배포하려면 `CS_FLASHCARDS_WIKI_BOOK_SRC`를 지정합니다.
+
+
 ## 데이터 저장 구조
 
 카드 콘텐츠와 학습 진행상태를 분리해서 관리합니다.
@@ -222,7 +233,10 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
   "ok": true,
   "csv_exists": true,
   "progress_db_exists": true,
-  "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite"
+  "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite",
+  "wiki_book_exists": true,
+  "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
+  "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book"
 }
 ```
 

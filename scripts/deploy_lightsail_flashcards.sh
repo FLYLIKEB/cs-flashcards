@@ -17,6 +17,8 @@ PASSWORD="${CS_FLASHCARDS_PASSWORD:-}"
 STATE_DIR="$ROOT_DIR/.omx"
 PASSWORD_FILE="$STATE_DIR/cs_flashcards_public_password"
 CHALOG_CONFIG="/Users/jwp/Developer/ChaLog/.ec2-config"
+WIKI_BOOK_SRC="${CS_FLASHCARDS_WIKI_BOOK_SRC:-$ROOT_DIR/../wikidocs-ebook}"
+
 
 if [[ -f "$CHALOG_CONFIG" ]]; then
   # shellcheck disable=SC1090
@@ -52,12 +54,23 @@ echo "배포 대상: $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR"
 echo "도메인: http://$DOMAIN (443 개방 시 https://$DOMAIN)"
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
-COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" \
-  app.py \
-  question_generator.py \
-  requirements.txt \
-  static \
-  data/CS_encyclopedia_300plus.csv
+TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
+mkdir -p "$TMP_STAGE/data"
+cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
+cp -R static "$TMP_STAGE/"
+cp data/CS_encyclopedia_300plus.csv "$TMP_STAGE/data/"
+if [[ -d "$WIKI_BOOK_SRC" ]]; then
+  echo "위키 문서 포함: $WIKI_BOOK_SRC"
+  mkdir -p "$TMP_STAGE/wiki_book"
+  cp "$WIKI_BOOK_SRC/README.md" "$TMP_STAGE/wiki_book/README.md"
+  cp "$WIKI_BOOK_SRC/TOC.md" "$TMP_STAGE/wiki_book/TOC.md"
+  cp -R "$WIKI_BOOK_SRC/pages" "$TMP_STAGE/wiki_book/"
+else
+  echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 없이 배포합니다: $WIKI_BOOK_SRC"
+fi
+COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" -C "$TMP_STAGE" .
+rm -rf "$TMP_STAGE"
+
 
 "${SSH[@]}" "mkdir -p '$REMOTE_DIR' '$REMOTE_DIR/backups'"
 "${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards.tar.gz"
@@ -169,6 +182,7 @@ Environment=CS_FLASHCARDS_PASSWORD=$PASSWORD
 Environment=CS_FLASHCARD_CSV=$REMOTE_DIR/data/CS_encyclopedia_300plus.csv
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
 Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DIR/state/progress.sqlite
+Environment=CS_FLASHCARDS_WIKI_BOOK_DIR=$REMOTE_DIR/wiki_book
 ExecStart=$REMOTE_DIR/.venv/bin/uvicorn app:app --host 127.0.0.1 --port $REMOTE_PORT
 Restart=always
 RestartSec=3

@@ -29,7 +29,8 @@ CSV_PATH = Path(os.environ.get("CS_FLASHCARD_CSV", DEFAULT_CSV_PATH)).expanduser
 PROGRESS_DB_PATH = Path(os.environ.get("CS_FLASHCARD_PROGRESS_DB", DEFAULT_PROGRESS_DB_PATH)).expanduser().resolve()
 BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).expanduser().resolve()
 STATIC_DIR = Path(__file__).resolve().parent / "static"
-DEFAULT_WIKI_BOOK_DIR = ROOT.parent / "wikidocs-ebook"
+DEFAULT_WIKI_BOOK_DIR = ROOT / "wiki_book"
+LEGACY_WIKI_BOOK_DIR = ROOT.parent / "wikidocs-ebook"
 WIKI_BOOK_DIR = Path(os.environ.get("CS_FLASHCARDS_WIKI_BOOK_DIR", DEFAULT_WIKI_BOOK_DIR)).expanduser().resolve()
 WIKI_PAGES_DIRNAME = "pages"
 WIKI_TOC_NAME = "TOC.md"
@@ -434,11 +435,27 @@ WIKI_INLINE_TOKEN_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]
 
 
 
-def wiki_book_dir(repo_dir: Path = WIKI_BOOK_DIR) -> Path:
-    resolved = Path(repo_dir).expanduser().resolve()
-    if not resolved.exists():
-        raise FileNotFoundError(f"Wiki book directory not found: {resolved}")
-    return resolved
+def wiki_book_dir(repo_dir: Path | None = None) -> Path:
+    if repo_dir is not None:
+        resolved = Path(repo_dir).expanduser().resolve()
+        if not resolved.exists():
+            raise FileNotFoundError(f"Wiki book directory not found: {resolved}")
+        return resolved
+    candidates = [
+        WIKI_BOOK_DIR,
+        LEGACY_WIKI_BOOK_DIR,
+        ROOT / "wikidocs-ebook",
+    ]
+    seen: set[Path] = set()
+    for candidate in candidates:
+        resolved = Path(candidate).expanduser().resolve()
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        if resolved.exists():
+            return resolved
+    searched = ", ".join(str(Path(candidate).expanduser().resolve()) for candidate in candidates)
+    raise FileNotFoundError(f"Wiki book directory not found. Checked: {searched}")
 
 
 
@@ -705,7 +722,7 @@ def render_markdown_page(markdown_text: str, repo_dir: Path, current_source: Pat
 
 
 
-def read_wiki_index(repo_dir: Path = WIKI_BOOK_DIR) -> dict[str, Any]:
+def read_wiki_index(repo_dir: Path | None = None) -> dict[str, Any]:
     repo = wiki_book_dir(repo_dir)
     toc = wiki_toc_path(repo)
     if not toc.exists():
@@ -783,7 +800,7 @@ def resolve_wiki_page_source(repo_dir: Path, page_slug: str, pages: dict[str, di
 
 
 
-def read_wiki_page(page_slug: str | None = None, repo_dir: Path = WIKI_BOOK_DIR) -> dict[str, Any]:
+def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -> dict[str, Any]:
     repo = wiki_book_dir(repo_dir)
     index = read_wiki_index(repo)
     slug = str(page_slug or index["default_page_slug"] or WIKI_BOOK_HOME_SLUG).strip().strip("/") or WIKI_BOOK_HOME_SLUG
@@ -824,7 +841,7 @@ def wiki_page_shell(page_slug: str) -> FileResponse:
 @app.get("/api/wiki/index")
 def api_wiki_index() -> dict[str, Any]:
     try:
-        return read_wiki_index(WIKI_BOOK_DIR)
+        return read_wiki_index()
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
@@ -834,7 +851,7 @@ def api_wiki_index() -> dict[str, Any]:
 @app.get("/api/wiki/page/{page_slug:path}")
 def api_wiki_page(page_slug: str) -> dict[str, Any]:
     try:
-        return read_wiki_page(page_slug, WIKI_BOOK_DIR)
+        return read_wiki_page(page_slug)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
@@ -844,7 +861,7 @@ def api_wiki_page(page_slug: str) -> dict[str, Any]:
 @app.get("/api/wiki/raw/{relative_path:path}")
 def api_wiki_raw(relative_path: str) -> FileResponse:
     try:
-        repo = wiki_book_dir(WIKI_BOOK_DIR)
+        repo = wiki_book_dir()
         target = safe_wiki_path(repo, relative_path)
         if not target or not target.exists() or not target.is_file():
             raise FileNotFoundError(f"Wiki file not found: {relative_path}")
@@ -935,12 +952,19 @@ def api_question_types() -> dict[str, Any]:
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
+    try:
+        resolved_wiki_book_dir = wiki_book_dir()
+        wiki_book_exists = True
+    except FileNotFoundError:
+        resolved_wiki_book_dir = WIKI_BOOK_DIR
+        wiki_book_exists = False
     return {
         "ok": True,
         "csv_path": str(CSV_PATH),
         "csv_exists": CSV_PATH.exists(),
         "progress_db_path": str(PROGRESS_DB_PATH),
         "progress_db_exists": PROGRESS_DB_PATH.exists(),
-        "wiki_book_dir": str(WIKI_BOOK_DIR),
-        "wiki_book_exists": WIKI_BOOK_DIR.exists(),
+        "wiki_book_dir": str(resolved_wiki_book_dir),
+        "wiki_book_exists": wiki_book_exists,
+        "wiki_book_configured_dir": str(WIKI_BOOK_DIR),
     }

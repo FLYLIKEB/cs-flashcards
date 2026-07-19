@@ -325,6 +325,20 @@ class WikiBookTests(unittest.TestCase):
             self.assertIn('<table>', page['html'])
             self.assertIn('<pre><code class="language-text">hello</code></pre>', page['html'])
 
+    def test_wiki_book_dir_and_health_use_configured_or_fallback_location(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                self.assertEqual(flashcard_app.wiki_book_dir(), book.resolve())
+                payload = flashcard_app.health()
+                self.assertTrue(payload['wiki_book_exists'])
+                self.assertEqual(payload['wiki_book_dir'], str(book.resolve()))
+                self.assertEqual(payload['wiki_book_configured_dir'], str(flashcard_app.WIKI_BOOK_DIR))
+            finally:
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
+
     def test_wiki_route_helpers_serve_local_book(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
