@@ -116,6 +116,19 @@ function closeWikiSearch() {
   toggleWikiSearch(false, {focus: false});
 }
 
+function wikiShowSearchResults() {
+  if (!wikiState.sidebarOpen) toggleWikiSidebar(true);
+  const matches = Array.from(document.querySelectorAll('#wikiToc .wiki-toc-link'));
+  if (!matches.length) {
+    wikiStatus('일치하는 문서가 없습니다.');
+    return;
+  }
+  closeWikiSearch();
+  matches[0].focus({preventScroll: true});
+  matches[0].scrollIntoView({block: 'nearest'});
+  wikiStatus(`검색 결과 ${matches.length}건`);
+}
+
 function wikiStatus(text, isError = false) {
   const el = wiki$('wikiStatus');
   if (!el) return;
@@ -308,10 +321,15 @@ wiki$('wikiSearchInput')?.addEventListener('input', (event) => {
 });
 
 wiki$('wikiSearchInput')?.addEventListener('keydown', (event) => {
-  if (event.key !== 'Escape') return;
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeWikiSearch();
+    wiki$('wikiSearchToggleBtn')?.focus({preventScroll: true});
+    return;
+  }
+  if (event.key !== 'Enter') return;
   event.preventDefault();
-  closeWikiSearch();
-  wiki$('wikiSearchToggleBtn')?.focus({preventScroll: true});
+  wikiShowSearchResults();
 });
 
 wiki$('wikiSearchToggleBtn')?.addEventListener('click', () => {
