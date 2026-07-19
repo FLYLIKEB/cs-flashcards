@@ -197,6 +197,65 @@ function wikiRenderBreadcrumbs(page) {
   el.innerHTML = crumbs.map((crumb) => `<a href="${wikiPageUrl(crumb.slug)}" data-wiki-nav="1">${wikiEscapeHtml(crumb.title)}</a>`).join(' <span>›</span> ');
 }
 
+function wikiNavigationItems() {
+  const items = [];
+  const seen = new Set();
+  const book = wikiState.index?.book;
+  if (book?.available !== false) {
+    const bookSlug = String(book?.slug || '_book').trim() || '_book';
+    items.push({
+      title: book?.title || '책 소개',
+      slug: bookSlug,
+      url: wikiPageUrl(bookSlug),
+    });
+    seen.add(bookSlug);
+  }
+  for (const item of Array.isArray(wikiState.index?.flat) ? wikiState.index.flat : []) {
+    const slug = String(item?.slug || '').trim();
+    if (!slug || seen.has(slug)) continue;
+    items.push({
+      title: item?.title || slug,
+      slug,
+      url: wikiPageUrl(slug),
+    });
+    seen.add(slug);
+  }
+  return items;
+}
+
+function wikiPageNavLink(item, direction) {
+  if (!item) return '<span class="wiki-page-nav-link is-empty" aria-hidden="true"></span>';
+  const label = direction === 'next' ? '다음 글' : '이전 글';
+  const rel = direction === 'next' ? 'next' : 'prev';
+  return `
+    <a class="wiki-page-nav-link ${direction}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1" rel="${rel}">
+      <span class="wiki-page-nav-kicker">${label}</span>
+      <strong>${wikiEscapeHtml(item.title)}</strong>
+    </a>`;
+}
+
+function wikiRenderPageNav(page) {
+  const el = wiki$('wikiPageNav');
+  if (!el) return;
+  const items = wikiNavigationItems();
+  const currentSlug = String(page?.slug || wikiState.currentSlug || '').trim();
+  const currentIndex = items.findIndex((item) => item.slug === currentSlug);
+  if (currentIndex < 0) {
+    el.hidden = true;
+    el.innerHTML = '';
+    return;
+  }
+  const previous = currentIndex > 0 ? items[currentIndex - 1] : null;
+  const next = currentIndex < items.length - 1 ? items[currentIndex + 1] : null;
+  if (!previous && !next) {
+    el.hidden = true;
+    el.innerHTML = '';
+    return;
+  }
+  el.hidden = false;
+  el.innerHTML = `${wikiPageNavLink(previous, 'prev')}${wikiPageNavLink(next, 'next')}`;
+}
+
 function wikiRenderLinkedCards(page) {
   const linkedCards = Array.isArray(page?.linked_cards) ? page.linked_cards : [];
   const flashcardLink = wiki$('wikiFlashcardLink');
@@ -233,6 +292,7 @@ function wikiApplyPage(page) {
   document.title = `${page.title || '문서'} · ${wikiState.index?.book?.title || 'CS 학습 위키'}`;
   wikiRenderBreadcrumbs(page);
   wikiRenderLinkedCards(page);
+  wikiRenderPageNav(page);
   wikiRenderToc();
   wikiStatus(`${page.title || '문서'} 열람 중`);
 }
