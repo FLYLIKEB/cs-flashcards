@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS 학습 위키</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="apple-touch-icon" href="/static/favicon.svg" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script defer src="/static/wiki.js"></script>
+</head>
+<body class="wiki-page-shell">
+  <header class="topbar wiki-topbar">
+    <div class="wiki-brand">
+      <a class="logo-refresh wiki-logo" href="/" title="플래시카드로 돌아가기" aria-label="플래시카드로 돌아가기">CS</a>
+      <div>
+        <p class="muted">로컬 위키 UI</p>
+        <h1 id="wikiBookTitle" class="wiki-book-title">불러오는 중...</h1>
+      </div>
+    </div>
+    <div class="header-search wiki-search" title="문서 검색">
+      <span>⌕</span>
+      <input id="wikiSearchInput" type="search" placeholder="문서 제목 검색" />
+    </div>
+    <div class="header-actions">
+      <a class="header-link" href="/">플래시카드</a>
+    </div>
+  </header>
+
+  <main class="wiki-shell">
+    <aside class="wiki-sidebar panel">
+      <div class="wiki-sidebar-head">
+        <a id="wikiBookIntroLink" class="header-link" href="/wiki/page/_book">책 소개</a>
+        <p id="wikiStatus" class="small muted">목차를 불러오는 중...</p>
+      </div>
+      <nav id="wikiToc" class="wiki-toc" aria-label="위키 목차"></nav>
+    </aside>
+
+    <section class="wiki-main panel">
+      <div class="wiki-meta-row">
+        <p id="wikiBreadcrumbs" class="small muted"></p>
+        <a id="wikiRawLink" class="header-link" href="#" target="_blank" rel="noopener noreferrer">원본</a>
+      </div>
+      <article id="wikiArticle" class="wiki-article" aria-live="polite"></article>
+    </section>
+  </main>
+</body>
+</html>

@@ -4,6 +4,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP_JS = (ROOT / 'static' / 'app.js').read_text(encoding='utf-8')
 INDEX_HTML = (ROOT / 'static' / 'index.html').read_text(encoding='utf-8')
+WIKI_HTML = (ROOT / 'static' / 'wiki.html').read_text(encoding='utf-8')
+WIKI_JS = (ROOT / 'static' / 'wiki.js').read_text(encoding='utf-8')
+STYLE_CSS = (ROOT / 'static' / 'style.css').read_text(encoding='utf-8')
+
 
 
 class StaticFrontendTests(unittest.TestCase):
@@ -70,6 +74,20 @@ class StaticFrontendTests(unittest.TestCase):
         ]:
             self.assertIn(snippet, APP_JS)
 
+    def test_wiki_ui_and_flashcard_links_are_present(self):
+        self.assertIn('id="wikiHomeLink"', INDEX_HTML)
+        self.assertIn('href="/wiki"', INDEX_HTML)
+        self.assertIn('target="_blank"', INDEX_HTML)
+        self.assertIn('function renderSourceLinks(sourceFiles)', APP_JS)
+        self.assertIn("$('sources').innerHTML = renderSourceLinks(c.source_files);", APP_JS)
+        self.assertIn('/wiki/page/', APP_JS)
+        self.assertIn('id="wikiSearchInput"', WIKI_HTML)
+        self.assertIn('id="wikiToc"', WIKI_HTML)
+        self.assertIn('id="wikiArticle"', WIKI_HTML)
+        self.assertIn('function wikiRenderToc()', WIKI_JS)
+        self.assertIn('function wikiLoadPage(slug', WIKI_JS)
+        self.assertIn('.wiki-shell', STYLE_CSS)
+        self.assertIn('.wiki-toc-link', STYLE_CSS)
     def test_audio_playback_repeat_and_term_language_controls_are_present(self):
         for snippet in [
             'id="termSpeechMode"',

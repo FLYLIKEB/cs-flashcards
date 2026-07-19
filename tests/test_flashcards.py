@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+
+
 import app as flashcard_app
 from app import mark_card, read_cards, read_csv_cards, save_memo, set_bookmark, summarize
 
@@ -60,6 +62,30 @@ def write_sample(
 def csv_status(path: Path) -> dict[str, str]:
     with path.open(encoding='utf-8-sig', newline='') as f:
         return next(csv.DictReader(f))
+
+
+def write_wiki_book(root: Path) -> Path:
+    book = root / 'wikidocs-ebook'
+    pages = book / 'pages'
+    pages.mkdir(parents=True, exist_ok=True)
+    (book / 'README.md').write_text(
+        '# 금공 IT 위키\n\n- [소개 문서](pages/intro.md)\n',
+        encoding='utf-8',
+    )
+    (book / 'TOC.md').write_text(
+        '# 목차\n\n- [소개 문서](pages/intro.md)\n  - [하위 문서](pages/child.md)\n',
+        encoding='utf-8',
+    )
+    (pages / 'intro.md').write_text(
+        '# 소개 문서\n\n[하위 문서](./child.md)\n\n| 구분 | 내용 |\n| --- | --- |\n| A | B |\n\n```text\nhello\n```\n',
+        encoding='utf-8',
+    )
+    (pages / 'child.md').write_text(
+        '# 하위 문서\n\n- 첫 항목\n- 둘째 항목\n',
+        encoding='utf-8',
+    )
+    return book
+
 
 
 class FlashcardProgressTests(unittest.TestCase):
@@ -282,5 +308,41 @@ class FlashcardProgressTests(unittest.TestCase):
             flashcard_app.PUBLIC_PASSWORD = original_password
 
 
+
+
+class WikiBookTests(unittest.TestCase):
+    def test_read_wiki_index_and_page_render_internal_links(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            index = flashcard_app.read_wiki_index(book)
+            self.assertEqual(index['book']['title'], '금공 IT 위키')
+            self.assertEqual(index['default_page_slug'], 'intro')
+            self.assertIn('child', index['pages'])
+
+            page = flashcard_app.read_wiki_page('intro', book)
+            self.assertEqual(page['title'], '소개 문서')
+            self.assertIn('/wiki/page/child', page['html'])
+            self.assertIn('<table>', page['html'])
+            self.assertIn('<pre><code class="language-text">hello</code></pre>', page['html'])
+
+    def test_wiki_route_helpers_serve_local_book(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                index_payload = flashcard_app.api_wiki_index()
+                self.assertEqual(index_payload['default_page_slug'], 'intro')
+
+                page_payload = flashcard_app.api_wiki_page('intro')
+                self.assertEqual(page_payload['title'], '소개 문서')
+
+                shell_response = flashcard_app.wiki_page_shell('intro')
+                self.assertTrue(str(shell_response.path).endswith('static/wiki.html'))
+
+                raw_response = flashcard_app.api_wiki_raw('pages/intro.md')
+                self.assertTrue(str(raw_response.path).endswith('pages/intro.md'))
+            finally:
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
 if __name__ == '__main__':
     unittest.main()

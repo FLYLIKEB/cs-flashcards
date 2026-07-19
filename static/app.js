@@ -202,6 +202,29 @@ function googleAiSearchUrl(query) {
   return `https://www.google.com/search?${params.toString()}`;
 }
 
+function wikiPageUrl(slug) {
+  const normalized = String(slug || '').trim().replace(/^\/+|\/+$/g, '');
+  if (!normalized) return '/wiki';
+  return `/wiki/page/${encodeURIComponent(normalized).replace(/%2F/g, '/')}`;
+}
+
+function wikiSlugFromSourcePath(value) {
+  const source = String(value || '').trim();
+  if (!source || !/\.md$/i.test(source)) return '';
+  return source.replace(/^\.\//, '').replace(/^pages\//, '').replace(/\.md$/i, '');
+}
+
+function renderSourceLinks(sourceFiles) {
+  const parts = String(sourceFiles || '').split(';').map((part) => part.trim()).filter(Boolean);
+  if (!parts.length) return '<span class="muted">없음</span>';
+  return parts.map((part) => {
+    const slug = wikiSlugFromSourcePath(part);
+    if (!slug) return `<span class="source-text">${escapeHtml(part)}</span>`;
+    const label = escapeHtml(part.replace(/^\.\//, '').replace(/^pages\//, '').replace(/\.md$/i, ''));
+    return `<a class="source-link" href="${wikiPageUrl(slug)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+  }).join('<span class="source-sep"> · </span>');
+}
+
 function normalizeTerm(value) {
   return String(value || '').trim().toLowerCase();
 }
@@ -2438,7 +2461,7 @@ function renderCard() {
   const emphasisTerms = cardTerms(c);
   $('definition').innerHTML = currentWordHtml(c.definition || '', 'definition', null, emphasisTerms);
   $('detail').innerHTML = renderDetailedExplanation(c.detailed_explanation, emphasisTerms);
-  $('sources').textContent = c.source_files || '';
+  $('sources').innerHTML = renderSourceLinks(c.source_files);
   $('examNote').innerHTML = currentWordHtml(c.exam_note || '', 'exam', null, emphasisTerms);
   const related = parseRelated(c.related_concepts);
   $('related').innerHTML = related.map((r) => `<button class="chip" type="button" data-term="${escapeHtml(r)}">${currentWordHtml(r, 'related')}</button>`).join('') || '<span class="muted">없음</span>';
