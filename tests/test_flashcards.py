@@ -297,12 +297,19 @@ class FlashcardProgressTests(unittest.TestCase):
         try:
             flashcard_app.PUBLIC_USERNAME = 'cs'
             flashcard_app.PUBLIC_PASSWORD = 'secret'
+            flashcard_app.AUTH_COOKIE_NAME = 'cs_flashcards_auth'
             self.assertFalse(flashcard_app.is_authorized(None))
             self.assertFalse(flashcard_app.is_authorized('Basic bad-token'))
             header = 'Basic ' + base64.b64encode(b'cs:secret').decode()
             self.assertTrue(flashcard_app.is_authorized(header))
             wrong = 'Basic ' + base64.b64encode(b'cs:wrong').decode()
             self.assertFalse(flashcard_app.is_authorized(wrong))
+            cookie_value = flashcard_app.authorized_cookie_value()
+            self.assertTrue(flashcard_app.is_authorized_cookie(cookie_value))
+            self.assertFalse(flashcard_app.is_authorized_cookie('bad-cookie'))
+            self.assertTrue(flashcard_app.is_authorized_request(None, cookie_value))
+            self.assertTrue(flashcard_app.is_authorized_request(header, None))
+            self.assertFalse(flashcard_app.is_authorized_request(None, None))
         finally:
             flashcard_app.PUBLIC_USERNAME = original_user
             flashcard_app.PUBLIC_PASSWORD = original_password

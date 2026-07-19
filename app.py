@@ -3,6 +3,8 @@ from __future__ import annotations
 import base64
 import csv
 import html
+import hashlib
+
 from contextlib import closing
 import hmac
 import os
@@ -40,6 +42,8 @@ REVIEW_COLUMNS = ["known_status", "last_reviewed", "review_count"]
 VALID_STATUSES = {"O", "X", ""}
 PUBLIC_USERNAME = os.environ.get("CS_FLASHCARDS_USERNAME", "cs")
 PUBLIC_PASSWORD = os.environ.get("CS_FLASHCARDS_PASSWORD", "")
+AUTH_COOKIE_NAME = "cs_flashcards_auth"
+
 
 app = FastAPI(title="CS Encyclopedia Flashcards", version="1.0.0")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -64,6 +68,12 @@ class QuestionGenerateRequest(BaseModel):
     seed: int | None = None
 
 
+def authorized_cookie_value() -> str:
+    seed = f"{PUBLIC_USERNAME}:{PUBLIC_PASSWORD}".encode("utf-8")
+    return hashlib.sha256(seed).hexdigest()
+
+
+
 def is_authorized(authorization: str | None) -> bool:
     if not PUBLIC_PASSWORD:
         return True
@@ -79,10 +89,35 @@ def is_authorized(authorization: str | None) -> bool:
     return hmac.compare_digest(username, PUBLIC_USERNAME) and hmac.compare_digest(password, PUBLIC_PASSWORD)
 
 
+
+def is_authorized_cookie(cookie_value: str | None) -> bool:
+    if not PUBLIC_PASSWORD:
+        return True
+    return bool(cookie_value) and hmac.compare_digest(cookie_value, authorized_cookie_value())
+
+
+
+def is_authorized_request(authorization: str | None, cookie_value: str | None) -> bool:
+    return is_authorized(authorization) or is_authorized_cookie(cookie_value)
+
+
+
 @app.middleware("http")
 async def optional_basic_auth(request: Request, call_next):
-    if is_authorized(request.headers.get("authorization")):
-        return await call_next(request)
+    authorization = request.headers.get("authorization")
+    cookie_value = request.cookies.get(AUTH_COOKIE_NAME)
+    if is_authorized_request(authorization, cookie_value):
+        response = await call_next(request)
+        if PUBLIC_PASSWORD and is_authorized(authorization) and not is_authorized_cookie(cookie_value):
+            response.set_cookie(
+                AUTH_COOKIE_NAME,
+                authorized_cookie_value(),
+                httponly=True,
+                secure=request.url.scheme == "https",
+                samesite="lax",
+                max_age=60 * 60 * 24 * 30,
+            )
+        return response
     return Response(
         "Authentication required",
         status_code=401,
