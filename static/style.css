@@ -3779,6 +3779,37 @@ select,
   display: grid;
   gap: .62rem;
 }
+.question-import-body {
+  overflow: auto;
+  padding: .95rem 1rem 1rem;
+  display: grid;
+  gap: .72rem;
+}
+.question-import-summary,
+.question-import-help {
+  margin: 0;
+  line-height: 1.55;
+}
+.question-import-help {
+  color: #334155;
+  font-size: .82rem;
+}
+.question-import-input {
+  width: 100%;
+  min-height: 18rem;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .82rem;
+  line-height: 1.55;
+}
+.question-import-error {
+  min-height: 1.2rem;
+  margin: 0;
+}
+.question-import-actions {
+  display: flex;
+  justify-content: flex-end;
+}
 .memo-list-item {
   display: grid;
   gap: .24rem;
@@ -4123,6 +4154,9 @@ select,
 .question-history-modal {
   width: min(760px, 94vw);
   grid-template-rows: auto auto minmax(0, 1fr);
+}
+.question-import-modal {
+  width: min(860px, 96vw);
 }
 .question-history-summary {
   font-variant-numeric: tabular-nums;

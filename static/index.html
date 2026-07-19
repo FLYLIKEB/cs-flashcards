@@ -198,10 +198,12 @@
               </select>
             </label>
             <button id="generateQuestionsBtn" class="question-toolbar-button is-primary" type="button">생성</button>
+            <button id="openQuestionImportBtn" class="question-toolbar-button" type="button" title="NotebookLM 등에서 만든 문제 세트 붙여넣기">가져오기</button>
             <button id="finishQuestionSessionBtn" class="question-toolbar-button" type="button" title="현재 모의 세트 종료 및 저장">종료</button>
             <button id="openAiQuizSearchBtn" class="question-toolbar-button" type="button" title="선택한 유형과 문제 수로 Google AI 검색 열기">AI</button>
             <button id="questionHistoryBtn" class="question-toolbar-button" type="button" title="현재 필터 기준 문제 기록 보기">기록</button>
             <button id="closeQuestionModeBtn" class="question-toolbar-button is-ghost" type="button" aria-label="문제 풀이 닫기" title="문제 풀이 닫기">×</button>
+
           </div>
 
         </div>
@@ -381,6 +383,25 @@
     </div>
   </div>
 
+  <div id="questionImportDialog" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="questionImportTitle" hidden>
+    <div class="modal-card question-import-modal">
+      <div class="modal-header">
+        <div>
+          <h2 id="questionImportTitle">문제 세트 가져오기</h2>
+          <p class="muted small question-import-summary">NotebookLM이나 외부 AI가 만든 JSON 문제 세트를 붙여넣으면 현재 카드와 매칭해 모의 세트로 불러옵니다.</p>
+        </div>
+        <button id="questionImportCloseBtn" class="modal-close" type="button" aria-label="문제 세트 가져오기 닫기">×</button>
+      </div>
+      <div class="question-import-body">
+        <p class="question-import-help">지원 형식: JSON 배열 또는 <code>{"questions": [...]}</code>. 각 문항에는 최소 <code>question_type</code>, <code>prompt</code>, 그리고 현재 카드와 매칭될 <code>card_id</code> 또는 <code>concept_term</code>/<code>term</code>이 필요합니다.</p>
+        <textarea id="questionImportInput" class="question-import-input" rows="16" placeholder='예시: {"title":"OS 진단 세트","time_limit_minutes":90,"questions":[{"concept_term":"교착상태","question_type":"subjective","prompt":"교착상태의 발생 조건을 설명하시오.","answer":"...","rubric":["상호배제","점유와 대기"]}]}'></textarea>
+        <p id="questionImportError" class="error-text question-import-error"></p>
+        <div class="question-import-actions">
+          <button id="questionImportApplyBtn" class="question-toolbar-button is-primary" type="button">불러오기</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="/static/app.js"></script>
 </body>
 </html>

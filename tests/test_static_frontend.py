@@ -266,6 +266,7 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionCountSelect"',
             'id="questionTimeLimitSelect"',
             'id="generateQuestionsBtn"',
+            'id="openQuestionImportBtn"',
             'id="finishQuestionSessionBtn"',
             'id="openAiQuizSearchBtn"',
             'id="questionHistoryBtn"',
@@ -284,6 +285,14 @@ class StaticFrontendTests(unittest.TestCase):
             'function openQuestionSourceCard()',
             'function openQuestionPracticeFromMenu()',
             'toggleQuestionMode(true)',
+            'function openQuestionImportDialog()',
+            'function importQuestionsFromText()',
+            'function importedQuestionSetPayload(rawText)',
+            'function buildImportedQuestions(rawQuestions)',
+            'function resolveImportedCard(rawQuestion, index)',
+            'questionImportInput',
+            'openQuestionImportBtn',
+            'questionImportApplyBtn',
             'function aiQuizSearchPrompt()',
             'function openAiQuizSearch(event = null)',
             '자체 퀴즈생성 기능을 활용해줘',
@@ -321,12 +330,17 @@ class StaticFrontendTests(unittest.TestCase):
             self.assertIn(snippet, APP_JS)
         self.assertIn('id="questionHistoryDialog"', INDEX_HTML)
         self.assertIn('id="questionHistoryBody"', INDEX_HTML)
+        self.assertIn('id="questionImportDialog"', INDEX_HTML)
+        self.assertIn('id="questionImportInput"', INDEX_HTML)
+        self.assertIn('id="questionImportApplyBtn"', INDEX_HTML)
         self.assertIn('data-question-history-filter="ambiguous"', INDEX_HTML)
         self.assertIn('data-question-history-filter="unknown"', INDEX_HTML)
         self.assertIn('.question-history-filter-row', STYLE_CSS)
         self.assertIn('.question-history-item', STYLE_CSS)
         self.assertIn('.question-session-meta', STYLE_CSS)
         self.assertIn('.question-history-session-meta', STYLE_CSS)
+        self.assertIn('.question-import-body', STYLE_CSS)
+        self.assertIn('.question-import-input', STYLE_CSS)
         self.assertIn('question-toolbar-button', INDEX_HTML)
         self.assertIn('.question-toolbar-button', STYLE_CSS)
 

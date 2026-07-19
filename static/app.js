@@ -87,6 +87,22 @@ const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multi
 const AI_QUIZ_PROMPT_TYPE_ORDER = ['multiple_choice', 'short', 'subjective', 'essay'];
 const AI_QUIZ_TERM_LIMIT = 80;
 const QUESTION_HISTORY_FILTER_LABELS = {all: '전체', correct: '맞음', ambiguous: '애매함', wrong: '틀림', unknown: '모름', pending: '미채점'};
+const IMPORTED_QUESTION_TYPE_ALIASES = {
+  short: 'short',
+  short_answer: 'short',
+  shortanswer: 'short',
+  subjective: 'subjective',
+  descriptive: 'subjective',
+  essay: 'essay',
+  multiple_choice: 'multiple_choice',
+  multiplechoice: 'multiple_choice',
+  mcq: 'multiple_choice',
+  객관식: 'multiple_choice',
+  주관식: 'short',
+  단답형: 'short',
+  서술형: 'subjective',
+  논술형: 'essay',
+};
 // Silent looping WAV: keeps an <audio> element "audible" while auto-listen is
 // active so mobile browsers treat the tab as playing media and don't freeze
 // its JS timers (which drive the speech queue) when the screen locks or the
@@ -2697,6 +2713,90 @@ function selectedQuestionTypeLabelsForPrompt() {
 function questionCountValue() {
   return Number.parseInt($('questionCountSelect')?.value || '10', 10) || 10;
 }
+function syncQuestionTimeLimitSelect(seconds) {
+  const select = $('questionTimeLimitSelect');
+  if (!select || !Number.isFinite(seconds) || seconds < 0 || seconds % 60 !== 0) return;
+  const minutes = String(Math.floor(seconds / 60));
+  if ([...select.options].some((option) => option.value === minutes)) select.value = minutes;
+}
+
+function questionImportDialog() {
+  return $('questionImportDialog');
+}
+
+function setQuestionImportError(message = '') {
+  const errorEl = $('questionImportError');
+  if (errorEl) errorEl.textContent = String(message || '').trim();
+}
+
+function openQuestionImportDialog() {
+  toggleMenu(false);
+  setQuestionImportError('');
+  const dialog = questionImportDialog();
+  if (dialog) dialog.hidden = false;
+  window.setTimeout(() => $('questionImportInput')?.focus(), 0);
+}
+
+function closeQuestionImportDialog() {
+  setQuestionImportError('');
+  const dialog = questionImportDialog();
+  if (dialog) dialog.hidden = true;
+}
+
+function extractImportJsonText(rawText) {
+  const text = String(rawText || '').trim();
+  if (!text) throw new Error('붙여넣은 문제 세트가 비어 있습니다.');
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced?.[1]?.trim()) return fenced[1].trim();
+  if (text.startsWith('{') || text.startsWith('[')) return text;
+  const objectIndex = text.indexOf('{');
+  const arrayIndex = text.indexOf('[');
+  const startIndex = objectIndex === -1 ? arrayIndex : arrayIndex === -1 ? objectIndex : Math.min(objectIndex, arrayIndex);
+  if (startIndex < 0) return text;
+  const startChar = text[startIndex];
+  const endChar = startChar === '[' ? ']' : '}';
+  const endIndex = text.lastIndexOf(endChar);
+  return endIndex > startIndex ? text.slice(startIndex, endIndex + 1).trim() : text.slice(startIndex).trim();
+}
+
+function normalizeImportedStringArray(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item || '').trim()).filter(Boolean);
+  }
+  const text = String(value || '').trim();
+  if (!text) return [];
+  return text
+    .split(/\n|;/)
+    .map((item) => item.replace(/^[-*\d.)\s]+/, '').trim())
+    .filter(Boolean);
+}
+
+function importedQuestionType(value) {
+  const raw = String(value || '').trim();
+  const normalizedKey = normalizeTerm(raw).replace(/\s+/g, '_');
+  const normalized = IMPORTED_QUESTION_TYPE_ALIASES[normalizedKey];
+  if (!normalized || !QUESTION_TYPE_LABELS[normalized]) {
+    throw new Error(`지원하지 않는 문제 유형입니다: ${raw || '(비어 있음)'}`);
+  }
+  return normalized;
+}
+
+function importedQuestionSetPayload(rawText) {
+  const parsed = JSON.parse(extractImportJsonText(rawText));
+  if (Array.isArray(parsed)) {
+    return {title: '', timeLimitSeconds: null, questions: parsed};
+  }
+  if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.questions)) {
+    throw new Error('최상위 JSON은 문제 배열 또는 questions 배열을 가진 객체여야 합니다.');
+  }
+  const minutes = Number.parseInt(parsed.time_limit_minutes ?? parsed.duration_minutes ?? parsed.timeLimitMinutes ?? '', 10);
+  const seconds = Number.parseInt(parsed.time_limit_seconds ?? parsed.duration_seconds ?? parsed.timeLimitSeconds ?? '', 10);
+  return {
+    title: String(parsed.title || parsed.name || '').trim(),
+    timeLimitSeconds: Number.isFinite(seconds) && seconds >= 0 ? seconds : Number.isFinite(minutes) && minutes >= 0 ? minutes * 60 : null,
+    questions: parsed.questions,
+  };
+}
 
 function filteredQuestionTerms() {
   const seen = new Set();
@@ -2751,6 +2851,100 @@ function currentQuestionCard() {
   return state.cards.find((item) => item.id === question.card_id)
     || state.filtered.find((item) => item.id === question.card_id)
     || null;
+}
+function resolveImportedCard(rawQuestion, index) {
+  const explicitId = String(rawQuestion.card_id ?? rawQuestion.cardId ?? rawQuestion.id ?? '').trim();
+  if (explicitId) {
+    const byId = state.cards.find((card) => String(card?.id || '').trim() === explicitId);
+    if (byId) return byId;
+    throw new Error(`${index + 1}번 문항의 card_id를 찾지 못했습니다: ${explicitId}`);
+  }
+  const candidates = [rawQuestion.concept_term, rawQuestion.term, rawQuestion.concept, rawQuestion.keyword, rawQuestion.title]
+    .map((value) => String(value || '').trim())
+    .filter(Boolean);
+  for (const candidate of candidates) {
+    const normalized = normalizeTerm(candidate);
+    const found = state.cards.find((card) => {
+      const cardId = normalizeTerm(card?.id || '');
+      const term = normalizeTerm(card?.term || '');
+      const english = normalizeTerm(card?.english || '');
+      return normalized && (normalized === cardId || normalized === term || normalized === english);
+    });
+    if (found) return found;
+  }
+  throw new Error(`${index + 1}번 문항의 개념을 현재 카드에서 찾지 못했습니다.`);
+}
+
+function importedAnswerIndex(rawQuestion, choices, answerText, index) {
+  const explicit = Number.parseInt(rawQuestion.answer_index ?? rawQuestion.answerIndex ?? rawQuestion.correct_index ?? rawQuestion.correctIndex ?? '', 10);
+  if (Number.isInteger(explicit) && explicit >= 0 && explicit < choices.length) return explicit;
+  const normalizedAnswer = normalizeTerm(answerText);
+  const foundIndex = choices.findIndex((choice) => normalizeTerm(choice) === normalizedAnswer);
+  if (foundIndex >= 0) return foundIndex;
+  throw new Error(`${index + 1}번 객관식 문항의 정답이 보기 목록에 없습니다.`);
+}
+
+function buildImportedQuestions(rawQuestions) {
+  if (!Array.isArray(rawQuestions) || !rawQuestions.length) {
+    throw new Error('가져올 문제 배열이 비어 있습니다.');
+  }
+  return rawQuestions.map((rawQuestion, index) => {
+    if (!rawQuestion || typeof rawQuestion !== 'object') {
+      throw new Error(`${index + 1}번 문항 형식이 올바르지 않습니다.`);
+    }
+    const card = resolveImportedCard(rawQuestion, index);
+    const importedTypeSource = rawQuestion.question_type ?? rawQuestion.type ?? rawQuestion.format ?? rawQuestion.kind ?? (rawQuestion.choices || rawQuestion.options ? 'multiple_choice' : 'subjective');
+    const type = importedQuestionType(importedTypeSource);
+    const prompt = String(rawQuestion.prompt ?? rawQuestion.question ?? '').trim();
+    const body = String(rawQuestion.body ?? rawQuestion.context ?? rawQuestion.description ?? '').trim();
+    const answer = String(rawQuestion.answer ?? rawQuestion.model_answer ?? rawQuestion.sample_answer ?? '').trim();
+    const explanation = String(rawQuestion.explanation ?? rawQuestion.commentary ?? rawQuestion.finance_it_application ?? '').trim();
+    const rubric = normalizeImportedStringArray(rawQuestion.rubric ?? rawQuestion.scoring_points ?? rawQuestion.grading_points ?? rawQuestion.trap_points);
+    const choices = type === 'multiple_choice' ? normalizeImportedStringArray(rawQuestion.choices ?? rawQuestion.options) : [];
+    if (!prompt) throw new Error(`${index + 1}번 문항의 prompt가 비어 있습니다.`);
+    if (type === 'multiple_choice' && choices.length < 2) {
+      throw new Error(`${index + 1}번 객관식 문항에는 보기 2개 이상이 필요합니다.`);
+    }
+    return {
+      id: `import-${Date.now()}-${index + 1}`,
+      card_id: card.id,
+      type,
+      type_label: QUESTION_TYPE_LABELS[type],
+      term: String(rawQuestion.concept_term || rawQuestion.term || card.term || card.english || card.id || '').trim(),
+      category: String(rawQuestion.subject || rawQuestion.category || card.category || '').trim(),
+      prompt,
+      body,
+      answer,
+      explanation,
+      rubric,
+      choices,
+      questionOrder: Number.parseInt(rawQuestion.question_order ?? rawQuestion.order ?? '', 10) || index + 1,
+      answer_index: type === 'multiple_choice' ? importedAnswerIndex(rawQuestion, choices, answer, index) : null,
+    };
+  });
+}
+
+function importQuestionsFromText() {
+  if (state.questionLoading || state.questionSaving) return;
+  try {
+    const payload = importedQuestionSetPayload($('questionImportInput')?.value || '');
+    const questions = buildImportedQuestions(payload.questions);
+    if (Number.isFinite(payload.timeLimitSeconds) && payload.timeLimitSeconds >= 0) {
+      syncQuestionTimeLimitSelect(payload.timeLimitSeconds);
+    }
+    commitCurrentQuestionElapsed();
+    resetQuestionSessionState();
+    state.questionMode = true;
+    prepareQuestionSession(questions, {
+      title: payload.title || `가져온 모의 세트 · 카드 ${questions.length}`,
+      timeLimitSeconds: Number.isFinite(payload.timeLimitSeconds) ? payload.timeLimitSeconds : null,
+    });
+    closeQuestionImportDialog();
+    renderQuestionPanel();
+    setMessage(`가져온 모의 세트 ${questions.length}문항을 불러왔습니다.`);
+  } catch (error) {
+    setQuestionImportError(error.message || String(error));
+  }
 }
 
 
@@ -2917,14 +3111,18 @@ function buildQuestionSessionTitle() {
   return `모의 세트 ${stamp} · 카드 ${state.filtered.length} · ${typeText} · ${limitLabel}`;
 }
 
-function prepareQuestionSession(questions) {
+function prepareQuestionSession(questions, options = {}) {
   const sessionStartedAt = new Date().toISOString();
+  const importedTitle = String(options.title || '').trim();
+  const importedLimit = Number.isFinite(options.timeLimitSeconds) && options.timeLimitSeconds >= 0
+    ? Math.floor(options.timeLimitSeconds)
+    : null;
   state.questionSessionId = `mock-${Date.now()}`;
-  state.questionSessionTitle = buildQuestionSessionTitle();
+  state.questionSessionTitle = importedTitle || buildQuestionSessionTitle();
   state.questionSessionStartedAt = sessionStartedAt;
   state.questionSessionStartMs = Date.now();
   state.questionSessionElapsedBaseSeconds = 0;
-  state.questionTimeLimitSeconds = timeLimitValue();
+  state.questionTimeLimitSeconds = importedLimit ?? timeLimitValue();
   state.questionSessionFinishedAt = '';
   state.questions = questions.map((item, index) => hydrateQuestionState({
     ...item,
@@ -2932,10 +3130,10 @@ function prepareQuestionSession(questions) {
     questionElapsedSeconds: 0,
     questionStartedAt: '',
     answeredAt: '',
-    questionOrder: index + 1,
+    questionOrder: Number.isInteger(item?.questionOrder) ? item.questionOrder : index + 1,
     sessionId: state.questionSessionId,
     sessionTitle: state.questionSessionTitle,
-    timeLimitSeconds: state.questionTimeLimitSeconds,
+    timeLimitSeconds: Number.isInteger(item?.timeLimitSeconds) ? item.timeLimitSeconds : state.questionTimeLimitSeconds,
     questionActiveSinceMs: 0,
   }));
   state.questionIndex = 0;
@@ -3103,7 +3301,7 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'finishQuestionSessionBtn'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -3701,10 +3899,14 @@ $('conceptBackBtn')?.addEventListener('click', (event) => {
 });
 $('shuffleBtn').addEventListener('click', toggleRandomMode);
 $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
+$('openQuestionImportBtn')?.addEventListener('click', openQuestionImportDialog);
+
 $('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);
 $('questionHistoryBtn')?.addEventListener('click', openQuestionHistory);
 $('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(false));
 $('finishQuestionSessionBtn')?.addEventListener('click', finishQuestionSession);
+$('questionImportApplyBtn')?.addEventListener('click', importQuestionsFromText);
+
 $('prevQuestionBtn')?.addEventListener('click', () => moveQuestion(-1));
 $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
 $('revealAnswerBtn')?.addEventListener('click', revealQuestionAnswer);
@@ -3777,6 +3979,8 @@ $('questionPracticeBtn')?.addEventListener('click', openQuestionPracticeFromMenu
 $('memoListCloseBtn').addEventListener('click', closeMemoList);
 $('bookmarkListCloseBtn').addEventListener('click', closeBookmarkList);
 $('questionHistoryCloseBtn')?.addEventListener('click', closeQuestionHistory);
+$('questionImportCloseBtn')?.addEventListener('click', closeQuestionImportDialog);
+
 $('memoListDialog').addEventListener('click', (event) => {
   if (event.target === $('memoListDialog')) closeMemoList();
 });
@@ -3785,6 +3989,15 @@ $('bookmarkListDialog').addEventListener('click', (event) => {
 });
 $('questionHistoryDialog')?.addEventListener('click', (event) => {
   if (event.target === $('questionHistoryDialog')) closeQuestionHistory();
+});
+$('questionImportDialog')?.addEventListener('click', (event) => {
+  if (event.target === $('questionImportDialog')) closeQuestionImportDialog();
+});
+$('questionImportInput')?.addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    event.preventDefault();
+    importQuestionsFromText();
+  }
 });
 $('memoListBody').addEventListener('click', (event) => {
   const item = event.target.closest('[data-card-id]');
