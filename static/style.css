@@ -4174,7 +4174,8 @@ select,
 .wiki-topbar {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 300;
+  isolation: isolate;
   border-bottom: 1px solid var(--wiki-border);
   background: rgba(255, 255, 255, .98);
 }
