@@ -173,13 +173,13 @@
 
       <section id="questionPanel" class="question-panel" aria-label="문제 풀이" hidden>
         <div class="question-toolbar">
-          <div>
-            <strong>문제 풀이</strong>
-            <p id="questionSummary" class="muted">현재 필터 기준으로 문제를 생성합니다.</p>
+          <div class="question-toolbar-main">
+            <strong>문제</strong>
+            <p id="questionSummary" class="muted question-summary">현재 필터 기준으로 생성합니다.</p>
           </div>
-          <div class="question-toolbar-actions">
+          <div class="question-toolbar-actions" aria-label="문제 작업">
             <label class="question-count-label" title="문제 수">
-              <span>문제 수</span>
+              <span>수</span>
               <select id="questionCountSelect">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
@@ -187,10 +187,10 @@
                 <option value="40">40</option>
               </select>
             </label>
-            <button id="generateQuestionsBtn" type="button">생성</button>
-            <button id="openAiQuizSearchBtn" type="button" title="선택한 유형과 문제 수로 Google AI 검색 열기">AI 검색</button>
-            <button id="questionHistoryBtn" type="button" title="현재 필터 기준 문제 기록 보기">기록</button>
-            <button id="closeQuestionModeBtn" type="button" aria-label="문제 풀이 닫기">닫기</button>
+            <button id="generateQuestionsBtn" class="question-toolbar-button is-primary" type="button">생성</button>
+            <button id="openAiQuizSearchBtn" class="question-toolbar-button" type="button" title="선택한 유형과 문제 수로 Google AI 검색 열기">AI</button>
+            <button id="questionHistoryBtn" class="question-toolbar-button" type="button" title="현재 필터 기준 문제 기록 보기">기록</button>
+            <button id="closeQuestionModeBtn" class="question-toolbar-button is-ghost" type="button" aria-label="문제 풀이 닫기" title="문제 풀이 닫기">×</button>
           </div>
         </div>
         <div class="question-type-row" aria-label="문제 유형 선택">
@@ -203,10 +203,10 @@
           <div class="question-card-empty muted">문제 생성을 누르면 현재 필터의 카드들로 문제가 만들어집니다.</div>
         </article>
         <div class="question-actions">
-          <button id="prevQuestionBtn" type="button">이전</button>
-          <button id="revealAnswerBtn" type="button">정답/해설 보기</button>
-          <button id="nextQuestionBtn" type="button">다음</button>
-          <button id="openQuestionCardBtn" type="button">원본 카드 보기</button>
+          <button id="prevQuestionBtn" class="question-action-button" type="button" title="이전 문제">←</button>
+          <button id="revealAnswerBtn" class="question-action-button question-action-wide" type="button" title="정답/해설 보기">정답</button>
+          <button id="nextQuestionBtn" class="question-action-button" type="button" title="다음 문제">→</button>
+          <button id="openQuestionCardBtn" class="question-action-button" type="button" title="원본 카드 보기">카드</button>
         </div>
       </section>
 
@@ -293,6 +293,39 @@
                     <button id="memoSaveBtn" class="memo-save-button" type="button">메모 저장</button>
                   </div>
                 </section>
+                <section id="aiRewriteSection" class="ai-rewrite-section">
+                  <details open>
+                    <summary>Codex AI 교체</summary>
+                    <p class="ai-rewrite-help">원하는 톤이나 길이를 적고 AI 초안을 만든 뒤, 아래 텍스트를 바로 수정해서 적용합니다.</p>
+                    <label class="ai-rewrite-field ai-rewrite-instruction">
+                      <span>지시</span>
+                      <textarea id="aiRewriteInstruction" rows="3" maxlength="4000" placeholder="예: 면접 답변형으로 더 짧고 비교 포인트가 드러나게 정리"></textarea>
+                    </label>
+                    <div class="ai-rewrite-actions">
+                      <button id="aiRewritePreviewBtn" type="button">AI 초안</button>
+                      <button id="aiRewriteApplyBtn" type="button">초안 적용</button>
+                    </div>
+                    <p id="aiRewriteStatus" class="ai-rewrite-status small muted">현재 카드 설명을 AI 초안으로 바꾼 뒤 아래 텍스트를 바로 수정·적용할 수 있습니다.</p>
+                    <div class="ai-rewrite-grid">
+                      <label class="ai-rewrite-field">
+                        <span>간단 설명</span>
+                        <textarea id="aiRewriteDefinition" rows="4" maxlength="12000"></textarea>
+                      </label>
+                      <label class="ai-rewrite-field">
+                        <span>상세 설명</span>
+                        <textarea id="aiRewriteDetail" rows="8" maxlength="50000"></textarea>
+                      </label>
+                      <label class="ai-rewrite-field">
+                        <span>시험 포인트</span>
+                        <textarea id="aiRewriteExam" rows="4" maxlength="20000"></textarea>
+                      </label>
+                      <label class="ai-rewrite-field ai-rewrite-alt">
+                        <span>이미지 설명</span>
+                        <textarea id="aiRewriteImageAlt" rows="3" maxlength="4000"></textarea>
+                      </label>
+                    </div>
+                  </details>
+                </section>
               </div>
             </div>
           </div>
@@ -332,14 +365,14 @@
       <div class="modal-header">
         <div>
           <h2 id="questionHistoryTitle">문제 기록</h2>
-          <p id="questionHistorySummary" class="muted small">현재 필터 기준 문제 기록을 불러옵니다.</p>
+          <p id="questionHistorySummary" class="muted small question-history-summary">현재 필터 기준 문제 기록을 불러옵니다.</p>
         </div>
         <button id="questionHistoryCloseBtn" class="modal-close" type="button" aria-label="문제 기록 닫기">×</button>
       </div>
       <div class="question-history-filter-row" aria-label="문제 기록 필터">
         <button type="button" data-question-history-filter="all">전체</button>
-        <button type="button" data-question-history-filter="correct">맞은 문제</button>
-        <button type="button" data-question-history-filter="wrong">틀린 문제</button>
+        <button type="button" data-question-history-filter="correct">맞음</button>
+        <button type="button" data-question-history-filter="wrong">틀림</button>
         <button type="button" data-question-history-filter="pending">미채점</button>
       </div>
       <div id="questionHistoryBody" class="question-history-body"></div>

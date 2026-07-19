@@ -8,6 +8,12 @@ const state = {
   markSaving: false,
   bookmarkSaving: false,
   memoSaving: false,
+  aiRewriteLoading: false,
+  aiRewriteApplying: false,
+  aiRewriteCardId: '',
+  aiRewriteDraft: null,
+  aiRewriteStatus: '',
+  aiRewriteError: '',
   menuOpen: false,
   speechHighlight: null,
   speechCurrent: null,
@@ -62,7 +68,7 @@ const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speak
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const AI_QUIZ_PROMPT_TYPE_ORDER = ['multiple_choice', 'short', 'subjective', 'essay'];
 const AI_QUIZ_TERM_LIMIT = 80;
-const QUESTION_HISTORY_FILTER_LABELS = {all: '전체', correct: '맞은 문제', wrong: '틀린 문제', pending: '미채점'};
+const QUESTION_HISTORY_FILTER_LABELS = {all: '전체', correct: '맞음', wrong: '틀림', pending: '미채점'};
 // Silent looping WAV: keeps an <audio> element "audible" while auto-listen is
 // active so mobile browsers treat the tab as playing media and don't freeze
 // its JS timers (which drive the speech queue) when the screen locks or the
@@ -1943,9 +1949,173 @@ function renderMemoControls(card) {
   setMemoControlsDisabled(state.memoSaving);
 }
 
+function aiRewriteDraftFromCard(card) {
+  return {
+    definition: String(card?.definition || ''),
+    detailed_explanation: String(card?.detailed_explanation || ''),
+    exam_note: String(card?.exam_note || ''),
+    concept_image_alt: String(card?.concept_image_alt || ''),
+  };
+}
+
+function currentAiRewriteDraft(card) {
+  if (!card) return null;
+  const changedCard = state.aiRewriteCardId !== card.id || !state.aiRewriteDraft;
+  if (changedCard) {
+    state.aiRewriteCardId = card.id;
+    state.aiRewriteDraft = aiRewriteDraftFromCard(card);
+    state.aiRewriteStatus = '';
+    state.aiRewriteError = '';
+    const instructionInput = $('aiRewriteInstruction');
+    if (instructionInput) {
+      instructionInput.value = '';
+      instructionInput.dataset.cardId = card.id;
+    }
+  }
+  return state.aiRewriteDraft;
+}
+
+function setAiRewriteDraftField(field, value) {
+  if (!state.aiRewriteDraft) return;
+  state.aiRewriteDraft[field] = String(value || '');
+}
+
+function renderAiRewriteControls(card) {
+  const section = $('aiRewriteSection');
+  const previewBtn = $('aiRewritePreviewBtn');
+  const applyBtn = $('aiRewriteApplyBtn');
+  const instructionInput = $('aiRewriteInstruction');
+  const statusEl = $('aiRewriteStatus');
+  if (!section || !previewBtn || !applyBtn || !instructionInput || !statusEl) return;
+
+  if (!card) {
+    section.hidden = true;
+    previewBtn.disabled = true;
+    applyBtn.disabled = true;
+    statusEl.textContent = 'AI 초안을 만들 카드가 없습니다.';
+    statusEl.classList.remove('error-text');
+    return;
+  }
+
+  section.hidden = false;
+  const draft = currentAiRewriteDraft(card);
+  const busy = state.aiRewriteLoading || state.aiRewriteApplying;
+  if (instructionInput.dataset.cardId !== card.id) {
+    instructionInput.value = '';
+    instructionInput.dataset.cardId = card.id;
+  }
+  instructionInput.disabled = busy;
+
+  [
+    ['aiRewriteDefinition', 'definition'],
+    ['aiRewriteDetail', 'detailed_explanation'],
+    ['aiRewriteExam', 'exam_note'],
+    ['aiRewriteImageAlt', 'concept_image_alt'],
+  ].forEach(([id, field]) => {
+    const input = $(id);
+    if (!input) return;
+    if (document.activeElement !== input) input.value = draft?.[field] || '';
+    input.disabled = busy;
+  });
+
+  previewBtn.disabled = busy;
+  applyBtn.disabled = busy || !draft;
+  previewBtn.textContent = state.aiRewriteLoading ? 'AI 초안 생성 중...' : 'AI 초안';
+  applyBtn.textContent = state.aiRewriteApplying ? '초안 적용 중...' : '초안 적용';
+  statusEl.textContent = state.aiRewriteError || state.aiRewriteStatus || '현재 카드 설명을 AI 초안으로 바꾼 뒤 아래 텍스트를 바로 수정·적용할 수 있습니다.';
+  statusEl.classList.toggle('error-text', Boolean(state.aiRewriteError));
+}
+
+async function responseErrorText(res) {
+  const raw = await res.text();
+  try {
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.detail === 'string' && parsed.detail.trim()) return parsed.detail.trim();
+  } catch (_error) {
+    // Fall back to the raw text body.
+  }
+  return raw || `${res.status}`;
+}
+
+async function previewAiRewrite() {
+  if (!state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
+  const current = state.filtered[state.index];
+  const instruction = $('aiRewriteInstruction')?.value || '';
+  state.aiRewriteLoading = true;
+  state.aiRewriteError = '';
+  state.aiRewriteStatus = `${current.term}: Codex AI 초안 생성 중...`;
+  renderAiRewriteControls(current);
+  setMessage(`${current.term}: AI 초안 생성 중...`);
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({instruction}),
+    });
+    if (!res.ok) throw new Error(await responseErrorText(res));
+    const data = await res.json();
+    state.aiRewriteCardId = current.id;
+    state.aiRewriteDraft = {
+      ...aiRewriteDraftFromCard(current),
+      ...(data.proposal || {}),
+    };
+    state.aiRewriteStatus = `${current.term}: ${(data.model || 'Codex')} 초안을 불러왔습니다.`;
+    renderAiRewriteControls(current);
+    setMessage(`${current.term}: AI 초안 생성 완료`);
+  } catch (error) {
+    state.aiRewriteStatus = '';
+    state.aiRewriteError = `AI 초안 생성 실패: ${error.message || error}`;
+    renderAiRewriteControls(current);
+    setMessage(state.aiRewriteError, true);
+  } finally {
+    state.aiRewriteLoading = false;
+    renderAiRewriteControls(state.filtered[state.index] || null);
+  }
+}
+
+async function applyAiRewrite() {
+  if (!state.filtered.length || state.aiRewriteLoading || state.aiRewriteApplying) return;
+  const current = state.filtered[state.index];
+  const draft = currentAiRewriteDraft(current);
+  if (!draft) return;
+  state.aiRewriteApplying = true;
+  state.aiRewriteError = '';
+  state.aiRewriteStatus = `${current.term}: AI 초안 적용 중...`;
+  renderAiRewriteControls(current);
+  setMessage(`${current.term}: AI 초안 적용 중...`);
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/apply`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(draft),
+    });
+    if (!res.ok) throw new Error(await responseErrorText(res));
+    const data = await res.json();
+    updateCardInCollections(data.card);
+    state.summary = data.summary;
+    state.aiRewriteCardId = data.card.id;
+    state.aiRewriteDraft = aiRewriteDraftFromCard(data.card);
+    state.aiRewriteStatus = data.backup_path
+      ? `${data.card.term}: AI 초안을 적용했고 CSV 백업도 남겼습니다.`
+      : `${data.card.term}: AI 초안을 적용했습니다.`;
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    renderCard();
+    setMessage(`${data.card.term}: AI 초안 적용 완료`);
+  } catch (error) {
+    state.aiRewriteStatus = '';
+    state.aiRewriteError = `AI 초안 적용 실패: ${error.message || error}`;
+    renderAiRewriteControls(current);
+    setMessage(state.aiRewriteError, true);
+  } finally {
+    state.aiRewriteApplying = false;
+    renderAiRewriteControls(state.filtered[state.index] || null);
+  }
+}
+
 function renderPersonalControls(card) {
   renderBookmarkControls(card);
   renderMemoControls(card);
+  renderAiRewriteControls(card);
 }
 
 async function writeClipboardText(text) {
@@ -2184,7 +2354,7 @@ function renderQuestionHistoryDialog() {
       summaryEl.textContent = `문제 기록 로딩 실패: ${state.questionHistoryError}`;
     } else {
       const summary = state.questionHistorySummary || {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, wrong: 0, pending: 0};
-      summaryEl.textContent = `현재 필터 카드 ${summary.selected_card_count || 0}개 · 전체 ${summary.total || 0} · 맞음 ${summary.correct || 0} · 틀림 ${summary.wrong || 0} · 미채점 ${summary.pending || 0}`;
+      summaryEl.textContent = `카드 ${summary.selected_card_count || 0} · 전체 ${summary.total || 0} · 맞음 ${summary.correct || 0} · 틀림 ${summary.wrong || 0} · 미채점 ${summary.pending || 0}`;
     }
   }
   if (!body) return;
@@ -2205,25 +2375,31 @@ function renderQuestionHistoryDialog() {
     const title = escapeHtml(item.term || item.card_id || '카드');
     const typeLabel = escapeHtml(QUESTION_TYPE_LABELS[item.question_type] || item.question_type || '문제');
     const category = escapeHtml(item.category || '미분류');
-    const resultLabel = escapeHtml(item.result_label || QUESTION_HISTORY_FILTER_LABELS[item.result_key] || '기록');
+    const resultLabel = escapeHtml(QUESTION_HISTORY_FILTER_LABELS[item.result_key] || item.result_label || '기록');
     const updatedAt = formatQuestionAttemptUpdatedAt(item.updated_at);
+    const prompt = String(item.prompt || '').trim();
+    const bodyText = String(item.body || '').trim();
     const answerText = escapeHtml(item.user_answer || '미입력');
     const wrongNote = String(item.wrong_note || '').trim();
     return `
       <article class="question-history-item">
         <div class="question-history-item-head">
-          <div>
+          <div class="question-history-item-heading">
             <strong>${title}</strong>
             <p class="question-history-item-meta">${category} · ${typeLabel}${updatedAt ? ` · ${escapeHtml(updatedAt)}` : ''}</p>
           </div>
           <span class="question-history-result ${escapeHtml(item.result_key || 'pending')}">${resultLabel}</span>
         </div>
-        <p class="question-history-item-prompt">${escapeHtml(item.prompt || '')}</p>
-        <p class="question-history-item-body">${escapeHtml(item.body || '')}</p>
-        <p class="question-history-item-answer"><strong>내 답:</strong> ${answerText}</p>
-        ${wrongNote ? `<p class="question-history-item-note"><strong>오답노트:</strong> ${escapeHtml(wrongNote)}</p>` : ''}
+        <div class="question-history-copy">
+          ${prompt ? `<p class="question-history-item-prompt">${escapeHtml(prompt)}</p>` : ''}
+          ${bodyText ? `<p class="question-history-item-body">${escapeHtml(bodyText)}</p>` : ''}
+        </div>
+        <div class="question-history-fields">
+          <p class="question-history-field"><span>내 답</span><strong>${answerText}</strong></p>
+          ${wrongNote ? `<p class="question-history-field note"><span>오답</span><strong>${escapeHtml(wrongNote)}</strong></p>` : ''}
+        </div>
         <div class="question-history-item-actions">
-          <button class="question-history-open-card" type="button" data-question-history-card-id="${escapeHtml(item.card_id || '')}">원본 카드 보기</button>
+          <button class="question-history-open-card" type="button" data-question-history-card-id="${escapeHtml(item.card_id || '')}">카드</button>
         </div>
       </article>`;
   }).join('');
@@ -2532,8 +2708,8 @@ function renderQuestionPanel() {
         : state.markSaving
           ? '카드 상태 저장 중...'
           : total
-            ? `${state.questionIndex + 1} / ${total} · 현재 필터 카드 ${filterCount}개 기준`
-            : `현재 필터 카드 ${filterCount}개 기준 · 생성 버튼을 누르세요.`;
+            ? `${state.questionIndex + 1} / ${total} · 카드 ${filterCount}`
+            : `카드 ${filterCount} · 생성 버튼을 누르세요.`;
   }
   if (!card) return;
   if (state.questionLoading) {
@@ -2548,12 +2724,12 @@ function renderQuestionPanel() {
   const reviewDisabled = state.questionLoading || state.questionSaving || state.markSaving || !reviewCard;
   const reviewStatus = reviewCard?.known_status || '';
   const reviewStatusText = reviewCard
-    ? `현재 카드 상태: ${statusLabel(reviewStatus)}`
+    ? `카드 상태 ${statusLabel(reviewStatus)}`
     : '원본 카드를 찾지 못했습니다.';
   const reviewBoxHtml = `
     <div class="question-review-box">
       <div class="question-review-head">
-        <strong>이 개념 바로 O/X</strong>
+        <strong>바로 O/X</strong>
         <span class="question-review-status">${escapeHtml(reviewStatusText)}</span>
       </div>
       <div class="question-review-actions">
@@ -3115,6 +3291,16 @@ $('unreviewedBtn').addEventListener('click', () => mark(''));
 $('bookmarkBtn').addEventListener('click', toggleBookmark);
 $('copyBookmarksBtn').addEventListener('click', copyBookmarkedTerms);
 $('memoSaveBtn').addEventListener('click', saveMemo);
+$('aiRewritePreviewBtn')?.addEventListener('click', previewAiRewrite);
+$('aiRewriteApplyBtn')?.addEventListener('click', applyAiRewrite);
+[
+  ['aiRewriteDefinition', 'definition'],
+  ['aiRewriteDetail', 'detailed_explanation'],
+  ['aiRewriteExam', 'exam_note'],
+  ['aiRewriteImageAlt', 'concept_image_alt'],
+].forEach(([id, field]) => {
+  $(id)?.addEventListener('input', (event) => setAiRewriteDraftField(field, event.target.value));
+});
 $('memoInput').addEventListener('keydown', (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
     event.preventDefault();

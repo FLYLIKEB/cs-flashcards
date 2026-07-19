@@ -1,5 +1,6 @@
 import base64
 import csv
+import json
 import sqlite3
 import tempfile
 import unittest
@@ -7,10 +8,9 @@ from contextlib import closing
 from pathlib import Path
 from unittest import mock
 
-
-
 import app as flashcard_app
 from app import mark_card, read_cards, read_csv_cards, save_memo, save_question_attempt, set_bookmark, summarize
+
 
 
 BASE_FIELDS = [
@@ -67,6 +67,21 @@ def write_sample(
 def csv_status(path: Path) -> dict[str, str]:
     with path.open(encoding='utf-8-sig', newline='') as f:
         return next(csv.DictReader(f))
+
+
+class FakeUrlopenResponse:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def read(self):
+        return json.dumps(self.payload, ensure_ascii=False).encode('utf-8')
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
 
 
 def write_wiki_book(root: Path) -> Path:
@@ -226,6 +241,129 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(cleared['memo'], '')
             self.assertEqual(cleared['memo_updated_at'], '')
 
+    def test_update_card_ai_content_rewrites_csv_fields_and_creates_backup(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            backup_dir = root / 'backups'
+            write_sample(csv_path, include_image=True, include_review=True, status='O', count='2')
+
+            updated, backup_path = flashcard_app.update_card_ai_content(
+                'CS-001',
+                flashcard_app.CardAiApplyRequest(
+                    definition='새 정의',
+                    detailed_explanation='의미: 더 쉽게 설명합니다. 활용: 면접 답변에 바로 쓰게 정리합니다.',
+                    exam_note='비교 포인트까지 함께 말합니다.',
+                    concept_image_alt='새 학습 이미지 설명',
+                ),
+                csv_path,
+                backup_dir,
+                db_path,
+            )
+
+            self.assertEqual(updated['definition'], '새 정의')
+            self.assertIsNotNone(backup_path)
+            self.assertTrue(backup_path.exists())
+            raw = csv_status(csv_path)
+            self.assertEqual(raw['definition'], '새 정의')
+            self.assertEqual(raw['concept_image_alt'], '새 학습 이미지 설명')
+            self.assertEqual(raw['known_status'], 'O')
+            rows, _ = read_cards(csv_path, db_path)
+            self.assertEqual(rows[0]['definition'], '새 정의')
+
+    def test_rewrite_card_with_codex_parses_json_output(self):
+        original_key = flashcard_app.OPENAI_API_KEY
+        try:
+            flashcard_app.OPENAI_API_KEY = 'test-key'
+            with mock.patch.object(
+                flashcard_app,
+                'urlopen',
+                return_value=FakeUrlopenResponse({
+                    'output_text': json.dumps({
+                        'definition': '새 정의',
+                        'detailed_explanation': '의미: 핵심을 정리합니다. 활용: 답변 흐름을 만듭니다.',
+                        'exam_note': '관련 개념과 비교합니다.',
+                        'concept_image_alt': '학습용 새 이미지 설명',
+                    }, ensure_ascii=False),
+                }),
+            ) as urlopen_mock:
+                result = flashcard_app.rewrite_card_with_codex({
+                    'id': 'CS-001',
+                    'term': '테스트',
+                    'definition': '기존 정의',
+                    'detailed_explanation': '기존 상세',
+                    'exam_note': '기존 포인트',
+                    'concept_image_alt': '기존 이미지 설명',
+                }, '더 쉽게')
+            self.assertEqual(result['definition'], '새 정의')
+            self.assertEqual(result['concept_image_alt'], '학습용 새 이미지 설명')
+            self.assertIn('/responses', urlopen_mock.call_args.args[0].full_url)
+        finally:
+            flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_api_card_ai_rewrite_preview_uses_csv_cards(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'output_text': json.dumps({
+                            'definition': '면접형 정의',
+                            'detailed_explanation': '의미: 구조적으로 설명합니다. 활용: 실무 예시를 붙입니다.',
+                            'exam_note': '비교 질문을 대비합니다.',
+                            'concept_image_alt': '면접형 이미지 설명',
+                        }, ensure_ascii=False),
+                    }),
+                ):
+                    data = flashcard_app.api_card_ai_rewrite_preview('CS-001', flashcard_app.CardAiRewriteRequest(instruction='면접형'))
+                self.assertEqual(data['card_id'], 'CS-001')
+                self.assertEqual(data['proposal']['definition'], '면접형 정의')
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_api_card_ai_rewrite_apply_updates_card_content(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_backup = flashcard_app.BACKUP_DIR
+            try:
+                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.BACKUP_DIR = root / 'backups'
+                data = flashcard_app.api_card_ai_rewrite_apply(
+                    'CS-001',
+                    flashcard_app.CardAiApplyRequest(
+                        definition='적용 정의',
+                        detailed_explanation='의미: 적용 테스트입니다. 활용: 저장 흐름을 검증합니다.',
+                        exam_note='적용 포인트',
+                        concept_image_alt='적용 이미지 설명',
+                    ),
+                )
+                self.assertEqual(data['card']['definition'], '적용 정의')
+                self.assertTrue(data['backup_path'])
+                self.assertEqual(csv_status(csv_path)['exam_note'], '적용 포인트')
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.BACKUP_DIR = original_backup
     def test_question_attempt_persists_to_sqlite_and_updates_card_stats(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

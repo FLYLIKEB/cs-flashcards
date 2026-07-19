@@ -51,6 +51,11 @@ WIKI_GITHUB_BRANCH = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_BRANCH", "mai
 WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).strip()
 WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX", "")).strip().strip("/")
 WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
+CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_alt")
+OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
+OPENAI_API_BASE = str(os.environ.get("CS_FLASHCARDS_OPENAI_API_BASE", "https://api.openai.com/v1")).rstrip("/")
+CODEX_MODEL = str(os.environ.get("CS_FLASHCARDS_CODEX_MODEL", "codex-mini-latest")).strip() or "codex-mini-latest"
+
 
 
 
@@ -92,6 +97,17 @@ class WikiChecklistRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     line_number: int = Field(ge=1, le=200000)
     checked: bool
+class CardAiRewriteRequest(BaseModel):
+    instruction: str = Field(default="", max_length=4000)
+
+
+class CardAiApplyRequest(BaseModel):
+    definition: str | None = Field(default=None, max_length=12000)
+    detailed_explanation: str | None = Field(default=None, max_length=50000)
+    exam_note: str | None = Field(default=None, max_length=20000)
+    concept_image_alt: str | None = Field(default=None, max_length=4000)
+
+
 
 
 
@@ -503,6 +519,193 @@ def save_memo(
         if row.get("id") == card_id:
             return row
     raise KeyError(card_id)
+AI_REWRITE_FIELD_LIMITS = {
+    "definition": 12000,
+    "detailed_explanation": 50000,
+    "exam_note": 20000,
+    "concept_image_alt": 4000,
+}
+
+
+def normalized_card_text(value: Any, *, limit: int) -> str:
+    text = str(value or "").replace("\r\n", "\n").replace("\r", "\n").strip()
+    return text[:limit]
+
+
+def extract_json_object_text(value: str) -> str:
+    text = str(value or "").strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end < start:
+        raise ValueError("AI 응답에서 JSON 객체를 찾지 못했습니다.")
+    return text[start : end + 1]
+
+
+def response_output_text(payload: dict[str, Any]) -> str:
+    top_level = str(payload.get("output_text") or "").strip()
+    if top_level:
+        return top_level
+    parts: list[str] = []
+    for item in payload.get("output") or []:
+        if not isinstance(item, dict):
+            continue
+        for content in item.get("content") or []:
+            if not isinstance(content, dict):
+                continue
+            text_value = content.get("text")
+            if isinstance(text_value, str) and text_value.strip():
+                parts.append(text_value)
+    combined = "\n".join(part for part in parts if part).strip()
+    if combined:
+        return combined
+    raise ValueError("AI 응답에서 텍스트를 찾지 못했습니다.")
+
+
+def openai_error_message(raw: str, fallback: str) -> str:
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError:
+        return raw.strip() or fallback
+    error = payload.get("error") if isinstance(payload, dict) else None
+    message = error.get("message") if isinstance(error, dict) else None
+    return str(message or raw or fallback).strip()
+
+
+def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict[str, str]:
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY가 설정되지 않아 Codex AI 초안을 만들 수 없습니다.")
+    payload = {
+        "model": CODEX_MODEL,
+        "input": [
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": (
+                            "You rewrite Korean CS flashcard content. Return only one JSON object with the keys "
+                            "definition, detailed_explanation, exam_note, concept_image_alt. Keep facts grounded in the "
+                            "provided card. Do not invent source files, links, or citations. definition should be 1-2 "
+                            "sentences. detailed_explanation must stay in Korean and include both '의미:' and '활용:' "
+                            "sections. exam_note should be concise interview/exam guidance. concept_image_alt should be a "
+                            "short Korean alt text only, not a URL."
+                        ),
+                    }
+                ],
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": json.dumps(
+                            {
+                                "instruction": str(instruction or "").strip() or "현재 카드 내용을 더 명확하고 학습 친화적으로 다듬어 주세요.",
+                                "card": {
+                                    "id": card.get("id", ""),
+                                    "term": card.get("term", ""),
+                                    "english": card.get("english", ""),
+                                    "category": card.get("category", ""),
+                                    "definition": card.get("definition", ""),
+                                    "detailed_explanation": card.get("detailed_explanation", ""),
+                                    "related_concepts": card.get("related_concepts", ""),
+                                    "exam_note": card.get("exam_note", ""),
+                                    "bok_appeared": card.get("bok_appeared", ""),
+                                    "importance": card.get("importance", ""),
+                                    "difficulty": card.get("difficulty", ""),
+                                    "concept_image_alt": card.get("concept_image_alt", ""),
+                                },
+                            },
+                            ensure_ascii=False,
+                        ),
+                    }
+                ],
+            },
+        ],
+    }
+    request = UrlRequest(
+        f"{OPENAI_API_BASE}/responses",
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {OPENAI_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urlopen(request, timeout=90) as response:
+            raw = response.read().decode("utf-8")
+    except HTTPError as exc:
+        raw = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(openai_error_message(raw, f"OpenAI API 오류 ({exc.code})")) from exc
+    except URLError as exc:
+        raise RuntimeError(f"OpenAI API 연결 실패: {exc.reason}") from exc
+    try:
+        parsed_response = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("OpenAI API 응답을 JSON으로 해석하지 못했습니다.") from exc
+    raw_text = response_output_text(parsed_response)
+    try:
+        parsed = json.loads(extract_json_object_text(raw_text))
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise RuntimeError("Codex 응답을 카드 초안 JSON으로 해석하지 못했습니다.") from exc
+    rewritten: dict[str, str] = {}
+    for field in CARD_AI_EDITABLE_FIELDS:
+        rewritten[field] = normalized_card_text(
+            parsed.get(field, card.get(field, "")),
+            limit=AI_REWRITE_FIELD_LIMITS[field],
+        )
+    return rewritten
+
+
+def update_card_ai_content(
+    card_id: str,
+    payload: CardAiApplyRequest,
+    csv_path: Path = CSV_PATH,
+    backup_dir: Path = BACKUP_DIR,
+    progress_db_path: Path | None = None,
+) -> tuple[dict[str, str], Path | None]:
+    raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
+    target: dict[str, str] | None = None
+    for row in raw_rows:
+        if row.get("id") == card_id:
+            target = row
+            break
+    if target is None:
+        raise KeyError(card_id)
+    updates = {
+        "definition": payload.definition,
+        "detailed_explanation": payload.detailed_explanation,
+        "exam_note": payload.exam_note,
+        "concept_image_alt": payload.concept_image_alt,
+    }
+    changed = False
+    for field, value in updates.items():
+        if value is None:
+            continue
+        if field not in fieldnames:
+            fieldnames.append(field)
+        normalized = normalized_card_text(value, limit=AI_REWRITE_FIELD_LIMITS[field])
+        if str(target.get(field, "")) != normalized:
+            target[field] = normalized
+            changed = True
+    backup_path = backup_csv(csv_path, backup_dir) if changed else None
+    if changed:
+        write_cards(raw_rows, fieldnames, csv_path)
+    updated_rows, _ = read_cards(csv_path, progress_db_path)
+    for row in updated_rows:
+        if row.get("id") == card_id:
+            return row, backup_path
+    raise KeyError(card_id)
+
+
 
 
 def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
@@ -1550,6 +1753,43 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {"card": card, "summary": summarize(rows)}
+@app.post("/api/cards/{card_id}/ai-rewrite/preview")
+def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> dict[str, Any]:
+    try:
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        current = next((row for row in rows if row.get("id") == card_id), None)
+        if current is None:
+            raise KeyError(card_id)
+        proposal = rewrite_card_with_codex(current, payload.instruction)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "card_id": card_id,
+        "model": CODEX_MODEL,
+        "proposal": proposal,
+    }
+
+
+@app.post("/api/cards/{card_id}/ai-rewrite/apply")
+def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict[str, Any]:
+    try:
+        card, backup_path = update_card_ai_content(card_id, payload, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "card": card,
+        "summary": summarize(rows),
+        "backup_path": str(backup_path) if backup_path else "",
+    }
 
 
 @app.post("/api/questions/generate")

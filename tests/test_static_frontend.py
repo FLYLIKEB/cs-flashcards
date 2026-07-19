@@ -56,6 +56,14 @@ class StaticFrontendTests(unittest.TestCase):
             'id="bookmarkFilterBtn"',
             'id="bookmarkListDialog"',
             'id="bookmarkListBody"',
+            'id="aiRewriteSection"',
+            'id="aiRewriteInstruction"',
+            'id="aiRewritePreviewBtn"',
+            'id="aiRewriteApplyBtn"',
+            'id="aiRewriteDefinition"',
+            'id="aiRewriteDetail"',
+            'id="aiRewriteExam"',
+            'id="aiRewriteImageAlt"',
         ]:
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
@@ -71,8 +79,22 @@ class StaticFrontendTests(unittest.TestCase):
             'function jumpToBookmarkCard(cardId)',
             'state.bookmarkFilter',
             'bookmarkOk',
+            'function aiRewriteDraftFromCard(card)',
+            'function renderAiRewriteControls(card)',
+            'function previewAiRewrite()',
+            'function applyAiRewrite()',
+            '/ai-rewrite/preview',
+            '/ai-rewrite/apply',
+            'Codex AI 초안 생성 중',
         ]:
             self.assertIn(snippet, APP_JS)
+        for snippet in [
+            '.ai-rewrite-section',
+            '.ai-rewrite-grid',
+            '.ai-rewrite-actions',
+            '#aiRewriteApplyBtn',
+        ]:
+            self.assertIn(snippet, STYLE_CSS)
 
     def test_wiki_ui_and_flashcard_links_are_present(self):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
@@ -265,12 +287,16 @@ class StaticFrontendTests(unittest.TestCase):
             'question-review-actions',
             "markQuestionSourceCard('O')",
             "markQuestionSourceCard('X')",
+            'const reviewCard = currentQuestionCard();',
+            'question-history-field',
         ]:
             self.assertIn(snippet, APP_JS)
         self.assertIn('id="questionHistoryDialog"', INDEX_HTML)
         self.assertIn('id="questionHistoryBody"', INDEX_HTML)
         self.assertIn('.question-history-filter-row', STYLE_CSS)
         self.assertIn('.question-history-item', STYLE_CSS)
+        self.assertIn('question-toolbar-button', INDEX_HTML)
+        self.assertIn('.question-toolbar-button', STYLE_CSS)
 
 
 if __name__ == '__main__':
