@@ -64,6 +64,10 @@ class StaticFrontendTests(unittest.TestCase):
             'id="aiRewriteDetail"',
             'id="aiRewriteExam"',
             'id="aiRewriteImageAlt"',
+            'id="conceptImageGenerateBtn"',
+            'id="conceptImageSaveBtn"',
+            'id="conceptImageCancelBtn"',
+            'id="backConceptImagePlaceholder"',
         ]:
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
@@ -86,6 +90,13 @@ class StaticFrontendTests(unittest.TestCase):
             '/ai-rewrite/preview',
             '/ai-rewrite/apply',
             'Codex AI 초안 생성 중',
+            'function conceptImagePreviewActive(card)',
+            'function previewConceptImage()',
+            'function saveConceptImagePreview()',
+            'function discardConceptImagePreview()',
+            '/ai-image/preview',
+            '/ai-image/apply',
+            'AI 이미지 생성 중',
         ]:
             self.assertIn(snippet, APP_JS)
         for snippet in [
@@ -93,6 +104,10 @@ class StaticFrontendTests(unittest.TestCase):
             '.ai-rewrite-grid',
             '.ai-rewrite-actions',
             '#aiRewriteApplyBtn',
+            '.concept-image-actions',
+            '.concept-image-action',
+            '.concept-image-placeholder',
+            '.concept-image-wrap.is-empty',
         ]:
             self.assertIn(snippet, STYLE_CSS)
 

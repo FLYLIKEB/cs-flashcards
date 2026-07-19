@@ -16,6 +16,8 @@ import sqlite3
 import tempfile
 from datetime import datetime, timezone
 from typing import Any
+from uuid import uuid4
+
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request as UrlRequest, urlopen
@@ -55,6 +57,12 @@ CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "c
 OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
 OPENAI_API_BASE = str(os.environ.get("CS_FLASHCARDS_OPENAI_API_BASE", "https://api.openai.com/v1")).rstrip("/")
 CODEX_MODEL = str(os.environ.get("CS_FLASHCARDS_CODEX_MODEL", "codex-mini-latest")).strip() or "codex-mini-latest"
+IMAGE_MODEL = str(os.environ.get("CS_FLASHCARDS_IMAGE_MODEL", "gpt-image-2")).strip() or "gpt-image-2"
+IMAGE_SIZE = str(os.environ.get("CS_FLASHCARDS_IMAGE_SIZE", "1024x1024")).strip() or "1024x1024"
+IMAGE_QUALITY = str(os.environ.get("CS_FLASHCARDS_IMAGE_QUALITY", "low")).strip() or "low"
+AI_IMAGE_DIR = Path(os.environ.get("CS_FLASHCARDS_AI_IMAGE_DIR", ROOT / "state" / "ai_images")).expanduser().resolve()
+AI_IMAGE_PREVIEW_DIR = Path(os.environ.get("CS_FLASHCARDS_AI_IMAGE_PREVIEW_DIR", ROOT / "state" / "ai_image_previews")).expanduser().resolve()
+
 
 
 
@@ -106,6 +114,11 @@ class CardAiApplyRequest(BaseModel):
     detailed_explanation: str | None = Field(default=None, max_length=50000)
     exam_note: str | None = Field(default=None, max_length=20000)
     concept_image_alt: str | None = Field(default=None, max_length=4000)
+
+
+class CardAiImageApplyRequest(BaseModel):
+    preview_name: str = Field(min_length=5, max_length=255)
+
 
 
 
@@ -704,6 +717,208 @@ def update_card_ai_content(
         if row.get("id") == card_id:
             return row, backup_path
     raise KeyError(card_id)
+AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
+
+
+def concept_image_alt_text(card: dict[str, str]) -> str:
+    explicit = str(card.get("concept_image_alt") or card.get("image_alt") or "").strip()
+    if explicit:
+        return explicit[:4000]
+    term = str(card.get("term") or card.get("english") or "개념").strip() or "개념"
+    category = str(card.get("category") or "").strip()
+    suffix = f"({category})" if category else ""
+    return f"{term}{suffix} 이해를 돕는 AI 생성 개념 이미지"[:4000]
+
+
+def concept_image_prompt(card: dict[str, str]) -> str:
+    term = str(card.get("term") or "").strip() or "개념"
+    english = str(card.get("english") or "").strip()
+    category = str(card.get("category") or "").strip() or "CS"
+    definition = normalized_card_text(card.get("definition", ""), limit=800)
+    detail = normalized_card_text(card.get("detailed_explanation", ""), limit=1800)
+    related = normalized_card_text(card.get("related_concepts", ""), limit=400)
+    return (
+        "Create a clean, minimal educational concept illustration for a Korean CS flashcard. "
+        "No text, no letters, no labels, no UI, no watermark, no logo, no border, no collage. "
+        "Use a simple single-scene composition with soft modern colors and high clarity. "
+        f"Subject: {term}. "
+        f"English term: {english or term}. "
+        f"Category: {category}. "
+        f"Definition: {definition}. "
+        f"Detailed explanation: {detail}. "
+        f"Related concepts: {related}. "
+        "Visualize the core mechanism or mental model of the concept so a learner can understand it at a glance. "
+        "Prefer a neutral academic diagram-like illustration, but rendered as a polished image rather than literal text diagram."
+    )
+
+
+def ensure_ai_image_dir(path: Path) -> Path:
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def validated_ai_image_name(value: str) -> str:
+    name = str(value or "").strip()
+    if not AI_IMAGE_FILENAME_RE.fullmatch(name):
+        raise ValueError("잘못된 이미지 이름입니다.")
+    return name
+
+
+def ai_image_file_path(directory: Path, name: str) -> Path:
+    normalized = validated_ai_image_name(name)
+    base = ensure_ai_image_dir(directory).resolve()
+    candidate = (base / normalized).resolve()
+    if candidate.parent != base:
+        raise ValueError("잘못된 이미지 경로입니다.")
+    return candidate
+
+
+def image_generation_result_bytes(payload: dict[str, Any]) -> bytes:
+    items = payload.get("data") or []
+    if not items:
+        raise ValueError("이미지 생성 응답이 비어 있습니다.")
+    first = items[0] if isinstance(items[0], dict) else {}
+    b64_json = first.get("b64_json")
+    if isinstance(b64_json, str) and b64_json.strip():
+        try:
+            return base64.b64decode(b64_json)
+        except ValueError as exc:
+            raise ValueError("이미지 base64 응답을 해석하지 못했습니다.") from exc
+    image_url = first.get("url")
+    if isinstance(image_url, str) and image_url.strip():
+        try:
+            with urlopen(image_url, timeout=120) as response:
+                return response.read()
+        except URLError as exc:
+            raise RuntimeError(f"생성된 이미지 다운로드 실패: {exc.reason}") from exc
+    raise ValueError("이미지 생성 응답에서 결과 이미지를 찾지 못했습니다.")
+
+
+def generate_ai_concept_image_preview(
+    card: dict[str, str],
+    *,
+    preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
+) -> dict[str, str]:
+    if not OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY가 설정되지 않아 AI 이미지 초안을 만들 수 없습니다.")
+    payload = {
+        "model": IMAGE_MODEL,
+        "prompt": concept_image_prompt(card),
+        "size": IMAGE_SIZE,
+        "quality": IMAGE_QUALITY,
+    }
+    request = UrlRequest(
+        f"{OPENAI_API_BASE}/images/generations",
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {OPENAI_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urlopen(request, timeout=180) as response:
+            raw = response.read().decode("utf-8")
+    except HTTPError as exc:
+        raw = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(openai_error_message(raw, f"OpenAI 이미지 API 오류 ({exc.code})")) from exc
+    except URLError as exc:
+        raise RuntimeError(f"OpenAI 이미지 API 연결 실패: {exc.reason}") from exc
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("OpenAI 이미지 API 응답을 JSON으로 해석하지 못했습니다.") from exc
+    image_bytes = image_generation_result_bytes(parsed)
+    preview_root = ensure_ai_image_dir(preview_dir)
+    token = uuid4().hex
+    preview_name = f"{token}.png"
+    preview_path = ai_image_file_path(preview_root, preview_name)
+    preview_path.write_bytes(image_bytes)
+    preview_meta = {
+        "card_id": str(card.get("id") or "").strip(),
+        "alt": concept_image_alt_text(card),
+        "created_at": utc_now_iso(),
+        "model": IMAGE_MODEL,
+        "size": IMAGE_SIZE,
+        "quality": IMAGE_QUALITY,
+    }
+    preview_path.with_suffix(".json").write_text(json.dumps(preview_meta, ensure_ascii=False), encoding="utf-8")
+    return {
+        "preview_name": preview_name,
+        "preview_url": f"/api/ai-image-previews/{quote(preview_name, safe='.-_')}",
+        "alt": preview_meta["alt"],
+        "model": IMAGE_MODEL,
+    }
+
+
+def read_ai_image_preview(preview_name: str, *, preview_dir: Path = AI_IMAGE_PREVIEW_DIR) -> tuple[Path, dict[str, Any]]:
+    preview_path = ai_image_file_path(preview_dir, preview_name)
+    meta_path = preview_path.with_suffix(".json")
+    if not preview_path.exists() or not meta_path.exists():
+        raise FileNotFoundError(f"AI 이미지 미리보기를 찾지 못했습니다: {preview_name}")
+    try:
+        metadata = json.loads(meta_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("AI 이미지 미리보기 메타데이터를 읽지 못했습니다.") from exc
+    return preview_path, metadata if isinstance(metadata, dict) else {}
+
+
+def apply_ai_concept_image(
+    card_id: str,
+    payload: CardAiImageApplyRequest,
+    csv_path: Path = CSV_PATH,
+    backup_dir: Path = BACKUP_DIR,
+    progress_db_path: Path | None = None,
+    image_dir: Path = AI_IMAGE_DIR,
+    preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
+) -> tuple[dict[str, str], Path | None, str]:
+    raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
+    target: dict[str, str] | None = None
+    for row in raw_rows:
+        if row.get("id") == card_id:
+            target = row
+            break
+    if target is None:
+        raise KeyError(card_id)
+    preview_path, metadata = read_ai_image_preview(payload.preview_name, preview_dir=preview_dir)
+    if str(metadata.get("card_id") or "").strip() != card_id:
+        raise ValueError("다른 카드용 AI 이미지 미리보기입니다.")
+    image_root = ensure_ai_image_dir(image_dir)
+    safe_card_id = re.sub(r"[^A-Za-z0-9_-]+", "-", card_id).strip("-") or "card"
+    final_name = f"{safe_card_id}-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid4().hex[:8]}.png"
+    final_path = ai_image_file_path(image_root, final_name)
+    shutil.copy2(preview_path, final_path)
+    changed = False
+    if "concept_image_url" not in fieldnames:
+        fieldnames.append("concept_image_url")
+    if "concept_image_alt" not in fieldnames:
+        fieldnames.append("concept_image_alt")
+    next_url = f"/api/ai-images/{final_name}"
+    next_alt = normalized_card_text(metadata.get("alt", concept_image_alt_text(target)), limit=4000)
+    if str(target.get("concept_image_url") or "") != next_url:
+        target["concept_image_url"] = next_url
+        changed = True
+    if str(target.get("concept_image_alt") or "") != next_alt:
+        target["concept_image_alt"] = next_alt
+        changed = True
+    backup_path = backup_csv(csv_path, backup_dir) if changed else None
+    if changed:
+        write_cards(raw_rows, fieldnames, csv_path)
+    try:
+        preview_path.unlink(missing_ok=True)
+        preview_path.with_suffix(".json").unlink(missing_ok=True)
+    except TypeError:
+        if preview_path.exists():
+            preview_path.unlink()
+        meta_path = preview_path.with_suffix(".json")
+        if meta_path.exists():
+            meta_path.unlink()
+    updated_rows, _ = read_cards(csv_path, progress_db_path)
+    for row in updated_rows:
+        if row.get("id") == card_id:
+            return row, backup_path, next_url
+    raise KeyError(card_id)
+
 
 
 
@@ -1792,6 +2007,86 @@ def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict
     }
 
 
+@app.get("/api/ai-image-previews/{preview_name}")
+def api_ai_image_preview_file(preview_name: str) -> FileResponse:
+    try:
+        preview_path, _ = read_ai_image_preview(preview_name, preview_dir=AI_IMAGE_PREVIEW_DIR)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return FileResponse(preview_path)
+
+
+@app.get("/api/ai-images/{image_name}")
+def api_ai_image_file(image_name: str) -> FileResponse:
+    try:
+        image_path = ai_image_file_path(AI_IMAGE_DIR, image_name)
+        if not image_path.exists():
+            raise FileNotFoundError(f"AI 이미지를 찾지 못했습니다: {image_name}")
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return FileResponse(image_path)
+
+
+@app.post("/api/cards/{card_id}/ai-image/preview")
+def api_card_ai_image_preview(card_id: str) -> dict[str, Any]:
+    try:
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        current = next((row for row in rows if row.get("id") == card_id), None)
+        if current is None:
+            raise KeyError(card_id)
+        preview = generate_ai_concept_image_preview(current, preview_dir=AI_IMAGE_PREVIEW_DIR)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "card_id": card_id,
+        **preview,
+    }
+
+
+@app.post("/api/cards/{card_id}/ai-image/apply")
+def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> dict[str, Any]:
+    try:
+        card, backup_path, image_url = apply_ai_concept_image(
+            card_id,
+            payload,
+            CSV_PATH,
+            BACKUP_DIR,
+            PROGRESS_DB_PATH,
+            AI_IMAGE_DIR,
+            AI_IMAGE_PREVIEW_DIR,
+        )
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "card": card,
+        "summary": summarize(rows),
+        "backup_path": str(backup_path) if backup_path else "",
+        "image_url": image_url,
+    }
+
+
+
 @app.post("/api/questions/generate")
 def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
     try:
@@ -1879,4 +2174,5 @@ def health() -> dict[str, Any]:
         "wiki_github_path_prefix": WIKI_GITHUB_PATH_PREFIX,
         "ai_rewrite_enabled": bool(OPENAI_API_KEY),
         "codex_model": CODEX_MODEL,
+        "ai_image_model": IMAGE_MODEL,
     }

@@ -364,6 +364,130 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.BACKUP_DIR = original_backup
+
+    def test_generate_ai_concept_image_preview_writes_preview_file(self):
+        original_key = flashcard_app.OPENAI_API_KEY
+        try:
+            flashcard_app.OPENAI_API_KEY = 'test-key'
+            png_bytes = b'\x89PNG\r\n\x1a\npreview'
+            with tempfile.TemporaryDirectory() as td:
+                preview_dir = Path(td) / 'previews'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'data': [
+                            {'b64_json': base64.b64encode(png_bytes).decode('ascii')},
+                        ],
+                    }),
+                ):
+                    preview = flashcard_app.generate_ai_concept_image_preview({
+                        'id': 'CS-001',
+                        'term': '인수 테스트',
+                        'english': 'Acceptance Test',
+                        'category': '소프트웨어공학',
+                        'definition': '정의',
+                        'detailed_explanation': '상세',
+                        'related_concepts': '[[검증]]',
+                        'concept_image_alt': '기존 이미지 설명',
+                    }, preview_dir=preview_dir)
+                preview_path, metadata = flashcard_app.read_ai_image_preview(preview['preview_name'], preview_dir=preview_dir)
+                self.assertEqual(preview_path.read_bytes(), png_bytes)
+                self.assertEqual(metadata['card_id'], 'CS-001')
+                self.assertEqual(preview['alt'], '기존 이미지 설명')
+                self.assertTrue(preview['preview_url'].endswith(preview['preview_name']))
+        finally:
+            flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_apply_ai_concept_image_updates_csv_and_persists_runtime_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            image_dir = root / 'ai_images'
+            preview_dir = root / 'previews'
+            backup_dir = root / 'backups'
+            write_sample(csv_path, include_image=True)
+            preview_dir.mkdir(parents=True, exist_ok=True)
+            preview_name = 'preview-test.png'
+            (preview_dir / preview_name).write_bytes(b'\x89PNG\r\n\x1a\nfinal')
+            (preview_dir / 'preview-test.json').write_text(json.dumps({
+                'card_id': 'CS-001',
+                'alt': 'AI 생성 새 이미지 설명',
+            }, ensure_ascii=False), encoding='utf-8')
+
+            updated, backup_path, image_url = flashcard_app.apply_ai_concept_image(
+                'CS-001',
+                flashcard_app.CardAiImageApplyRequest(preview_name=preview_name),
+                csv_path,
+                backup_dir,
+                db_path,
+                image_dir,
+                preview_dir,
+            )
+
+            self.assertTrue(image_url.startswith('/api/ai-images/CS-001-'))
+            self.assertEqual(updated['concept_image_alt'], 'AI 생성 새 이미지 설명')
+            self.assertIsNotNone(backup_path)
+            self.assertTrue(backup_path.exists())
+            saved = csv_status(csv_path)
+            self.assertEqual(saved['concept_image_alt'], 'AI 생성 새 이미지 설명')
+            self.assertEqual(saved['concept_image_url'], image_url)
+            self.assertFalse((preview_dir / preview_name).exists())
+            self.assertEqual(len(list(image_dir.glob('*.png'))), 1)
+
+    def test_api_card_ai_image_preview_and_apply_use_runtime_dirs(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            image_dir = root / 'ai_images'
+            preview_dir = root / 'previews'
+            backup_dir = root / 'backups'
+            write_sample(csv_path, include_image=True)
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_backup = flashcard_app.BACKUP_DIR
+            original_image_dir = flashcard_app.AI_IMAGE_DIR
+            original_preview_dir = flashcard_app.AI_IMAGE_PREVIEW_DIR
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.BACKUP_DIR = backup_dir
+                flashcard_app.AI_IMAGE_DIR = image_dir
+                flashcard_app.AI_IMAGE_PREVIEW_DIR = preview_dir
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                png_bytes = b'\x89PNG\r\n\x1a\npreview'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'data': [
+                            {'b64_json': base64.b64encode(png_bytes).decode('ascii')},
+                        ],
+                    }),
+                ):
+                    preview = flashcard_app.api_card_ai_image_preview('CS-001')
+                self.assertEqual(preview['card_id'], 'CS-001')
+                preview_name = preview['preview_name']
+                served_preview = flashcard_app.api_ai_image_preview_file(preview_name)
+                self.assertTrue(str(served_preview.path).endswith(preview_name))
+
+                applied = flashcard_app.api_card_ai_image_apply(
+                    'CS-001',
+                    flashcard_app.CardAiImageApplyRequest(preview_name=preview_name),
+                )
+                self.assertTrue(applied['image_url'].startswith('/api/ai-images/'))
+                served_final = flashcard_app.api_ai_image_file(Path(applied['image_url']).name)
+                self.assertTrue(str(served_final.path).endswith('.png'))
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.BACKUP_DIR = original_backup
+                flashcard_app.AI_IMAGE_DIR = original_image_dir
+                flashcard_app.AI_IMAGE_PREVIEW_DIR = original_preview_dir
+                flashcard_app.OPENAI_API_KEY = original_key
     def test_question_attempt_persists_to_sqlite_and_updates_card_stats(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -525,15 +649,19 @@ class FlashcardProgressTests(unittest.TestCase):
     def test_health_reports_ai_rewrite_config(self):
         original_key = flashcard_app.OPENAI_API_KEY
         original_model = flashcard_app.CODEX_MODEL
+        original_image_model = flashcard_app.IMAGE_MODEL
         try:
             flashcard_app.OPENAI_API_KEY = 'test-key'
             flashcard_app.CODEX_MODEL = 'codex-test'
+            flashcard_app.IMAGE_MODEL = 'gpt-image-test'
             payload = flashcard_app.health()
             self.assertTrue(payload['ai_rewrite_enabled'])
             self.assertEqual(payload['codex_model'], 'codex-test')
+            self.assertEqual(payload['ai_image_model'], 'gpt-image-test')
         finally:
             flashcard_app.OPENAI_API_KEY = original_key
             flashcard_app.CODEX_MODEL = original_model
+            flashcard_app.IMAGE_MODEL = original_image_model
 
 
 

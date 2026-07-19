@@ -14,6 +14,12 @@ const state = {
   aiRewriteDraft: null,
   aiRewriteStatus: '',
   aiRewriteError: '',
+  aiImageGenerating: false,
+  aiImageSaving: false,
+  aiImageCardId: '',
+  aiImagePreviewName: '',
+  aiImagePreviewUrl: '',
+  aiImagePreviewAlt: '',
   menuOpen: false,
   speechHighlight: null,
   speechCurrent: null,
@@ -1743,6 +1749,18 @@ function conceptImageUrl(card) {
   return url;
 }
 
+function conceptImagePreviewActive(card) {
+  return Boolean(card?.id) && state.aiImageCardId === card.id && state.aiImagePreviewUrl && state.aiImagePreviewName;
+}
+
+function clearConceptImagePreview(cardId = null) {
+  if (cardId && state.aiImageCardId && state.aiImageCardId !== cardId) return;
+  state.aiImageCardId = '';
+  state.aiImagePreviewName = '';
+  state.aiImagePreviewUrl = '';
+  state.aiImagePreviewAlt = '';
+}
+
 function isDirectImageUrl(url) {
   try {
     const parsed = new window.URL(url, window.location.origin);
@@ -1760,26 +1778,129 @@ function conceptImageAlt(card) {
   return `${term}${category} 이해를 돕는 학습용 개념 이미지`;
 }
 
+function conceptImageDisplayState(card) {
+  const previewActive = conceptImagePreviewActive(card);
+  const previewUrl = previewActive ? String(state.aiImagePreviewUrl || '').trim() : '';
+  const persistedUrl = conceptImageUrl(card);
+  const url = previewUrl || persistedUrl;
+  return {
+    previewActive,
+    url,
+    alt: previewActive ? (state.aiImagePreviewAlt || conceptImageAlt(card)) : conceptImageAlt(card),
+    hasImage: Boolean(url && isDirectImageUrl(url)),
+  };
+}
+
+async function previewConceptImage() {
+  if (!state.filtered.length || state.aiImageGenerating || state.aiImageSaving) return;
+  const current = state.filtered[state.index];
+  state.aiImageGenerating = true;
+  renderConceptImage(current);
+  setMessage(`${current.term}: AI 이미지 생성 중...`);
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/preview`, {method: 'POST'});
+    if (!res.ok) throw new Error(await responseErrorText(res));
+    const data = await res.json();
+    state.aiImageCardId = current.id;
+    state.aiImagePreviewName = String(data.preview_name || '');
+    state.aiImagePreviewUrl = String(data.preview_url || '');
+    state.aiImagePreviewAlt = String(data.alt || conceptImageAlt(current));
+    renderConceptImage(current);
+    setMessage(`${current.term}: AI 이미지 미리보기를 불러왔습니다.`);
+  } catch (error) {
+    renderConceptImage(current);
+    setMessage(`AI 이미지 생성 실패: ${error.message || error}`, true);
+  } finally {
+    state.aiImageGenerating = false;
+    renderConceptImage(state.filtered[state.index] || null);
+  }
+}
+
+async function saveConceptImagePreview() {
+  if (!state.filtered.length || state.aiImageGenerating || state.aiImageSaving) return;
+  const current = state.filtered[state.index];
+  if (!conceptImagePreviewActive(current)) return;
+  state.aiImageSaving = true;
+  renderConceptImage(current);
+  setMessage(`${current.term}: AI 이미지 저장 중...`);
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-image/apply`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({preview_name: state.aiImagePreviewName}),
+    });
+    if (!res.ok) throw new Error(await responseErrorText(res));
+    const data = await res.json();
+    clearConceptImagePreview(current.id);
+    updateCardInCollections(data.card);
+    state.summary = data.summary;
+    renderStats(summaryFromRows(rowsForHeaderStats()));
+    renderCard();
+    setMessage(`${data.card.term}: AI 이미지를 저장했습니다.`);
+  } catch (error) {
+    renderConceptImage(current);
+    setMessage(`AI 이미지 저장 실패: ${error.message || error}`, true);
+  } finally {
+    state.aiImageSaving = false;
+    renderConceptImage(state.filtered[state.index] || null);
+  }
+}
+
+function discardConceptImagePreview() {
+  const current = state.filtered[state.index] || null;
+  if (!current || !conceptImagePreviewActive(current)) return;
+  clearConceptImagePreview(current.id);
+  renderConceptImage(current);
+  setMessage(`${current.term}: AI 이미지 미리보기를 취소했습니다.`);
+}
+
 function renderConceptImage(card) {
   const wrap = $('backConceptImageWrap');
   const image = $('backConceptImage');
-  if (!wrap || !image) return;
+  const placeholder = $('backConceptImagePlaceholder');
+  const generateBtn = $('conceptImageGenerateBtn');
+  const saveBtn = $('conceptImageSaveBtn');
+  const cancelBtn = $('conceptImageCancelBtn');
+  if (!wrap || !image || !placeholder || !generateBtn || !saveBtn || !cancelBtn) return;
 
-  const url = conceptImageUrl(card);
-  if (!url || !isDirectImageUrl(url)) {
+  if (!card) {
     wrap.hidden = true;
     image.removeAttribute('src');
-    image.removeAttribute('title');
     image.alt = '';
-    image.hidden = false;
+    image.hidden = true;
+    placeholder.hidden = true;
+    generateBtn.disabled = true;
+    saveBtn.hidden = true;
+    cancelBtn.hidden = true;
     return;
   }
 
-  image.hidden = false;
-  image.src = url;
-  image.alt = conceptImageAlt(card);
-  image.title = `${googleSearchQuery(card)} 구글 AI 검색`;
+  const {previewActive, url, alt, hasImage} = conceptImageDisplayState(card);
+  const busy = state.aiImageGenerating || state.aiImageSaving;
   wrap.hidden = false;
+  wrap.classList.toggle('preview-active', previewActive);
+  wrap.classList.toggle('is-empty', !hasImage);
+  image.hidden = !hasImage;
+  placeholder.hidden = hasImage;
+
+  if (hasImage) {
+    image.src = url;
+    image.alt = alt;
+    image.title = previewActive ? `${card.term} AI 이미지 미리보기` : `${googleSearchQuery(card)} 구글 AI 검색`;
+  } else {
+    image.removeAttribute('src');
+    image.removeAttribute('title');
+    image.alt = '';
+  }
+
+  generateBtn.disabled = busy;
+  generateBtn.textContent = state.aiImageGenerating ? '…' : 'AI';
+  generateBtn.title = state.aiImageGenerating ? 'AI 이미지 생성 중' : 'AI 이미지 재생성';
+  generateBtn.dataset.tip = state.aiImageGenerating ? '생성 중' : 'AI 이미지 재생성';
+  saveBtn.hidden = !previewActive;
+  cancelBtn.hidden = !previewActive;
+  saveBtn.disabled = busy;
+  cancelBtn.disabled = busy;
 }
 
 async function loadCards() {
@@ -3291,6 +3412,10 @@ $('unreviewedBtn').addEventListener('click', () => mark(''));
 $('bookmarkBtn').addEventListener('click', toggleBookmark);
 $('copyBookmarksBtn').addEventListener('click', copyBookmarkedTerms);
 $('memoSaveBtn').addEventListener('click', saveMemo);
+$('conceptImageGenerateBtn')?.addEventListener('click', previewConceptImage);
+$('conceptImageSaveBtn')?.addEventListener('click', saveConceptImagePreview);
+$('conceptImageCancelBtn')?.addEventListener('click', discardConceptImagePreview);
+
 $('aiRewritePreviewBtn')?.addEventListener('click', previewAiRewrite);
 $('aiRewriteApplyBtn')?.addEventListener('click', applyAiRewrite);
 [
@@ -3380,6 +3505,7 @@ $('searchInput').addEventListener('keydown', returnFocusFromSearchInput);
   $(id)?.addEventListener('click', openCurrentGoogleSearch);
 });
 $('backConceptImageWrap')?.addEventListener('click', (event) => {
+  if (event.target.closest('button')) return;
   event.preventDefault();
   event.stopPropagation();
   openCurrentGoogleSearch(event);

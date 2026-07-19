@@ -251,7 +251,13 @@
                 </span>
               </div>
               <figure id="backConceptImageWrap" class="concept-image-wrap" hidden>
+                <div class="concept-image-actions" aria-label="AI 이미지 제어">
+                  <button id="conceptImageGenerateBtn" class="concept-image-action has-tip" type="button" title="AI 이미지 재생성" data-tip="AI 이미지 재생성">AI</button>
+                  <button id="conceptImageSaveBtn" class="concept-image-action save has-tip" type="button" title="이 이미지 저장" data-tip="저장" hidden>✓</button>
+                  <button id="conceptImageCancelBtn" class="concept-image-action cancel has-tip" type="button" title="미리보기 취소" data-tip="취소" hidden>✕</button>
+                </div>
                 <img id="backConceptImage" class="concept-image" alt="" loading="lazy" decoding="async" />
+                <div id="backConceptImagePlaceholder" class="concept-image-placeholder" hidden>이미지 없음</div>
               </figure>
               <div class="back-page-toolbar" aria-label="카드 뒷면 페이지 이동">
                 <button id="conceptBackBtn" class="concept-return-button" type="button" aria-label="이전 개념 카드와 필터로 돌아가기" title="이전 개념 카드와 필터로 돌아가기" hidden>↩ 이전</button>
