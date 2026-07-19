@@ -111,6 +111,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn("wikiLoadPage(slug, {push: true})", WIKI_JS)
         self.assertIn('.wiki-toc-row', STYLE_CSS)
         self.assertIn('.wiki-toc-toggle', STYLE_CSS)
+        self.assertIn('max-height: calc(100vh - 6.7rem)', STYLE_CSS)
+        self.assertIn('overscroll-behavior: contain;', STYLE_CSS)
+        self.assertIn('overflow: hidden;', STYLE_CSS)
         self.assertIn('.wiki-toc-item.open > .wiki-toc-row .wiki-toc-toggle', STYLE_CSS)
     def test_audio_playback_repeat_and_term_language_controls_are_present(self):
         for snippet in [

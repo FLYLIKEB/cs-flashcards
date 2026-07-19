@@ -4325,10 +4325,14 @@ body.wiki-sidebar-collapsed .wiki-shell {
 .wiki-sidebar {
   position: sticky;
   top: 5.45rem;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 6.7rem);
   padding: 1rem 1.05rem;
-  overflow: auto;
+  overflow: hidden;
   scrollbar-gutter: stable;
 }
+
 
 body.wiki-sidebar-collapsed .wiki-sidebar {
   display: none;
@@ -4373,6 +4377,14 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   color: #888888;
   font-size: .82rem;
 }
+
+.wiki-toc {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-right: .2rem;
+}
+
 
 .wiki-toc {
   color: #333333;
@@ -4763,6 +4775,7 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
     top: auto;
     min-height: 0;
     max-height: none;
+    overflow: visible;
   }
 
   .wiki-main {
