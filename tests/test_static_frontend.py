@@ -59,6 +59,8 @@ class StaticFrontendTests(unittest.TestCase):
             'id="definitionAiBtn"',
             'id="detailAiBtn"',
             'id="examAiBtn"',
+            'id="conceptImageZoomOutBtn"',
+            'id="conceptImageZoomInBtn"',
             'id="conceptImageGenerateBtn"',
 
             'id="backConceptImagePlaceholder"',
@@ -84,9 +86,11 @@ class StaticFrontendTests(unittest.TestCase):
             '/ai-rewrite/preview',
             '/ai-rewrite/apply',
             'AI 변환 중',
-            'function conceptImagePreviewActive(card)',
-            'function bindConceptImageLoadState()',
-            "hasImage: Boolean(url)",
+            'conceptImageScale: 1,',
+            'const CONCEPT_IMAGE_SCALE_MIN = 0.8;',
+            'function updateConceptImageZoomControls({hasImage = false} = {})',
+            'function stepConceptImageScale(delta)',
+            'function conceptImageScalePercent()',
             'async function previewConceptImage()',
             '/ai-image/preview',
             '/ai-image/apply',
@@ -94,6 +98,9 @@ class StaticFrontendTests(unittest.TestCase):
             'function openConceptImageDialog()',
             'function closeConceptImageDialog({restoreFocus = true} = {})',
             "$('conceptImageZoomBtn')?.addEventListener('click'",
+            "$('conceptImageZoomOutBtn')?.addEventListener('click'",
+            "$('conceptImageZoomInBtn')?.addEventListener('click'",
+            'setMessage(`${current.term}: 이미지 크기 ${conceptImageScalePercent()}%`);',
             'openConceptImageDialog();',
             'AI 이미지 생성 중',
         ]:
@@ -106,13 +113,16 @@ class StaticFrontendTests(unittest.TestCase):
             '.concept-image-actions',
             '.concept-image-action',
             '.concept-image-action.zoom',
+            '.concept-image-action.zoom-step',
             '.concept-image-placeholder',
             '.concept-image-wrap.is-empty',
             '.concept-image-modal-image',
         ]:
             self.assertIn(snippet, STYLE_CSS)
-        self.assertIn('max-height: clamp(165px, 30vh, 280px);', STYLE_CSS)
-        self.assertIn('.concept-image { max-height: 205px; }', STYLE_CSS)
+        self.assertIn('max-height: calc(clamp(165px, 30vh, 280px) * var(--concept-image-scale, 1));', STYLE_CSS)
+        self.assertIn('.concept-image { max-height: calc(205px * var(--concept-image-scale, 1)); }', STYLE_CSS)
+        self.assertIn('id="conceptImageZoomOutBtn"', INDEX_HTML)
+        self.assertIn('id="conceptImageZoomInBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageZoomBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageDialog"', INDEX_HTML)
 
@@ -279,11 +289,24 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionTimeLimitSelect"',
             'id="generateQuestionsBtn"',
             'id="openQuestionImportBtn"',
+            'id="questionBankToggleBtn"',
+            'id="questionBankBrowser"',
+            'id="questionBankQueryInput"',
+            'id="questionBankTopicInput"',
+            'id="questionBankFieldInput"',
+            'id="questionBankIssuerInput"',
+            'id="questionBankSourceInput"',
+            'id="questionBankDifficultySelect"',
+            'id="questionBankTypeSelect"',
+            'id="questionBankSectionInput"',
+            'id="questionBankList"',
+            'id="questionBankLoadBtn"',
             'id="finishQuestionSessionBtn"',
             'id="openAiQuizSearchBtn"',
             'id="questionHistoryBtn"',
             'id="revealAnswerBtn"',
             'id="openQuestionCardBtn"',
+
         ]:
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
@@ -299,6 +322,13 @@ class StaticFrontendTests(unittest.TestCase):
             'function renderQuestionSessionReview(',
             'function generateQuestionsFromCurrentFilter()',
             '/api/questions/generate',
+            '/api/question-bank',
+            'function fetchQuestionBankEntries()',
+            'function renderQuestionBankBrowser()',
+            'function openQuestionBankSession(startIndex = 0)',
+            'function renderQuestionMarkdown(source)',
+            'question-md-image',
+            'question-bank-item',
             'function renderQuestionPanel()',
             'function revealQuestionAnswer()',
             'function openQuestionSourceCard()',
@@ -371,6 +401,10 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-import-input', STYLE_CSS)
         self.assertIn('question-toolbar-button', INDEX_HTML)
         self.assertIn('.question-toolbar-button', STYLE_CSS)
+        self.assertIn('.question-bank-browser', STYLE_CSS)
+        self.assertIn('.question-bank-list', STYLE_CSS)
+        self.assertIn('.question-markdown', STYLE_CSS)
+        self.assertIn('.question-md-image', STYLE_CSS)
 
 
 if __name__ == '__main__':

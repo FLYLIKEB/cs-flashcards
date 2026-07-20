@@ -1449,6 +1449,48 @@ def upsert_question_bank_entries(
     }
 
 
+def seed_demo_question_bank_entries(
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> None:
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        existing_count = int(conn.execute("SELECT COUNT(*) FROM question_bank").fetchone()[0] or 0)
+    if existing_count:
+        return
+    rows, _ = read_cards(csv_path, db_path)
+    if not rows:
+        return
+    sample = rows[0]
+    upsert_question_bank_entries(
+        [
+            {
+                "card_id": sample.get("id") or "",
+                "question_type": "subjective",
+                "prompt": "## 더미 문제\n**정규화(Normalization)** 의 목적을 설명하시오.",
+                "body": "다음 요구를 모두 반영해 답하시오.\n\n- 데이터 중복 관점\n- 이상 현상 관점\n- 실무 설계 관점\n\n![예시 이미지](/static/favicon.svg)\n\n> 위 이미지는 마크다운 이미지 렌더링 예시입니다.",
+                "answer": "정규화는 릴레이션을 분해하여 **데이터 중복을 줄이고**, 삽입/삭제/갱신 이상을 방지하며, 스키마를 더 일관되게 유지하기 위한 과정이다.",
+                "explanation": "### 해설\n\n1. **중복 감소**: 같은 사실을 여러 행에 반복 저장하지 않게 한다.\n2. **이상 현상 방지**: 삽입 이상, 삭제 이상, 갱신 이상을 완화한다.\n3. **유지보수성 향상**: 제약조건과 의미가 더 분명해진다.\n\n![해설 이미지](/static/favicon.svg)",
+                "rubric": ["중복 감소", "이상 현상 방지", "유지보수성 향상"],
+                "topic": "데이터베이스",
+                "field_name": "데모",
+                "keywords": ["정규화", "이상 현상", "데이터베이스"],
+                "difficulty": "중",
+                "issuer": "샘플",
+                "source_location": "더미 데이터 1번",
+                "section": "연습문제",
+                "points": 10,
+                "expected_time_seconds": 300,
+                "answer_guide": "정의 → 목적 → 이상 현상 순으로 3~5문장",
+                "session_mode": "practice",
+            }
+        ],
+        csv_path,
+        db_path,
+    )
+
+
 def read_question_bank_entries(
     csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
@@ -1458,11 +1500,15 @@ def read_question_bank_entries(
     topic: str = "",
     field_name: str = "",
     issuer: str = "",
+    difficulty: str = "",
+    section: str = "",
     source_location: str = "",
+    query: str = "",
     limit: int = 200,
 ) -> dict[str, Any]:
     db_path = progress_db_for(csv_path, progress_db_path)
     ensure_progress_db(db_path)
+    seed_demo_question_bank_entries(csv_path, db_path)
     safe_limit = max(1, min(int(limit or 200), 500))
     filters = {
         "card_id": normalize_question_bank_text(card_id, limit=255),
@@ -1470,22 +1516,47 @@ def read_question_bank_entries(
         "topic": normalize_question_bank_text(topic, limit=255),
         "field_name": normalize_question_bank_text(field_name, limit=255),
         "issuer": normalize_question_bank_text(issuer, limit=255),
+        "difficulty": normalize_question_bank_text(difficulty, limit=64),
+        "section": normalize_question_bank_text(section, limit=64),
         "source_location": normalize_question_bank_text(source_location, limit=255),
+        "query": normalize_question_bank_text(query, limit=255),
     }
     where_clauses: list[str] = []
     params: list[Any] = []
-    for column, value in filters.items():
+    for column in ("card_id", "topic", "field_name", "issuer", "difficulty", "section", "source_location"):
+        value = filters[column]
         if not value:
             continue
-        where_clauses.append(f"{column} = ?")
-        params.append(value)
+        where_clauses.append(f"LOWER({column}) LIKE ?")
+        params.append(f"%{value.lower()}%")
+    if filters["question_type"]:
+        where_clauses.append("question_type = ?")
+        params.append(filters["question_type"])
+    if filters["query"]:
+        where_clauses.append(
+            "(" + " OR ".join([
+                "LOWER(prompt) LIKE ?",
+                "LOWER(body) LIKE ?",
+                "LOWER(answer) LIKE ?",
+                "LOWER(explanation) LIKE ?",
+                "LOWER(topic) LIKE ?",
+                "LOWER(field_name) LIKE ?",
+                "LOWER(issuer) LIKE ?",
+                "LOWER(source_location) LIKE ?",
+                "LOWER(keywords_json) LIKE ?",
+            ]) + ")"
+        )
+        needle = f"%{filters['query'].lower()}%"
+        params.extend([needle] * 9)
     where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    rows, _ = read_cards(csv_path, db_path)
+    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
     with closing(connect_progress_db(db_path)) as conn:
         total_row = conn.execute(
             f"SELECT COUNT(*) AS total_count FROM question_bank {where_sql}",
             tuple(params),
         ).fetchone()
-        rows = conn.execute(
+        query_rows = conn.execute(
             f"""
             SELECT id, card_id, question_type, prompt, body, answer, explanation,
                    rubric_json, choices_json, answer_index, topic, field_name, keywords_json,
@@ -1498,7 +1569,15 @@ def read_question_bank_entries(
             """,
             tuple(params + [safe_limit]),
         ).fetchall()
-    items = [question_bank_row_to_dict(row) or {} for row in rows]
+    items: list[dict[str, Any]] = []
+    for row in query_rows:
+        item = question_bank_row_to_dict(row) or {}
+        card = card_map.get(item.get("card_id", ""), {})
+        item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
+        item["english"] = card.get("english") or ""
+        item["card_category"] = card.get("category") or ""
+        item["card_url"] = flashcard_card_url(item.get("card_id") or "") if item.get("card_id") else ""
+        items.append(item)
     return {
         "items": items,
         "summary": {
@@ -2866,7 +2945,10 @@ def api_question_bank(request: Request) -> dict[str, Any]:
             topic=request.query_params.get("topic", ""),
             field_name=request.query_params.get("field_name", request.query_params.get("field", "")),
             issuer=request.query_params.get("issuer", ""),
+            difficulty=request.query_params.get("difficulty", ""),
+            section=request.query_params.get("section", ""),
             source_location=request.query_params.get("source_location", ""),
+            query=request.query_params.get("q", request.query_params.get("query", "")),
             limit=limit,
         )
     except ValueError as exc:

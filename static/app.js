@@ -22,6 +22,7 @@ const state = {
   aiImagePreviewUrl: '',
   aiImagePreviewAlt: '',
   aiNotificationsRequested: false,
+  conceptImageScale: 1,
 
   menuOpen: false,
   speechHighlight: null,
@@ -75,6 +76,12 @@ const state = {
   questionHistoryItems: [],
   questionHistorySummary: null,
   questionHistoryError: '',
+  questionBankOpen: false,
+  questionBankLoading: false,
+  questionBankItems: [],
+  questionBankSummary: null,
+  questionBankError: '',
+  questionBankSelectedId: '',
 
 };
 
@@ -86,6 +93,10 @@ const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
 const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate', 'speechVoice'];
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_SESSION_MODE_LABELS = {practice: '일반', bok: '한국은행'};
+const CONCEPT_IMAGE_SCALE_DEFAULT = 1;
+const CONCEPT_IMAGE_SCALE_MIN = 0.8;
+const CONCEPT_IMAGE_SCALE_MAX = 1.8;
+const CONCEPT_IMAGE_SCALE_STEP = 0.1;
 const BOK_MOCK_CONFIG = {
   subjectiveCount: 8,
   essayCount: 1,
@@ -1802,6 +1813,58 @@ function renderConceptGraph(card) {
   `;
 }
 
+function clampConceptImageScale(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return CONCEPT_IMAGE_SCALE_DEFAULT;
+  return Math.min(CONCEPT_IMAGE_SCALE_MAX, Math.max(CONCEPT_IMAGE_SCALE_MIN, Math.round(numeric * 100) / 100));
+}
+
+function conceptImageScalePercent() {
+  return Math.round(clampConceptImageScale(state.conceptImageScale) * 100);
+}
+
+function applyConceptImageScale(image = $('backConceptImage')) {
+  if (!image) return;
+  image.style.setProperty('--concept-image-scale', String(clampConceptImageScale(state.conceptImageScale)));
+}
+
+function updateConceptImageZoomControls({hasImage = false} = {}) {
+  const zoomOutBtn = $('conceptImageZoomOutBtn');
+  const zoomInBtn = $('conceptImageZoomInBtn');
+  const zoomBtn = $('conceptImageZoomBtn');
+  if (!zoomOutBtn || !zoomInBtn || !zoomBtn) return;
+  const scalePercent = conceptImageScalePercent();
+  const canZoomOut = hasImage && state.conceptImageScale > CONCEPT_IMAGE_SCALE_MIN;
+  const canZoomIn = hasImage && state.conceptImageScale < CONCEPT_IMAGE_SCALE_MAX;
+  const zoomOutLabel = hasImage ? `이미지 축소 · ${scalePercent}%` : '축소할 이미지 없음';
+  const zoomInLabel = hasImage ? `이미지 확대 · ${scalePercent}%` : '확대할 이미지 없음';
+  const zoomDialogLabel = hasImage ? `이미지 크게 보기 · 현재 ${scalePercent}%` : '확대할 이미지 없음';
+  zoomOutBtn.disabled = !canZoomOut;
+  zoomOutBtn.title = zoomOutLabel;
+  zoomOutBtn.dataset.tip = hasImage ? `축소 · ${scalePercent}%` : '이미지 없음';
+  zoomOutBtn.setAttribute('aria-label', zoomOutLabel);
+  zoomInBtn.disabled = !canZoomIn;
+  zoomInBtn.title = zoomInLabel;
+  zoomInBtn.dataset.tip = hasImage ? `확대 · ${scalePercent}%` : '이미지 없음';
+  zoomInBtn.setAttribute('aria-label', zoomInLabel);
+  zoomBtn.disabled = !hasImage;
+  zoomBtn.title = zoomDialogLabel;
+  zoomBtn.dataset.tip = hasImage ? `크게 보기 · ${scalePercent}%` : '이미지 없음';
+  zoomBtn.setAttribute('aria-label', zoomDialogLabel);
+}
+
+function stepConceptImageScale(delta) {
+  const current = state.filtered[state.index] || null;
+  if (!current) return;
+  const next = clampConceptImageScale((state.conceptImageScale || CONCEPT_IMAGE_SCALE_DEFAULT) + delta);
+  if (Math.abs(next - state.conceptImageScale) < 0.001) {
+    renderConceptImage(current);
+    return;
+  }
+  state.conceptImageScale = next;
+  renderConceptImage(current);
+  setMessage(`${current.term}: 이미지 크기 ${conceptImageScalePercent()}%`);
+}
 function conceptImageUrl(card) {
   const url = String(card?.concept_image_url || card?.image_url || '').trim();
   if (!url) return '';
@@ -1964,10 +2027,14 @@ function renderConceptImage(card) {
   const wrap = $('backConceptImageWrap');
   const image = $('backConceptImage');
   const placeholder = $('backConceptImagePlaceholder');
+  const zoomOutBtn = $('conceptImageZoomOutBtn');
+  const zoomInBtn = $('conceptImageZoomInBtn');
   const zoomBtn = $('conceptImageZoomBtn');
   const generateBtn = $('conceptImageGenerateBtn');
-  if (!wrap || !image || !placeholder || !zoomBtn || !generateBtn) return;
+  if (!wrap || !image || !placeholder || !zoomOutBtn || !zoomInBtn || !zoomBtn || !generateBtn) return;
   bindConceptImageLoadState();
+  state.conceptImageScale = clampConceptImageScale(state.conceptImageScale);
+  applyConceptImageScale(image);
 
   if (!card) {
     wrap.hidden = true;
@@ -1977,7 +2044,7 @@ function renderConceptImage(card) {
     image.dataset.expectedSrc = '';
     image.hidden = true;
     placeholder.hidden = true;
-    zoomBtn.disabled = true;
+    updateConceptImageZoomControls();
     generateBtn.disabled = true;
     closeConceptImageDialog({restoreFocus: false});
     return;
@@ -2019,9 +2086,7 @@ function renderConceptImage(card) {
     closeConceptImageDialog({restoreFocus: false});
   }
 
-  zoomBtn.disabled = !hasImage;
-  zoomBtn.title = hasImage ? '이미지 크게 보기' : '확대할 이미지 없음';
-  zoomBtn.dataset.tip = hasImage ? '이미지 크게 보기' : '이미지 없음';
+  updateConceptImageZoomControls({hasImage});
   generateBtn.disabled = busy;
   generateBtn.textContent = activeBusy ? '…' : 'AI';
   generateBtn.title = activeBusy ? 'AI 이미지 생성 중' : 'AI 이미지 재생성';
@@ -3142,6 +3207,146 @@ async function importQuestionsFromText() {
   }
 }
 
+function questionBankFilterValues() {
+  return {
+    q: $('questionBankQueryInput')?.value?.trim() || '',
+    topic: $('questionBankTopicInput')?.value?.trim() || '',
+    field_name: $('questionBankFieldInput')?.value?.trim() || '',
+    issuer: $('questionBankIssuerInput')?.value?.trim() || '',
+    source_location: $('questionBankSourceInput')?.value?.trim() || '',
+    difficulty: $('questionBankDifficultySelect')?.value || '',
+    question_type: $('questionBankTypeSelect')?.value || '',
+    section: $('questionBankSectionInput')?.value?.trim() || '',
+    limit: '500',
+  };
+}
+
+function questionBankQueryString() {
+  const params = new URLSearchParams();
+  Object.entries(questionBankFilterValues()).forEach(([key, value]) => {
+    if (!value) return;
+    params.set(key, value);
+  });
+  return params.toString();
+}
+
+async function fetchQuestionBankEntries() {
+  const qs = questionBankQueryString();
+  const res = await fetch(`/api/question-bank${qs ? `?${qs}` : ''}`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function questionBankItemToQuestion(item, index) {
+  return hydrateQuestionState({
+    id: `bank-${item.question_bank_id || index + 1}`,
+    questionBankId: String(item.question_bank_id || ''),
+    card_id: String(item.card_id || ''),
+    type: String(item.question_type || 'subjective'),
+    type_label: QUESTION_TYPE_LABELS[item.question_type] || item.question_type || '문제',
+    term: String(item.term || item.card_id || ''),
+    category: String(item.topic || item.card_category || '미분류'),
+    topic: String(item.topic || ''),
+    fieldName: String(item.field_name || ''),
+    keywords: Array.isArray(item.keywords) ? item.keywords : [],
+    difficulty: String(item.difficulty || ''),
+    issuer: String(item.issuer || ''),
+    sourceLocation: String(item.source_location || ''),
+    prompt: String(item.prompt || ''),
+    body: String(item.body || ''),
+    answer: String(item.answer || ''),
+    explanation: String(item.explanation || ''),
+    rubric: Array.isArray(item.rubric) ? item.rubric : [],
+    choices: Array.isArray(item.choices) ? item.choices : [],
+    answer_index: Number.isInteger(item.answer_index) ? item.answer_index : null,
+    section: String(item.section || ''),
+    points: Number.isInteger(item.points) ? item.points : null,
+    expectedTimeSeconds: Number.isInteger(item.expected_time_seconds) ? item.expected_time_seconds : null,
+    answerGuide: String(item.answer_guide || ''),
+    sessionMode: normalizeQuestionSessionMode(item.session_mode || 'practice'),
+    questionOrder: index + 1,
+  });
+}
+
+function renderQuestionBankBrowser() {
+  const panel = $('questionBankBrowser');
+  const list = $('questionBankList');
+  const summary = $('questionBankSummary');
+  const error = $('questionBankError');
+  if (!panel || !list || !summary || !error) return;
+  panel.hidden = !state.questionBankOpen;
+  if (!state.questionBankOpen) return;
+  const total = Number(state.questionBankSummary?.total || 0);
+  const returned = Number(state.questionBankSummary?.returned || state.questionBankItems.length || 0);
+  summary.textContent = state.questionBankLoading
+    ? '문제은행을 불러오는 중입니다.'
+    : `총 ${total}문항 · 현재 ${returned}문항 · 번호를 눌러 해당 문제부터 풉니다.`;
+  error.textContent = state.questionBankError || '';
+  if (!state.questionBankItems.length) {
+    list.innerHTML = '<li class="muted">조건에 맞는 문제가 없습니다.</li>';
+    return;
+  }
+  list.innerHTML = state.questionBankItems.map((item, index) => {
+    const active = state.questionBankSelectedId && state.questionBankSelectedId === String(item.question_bank_id || '');
+    const meta = [item.topic || item.card_category || '', item.field_name || '', item.issuer || '', item.difficulty || '', item.source_location || ''].filter(Boolean).join(' · ');
+    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 160);
+    return `<li><button class="question-bank-item${active ? ' active' : ''}" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`)}</span><span class="question-bank-item-meta">${escapeHtml(meta || '메타데이터 없음')}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></li>`;
+  }).join('');
+}
+
+function openQuestionBankSession(startIndex = 0) {
+  if (!state.questionBankItems.length) {
+    setMessage('문제은행 목록이 비어 있습니다.', true);
+    return;
+  }
+  commitCurrentQuestionElapsed();
+  resetQuestionSessionState();
+  state.questionMode = true;
+  const questions = state.questionBankItems.map((item, index) => questionBankItemToQuestion(item, index));
+  const start = Math.max(0, Math.min(questions.length - 1, startIndex));
+  const firstMode = questions.find((item) => item?.sessionMode)?.sessionMode || 'practice';
+  prepareQuestionSession(questions, {
+    title: `문제은행 세트 · ${state.questionBankItems.length}문항`,
+    mode: firstMode,
+  });
+  state.questionIndex = start;
+  state.answerRevealed = Boolean(state.questions[start]?.answerRevealed);
+  state.selectedChoiceIndex = Number.isInteger(state.questions[start]?.selectedChoiceIndex) ? state.questions[start].selectedChoiceIndex : null;
+  state.questionBankSelectedId = String(state.questionBankItems[start]?.question_bank_id || '');
+  activateCurrentQuestionTimer();
+  renderQuestionPanel();
+  setMessage(`문제은행 ${state.questionBankItems.length}문항을 불러왔습니다.`);
+}
+
+async function loadQuestionBankBrowser() {
+  state.questionBankLoading = true;
+  state.questionBankError = '';
+  renderQuestionBankBrowser();
+  try {
+    const data = await fetchQuestionBankEntries();
+    state.questionBankItems = Array.isArray(data.items) ? data.items : [];
+    state.questionBankSummary = data.summary || {total: state.questionBankItems.length, returned: state.questionBankItems.length};
+    if (!state.questionBankSelectedId && state.questionBankItems[0]?.question_bank_id) {
+      state.questionBankSelectedId = String(state.questionBankItems[0].question_bank_id);
+    }
+  } catch (error) {
+    state.questionBankItems = [];
+    state.questionBankSummary = {total: 0, returned: 0};
+    state.questionBankError = error.message || String(error);
+  } finally {
+    state.questionBankLoading = false;
+    renderQuestionBankBrowser();
+  }
+}
+
+function toggleQuestionBankBrowser(force = !state.questionBankOpen) {
+  state.questionBankOpen = Boolean(force);
+  renderQuestionBankBrowser();
+  if (state.questionBankOpen && !state.questionBankItems.length && !state.questionBankLoading) {
+    loadQuestionBankBrowser().catch(() => {});
+  }
+}
+
 
 function hydrateQuestionState(question) {
   if (!question) return null;
@@ -3548,7 +3753,7 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -3590,11 +3795,13 @@ function renderQuestionPanel() {
   const card = $('questionCard');
   updateRandomButtons();
   updateQuestionPracticeButton();
+  renderQuestionBankBrowser();
   if (!state.questionMode) {
     stopQuestionTimer();
     renderQuestionSessionReview();
     return;
   }
+
   setQuestionControlsDisabled(state.questionLoading || state.questionSaving || state.markSaving);
   const total = state.questions.length;
   const question = hydrateQuestionState(currentQuestion());
@@ -3602,6 +3809,7 @@ function renderQuestionPanel() {
   if (question) {
     state.answerRevealed = Boolean(question.answerRevealed);
     state.selectedChoiceIndex = Number.isInteger(question.selectedChoiceIndex) ? question.selectedChoiceIndex : null;
+    if (question.questionBankId) state.questionBankSelectedId = String(question.questionBankId);
     activateCurrentQuestionTimer();
   } else {
     state.answerRevealed = false;
@@ -3616,7 +3824,7 @@ function renderQuestionPanel() {
     return;
   }
   if (!question) {
-    card.innerHTML = '<div class="question-card-empty muted">문제 생성을 누르면 현재 필터 카드로 모의 세트가 만들어집니다.</div>';
+    card.innerHTML = '<div class="question-card-empty muted">문제 생성, 가져오기, 또는 문제은행 목록에서 문항을 불러오세요.</div>';
     return;
   }
 
@@ -3644,11 +3852,11 @@ function renderQuestionPanel() {
       ${choices.map((choice, index) => {
         const isAnswer = question.answerRevealed && index === question.answer_index;
         const isSelected = index === question.selectedChoiceIndex;
-        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(choice)}</button></li>`;
+        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${renderMarkdownInline(choice)}</button></li>`;
       }).join('')}
     </ol>` : '';
   const answerGuideHtml = question.answerGuide
-    ? `<p class="question-answer-guide"><strong>답안 가이드</strong> ${escapeHtml(question.answerGuide)}</p>`
+    ? `<div class="question-answer-guide question-markdown"><strong>답안 가이드</strong>${renderQuestionMarkdown(question.answerGuide)}</div>`
     : '';
   const draftPlaceholder = revealLocked
     ? '세트 종료 전까지 정답이 공개되지 않습니다. 실전처럼 답안을 먼저 작성하세요.'
@@ -3691,8 +3899,8 @@ function renderQuestionPanel() {
   const answer = question.answerRevealed ? `
     <div class="question-answer">
       <strong>정답/모범답안</strong>
-      <p>${escapeHtml(question.answer || '')}</p>
-      ${question.explanation ? `<p class="question-explanation">${escapeHtml(question.explanation)}</p>` : ''}
+      <div class="question-answer-markdown">${renderQuestionMarkdown(question.answer || '')}</div>
+      ${question.explanation ? `<div class="question-explanation-markdown">${renderQuestionMarkdown(question.explanation)}</div>` : ''}
       ${rubric}
       ${gradeHtml}
       ${wrongNoteHtml}
@@ -3706,6 +3914,10 @@ function renderQuestionPanel() {
     state.questionSessionTitle || question.sessionTitle,
     questionSessionModeLabel(question.sessionMode || state.questionSessionMode),
     question.section || '',
+    question.fieldName || '',
+    question.issuer || '',
+    question.sourceLocation || '',
+    question.difficulty ? `난이도 ${question.difficulty}` : '',
     Number.isInteger(question.points) ? `${question.points}점` : '',
     question.questionOrder ? `문항 ${question.questionOrder}` : '',
     Number.isInteger(question.expectedTimeSeconds) ? `권장 ${formatElapsedClock(question.expectedTimeSeconds)}` : '',
@@ -3715,14 +3927,16 @@ function renderQuestionPanel() {
     <div class="question-meta">
       <span class="badge">${escapeHtml(questionTypeBadge(question))}</span>
       <span class="badge">${escapeHtml(question.category || '미분류')}</span>
-      <span class="badge">${escapeHtml(question.card_id || '')}</span>
+      ${question.fieldName ? `<span class="badge">${escapeHtml(question.fieldName)}</span>` : ''}
+      ${question.issuer ? `<span class="badge">${escapeHtml(question.issuer)}</span>` : ''}
+      ${question.difficulty ? `<span class="badge">난이도 ${escapeHtml(question.difficulty)}</span>` : ''}
       ${question.section ? `<span class="badge">${escapeHtml(question.section)}</span>` : ''}
       ${Number.isInteger(question.points) ? `<span class="badge">${escapeHtml(String(question.points))}점</span>` : ''}
       ${question.judgment !== 'pending' ? `<span class="badge">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>` : ''}
     </div>
     <p class="question-session-meta">${escapeHtml(sessionMeta)}</p>
-    <h2>${escapeHtml(question.prompt || '문제')}</h2>
-    <p class="question-body">${escapeHtml(question.body || '')}</p>
+    <div class="question-prompt">${renderQuestionMarkdown(question.prompt || '문제')}</div>
+    <div class="question-body">${renderQuestionMarkdown(question.body || '')}</div>
     ${lockNoticeHtml}
     ${reviewBoxHtml}
     ${draftHtml}
@@ -3736,7 +3950,7 @@ function renderQuestionPanel() {
     $('revealAnswerBtn').textContent = revealLocked ? '정답 잠금' : '정답';
     $('revealAnswerBtn').title = revealLocked ? '한은 모드는 세트 종료 전 정답이 공개되지 않습니다.' : '정답/해설 보기';
   }
-  $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question;
+  $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !reviewCard;
   if ($('finishQuestionSessionBtn')) {
     $('finishQuestionSessionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !total;
     $('finishQuestionSessionBtn').textContent = questionSessionIsBok(question.sessionMode || state.questionSessionMode) && !state.questionSessionFinishedAt ? '제출' : '종료';
@@ -3855,8 +4069,11 @@ function toggleQuestionMode(force = !state.questionMode) {
     activateCurrentQuestionTimer();
   }
   state.questionMode = nextMode;
+  if (state.questionMode && state.questionBankOpen && !state.questionBankItems.length && !state.questionBankLoading) {
+    loadQuestionBankBrowser().catch(() => {});
+  }
   renderQuestionPanel();
-  setMessage(state.questionMode ? (state.questions.length ? '모의 세트를 다시 열었습니다.' : '문제 풀이를 열었습니다. 생성 버튼으로 문제를 만드세요.') : '문제 풀이를 닫았습니다.');
+  setMessage(state.questionMode ? (state.questions.length ? '모의 세트를 다시 열었습니다.' : '문제 풀이를 열었습니다. 생성 버튼, 가져오기, 또는 문제은행을 사용하세요.') : '문제 풀이를 닫았습니다.');
 }
 
 
@@ -4139,6 +4356,146 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+function safeMarkdownUrl(url) {
+  const raw = String(url || '').trim();
+  if (!raw) return '';
+  if (raw.startsWith('/')) return raw;
+  if (raw.startsWith('./') || raw.startsWith('../')) return raw;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (/^data:image\//i.test(raw)) return raw;
+  return '';
+}
+
+function markdownPreviewText(source) {
+  return String(source || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*\]\(([^)]+)\)/g, ' ')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/^>\s?/gm, '')
+    .replace(/[*_`>|-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function renderMarkdownInline(source) {
+  const tokens = [];
+  const stash = (html) => `\u0000${tokens.push(html) - 1}\u0000`;
+  let text = String(source || '');
+  text = text.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_match, alt, url, title) => {
+    const safeUrl = safeMarkdownUrl(url);
+    if (!safeUrl) return '';
+    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+    return stash(`<figure class="question-md-figure"><img class="question-md-image" src="${escapeHtml(safeUrl)}" alt="${escapeHtml(alt)}" loading="lazy"${titleAttr} />${alt ? `<figcaption>${escapeHtml(alt)}</figcaption>` : ''}</figure>`);
+  });
+  text = text.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_match, label, url, title) => {
+    const safeUrl = safeMarkdownUrl(url);
+    if (!safeUrl) return escapeHtml(label);
+    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+    return stash(`<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${escapeHtml(label)}</a>`);
+  });
+  text = text.replace(/`([^`]+)`/g, (_match, code) => stash(`<code>${escapeHtml(code)}</code>`));
+  text = escapeHtml(text)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/__([^_]+)__/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/_([^_]+)_/g, '<em>$1</em>')
+    .replace(/~~([^~]+)~~/g, '<del>$1</del>')
+    .replace(/\n/g, '<br />');
+  return text.replace(/\u0000(\d+)\u0000/g, (_match, index) => tokens[Number(index)] || '');
+
+}
+
+function renderMarkdownTable(lines) {
+  const cells = (line) => String(line || '').trim().replace(/^\||\|$/g, '').split('|').map((cell) => renderMarkdownInline(cell.trim()));
+  const header = cells(lines[0]);
+  const body = lines.slice(2).map((line) => cells(line));
+  return `<div class="question-md-table-wrap"><table class="question-md-table"><thead><tr>${header.map((cell) => `<th>${cell}</th>`).join('')}</tr></thead><tbody>${body.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+function renderQuestionMarkdown(source) {
+  const text = String(source || '').replace(/\r\n?/g, '\n');
+  if (!text.trim()) return '';
+  const lines = text.split('\n');
+  const html = [];
+  let index = 0;
+  while (index < lines.length) {
+    const line = lines[index];
+    const trimmed = line.trim();
+    if (!trimmed) {
+      index += 1;
+      continue;
+    }
+    if (/^```/.test(trimmed)) {
+      const fence = trimmed.slice(3).trim();
+      const code = [];
+      index += 1;
+      while (index < lines.length && !/^```/.test(lines[index].trim())) {
+        code.push(lines[index]);
+        index += 1;
+      }
+      if (index < lines.length) index += 1;
+      html.push(`<pre class="question-md-pre"><code class="language-${escapeHtml(fence || 'text')}">${escapeHtml(code.join('\n'))}</code></pre>`);
+      continue;
+    }
+    if (trimmed.includes('|') && index + 1 < lines.length && /^\s*\|?\s*[:-]-*.*\|/.test(lines[index + 1])) {
+      const tableLines = [line, lines[index + 1]];
+      index += 2;
+      while (index < lines.length && lines[index].includes('|') && lines[index].trim()) {
+        tableLines.push(lines[index]);
+        index += 1;
+      }
+      html.push(renderMarkdownTable(tableLines));
+      continue;
+    }
+    const heading = trimmed.match(/^(#{1,6})\s+(.+)$/);
+    if (heading) {
+      const level = Math.min(6, heading[1].length);
+      html.push(`<h${level} class="question-md-h${level}">${renderMarkdownInline(heading[2])}</h${level}>`);
+      index += 1;
+      continue;
+    }
+    if (/^>\s?/.test(trimmed)) {
+      const quote = [];
+      while (index < lines.length && /^>\s?/.test(lines[index].trim())) {
+        quote.push(lines[index].trim().replace(/^>\s?/, ''));
+        index += 1;
+      }
+      html.push(`<blockquote class="question-md-blockquote">${quote.map((part) => `<p>${renderMarkdownInline(part)}</p>`).join('')}</blockquote>`);
+      continue;
+    }
+    if (/^[-*]\s+/.test(trimmed)) {
+      const items = [];
+      while (index < lines.length && /^[-*]\s+/.test(lines[index].trim())) {
+        items.push(lines[index].trim().replace(/^[-*]\s+/, ''));
+        index += 1;
+      }
+      html.push(`<ul class="question-md-list">${items.map((item) => `<li>${renderMarkdownInline(item)}</li>`).join('')}</ul>`);
+      continue;
+    }
+    if (/^\d+[.)]\s+/.test(trimmed)) {
+      const items = [];
+      while (index < lines.length && /^\d+[.)]\s+/.test(lines[index].trim())) {
+        items.push(lines[index].trim().replace(/^\d+[.)]\s+/, ''));
+        index += 1;
+      }
+      html.push(`<ol class="question-md-list ordered">${items.map((item) => `<li>${renderMarkdownInline(item)}</li>`).join('')}</ol>`);
+      continue;
+    }
+    const paragraph = [trimmed];
+    index += 1;
+    while (index < lines.length) {
+      const next = lines[index].trim();
+      if (!next || /^```/.test(next) || /^(#{1,6})\s+/.test(next) || /^>\s?/.test(next) || /^[-*]\s+/.test(next) || /^\d+[.)]\s+/.test(next)) break;
+      if (next.includes('|') && index + 1 < lines.length && /^\s*\|?\s*[:-]-*.*\|/.test(lines[index + 1])) break;
+      paragraph.push(next);
+      index += 1;
+    }
+    html.push(`<p>${renderMarkdownInline(paragraph.join('\n'))}</p>`);
+  }
+  return `<div class="question-markdown">${html.join('')}</div>`;
+}
+
 function updateRandomButtons() {
   const button = $('shuffleBtn');
   if (!button) return;
@@ -4279,12 +4636,30 @@ $('questionSessionModeSelect')?.addEventListener('change', () => {
 });
 $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
 $('openQuestionImportBtn')?.addEventListener('click', openQuestionImportDialog);
+$('questionBankToggleBtn')?.addEventListener('click', () => toggleQuestionBankBrowser());
+$('questionBankRefreshBtn')?.addEventListener('click', () => loadQuestionBankBrowser().catch(() => {}));
+$('questionBankLoadBtn')?.addEventListener('click', () => openQuestionBankSession(0));
+['questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
+  $(id)?.addEventListener('change', () => loadQuestionBankBrowser().catch(() => {}));
+  $(id)?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      loadQuestionBankBrowser().catch(() => {});
+    }
+  });
+});
 
 $('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);
 $('questionHistoryBtn')?.addEventListener('click', openQuestionHistory);
 $('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(false));
 $('finishQuestionSessionBtn')?.addEventListener('click', finishQuestionSession);
 $('questionImportApplyBtn')?.addEventListener('click', importQuestionsFromText);
+$('questionBankList')?.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-question-bank-index]');
+  if (!button) return;
+  const index = Number.parseInt(button.dataset.questionBankIndex || '', 10);
+  if (Number.isInteger(index)) openQuestionBankSession(index);
+});
 
 $('prevQuestionBtn')?.addEventListener('click', () => moveQuestion(-1));
 $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
@@ -4331,6 +4706,16 @@ $('bookmarkBtn').addEventListener('click', toggleBookmark);
 $('copyBookmarksBtn').addEventListener('click', copyBookmarkedTerms);
 $('memoSaveBtn').addEventListener('click', saveMemo);
 $('conceptImageGenerateBtn')?.addEventListener('click', previewConceptImage);
+$('conceptImageZoomOutBtn')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  stepConceptImageScale(-CONCEPT_IMAGE_SCALE_STEP);
+});
+$('conceptImageZoomInBtn')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  stepConceptImageScale(CONCEPT_IMAGE_SCALE_STEP);
+});
 $('conceptImageZoomBtn')?.addEventListener('click', (event) => {
   event.preventDefault();
   event.stopPropagation();

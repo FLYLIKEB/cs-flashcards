@@ -826,6 +826,30 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed['summary']['total'], 1)
             self.assertEqual(listed['items'][0]['question_bank_id'], question['question_bank_id'])
 
+    def test_read_question_bank_entries_seeds_demo_and_filters(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            seeded = flashcard_app.read_question_bank_entries(csv_path, db_path, limit=10)
+            self.assertEqual(seeded['summary']['total'], 1)
+            self.assertEqual(seeded['items'][0]['issuer'], '샘플')
+            self.assertEqual(seeded['items'][0]['topic'], '데이터베이스')
+            self.assertIn('/static/favicon.svg', seeded['items'][0]['body'])
+
+            filtered = flashcard_app.read_question_bank_entries(
+                csv_path,
+                db_path,
+                issuer='샘플',
+                difficulty='중',
+                topic='데이터',
+                query='정규화',
+                limit=10,
+            )
+            self.assertEqual(filtered['summary']['total'], 1)
+            self.assertEqual(filtered['items'][0]['field_name'], '데모')
     def test_old_progress_schema_migrates_for_bookmark_and_memo_columns(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

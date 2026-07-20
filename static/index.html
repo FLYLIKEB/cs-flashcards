@@ -207,10 +207,12 @@
             </label>
             <button id="generateQuestionsBtn" class="question-toolbar-button is-primary" type="button">생성</button>
             <button id="openQuestionImportBtn" class="question-toolbar-button" type="button" title="NotebookLM 등에서 만든 문제 세트 붙여넣기">가져오기</button>
+            <button id="questionBankToggleBtn" class="question-toolbar-button" type="button" title="DB 문제은행 목록 열기">문제은행</button>
             <button id="finishQuestionSessionBtn" class="question-toolbar-button" type="button" title="현재 모의 세트 종료 및 저장">종료</button>
             <button id="openAiQuizSearchBtn" class="question-toolbar-button" type="button" title="선택한 유형과 문제 수로 Google AI 검색 열기">AI</button>
             <button id="questionHistoryBtn" class="question-toolbar-button" type="button" title="현재 필터 기준 문제 기록 보기">기록</button>
             <button id="closeQuestionModeBtn" class="question-toolbar-button is-ghost" type="button" aria-label="문제 풀이 닫기" title="문제 풀이 닫기">×</button>
+
 
           </div>
 
@@ -221,6 +223,41 @@
           <label><input id="questionTypeMultipleChoice" type="checkbox" value="multiple_choice" checked /> 객관식</label>
           <label><input id="questionTypeEssay" type="checkbox" value="essay" checked /> 논술형</label>
         </div>
+        <section id="questionBankBrowser" class="question-bank-browser" hidden aria-label="문제은행 목록">
+          <div class="question-bank-head">
+            <div>
+              <strong>문제은행</strong>
+              <p id="questionBankSummary" class="muted question-bank-summary">저장된 문제를 불러오는 중입니다.</p>
+            </div>
+            <div class="question-bank-actions">
+              <button id="questionBankRefreshBtn" class="question-toolbar-button" type="button">조회</button>
+              <button id="questionBankLoadBtn" class="question-toolbar-button is-primary" type="button">현재 목록 풀기</button>
+            </div>
+          </div>
+          <div class="question-bank-filter-grid">
+            <input id="questionBankQueryInput" type="search" placeholder="문제/정답/키워드 검색" />
+            <input id="questionBankTopicInput" type="search" placeholder="문제유형(예: 데이터베이스)" />
+            <input id="questionBankFieldInput" type="search" placeholder="분야(예: 전산학술)" />
+            <input id="questionBankIssuerInput" type="search" placeholder="출제기관(예: 한국은행)" />
+            <input id="questionBankSourceInput" type="search" placeholder="출제위치(예: 2013년 학술파트 1)" />
+            <select id="questionBankDifficultySelect">
+              <option value="">난이도 *</option>
+              <option value="상">상</option>
+              <option value="중">중</option>
+              <option value="하">하</option>
+            </select>
+            <select id="questionBankTypeSelect">
+              <option value="">형식 *</option>
+              <option value="short">주관식</option>
+              <option value="subjective">서술형</option>
+              <option value="multiple_choice">객관식</option>
+              <option value="essay">논술형</option>
+            </select>
+            <input id="questionBankSectionInput" type="search" placeholder="섹션(예: 전공필기)" />
+          </div>
+          <ol id="questionBankList" class="question-bank-list"></ol>
+          <p id="questionBankError" class="message question-bank-error" role="status"></p>
+        </section>
         <article id="questionCard" class="question-card" aria-live="polite">
           <div class="question-card-empty muted">문제 생성을 누르면 현재 필터의 카드들로 문제가 만들어집니다.</div>
         </article>
@@ -275,7 +312,9 @@
               </div>
               <figure id="backConceptImageWrap" class="concept-image-wrap" hidden>
                 <div class="concept-image-actions" aria-label="개념 이미지 제어">
-                  <button id="conceptImageZoomBtn" class="concept-image-action zoom has-tip" type="button" title="이미지 크게 보기" data-tip="이미지 크게 보기" aria-label="이미지 크게 보기">확대</button>
+                  <button id="conceptImageZoomOutBtn" class="concept-image-action zoom-step has-tip" type="button" title="이미지 축소" data-tip="이미지 축소" aria-label="이미지 축소">−</button>
+                  <button id="conceptImageZoomInBtn" class="concept-image-action zoom-step has-tip" type="button" title="이미지 확대" data-tip="이미지 확대" aria-label="이미지 확대">+</button>
+                  <button id="conceptImageZoomBtn" class="concept-image-action zoom has-tip" type="button" title="이미지 크게 보기" data-tip="이미지 크게 보기" aria-label="이미지 크게 보기">보기</button>
                   <button id="conceptImageGenerateBtn" class="concept-image-action has-tip" type="button" title="AI 이미지 재생성" data-tip="AI 이미지 재생성">AI</button>
                 </div>
                 <img id="backConceptImage" class="concept-image" alt="" loading="lazy" decoding="async" />
