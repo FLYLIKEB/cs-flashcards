@@ -198,12 +198,15 @@ class StaticFrontendTests(unittest.TestCase):
         popup_block = APP_JS.split('function renderMindMapWindow() {', 1)[1].split('function bootstrapMindMapPopupWindow() {', 1)[0]
         for snippet in [
             '카테고리형 마인드맵',
-            '현재 필터 카드 → 대분류 → 카드',
+            '현재 필터 카드 → 대분류 → 소분류 → 카드',
             'mindmap-root-card',
             'mindmap-category-branch',
             'mindmap-category-node',
+            'mindmap-subbranch',
+            'mindmap-subbranch-head',
             'mindmap-leaf-grid',
             '대분류',
+            '소분류',
             '직접 연결',
         ]:
             self.assertIn(snippet, popup_block)
@@ -227,6 +230,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="bankPageCategoryInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
 
         self.assertIn('문제 풀이 · 문제은행', QUESTION_BANK_HTML)
@@ -236,7 +240,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_PRACTICE_COLLAPSED_KEY', QUESTION_BANK_JS)
         self.assertIn('function populateIssuerOptions(', QUESTION_BANK_JS)
+        self.assertIn('function populateCategoryOptions(', QUESTION_BANK_JS)
         self.assertIn('available_issuers', QUESTION_BANK_JS)
+        self.assertIn('available_categories', QUESTION_BANK_JS)
 
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
@@ -456,6 +462,8 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionBankQueryInput"',
             'id="questionBankTopicInput"',
             'id="questionBankFieldInput"',
+            'id="questionBankCategoryInput"',
+            '<select id="questionBankCategoryInput"',
             'id="questionBankIssuerInput"',
             '<select id="questionBankIssuerInput"',
 

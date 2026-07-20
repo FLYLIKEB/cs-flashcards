@@ -2880,6 +2880,22 @@ function buildMindMapGraphData(cards = state.filtered, currentCardId = state.fil
     group.count = group.cards.length;
     group.hasCurrent = group.cards.some((card) => card.isCurrent);
     group.directCount = group.cards.filter((card) => card.directToCurrent).length;
+    const primaryCards = group.cards.filter((card) => card.isCurrent || card.directToCurrent);
+    const secondaryCards = group.cards.filter((card) => !card.isCurrent && !card.directToCurrent);
+    group.subgroups = [
+      primaryCards.length ? {
+        key: 'primary',
+        label: '핵심 가지',
+        caption: group.hasCurrent ? '현재 카드와 직접 연결된 카드' : '현재 카드와 직접 연결된 카드',
+        cards: primaryCards,
+      } : null,
+      secondaryCards.length ? {
+        key: 'secondary',
+        label: '확장 가지',
+        caption: '같은 대분류에 속한 나머지 카드',
+        cards: secondaryCards,
+      } : null,
+    ].filter(Boolean);
     return group;
   }).sort((a, b) => Number(b.hasCurrent) - Number(a.hasCurrent)
     || Number(b.directCount > 0) - Number(a.directCount > 0)
@@ -3157,6 +3173,50 @@ function renderMindMapWindow() {
       font-size: .9rem;
       line-height: 1.45;
     }
+    .mindmap-subbranches {
+      display: grid;
+      gap: 12px;
+    }
+    .mindmap-subbranch {
+      position: relative;
+      display: grid;
+      gap: 10px;
+      padding-left: 18px;
+    }
+    .mindmap-subbranch::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: rgba(148, 163, 184, 0.38);
+    }
+    .mindmap-subbranch-head {
+      position: relative;
+      display: grid;
+      gap: 3px;
+      padding: 8px 10px 8px 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: .88rem;
+    }
+    .mindmap-subbranch-head::before {
+      content: '';
+      position: absolute;
+      left: -18px;
+      top: 50%;
+      width: 18px;
+      border-top: 2px solid rgba(148, 163, 184, 0.38);
+    }
+    .mindmap-subbranch-head strong {
+      color: #0f172a;
+      font-size: .94rem;
+    }
+    .mindmap-subbranch-head small {
+      color: #64748b;
+    }
     .mindmap-leaf-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
@@ -3268,9 +3328,9 @@ function renderMindMapWindow() {
     <section class="mindmap-panel">
       <header class="mindmap-head">
         <p class="mindmap-kicker">카테고리형 마인드맵</p>
-        <h1 class="mindmap-title">현재 필터 카드 → 대분류 → 카드</h1>
+        <h1 class="mindmap-title">현재 필터 카드 → 대분류 → 소분류 → 카드</h1>
         <p class="mindmap-summary">${escapeHtml(summaryText)} · 펼친 카드 ${layout.totalCards}개 · 대분류 ${layout.totalCategories}개</p>
-        <p class="mindmap-hint">현재 필터 카드들을 대분류별로 묶었습니다. 대분류를 펼치면 카드로 내려가고, 카드를 누르면 원본 창으로 이동합니다.</p>
+        <p class="mindmap-hint">현재 필터 카드들을 대분류와 소분류 가지로 나눠서 나무처럼 펼쳤습니다. 가지를 따라 카드로 내려가고, 카드를 누르면 원본 창으로 이동합니다.</p>
       </header>
       <div class="mindmap-tree-panel">
         ${layout.totalCards ? `
@@ -3278,7 +3338,7 @@ function renderMindMapWindow() {
             <article class="mindmap-root-card">
               <p class="mindmap-root-kicker">현재 필터 카드</p>
               <h2 class="mindmap-root-title">${escapeHtml(summaryText || '전체 카드')}</h2>
-              <p class="mindmap-root-summary">현재 카드 중심으로 직접 연결 카드와 같은 필터 카드들을 대분류 → 카드 순서로 정리했습니다.</p>
+              <p class="mindmap-root-summary">현재 카드 중심으로 직접 연결 카드와 같은 필터 카드들을 대분류 → 소분류 → 카드 순서의 가지 구조로 정리했습니다.</p>
               ${currentCard ? `
                 <div class="mindmap-current-card">
                   <span>현재 카드</span>
@@ -3328,21 +3388,31 @@ function renderMindMapWindow() {
                   </summary>
                   <div class="mindmap-branch-body">
                     <div class="mindmap-branch-caption">${escapeHtml(categoryHint)}</div>
-                    <div class="mindmap-leaf-grid">
-                      ${group.cards.map((node) => {
-                        const cardSoft = `${node.color}14`;
-                        const badges = [
-                          node.isCurrent ? '<span class="mindmap-badge current">현재 카드</span>' : '',
-                          node.directToCurrent ? '<span class="mindmap-badge direct">직접 연결</span>' : '',
-                          `<span class="mindmap-badge links">연결 ${node.visibleLinkCount}개</span>`,
-                        ].join('');
-                        return `<button class="mindmap-leaf${node.isCurrent ? ' current' : ''}" type="button" data-card-id="${escapeHtml(node.id)}" style="border-color: ${escapeHtml(borderColor)}; background: linear-gradient(180deg, #ffffff 0%, ${escapeHtml(cardSoft)} 100%);">
+                    <div class="mindmap-subbranches">
+                      ${group.subgroups.map((subgroup) => `
+                        <section class="mindmap-subbranch mindmap-subbranch-${subgroup.key}">
+                          <div class="mindmap-subbranch-head">
+                            <strong>소분류 · ${escapeHtml(subgroup.label)}</strong>
+                            <small>${escapeHtml(subgroup.caption)}</small>
+                          </div>
+                          <div class="mindmap-leaf-grid">
+                            ${subgroup.cards.map((node) => {
+                              const cardSoft = `${node.color}14`;
+                              const badges = [
+                                node.isCurrent ? '<span class="mindmap-badge current">현재 카드</span>' : '',
+                                node.directToCurrent ? '<span class="mindmap-badge direct">직접 연결</span>' : '',
+                                `<span class="mindmap-badge links">연결 ${node.visibleLinkCount}개</span>`,
+                              ].join('');
+                              return `<button class="mindmap-leaf${node.isCurrent ? ' current' : ''}" type="button" data-card-id="${escapeHtml(node.id)}" style="border-color: ${escapeHtml(borderColor)}; background: linear-gradient(180deg, #ffffff 0%, ${escapeHtml(cardSoft)} 100%);">
                           <span class="mindmap-leaf-badges">${badges}</span>
                           <strong>${escapeHtml(node.term)}</strong>
                           ${node.english ? `<span class="mindmap-leaf-english">${escapeHtml(node.english)}</span>` : ''}
                           <small>${node.visibleLinkCount ? `현재 필터 연결 ${node.visibleLinkCount}개` : '현재 필터 연결 없음'}</small>
                         </button>`;
-                      }).join('')}
+                            }).join('')}
+                          </div>
+                        </section>
+                      `).join('')}
                     </div>
                   </div>
                 </details>`;
@@ -4293,6 +4363,7 @@ function questionBankFilterValues() {
     q: $('questionBankQueryInput')?.value?.trim() || '',
     topic: $('questionBankTopicInput')?.value?.trim() || '',
     field_name: $('questionBankFieldInput')?.value?.trim() || '',
+    category: $('questionBankCategoryInput')?.value?.trim() || '',
     issuer: $('questionBankIssuerInput')?.value?.trim() || '',
     source_location: $('questionBankSourceInput')?.value?.trim() || '',
     difficulty: $('questionBankDifficultySelect')?.value || '',
@@ -4330,6 +4401,20 @@ function populateQuestionBankIssuerOptions(issuers, selected = '') {
   });
   select.innerHTML = options.join('');
   select.value = (Array.isArray(issuers) && issuers.includes(selectedValue)) ? selectedValue : '';
+}
+
+function populateQuestionBankCategoryOptions(categories, selected = '') {
+  const select = $('questionBankCategoryInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || '').trim();
+  const options = ['<option value="">카테고리 *</option>'];
+  (Array.isArray(categories) ? categories : []).forEach((category) => {
+    const value = String(category || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(categories) && categories.includes(selectedValue)) ? selectedValue : '';
 }
 
 
@@ -4392,7 +4477,10 @@ function renderQuestionBankBrowser() {
     const active = state.questionBankSelectedId && state.questionBankSelectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
     const typeLabel = escapeHtml(questionTypeBadge(item) || '');
-    const topic = escapeHtml(item.topic || item.card_category || '');
+    const topic = escapeHtml([
+      String(item.category || item.card_category || '').trim(),
+      String(item.topic || '').trim(),
+    ].filter((value, index, array) => value && array.indexOf(value) === index).join(' · '));
     const issuer = escapeHtml(item.issuer || '');
     const difficulty = escapeHtml(item.difficulty || '');
     const source = escapeHtml(item.source_location || '');
@@ -4434,6 +4522,7 @@ async function loadQuestionBankBrowser() {
     state.questionBankItems = Array.isArray(data.items) ? data.items : [];
     state.questionBankSummary = data.summary || {total: state.questionBankItems.length, returned: state.questionBankItems.length};
     populateQuestionBankIssuerOptions(state.questionBankSummary?.available_issuers || [], questionBankFilterValues().issuer);
+    populateQuestionBankCategoryOptions(state.questionBankSummary?.available_categories || [], questionBankFilterValues().category);
 
     if (!state.questionBankSelectedId && state.questionBankItems[0]?.question_bank_id) {
       state.questionBankSelectedId = String(state.questionBankItems[0].question_bank_id);
@@ -4442,6 +4531,7 @@ async function loadQuestionBankBrowser() {
     state.questionBankItems = [];
     state.questionBankSummary = {total: 0, returned: 0};
     populateQuestionBankIssuerOptions([], questionBankFilterValues().issuer);
+    populateQuestionBankCategoryOptions([], questionBankFilterValues().category);
     state.questionBankError = error.message || String(error);
   } finally {
     state.questionBankLoading = false;
@@ -4864,7 +4954,7 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankCloseBtn', 'questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankCloseBtn', 'questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -5784,7 +5874,7 @@ $('questionBankToggleBtn')?.addEventListener('click', () => toggleQuestionBankBr
 $('questionBankRefreshBtn')?.addEventListener('click', () => loadQuestionBankBrowser().catch(() => {}));
 $('questionBankLoadBtn')?.addEventListener('click', () => openQuestionBankSession(0));
 $('questionBankCloseBtn')?.addEventListener('click', () => toggleQuestionBankBrowser(false));
-['questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
+['questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankBrowser().catch(() => {}));
   $(id)?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
