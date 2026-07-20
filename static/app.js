@@ -4004,13 +4004,15 @@ function renderQuestionPanel() {
     </div>`;
   const choices = Array.isArray(question.choices) ? question.choices : [];
   const choiceHtml = choices.length ? `
-    <ol class="question-choices">
-      ${choices.map((choice, index) => {
-        const isAnswer = question.answerRevealed && index === question.answer_index;
-        const isSelected = index === question.selectedChoiceIndex;
-        return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${renderMarkdownInline(choice)}</button></li>`;
-      }).join('')}
-    </ol>` : '';
+    <div class="question-surface question-choice-surface">
+      <ol class="question-choices">
+        ${choices.map((choice, index) => {
+          const isAnswer = question.answerRevealed && index === question.answer_index;
+          const isSelected = index === question.selectedChoiceIndex;
+          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${renderMarkdownInline(choice)}</button></li>`;
+        }).join('')}
+      </ol>
+    </div>` : '';
   const answerGuideHtml = question.answerGuide
     ? `<div class="question-answer-guide question-markdown"><strong>답안 가이드</strong>${renderQuestionMarkdown(question.answerGuide)}</div>`
     : '';
@@ -4018,11 +4020,11 @@ function renderQuestionPanel() {
     ? '세트 종료 전까지 정답이 공개되지 않습니다. 실전처럼 답안을 먼저 작성하세요.'
     : '여기에 답안을 적고 정답/해설을 본 뒤 결과를 저장하세요.';
   const draftHtml = questionNeedsManualGrading(question) ? `
-    <div class="question-answer-draft">
+    <div class="question-answer-draft question-surface">
       <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
       <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
       ${answerGuideHtml}
-    </div>` : answerGuideHtml;
+    </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
     <div class="question-rubric">
       <strong>채점 포인트</strong>
@@ -4053,7 +4055,7 @@ function renderQuestionPanel() {
       </div>
     </div>` : '';
   const answer = question.answerRevealed ? `
-    <div class="question-answer">
+    <div class="question-answer question-surface question-answer-surface">
       <strong>정답/모범답안</strong>
       <div class="question-answer-markdown">${renderQuestionMarkdown(question.answer || '')}</div>
       ${question.explanation ? `<div class="question-explanation-markdown">${renderQuestionMarkdown(question.explanation)}</div>` : ''}
@@ -4061,14 +4063,22 @@ function renderQuestionPanel() {
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+  const sessionMode = question.sessionMode || state.questionSessionMode;
+  const sessionModeLabelText = questionSessionModeLabel(sessionMode);
   const lockNoticeHtml = revealLocked ? `
-    <div class="question-session-lock">
+    <div class="question-session-lock question-side-note">
       <strong>한은 모드</strong>
       <p>세트 종료 전까지 정답과 해설이 잠겨 있습니다. 전 문항을 먼저 풀고 제출한 뒤 문항별로 회고하세요.</p>
     </div>` : '';
+  const sideStateHtml = revealLocked
+    ? lockNoticeHtml
+    : `<div class="question-side-note">
+        <span class="question-side-note-label">풀이 상태</span>
+        <p>${escapeHtml(question.answerRevealed ? '정답과 해설을 확인하고 채점 결과를 남기세요.' : '답안을 먼저 작성한 뒤 정답/해설을 열어 비교하세요.')}</p>
+      </div>`;
   const sessionMeta = [
     state.questionSessionTitle || question.sessionTitle,
-    questionSessionModeLabel(question.sessionMode || state.questionSessionMode),
+    sessionModeLabelText,
     question.section || '',
     question.fieldName || '',
     question.issuer || '',
@@ -4079,25 +4089,43 @@ function renderQuestionPanel() {
     Number.isInteger(question.expectedTimeSeconds) ? `권장 ${formatElapsedClock(question.expectedTimeSeconds)}` : '',
     `문항 시간 ${formatElapsedClock(currentQuestionElapsedSeconds(question))}`,
   ].filter(Boolean).join(' · ');
+  const progressPercent = total ? Math.max(0, Math.min(100, Math.round(((state.questionIndex + 1) / total) * 100))) : 0;
+  const questionPosition = total ? `문항 ${state.questionIndex + 1} / ${total}` : '문항';
+  const bodyHtml = question.body ? `<div class="question-body question-surface">${renderQuestionMarkdown(question.body)}</div>` : '';
   card.innerHTML = `
-    <div class="question-meta">
-      <span class="badge">${escapeHtml(questionTypeBadge(question))}</span>
-      <span class="badge">${escapeHtml(question.category || '미분류')}</span>
-      ${question.fieldName ? `<span class="badge">${escapeHtml(question.fieldName)}</span>` : ''}
-      ${question.issuer ? `<span class="badge">${escapeHtml(question.issuer)}</span>` : ''}
-      ${question.difficulty ? `<span class="badge">난이도 ${escapeHtml(question.difficulty)}</span>` : ''}
-      ${question.section ? `<span class="badge">${escapeHtml(question.section)}</span>` : ''}
-      ${Number.isInteger(question.points) ? `<span class="badge">${escapeHtml(String(question.points))}점</span>` : ''}
-      ${question.judgment !== 'pending' ? `<span class="badge">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>` : ''}
+    <div class="question-card-shell">
+      <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
+      <div class="question-card-head">
+        <div class="question-card-head-copy">
+          <p class="question-card-kicker">${escapeHtml(sessionModeLabelText)} · ${escapeHtml(questionPosition)}</p>
+          <h2 class="question-card-title">${escapeHtml(questionTypeBadge(question))} · ${escapeHtml(question.category || '미분류')}</h2>
+          <p class="question-session-meta">${escapeHtml(sessionMeta)}</p>
+        </div>
+        <div class="question-meta">
+          <span class="badge">${escapeHtml(questionTypeBadge(question))}</span>
+          <span class="badge">${escapeHtml(question.category || '미분류')}</span>
+          ${question.fieldName ? `<span class="badge">${escapeHtml(question.fieldName)}</span>` : ''}
+          ${question.issuer ? `<span class="badge">${escapeHtml(question.issuer)}</span>` : ''}
+          ${question.difficulty ? `<span class="badge">난이도 ${escapeHtml(question.difficulty)}</span>` : ''}
+          ${question.section ? `<span class="badge">${escapeHtml(question.section)}</span>` : ''}
+          ${Number.isInteger(question.points) ? `<span class="badge">${escapeHtml(String(question.points))}점</span>` : ''}
+          ${question.judgment !== 'pending' ? `<span class="badge">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>` : ''}
+        </div>
+      </div>
+      <div class="question-card-grid">
+        <div class="question-main-stack">
+          <div class="question-prompt question-surface">${renderQuestionMarkdown(question.prompt || '문제')}</div>
+          ${bodyHtml}
+          ${choiceHtml}
+          ${draftHtml}
+          ${answer}
+        </div>
+        <aside class="question-side-stack">
+          ${sideStateHtml}
+          ${reviewBoxHtml}
+        </aside>
+      </div>
     </div>
-    <p class="question-session-meta">${escapeHtml(sessionMeta)}</p>
-    <div class="question-prompt">${renderQuestionMarkdown(question.prompt || '문제')}</div>
-    <div class="question-body">${renderQuestionMarkdown(question.body || '')}</div>
-    ${lockNoticeHtml}
-    ${reviewBoxHtml}
-    ${draftHtml}
-    ${choiceHtml}
-    ${answer}
   `;
   $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex <= 0;
   $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex >= total - 1;
