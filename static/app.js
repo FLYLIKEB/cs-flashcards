@@ -2979,12 +2979,14 @@ function renderFlashcardTableWindow() {
       window.setTimeout(() => {
         try {
           openerRef[callbackName](...args);
+          window.focus();
         } catch (_error) {}
       }, 0);
       return true;
     };
     const activateRow = (row) => {
       if (!row) return;
+      try { row.focus({preventScroll: true}); } catch (_error) {}
       invokeOpener('__csFlashcardsSelectCardFromTable', row.dataset.rowCardId || '');
     };
     document.addEventListener('click', (event) => {
