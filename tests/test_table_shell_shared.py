@@ -46,6 +46,8 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('.question-bank-item-preview', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-shell-grid', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-frame', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-shell-table-pane #bankPageList .cs-table-wrap', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-shell-table-pane .cs-table th', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
 

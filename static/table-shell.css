@@ -28,13 +28,28 @@ body.cs-table-page {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(420px, .92fr);
   gap: 12px;
-  align-items: start;
+  align-items: stretch;
+  min-height: calc(100vh - 24px);
 }
 
 .question-bank-shell-pane {
   min-width: 0;
+  min-height: 0;
   display: grid;
   gap: 10px;
+}
+.question-bank-shell-table-pane,
+.question-bank-shell-practice-pane {
+  overflow: hidden;
+  background: #fff;
+}
+
+.question-bank-shell-practice-pane {
+  z-index: 1;
+}
+
+.question-bank-shell-table-pane {
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
 }
 
 .question-bank-shell-pane > .cs-table-meta {
@@ -48,7 +63,12 @@ body.cs-table-page {
 }
 
 .question-bank-shell-practice-pane {
+  position: sticky;
+  top: 12px;
   align-content: start;
+  align-self: start;
+  height: calc(100vh - 24px);
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .question-bank-practice-meta {
@@ -60,7 +80,8 @@ body.cs-table-page {
 }
 
 .question-bank-practice-placeholder {
-  min-height: 240px;
+  min-height: 0;
+  height: 100%;
   display: grid;
   place-items: center;
   padding: 14px;
@@ -79,9 +100,31 @@ body.cs-table-page {
 
 .question-bank-practice-frame {
   width: 100%;
-  min-height: calc(100vh - 9.5rem);
+  height: 100%;
+  min-height: 0;
   border: 1px solid var(--cs-table-line);
   background: #fff;
+}
+.question-bank-shell-table-pane #bankPageList,
+.question-bank-shell-table-pane #bankPageList .cs-table-wrap {
+  min-height: 0;
+  height: 100%;
+}
+
+.question-bank-shell-table-pane #bankPageList .cs-table-wrap {
+  overflow: auto;
+}
+
+.question-bank-shell-table-pane .cs-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.question-bank-shell-table-pane .cs-table-wrap,
+.question-bank-practice-frame,
+.question-bank-practice-placeholder {
+  border-radius: 0;
 }
 
 .cs-table-meta {
@@ -292,9 +335,22 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
 @media (max-width: 1180px) {
   .question-bank-shell-grid {
     grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+  }
+
+  .question-bank-shell-practice-pane {
+    position: static;
+    top: auto;
+    height: auto;
+    grid-template-rows: auto auto;
   }
 
   .question-bank-practice-frame {
     min-height: 72vh;
+  }
+
+  .question-bank-shell-table-pane #bankPageList,
+  .question-bank-shell-table-pane #bankPageList .cs-table-wrap {
+    height: auto;
   }
 }
