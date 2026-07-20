@@ -3555,7 +3555,7 @@ select,
   display: block;
   width: auto;
   max-width: 100%;
-  max-height: clamp(150px, 27vh, 250px);
+  max-height: clamp(165px, 30vh, 280px);
   object-fit: contain;
   margin: 0 auto;
   cursor: pointer;
@@ -3597,7 +3597,7 @@ select,
 }
 @media (max-width: 720px) {
   .concept-image-wrap { margin: .42rem 0 .55rem; }
-  .concept-image { max-height: 180px; }
+  .concept-image { max-height: 205px; }
   .concept-image-actions {
     top: .38rem;
     right: .38rem;

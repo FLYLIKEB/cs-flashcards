@@ -111,6 +111,8 @@ class StaticFrontendTests(unittest.TestCase):
             '.concept-image-modal-image',
         ]:
             self.assertIn(snippet, STYLE_CSS)
+        self.assertIn('max-height: clamp(165px, 30vh, 280px);', STYLE_CSS)
+        self.assertIn('.concept-image { max-height: 205px; }', STYLE_CSS)
         self.assertIn('id="conceptImageZoomBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageDialog"', INDEX_HTML)
 
