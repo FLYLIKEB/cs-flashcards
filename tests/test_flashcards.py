@@ -18,6 +18,7 @@ BASE_FIELDS = [
     'related_concepts', 'source_files', 'exam_note', 'bok_appeared', 'importance', 'difficulty',
 ]
 IMAGE_FIELDS = ['concept_image_url', 'concept_image_alt']
+MEDIA_FIELDS = ['concept_media_type', 'concept_media_payload']
 REVIEW_FIELDS = ['known_status', 'last_reviewed', 'review_count']
 
 
@@ -26,13 +27,14 @@ def write_sample(
     *,
     include_review: bool = False,
     include_image: bool = False,
+    include_media: bool = False,
     status: str = '',
     count: str = '0',
     term: str = '테스트',
     english: str = 'Test',
     source_files: str = 'sample.md',
 ):
-    fieldnames = BASE_FIELDS + (IMAGE_FIELDS if include_image else []) + (REVIEW_FIELDS if include_review else [])
+    fieldnames = BASE_FIELDS + (IMAGE_FIELDS if include_image else []) + (MEDIA_FIELDS if include_media else []) + (REVIEW_FIELDS if include_review else [])
     with path.open('w', encoding='utf-8-sig', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -54,6 +56,11 @@ def write_sample(
             row.update({
                 'concept_image_url': 'https://example.com/test-concept.png',
                 'concept_image_alt': '테스트 개념 이해 이미지',
+            })
+        if include_media:
+            row.update({
+                'concept_media_type': 'mermaid',
+                'concept_media_payload': 'graph TD\n  A[테스트] --> B[흐름]',
             })
         if include_review:
             row.update({
@@ -157,6 +164,17 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['concept_image_url'], 'https://example.com/test-concept.png')
             self.assertEqual(rows[0]['concept_image_alt'], '테스트 개념 이해 이미지')
 
+    def test_read_cards_preserves_concept_media_fields(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = Path(td) / 'cards.csv'
+            db_path = Path(td) / 'progress.sqlite'
+            write_sample(csv_path, include_image=True, include_media=True)
+            rows, fields = read_cards(csv_path, db_path)
+            self.assertIn('concept_media_type', fields)
+            self.assertIn('concept_media_payload', fields)
+            self.assertEqual(rows[0]['concept_media_type'], 'mermaid')
+            self.assertEqual(rows[0]['concept_media_payload'], 'graph TD\n  A[테스트] --> B[흐름]')
+
     def test_read_cards_migrates_existing_csv_progress_once(self):
         with tempfile.TemporaryDirectory() as td:
             csv_path = Path(td) / 'cards.csv'
@@ -220,6 +238,30 @@ class FlashcardProgressTests(unittest.TestCase):
                 ).fetchone()
             self.assertEqual(legacy, ('', '', '', '', ''))
 
+
+    def test_api_cards_reads_sqlite_when_runtime_csv_missing(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            missing_csv = root / 'missing.csv'
+            write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
+
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            try:
+                flashcard_app.CSV_PATH = missing_csv
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                data = flashcard_app.api_cards()
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
+
+            self.assertEqual(len(data['cards']), 1)
+            self.assertEqual(data['cards'][0]['definition'], '정의')
+            self.assertEqual(data['cards'][0]['concept_image_url'], 'https://example.com/test-concept.png')
+            self.assertEqual(data['summary']['content_db_path'], str(db_path.resolve()))
 
     def test_mark_card_persists_status_to_sqlite_not_csv(self):
         with tempfile.TemporaryDirectory() as td:
@@ -337,6 +379,36 @@ class FlashcardProgressTests(unittest.TestCase):
                     ('CS-001',),
                 ).fetchone()
             self.assertEqual(legacy, ('', '', '', ''))
+
+    def test_update_card_concept_media_updates_sqlite_content(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            backup_dir = root / 'backups'
+            write_sample(csv_path, include_image=True)
+
+            updated, backup_path = flashcard_app.update_card_concept_media(
+                'CS-001',
+                flashcard_app.CardConceptMediaRequest(
+                    concept_media_type='html',
+                    concept_media_payload='<div class="demo">flow</div><script>document.body.dataset.ready = "1";</script>',
+                    concept_image_alt='동적 개념 위젯',
+                ),
+                csv_path,
+                backup_dir,
+                db_path,
+            )
+
+            self.assertEqual(updated['concept_media_type'], 'html')
+            self.assertIn('document.body.dataset.ready', updated['concept_media_payload'])
+            self.assertEqual(updated['concept_image_alt'], '동적 개념 위젯')
+            self.assertIsNotNone(backup_path)
+            saved = sqlite_card_status(db_path)
+            self.assertEqual(saved['concept_media_type'], 'html')
+            self.assertIn('document.body.dataset.ready', saved['concept_media_payload'])
+            self.assertEqual(saved['concept_image_alt'], '동적 개념 위젯')
+            self.assertEqual(saved['concept_image_url'], 'https://example.com/test-concept.png')
 
     def test_rewrite_card_with_codex_parses_json_output(self):
         original_key = flashcard_app.OPENAI_API_KEY
@@ -501,10 +573,14 @@ class FlashcardProgressTests(unittest.TestCase):
             saved = sqlite_card_status(db_path)
             self.assertEqual(saved['concept_image_alt'], 'AI 생성 새 이미지 설명')
             self.assertEqual(saved['concept_image_url'], image_url)
+            self.assertEqual(saved['concept_media_type'], 'image')
+            self.assertEqual(saved['concept_media_payload'], image_url)
             self.assertEqual(csv_status(csv_path)['concept_image_url'], 'https://example.com/test-concept.png')
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['concept_image_url'], image_url)
             self.assertEqual(rows[0]['concept_image_alt'], 'AI 생성 새 이미지 설명')
+            self.assertEqual(rows[0]['concept_media_type'], 'image')
+            self.assertEqual(rows[0]['concept_media_payload'], image_url)
             self.assertFalse((preview_dir / preview_name).exists())
             self.assertEqual(len(list(image_dir.glob('*.png'))), 1)
 
@@ -560,6 +636,36 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app.AI_IMAGE_DIR = original_image_dir
                 flashcard_app.AI_IMAGE_PREVIEW_DIR = original_preview_dir
                 flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_api_card_concept_media_updates_runtime_sqlite(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            backup_dir = root / 'backups'
+            write_sample(csv_path, include_image=True)
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_backup = flashcard_app.BACKUP_DIR
+            try:
+                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.BACKUP_DIR = backup_dir
+                payload = flashcard_app.CardConceptMediaRequest(
+                    concept_media_type='mermaid',
+                    concept_media_payload='graph TD\n  A[CPU] --> B[스케줄링]',
+                    concept_image_alt='CPU 스케줄링 흐름도',
+                )
+                result = flashcard_app.api_card_concept_media('CS-001', payload)
+                self.assertEqual(result['card']['concept_media_type'], 'mermaid')
+                self.assertIn('A[CPU]', result['card']['concept_media_payload'])
+                self.assertEqual(result['card']['concept_image_alt'], 'CPU 스케줄링 흐름도')
+                saved = sqlite_card_status(db_path)
+                self.assertEqual(saved['concept_media_type'], 'mermaid')
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.BACKUP_DIR = original_backup
 
     def test_api_card_ai_image_discard_removes_preview_file(self):
         with tempfile.TemporaryDirectory() as td:

@@ -12,7 +12,7 @@
   <header class="topbar">
     <div>
       <button id="logoRefreshBtn" class="logo-refresh" type="button" title="새로고침" aria-label="새로고침">CS</button>
-      <p id="csvPath" class="muted">CSV 로딩 중...</p>
+      <p id="contentDbPath" class="muted">DB 로딩 중...</p>
     </div>
     <div class="header-search" title="검색">
       <span>⌕</span>
@@ -355,9 +355,15 @@
                   <button id="conceptImageZoomOutBtn" class="concept-image-action zoom-step has-tip" type="button" title="이미지 축소" data-tip="이미지 축소" aria-label="이미지 축소">−</button>
                   <button id="conceptImageZoomInBtn" class="concept-image-action zoom-step has-tip" type="button" title="이미지 확대" data-tip="이미지 확대" aria-label="이미지 확대">+</button>
                   <button id="conceptImageZoomBtn" class="concept-image-action zoom has-tip" type="button" title="이미지 크게 보기" data-tip="이미지 크게 보기" aria-label="이미지 크게 보기">보기</button>
+                  <button id="conceptMediaEditBtn" class="concept-image-action zoom has-tip" type="button" title="개념 미디어 편집" data-tip="개념 미디어">코드</button>
                   <button id="conceptImageGenerateBtn" class="concept-image-action has-tip" type="button" title="AI 이미지 재생성" data-tip="AI 이미지 재생성">AI</button>
                 </div>
-                <img id="backConceptImage" class="concept-image" alt="" loading="lazy" decoding="async" />
+                <div id="backConceptMediaStage" class="concept-media-stage">
+                  <img id="backConceptImage" class="concept-image concept-media-surface" alt="" loading="lazy" decoding="async" hidden />
+                  <video id="backConceptVideo" class="concept-video concept-media-surface" hidden muted loop playsinline controls preload="metadata"></video>
+                  <iframe id="backConceptHtmlFrame" class="concept-media-iframe concept-media-surface" hidden sandbox="allow-scripts" referrerpolicy="no-referrer" loading="lazy" title="개념 동적 시각화"></iframe>
+                  <div id="backConceptMermaid" class="concept-media-mermaid concept-media-surface" hidden aria-label="개념 다이어그램"></div>
+                </div>
                 <div id="backConceptImagePlaceholder" class="concept-image-placeholder" hidden>이미지 없음</div>
               </figure>
               <div class="back-page-toolbar" aria-label="카드 뒷면 페이지 이동">
@@ -499,7 +505,42 @@
         <button id="conceptImageDialogCloseBtn" class="modal-close" type="button" aria-label="확대 이미지 닫기">×</button>
       </div>
       <div class="concept-image-modal-body">
-        <img id="conceptImageDialogImage" class="concept-image-modal-image" alt="" loading="eager" decoding="async" />
+        <div id="conceptImageDialogStage" class="concept-image-modal-stage"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="conceptMediaDialog" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="conceptMediaDialogTitle" hidden>
+    <div class="modal-card concept-media-editor-modal">
+      <div class="modal-header">
+        <div>
+          <h2 id="conceptMediaDialogTitle">개념 미디어 편집</h2>
+          <p class="muted small concept-media-editor-help">GIF/비디오 URL, Mermaid 문법, 또는 sandbox iframe 안에서 돌아갈 HTML 위젯 코드를 붙여넣습니다.</p>
+        </div>
+        <button id="conceptMediaDialogCloseBtn" class="modal-close" type="button" aria-label="개념 미디어 편집 닫기">×</button>
+      </div>
+      <div class="concept-media-editor-body">
+        <label class="concept-media-editor-field">형식
+          <select id="conceptMediaTypeInput">
+            <option value="">기존 이미지 유지</option>
+            <option value="image">이미지</option>
+            <option value="gif">GIF</option>
+            <option value="video">비디오</option>
+            <option value="mermaid">Mermaid</option>
+            <option value="html">HTML 위젯</option>
+          </select>
+        </label>
+        <label class="concept-media-editor-field">URL 또는 코드
+          <textarea id="conceptMediaPayloadInput" class="concept-media-editor-textarea" rows="12" placeholder="https://... 또는 Mermaid/HTML 코드"></textarea>
+        </label>
+        <label class="concept-media-editor-field">설명(alt)
+          <input id="conceptMediaAltInput" type="text" maxlength="4000" placeholder="미디어 설명" />
+        </label>
+        <p id="conceptMediaDialogError" class="error-text concept-media-editor-error"></p>
+        <div class="concept-media-editor-actions">
+          <button id="conceptMediaDialogSaveBtn" class="question-toolbar-button is-primary" type="button">저장</button>
+          <button id="conceptMediaDialogCancelBtn" class="question-toolbar-button" type="button">닫기</button>
+        </div>
       </div>
     </div>
   </div>

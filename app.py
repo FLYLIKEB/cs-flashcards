@@ -59,6 +59,8 @@ CARD_CONTENT_COLUMNS = [
     "difficulty",
     "concept_image_url",
     "concept_image_alt",
+    "concept_media_type",
+    "concept_media_payload",
 ]
 CARD_CONTENT_DB_COLUMNS = [field for field in CARD_CONTENT_COLUMNS if field != "id"]
 VALID_STATUSES = {"O", "X", ""}
@@ -84,6 +86,7 @@ CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "c
 # Legacy-only SQLite columns that older deployments may still carry until they
 # are flushed into the canonical card-content rows.
 AI_PROGRESS_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt")
+CONCEPT_MEDIA_TYPES = {"", "image", "gif", "video", "mermaid", "html"}
 
 OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
 OPENAI_API_BASE = str(os.environ.get("CS_FLASHCARDS_OPENAI_API_BASE", "https://api.openai.com/v1")).rstrip("/")
@@ -212,6 +215,12 @@ class CardAiImageApplyRequest(BaseModel):
     preview_name: str = Field(min_length=5, max_length=255)
 
 
+class CardConceptMediaRequest(BaseModel):
+    concept_media_type: str = Field(default="", max_length=32)
+    concept_media_payload: str = Field(default="", max_length=200000)
+    concept_image_alt: str | None = Field(default=None, max_length=4000)
+
+
 
 
 
@@ -307,12 +316,12 @@ def normalized_bookmarked(value: Any) -> str:
     return "1" if str(value or "").strip().lower() in {"1", "true", "yes", "y", "o", "on"} else "0"
 
 
-def progress_db_for(csv_path: Path, progress_db_path: Path | None = None) -> Path:
+def progress_db_for(csv_path: Path | None = None, progress_db_path: Path | None = None) -> Path:
+    del csv_path  # Legacy bootstrap path no longer participates in runtime card reads.
     if progress_db_path is not None:
         return progress_db_path.expanduser().resolve()
-    if csv_path.resolve() == CSV_PATH:
-        return PROGRESS_DB_PATH
-    return csv_path.with_suffix(".progress.sqlite").resolve()
+    return PROGRESS_DB_PATH
+
 
 
 def read_csv_cards(csv_path: Path = CSV_PATH, *, keep_csv_progress: bool = False) -> tuple[list[dict[str, str]], list[str]]:
@@ -383,6 +392,8 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 difficulty TEXT NOT NULL DEFAULT '',
                 concept_image_url TEXT NOT NULL DEFAULT '',
                 concept_image_alt TEXT NOT NULL DEFAULT '',
+                concept_media_type TEXT NOT NULL DEFAULT '',
+                concept_media_payload TEXT NOT NULL DEFAULT '',
                 sort_order INTEGER NOT NULL DEFAULT 0,
                 updated_at TEXT NOT NULL DEFAULT ''
             )
@@ -405,6 +416,8 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
             "difficulty": "TEXT NOT NULL DEFAULT ''",
             "concept_image_url": "TEXT NOT NULL DEFAULT ''",
             "concept_image_alt": "TEXT NOT NULL DEFAULT ''",
+            "concept_media_type": "TEXT NOT NULL DEFAULT ''",
+            "concept_media_payload": "TEXT NOT NULL DEFAULT ''",
             "sort_order": "INTEGER NOT NULL DEFAULT 0",
             "updated_at": "TEXT NOT NULL DEFAULT ''",
         }
@@ -582,8 +595,8 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 INSERT OR IGNORE INTO cards
                     (card_id, term, english, category, alphabet_index, korean_initial, definition, detailed_explanation,
                      related_concepts, source_files, exam_note, bok_appeared, importance, difficulty,
-                     concept_image_url, concept_image_alt, sort_order, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     concept_image_url, concept_image_alt, concept_media_type, concept_media_payload, sort_order, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 [
                     (
@@ -603,6 +616,8 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                         row.get("difficulty") or "",
                         row.get("concept_image_url") or "",
                         row.get("concept_image_alt") or "",
+                        row.get("concept_media_type") or "",
+                        row.get("concept_media_payload") or "",
                         index,
                         now,
                     )
@@ -610,11 +625,11 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                     if row.get("id")
                 ],
             )
-        if not existed and seed_rows:
+        if seed_rows:
             now = utc_now_iso()
             conn.executemany(
                 """
-                INSERT OR REPLACE INTO card_progress
+                INSERT OR IGNORE INTO card_progress
                     (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
@@ -633,6 +648,7 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                     if row.get("id") and progress_row_is_meaningful(row)
                 ],
             )
+
         conn.commit()
 
 
@@ -773,14 +789,22 @@ def merge_progress(
 
 def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
     db_path = progress_db_for(csv_path, progress_db_path)
-    seed_rows = seed_rows_from_csv(csv_path)
+    seed_rows = seed_rows_from_csv(csv_path) if csv_path is not None and (not db_path.exists()) else None
     ensure_progress_db(db_path, seed_rows)
     sync_legacy_ai_progress_to_db(db_path)
     card_rows, fieldnames = read_card_content(db_path)
+    if not card_rows and csv_path is not None:
+        seed_rows = seed_rows or seed_rows_from_csv(csv_path)
+        if seed_rows:
+            ensure_progress_db(db_path, seed_rows)
+            sync_legacy_ai_progress_to_db(db_path)
+            card_rows, fieldnames = read_card_content(db_path)
     if not card_rows:
         raise FileNotFoundError(f"Card content not found in SQLite: {db_path}")
     rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
+
+
 
 
 def update_card_content_fields(
@@ -791,8 +815,10 @@ def update_card_content_fields(
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
     db_path = progress_db_for(csv_path, progress_db_path)
-    ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+    seed_rows = seed_rows_from_csv(csv_path) if csv_path is not None and (not db_path.exists()) else None
+    ensure_progress_db(db_path, seed_rows)
     sync_legacy_ai_progress_to_db(db_path)
+
     rows, _ = read_card_content(db_path)
     target = next((row for row in rows if row.get("id") == card_id), None)
     if target is None:
@@ -951,12 +977,21 @@ AI_REWRITE_FIELD_LIMITS = {
 AI_CARD_FIELD_LIMITS = {
     **AI_REWRITE_FIELD_LIMITS,
     "concept_image_url": 4096,
+    "concept_media_type": 32,
+    "concept_media_payload": 200000,
 }
 
 
 def normalized_card_text(value: Any, *, limit: int) -> str:
     text = str(value or "").replace("\r\n", "\n").replace("\r", "\n").strip()
     return text[:limit]
+
+
+def normalized_concept_media_type(value: Any) -> str:
+    media_type = str(value or "").strip().lower()
+    if media_type not in CONCEPT_MEDIA_TYPES:
+        raise ValueError("지원하지 않는 개념 미디어 형식입니다.")
+    return media_type
 
 
 def extract_json_object_text(value: str) -> str:
@@ -1160,6 +1195,35 @@ def update_card_ai_content(
             return row, backup_path
     return updated_row, backup_path
 
+
+def update_card_concept_media(
+    card_id: str,
+    payload: CardConceptMediaRequest,
+    csv_path: Path = CSV_PATH,
+    backup_dir: Path = BACKUP_DIR,
+    progress_db_path: Path | None = None,
+) -> tuple[dict[str, str], Path | None]:
+    media_type = normalized_concept_media_type(payload.concept_media_type)
+    media_payload = normalized_card_text(payload.concept_media_payload, limit=AI_CARD_FIELD_LIMITS["concept_media_payload"])
+    if media_type and not media_payload:
+        raise ValueError("개념 미디어 내용을 함께 입력해야 합니다.")
+    if media_payload and not media_type:
+        raise ValueError("개념 미디어 형식을 먼저 선택해야 합니다.")
+    updates: dict[str, str] = {
+        "concept_media_type": media_type,
+        "concept_media_payload": media_payload,
+    }
+    if payload.concept_image_alt is not None:
+        updates["concept_image_alt"] = normalized_card_text(payload.concept_image_alt, limit=AI_REWRITE_FIELD_LIMITS["concept_image_alt"])
+    if media_type in {"image", "gif"} and media_payload:
+        updates["concept_image_url"] = media_payload
+    updated_row, backup_path = update_card_content_fields(card_id, updates, csv_path, backup_dir, progress_db_path)
+    refreshed_rows, _ = read_cards(csv_path, progress_db_for(csv_path, progress_db_path))
+    for row in refreshed_rows:
+        if row.get("id") == card_id:
+            return row, backup_path
+    return updated_row, backup_path
+
 AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
 
 
@@ -1332,7 +1396,7 @@ def apply_ai_concept_image(
     next_alt = normalized_card_text(metadata.get("alt", concept_image_alt_text(target)), limit=4000)
     updated_row, backup_path = update_card_content_fields(
         card_id,
-        {"concept_image_url": next_url, "concept_image_alt": next_alt},
+        {"concept_image_url": next_url, "concept_image_alt": next_alt, "concept_media_type": "image", "concept_media_payload": next_url},
         csv_path,
         backup_dir,
         db_path,
@@ -2674,10 +2738,9 @@ def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         "bookmarked": bookmarked,
         "memo_count": memo_count,
         "categories": categories,
-        "csv_path": str(PROGRESS_DB_PATH),
         "content_db_path": str(PROGRESS_DB_PATH),
-        "bootstrap_csv_path": str(CSV_PATH),
         "progress_db_path": str(PROGRESS_DB_PATH),
+
     }
 
 
@@ -3447,6 +3510,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     page_meta = index["pages"].get(slug, {})
     title = page_meta.get("title") or extract_markdown_title(markdown_text, source_path.stem)
     linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+
     return {
         "slug": slug,
         "title": title,
@@ -3591,6 +3655,7 @@ def api_wiki_raw(relative_path: str) -> FileResponse:
 def api_cards() -> dict[str, Any]:
     try:
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
@@ -3603,6 +3668,7 @@ def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
     try:
         card = mark_card(card_id, payload.known_status, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
@@ -3615,6 +3681,7 @@ def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
     try:
         card = set_bookmark(card_id, payload.bookmarked, CSV_PATH, PROGRESS_DB_PATH)
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
@@ -3627,6 +3694,7 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
     try:
         card = save_memo(card_id, payload.memo, CSV_PATH, PROGRESS_DB_PATH)
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
@@ -3636,6 +3704,7 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
 def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> dict[str, Any]:
     try:
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
         current = next((row for row in rows if row.get("id") == card_id), None)
         if current is None:
             raise KeyError(card_id)
@@ -3658,6 +3727,26 @@ def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict
     try:
         card, backup_path = update_card_ai_content(card_id, payload, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "card": card,
+        "summary": summarize(rows),
+        "backup_path": str(backup_path) if backup_path else "",
+    }
+
+
+@app.post("/api/cards/{card_id}/concept-media")
+def api_card_concept_media(card_id: str, payload: CardConceptMediaRequest) -> dict[str, Any]:
+    try:
+        card, backup_path = update_card_concept_media(card_id, payload, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
+        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except ValueError as exc:
@@ -3703,6 +3792,7 @@ def api_ai_image_file(image_name: str) -> FileResponse:
 def api_card_ai_image_preview(card_id: str) -> dict[str, Any]:
     try:
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
         current = next((row for row in rows if row.get("id") == card_id), None)
         if current is None:
             raise KeyError(card_id)
@@ -3741,13 +3831,14 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
         card, backup_path, image_url = apply_ai_concept_image(
             card_id,
             payload,
-            CSV_PATH,
-            BACKUP_DIR,
-            PROGRESS_DB_PATH,
-            AI_IMAGE_DIR,
-            AI_IMAGE_PREVIEW_DIR,
+            csv_path=CSV_PATH,
+            backup_dir=BACKUP_DIR,
+            progress_db_path=PROGRESS_DB_PATH,
+            image_dir=AI_IMAGE_DIR,
+            preview_dir=AI_IMAGE_PREVIEW_DIR,
         )
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except FileNotFoundError as exc:
@@ -3776,7 +3867,8 @@ def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
             count=payload.count,
             seed=payload.seed,
         )
-        return attach_generated_question_bank_ids(generated, rows, CSV_PATH, PROGRESS_DB_PATH)
+        return attach_generated_question_bank_ids(generated, rows, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {exc}") from exc
     except ValueError as exc:
@@ -3788,7 +3880,8 @@ def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
 @app.post("/api/question-bank")
 def api_question_bank_upsert(payload: QuestionBankUpsertRequest) -> dict[str, Any]:
     try:
-        return upsert_question_bank_entries(payload.questions, CSV_PATH, PROGRESS_DB_PATH)
+        return upsert_question_bank_entries(payload.questions, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {exc}") from exc
     except ValueError as exc:
@@ -3806,8 +3899,8 @@ def api_question_bank(request: Request) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=f"Invalid limit: {raw_limit}") from exc
     try:
         return read_question_bank_entries(
-            CSV_PATH,
-            PROGRESS_DB_PATH,
+            csv_path=None,
+            progress_db_path=PROGRESS_DB_PATH,
             card_id=request.query_params.get("card_id", ""),
             question_type=request.query_params.get("question_type", ""),
             topic=request.query_params.get("topic", ""),
@@ -3820,6 +3913,7 @@ def api_question_bank(request: Request) -> dict[str, Any]:
             query=request.query_params.get("q", request.query_params.get("query", "")),
             limit=limit,
         )
+
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
@@ -3829,7 +3923,8 @@ def api_question_bank(request: Request) -> dict[str, Any]:
 @app.post("/api/questions/attempt")
 def api_question_attempt(payload: QuestionAttemptRequest) -> dict[str, Any]:
     try:
-        return save_question_attempt(payload, CSV_PATH, PROGRESS_DB_PATH)
+        return save_question_attempt(payload, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {payload.card_id}") from exc
     except ValueError as exc:
@@ -3847,8 +3942,8 @@ def api_question_attempts(request: Request) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=f"Invalid limit: {raw_limit}") from exc
     try:
         return read_question_attempts(
-            CSV_PATH,
-            PROGRESS_DB_PATH,
+            csv_path=None,
+            progress_db_path=PROGRESS_DB_PATH,
             card_ids=request.query_params.getlist("card_id"),
             result=request.query_params.get("result", "all"),
             limit=limit,
@@ -3884,10 +3979,10 @@ def health() -> dict[str, Any]:
         "ok": True,
         "content_db_path": str(PROGRESS_DB_PATH),
         "content_db_exists": PROGRESS_DB_PATH.exists(),
-        "bootstrap_csv_path": str(CSV_PATH),
-        "bootstrap_csv_exists": CSV_PATH.exists(),
         "progress_db_path": str(PROGRESS_DB_PATH),
         "progress_db_exists": PROGRESS_DB_PATH.exists(),
+        "legacy_bootstrap_csv_path": str(CSV_PATH),
+        "legacy_bootstrap_csv_exists": CSV_PATH.exists(),
         "wiki_book_dir": str(resolved_wiki_book_dir),
         "wiki_book_exists": wiki_book_exists,
         "wiki_book_configured_dir": str(WIKI_BOOK_DIR),
