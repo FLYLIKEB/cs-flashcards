@@ -261,7 +261,8 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(len(data['cards']), 1)
             self.assertEqual(data['cards'][0]['definition'], '정의')
             self.assertEqual(data['cards'][0]['concept_image_url'], 'https://example.com/test-concept.png')
-            self.assertEqual(data['summary']['content_db_path'], str(db_path.resolve()))
+            self.assertEqual(data['summary']['content_db_path'], str(db_path))
+
 
     def test_mark_card_persists_status_to_sqlite_not_csv(self):
         with tempfile.TemporaryDirectory() as td:
@@ -446,6 +447,8 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
+
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_key = flashcard_app.OPENAI_API_KEY
@@ -479,6 +482,7 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_backup = flashcard_app.BACKUP_DIR
@@ -593,6 +597,8 @@ class FlashcardProgressTests(unittest.TestCase):
             preview_dir = root / 'previews'
             backup_dir = root / 'backups'
             write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
+
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_backup = flashcard_app.BACKUP_DIR
@@ -644,6 +650,8 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             backup_dir = root / 'backups'
             write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
+
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_backup = flashcard_app.BACKUP_DIR
@@ -674,6 +682,8 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             preview_dir = root / 'previews'
             write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
+
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_preview_dir = flashcard_app.AI_IMAGE_PREVIEW_DIR
@@ -1153,6 +1163,8 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path)
+            read_cards(csv_path, db_path)
+
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
@@ -1324,6 +1336,7 @@ class WikiBookTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path, term='소개 문서', english='Intro Document', source_files='pages/intro.md;pages/child.md')
+            read_cards(csv_path, db_path)
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:

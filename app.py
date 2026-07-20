@@ -3509,7 +3509,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     source_relative = str(source_path.relative_to(repo)).replace(os.sep, "/")
     page_meta = index["pages"].get(slug, {})
     title = page_meta.get("title") or extract_markdown_title(markdown_text, source_path.stem)
-    linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+    linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
 
     return {
         "slug": slug,
@@ -3654,7 +3654,8 @@ def api_wiki_raw(relative_path: str) -> FileResponse:
 @app.get("/api/cards")
 def api_cards() -> dict[str, Any]:
     try:
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -3796,7 +3797,8 @@ def api_ai_image_file(image_name: str) -> FileResponse:
 @app.post("/api/cards/{card_id}/ai-image/preview")
 def api_card_ai_image_preview(card_id: str) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
         current = next((row for row in rows if row.get("id") == card_id), None)
         if current is None:
@@ -3836,13 +3838,14 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
         card, backup_path, image_url = apply_ai_concept_image(
             card_id,
             payload,
-            csv_path=CSV_PATH,
+            csv_path=None,
             backup_dir=BACKUP_DIR,
             progress_db_path=PROGRESS_DB_PATH,
             image_dir=AI_IMAGE_DIR,
             preview_dir=AI_IMAGE_PREVIEW_DIR,
         )
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -3864,7 +3867,7 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
 @app.post("/api/questions/generate")
 def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
         generated = generate_questions(
             rows,
             card_ids=payload.card_ids,
@@ -3872,7 +3875,8 @@ def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
             count=payload.count,
             seed=payload.seed,
         )
-        return attach_generated_question_bank_ids(generated, rows, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+        return attach_generated_question_bank_ids(generated, rows, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {exc}") from exc
@@ -3885,7 +3889,8 @@ def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
 @app.post("/api/question-bank")
 def api_question_bank_upsert(payload: QuestionBankUpsertRequest) -> dict[str, Any]:
     try:
-        return upsert_question_bank_entries(payload.questions, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+        return upsert_question_bank_entries(payload.questions, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {exc}") from exc
@@ -3928,7 +3933,7 @@ def api_question_bank(request: Request) -> dict[str, Any]:
 @app.post("/api/questions/attempt")
 def api_question_attempt(payload: QuestionAttemptRequest) -> dict[str, Any]:
     try:
-        return save_question_attempt(payload, csv_path=CSV_PATH, progress_db_path=PROGRESS_DB_PATH)
+        return save_question_attempt(payload, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {payload.card_id}") from exc

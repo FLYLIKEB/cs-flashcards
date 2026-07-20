@@ -87,7 +87,8 @@ if [[ -z "${REMOTE_HOST:-}" || ! -f "${SSH_KEY:-}" ]]; then
   exit 1
 fi
 
-echo "개념 이미지: CSV URL 렌더링 + AI 재생성 이미지는 서버 state/ai_images 에 저장"
+echo "개념 이미지: SQLite cards 테이블에 URL/미디어를 기록하고 AI 재생성 이미지는 서버 state/ai_images 에 저장"
+
 
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
@@ -309,7 +310,6 @@ User=ubuntu
 WorkingDirectory=$REMOTE_DIR
 Environment=CS_FLASHCARDS_USERNAME=$USERNAME
 Environment=CS_FLASHCARDS_PASSWORD=$PASSWORD
-Environment=CS_FLASHCARD_CSV=$REMOTE_DIR/data/CS_encyclopedia_300plus.csv
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
 Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DIR/state/progress.sqlite
 Environment=CS_FLASHCARDS_WIKI_BOOK_DIR=$REMOTE_DIR/wiki_book

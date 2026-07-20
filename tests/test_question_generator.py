@@ -133,16 +133,18 @@ class QuestionGeneratorTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             generate_questions(sample_cards(), card_ids=['CS-999'], types=['short'], count=1, seed=1)
 
-    def test_api_generate_questions_uses_csv_cards(self):
+    def test_api_generate_questions_reads_runtime_sqlite_when_csv_missing(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
+            missing_csv = root / 'missing.csv'
             write_cards(csv_path)
+            flashcard_app.read_cards(csv_path, db_path)
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
-                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.CSV_PATH = missing_csv
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 data = flashcard_app.api_generate_questions(flashcard_app.QuestionGenerateRequest(
                     card_ids=['CS-001'],

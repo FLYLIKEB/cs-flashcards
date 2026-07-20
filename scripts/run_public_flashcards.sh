@@ -188,7 +188,7 @@ cat <<EOF
 
 - iPhone Safari/Chrome에서 위 주소를 열면 됩니다.
 - 이 터미널을 닫으면 공개 접속도 종료됩니다.
-- O/X 체크는 이 Mac의 CSV에 저장됩니다.
+- O/X 체크와 카드 설명은 이 Mac의 SQLite(`state/progress.sqlite`)에 저장됩니다.
 - 고정주소 설정 파일: ${CONFIG_FILE}
 - 앱 로그: $APP_LOG
 - 터널 로그: $TUNNEL_LOG
