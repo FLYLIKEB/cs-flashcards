@@ -64,7 +64,17 @@
             <label class="wiki-editor-ai-label" for="wikiEditorAiInstruction">AI 수정 지시</label>
             <button id="wikiEditorAiBtn" class="inline-ai-btn has-tip" type="button" title="AI로 문서 다듬기" data-tip="위키 AI">AI</button>
           </div>
-          <textarea id="wikiEditorAiInstruction" class="wiki-editor-ai-input" rows="2" maxlength="4000" placeholder="예: 면접 답변용으로 더 간결하게 정리하고 Markdown 표/링크 구조는 유지"></textarea>
+          <div class="wiki-editor-ai-template-bar">
+            <div id="wikiEditorAiTemplates" class="wiki-editor-ai-templates" role="group" aria-label="AI 지시 템플릿"></div>
+            <button id="wikiEditorAiTemplateToggle" class="header-link" type="button">템플릿 수정</button>
+          </div>
+          <div id="wikiEditorAiTemplateEditor" class="wiki-editor-ai-template-editor" hidden aria-hidden="true">
+            <div id="wikiEditorAiTemplateList" class="wiki-editor-ai-template-list"></div>
+            <div class="wiki-editor-ai-template-actions">
+              <button id="wikiEditorAiTemplateResetBtn" class="header-link" type="button">기본값 복원</button>
+            </div>
+          </div>
+          <textarea id="wikiEditorAiInstruction" class="wiki-editor-ai-input" rows="3" maxlength="4000" placeholder="예: 면접 답변용으로 더 간결하게 정리하고 Markdown 표/링크 구조는 유지"></textarea>
           <p id="wikiEditorAiStatus" class="wiki-editor-ai-status">현재 Markdown과 지시문을 기준으로 AI 초안을 편집기에 반영합니다.</p>
         </div>
         <div class="wiki-editor-actions">

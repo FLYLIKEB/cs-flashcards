@@ -6179,6 +6179,100 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   flex-wrap: wrap;
 }
 
+.wiki-editor-ai-template-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .7rem;
+  margin-top: .7rem;
+  flex-wrap: wrap;
+}
+
+.wiki-editor-ai-templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.wiki-editor-ai-template-btn {
+  border: 1px solid var(--wiki-border);
+  border-radius: 999px;
+  background: #f7f9fc;
+  color: #1f2937;
+  font: inherit;
+  font-size: .84rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: .48rem .82rem;
+}
+
+.wiki-editor-ai-template-btn:hover:not(:disabled),
+.wiki-editor-ai-template-btn.is-active {
+  border-color: #9ec6e4;
+  background: #eaf4fb;
+  color: #0f4f7a;
+}
+
+.wiki-editor-ai-template-btn:disabled {
+  opacity: .55;
+}
+
+.wiki-editor-ai-template-editor {
+  margin-top: .78rem;
+  padding: .82rem;
+  border: 1px dashed var(--wiki-border);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.wiki-editor-ai-template-list {
+  display: grid;
+  gap: .8rem;
+}
+
+.wiki-editor-ai-template-card {
+  display: grid;
+  gap: .6rem;
+}
+
+.wiki-editor-ai-template-row {
+  display: grid;
+  gap: .35rem;
+}
+
+.wiki-editor-ai-template-field-label {
+  color: #374151;
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.wiki-editor-ai-template-field {
+  width: 100%;
+  padding: .68rem .78rem;
+  border: 1px solid var(--wiki-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #222222;
+  font: inherit;
+}
+
+.wiki-editor-ai-template-textarea {
+  resize: vertical;
+  min-height: 6.7rem;
+}
+
+.wiki-editor-ai-template-field:focus-visible {
+  outline: 2px solid rgba(51, 122, 183, .22);
+  outline-offset: 1px;
+  border-color: #9ec6e4;
+}
+
+.wiki-editor-ai-template-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: .78rem;
+}
+
 .wiki-editor-ai-label {
   color: #333333;
   font-size: .88rem;
@@ -6606,6 +6700,15 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   }
   .wiki-editor .EasyMDEContainer .CodeMirror-sided,
   .wiki-editor .EasyMDEContainer .editor-preview-side {
+    width: 100%;
+  }
+  .wiki-editor-ai-template-bar,
+  .wiki-editor-ai-template-actions {
+    justify-content: stretch;
+  }
+
+  .wiki-editor-ai-template-actions .header-link,
+  .wiki-editor-ai-template-bar .header-link {
     width: 100%;
   }
   .wiki-page-nav {
