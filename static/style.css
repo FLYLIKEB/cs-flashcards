@@ -6026,11 +6026,20 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   color: #bbbbbb;
 }
 
+.wiki-page-footer {
+  max-width: 48rem;
+  margin: 1.5rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--wiki-border-soft);
+}
+
 .wiki-page-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: .5rem;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .wiki-main .header-link {
@@ -6167,10 +6176,10 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   font-size: .78rem;
 }
 .wiki-page-nav {
-  max-width: 48rem;
-  margin: 1.5rem auto 0;
-  padding-top: 1rem;
-  border-top: 1px solid var(--wiki-border-soft);
+  max-width: none;
+  margin: 0;
+  padding-top: 0;
+  border-top: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .72rem;
