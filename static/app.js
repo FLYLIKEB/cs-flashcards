@@ -91,6 +91,39 @@ const cardEl = $('card');
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
+const FLASHCARD_TABLE_COLUMN_ORDER_KEY = 'csFlashcardsTableColumnOrder:v1';
+const FLASHCARD_TABLE_DEFAULT_COLUMNS = ['bookmark', 'index', 'term', 'english', 'category', 'status'];
+const FLASHCARD_TABLE_COLUMNS = {
+  bookmark: {
+    label: '★',
+    width: 42,
+    className: 'bookmark-cell',
+    render: (card) => `<button class="table-action bookmark-action${isCardBookmarked(card) ? ' active' : ''}" type="button" data-bookmark-card-id="${escapeHtml(card.id)}" aria-label="북마크 토글" title="북마크 토글"${state.bookmarkSaving ? ' disabled' : ''}>${isCardBookmarked(card) ? '★' : '☆'}</button>`,
+  },
+  index: {
+    label: '#',
+    width: 56,
+    render: (_card, index) => String(index + 1),
+  },
+  term: {
+    label: '용어',
+    className: 'term-cell',
+    render: (card) => escapeHtml(card.term || card.id),
+  },
+  english: {
+    label: '영문',
+    render: (card) => escapeHtml(card.english || '—'),
+  },
+  category: {
+    label: '분류',
+    render: (card) => escapeHtml(categoryLabel(card.category)),
+  },
+  status: {
+    label: '상태',
+    width: 92,
+    render: (card) => `<div class="status-actions">${['O', 'X', ''].map((value) => `<button class="table-action status-action${card.known_status === value ? ' active' : ''}" type="button" data-status-card-id="${escapeHtml(card.id)}" data-status-value="${escapeHtml(value)}" aria-label="상태 ${escapeHtml(statusLabel(value))}" title="${escapeHtml(statusLabel(value))}"${state.markSaving ? ' disabled' : ''}>${escapeHtml(statusLabel(value))}</button>`).join('')}</div>`,
+  },
+};
 const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate', 'speechVoice'];
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_SESSION_MODE_LABELS = {practice: '일반', bok: '한국은행'};
@@ -2674,6 +2707,36 @@ function selectCardFromFlashcardTable(cardId) {
 
 window.__csFlashcardsSelectCardFromTable = selectCardFromFlashcardTable;
 
+function flashcardTableColumnOrder() {
+  const fallback = [...FLASHCARD_TABLE_DEFAULT_COLUMNS];
+  try {
+    const saved = JSON.parse(localStorage.getItem(FLASHCARD_TABLE_COLUMN_ORDER_KEY) || '[]');
+    if (!Array.isArray(saved)) return fallback;
+    const filtered = saved.filter((key, index) => FLASHCARD_TABLE_DEFAULT_COLUMNS.includes(key) && saved.indexOf(key) === index);
+    return [...filtered, ...fallback.filter((key) => !filtered.includes(key))];
+  } catch (_error) {
+    return fallback;
+  }
+}
+
+function saveFlashcardTableColumnOrder(order) {
+  try {
+    localStorage.setItem(FLASHCARD_TABLE_COLUMN_ORDER_KEY, JSON.stringify(order));
+  } catch (_error) {}
+}
+
+function moveFlashcardTableColumn(sourceKey, targetKey) {
+  if (!FLASHCARD_TABLE_DEFAULT_COLUMNS.includes(sourceKey) || !FLASHCARD_TABLE_DEFAULT_COLUMNS.includes(targetKey) || sourceKey === targetKey) return false;
+  const order = flashcardTableColumnOrder();
+  const fromIndex = order.indexOf(sourceKey);
+  const toIndex = order.indexOf(targetKey);
+  if (fromIndex < 0 || toIndex < 0) return false;
+  order.splice(toIndex, 0, ...order.splice(fromIndex, 1));
+  saveFlashcardTableColumnOrder(order);
+  renderFlashcardTableWindow();
+  return true;
+}
+
 function refreshAfterFlashcardTableMutation(card) {
   syncUpdatedCard(card);
   if (state.statusFilter || state.bookmarkFilter) {
@@ -2770,6 +2833,7 @@ async function setFlashcardStatusFromTable(cardId, status) {
   }
 }
 
+window.__csFlashcardsMoveTableColumn = moveFlashcardTableColumn;
 window.__csFlashcardsToggleBookmarkFromTable = toggleFlashcardBookmarkFromTable;
 window.__csFlashcardsSetStatusFromTable = setFlashcardStatusFromTable;
 window.__csFlashcardsTableClosed = () => {
@@ -2785,14 +2849,19 @@ function renderFlashcardTableWindow() {
   const rows = state.filtered;
   const currentCardId = rows[state.index]?.id || '';
   const summaryText = flashcardTableSummaryText();
+  const columnOrder = flashcardTableColumnOrder();
+  const headerHtml = columnOrder.map((key) => {
+    const column = FLASHCARD_TABLE_COLUMNS[key];
+    const widthAttr = column.width ? ` style="width:${column.width}px;"` : '';
+    const classAttr = `column-header${column.className ? ` ${column.className}` : ''}`;
+    return `<th scope="col" class="${classAttr}"${widthAttr} draggable="true" data-column-key="${escapeHtml(key)}" title="드래그해서 열 위치 변경">${escapeHtml(column.label)}</th>`;
+  }).join('');
   const rowsHtml = rows.length ? rows.map((card, index) => `
     <tr class="${card.id === currentCardId ? 'current-row' : ''}" data-row-card-id="${escapeHtml(card.id)}" tabindex="0">
-      <td class="bookmark-cell"><button class="table-action bookmark-action${isCardBookmarked(card) ? ' active' : ''}" type="button" data-bookmark-card-id="${escapeHtml(card.id)}" aria-label="북마크 토글" title="북마크 토글"${state.bookmarkSaving ? ' disabled' : ''}>${isCardBookmarked(card) ? '★' : '☆'}</button></td>
-      <td>${index + 1}</td>
-      <td class="term-cell">${escapeHtml(card.term || card.id)}</td>
-      <td>${escapeHtml(card.english || '—')}</td>
-      <td>${escapeHtml(categoryLabel(card.category))}</td>
-      <td><div class="status-actions">${['O', 'X', ''].map((value) => `<button class="table-action status-action${card.known_status === value ? ' active' : ''}" type="button" data-status-card-id="${escapeHtml(card.id)}" data-status-value="${escapeHtml(value)}" aria-label="상태 ${escapeHtml(statusLabel(value))}" title="${escapeHtml(statusLabel(value))}"${state.markSaving ? ' disabled' : ''}>${escapeHtml(statusLabel(value))}</button>`).join('')}</div></td>
+      ${columnOrder.map((key) => {
+        const column = FLASHCARD_TABLE_COLUMNS[key];
+        return `<td${column.className ? ` class="${column.className}"` : ''}>${column.render(card, index)}</td>`;
+      }).join('')}
     </tr>
   `).join('') : '<p class="empty-state">현재 조건에 맞는 카드가 없습니다.</p>';
   try {
@@ -2815,6 +2884,9 @@ function renderFlashcardTableWindow() {
     table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     th, td { padding: 7px 9px; border: 1px solid var(--line); text-align: left; vertical-align: middle; line-height: 1.35; }
     th { background: #fafafa; font-weight: 600; }
+    .column-header { cursor: grab; user-select: none; }
+    .column-header.dragging { opacity: .45; }
+    .column-header.drop-target { background: #f0f0f0; }
     tbody tr { cursor: pointer; }
     tbody tr:hover td, tbody tr:focus-visible td, tbody tr.current-row td { background: var(--row); }
     tbody tr:focus-visible { outline: none; }
@@ -2835,9 +2907,9 @@ function renderFlashcardTableWindow() {
     <div class="meta">
       <h1>플래시카드 표 목록</h1>
       <p class="summary">${escapeHtml(summaryText)} · ${rows.length}개 · 현재 ${rows.length ? state.index + 1 : 0}</p>
-      <p class="hint">행 클릭 이동 · 별/O/X/–는 바로 수정</p>
+      <p class="hint">열 제목 드래그로 순서 변경 · 행 클릭 이동 · 별/O/X/– 바로 수정</p>
     </div>
-    ${rows.length ? `<div class="table-wrap"><table><thead><tr><th style="width:42px;">★</th><th style="width:56px;">#</th><th>용어</th><th>영문</th><th>분류</th><th style="width:92px;">상태</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
+    ${rows.length ? `<div class="table-wrap"><table><thead><tr>${headerHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
   </div>
   <script>
     const activateRow = (row) => {
@@ -2873,6 +2945,40 @@ function renderFlashcardTableWindow() {
       if (!row || (event.key !== 'Enter' && event.key !== ' ')) return;
       event.preventDefault();
       activateRow(row);
+    });
+    const headers = [...document.querySelectorAll('[data-column-key]')];
+    let draggingColumnKey = '';
+    headers.forEach((header) => {
+      header.addEventListener('dragstart', (event) => {
+        draggingColumnKey = header.dataset.columnKey || '';
+        header.classList.add('dragging');
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', draggingColumnKey);
+        }
+      });
+      header.addEventListener('dragover', (event) => {
+        if (!draggingColumnKey || draggingColumnKey === (header.dataset.columnKey || '')) return;
+        event.preventDefault();
+        header.classList.add('drop-target');
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      });
+      header.addEventListener('dragleave', () => {
+        header.classList.remove('drop-target');
+      });
+      header.addEventListener('drop', (event) => {
+        event.preventDefault();
+        header.classList.remove('drop-target');
+        const openerRef = window.opener;
+        const targetKey = header.dataset.columnKey || '';
+        if (draggingColumnKey && targetKey && draggingColumnKey !== targetKey && openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsMoveTableColumn === 'function') {
+          openerRef.__csFlashcardsMoveTableColumn(draggingColumnKey, targetKey);
+        }
+      });
+      header.addEventListener('dragend', () => {
+        draggingColumnKey = '';
+        headers.forEach((item) => item.classList.remove('dragging', 'drop-target'));
+      });
     });
     window.addEventListener('beforeunload', () => {
       const openerRef = window.opener;
