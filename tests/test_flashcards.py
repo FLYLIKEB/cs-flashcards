@@ -1091,6 +1091,8 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(database['expected_time_seconds'], 12 * 60)
             self.assertEqual(database['session_mode'], 'bok')
             self.assertEqual(database['source_location'], '한국은행 2021 컴퓨터공학 학술 파트 I · 1. 데이터베이스')
+            self.assertEqual(database['keywords'], ['데이터베이스'])
+
 
             essay = next(item for item in entries if item['question_type'] == 'essay')
             self.assertEqual(essay['prompt'], '### 1. 원격근무(VDI) 환경 참고 그림')
@@ -1101,6 +1103,11 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(essay['points'], 20)
             self.assertEqual(essay['expected_time_seconds'], 54 * 60)
             self.assertEqual(essay['answer'], '')
+            self.assertIn('VDI', essay['keywords'])
+            self.assertIn('원격근무', essay['keywords'])
+            self.assertNotIn('한국은행', essay['keywords'])
+            self.assertNotIn('2021', essay['keywords'])
+
 
             multiple_choice = next(item for item in entries if item['question_type'] == 'multiple_choice')
             self.assertEqual(multiple_choice['prompt'], '### 1. 해시 테이블에 대한 다음 설명으로 옳은 것은?')
@@ -1110,6 +1117,30 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIsNone(multiple_choice['points'])
             self.assertEqual(multiple_choice['session_mode'], 'bok')
             self.assertEqual(multiple_choice['category'], '자료구조·알고리즘')
+
+    def test_bok_question_bank_keywords_drop_generic_labels(self):
+        essay_keywords = flashcard_app.bok_question_bank_keywords(
+            '한국은행 2013 일반논술 발췌',
+            '제시문 1',
+            prompt='### 1. 제시문 1',
+            body='인간 본성(human nature)과 성범죄 문제를 다루고 문화적 진화와 DNA를 함께 논한다.',
+            category='인공지능·데이터',
+            question_type='essay',
+        )
+        self.assertIn('인간 본성', essay_keywords)
+        self.assertIn('성범죄', essay_keywords)
+        self.assertNotIn('제시문 1', essay_keywords)
+        self.assertNotIn('한국은행', essay_keywords)
+
+        topical_keywords = flashcard_app.bok_question_bank_keywords(
+            '한국은행 2025 컴퓨터공학 학술 13. 정보보호: 사회공학, XSS, CSRF',
+            '정보보호: 사회공학, XSS, CSRF',
+            prompt='### 13. 정보보호: 사회공학, XSS, CSRF',
+            body='사회공학, XSS, CSRF 공격 대응 방안을 설명하시오.',
+            category='보안',
+            question_type='subjective',
+        )
+        self.assertEqual(topical_keywords[:4], ['정보보호', '사회공학', 'XSS', 'CSRF'])
 
     def test_sync_bok_question_bank_entries_upserts_empty_answers(self):
         with tempfile.TemporaryDirectory() as td:

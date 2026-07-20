@@ -2073,7 +2073,101 @@ BOK_SUBJECTIVE_EXPECTED_SECONDS = 12 * 60
 BOK_ESSAY_EXPECTED_SECONDS = 54 * 60
 BOK_SUBJECTIVE_ANSWER_GUIDE = "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장"
 BOK_ESSAY_ANSWER_GUIDE = "정의 → 원리 → 비교 → 사례 → 금융IT 적용 → 결론 순으로 12~15문장"
-
+BOK_KEYWORD_SPLIT_RE = re.compile(r"\s*[:·,/]\s*")
+BOK_KEYWORD_SUFFIX_RE = re.compile(r"\s*(?:참고 그림|구성도|헤더 구조|개요|그림)\s*$")
+BOK_KEYWORD_NOISE_RE = re.compile(r"(?:^제시문\s*\d+$|^문제$|^유의사항$|^(?:i|ii|iii|iv|v|그리고|최근|현재|상기)$|다음(?:을|에)?|물음|답하시오|기술하시오|논술하시오|설명하시오|비교하시오|올바른|올바르게|어떻게|무엇|얼마|시나리오)")
+BOK_KEYWORD_MATCHERS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("PKI", ("pki",)),
+    ("전자서명", ("전자서명",)),
+    ("XSS", ("xss", "cross site scripting")),
+    ("CSRF", ("csrf",)),
+    ("사회공학", ("사회공학",)),
+    ("ARP 공격", ("arp 공격",)),
+    ("사이버 침해", ("사이버 침해",)),
+    ("사이버 테러", ("사이버 테러",)),
+    ("데이터베이스", ("데이터베이스", "database")),
+    ("트랜잭션", ("트랜잭션", "transaction")),
+    ("정규화", ("정규화",)),
+    ("데이터 웨어하우스", ("데이터 웨어하우스", "data warehousing")),
+    ("데이터 관리", ("데이터 관리",)),
+    ("데이터 품질", ("데이터 품질",)),
+    ("데이터 표준화", ("데이터 표현", "다르게 입력", "표준화")),
+    ("표준화", ("표준화", "일원화")),
+    ("JSON", ("json",)),
+    ("XML", ("xml",)),
+    ("공개소프트웨어", ("공개소프트웨어", "open source software", "오픈소스")),
+    ("R", (" r(", " r(", " r ", "최근 비즈니스 및 학계로부터 각광을 받고 있는 공개소프트웨어(open source software)인 r")),
+    ("SAS", ("sas",)),
+    ("MATLAB", ("matlab",)),
+    ("Stata", ("stata",)),
+    ("EViews", ("eviews",)),
+    ("Gauss", ("gauss",)),
+    ("블록체인", ("블록체인", "blockchain", "비트코인")),
+    ("자산관리시스템", ("자산관리시스템",)),
+    ("원격근무", ("원격근무",)),
+    ("재택근무", ("재택근무",)),
+    ("VDI", ("vdi", "virtual desktop infrastructure")),
+    ("클라우드", ("클라우드", "cloud")),
+    ("IaaS", ("iaas",)),
+    ("PaaS", ("paas",)),
+    ("SaaS", ("saas",)),
+    ("프라이빗 클라우드", ("프라이빗", "private cloud")),
+    ("퍼블릭 클라우드", ("퍼블릭", "public cloud")),
+    ("하이브리드 클라우드", ("하이브리드", "hybrid cloud")),
+    ("유틸리티 컴퓨팅", ("유틸리티 컴퓨팅", "utility computing")),
+    ("SOA", ("soa",)),
+    ("웹 2.0", ("웹 2.0", "web 2.0")),
+    ("프로세스", ("프로세스", "process")),
+    ("세마포어", ("세마포어", "semaphore")),
+    ("스케줄링", ("스케줄링", "scheduling")),
+    ("SJF", ("sjf", "shortest job first")),
+    ("교착상태", ("교착상태", "deadlock")),
+    ("은행원 알고리즘", ("은행원 알고리즘", "banker's algorithm")),
+    ("페이지 부재", ("페이지 부재", "page fault")),
+    ("메모리 관리", ("메모리 관리",)),
+    ("플래시 메모리", ("플래시 메모리",)),
+    ("RAID", ("raid",)),
+    ("캐시 메모리", ("캐시 메모리",)),
+    ("파이프라인", ("파이프라인", "pipeline")),
+    ("2진수", ("2진수",)),
+    ("논리회로", ("논리회로",)),
+    ("플립플롭", ("플립플롭", "flip-flop")),
+    ("라우팅", ("라우팅",)),
+    ("DNS", ("dns",)),
+    ("TCP", ("tcp",)),
+    ("FTP", ("ftp", "파일 전송 프로토콜")),
+    ("IPv4", ("ipv4",)),
+    ("주민등록번호", ("주민등록번호",)),
+    ("데이터 통신", ("데이터 통신",)),
+    ("브리지", ("브리지", "bridge")),
+    ("CRC", ("crc", "cyclic redundancy check")),
+    ("QoS", ("qos", "quality of service")),
+    ("네트워크 보안", ("네트워크 보안",)),
+    ("객체지향", ("객체지향",)),
+    ("Java", ("java",)),
+    ("정규 표현식", ("정규 표현식", "regular expression")),
+    ("MVC", ("mvc",)),
+    ("애자일", ("agile", "애자일")),
+    ("소프트웨어 공학", ("소프트웨어 공학", "software crisis", "소프트웨어 위기")),
+    ("프로젝트 관리", ("프로젝트 관리자", "프로젝트 관리", "프로젝트의 성공")),
+    ("통계 분석", ("통계 분석",)),
+    ("규모 산정", ("규모 산정",)),
+    ("해시", ("해시", "hash")),
+    ("허프만", ("허프만", "huffman")),
+    ("이진검색트리", ("이진검색트리", "binary search tree")),
+    ("후위표기식", ("후위표기식", "postfix expression")),
+    ("스택", ("스택", "stack")),
+    ("그래프 알고리즘", ("그래프 알고리즘",)),
+    ("최소신장트리", ("최소신장트리",)),
+    ("동적 계획법", ("동적 계획법",)),
+    ("머신러닝", ("머신러닝", "머신 러닝", "machine learning")),
+    ("인공지능", ("인공지능", "artificial intelligence")),
+    ("텍스트 마이닝", ("텍스트 마이닝", "text mining")),
+    ("인간 본성", ("인간 본성", "human nature")),
+    ("성범죄", ("성범죄",)),
+    ("DNA", ("dna",)),
+    ("문화적 진화", ("문화적 진화",)),
+)
 
 
 def clean_bok_question_bank_title(value: str) -> str:
@@ -2201,25 +2295,91 @@ def bok_question_bank_answer_guide(question_type: str) -> str:
 
 
 
-def bok_question_bank_keywords(page_title: str, topic: str) -> list[str]:
-    keywords: list[str] = ["한국은행"]
-    year_match = BOK_YEAR_RE.search(page_title)
-    if year_match:
-        keywords.append(year_match.group(1))
-    field_name = bok_question_bank_field_name(page_title)
-    if field_name:
-        keywords.append(field_name)
-    if topic:
-        keywords.append(topic)
-    seen: set[str] = set()
-    ordered: list[str] = []
-    for item in keywords:
-        normalized = str(item or "").strip()
-        if not normalized or normalized in seen:
+def bok_normalize_keyword_fragment(value: Any) -> str:
+    text = normalize_question_bank_text(value, limit=80)
+    if not text:
+        return ""
+    text = BOK_KEYWORD_SUFFIX_RE.sub("", text).strip(" :-")
+    text = re.sub(r"\s+", " ", text)
+    return text
+
+
+
+def bok_keyword_is_noise(value: str) -> bool:
+    if not value:
+        return True
+    if BOK_KEYWORD_NOISE_RE.search(value):
+        return True
+    if len(value) > 28 and ("?" in value or any(token in value for token in ("하시오", "답하시오", "기술하시오", "설명하시오", "비교하시오", "논술하시오"))):
+        return True
+    return False
+
+
+
+def bok_topic_keyword_candidates(topic: str) -> list[str]:
+    normalized = normalize_question_bank_text(topic, limit=255)
+    if not normalized or bok_keyword_is_noise(normalized):
+        return []
+    if not normalized:
+        return []
+    pieces = BOK_KEYWORD_SPLIT_RE.split(normalized) if BOK_KEYWORD_SPLIT_RE.search(normalized) else [normalized]
+    candidates: list[str] = []
+    for piece in pieces:
+        cleaned = bok_normalize_keyword_fragment(piece)
+        if not cleaned:
             continue
-        seen.add(normalized)
+        parenthetical = [bok_normalize_keyword_fragment(item) for item in re.findall(r"\(([^)]+)\)", cleaned)]
+        plain = bok_normalize_keyword_fragment(re.sub(r"\([^)]*\)", " ", cleaned))
+        for candidate in ([plain] if plain else []) + parenthetical:
+            if candidate and len(candidate) <= 28 and not bok_keyword_is_noise(candidate):
+                candidates.append(candidate)
+    if candidates:
+        return candidates
+    cleaned = bok_normalize_keyword_fragment(normalized)
+    if cleaned and len(cleaned) <= 28 and not bok_keyword_is_noise(cleaned):
+        return [cleaned]
+    return []
+
+
+
+def bok_detect_keyword_matches(*texts: str) -> list[str]:
+    combined = "\n".join(str(text or "") for text in texts)
+    lowered = combined.casefold()
+    matches: list[str] = []
+    for label, needles in BOK_KEYWORD_MATCHERS:
+        if any(needle.casefold() in lowered for needle in needles):
+            matches.append(label)
+    return matches
+
+
+
+def bok_question_bank_keywords(
+    page_title: str,
+    topic: str,
+    *,
+    prompt: str = "",
+    body: str = "",
+    category: str = "",
+    question_type: str = "subjective",
+) -> list[str]:
+    candidates: list[str] = []
+    candidates.extend(bok_topic_keyword_candidates(topic))
+    candidates.extend(bok_detect_keyword_matches(topic, prompt, body))
+    if question_type == "essay":
+        candidates.extend(bok_detect_keyword_matches(clean_bok_question_bank_title(page_title), body))
+    ordered: list[str] = []
+    seen: set[str] = set()
+    for item in candidates:
+        normalized = bok_normalize_keyword_fragment(item)
+        key = normalized.casefold()
+        if not normalized or key in seen or bok_keyword_is_noise(normalized):
+            continue
+        seen.add(key)
         ordered.append(normalized)
-    return ordered
+    normalized_category = bok_normalize_keyword_fragment(category)
+    if normalized_category and normalized_category.casefold() not in seen and not ordered:
+        ordered.append(normalized_category)
+    return ordered[:6]
 
 
 
@@ -2281,7 +2441,14 @@ def parse_bok_question_bank_entries(
                     "topic": topic,
                     "field_name": field_name,
                     "category": category,
-                    "keywords": bok_question_bank_keywords(page_title, topic),
+                    "keywords": bok_question_bank_keywords(
+                        page_title,
+                        topic,
+                        prompt=prompt,
+                        body=body,
+                        category=category,
+                        question_type=question_type,
+                    ),
                     "difficulty": "",
                     "issuer": "한국은행",
                     "source_location": f"{page_title} · {question_no}. {topic}" if topic else f"{page_title} · {question_no}",
@@ -2326,7 +2493,14 @@ def parse_bok_question_bank_entries(
             "topic": fallback_topic,
             "field_name": field_name,
             "category": category,
-            "keywords": bok_question_bank_keywords(page_title, fallback_topic),
+            "keywords": bok_question_bank_keywords(
+                page_title,
+                fallback_topic,
+                prompt=f"### 1. {fallback_topic}",
+                body=body,
+                category=category,
+                question_type=question_type,
+            ),
             "difficulty": "",
             "issuer": "한국은행",
             "source_location": f"{page_title} · 1. {fallback_topic}" if fallback_topic else f"{page_title} · 1",
