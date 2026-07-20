@@ -22,6 +22,7 @@ const state = {
   aiImagePreviewUrl: '',
   aiImagePreviewAlt: '',
   aiNotificationsRequested: false,
+  conceptMediaSaving: false,
   conceptImageScale: 1,
 
   menuOpen: false,
@@ -134,6 +135,11 @@ const CONCEPT_IMAGE_SCALE_DEFAULT = 1;
 const CONCEPT_IMAGE_SCALE_MIN = 0.8;
 const CONCEPT_IMAGE_SCALE_MAX = 1.8;
 const CONCEPT_IMAGE_SCALE_STEP = 0.1;
+const CONCEPT_MEDIA_TYPES = Object.freeze(['', 'image', 'gif', 'video', 'mermaid', 'html']);
+const MERMAID_MODULE_URL = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+let mermaidRendererPromise = null;
+let conceptMediaRenderToken = 0;
+let conceptMediaDialogRenderToken = 0;
 const BOK_MOCK_CONFIG = {
   subjectiveCount: 8,
   essayCount: 1,
@@ -1944,33 +1950,36 @@ function conceptImageScalePercent() {
   return Math.round(clampConceptImageScale(state.conceptImageScale) * 100);
 }
 
-function applyConceptImageScale(image = $('backConceptImage')) {
-  if (!image) return;
-  image.style.setProperty('--concept-image-scale', String(clampConceptImageScale(state.conceptImageScale)));
+function applyConceptImageScale() {
+  const scale = String(clampConceptImageScale(state.conceptImageScale));
+  ['backConceptImage', 'backConceptVideo', 'backConceptHtmlFrame', 'backConceptMermaid'].forEach((id) => {
+    const node = $(id);
+    if (node) node.style.setProperty('--concept-image-scale', scale);
+  });
 }
 
-function updateConceptImageZoomControls({hasImage = false} = {}) {
+function updateConceptImageZoomControls({hasMedia = false} = {}) {
   const zoomOutBtn = $('conceptImageZoomOutBtn');
   const zoomInBtn = $('conceptImageZoomInBtn');
   const zoomBtn = $('conceptImageZoomBtn');
   if (!zoomOutBtn || !zoomInBtn || !zoomBtn) return;
   const scalePercent = conceptImageScalePercent();
-  const canZoomOut = hasImage && state.conceptImageScale > CONCEPT_IMAGE_SCALE_MIN;
-  const canZoomIn = hasImage && state.conceptImageScale < CONCEPT_IMAGE_SCALE_MAX;
-  const zoomOutLabel = hasImage ? `이미지 축소 · ${scalePercent}%` : '축소할 이미지 없음';
-  const zoomInLabel = hasImage ? `이미지 확대 · ${scalePercent}%` : '확대할 이미지 없음';
-  const zoomDialogLabel = hasImage ? `이미지 크게 보기 · 현재 ${scalePercent}%` : '확대할 이미지 없음';
+  const canZoomOut = hasMedia && state.conceptImageScale > CONCEPT_IMAGE_SCALE_MIN;
+  const canZoomIn = hasMedia && state.conceptImageScale < CONCEPT_IMAGE_SCALE_MAX;
+  const zoomOutLabel = hasMedia ? `이미지 축소 · ${scalePercent}%` : '축소할 미디어 없음';
+  const zoomInLabel = hasMedia ? `이미지 확대 · ${scalePercent}%` : '확대할 미디어 없음';
+  const zoomDialogLabel = hasMedia ? `이미지 크게 보기 · 현재 ${scalePercent}%` : '확대할 미디어 없음';
   zoomOutBtn.disabled = !canZoomOut;
   zoomOutBtn.title = zoomOutLabel;
-  zoomOutBtn.dataset.tip = hasImage ? `축소 · ${scalePercent}%` : '이미지 없음';
+  zoomOutBtn.dataset.tip = hasMedia ? `축소 · ${scalePercent}%` : '미디어 없음';
   zoomOutBtn.setAttribute('aria-label', zoomOutLabel);
   zoomInBtn.disabled = !canZoomIn;
   zoomInBtn.title = zoomInLabel;
-  zoomInBtn.dataset.tip = hasImage ? `확대 · ${scalePercent}%` : '이미지 없음';
+  zoomInBtn.dataset.tip = hasMedia ? `확대 · ${scalePercent}%` : '미디어 없음';
   zoomInBtn.setAttribute('aria-label', zoomInLabel);
-  zoomBtn.disabled = !hasImage;
+  zoomBtn.disabled = !hasMedia;
   zoomBtn.title = zoomDialogLabel;
-  zoomBtn.dataset.tip = hasImage ? `크게 보기 · ${scalePercent}%` : '이미지 없음';
+  zoomBtn.dataset.tip = hasMedia ? `크게 보기 · ${scalePercent}%` : '미디어 없음';
   zoomBtn.setAttribute('aria-label', zoomDialogLabel);
 }
 
@@ -1986,6 +1995,12 @@ function stepConceptImageScale(delta) {
   renderConceptImage(current);
   setMessage(`${current.term}: 이미지 크기 ${conceptImageScalePercent()}%`);
 }
+
+function normalizedConceptMediaType(value) {
+  const mediaType = String(value || '').trim().toLowerCase();
+  return CONCEPT_MEDIA_TYPES.includes(mediaType) ? mediaType : '';
+}
+
 function conceptImageUrl(card) {
   const url = String(card?.concept_image_url || card?.image_url || '').trim();
   if (!url) return '';
@@ -2005,23 +2020,6 @@ function clearConceptImagePreview(cardId = null) {
   state.aiImagePreviewAlt = '';
 }
 
-function bindConceptImageLoadState() {
-  const image = $('backConceptImage');
-  const placeholder = $('backConceptImagePlaceholder');
-  if (!image || !placeholder || image.dataset.loadBound === '1') return;
-  image.dataset.loadBound = '1';
-  image.addEventListener('load', () => {
-    if (!image.dataset.expectedSrc) return;
-    image.hidden = false;
-    placeholder.hidden = true;
-  });
-  image.addEventListener('error', () => {
-    image.hidden = true;
-    placeholder.hidden = false;
-  });
-}
-
-
 function conceptImageAlt(card) {
   const explicit = String(card?.concept_image_alt || card?.image_alt || '').trim();
   if (explicit) return explicit;
@@ -2030,17 +2028,273 @@ function conceptImageAlt(card) {
   return `${term}${category} 이해를 돕는 학습용 개념 이미지`;
 }
 
-function conceptImageDisplayState(card) {
+function conceptMediaDisplayState(card) {
   const previewActive = conceptImagePreviewActive(card);
-  const previewUrl = previewActive ? String(state.aiImagePreviewUrl || '').trim() : '';
-  const persistedUrl = conceptImageUrl(card);
-  const url = previewUrl || persistedUrl;
+  if (previewActive) {
+    return {
+      previewActive,
+      mediaType: 'image',
+      payload: String(state.aiImagePreviewUrl || '').trim(),
+      alt: state.aiImagePreviewAlt || conceptImageAlt(card),
+      hasMedia: Boolean(state.aiImagePreviewUrl),
+    };
+  }
+  const mediaType = normalizedConceptMediaType(card?.concept_media_type);
+  const payload = String(card?.concept_media_payload || '').trim();
+  if (mediaType && payload) {
+    return {
+      previewActive: false,
+      mediaType,
+      payload,
+      alt: conceptImageAlt(card),
+      hasMedia: true,
+    };
+  }
+  const legacyUrl = conceptImageUrl(card);
   return {
-    previewActive,
-    url,
-    alt: previewActive ? (state.aiImagePreviewAlt || conceptImageAlt(card)) : conceptImageAlt(card),
-    hasImage: Boolean(url),
+    previewActive: false,
+    mediaType: legacyUrl && /\.gif(?:$|[?#])/i.test(legacyUrl) ? 'gif' : 'image',
+    payload: legacyUrl,
+    alt: conceptImageAlt(card),
+    hasMedia: Boolean(legacyUrl),
   };
+}
+
+function setConceptImagePlaceholder(text = '이미지 없음') {
+  const placeholder = $('backConceptImagePlaceholder');
+  if (placeholder) placeholder.textContent = text;
+}
+
+function clearConceptMediaIframe(frame) {
+  if (!frame) return;
+  frame.removeAttribute('src');
+  frame.removeAttribute('srcdoc');
+  frame.style.removeProperty('height');
+  frame.dataset.payload = '';
+  frame.dataset.alt = '';
+}
+
+function bindConceptImageLoadState() {
+  const image = $('backConceptImage');
+  const video = $('backConceptVideo');
+  const frame = $('backConceptHtmlFrame');
+  const placeholder = $('backConceptImagePlaceholder');
+  if (!placeholder) return;
+  if (image && image.dataset.loadBound !== '1') {
+    image.dataset.loadBound = '1';
+    image.addEventListener('load', () => {
+      if (!image.dataset.expectedSrc) return;
+      image.hidden = false;
+      placeholder.hidden = true;
+    });
+    image.addEventListener('error', () => {
+      image.hidden = true;
+      placeholder.hidden = false;
+      setConceptImagePlaceholder('이미지를 불러오지 못했습니다.');
+    });
+  }
+  if (video && video.dataset.loadBound !== '1') {
+    video.dataset.loadBound = '1';
+    video.addEventListener('loadeddata', () => {
+      if (!video.dataset.expectedSrc) return;
+      video.hidden = false;
+      placeholder.hidden = true;
+    });
+    video.addEventListener('error', () => {
+      video.hidden = true;
+      placeholder.hidden = false;
+      setConceptImagePlaceholder('비디오를 불러오지 못했습니다.');
+    });
+  }
+  if (frame && frame.dataset.loadBound !== '1') {
+    frame.dataset.loadBound = '1';
+    frame.addEventListener('load', () => {
+      if (!frame.dataset.payload) return;
+      frame.hidden = false;
+      placeholder.hidden = true;
+    });
+  }
+}
+
+function bindConceptMediaFrameResize() {
+  if (window.__csFlashcardsConceptMediaFrameBound) return;
+  window.__csFlashcardsConceptMediaFrameBound = true;
+  window.addEventListener('message', (event) => {
+    const data = event?.data;
+    if (!data || data.type !== 'cs-flashcards-concept-media-height') return;
+    const height = Math.max(180, Math.min(960, Number(data.height) || 0));
+    const mainFrame = $('backConceptHtmlFrame');
+    const dialogFrame = $('conceptImageDialogStage')?.querySelector('iframe');
+    [mainFrame, dialogFrame].forEach((frame) => {
+      if (frame && frame.contentWindow === event.source) frame.style.height = `${height}px`;
+    });
+  });
+}
+
+function conceptMediaIframeSrcdoc(payload, alt = '') {
+  const encodedPayload = JSON.stringify(String(payload || '')).replace(/</g, '\\u003c');
+  const encodedAlt = JSON.stringify(String(alt || '개념 동적 시각화')).replace(/</g, '\\u003c');
+  return `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(180deg, rgba(248, 250, 252, .94), rgba(255, 255, 255, 1));
+      color: #0f172a;
+    }
+    #app {
+      width: min(100%, 980px);
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <main id="app" aria-label=${encodedAlt}></main>
+  <script>
+    const payload = ${encodedPayload};
+    const root = document.getElementById('app');
+    if (root) root.innerHTML = payload;
+    const postSize = () => {
+      const height = Math.max(
+        document.documentElement.scrollHeight || 0,
+        document.body.scrollHeight || 0,
+        root?.scrollHeight || 0,
+      );
+      parent.postMessage({type: 'cs-flashcards-concept-media-height', height}, '*');
+    };
+    new MutationObserver(postSize).observe(document.body, {subtree: true, childList: true, attributes: true, characterData: true});
+    if ('ResizeObserver' in window) new ResizeObserver(postSize).observe(document.body);
+    window.addEventListener('load', () => {
+      postSize();
+      window.setTimeout(postSize, 120);
+    });
+    window.setInterval(postSize, 1200);
+  <\/script>
+</body>
+</html>`;
+}
+
+async function ensureMermaidRenderer() {
+  if (mermaidRendererPromise) return mermaidRendererPromise;
+  mermaidRendererPromise = import(MERMAID_MODULE_URL).then((module) => {
+    const mermaid = module?.default || module?.mermaid || module;
+    if (!mermaid || typeof mermaid.render !== 'function') throw new Error('Mermaid renderer unavailable');
+    if (typeof mermaid.initialize === 'function') {
+      mermaid.initialize({startOnLoad: false, securityLevel: 'strict', theme: 'neutral'});
+    }
+    return mermaid;
+  });
+  return mermaidRendererPromise;
+}
+
+async function renderConceptMermaidInto(container, source, {modal = false} = {}) {
+  if (!container) return;
+  const token = modal ? ++conceptMediaDialogRenderToken : ++conceptMediaRenderToken;
+  container.hidden = false;
+  container.classList.add('is-loading');
+  container.textContent = 'Mermaid 다이어그램 렌더링 중...';
+  try {
+    const mermaid = await ensureMermaidRenderer();
+    const renderId = `csFlashcardsMermaid${modal ? 'Dialog' : 'Main'}${Date.now()}${Math.random().toString(36).slice(2, 8)}`;
+    const rendered = await mermaid.render(renderId, String(source || ''));
+    if ((modal ? conceptMediaDialogRenderToken : conceptMediaRenderToken) !== token) return;
+    container.classList.remove('is-loading');
+    container.innerHTML = rendered?.svg || '';
+    if (typeof rendered?.bindFunctions === 'function') rendered.bindFunctions(container);
+    container.querySelector('svg')?.removeAttribute('height');
+  } catch (_error) {
+    if ((modal ? conceptMediaDialogRenderToken : conceptMediaRenderToken) !== token) return;
+    container.classList.remove('is-loading');
+    container.textContent = 'Mermaid 다이어그램을 렌더링하지 못했습니다.';
+  }
+}
+
+function resetMainConceptMedia() {
+  const image = $('backConceptImage');
+  const video = $('backConceptVideo');
+  const frame = $('backConceptHtmlFrame');
+  const mermaid = $('backConceptMermaid');
+  if (image) {
+    image.removeAttribute('src');
+    image.removeAttribute('title');
+    image.alt = '';
+    image.dataset.expectedSrc = '';
+    image.hidden = true;
+  }
+  if (video) {
+    video.pause();
+    video.removeAttribute('src');
+    video.removeAttribute('title');
+    video.removeAttribute('aria-label');
+    video.dataset.expectedSrc = '';
+    video.hidden = true;
+    video.load();
+  }
+  if (frame) {
+    clearConceptMediaIframe(frame);
+    frame.hidden = true;
+  }
+  if (mermaid) {
+    mermaid.hidden = true;
+    mermaid.classList.remove('is-loading');
+    mermaid.textContent = '';
+    mermaid.innerHTML = '';
+  }
+}
+
+async function renderConceptImageDialogContent(card) {
+  const stage = $('conceptImageDialogStage');
+  if (!stage) return false;
+  const {mediaType, payload, alt, hasMedia} = conceptMediaDisplayState(card);
+  stage.innerHTML = '';
+  if (!hasMedia) return false;
+  if (mediaType === 'video') {
+    const video = document.createElement('video');
+    video.className = 'concept-image-modal-video';
+    video.controls = true;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    video.src = payload;
+    video.setAttribute('aria-label', alt);
+    stage.appendChild(video);
+    return true;
+  }
+  if (mediaType === 'html') {
+    const frame = document.createElement('iframe');
+    frame.className = 'concept-image-modal-iframe';
+    frame.hidden = false;
+    frame.loading = 'eager';
+    frame.sandbox = 'allow-scripts';
+    frame.referrerPolicy = 'no-referrer';
+    frame.title = alt || '개념 동적 시각화';
+    frame.srcdoc = conceptMediaIframeSrcdoc(payload, alt);
+    stage.appendChild(frame);
+    return true;
+  }
+  if (mediaType === 'mermaid') {
+    const container = document.createElement('div');
+    container.className = 'concept-image-modal-mermaid';
+    stage.appendChild(container);
+    renderConceptMermaidInto(container, payload, {modal: true});
+    return true;
+  }
+  const image = document.createElement('img');
+  image.className = 'concept-image-modal-image';
+  image.loading = 'eager';
+  image.decoding = 'async';
+  image.alt = alt;
+  image.src = payload;
+  stage.appendChild(image);
+  return true;
 }
 
 async function previewConceptImage() {
@@ -2087,8 +2341,6 @@ async function previewConceptImage() {
   }
 }
 
-
-
 async function discardConceptImagePreview() {
   const current = state.filtered[state.index] || null;
   if (!current || !conceptImagePreviewActive(current) || state.aiImageGenerating || state.aiImageSaving) return;
@@ -2120,94 +2372,196 @@ function conceptImageDialogOpen() {
 }
 
 function openConceptImageDialog() {
-  const image = $('backConceptImage');
+  const current = state.filtered[state.index] || null;
   const dialog = $('conceptImageDialog');
-  const dialogImage = $('conceptImageDialogImage');
-  if (!image || !dialog || !dialogImage || image.hidden) return;
-  const src = image.currentSrc || image.getAttribute('src') || '';
-  if (!src) return;
-  dialogImage.src = src;
-  dialogImage.alt = image.alt || '';
+  if (!current || !dialog) return;
+  const {hasMedia} = conceptMediaDisplayState(current);
+  if (!hasMedia) return;
   dialog.hidden = false;
+  renderConceptImageDialogContent(current);
   $('conceptImageDialogCloseBtn')?.focus();
 }
 
 function closeConceptImageDialog({restoreFocus = true} = {}) {
   const dialog = $('conceptImageDialog');
-  const dialogImage = $('conceptImageDialogImage');
+  const stage = $('conceptImageDialogStage');
   if (!dialog || dialog.hidden) return;
   dialog.hidden = true;
-  if (dialogImage) {
-    dialogImage.removeAttribute('src');
-    dialogImage.alt = '';
-  }
+  if (stage) stage.innerHTML = '';
   if (restoreFocus) focusAppCard();
+}
+
+function conceptMediaDialogOpen() {
+  const dialog = $('conceptMediaDialog');
+  return Boolean(dialog && !dialog.hidden);
+}
+
+function updateConceptMediaDialogPlaceholder() {
+  const typeInput = $('conceptMediaTypeInput');
+  const payloadInput = $('conceptMediaPayloadInput');
+  if (!typeInput || !payloadInput) return;
+  const mediaType = normalizedConceptMediaType(typeInput.value);
+  const placeholders = {
+    '': '기존 이미지 유지 또는 비우기',
+    image: 'https://... 이미지 URL',
+    gif: 'https://... GIF URL',
+    video: 'https://... mp4/webm URL',
+    mermaid: 'graph TD\n  A[개념] --> B[핵심 동작]',
+    html: '<div>...</div><script>...</script>',
+  };
+  payloadInput.placeholder = placeholders[mediaType] || placeholders.html;
+}
+
+function setConceptMediaDialogBusy(disabled) {
+  const typeInput = $('conceptMediaTypeInput');
+  const payloadInput = $('conceptMediaPayloadInput');
+  const altInput = $('conceptMediaAltInput');
+  const saveBtn = $('conceptMediaDialogSaveBtn');
+  const cancelBtn = $('conceptMediaDialogCancelBtn');
+  if (typeInput) typeInput.disabled = disabled;
+  if (payloadInput) payloadInput.disabled = disabled;
+  if (altInput) altInput.disabled = disabled;
+  if (saveBtn) saveBtn.disabled = disabled;
+  if (cancelBtn) cancelBtn.disabled = disabled;
+}
+
+function openConceptMediaDialog() {
+  const current = state.filtered[state.index] || null;
+  const dialog = $('conceptMediaDialog');
+  if (!current || !dialog) return;
+  const typeInput = $('conceptMediaTypeInput');
+  const payloadInput = $('conceptMediaPayloadInput');
+  const altInput = $('conceptMediaAltInput');
+  const errorEl = $('conceptMediaDialogError');
+  if (typeInput) typeInput.value = normalizedConceptMediaType(current.concept_media_type);
+  if (payloadInput) payloadInput.value = String(current.concept_media_payload || '');
+  if (altInput) altInput.value = conceptImageAlt(current);
+  if (errorEl) errorEl.textContent = '';
+  updateConceptMediaDialogPlaceholder();
+  setConceptMediaDialogBusy(false);
+  dialog.hidden = false;
+  (payloadInput || typeInput || altInput)?.focus();
+}
+
+function closeConceptMediaDialog({restoreFocus = true} = {}) {
+  const dialog = $('conceptMediaDialog');
+  if (!dialog || dialog.hidden) return;
+  dialog.hidden = true;
+  if (restoreFocus) focusAppCard();
+}
+
+async function saveConceptMedia() {
+  const current = state.filtered[state.index] || null;
+  if (!current || state.conceptMediaSaving) return;
+  const typeInput = $('conceptMediaTypeInput');
+  const payloadInput = $('conceptMediaPayloadInput');
+  const altInput = $('conceptMediaAltInput');
+  const errorEl = $('conceptMediaDialogError');
+  const payload = {
+    concept_media_type: typeInput?.value || '',
+    concept_media_payload: payloadInput?.value || '',
+    concept_image_alt: altInput?.value || '',
+  };
+  state.conceptMediaSaving = true;
+  setConceptMediaDialogBusy(true);
+  if (errorEl) errorEl.textContent = '';
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/concept-media`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(await responseErrorText(res));
+    const data = await res.json();
+    await refreshCards({cardId: data.card.id, message: null});
+    closeConceptMediaDialog({restoreFocus: false});
+    setMessage(`${data.card.term}: 개념 미디어를 저장했습니다.`);
+  } catch (error) {
+    if (errorEl) errorEl.textContent = error.message || String(error);
+  } finally {
+    state.conceptMediaSaving = false;
+    setConceptMediaDialogBusy(false);
+  }
 }
 
 function renderConceptImage(card) {
   const wrap = $('backConceptImageWrap');
   const image = $('backConceptImage');
+  const video = $('backConceptVideo');
+  const frame = $('backConceptHtmlFrame');
+  const mermaid = $('backConceptMermaid');
   const placeholder = $('backConceptImagePlaceholder');
-  const zoomOutBtn = $('conceptImageZoomOutBtn');
-  const zoomInBtn = $('conceptImageZoomInBtn');
-  const zoomBtn = $('conceptImageZoomBtn');
+  const editBtn = $('conceptMediaEditBtn');
   const generateBtn = $('conceptImageGenerateBtn');
-  if (!wrap || !image || !placeholder || !zoomOutBtn || !zoomInBtn || !zoomBtn || !generateBtn) return;
+  if (!wrap || !image || !video || !frame || !mermaid || !placeholder || !editBtn || !generateBtn) return;
   bindConceptImageLoadState();
+  bindConceptMediaFrameResize();
   state.conceptImageScale = clampConceptImageScale(state.conceptImageScale);
-  applyConceptImageScale(image);
+  applyConceptImageScale();
 
   if (!card) {
     wrap.hidden = true;
-    image.removeAttribute('src');
-    image.removeAttribute('title');
-    image.alt = '';
-    image.dataset.expectedSrc = '';
-    image.hidden = true;
+    resetMainConceptMedia();
     placeholder.hidden = true;
     updateConceptImageZoomControls();
+    editBtn.disabled = true;
     generateBtn.disabled = true;
     closeConceptImageDialog({restoreFocus: false});
+    closeConceptMediaDialog({restoreFocus: false});
     return;
   }
 
-  const {previewActive, url, alt, hasImage} = conceptImageDisplayState(card);
+  const {previewActive, mediaType, payload, alt, hasMedia} = conceptMediaDisplayState(card);
   const busy = state.aiImageGenerating || state.aiImageSaving;
   const activeBusy = busy && state.aiImageCardId === card.id;
   wrap.hidden = false;
   wrap.classList.toggle('preview-active', previewActive);
-  wrap.classList.toggle('is-empty', !hasImage);
+  wrap.classList.toggle('is-empty', !hasMedia);
+  resetMainConceptMedia();
+  setConceptImagePlaceholder('이미지 없음');
 
-  if (hasImage) {
-    image.dataset.expectedSrc = url;
-    image.alt = alt;
-    image.title = previewActive ? `${card.term} AI 이미지 미리보기 크게 보기` : `${card.term} 이미지 크게 보기`;
-    image.hidden = false;
-    placeholder.hidden = true;
-    if (image.getAttribute('src') !== url) image.src = url;
-    if (image.complete) {
-      const loaded = image.naturalWidth > 0;
-      image.hidden = !loaded;
-      placeholder.hidden = loaded;
-    }
-    if (conceptImageDialogOpen()) {
-      const dialogImage = $('conceptImageDialogImage');
-      if (dialogImage) {
-        if (dialogImage.getAttribute('src') !== url) dialogImage.src = url;
-        dialogImage.alt = alt;
+  if (hasMedia) {
+    if (mediaType === 'video') {
+      video.dataset.expectedSrc = payload;
+      video.src = payload;
+      video.title = `${card.term} 개념 비디오 크게 보기`;
+      video.setAttribute('aria-label', alt);
+      video.hidden = false;
+      placeholder.hidden = true;
+      video.play().catch(() => {});
+    } else if (mediaType === 'html') {
+      frame.dataset.payload = payload;
+      frame.dataset.alt = alt;
+      frame.title = alt || `${card.term} 개념 위젯`;
+      frame.srcdoc = conceptMediaIframeSrcdoc(payload, alt);
+      frame.hidden = false;
+      placeholder.hidden = true;
+    } else if (mediaType === 'mermaid') {
+      mermaid.hidden = false;
+      placeholder.hidden = true;
+      renderConceptMermaidInto(mermaid, payload);
+    } else {
+      image.dataset.expectedSrc = payload;
+      image.alt = alt;
+      image.title = previewActive ? `${card.term} AI 이미지 미리보기 크게 보기` : `${card.term} 이미지 크게 보기`;
+      image.hidden = false;
+      if (image.getAttribute('src') !== payload) image.src = payload;
+      if (image.complete) {
+        const loaded = image.naturalWidth > 0;
+        image.hidden = !loaded;
+        placeholder.hidden = loaded;
+      } else {
+        placeholder.hidden = true;
       }
     }
+    if (conceptImageDialogOpen()) renderConceptImageDialogContent(card);
   } else {
-    image.removeAttribute('src');
-    image.removeAttribute('title');
-    image.alt = '';
-    image.dataset.expectedSrc = '';
-    image.hidden = true;
     placeholder.hidden = false;
     closeConceptImageDialog({restoreFocus: false});
   }
 
-  updateConceptImageZoomControls({hasImage});
+  updateConceptImageZoomControls({hasMedia});
+  editBtn.disabled = state.conceptMediaSaving;
   generateBtn.disabled = busy;
   generateBtn.textContent = activeBusy ? '…' : 'AI';
   generateBtn.title = activeBusy ? 'AI 이미지 생성 중' : 'AI 이미지 재생성';
@@ -2229,7 +2583,7 @@ async function loadCards() {
     state.initialCardQueryApplied = true;
     applyInitialCardQuery();
   }
-  $('csvPath').textContent = data.summary.csv_path;
+  $('contentDbPath').textContent = data.summary.content_db_path;
   setAudioButtons();
   updateAudioEstimate();
   consumePendingQuestionBankLaunch();
@@ -2975,6 +3329,99 @@ function buildMindMapLayout(graph) {
   };
 }
 
+function escapeMindMapMarkdown(value) {
+  return String(value || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/([`*_{}\[\]()#+.!|>])/g, '\\$1')
+    .replace(/\n+/g, ' ')
+    .trim();
+}
+
+function mindMapNodeMarkdownLabel(node) {
+  const badges = [
+    node.isCurrent ? '현재 카드' : '',
+    node.directToCurrent ? '직접 연결' : '',
+  ].filter(Boolean).join(' · ');
+  const label = [
+    badges,
+    node.term,
+    node.english,
+  ].filter(Boolean).join(' · ');
+  return escapeMindMapMarkdown(label || node.id);
+}
+
+function renderMindMapMarkdown(layout, summaryText) {
+  const lines = [
+    `# ${escapeMindMapMarkdown(summaryText || '현재 필터 카드')}`,
+  ];
+  if (layout.currentCard) {
+    lines.push(`## 현재 카드 · ${mindMapNodeMarkdownLabel({
+      ...layout.currentCard,
+      term: layout.currentCard.term || layout.currentCard.id,
+      english: layout.currentCard.english || '',
+      isCurrent: true,
+      directToCurrent: false,
+      id: layout.currentCard.id,
+    })}`);
+    lines.push(`- [${mindMapNodeMarkdownLabel({
+      ...layout.currentCard,
+      term: layout.currentCard.term || layout.currentCard.id,
+      english: layout.currentCard.english || '',
+      isCurrent: true,
+      directToCurrent: false,
+      id: layout.currentCard.id,
+    })}](card:${encodeURIComponent(layout.currentCard.id)})`);
+  }
+  layout.categoryGroups.forEach((group) => {
+    lines.push(`## ${escapeMindMapMarkdown(group.categoryLabel)}`);
+    group.subgroups.forEach((subgroup) => {
+      lines.push(`### ${escapeMindMapMarkdown(`소분류 · ${subgroup.label}`)}`);
+      subgroup.cards.forEach((node) => {
+        lines.push(`- [${mindMapNodeMarkdownLabel(node)}](card:${encodeURIComponent(node.id)})`);
+      });
+    });
+  });
+  return lines.join('\n');
+}
+
+window.renderMindMapPluginWindow = function renderMindMapPluginWindow(popupWindow, attempt = 0) {
+  if (!popupWindow || popupWindow.closed) return false;
+  const pluginShell = popupWindow.document.getElementById('mindmapPluginShell');
+  const fallbackTree = popupWindow.document.getElementById('mindmapFallbackTree');
+  const svg = popupWindow.document.getElementById('mindmapMarkmap');
+  const markdown = popupWindow.document.getElementById('mindmapMarkdown')?.textContent || '';
+  const markmapApi = popupWindow.markmap;
+  if (!pluginShell || !fallbackTree || !svg || !markdown || !markmapApi?.Markmap || !markmapApi?.Transformer) {
+    if (attempt >= 40) return false;
+    window.setTimeout(() => {
+      window.renderMindMapPluginWindow(popupWindow, attempt + 1);
+    }, 250);
+    return false;
+  }
+  try {
+    const transformer = new markmapApi.Transformer();
+    const {root} = transformer.transform(markdown);
+    svg.innerHTML = '';
+    markmapApi.Markmap.create(svg, {
+      autoFit: true,
+      colorFreezeLevel: 2,
+      duration: 0,
+      initialExpandLevel: 6,
+      maxWidth: 240,
+      paddingX: 20,
+    }, root);
+    pluginShell.hidden = false;
+    fallbackTree.hidden = true;
+    return true;
+  } catch (_error) {
+    if (attempt >= 40) return false;
+    window.setTimeout(() => {
+      window.renderMindMapPluginWindow(popupWindow, attempt + 1);
+    }, 250);
+    return false;
+  }
+}
+
 function renderMindMapWindow() {
   const popup = state.mindMapWindow;
   if (!popup || popup.closed) {
@@ -2987,6 +3434,7 @@ function renderMindMapWindow() {
   const summaryText = flashcardTableSummaryText();
   const rootColor = CATEGORY_COLORS[currentCard?.category] || '#2563eb';
   const rootSoft = `${rootColor}18`;
+  const mindMapMarkdown = renderMindMapMarkdown(layout, summaryText);
   try {
     popup.document.open();
     popup.document.write(`<!doctype html>
@@ -3049,7 +3497,45 @@ function renderMindMapWindow() {
       color: #475569;
       font-size: .96rem;
     }
-    .mindmap-tree-panel {
+    .mindmap-plugin-shell[hidden],
+    .mindmap-fallback-tree[hidden] {
+      display: none !important;
+    }
+    .mindmap-plugin-shell {
+      padding: 0 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+    .mindmap-plugin-caption {
+      display: grid;
+      gap: 4px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(239,246,255,.9));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      color: #475569;
+      font-size: .92rem;
+    }
+    .mindmap-plugin-caption strong {
+      color: #0f172a;
+      font-size: 1rem;
+    }
+    .mindmap-plugin-canvas {
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+    }
+    #mindmapMarkmap {
+      display: block;
+      width: 100%;
+      min-height: 820px;
+      background:
+        radial-gradient(circle at top, rgba(219, 234, 254, 0.48), transparent 36%),
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.96));
+    }
+    .mindmap-fallback-tree {
       padding: 0 18px 18px;
     }
     .mindmap-tree {
@@ -3126,15 +3612,8 @@ function renderMindMapWindow() {
       background: rgba(255, 255, 255, 0.78);
       border: 1px solid rgba(148, 163, 184, 0.18);
     }
-    .mindmap-metric strong {
-      display: block;
-      font-size: 1rem;
-    }
-    .mindmap-metric small {
-      display: block;
-      margin-top: 4px;
-      color: #64748b;
-    }
+    .mindmap-metric strong { display: block; font-size: 1rem; }
+    .mindmap-metric small { display: block; margin-top: 4px; color: #64748b; }
     .mindmap-branches {
       position: relative;
       display: grid;
@@ -3187,9 +3666,7 @@ function renderMindMapWindow() {
       font-size: .95rem;
       transition: transform .18s ease;
     }
-    .mindmap-category-branch:not([open]) .mindmap-category-node::after {
-      transform: rotate(-90deg);
-    }
+    .mindmap-category-branch:not([open]) .mindmap-category-node::after { transform: rotate(-90deg); }
     .mindmap-category-kicker {
       font-size: 11px;
       font-weight: 800;
@@ -3203,10 +3680,7 @@ function renderMindMapWindow() {
       font-size: 1.05rem;
       line-height: 1.25;
     }
-    .mindmap-category-node small {
-      color: #475569;
-      font-size: .9rem;
-    }
+    .mindmap-category-node small { color: #475569; font-size: .9rem; }
     .mindmap-branch-body {
       display: grid;
       gap: 12px;
@@ -3220,10 +3694,7 @@ function renderMindMapWindow() {
       font-size: .9rem;
       line-height: 1.45;
     }
-    .mindmap-subbranches {
-      display: grid;
-      gap: 12px;
-    }
+    .mindmap-subbranches { display: grid; gap: 12px; }
     .mindmap-subbranch {
       position: relative;
       display: grid;
@@ -3257,13 +3728,8 @@ function renderMindMapWindow() {
       width: 18px;
       border-top: 2px solid rgba(148, 163, 184, 0.38);
     }
-    .mindmap-subbranch-head strong {
-      color: #0f172a;
-      font-size: .94rem;
-    }
-    .mindmap-subbranch-head small {
-      color: #64748b;
-    }
+    .mindmap-subbranch-head strong { color: #0f172a; font-size: .94rem; }
+    .mindmap-subbranch-head small { color: #64748b; }
     .mindmap-leaf-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
@@ -3306,28 +3772,12 @@ function renderMindMapWindow() {
       background: #eef2ff;
       color: #4338ca;
     }
-    .mindmap-badge.current {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-    .mindmap-badge.direct {
-      background: #dcfce7;
-      color: #15803d;
-    }
-    .mindmap-badge.links {
-      background: #fef3c7;
-      color: #b45309;
-    }
-    .mindmap-leaf strong {
-      display: block;
-      font-size: .98rem;
-      line-height: 1.3;
-    }
+    .mindmap-badge.current { background: #dbeafe; color: #1d4ed8; }
+    .mindmap-badge.direct { background: #dcfce7; color: #15803d; }
+    .mindmap-badge.links { background: #fef3c7; color: #b45309; }
+    .mindmap-leaf strong { display: block; font-size: .98rem; line-height: 1.3; }
     .mindmap-leaf-english,
-    .mindmap-leaf small {
-      color: #475569;
-      line-height: 1.4;
-    }
+    .mindmap-leaf small { color: #475569; line-height: 1.4; }
     .mindmap-empty {
       padding: 64px 22px;
       text-align: center;
@@ -3335,51 +3785,45 @@ function renderMindMapWindow() {
       font-size: 1rem;
     }
     @media (max-width: 1100px) {
-      .mindmap-tree {
-        grid-template-columns: 1fr;
-      }
-      .mindmap-root-card {
-        position: static;
-      }
-      .mindmap-root-card::after {
-        display: none;
-      }
-      .mindmap-branches {
-        padding-left: 18px;
-      }
-      .mindmap-branches::before {
-        left: 0;
-      }
+      .mindmap-tree { grid-template-columns: 1fr; }
+      .mindmap-root-card { position: static; }
+      .mindmap-root-card::after { display: none; }
+      .mindmap-branches { padding-left: 18px; }
+      .mindmap-branches::before { left: 0; }
     }
     @media (max-width: 760px) {
-      .mindmap-shell {
-        padding: 14px;
-      }
-      .mindmap-head {
-        padding: 18px 18px 14px;
-      }
-      .mindmap-tree-panel {
-        padding: 0 12px 12px;
-      }
-      .mindmap-root-metrics {
-        grid-template-columns: 1fr;
-      }
-      .mindmap-leaf-grid {
-        grid-template-columns: 1fr;
-      }
+      .mindmap-shell { padding: 14px; }
+      .mindmap-head { padding: 18px 18px 14px; }
+      .mindmap-plugin-shell,
+      .mindmap-fallback-tree { padding: 0 12px 12px; }
+      .mindmap-root-metrics { grid-template-columns: 1fr; }
+      .mindmap-leaf-grid { grid-template-columns: 1fr; }
+      #mindmapMarkmap { min-height: 720px; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.9"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.18.9"></script>
 </head>
 <body>
   <main class="mindmap-shell">
     <section class="mindmap-panel">
       <header class="mindmap-head">
-        <p class="mindmap-kicker">카테고리형 마인드맵</p>
-        <h1 class="mindmap-title">현재 필터 카드 → 대분류 → 소분류 → 카드</h1>
+        <p class="mindmap-kicker">플러그인 마인드맵</p>
+        <h1 class="mindmap-title">현재 필터 카드 → 가지형 마인드맵</h1>
         <p class="mindmap-summary">${escapeHtml(summaryText)} · 펼친 카드 ${layout.totalCards}개 · 대분류 ${layout.totalCategories}개</p>
-        <p class="mindmap-hint">현재 필터 카드들을 대분류와 소분류 가지로 나눠서 나무처럼 펼쳤습니다. 가지를 따라 카드로 내려가고, 카드를 누르면 원본 창으로 이동합니다.</p>
+        <p class="mindmap-hint">Markmap 플러그인으로 노트북형 가지 구조를 먼저 렌더링하고, 로드 실패 시 아래 트리형 백업 레이아웃을 유지합니다.</p>
       </header>
-      <div class="mindmap-tree-panel">
+      <div class="mindmap-plugin-shell" id="mindmapPluginShell" hidden>
+        <div class="mindmap-plugin-caption">
+          <strong>노트북형 가지 보기</strong>
+          <span>대분류와 소분류를 따라 좌→우 가지로 뻗는 외부 플러그인 마인드맵입니다.</span>
+        </div>
+        <div class="mindmap-plugin-canvas">
+          <svg id="mindmapMarkmap"></svg>
+        </div>
+      </div>
+      <div class="mindmap-fallback-tree" id="mindmapFallbackTree">
         ${layout.totalCards ? `
           <div class="mindmap-tree">
             <article class="mindmap-root-card">
@@ -3400,22 +3844,10 @@ function renderMindMapWindow() {
                 </div>
               `}
               <div class="mindmap-root-metrics">
-                <div class="mindmap-metric">
-                  <strong>${layout.totalCategories}개</strong>
-                  <small>대분류</small>
-                </div>
-                <div class="mindmap-metric">
-                  <strong>${layout.directCardCount}개</strong>
-                  <small>직접 연결 카드</small>
-                </div>
-                <div class="mindmap-metric">
-                  <strong>${layout.connectedCategoryCount}개</strong>
-                  <small>연결된 대분류</small>
-                </div>
-                <div class="mindmap-metric">
-                  <strong>${layout.totalCards}개</strong>
-                  <small>현재 필터 카드</small>
-                </div>
+                <div class="mindmap-metric"><strong>${layout.totalCategories}개</strong><small>대분류</small></div>
+                <div class="mindmap-metric"><strong>${layout.directCardCount}개</strong><small>직접 연결 카드</small></div>
+                <div class="mindmap-metric"><strong>${layout.connectedCategoryCount}개</strong><small>연결된 대분류</small></div>
+                <div class="mindmap-metric"><strong>${layout.totalCards}개</strong><small>현재 필터 카드</small></div>
               </div>
             </article>
             <div class="mindmap-branches">
@@ -3451,11 +3883,11 @@ function renderMindMapWindow() {
                                 `<span class="mindmap-badge links">연결 ${node.visibleLinkCount}개</span>`,
                               ].join('');
                               return `<button class="mindmap-leaf${node.isCurrent ? ' current' : ''}" type="button" data-card-id="${escapeHtml(node.id)}" style="border-color: ${escapeHtml(borderColor)}; background: linear-gradient(180deg, #ffffff 0%, ${escapeHtml(cardSoft)} 100%);">
-                          <span class="mindmap-leaf-badges">${badges}</span>
-                          <strong>${escapeHtml(node.term)}</strong>
-                          ${node.english ? `<span class="mindmap-leaf-english">${escapeHtml(node.english)}</span>` : ''}
-                          <small>${node.visibleLinkCount ? `현재 필터 연결 ${node.visibleLinkCount}개` : '현재 필터 연결 없음'}</small>
-                        </button>`;
+                                <span class="mindmap-leaf-badges">${badges}</span>
+                                <strong>${escapeHtml(node.term)}</strong>
+                                ${node.english ? `<span class="mindmap-leaf-english">${escapeHtml(node.english)}</span>` : ''}
+                                <small>${node.visibleLinkCount ? `현재 필터 연결 ${node.visibleLinkCount}개` : '현재 필터 연결 없음'}</small>
+                              </button>`;
                             }).join('')}
                           </div>
                         </section>
@@ -3468,6 +3900,7 @@ function renderMindMapWindow() {
           </div>
         ` : `<div class="mindmap-empty">현재 필터 조건에 맞는 카드가 없습니다.</div>`}
       </div>
+      <script id="mindmapMarkdown" type="text/plain">${escapeHtml(mindMapMarkdown)}</script>
     </section>
   </main>
   <script>
@@ -3483,10 +3916,13 @@ function renderMindMapWindow() {
       return true;
     };
     document.addEventListener('click', (event) => {
-      const trigger = event.target.closest('[data-card-id]');
+      const trigger = event.target.closest('[data-card-id], a[href^="card:"]');
       if (!trigger) return;
       event.preventDefault();
-      invokeOpener('__csFlashcardsSelectCardFromMindMap', trigger.dataset.cardId || '');
+      const href = String(trigger.getAttribute('href') || '');
+      const cardId = trigger.dataset.cardId || decodeURIComponent(href.replace(/^card:/, ''));
+      if (!cardId) return;
+      invokeOpener('__csFlashcardsSelectCardFromMindMap', cardId);
     });
     window.addEventListener('beforeunload', () => {
       invokeOpener('__csFlashcardsMindMapClosed');
@@ -3495,6 +3931,7 @@ function renderMindMapWindow() {
 </body>
 </html>`);
     popup.document.close();
+    window.renderMindMapPluginWindow(popup);
   } catch (_error) {
     state.mindMapWindow = null;
     setMessage('마인드맵 창을 새로 열어주세요.', true);
@@ -3502,6 +3939,7 @@ function renderMindMapWindow() {
 }
 
 function bootstrapMindMapPopupWindow() {
+
 
   if (!mindMapPopupRequested()) return false;
   const openerRef = window.opener;
@@ -6039,6 +6477,15 @@ $('conceptImageZoomBtn')?.addEventListener('click', (event) => {
   event.stopPropagation();
   openConceptImageDialog();
 });
+$('conceptMediaEditBtn')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  openConceptMediaDialog();
+});
+$('conceptMediaTypeInput')?.addEventListener('change', updateConceptMediaDialogPlaceholder);
+$('conceptMediaDialogSaveBtn')?.addEventListener('click', saveConceptMedia);
+$('conceptMediaDialogCancelBtn')?.addEventListener('click', () => closeConceptMediaDialog());
+$('conceptMediaDialogCloseBtn')?.addEventListener('click', () => closeConceptMediaDialog());
 
 [
   ['definitionAiBtn', () => previewAiRewrite('definition')],
@@ -6085,6 +6532,9 @@ $('questionImportDialog')?.addEventListener('click', (event) => {
 });
 $('conceptImageDialog')?.addEventListener('click', (event) => {
   if (event.target === $('conceptImageDialog')) closeConceptImageDialog();
+});
+$('conceptMediaDialog')?.addEventListener('click', (event) => {
+  if (event.target === $('conceptMediaDialog')) closeConceptMediaDialog();
 });
 $('questionImportInput')?.addEventListener('keydown', (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
@@ -6191,6 +6641,11 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && conceptImageDialogOpen()) {
     e.preventDefault();
     closeConceptImageDialog();
+    return;
+  }
+  if (e.key === 'Escape' && conceptMediaDialogOpen()) {
+    e.preventDefault();
+    closeConceptMediaDialog();
     return;
   }
   if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {

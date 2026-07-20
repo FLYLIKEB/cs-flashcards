@@ -18,6 +18,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="conceptBackBtn"', INDEX_HTML)
         self.assertIn('이전 개념 카드와 필터로 돌아가기', INDEX_HTML)
 
+    def test_frontend_shows_content_db_source(self):
+        self.assertIn('id="contentDbPath"', INDEX_HTML)
+        self.assertIn("$('contentDbPath').textContent = data.summary.content_db_path;", APP_JS)
     def test_concept_jump_saves_and_restores_full_view_state(self):
         self.assertIn('conceptHistory: []', APP_JS)
         self.assertIn('function currentViewSnapshot()', APP_JS)
@@ -66,9 +69,15 @@ class StaticFrontendTests(unittest.TestCase):
             'id="examAiBtn"',
             'id="conceptImageZoomOutBtn"',
             'id="conceptImageZoomInBtn"',
+            'id="conceptMediaEditBtn"',
             'id="conceptImageGenerateBtn"',
-
+            'id="backConceptVideo"',
+            'id="backConceptHtmlFrame"',
+            'id="backConceptMermaid"',
             'id="backConceptImagePlaceholder"',
+            'id="conceptImageDialogStage"',
+            'id="conceptMediaDialog"',
+            'id="conceptMediaTypeInput"',
         ]:
             self.assertIn(snippet, INDEX_HTML)
         for snippet in [
@@ -130,15 +139,23 @@ class StaticFrontendTests(unittest.TestCase):
             'AI 변환 중',
             'conceptImageScale: 1,',
             'const CONCEPT_IMAGE_SCALE_MIN = 0.8;',
-            'function updateConceptImageZoomControls({hasImage = false} = {})',
+            'const CONCEPT_MEDIA_TYPES = Object.freeze',
+            'function updateConceptImageZoomControls({hasMedia = false} = {})',
             'function stepConceptImageScale(delta)',
             'function conceptImageScalePercent()',
+            'function conceptMediaDisplayState(card)',
             'async function previewConceptImage()',
+            'async function saveConceptMedia()',
             '/ai-image/preview',
             '/ai-image/apply',
             '/ai-image/discard',
+            '/concept-media',
+            'function openConceptMediaDialog()',
+            'function updateConceptMediaDialogPlaceholder()',
             'function openConceptImageDialog()',
             'function closeConceptImageDialog({restoreFocus = true} = {})',
+            "$('conceptMediaEditBtn')?.addEventListener('click'",
+            "$('conceptMediaDialogSaveBtn')?.addEventListener('click', saveConceptMedia);",
             "$('conceptImageZoomBtn')?.addEventListener('click'",
             "$('conceptImageZoomOutBtn')?.addEventListener('click'",
             "$('conceptImageZoomInBtn')?.addEventListener('click'",
@@ -159,13 +176,19 @@ class StaticFrontendTests(unittest.TestCase):
             '.concept-image-action',
             '.concept-image-action.zoom',
             '.concept-image-action.zoom-step',
+            '.concept-media-stage',
+            '.concept-video',
+            '.concept-media-iframe',
+            '.concept-media-mermaid',
+            '.concept-media-editor-modal',
             '.concept-image-placeholder',
             '.concept-image-wrap.is-empty',
             '.concept-image-modal-image',
+            '.concept-image-modal-iframe',
         ]:
             self.assertIn(snippet, STYLE_CSS)
         self.assertIn('max-height: calc(clamp(165px, 30vh, 280px) * var(--concept-image-scale, 1));', STYLE_CSS)
-        self.assertIn('.concept-image { max-height: calc(205px * var(--concept-image-scale, 1)); }', STYLE_CSS)
+        self.assertIn('max-height: calc(205px * var(--concept-image-scale, 1));', STYLE_CSS)
         self.assertIn('id="conceptImageZoomOutBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageZoomInBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageZoomBtn"', INDEX_HTML)
@@ -174,13 +197,15 @@ class StaticFrontendTests(unittest.TestCase):
     def test_mind_map_popup_script_contract_is_scoped_and_stable(self):
         popup_block = APP_JS.split('function renderMindMapWindow() {', 1)[1].split('function bootstrapMindMapPopupWindow() {', 1)[0]
         self.assertIn("const invokeOpener = (callbackName, ...args) => {", popup_block)
-        self.assertIn("invokeOpener('__csFlashcardsSelectCardFromMindMap', trigger.dataset.cardId || '');", popup_block)
+        self.assertIn("const cardId = trigger.dataset.cardId || decodeURIComponent(href.replace(/^card:/, ''));", popup_block)
         self.assertIn("invokeOpener('__csFlashcardsMindMapClosed');", popup_block)
         self.assertIn('openerRef.focus?.();', popup_block)
         self.assertNotIn('window.focus();', popup_block)
         self.assertEqual(popup_block.count("invokeOpener('__csFlashcardsSelectCardFromMindMap'"), 1)
         self.assertEqual(popup_block.count("invokeOpener('__csFlashcardsMindMapClosed');"), 1)
         self.assertEqual(popup_block.count('window.setTimeout(() => {'), 1)
+        self.assertIn('renderMindMapPluginWindow(popup);', APP_JS)
+        self.assertIn('function renderMindMapPluginWindow(popupWindow, attempt = 0) {', APP_JS)
 
     def test_mind_map_popup_bootstrap_and_reopen_contract(self):
         bootstrap_block = APP_JS.split('function bootstrapMindMapPopupWindow() {', 1)[1].split('function openMindMapWindow() {', 1)[0]
@@ -194,22 +219,27 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('state.mindMapWindow = popup;', open_block)
         self.assertIn('popup.focus();', open_block)
 
-    def test_mind_map_popup_uses_grouped_category_tree_layout(self):
+    def test_mind_map_popup_prefers_markmap_plugin_with_tree_fallback(self):
         popup_block = APP_JS.split('function renderMindMapWindow() {', 1)[1].split('function bootstrapMindMapPopupWindow() {', 1)[0]
         for snippet in [
-            '카테고리형 마인드맵',
-            '현재 필터 카드 → 대분류 → 소분류 → 카드',
-            'mindmap-root-card',
-            'mindmap-category-branch',
-            'mindmap-category-node',
-            'mindmap-subbranch',
-            'mindmap-subbranch-head',
-            'mindmap-leaf-grid',
-            '대분류',
-            '소분류',
-            '직접 연결',
+            '플러그인 마인드맵',
+            '현재 필터 카드 → 가지형 마인드맵',
+            'renderMindMapMarkdown(layout, summaryText)',
+            'mindmapPluginShell',
+            'mindmapMarkmap',
+            'mindmapFallbackTree',
+            'renderMindMapPluginWindow(popup);',
+            'https://cdn.jsdelivr.net/npm/d3@7',
+            'https://cdn.jsdelivr.net/npm/markmap-view@0.18.9',
+            'https://cdn.jsdelivr.net/npm/markmap-lib@0.18.9',
+            'Markmap 플러그인으로 노트북형 가지 구조를 먼저 렌더링하고',
+            '소분류 ·',
+            'Markmap 플러그인으로 노트북형 가지 구조를 먼저 렌더링하고',
+            "event.target.closest('[data-card-id], a[href^=\"card:\"]')",
         ]:
             self.assertIn(snippet, popup_block)
+        self.assertIn('function renderMindMapPluginWindow(popupWindow, attempt = 0) {', APP_JS)
+        self.assertIn('const markmapApi = popupWindow.markmap;', APP_JS)
 
     def test_wiki_ui_and_flashcard_links_are_present(self):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
@@ -243,6 +273,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('function populateCategoryOptions(', QUESTION_BANK_JS)
         self.assertIn('available_issuers', QUESTION_BANK_JS)
         self.assertIn('available_categories', QUESTION_BANK_JS)
+        self.assertIn('question-keyword-link', QUESTION_BANK_JS)
+        self.assertIn('card_query=', QUESTION_BANK_JS)
 
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
@@ -466,6 +498,7 @@ class StaticFrontendTests(unittest.TestCase):
             '<select id="questionBankCategoryInput"',
             'id="questionBankIssuerInput"',
             '<select id="questionBankIssuerInput"',
+            '<th scope="col">키워드</th>',
 
             'id="questionBankSourceInput"',
             'id="questionBankDifficultySelect"',
@@ -495,6 +528,9 @@ class StaticFrontendTests(unittest.TestCase):
             'function questionRevealLocked(',
             'function generateBokExamQuestions(',
             'function populateQuestionBankIssuerOptions(',
+            'function findCardByKeyword(',
+            'function renderQuestionKeywordLinks(',
+            'function goToQuestionKeyword(',
             'function renderQuestionSessionReview(',
             'function generateQuestionsFromCurrentFilter()',
             '/api/questions/generate',
@@ -510,6 +546,7 @@ class StaticFrontendTests(unittest.TestCase):
             'function renderQuestionPanel()',
             'function revealQuestionAnswer()',
             'function openQuestionSourceCard()',
+            'question-keyword-link',
             'function openQuestionPracticeFromMenu()',
             'toggleQuestionMode(true)',
             'function openQuestionImportDialog()',
