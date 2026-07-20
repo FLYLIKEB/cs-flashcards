@@ -2687,16 +2687,14 @@ function renderFlashcardTableWindow() {
   const currentCardId = rows[state.index]?.id || '';
   const summaryText = flashcardTableSummaryText();
   const rowsHtml = rows.length ? rows.map((card, index) => `
-    <tr class="${card.id === currentCardId ? 'active' : ''}" data-card-id="${escapeHtml(card.id)}" tabindex="0">
+    <tr class="${card.id === currentCardId ? 'current-row' : ''}" data-card-id="${escapeHtml(card.id)}" tabindex="0">
       <td>${index + 1}</td>
-      <td class="term-cell">${isCardBookmarked(card) ? '<span class="bookmark">★</span> ' : ''}${escapeHtml(card.term || card.id)}</td>
+      <td class="term-cell">${isCardBookmarked(card) ? '★ ' : ''}${escapeHtml(card.term || card.id)}</td>
       <td>${escapeHtml(card.english || '—')}</td>
       <td>${escapeHtml(categoryLabel(card.category))}</td>
-      <td><span class="status-badge">${escapeHtml(statusLabel(card.known_status))}</span></td>
+      <td>${escapeHtml(statusLabel(card.known_status))}</td>
     </tr>
-  `).join('') : `
-    <div class="empty-state">현재 조건에 맞는 카드가 없습니다.</div>
-  `;
+  `).join('') : '<p class="empty-state">현재 조건에 맞는 카드가 없습니다.</p>';
   try {
     popup.document.open();
     popup.document.write(`<!doctype html>
@@ -2706,44 +2704,33 @@ function renderFlashcardTableWindow() {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>플래시카드 표 목록</title>
   <style>
-    :root { color-scheme: light; --bg: #f6f5f2; --panel: rgba(255,255,255,.82); --line: #e7e3dc; --text: #171717; --muted: #6f6f6a; --accent: #1f3a5f; --accent-soft: #eef3f8; --shadow: 0 24px 70px rgba(29, 25, 20, .12); }
+    :root { color-scheme: light; --line: #d7d7d7; --line-strong: #bcbcbc; --text: #111; --muted: #666; --bg: #fff; --row: #f3f3f3; }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; color: var(--text); background: radial-gradient(circle at top left, rgba(31, 58, 95, .08), transparent 22rem), linear-gradient(180deg, #fff, var(--bg)); }
-    .shell { padding: 24px; }
-    .panel { max-width: 1200px; margin: 0 auto; padding: 22px; border: 1px solid var(--line); border-radius: 28px; background: var(--panel); box-shadow: var(--shadow); backdrop-filter: blur(24px); }
-    .header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
-    h1 { margin: 0; font-size: 1.45rem; letter-spacing: -.04em; }
-    .subtitle, .hint { margin: 6px 0 0; color: var(--muted); font-size: .94rem; }
-    .pill { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 700; white-space: nowrap; }
-    .table-wrap { overflow: auto; border-radius: 22px; }
-    table { width: 100%; border-collapse: separate; border-spacing: 0 10px; table-layout: fixed; }
-    th, td { padding: 14px 16px; text-align: left; background: rgba(255,255,255,.92); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: .95rem; }
-    th { position: sticky; top: 0; z-index: 1; color: var(--muted); font-size: .82rem; letter-spacing: .01em; text-transform: uppercase; background: rgba(247,247,244,.96); }
-    th:first-child, td:first-child { border-left: 1px solid var(--line); border-radius: 16px 0 0 16px; width: 72px; }
-    th:last-child, td:last-child { border-right: 1px solid var(--line); border-radius: 0 16px 16px 0; width: 88px; }
-    tbody tr { cursor: pointer; outline: none; }
-    tbody tr.active td { border-color: rgba(31, 58, 95, .24); background: linear-gradient(180deg, #fff, #f8fbff); box-shadow: 0 14px 34px rgba(31, 58, 95, .08); }
-    tbody tr:focus-visible td, tbody tr:hover td { border-color: rgba(31, 58, 95, .24); }
-    .term-cell { font-weight: 700; }
-    .bookmark { color: #ca8a04; }
-    .status-badge { display: inline-flex; min-width: 34px; justify-content: center; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: #fff; }
-    .empty-state { padding: 44px 18px; text-align: center; color: var(--muted); border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,.92); }
-    @media (max-width: 780px) { .shell { padding: 14px; } .panel { padding: 16px; border-radius: 22px; } }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; }
+    .shell { padding: 12px; }
+    .meta { margin: 0 0 8px; }
+    h1 { margin: 0 0 2px; font-size: 14px; font-weight: 700; }
+    .summary, .hint { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .table-wrap { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    th, td { padding: 7px 9px; border: 1px solid var(--line); text-align: left; vertical-align: middle; line-height: 1.35; }
+    th { background: #fafafa; font-weight: 600; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover td, tbody tr:focus-visible td, tbody tr.current-row td { background: var(--row); }
+    tbody tr:focus-visible { outline: none; }
+    .term-cell { font-weight: 600; }
+    .empty-state { margin: 0; padding: 14px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    @media (max-width: 780px) { .shell { padding: 8px; } th, td { padding: 6px 8px; } }
   </style>
 </head>
 <body>
   <div class="shell">
-    <div class="panel">
-      <div class="header">
-        <div>
-          <h1>플래시카드 표 목록</h1>
-          <p class="subtitle">${escapeHtml(summaryText)} · ${rows.length}개</p>
-          <p class="hint">행을 누르면 원래 창의 카드로 바로 이동합니다.</p>
-        </div>
-        <div class="pill">현재 ${rows.length ? state.index + 1 : 0} / ${rows.length}</div>
-      </div>
-      ${rows.length ? `<div class="table-wrap"><table><thead><tr><th>#</th><th>용어</th><th>영문</th><th>분류</th><th>상태</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
+    <div class="meta">
+      <h1>플래시카드 표 목록</h1>
+      <p class="summary">${escapeHtml(summaryText)} · ${rows.length}개 · 현재 ${rows.length ? state.index + 1 : 0}</p>
+      <p class="hint">행을 누르면 원래 창의 카드로 이동합니다.</p>
     </div>
+    ${rows.length ? `<div class="table-wrap"><table><thead><tr><th style="width:56px;">#</th><th>용어</th><th>영문</th><th>분류</th><th style="width:56px;">상태</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
   </div>
   <script>
     const activateRow = (row) => {
