@@ -1973,9 +1973,11 @@ def sync_bok_question_bank_entries(
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
     entries = parse_bok_question_bank_entries(repo_dir)
+    cleared = clear_bok_question_bank_entries(csv_path, progress_db_path)
     saved = upsert_question_bank_entries(entries, csv_path, progress_db_path)
     return {
         "pages": len(bok_question_bank_source_pages(repo_dir)),
+        "cleared": cleared,
         "count": saved.get("count", 0),
         "items": saved.get("items", []),
     }
