@@ -363,6 +363,10 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('data-wiki-task-checkbox="1"', WIKI_JS)
         self.assertIn('.wiki-task-list', STYLE_CSS)
         self.assertIn('.wiki-task-item', STYLE_CSS)
+        self.assertIn('.wiki-article ul ul', STYLE_CSS)
+        self.assertIn('.wiki-article ul ul ul', STYLE_CSS)
+        self.assertIn('.wiki-article ol ol', STYLE_CSS)
+        self.assertIn('.wiki-article ol ol ol', STYLE_CSS)
     def test_audio_playback_repeat_and_term_language_controls_are_present(self):
         for snippet in [
             'id="termSpeechMode"',

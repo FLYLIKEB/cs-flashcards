@@ -48,6 +48,16 @@ class WikiMarkdownEditorTests(unittest.TestCase):
             self.assertIn('data-wiki-task-checkbox="1"', payload['html'])
             self.assertIn('/wiki/page/child', payload['html'])
 
+    def test_render_wiki_markdown_preview_preserves_nested_list_hierarchy(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            payload = flashcard_app.render_wiki_markdown_preview(
+                'pages/intro.md',
+                '# 소개 문서\n\n- 상위 항목\n  - 하위 항목\n    - 더 하위 항목\n\n1. 첫째\n   1. 둘째\n',
+                book,
+            )
+            self.assertIn('<ul><li>상위 항목<ul><li>하위 항목<ul><li>더 하위 항목</li></ul></li></ul></li></ul>', payload['html'])
+            self.assertIn('<ol><li>첫째<ol><li>둘째</li></ol></li></ol>', payload['html'])
     def test_api_wiki_render_preview_returns_rendered_html(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))

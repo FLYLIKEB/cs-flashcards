@@ -6483,6 +6483,27 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   padding-left: 1.35rem;
 }
 
+.wiki-article ul ul {
+  list-style-type: circle;
+}
+
+.wiki-article ul ul ul {
+  list-style-type: square;
+}
+
+.wiki-article ol ol {
+  list-style-type: lower-alpha;
+}
+
+.wiki-article ol ol ol {
+  list-style-type: lower-roman;
+}
+
+.wiki-article li > ul,
+.wiki-article li > ol {
+  margin: .42rem 0 0;
+}
+
 .wiki-article .wiki-task-list {
   padding-left: 0;
   list-style: none;

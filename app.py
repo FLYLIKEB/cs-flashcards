@@ -2877,32 +2877,98 @@ def render_inline_markdown_tokens(text: str, repo_dir: Path, current_source: Pat
     rendered.append(html.escape(text[last:]))
     return "".join(rendered)
 
+def markdown_list_indent(indent: str) -> int:
+    return len(str(indent or "").replace("\t", "    "))
 
-def render_markdown_list(lines: list[str], line_numbers: list[int], repo_dir: Path, current_source: Path) -> str:
-    first_match = WIKI_LIST_RE.match(lines[0])
-    tag = "ol" if first_match and first_match.group("marker").endswith(".") else "ul"
-    source_relative = str(current_source.relative_to(repo_dir)).replace(os.sep, "/")
+
+
+def render_markdown_list_block(
+    entries: list[dict[str, Any]],
+    index: int,
+    indent: int,
+    repo_dir: Path,
+    current_source: Path,
+    source_relative: str,
+) -> tuple[str, int]:
+    first = entries[index]
+    tag = str(first.get("tag") or "ul")
     items: list[str] = []
     is_task_list = True
+
+    while index < len(entries):
+        entry = entries[index]
+        entry_indent = int(entry.get("indent") or 0)
+        if entry_indent < indent:
+            break
+        if entry_indent > indent:
+            break
+        if str(entry.get("tag") or "ul") != tag:
+            break
+
+        body = str(entry.get("body") or "")
+        line_number = int(entry.get("line_number") or 0)
+        task_item = parse_markdown_task_item(body)
+        if task_item:
+            item_checked, item_text = task_item
+            checked_attr = " checked" if item_checked else ""
+            item_class = ' class="wiki-task-item"'
+            item_inner = (
+                "<label>"
+                f"<input type=\"checkbox\" data-wiki-task-checkbox=\"1\" data-wiki-task-source=\"{html.escape(source_relative, quote=True)}\" data-wiki-task-line=\"{line_number}\"{checked_attr} />"
+                f"<span>{render_inline_markdown(item_text, repo_dir, current_source)}</span>"
+                "</label>"
+            )
+        else:
+            is_task_list = False
+            item_class = ""
+            item_inner = render_inline_markdown(body.strip(), repo_dir, current_source)
+
+        index += 1
+        nested_parts: list[str] = []
+        while index < len(entries) and int(entries[index].get("indent") or 0) > indent:
+            nested_html, index = render_markdown_list_block(
+                entries,
+                index,
+                int(entries[index].get("indent") or 0),
+                repo_dir,
+                current_source,
+                source_relative,
+            )
+            nested_parts.append(nested_html)
+        items.append(f"<li{item_class}>{item_inner}{''.join(nested_parts)}</li>")
+
+    class_attr = ' class="wiki-task-list"' if items and is_task_list else ""
+    return f"<{tag}{class_attr}>" + "".join(items) + f"</{tag}>", index
+
+
+
+def render_markdown_list(lines: list[str], line_numbers: list[int], repo_dir: Path, current_source: Path) -> str:
+    source_relative = str(current_source.relative_to(repo_dir)).replace(os.sep, "/")
+    entries: list[dict[str, Any]] = []
     for line, line_number in zip(lines, line_numbers):
         match = WIKI_LIST_RE.match(line)
         if not match:
             continue
-        task_item = parse_markdown_task_item(match.group("body"))
-        if task_item:
-            item_checked, item_text = task_item
-            checked_attr = " checked" if item_checked else ""
-            items.append(
-                "<li class=\"wiki-task-item\"><label>"
-                f"<input type=\"checkbox\" data-wiki-task-checkbox=\"1\" data-wiki-task-source=\"{html.escape(source_relative, quote=True)}\" data-wiki-task-line=\"{line_number}\"{checked_attr} />"
-                f"<span>{render_inline_markdown(item_text, repo_dir, current_source)}</span>"
-                "</label></li>"
-            )
-            continue
-        is_task_list = False
-        items.append(f"<li>{render_inline_markdown(match.group('body').strip(), repo_dir, current_source)}</li>")
-    class_attr = ' class="wiki-task-list"' if items and is_task_list else ""
-    return f"<{tag}{class_attr}>" + "".join(items) + f"</{tag}>"
+        marker = match.group("marker")
+        entries.append({
+            "indent": markdown_list_indent(match.group("indent")),
+            "tag": "ol" if marker.endswith(".") else "ul",
+            "body": match.group("body"),
+            "line_number": line_number,
+        })
+    rendered: list[str] = []
+    index = 0
+    while index < len(entries):
+        block_html, index = render_markdown_list_block(
+            entries,
+            index,
+            int(entries[index].get("indent") or 0),
+            repo_dir,
+            current_source,
+            source_relative,
+        )
+        rendered.append(block_html)
+    return "".join(rendered)
 
 
 def render_markdown_table(lines: list[str], repo_dir: Path, current_source: Path) -> str:
