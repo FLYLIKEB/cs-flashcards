@@ -313,6 +313,23 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   line-height: 1.4;
 }
 
+.question-keyword-link,
+.question-keyword-text,
+.question-keyword-sep {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.question-keyword-link {
+  color: var(--cs-table-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.question-keyword-link:hover {
+  color: var(--cs-table-accent-strong);
+}
+
 .cs-table-empty {
   margin: 0;
   padding: 14px 10px;

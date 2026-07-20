@@ -15,13 +15,19 @@ class QuestionBankMetadataTests(unittest.TestCase):
         self.assertIn('<select id="questionBankCategoryInput"', INDEX_HTML)
         self.assertIn('<select id="questionBankIssuerInput"', INDEX_HTML)
 
-    def test_question_bank_scripts_populate_category_and_issuer_options(self):
+    def test_question_bank_scripts_populate_category_and_issuer_options_and_keywords(self):
         self.assertIn('function populateIssuerOptions(', QUESTION_BANK_JS)
         self.assertIn('function populateCategoryOptions(', QUESTION_BANK_JS)
+        self.assertIn('function normalizeQuestionKeywords(', QUESTION_BANK_JS)
+        self.assertIn('function renderQuestionKeywordLinks(', QUESTION_BANK_JS)
+        self.assertIn('card_query=', QUESTION_BANK_JS)
         self.assertIn('available_issuers', QUESTION_BANK_JS)
         self.assertIn('available_categories', QUESTION_BANK_JS)
         self.assertIn('function populateQuestionBankIssuerOptions(', APP_JS)
         self.assertIn('function populateQuestionBankCategoryOptions(', APP_JS)
+        self.assertIn('function findCardByKeyword(', APP_JS)
+        self.assertIn('function renderQuestionKeywordLinks(', APP_JS)
+        self.assertIn('function goToQuestionKeyword(', APP_JS)
         self.assertIn('available_issuers', APP_JS)
         self.assertIn('available_categories', APP_JS)
 

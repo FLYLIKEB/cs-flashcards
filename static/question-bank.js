@@ -6,7 +6,7 @@ const QUESTION_BANK_COLUMNS = [
   {key: 'index', label: '#', width: '56px'},
   {key: 'prompt', label: '문제', width: '36rem', cellClassName: 'term-cell'},
   {key: 'type', label: '형식', width: '8.5rem'},
-  {key: 'topic', label: '카테고리 · 문제유형', width: '14rem'},
+  {key: 'topic', label: '키워드', width: '16rem'},
   {key: 'issuer', label: '기관', width: '9rem'},
   {key: 'difficulty', label: '난이도', width: '7rem'},
   {key: 'source', label: '출처', width: '13rem'},
@@ -37,6 +37,38 @@ function markdownPreviewText(source) {
     .replace(/[#>*_`|~-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function normalizeQuestionKeywords(value) {
+  const rawItems = Array.isArray(value) ? value : String(value || '').split(/[;,\n]/);
+  const seen = new Set();
+  return rawItems
+    .map((item) => String(item || '').trim())
+    .filter((item) => {
+      if (!item) return false;
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function keywordCardQueryUrl(keyword) {
+  const text = String(keyword || '').trim();
+  if (!text || text === '한국은행' || /^20\d{2}$/.test(text) || /(학술|논술|전산)/.test(text)) return '';
+  return `/?card_query=${encodeURIComponent(text)}&side=back`;
+}
+
+function renderQuestionKeywordLinks(keywords) {
+  const items = normalizeQuestionKeywords(keywords);
+  if (!items.length) return '—';
+  return items.map((keyword) => {
+    const url = keywordCardQueryUrl(keyword);
+    const text = escapeHtml(keyword);
+    return url
+      ? `<a class="question-keyword-link" href="${url}" title="${text} 카드 보기">${text}</a>`
+      : `<span class="question-keyword-text">${text}</span>`;
+  }).join('<span class="question-keyword-sep">, </span>');
 }
 
 function questionTypeLabel(item) {
@@ -170,10 +202,7 @@ function tableRows() {
     const active = bankState.selectedId && bankState.selectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
     const typeLabel = escapeHtml(questionTypeLabel(item));
-    const topic = escapeHtml([
-      String(item.category || item.card_category || '').trim(),
-      String(item.topic || '').trim(),
-    ].filter((value, index, array) => value && array.indexOf(value) === index).join(' · '));
+    const topic = renderQuestionKeywordLinks(item.keywords);
     const issuer = escapeHtml(item.issuer || '');
     const difficulty = escapeHtml(item.difficulty || '');
     const source = escapeHtml(item.source_location || '');
@@ -185,7 +214,7 @@ function tableRows() {
         index: String(index + 1),
         prompt: `<span class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</span>`,
         type: typeLabel || '—',
-        topic: topic || '—',
+        topic: topic,
         issuer: issuer || '—',
         difficulty: difficulty || '—',
         source: source || '—',
