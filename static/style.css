@@ -4539,13 +4539,17 @@ select,
 }
 .question-md-figure {
   margin: .72rem 0;
+  display: grid;
+  justify-items: center;
+  text-align: center;
 }
 .question-md-image {
   display: block;
   width: auto;
-  max-width: min(100%, 720px);
-  max-height: min(56vh, 34rem);
+  max-width: min(100%, 520px);
+  max-height: min(42vh, 24rem);
   height: auto;
+  margin-inline: auto;
   border-radius: 14px;
   border: 1px solid rgba(31, 58, 95, .08);
   background: #fff;
@@ -5463,8 +5467,9 @@ select,
 }
 .question-bank-table {
   width: 100%;
+  min-width: 1100px;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   background: #fff;
 }
 .question-bank-table th,
@@ -5481,6 +5486,7 @@ select,
   color: var(--muted);
   font-size: .74rem;
   font-weight: 800;
+  white-space: nowrap;
 }
 .question-bank-table td:not(.question-bank-col-title) {
   white-space: nowrap;
@@ -5497,13 +5503,13 @@ select,
   font-variant-numeric: tabular-nums;
 }
 .question-bank-col-title {
-  width: 48%;
+  width: 36rem;
 }
 .question-bank-col-type {
-  width: 8rem;
+  width: 8.5rem;
 }
 .question-bank-col-field {
-  width: 9rem;
+  width: 10rem;
 }
 .question-bank-col-issuer {
   width: 8rem;
@@ -5512,7 +5518,7 @@ select,
   width: 6rem;
 }
 .question-bank-col-source {
-  width: 11rem;
+  width: 13rem;
 }
 .question-bank-row-trigger {
   width: 100%;
@@ -5551,7 +5557,7 @@ select,
 }
 @media (max-width: 760px) {
   .question-bank-table {
-    min-width: 760px;
+    min-width: 1100px;
   }
   .question-panel,
   .question-toolbar-main,
