@@ -14,9 +14,10 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('/static/table-shell.css', QUESTION_BANK_HTML)
         self.assertIn('/static/table-shell.js', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
-        self.assertIn('열 제목 드래그로 순서 변경', QUESTION_BANK_HTML)
+        self.assertIn('문제 풀이 · 문제은행', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
+        self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('question-bank-shell-grid', QUESTION_BANK_HTML)
 
     def test_question_bank_page_uses_shared_renderer(self):

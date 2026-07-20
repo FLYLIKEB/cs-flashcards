@@ -164,9 +164,7 @@ function renderPracticePane() {
   const summary = $('bankPagePracticeSummary');
   const placeholder = $('bankPagePracticePlaceholder');
   const frame = $('bankPagePracticeFrame');
-  const openTab = $('bankPageOpenPracticeTab');
-  if (!summary || !placeholder || !frame || !openTab) return;
-  openTab.href = practiceFrameUrl();
+  if (!summary || !placeholder || !frame) return;
   if (!bankState.items.length) {
     summary.textContent = bankState.loading ? '문제은행 목록을 불러온 뒤 오른쪽에 문제 풀이를 연결합니다.' : '표에 표시할 문제가 없습니다.';
     placeholder.textContent = bankState.loading ? '문제 목록을 불러오는 중입니다.' : '현재 조건에 맞는 문제은행 항목이 없습니다.';
@@ -194,7 +192,7 @@ function renderTable() {
   const returned = Number(bankState.summary?.returned || bankState.items.length || 0);
   summary.textContent = bankState.loading
     ? '문제은행을 불러오는 중입니다.'
-    : `총 ${total}문항 · 현재 ${returned}문항 · ${bankState.practiceCollapsed ? '문제 풀이 패널 숨김 상태' : '왼쪽 표와 오른쪽 문제 풀이가 한 화면에서 함께 동작합니다.'}`;
+    : `총 ${total}문항 · 현재 ${returned}문항 · ${bankState.practiceCollapsed ? '문제 풀이 패널 숨김 상태' : '문제 풀이와 문제은행 표를 한 화면에서 함께 사용 중입니다.'}`;
   error.textContent = bankState.error || '';
   window.CSTableShell.renderTable(mount, {
     columns: QUESTION_BANK_COLUMNS,

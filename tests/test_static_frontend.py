@@ -171,16 +171,29 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="conceptImageZoomBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageDialog"', INDEX_HTML)
 
+    def test_mind_map_popup_script_contract_is_scoped_and_stable(self):
+        popup_block = APP_JS.split('function renderMindMapWindow() {', 1)[1].split('function bootstrapMindMapPopupWindow() {', 1)[0]
+        self.assertIn("const invokeOpener = (callbackName, ...args) => {", popup_block)
+        self.assertIn("invokeOpener('__csFlashcardsSelectCardFromMindMap', trigger.dataset.cardId || '');", popup_block)
+        self.assertIn("invokeOpener('__csFlashcardsMindMapClosed');", popup_block)
+        self.assertIn('openerRef.focus?.();', popup_block)
+        self.assertNotIn('window.focus();', popup_block)
+        self.assertEqual(popup_block.count("invokeOpener('__csFlashcardsSelectCardFromMindMap'"), 1)
+        self.assertEqual(popup_block.count("invokeOpener('__csFlashcardsMindMapClosed');"), 1)
+        self.assertEqual(popup_block.count('window.setTimeout(() => {'), 1)
+
     def test_wiki_ui_and_flashcard_links_are_present(self):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
         self.assertIn('id="questionBankPageLink"', INDEX_HTML)
         self.assertIn('href="/wiki"', INDEX_HTML)
         self.assertIn('href="/question-bank"', INDEX_HTML)
+        self.assertIn('문제 풀이 · 문제은행', INDEX_HTML)
         self.assertIn('target="_blank"', INDEX_HTML)
         menu_popover = INDEX_HTML.split('id="menuPopover"', 1)[1].split('</div>', 1)[0]
         self.assertIn('id="wikiHomeLink"', menu_popover)
         self.assertIn('id="questionBankPageLink"', menu_popover)
         self.assertIn('id="mindMapBtn"', menu_popover)
+        self.assertNotIn('id="questionPracticeBtn"', menu_popover)
         self.assertIn('function renderSourceLinks(sourceFiles)', APP_JS)
         self.assertIn("$('sources').innerHTML = renderSourceLinks(c.source_files);", APP_JS)
         self.assertIn('/wiki/page/', APP_JS)
@@ -188,7 +201,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
+        self.assertIn('문제 풀이 · 문제은행', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
+        self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_PRACTICE_COLLAPSED_KEY', QUESTION_BANK_JS)
@@ -370,8 +385,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-panel[hidden]', (ROOT / 'static' / 'style.css').read_text(encoding='utf-8'))
         self.assertIn('display: none !important', (ROOT / 'static' / 'style.css').read_text(encoding='utf-8'))
         self.assertNotIn('id="questionModeBtn"', INDEX_HTML)
+        self.assertNotIn('id="questionPracticeBtn"', INDEX_HTML)
         for snippet in [
-            'id="questionPracticeBtn"',
             'id="questionPanel"',
             'id="questionSessionModeSelect"',
             'id="questionSessionReview"',
