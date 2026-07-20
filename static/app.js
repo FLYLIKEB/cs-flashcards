@@ -2706,6 +2706,21 @@ function selectCardFromFlashcardTable(cardId) {
 
 window.__csFlashcardsSelectCardFromTable = selectCardFromFlashcardTable;
 
+function flashcardTablePopupRequested() {
+  try {
+    return new URLSearchParams(window.location.search).get('popup') === 'flashcard-table';
+  } catch (_error) {
+    return false;
+  }
+}
+
+function registerFlashcardTableWindow(popupWindow = null) {
+  if (!popupWindow || popupWindow.closed) return false;
+  state.flashcardTableWindow = popupWindow;
+  renderFlashcardTableWindow();
+  return true;
+}
+
 function flashcardTableColumnOrder() {
   const fallback = [...FLASHCARD_TABLE_DEFAULT_COLUMNS];
   try {
@@ -2832,6 +2847,7 @@ async function setFlashcardStatusFromTable(cardId, status) {
   }
 }
 
+window.__csFlashcardsRegisterTableWindow = registerFlashcardTableWindow;
 window.__csFlashcardsMoveTableColumn = moveFlashcardTableColumn;
 window.__csFlashcardsToggleBookmarkFromTable = toggleFlashcardBookmarkFromTable;
 window.__csFlashcardsSetStatusFromTable = setFlashcardStatusFromTable;
@@ -2978,10 +2994,7 @@ function renderFlashcardTableWindow() {
         headers.forEach((item) => item.classList.remove('dragging', 'drop-target'));
       });
     });
-    window.addEventListener('beforeunload', () => {
-      const openerRef = window.opener;
-      if (openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsTableClosed === 'function') openerRef.__csFlashcardsTableClosed();
-    });
+
   </script>
 </body>
 </html>`);
@@ -2992,6 +3005,16 @@ function renderFlashcardTableWindow() {
   }
 }
 
+function bootstrapFlashcardTablePopupWindow() {
+  if (!flashcardTablePopupRequested()) return false;
+  const openerRef = window.opener;
+  if (!openerRef || openerRef.closed || typeof openerRef.__csFlashcardsRegisterTableWindow !== 'function') {
+    document.body.innerHTML = '<div style="padding:16px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans KR,sans-serif;color:#444;">원본 창을 먼저 연 뒤 다시 시도하세요.</div>';
+    return true;
+  }
+  openerRef.__csFlashcardsRegisterTableWindow(window);
+  return true;
+}
 function openFlashcardTableWindow() {
   toggleMenu(false);
   if (state.flashcardTableWindow && !state.flashcardTableWindow.closed) {
@@ -2999,7 +3022,9 @@ function openFlashcardTableWindow() {
     state.flashcardTableWindow.focus();
     return;
   }
-  const popup = window.open('', 'csFlashcardTableWindow', 'popup=yes,width=1120,height=760,resizable=yes,scrollbars=yes');
+  const popupUrl = new window.URL(window.location.href);
+  popupUrl.searchParams.set('popup', 'flashcard-table');
+  const popup = window.open(popupUrl.toString(), 'csFlashcardTableWindow', 'popup=yes,width=1120,height=760,resizable=yes,scrollbars=yes');
   if (!popup) {
     setMessage('팝업이 차단되어 표 목록을 열지 못했습니다.', true);
     return;
@@ -5355,9 +5380,11 @@ populateSpeechVoiceSelect();
 updateRandomButtons();
 updateQuestionPracticeButton();
 
-loadCards().catch((err) => {
-  setMessage(`로딩 실패: ${err.message}`, true);
-  applyFrontIllustration({term: '로딩 실패', english: '', category: ''});
-  $('frontTerm').textContent = '로딩 실패';
-  $('frontEnglish').textContent = err.message;
-});
+if (!bootstrapFlashcardTablePopupWindow()) {
+  loadCards().catch((err) => {
+    setMessage(`로딩 실패: ${err.message}`, true);
+    applyFrontIllustration({term: '로딩 실패', english: '', category: ''});
+    $('frontTerm').textContent = '로딩 실패';
+    $('frontEnglish').textContent = err.message;
+  });
+}
