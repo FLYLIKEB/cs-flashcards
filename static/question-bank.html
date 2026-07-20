@@ -10,44 +10,63 @@
 </head>
 <body class="cs-table-page question-bank-page">
   <header class="question-bank-shell-topbar" hidden></header>
-  <main class="cs-table-shell question-bank-shell" aria-label="문제은행 목록">
-    <div class="cs-table-meta">
-      <div>
-        <h1 class="cs-table-title">문제은행 표</h1>
-        <p id="bankPageSummary" class="cs-table-summary">문제은행을 불러오는 중입니다.</p>
-        <p class="cs-table-hint">열 제목 드래그로 순서 변경 · 행 클릭 이동 · 필터는 URL에 유지됩니다.</p>
-      </div>
-      <div class="cs-table-toolbar">
-        <a class="cs-table-button" href="/">플래시카드</a>
-        <button id="bankPageRefreshBtn" class="cs-table-button" type="button">조회</button>
-        <button id="bankPageLaunchBtn" class="cs-table-button cs-table-button-primary" type="button">현재 목록 풀기</button>
-      </div>
-    </div>
+  <main class="cs-table-shell question-bank-shell" aria-label="문제은행 목록과 문제 풀이">
+    <div class="question-bank-shell-grid">
+      <section class="question-bank-shell-pane question-bank-shell-table-pane" aria-label="문제은행 표">
+        <div class="cs-table-meta">
+          <div>
+            <h1 class="cs-table-title">문제은행 표</h1>
+            <p id="bankPageSummary" class="cs-table-summary">문제은행을 불러오는 중입니다.</p>
+            <p class="cs-table-hint">열 제목 드래그로 순서 변경 · 행 클릭 시 오른쪽 문제 풀이와 즉시 연동됩니다.</p>
+          </div>
+          <div class="cs-table-toolbar">
+            <a class="cs-table-button" href="/">플래시카드</a>
+            <button id="bankPageRefreshBtn" class="cs-table-button" type="button">조회</button>
+            <button id="bankPageLaunchBtn" class="cs-table-button cs-table-button-primary" type="button">현재 목록 풀기</button>
+          </div>
+        </div>
 
-    <div class="cs-table-filter-grid">
-      <input id="bankPageQueryInput" class="cs-table-control" type="search" placeholder="문제/정답/키워드 검색" />
-      <input id="bankPageTopicInput" class="cs-table-control" type="search" placeholder="문제유형(예: 데이터베이스)" />
-      <input id="bankPageFieldInput" class="cs-table-control" type="search" placeholder="분야(예: 전산학술)" />
-      <input id="bankPageIssuerInput" class="cs-table-control" type="search" placeholder="출제기관(예: 한국은행)" />
-      <input id="bankPageSourceInput" class="cs-table-control" type="search" placeholder="출제위치(예: 2013년 학술파트 1)" />
-      <select id="bankPageDifficultySelect" class="cs-table-control">
-        <option value="">난이도 *</option>
-        <option value="상">상</option>
-        <option value="중">중</option>
-        <option value="하">하</option>
-      </select>
-      <select id="bankPageTypeSelect" class="cs-table-control">
-        <option value="">형식 *</option>
-        <option value="short">주관식</option>
-        <option value="subjective">서술형</option>
-        <option value="multiple_choice">객관식</option>
-        <option value="essay">논술형</option>
-      </select>
-      <input id="bankPageSectionInput" class="cs-table-control" type="search" placeholder="섹션(예: 전공필기)" />
-    </div>
+        <div class="cs-table-filter-grid">
+          <input id="bankPageQueryInput" class="cs-table-control" type="search" placeholder="문제/정답/키워드 검색" />
+          <input id="bankPageTopicInput" class="cs-table-control" type="search" placeholder="문제유형(예: 데이터베이스)" />
+          <input id="bankPageFieldInput" class="cs-table-control" type="search" placeholder="분야(예: 전산학술)" />
+          <input id="bankPageIssuerInput" class="cs-table-control" type="search" placeholder="출제기관(예: 한국은행)" />
+          <input id="bankPageSourceInput" class="cs-table-control" type="search" placeholder="출제위치(예: 2013년 학술파트 1)" />
+          <select id="bankPageDifficultySelect" class="cs-table-control">
+            <option value="">난이도 *</option>
+            <option value="상">상</option>
+            <option value="중">중</option>
+            <option value="하">하</option>
+          </select>
+          <select id="bankPageTypeSelect" class="cs-table-control">
+            <option value="">형식 *</option>
+            <option value="short">주관식</option>
+            <option value="subjective">서술형</option>
+            <option value="multiple_choice">객관식</option>
+            <option value="essay">논술형</option>
+          </select>
+          <input id="bankPageSectionInput" class="cs-table-control" type="search" placeholder="섹션(예: 전공필기)" />
+        </div>
 
-    <div id="bankPageList"></div>
-    <p id="bankPageError" class="cs-table-error" role="status"></p>
+        <div id="bankPageList"></div>
+        <p id="bankPageError" class="cs-table-error" role="status"></p>
+      </section>
+
+      <section class="question-bank-shell-pane question-bank-shell-practice-pane" aria-label="문제 풀이 패널">
+        <div class="cs-table-meta question-bank-practice-meta">
+          <div>
+            <h2 class="cs-table-title">문제 풀이</h2>
+            <p id="bankPagePracticeSummary" class="cs-table-summary">왼쪽 표에서 문제를 고르면 여기서 바로 풉니다.</p>
+            <p class="cs-table-hint">현재 필터 목록이 오른쪽 세트와 연결됩니다.</p>
+          </div>
+          <div class="cs-table-toolbar">
+            <a id="bankPageOpenPracticeTab" class="cs-table-button" href="/" target="_blank" rel="noopener noreferrer">새 탭</a>
+          </div>
+        </div>
+        <div id="bankPagePracticePlaceholder" class="question-bank-practice-placeholder">왼쪽 문제은행 표에서 행을 클릭하거나 현재 목록 풀기를 누르면 문제 풀이가 이 영역에 열립니다.</div>
+        <iframe id="bankPagePracticeFrame" class="question-bank-practice-frame" title="문제 풀이" hidden></iframe>
+      </section>
+    </div>
   </main>
   <script src="/static/table-shell.js"></script>
   <script src="/static/question-bank.js"></script>

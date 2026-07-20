@@ -167,6 +167,11 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
+        self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
+        self.assertIn('function practiceFrameUrl()', QUESTION_BANK_JS)
+        self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
+        self.assertIn("get('question-bank-embed') === '1'", APP_JS)
         self.assertIn('id="wikiSearchToggleBtn"', WIKI_HTML)
         self.assertIn('id="wikiSearch"', WIKI_HTML)
         self.assertIn('id="wikiSidebarToggleBtn"', WIKI_HTML)
@@ -468,6 +473,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('question-bank-shell-topbar', QUESTION_BANK_HTML)
         self.assertIn('.question-bank-shell', STYLE_CSS)
         self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
+        self.assertIn('.question-bank-embed .topbar', STYLE_CSS)
 
 
 if __name__ == '__main__':

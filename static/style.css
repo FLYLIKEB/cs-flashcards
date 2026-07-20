@@ -6109,6 +6109,53 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   border-color: #9ec6e4;
 }
 
+.wiki-editor-ai {
+  margin-top: .85rem;
+  padding: .82rem .9rem;
+  border: 1px solid var(--wiki-border-soft);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.wiki-editor-ai-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .65rem;
+  flex-wrap: wrap;
+}
+
+.wiki-editor-ai-label {
+  color: #333333;
+  font-size: .88rem;
+  font-weight: 700;
+}
+
+.wiki-editor-ai-input {
+  width: 100%;
+  margin-top: .65rem;
+  padding: .72rem .82rem;
+  border: 1px solid var(--wiki-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #222222;
+  font: inherit;
+  resize: vertical;
+}
+
+.wiki-editor-ai-input:focus-visible {
+  outline: 2px solid rgba(51, 122, 183, .22);
+  outline-offset: 1px;
+  border-color: #9ec6e4;
+}
+
+.wiki-editor-ai-status {
+  margin: .55rem 0 0;
+  color: #666666;
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
 .wiki-editor-actions {
   display: flex;
   justify-content: flex-end;
@@ -6622,4 +6669,36 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   .question-bank-shell-actions {
     width: 100%;
   }
+}
+
+body.question-bank-embed .topbar,
+body.question-bank-embed #controlsPanel,
+body.question-bank-embed .progress-line,
+body.question-bank-embed #filterRow,
+body.question-bank-embed .flashcard,
+body.question-bank-embed .mark-row,
+body.question-bank-embed #closeQuestionModeBtn {
+  display: none !important;
+}
+
+body.question-bank-embed .layout,
+body.question-bank-embed.controls-collapsed .layout {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0;
+}
+
+body.question-bank-embed .study-area {
+  gap: 0;
+}
+
+body.question-bank-embed .question-panel {
+  min-height: 100vh;
+  margin: 0;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  box-shadow: none;
 }

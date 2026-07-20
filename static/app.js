@@ -88,6 +88,7 @@ const state = {
 
 const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
+const aiTools = window.CsAiTools || null;
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
@@ -402,6 +403,14 @@ function consumePendingQuestionBankLaunch() {
     state.questionBankSelectedId = String(selected?.question_bank_id || '');
     openQuestionBankSession(startIndex);
     return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function questionBankEmbedMode() {
+  try {
+    return new URLSearchParams(window.location.search).get('question-bank-embed') === '1';
   } catch (_error) {
     return false;
   }
@@ -2395,10 +2404,23 @@ function renderAiRewriteControls(card) {
     const row = previewBtn?.closest('.section-title-row') || null;
     if (!previewBtn) return;
     const active = busy && state.aiRewriteActiveField === field && state.aiRewriteCardId === card?.id;
-    previewBtn.disabled = busy || !card;
-    previewBtn.textContent = active ? '…' : 'AI';
-    previewBtn.title = active ? `${config.label} AI 변환 중` : `${config.label} AI 변환`;
-    previewBtn.dataset.tip = active ? '변환 중' : `${config.label} AI`;
+    if (aiTools?.setButtonBusy) {
+      aiTools.setButtonBusy(previewBtn, {
+        busy: active,
+        disabled: busy || !card,
+        idleLabel: 'AI',
+        busyLabel: '…',
+        idleTitle: `${config.label} AI 변환`,
+        busyTitle: `${config.label} AI 변환 중`,
+        idleTip: `${config.label} AI`,
+        busyTip: '변환 중',
+      });
+    } else {
+      previewBtn.disabled = busy || !card;
+      previewBtn.textContent = active ? '…' : 'AI';
+      previewBtn.title = active ? `${config.label} AI 변환 중` : `${config.label} AI 변환`;
+      previewBtn.dataset.tip = active ? '변환 중' : `${config.label} AI`;
+    }
     row?.classList.toggle('ai-previewing', active);
   });
 }
@@ -2406,6 +2428,7 @@ function renderAiRewriteControls(card) {
 
 
 async function responseErrorText(res) {
+  if (aiTools?.responseErrorText) return aiTools.responseErrorText(res);
   const raw = await res.text();
   try {
     const parsed = JSON.parse(raw);
@@ -2428,13 +2451,17 @@ async function previewAiRewrite(field) {
   renderAiRewriteControls(current);
   setMessage(`${current.term}: ${config.label} AI 변경 요청됨. 완료 시 알림합니다.`);
   try {
-    const previewRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({instruction: config.instruction}),
-    });
-    if (!previewRes.ok) throw new Error(await responseErrorText(previewRes));
-    const previewData = await previewRes.json();
+    const previewData = aiTools?.postJson
+      ? await aiTools.postJson(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {instruction: config.instruction})
+      : await (async () => {
+          const previewRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/preview`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({instruction: config.instruction}),
+          });
+          if (!previewRes.ok) throw new Error(await responseErrorText(previewRes));
+          return previewRes.json();
+        })();
     const nextValue = String(previewData?.proposal?.[field] ?? current?.[field] ?? '');
     const applyRes = await fetch(`/api/cards/${encodeURIComponent(current.id)}/ai-rewrite/apply`, {
       method: 'POST',
@@ -5383,6 +5410,7 @@ renderAudioPresets();
 populateSpeechVoiceSelect();
 updateRandomButtons();
 updateQuestionPracticeButton();
+document.body.classList.toggle('question-bank-embed', questionBankEmbedMode());
 
 if (!bootstrapFlashcardTablePopupWindow()) {
   loadCards().catch((err) => {

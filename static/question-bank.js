@@ -18,6 +18,9 @@ const bankState = {
   loading: false,
   error: '',
   selectedId: '',
+  practiceLoaded: false,
+  practiceStartIndex: 0,
+  practiceNonce: 0,
 };
 
 function escapeHtml(value) {
@@ -36,6 +39,15 @@ function markdownPreviewText(source) {
 
 function questionTypeLabel(item) {
   return QUESTION_TYPE_LABELS[String(item?.question_type || '').trim()] || String(item?.question_type || '문제');
+}
+
+function selectedIndex(fallback = 0) {
+  const found = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === bankState.selectedId);
+  return found >= 0 ? found : Math.max(0, Math.min(bankState.items.length - 1, fallback));
+}
+
+function practiceFrameUrl() {
+  return `/?question-bank-embed=1&question-bank-run=${Date.now()}-${bankState.practiceNonce}`;
 }
 
 function filterValues() {
@@ -114,6 +126,31 @@ function tableRows() {
   });
 }
 
+function renderPracticePane() {
+  const summary = $('bankPagePracticeSummary');
+  const placeholder = $('bankPagePracticePlaceholder');
+  const frame = $('bankPagePracticeFrame');
+  const openTab = $('bankPageOpenPracticeTab');
+  if (!summary || !placeholder || !frame || !openTab) return;
+  openTab.href = practiceFrameUrl();
+  if (!bankState.items.length) {
+    summary.textContent = bankState.loading ? '문제은행 목록을 불러온 뒤 오른쪽에 문제 풀이를 연결합니다.' : '표에 표시할 문제가 없습니다.';
+    placeholder.textContent = bankState.loading ? '문제 목록을 불러오는 중입니다.' : '현재 조건에 맞는 문제은행 항목이 없습니다.';
+    placeholder.hidden = false;
+    frame.hidden = true;
+    return;
+  }
+  const start = selectedIndex(bankState.practiceStartIndex);
+  const selected = bankState.items[start];
+  const prompt = markdownPreviewText(selected?.prompt || '').slice(0, 46) || `문제 ${start + 1}`;
+  summary.textContent = bankState.practiceLoaded
+    ? `현재 목록 ${bankState.items.length}문항 · ${start + 1}번부터 풀이 · ${prompt}`
+    : `현재 목록 ${bankState.items.length}문항 · 왼쪽 행을 클릭하면 여기서 바로 풉니다.`;
+  placeholder.textContent = `선택된 ${start + 1}번 문제부터 현재 목록 전체를 오른쪽에서 이어서 풀 수 있습니다.`;
+  placeholder.hidden = bankState.practiceLoaded;
+  frame.hidden = !bankState.practiceLoaded;
+}
+
 function renderTable() {
   const summary = $('bankPageSummary');
   const mount = $('bankPageList');
@@ -123,7 +160,7 @@ function renderTable() {
   const returned = Number(bankState.summary?.returned || bankState.items.length || 0);
   summary.textContent = bankState.loading
     ? '문제은행을 불러오는 중입니다.'
-    : `총 ${total}문항 · 현재 ${returned}문항 · 행 클릭 이동 · 열 제목 드래그로 순서 변경`;
+    : `총 ${total}문항 · 현재 ${returned}문항 · 왼쪽 표와 오른쪽 문제 풀이가 한 화면에서 함께 동작합니다.`;
   error.textContent = bankState.error || '';
   window.CSTableShell.renderTable(mount, {
     columns: QUESTION_BANK_COLUMNS,
@@ -134,6 +171,7 @@ function renderTable() {
     onRowActivate: (_row, index) => {
       bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
       renderTable();
+      renderPracticePane();
       launch(index);
     },
     onColumnMove: (sourceKey, targetKey) => {
@@ -147,9 +185,16 @@ function launch(startIndex = 0) {
   if (!bankState.items.length) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
     renderTable();
+    renderPracticePane();
     return;
   }
-  const safeStart = Math.max(0, Math.min(bankState.items.length - 1, startIndex));
+  const safeStart = selectedIndex(startIndex);
+  const frame = $('bankPagePracticeFrame');
+  bankState.selectedId = String(bankState.items[safeStart]?.question_bank_id || '');
+  bankState.practiceLoaded = true;
+  bankState.practiceStartIndex = safeStart;
+  renderTable();
+  renderPracticePane();
   try {
     window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY, JSON.stringify({
       items: bankState.items,
@@ -158,9 +203,11 @@ function launch(startIndex = 0) {
   } catch (error) {
     bankState.error = error.message || String(error);
     renderTable();
+    renderPracticePane();
     return;
   }
-  window.location.href = '/';
+  bankState.practiceNonce += 1;
+  if (frame) frame.src = practiceFrameUrl();
 }
 
 async function loadQuestionBankPage() {
@@ -168,27 +215,34 @@ async function loadQuestionBankPage() {
   bankState.error = '';
   syncUrl();
   renderTable();
+  renderPracticePane();
   try {
     const data = await fetchEntries();
+    const previousSelectedId = bankState.selectedId;
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
-    bankState.selectedId = String(bankState.items[0]?.question_bank_id || '');
+    const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
+    bankState.selectedId = String(bankState.items[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
   } catch (error) {
     bankState.items = [];
     bankState.summary = {total: 0, returned: 0};
     bankState.error = error.message || String(error);
+    bankState.practiceLoaded = false;
   } finally {
     bankState.loading = false;
     renderTable();
+    renderPracticePane();
+    if (bankState.items.length) launch(selectedIndex());
   }
 }
 
 applyFiltersFromUrl();
 renderTable();
+renderPracticePane();
 loadQuestionBankPage().catch(() => {});
 
 $('bankPageRefreshBtn')?.addEventListener('click', () => loadQuestionBankPage().catch(() => {}));
-$('bankPageLaunchBtn')?.addEventListener('click', () => launch(0));
+$('bankPageLaunchBtn')?.addEventListener('click', () => launch(selectedIndex()));
 ['bankPageQueryInput', 'bankPageTopicInput', 'bankPageFieldInput', 'bankPageIssuerInput', 'bankPageSourceInput', 'bankPageDifficultySelect', 'bankPageTypeSelect', 'bankPageSectionInput'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankPage().catch(() => {}));
   $(id)?.addEventListener('keydown', (event) => {
