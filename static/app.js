@@ -3200,6 +3200,7 @@ function buildMindMapGraphData(cards = state.filtered, currentCardId = state.fil
   const identityKeysCache = new Map();
   const visibleByConcept = new Map();
   const visibleNeighbors = new Map(visibleCards.map((card) => [card.id, new Set()]));
+  const visibleCardsById = new Map(visibleCards.map((card) => [card.id, card]));
 
   const identityKeysFor = (card) => {
     if (!card) return [];
@@ -3281,6 +3282,24 @@ function buildMindMapGraphData(cards = state.filtered, currentCardId = state.fil
     group.count = group.cards.length;
     group.hasCurrent = group.cards.some((card) => card.isCurrent);
     group.directCount = group.cards.filter((card) => card.directToCurrent).length;
+    group.totalConnectionCount = group.cards.reduce((sum, card) => sum + (card.visibleLinkCount || 0), 0);
+    group.uniqueNeighborIds = new Set();
+    group.linkedCategoryKeys = new Set();
+    group.cards.forEach((card) => {
+      const neighbors = visibleNeighbors.get(card.id) || new Set();
+      neighbors.forEach((neighborId) => {
+        group.uniqueNeighborIds.add(neighborId);
+        const neighborCard = visibleCardsById.get(neighborId);
+        const neighborCategoryKey = neighborCard?.category || '미분류';
+        if (neighborCategoryKey !== group.key) group.linkedCategoryKeys.add(neighborCategoryKey);
+      });
+    });
+    group.uniqueNeighborCount = group.uniqueNeighborIds.size;
+    group.linkedCategoryCount = group.linkedCategoryKeys.size;
+    group.connectionScore = (group.totalConnectionCount * 100)
+      + (group.uniqueNeighborCount * 10)
+      + group.directCount
+      + Number(group.hasCurrent);
     const primaryCards = group.cards.filter((card) => card.isCurrent || card.directToCurrent);
     const secondaryCards = group.cards.filter((card) => !card.isCurrent && !card.directToCurrent);
     group.subgroups = [
@@ -3298,15 +3317,22 @@ function buildMindMapGraphData(cards = state.filtered, currentCardId = state.fil
       } : null,
     ].filter(Boolean);
     return group;
-  }).sort((a, b) => Number(b.hasCurrent) - Number(a.hasCurrent)
-    || Number(b.directCount > 0) - Number(a.directCount > 0)
+  }).sort((a, b) => b.connectionScore - a.connectionScore
+    || b.totalConnectionCount - a.totalConnectionCount
+    || b.uniqueNeighborCount - a.uniqueNeighborCount
     || b.directCount - a.directCount
+    || Number(b.hasCurrent) - Number(a.hasCurrent)
     || b.count - a.count
     || a.label.localeCompare(b.label, 'ko'));
 
+  categoryGroups.forEach((group, index) => {
+    group.connectionRank = index + 1;
+    group.isTopHub = index === 0;
+  });
+
   const shouldOpenAll = categoryGroups.length <= 4 || visibleCards.length <= 36;
   categoryGroups.forEach((group) => {
-    group.defaultOpen = shouldOpenAll || group.hasCurrent || group.directCount > 0;
+    group.defaultOpen = shouldOpenAll || group.isTopHub || group.connectionRank <= 3 || group.hasCurrent || group.directCount > 0;
   });
 
   return {
@@ -3326,6 +3352,8 @@ function buildMindMapLayout(graph) {
     totalCategories: categoryGroups.length,
     directCardCount: categoryGroups.reduce((sum, group) => sum + (group.directCount || 0), 0),
     connectedCategoryCount: categoryGroups.filter((group) => group.hasCurrent || group.directCount > 0).length,
+    topCategoryLabel: categoryGroups[0]?.categoryLabel || '',
+    topCategoryConnectionCount: categoryGroups[0]?.totalConnectionCount || 0,
   };
 }
 
@@ -3373,7 +3401,7 @@ function renderMindMapMarkdown(layout, summaryText) {
     })}](card:${encodeURIComponent(layout.currentCard.id)})`);
   }
   layout.categoryGroups.forEach((group) => {
-    lines.push(`## ${escapeMindMapMarkdown(group.categoryLabel)}`);
+    lines.push(`## ${escapeMindMapMarkdown(`${group.connectionRank}위 연결 허브 · ${group.categoryLabel} · 연결 ${group.totalConnectionCount}개`)}`);
     group.subgroups.forEach((subgroup) => {
       lines.push(`### ${escapeMindMapMarkdown(`소분류 · ${subgroup.label}`)}`);
       subgroup.cards.forEach((node) => {
@@ -3812,7 +3840,7 @@ function renderMindMapWindow() {
         <p class="mindmap-kicker">플러그인 마인드맵</p>
         <h1 class="mindmap-title">현재 필터 카드 → 가지형 마인드맵</h1>
         <p class="mindmap-summary">${escapeHtml(summaryText)} · 펼친 카드 ${layout.totalCards}개 · 대분류 ${layout.totalCategories}개</p>
-        <p class="mindmap-hint">Markmap 플러그인으로 노트북형 가지 구조를 먼저 렌더링하고, 로드 실패 시 아래 트리형 백업 레이아웃을 유지합니다.</p>
+        <p class="mindmap-hint">가장 많이 연결된 대분류부터 정렬하고, Markmap 플러그인으로 노트북형 가지 구조를 먼저 렌더링합니다. ${layout.topCategoryLabel ? `현재 연결 허브는 ${escapeHtml(layout.topCategoryLabel)} · 연결 ${layout.topCategoryConnectionCount}개입니다.` : ''}</p>
       </header>
       <div class="mindmap-plugin-shell" id="mindmapPluginShell" hidden>
         <div class="mindmap-plugin-caption">
@@ -3829,7 +3857,7 @@ function renderMindMapWindow() {
             <article class="mindmap-root-card">
               <p class="mindmap-root-kicker">현재 필터 카드</p>
               <h2 class="mindmap-root-title">${escapeHtml(summaryText || '전체 카드')}</h2>
-              <p class="mindmap-root-summary">현재 카드 중심으로 직접 연결 카드와 같은 필터 카드들을 대분류 → 소분류 → 카드 순서의 가지 구조로 정리했습니다.</p>
+              <p class="mindmap-root-summary">현재 카드 중심으로 직접 연결 카드와 같은 필터 카드들을 연결량이 큰 대분류 → 소분류 → 카드 순서의 가지 구조로 정리했습니다.</p>
               ${currentCard ? `
                 <div class="mindmap-current-card">
                   <span>현재 카드</span>
@@ -3845,7 +3873,7 @@ function renderMindMapWindow() {
               `}
               <div class="mindmap-root-metrics">
                 <div class="mindmap-metric"><strong>${layout.totalCategories}개</strong><small>대분류</small></div>
-                <div class="mindmap-metric"><strong>${layout.directCardCount}개</strong><small>직접 연결 카드</small></div>
+                <div class="mindmap-metric"><strong>${layout.topCategoryConnectionCount}개</strong><small>최대 연결량</small></div>
                 <div class="mindmap-metric"><strong>${layout.connectedCategoryCount}개</strong><small>연결된 대분류</small></div>
                 <div class="mindmap-metric"><strong>${layout.totalCards}개</strong><small>현재 필터 카드</small></div>
               </div>
@@ -3855,15 +3883,15 @@ function renderMindMapWindow() {
                 const borderColor = `${group.color}3d`;
                 const branchSoft = `${group.color}14`;
                 const categoryHint = group.hasCurrent
-                  ? '현재 카드가 포함된 대분류입니다.'
+                  ? `현재 카드가 포함된 대분류이며 연결량 순위 ${group.connectionRank}위입니다.`
                   : group.directCount
-                    ? `현재 카드와 직접 연결된 카드 ${group.directCount}개가 포함된 대분류입니다.`
-                    : '현재 필터에 포함된 카드들을 정리한 대분류입니다.';
+                    ? `현재 카드와 직접 연결된 카드 ${group.directCount}개가 포함된 대분류이며 연결량 순위 ${group.connectionRank}위입니다.`
+                    : `현재 필터에 포함된 카드들을 연결량 순위 ${group.connectionRank}위 기준으로 정리한 대분류입니다.`;
                 return `<details class="mindmap-category-branch${group.hasCurrent ? ' current-branch' : ''}"${group.defaultOpen ? ' open' : ''}>
                   <summary class="mindmap-category-node" style="border-left: 4px solid ${escapeHtml(group.color)}; background: linear-gradient(135deg, #ffffff 0%, ${escapeHtml(branchSoft)} 100%);">
-                    <span class="mindmap-category-kicker">대분류${group.hasCurrent ? ' · 현재 카드 포함' : group.directCount ? ' · 직접 연결 포함' : ''}</span>
+                    <span class="mindmap-category-kicker">대분류 · 연결 ${group.totalConnectionCount}개${group.isTopHub ? ' · 최상위 허브' : ''}${group.hasCurrent ? ' · 현재 카드 포함' : group.directCount ? ' · 직접 연결 포함' : ''}</span>
                     <strong>${escapeHtml(group.categoryLabel)}</strong>
-                    <small>${group.count}개 카드 · 직접 연결 ${group.directCount}개</small>
+                    <small>${group.count}개 카드 · 연결 순위 ${group.connectionRank}위 · 연결 대분류 ${group.linkedCategoryCount}개</small>
                   </summary>
                   <div class="mindmap-branch-body">
                     <div class="mindmap-branch-caption">${escapeHtml(categoryHint)}</div>

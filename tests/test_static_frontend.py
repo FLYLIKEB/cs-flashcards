@@ -232,12 +232,15 @@ class StaticFrontendTests(unittest.TestCase):
             'https://cdn.jsdelivr.net/npm/d3@7',
             'https://cdn.jsdelivr.net/npm/markmap-view@0.18.9',
             'https://cdn.jsdelivr.net/npm/markmap-lib@0.18.9',
-            'Markmap 플러그인으로 노트북형 가지 구조를 먼저 렌더링하고',
+            '가장 많이 연결된 대분류부터 정렬하고',
+            '연결량이 큰 대분류 → 소분류 → 카드 순서',
+            '연결 순위 ${group.connectionRank}위',
+            '최상위 허브',
             '소분류 ·',
-            'Markmap 플러그인으로 노트북형 가지 구조를 먼저 렌더링하고',
             "event.target.closest('[data-card-id], a[href^=\"card:\"]')",
         ]:
             self.assertIn(snippet, popup_block)
+        self.assertIn('connectionScore = (group.totalConnectionCount * 100)', APP_JS)
         self.assertIn('function renderMindMapPluginWindow(popupWindow, attempt = 0) {', APP_JS)
         self.assertIn('const markmapApi = popupWindow.markmap;', APP_JS)
 
