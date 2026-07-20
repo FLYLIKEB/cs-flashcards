@@ -182,6 +182,18 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertEqual(popup_block.count("invokeOpener('__csFlashcardsMindMapClosed');"), 1)
         self.assertEqual(popup_block.count('window.setTimeout(() => {'), 1)
 
+    def test_mind_map_popup_bootstrap_and_reopen_contract(self):
+        bootstrap_block = APP_JS.split('function bootstrapMindMapPopupWindow() {', 1)[1].split('function openMindMapWindow() {', 1)[0]
+        open_block = APP_JS.split('function openMindMapWindow() {', 1)[1].split("function flashcardTablePopupRequested() {", 1)[0]
+        self.assertIn('openerRef.__csFlashcardsRegisterMindMapWindow(window);', bootstrap_block)
+        self.assertIn("typeof openerRef.__csFlashcardsRegisterMindMapWindow !== 'function'", bootstrap_block)
+        self.assertIn('if (state.mindMapWindow && !state.mindMapWindow.closed) {', open_block)
+        self.assertIn('renderMindMapWindow();', open_block)
+        self.assertIn('state.mindMapWindow.focus();', open_block)
+        self.assertIn("const popup = window.open(popupUrl.toString(), 'csFlashcardsMindMapWindow'", open_block)
+        self.assertIn('state.mindMapWindow = popup;', open_block)
+        self.assertIn('popup.focus();', open_block)
+
     def test_wiki_ui_and_flashcard_links_are_present(self):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
         self.assertIn('id="questionBankPageLink"', INDEX_HTML)
@@ -201,12 +213,17 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
+
         self.assertIn('문제 풀이 · 문제은행', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
         self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_PRACTICE_COLLAPSED_KEY', QUESTION_BANK_JS)
+        self.assertIn('function populateIssuerOptions(', QUESTION_BANK_JS)
+        self.assertIn('available_issuers', QUESTION_BANK_JS)
+
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
         self.assertIn('function practiceFrameUrl()', QUESTION_BANK_JS)
@@ -404,6 +421,8 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionBankTopicInput"',
             'id="questionBankFieldInput"',
             'id="questionBankIssuerInput"',
+            '<select id="questionBankIssuerInput"',
+
             'id="questionBankSourceInput"',
             'id="questionBankDifficultySelect"',
             'id="questionBankTypeSelect"',
@@ -431,6 +450,7 @@ class StaticFrontendTests(unittest.TestCase):
             'function applyQuestionSessionModePreset(',
             'function questionRevealLocked(',
             'function generateBokExamQuestions(',
+            'function populateQuestionBankIssuerOptions(',
             'function renderQuestionSessionReview(',
             'function generateQuestionsFromCurrentFilter()',
             '/api/questions/generate',
@@ -531,6 +551,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-bank-shell', STYLE_CSS)
         self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
         self.assertIn('.question-bank-embed .topbar', STYLE_CSS)
+        self.assertIn('body.question-bank-embed #questionBankToggleBtn', STYLE_CSS)
+        self.assertIn('body.question-bank-embed #questionBankBrowser', STYLE_CSS)
+        self.assertIn('body.question-bank-embed {', STYLE_CSS)
         self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
 

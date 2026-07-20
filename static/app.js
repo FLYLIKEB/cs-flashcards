@@ -3714,7 +3714,7 @@ function normalizeImportedStringArray(value) {
   const text = String(value || '').trim();
   if (!text) return [];
   return text
-    .split(/\n|;/)
+    .split(/\n|[;,]/)
     .map((item) => item.replace(/^[-*\d.)\s]+/, '').trim())
     .filter(Boolean);
 }
@@ -3853,7 +3853,8 @@ function buildImportedQuestions(rawQuestions) {
     const explanation = String(rawQuestion.explanation ?? rawQuestion.commentary ?? rawQuestion.finance_it_application ?? '').trim();
     const rubric = normalizeImportedStringArray(rawQuestion.rubric ?? rawQuestion.scoring_points ?? rawQuestion.grading_points ?? rawQuestion.trap_points);
     const choices = type === 'multiple_choice' ? normalizeImportedStringArray(rawQuestion.choices ?? rawQuestion.options) : [];
-    const topic = String(rawQuestion.topic ?? rawQuestion.question_topic ?? rawQuestion.problem_type ?? rawQuestion.subject ?? rawQuestion.category ?? card.category ?? '').trim();
+    const topic = String(rawQuestion.topic ?? rawQuestion.question_topic ?? rawQuestion.problem_type ?? rawQuestion.subject ?? '').trim();
+    const category = String(rawQuestion.category ?? rawQuestion.card_category ?? card.category ?? topic ?? '').trim();
     const fieldName = String(rawQuestion.field_name ?? rawQuestion.field ?? rawQuestion.domain ?? rawQuestion.area ?? '').trim();
     const keywords = normalizeImportedStringArray(rawQuestion.keywords ?? rawQuestion.keyword ?? rawQuestion.tags ?? rawQuestion.tag_list);
     const difficulty = String(rawQuestion.difficulty ?? rawQuestion.level ?? '').trim();
@@ -3876,7 +3877,7 @@ function buildImportedQuestions(rawQuestions) {
       type,
       type_label: QUESTION_TYPE_LABELS[type],
       term: String(rawQuestion.concept_term || rawQuestion.term || card.term || card.english || card.id || '').trim(),
-      category: topic || String(card.category || '').trim(),
+      category,
       topic,
       fieldName,
       keywords,
@@ -3918,6 +3919,7 @@ function questionBankEntryPayload(question) {
     answer_index: Number.isInteger(current.answer_index) ? current.answer_index : null,
     topic: current.topic || current.category || '',
     field_name: current.fieldName || current.field_name || '',
+    category: current.category || current.card_category || '',
     keywords: Array.isArray(current.keywords) ? current.keywords : [],
     difficulty: current.difficulty || '',
     issuer: current.issuer || '',
@@ -3952,6 +3954,7 @@ function mergeQuestionBankEntries(questions, savedItems) {
       questionBankId: String(stored.question_bank_id || question.questionBankId || question.question_bank_id || ''),
       topic: String(stored.topic || question.topic || question.category || ''),
       fieldName: String(stored.field_name || question.fieldName || question.field_name || ''),
+      category: String(stored.category || question.category || stored.card_category || question.card_category || ''),
       keywords: Array.isArray(stored.keywords) ? stored.keywords : Array.isArray(question.keywords) ? question.keywords : [],
       difficulty: String(stored.difficulty || question.difficulty || ''),
       issuer: String(stored.issuer || question.issuer || ''),
@@ -4022,6 +4025,21 @@ async function fetchQuestionBankEntries() {
   return res.json();
 }
 
+function populateQuestionBankIssuerOptions(issuers, selected = '') {
+  const select = $('questionBankIssuerInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || '').trim();
+  const options = ['<option value="">출제기관 *</option>'];
+  (Array.isArray(issuers) ? issuers : []).forEach((issuer) => {
+    const value = String(issuer || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(issuers) && issuers.includes(selectedValue)) ? selectedValue : '';
+}
+
+
 function questionBankItemToQuestion(item, index) {
   return hydrateQuestionState({
     id: `bank-${item.question_bank_id || index + 1}`,
@@ -4030,7 +4048,8 @@ function questionBankItemToQuestion(item, index) {
     type: String(item.question_type || 'subjective'),
     type_label: QUESTION_TYPE_LABELS[item.question_type] || item.question_type || '문제',
     term: String(item.term || item.card_id || ''),
-    category: String(item.topic || item.card_category || '미분류'),
+    category: String(item.category || item.card_category || item.topic || '미분류'),
+
     topic: String(item.topic || ''),
     fieldName: String(item.field_name || ''),
     keywords: Array.isArray(item.keywords) ? item.keywords : [],
@@ -4121,12 +4140,15 @@ async function loadQuestionBankBrowser() {
     const data = await fetchQuestionBankEntries();
     state.questionBankItems = Array.isArray(data.items) ? data.items : [];
     state.questionBankSummary = data.summary || {total: state.questionBankItems.length, returned: state.questionBankItems.length};
+    populateQuestionBankIssuerOptions(state.questionBankSummary?.available_issuers || [], questionBankFilterValues().issuer);
+
     if (!state.questionBankSelectedId && state.questionBankItems[0]?.question_bank_id) {
       state.questionBankSelectedId = String(state.questionBankItems[0].question_bank_id);
     }
   } catch (error) {
     state.questionBankItems = [];
     state.questionBankSummary = {total: 0, returned: 0};
+    populateQuestionBankIssuerOptions([], questionBankFilterValues().issuer);
     state.questionBankError = error.message || String(error);
   } finally {
     state.questionBankLoading = false;
