@@ -2673,6 +2673,105 @@ function selectCardFromFlashcardTable(cardId) {
 }
 
 window.__csFlashcardsSelectCardFromTable = selectCardFromFlashcardTable;
+
+function refreshAfterFlashcardTableMutation(card) {
+  syncUpdatedCard(card);
+  if (state.statusFilter || state.bookmarkFilter) {
+    applyFilters(card.id);
+    return;
+  }
+  renderStats(summaryFromRows(rowsForHeaderStats()));
+  renderFlashcardTableWindow();
+}
+
+async function toggleFlashcardBookmarkFromTable(cardId) {
+  if (!cardId || state.bookmarkSaving) return false;
+  const current = state.cards.find((item) => item.id === cardId);
+  if (!current) {
+    setMessage('표 목록에서 선택한 카드를 찾지 못했습니다.', true);
+    return false;
+  }
+  const previous = {...current};
+  const nextBookmarked = !isCardBookmarked(current);
+  const optimistic = {...current, bookmarked: bookmarkValue(nextBookmarked)};
+
+  state.bookmarkSaving = true;
+  setBookmarkButtonsDisabled(true);
+  updateCardInCollections(optimistic);
+  refreshAfterFlashcardTableMutation(optimistic);
+  if ($('bookmarkListDialog') && !$('bookmarkListDialog').hidden) renderBookmarkList();
+  setMessage(`${optimistic.term}: 북마크 ${nextBookmarked ? '저장' : '해제'} 중...`);
+
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/bookmark`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({bookmarked: nextBookmarked}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    updateCardInCollections(data.card);
+    state.summary = data.summary;
+    refreshAfterFlashcardTableMutation(data.card);
+    if ($('bookmarkListDialog') && !$('bookmarkListDialog').hidden) renderBookmarkList();
+    setMessage(`${data.card.term}: 북마크 ${isCardBookmarked(data.card) ? '저장 완료' : '해제 완료'}`);
+    return true;
+  } catch (error) {
+    updateCardInCollections(previous);
+    refreshAfterFlashcardTableMutation(previous);
+    if ($('bookmarkListDialog') && !$('bookmarkListDialog').hidden) renderBookmarkList();
+    setMessage(`북마크 저장 실패: ${error.message || error}`, true);
+    return false;
+  } finally {
+    state.bookmarkSaving = false;
+    renderPersonalControls(state.filtered[state.index] || null);
+    renderFlashcardTableWindow();
+  }
+}
+
+async function setFlashcardStatusFromTable(cardId, status) {
+  if (!cardId || state.markSaving || !['O', 'X', ''].includes(status)) return false;
+  const current = state.cards.find((item) => item.id === cardId);
+  if (!current) {
+    setMessage('표 목록에서 선택한 카드를 찾지 못했습니다.', true);
+    return false;
+  }
+  const previous = {...current};
+  const optimistic = buildMarkedCardState(previous, status);
+
+  state.markSaving = true;
+  setMarkButtonsDisabled(true);
+  updateCardInCollections(optimistic);
+  refreshAfterFlashcardTableMutation(optimistic);
+  setMessage(`${optimistic.term}: ${statusLabel(status)} 저장 중...`);
+
+  try {
+    const res = await fetch(`/api/cards/${encodeURIComponent(current.id)}/mark`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({known_status: status}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    updateCardInCollections(data.card);
+    state.summary = data.summary;
+    refreshAfterFlashcardTableMutation(data.card);
+    setMessage(`${data.card.term}: ${statusLabel(status)} 저장 완료`);
+    return true;
+  } catch (error) {
+    updateCardInCollections(previous);
+    refreshAfterFlashcardTableMutation(previous);
+    setMessage(`저장 실패: ${error.message || error}`, true);
+    return false;
+  } finally {
+    state.markSaving = false;
+    setMarkButtonsDisabled(false);
+    renderFlashcardTableWindow();
+  }
+}
+
+window.__csFlashcardsToggleBookmarkFromTable = toggleFlashcardBookmarkFromTable;
+window.__csFlashcardsSetStatusFromTable = setFlashcardStatusFromTable;
 window.__csFlashcardsTableClosed = () => {
   state.flashcardTableWindow = null;
 };
@@ -2687,12 +2786,13 @@ function renderFlashcardTableWindow() {
   const currentCardId = rows[state.index]?.id || '';
   const summaryText = flashcardTableSummaryText();
   const rowsHtml = rows.length ? rows.map((card, index) => `
-    <tr class="${card.id === currentCardId ? 'current-row' : ''}" data-card-id="${escapeHtml(card.id)}" tabindex="0">
+    <tr class="${card.id === currentCardId ? 'current-row' : ''}" data-row-card-id="${escapeHtml(card.id)}" tabindex="0">
+      <td class="bookmark-cell"><button class="table-action bookmark-action${isCardBookmarked(card) ? ' active' : ''}" type="button" data-bookmark-card-id="${escapeHtml(card.id)}" aria-label="북마크 토글" title="북마크 토글"${state.bookmarkSaving ? ' disabled' : ''}>${isCardBookmarked(card) ? '★' : '☆'}</button></td>
       <td>${index + 1}</td>
-      <td class="term-cell">${isCardBookmarked(card) ? '★ ' : ''}${escapeHtml(card.term || card.id)}</td>
+      <td class="term-cell">${escapeHtml(card.term || card.id)}</td>
       <td>${escapeHtml(card.english || '—')}</td>
       <td>${escapeHtml(categoryLabel(card.category))}</td>
-      <td>${escapeHtml(statusLabel(card.known_status))}</td>
+      <td><div class="status-actions">${['O', 'X', ''].map((value) => `<button class="table-action status-action${card.known_status === value ? ' active' : ''}" type="button" data-status-card-id="${escapeHtml(card.id)}" data-status-value="${escapeHtml(value)}" aria-label="상태 ${escapeHtml(statusLabel(value))}" title="${escapeHtml(statusLabel(value))}"${state.markSaving ? ' disabled' : ''}>${escapeHtml(statusLabel(value))}</button>`).join('')}</div></td>
     </tr>
   `).join('') : '<p class="empty-state">현재 조건에 맞는 카드가 없습니다.</p>';
   try {
@@ -2704,7 +2804,7 @@ function renderFlashcardTableWindow() {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>플래시카드 표 목록</title>
   <style>
-    :root { color-scheme: light; --line: #d7d7d7; --line-strong: #bcbcbc; --text: #111; --muted: #666; --bg: #fff; --row: #f3f3f3; }
+    :root { color-scheme: light; --line: #d7d7d7; --text: #111; --muted: #666; --bg: #fff; --row: #f3f3f3; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; }
     .shell { padding: 12px; }
@@ -2719,6 +2819,13 @@ function renderFlashcardTableWindow() {
     tbody tr:hover td, tbody tr:focus-visible td, tbody tr.current-row td { background: var(--row); }
     tbody tr:focus-visible { outline: none; }
     .term-cell { font-weight: 600; }
+    .bookmark-cell { width: 42px; text-align: center; }
+    .table-action { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; }
+    .table-action:disabled { opacity: .35; cursor: default; }
+    .bookmark-action { width: 100%; text-align: center; }
+    .bookmark-action.active, .status-action.active { font-weight: 700; }
+    .status-actions { display: inline-flex; gap: 5px; }
+    .status-action.active { text-decoration: underline; text-underline-offset: 2px; }
     .empty-state { margin: 0; padding: 14px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; }
     @media (max-width: 780px) { .shell { padding: 8px; } th, td { padding: 6px 8px; } }
   </style>
@@ -2728,23 +2835,41 @@ function renderFlashcardTableWindow() {
     <div class="meta">
       <h1>플래시카드 표 목록</h1>
       <p class="summary">${escapeHtml(summaryText)} · ${rows.length}개 · 현재 ${rows.length ? state.index + 1 : 0}</p>
-      <p class="hint">행을 누르면 원래 창의 카드로 이동합니다.</p>
+      <p class="hint">행 클릭 이동 · 별/O/X/–는 바로 수정</p>
     </div>
-    ${rows.length ? `<div class="table-wrap"><table><thead><tr><th style="width:56px;">#</th><th>용어</th><th>영문</th><th>분류</th><th style="width:56px;">상태</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
+    ${rows.length ? `<div class="table-wrap"><table><thead><tr><th style="width:42px;">★</th><th style="width:56px;">#</th><th>용어</th><th>영문</th><th>분류</th><th style="width:92px;">상태</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
   </div>
   <script>
     const activateRow = (row) => {
       const openerRef = window.opener;
       if (!row || !openerRef || openerRef.closed || typeof openerRef.__csFlashcardsSelectCardFromTable !== 'function') return;
-      openerRef.__csFlashcardsSelectCardFromTable(row.dataset.cardId || '');
+      openerRef.__csFlashcardsSelectCardFromTable(row.dataset.rowCardId || '');
       openerRef.focus();
     };
     document.addEventListener('click', (event) => {
-      const row = event.target.closest('[data-card-id]');
+      const openerRef = window.opener;
+      const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
+      if (bookmarkButton) {
+        event.preventDefault();
+        if (openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsToggleBookmarkFromTable === 'function') {
+          openerRef.__csFlashcardsToggleBookmarkFromTable(bookmarkButton.dataset.bookmarkCardId || '');
+        }
+        return;
+      }
+      const statusButton = event.target.closest('[data-status-card-id]');
+      if (statusButton) {
+        event.preventDefault();
+        if (openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsSetStatusFromTable === 'function') {
+          openerRef.__csFlashcardsSetStatusFromTable(statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
+        }
+        return;
+      }
+      const row = event.target.closest('[data-row-card-id]');
       if (row) activateRow(row);
     });
     document.addEventListener('keydown', (event) => {
-      const row = event.target.closest('[data-card-id]');
+      if (event.target.closest('button')) return;
+      const row = event.target.closest('[data-row-card-id]');
       if (!row || (event.key !== 'Enter' && event.key !== ' ')) return;
       event.preventDefault();
       activateRow(row);
