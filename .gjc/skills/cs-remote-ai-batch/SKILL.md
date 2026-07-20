@@ -1,7 +1,8 @@
 ---
 name: cs-remote-ai-batch
-description: 이 cs_flashcards 프로젝트의 원격 AI 일괄 변환 워크플로입니다. 공개 사이트의 카드들을 카테고리 단위로 조회해 간단 설명·상세 설명·시험 포인트·개념 이미지를 아직 AI 반영이 안 된 카드만 웨이브 병렬 호출로 생성·저장하고, 저장 결과가 CSV 정본과 이미지 파일에 반영됐는지 검증해야 할 때 사용합니다.
+description: 이 cs_flashcards 프로젝트의 원격 AI 일괄 변환 워크플로입니다. 공개 사이트의 카드들을 카테고리 단위로 조회해 간단 설명·상세 설명·시험 포인트·개념 이미지를 아직 AI 반영이 안 된 카드만 웨이브 병렬 호출로 생성·저장하고, 저장 결과가 SQLite 정본과 이미지 파일에 반영됐는지 검증해야 할 때 사용합니다.
 use_conditions: 운영 카드 여러 장의 설명이나 이미지를 한 번에 AI 변환해야 하거나, 특정 카테고리에서 아직 AI가 안 먹은 카드만 골라 원격 API로 저장해야 할 때.
+
 ---
 
 # CS Remote AI Batch
@@ -10,9 +11,10 @@ Use this skill to batch-apply the flashcard app's remote AI rewrite and AI image
 
 ## Core invariants
 
-- Treat `data/CS_encyclopedia_300plus.csv` as the baseline content source for "아직 AI가 안 먹은 카드" 판정에만 사용합니다.
-- Treat remote `/api/cards` as the live merged view. 카드 콘텐츠는 CSV가 정본이고, `state/progress.sqlite`는 학습 진행상태만 덧씌웁니다.
+- Treat `data/CS_encyclopedia_300plus.csv` as an optional bootstrap baseline for "아직 AI가 안 먹은 카드" 판정에만 사용합니다.
+- Treat remote `/api/cards` as the live merged view. 카드 콘텐츠 정본과 학습 진행상태가 모두 `state/progress.sqlite`에 있습니다.
 - Never edit or commit `state/progress.sqlite`, `state/ai_images/`, `.omx/*password*`, API keys, or Basic Auth credentials.
+
 - Use the public app endpoints with Basic Auth. The default username is `cs`; read the password from `.omx/cs_flashcards_public_password` unless the user gives another credential.
 - Verify `/api/health` first. Stop if `ai_rewrite_enabled` is false or `progress_db_exists` is false.
 - Run in waves of roughly 3-5 parallel cards. If 502/timeout appears, shrink the next wave or retry the remaining cards sequentially.
@@ -36,11 +38,12 @@ Use the same rewrite instructions as the shipped UI:
 
 ## Workflow
 
-1. Read `README.md` sections describing `/api/cards`, AI image storage, CSV content persistence, and `state/progress.sqlite` progress persistence.
+1. Read `README.md` sections describing `/api/cards`, AI image storage, SQLite `cards` content persistence, and `state/progress.sqlite` progress persistence.
 2. Fetch `/api/health` and `/api/cards` from the remote site with Basic Auth.
-3. Load the local CSV and build the target set for the requested category and fields.
-   - `definition`/`detailed_explanation`/`exam_note`: select only cards whose live remote field still equals the CSV field.
+3. If a local CSV bootstrap file still exists, use it only as a baseline snapshot when building the target set for the requested category and fields.
+   - `definition`/`detailed_explanation`/`exam_note`: when using the bootstrap CSV, select only cards whose live remote field still equals that baseline field.
    - `image`: select only cards whose live `concept_image_url` does not start with `/api/ai-images/`.
+
 4. Execute the target set in waves.
    - For text: preview, extract the requested field only, then apply that field only.
    - For image: preview, then apply with the returned `preview_name`.
@@ -58,7 +61,7 @@ Report all of the following:
 - success count and retry count;
 - any failed card IDs after final retry;
 - final remaining count per field after re-fetch;
-- whether the saved values are now reflected in the canonical content source (text differs from local baseline CSV, images are served from `/api/ai-images/`).
+- whether the saved values are now reflected in the canonical SQLite content source (`/api/ai-images/` for images, updated remote text values for text).
 
 ## When not to use this skill
 

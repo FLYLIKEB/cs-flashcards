@@ -49,14 +49,16 @@ http://127.0.0.1:8000
 
 ## 데이터 저장 구조
 
-카드 콘텐츠와 학습 진행상태를 분리해서 관리합니다.
+카드 콘텐츠와 학습 진행상태를 모두 SQLite 중심으로 관리합니다.
 
 | 구분 | 저장 위치 | Git 관리 | 배포 시 덮어쓰기 | 용도 |
 | --- | --- | --- | --- | --- |
-| 카드 콘텐츠 | `data/CS_encyclopedia_300plus.csv` | O | O | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트, 이미지 URL/alt, 한국은행 출제 여부, 중요도, 난이도 |
-| 학습 진행상태 | `state/progress.sqlite` | X | X | O/X, 마지막 학습 시각, 복습 횟수, 북마크, 메모, 문제풀이 기록 |
+| 카드 콘텐츠 | `state/progress.sqlite`의 `cards` 테이블 | X | X | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트, 이미지 URL/alt, 한국은행 출제 여부, 중요도, 난이도 |
+| 학습 진행상태 | `state/progress.sqlite`의 `card_progress` 테이블 | X | X | O/X, 마지막 학습 시각, 복습 횟수, 북마크, 메모, 문제풀이 기록 |
+| 부트스트랩 원본 | `data/CS_encyclopedia_300plus.csv` | O | O | 새 배포에서 누락 카드만 한 번 채우는 시드 파일 |
 
-앱은 `/api/cards`를 호출할 때 CSV를 카드 콘텐츠의 정본(source of truth)으로 읽고, SQLite에는 학습 진행상태만 덧씌웁니다. 예전 배포에서 SQLite에 남아 있던 AI 설명/이미지 오버레이는 서버 시작 시 CSV로 자동 이관한 뒤 비워서, 이후에는 CSV 하나만 보면 현재 카드 콘텐츠를 알 수 있습니다.
+앱은 `/api/cards`를 호출할 때 SQLite의 `cards` 테이블을 카드 콘텐츠 정본(source of truth)으로 읽고, 같은 DB의 진행상태·문제풀이 통계를 합쳐 반환합니다. 예전 배포에서 `card_progress`에 남아 있던 AI 설명/이미지 오버레이는 서버 시작 시 `cards` 테이블로 자동 이관한 뒤 비웁니다.
+
 
 
 진행상태 SQLite 테이블의 핵심 구조는 다음과 같습니다.
@@ -197,14 +199,15 @@ python3 scripts/generate_concept_images.py --write-csv
 
 ## 내용을 수정하고 반영하기
 
-카드의 용어, 요약, 상세설명, 한국은행 출제 여부, 중요도, 난이도 같은 콘텐츠는 아래 CSV에 있습니다. O/X, 마지막 학습 시각, 복습 횟수는 SQLite 진행상태 DB에 따로 저장되므로 CSV를 수정/배포해도 학습 상태가 원복되지 않습니다.
+카드의 용어, 요약, 상세설명, 한국은행 출제 여부, 중요도, 난이도 같은 콘텐츠는 운영 중에는 SQLite `cards` 테이블에서 읽습니다. `data/CS_encyclopedia_300plus.csv`는 새 배포에서 아직 DB에 없는 카드만 채우는 시드 파일이고, O/X·마지막 학습 시각·복습 횟수는 `card_progress`에 따로 저장됩니다.
 
 ```text
-data/CS_encyclopedia_300plus.csv
+state/progress.sqlite
 ```
 
-수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 기존 원격 CSV의 카드 콘텐츠를 우선 보존하고, 학습 진행상태는 계속 SQLite에 유지합니다.
-브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 CSV에 기록됩니다.
+수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 기존 원격 SQLite 카드 콘텐츠와 학습 진행상태를 보존하고, 번들 CSV는 새 카드 부트스트랩에만 사용합니다.
+브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다.
+
 
 
 ```bash
@@ -277,9 +280,10 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
 
 {
   "ok": true,
-  "csv_exists": true,
+  "content_db_exists": true,
   "progress_db_exists": true,
   "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite",
+  "bootstrap_csv_exists": true,
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
   "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book",

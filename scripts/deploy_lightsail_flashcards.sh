@@ -165,8 +165,9 @@ sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot pytho
 
 mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
 
-# Preserve learning progress and current card content before deployment replaces the CSV.
-# Existing SQLite rows win; old remote CSV values are imported only when the DB is still blank for that card/field.
+# Preserve learning progress and legacy card-content overlays before deployment replaces the bootstrap CSV.
+# The new code flushes these legacy card-content columns into the canonical SQLite cards table after unpack.
+
 python3 - "$REMOTE_DIR/data/CS_encyclopedia_300plus.csv" "$REMOTE_DIR/state/progress.sqlite" <<'PY'
 from __future__ import annotations
 import csv
@@ -256,7 +257,8 @@ if csv_path.exists():
                 if has_card_content:
                     migrated_card_content += delta
         conn.commit()
-        print(f"progress migration: imported {imported} row(s) from existing remote CSV; preserved {migrated_card_content} card-content row(s)")
+        print(f"progress migration: imported {imported} row(s) from existing remote CSV; preserved {migrated_card_content} legacy card-content row(s)")
+
     finally:
         conn.close()
 else:
@@ -272,6 +274,17 @@ cd "$REMOTE_DIR"
 python3 -m venv .venv
 .venv/bin/python -m pip install -q --upgrade pip
 .venv/bin/python -m pip install -q -r requirements.txt
+.venv/bin/python - <<'PY'
+import json
+import app
+seed_rows = app.seed_rows_from_csv(app.CSV_PATH) or []
+app.ensure_progress_db(app.PROGRESS_DB_PATH, seed_rows)
+app.sync_legacy_ai_progress_to_db(app.PROGRESS_DB_PATH)
+cards, _ = app.read_card_content(app.PROGRESS_DB_PATH)
+print("SQLite card bootstrap:", json.dumps({
+    "count": len(cards),
+}, ensure_ascii=False))
+PY
 if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then
   .venv/bin/python - <<'PY'
 import json

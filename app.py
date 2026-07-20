@@ -13,7 +13,6 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import sqlite3
-import tempfile
 from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
@@ -43,6 +42,25 @@ WIKI_TOC_NAME = "TOC.md"
 WIKI_BOOK_README_NAME = "README.md"
 WIKI_BOOK_HOME_SLUG = "_book"
 REVIEW_COLUMNS = ["known_status", "last_reviewed", "review_count"]
+CARD_CONTENT_COLUMNS = [
+    "id",
+    "term",
+    "english",
+    "category",
+    "alphabet_index",
+    "korean_initial",
+    "definition",
+    "detailed_explanation",
+    "related_concepts",
+    "source_files",
+    "exam_note",
+    "bok_appeared",
+    "importance",
+    "difficulty",
+    "concept_image_url",
+    "concept_image_alt",
+]
+CARD_CONTENT_DB_COLUMNS = [field for field in CARD_CONTENT_COLUMNS if field != "id"]
 VALID_STATUSES = {"O", "X", ""}
 QUESTION_ATTEMPT_RESULT_VALUES = {"all", "correct", "wrong", "pending", "ambiguous", "unknown"}
 QUESTION_ATTEMPT_JUDGMENT_VALUES = {"correct", "ambiguous", "wrong", "unknown", "pending"}
@@ -64,8 +82,9 @@ WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PRE
 WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
 CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_alt")
 # Legacy-only SQLite columns that older deployments may still carry until they
-# are flushed back into the canonical CSV content source.
+# are flushed into the canonical card-content rows.
 AI_PROGRESS_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt")
+
 OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
 OPENAI_API_BASE = str(os.environ.get("CS_FLASHCARDS_OPENAI_API_BASE", "https://api.openai.com/v1")).rstrip("/")
 CODEX_MODEL = str(os.environ.get("CS_FLASHCARDS_CODEX_MODEL", "codex-mini-latest")).strip() or "codex-mini-latest"
@@ -262,6 +281,10 @@ def ensure_review_columns(fieldnames: list[str] | None) -> list[str]:
     return fields
 
 
+def content_fieldnames() -> list[str]:
+    return ensure_review_columns(list(CARD_CONTENT_COLUMNS))
+
+
 def normalized_review_count(value: str | None) -> str:
     try:
         count = int(value or "0")
@@ -306,6 +329,13 @@ def read_csv_cards(csv_path: Path = CSV_PATH, *, keep_csv_progress: bool = False
     return rows, fieldnames
 
 
+def seed_rows_from_csv(csv_path: Path = CSV_PATH) -> list[dict[str, str]] | None:
+    if not csv_path.exists():
+        return None
+    rows, _ = read_csv_cards(csv_path, keep_csv_progress=True)
+    return rows
+
+
 def progress_row_is_meaningful(row: dict[str, str]) -> bool:
     return bool(
         row.get("known_status") in {"O", "X"}
@@ -328,6 +358,54 @@ def connect_progress_db(progress_db_path: Path) -> sqlite3.Connection:
 def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] | None = None) -> None:
     existed = progress_db_path.exists()
     with closing(connect_progress_db(progress_db_path)) as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS cards (
+                card_id TEXT PRIMARY KEY,
+                term TEXT NOT NULL DEFAULT '',
+                english TEXT NOT NULL DEFAULT '',
+                category TEXT NOT NULL DEFAULT '',
+                alphabet_index TEXT NOT NULL DEFAULT '',
+                korean_initial TEXT NOT NULL DEFAULT '',
+                definition TEXT NOT NULL DEFAULT '',
+                detailed_explanation TEXT NOT NULL DEFAULT '',
+                related_concepts TEXT NOT NULL DEFAULT '',
+                source_files TEXT NOT NULL DEFAULT '',
+                exam_note TEXT NOT NULL DEFAULT '',
+                bok_appeared TEXT NOT NULL DEFAULT '',
+                importance TEXT NOT NULL DEFAULT '',
+                difficulty TEXT NOT NULL DEFAULT '',
+                concept_image_url TEXT NOT NULL DEFAULT '',
+                concept_image_alt TEXT NOT NULL DEFAULT '',
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL DEFAULT ''
+            )
+            """
+        )
+        card_columns = {row["name"] for row in conn.execute("PRAGMA table_info(cards)").fetchall()}
+        card_column_definitions = {
+            "term": "TEXT NOT NULL DEFAULT ''",
+            "english": "TEXT NOT NULL DEFAULT ''",
+            "category": "TEXT NOT NULL DEFAULT ''",
+            "alphabet_index": "TEXT NOT NULL DEFAULT ''",
+            "korean_initial": "TEXT NOT NULL DEFAULT ''",
+            "definition": "TEXT NOT NULL DEFAULT ''",
+            "detailed_explanation": "TEXT NOT NULL DEFAULT ''",
+            "related_concepts": "TEXT NOT NULL DEFAULT ''",
+            "source_files": "TEXT NOT NULL DEFAULT ''",
+            "exam_note": "TEXT NOT NULL DEFAULT ''",
+            "bok_appeared": "TEXT NOT NULL DEFAULT ''",
+            "importance": "TEXT NOT NULL DEFAULT ''",
+            "difficulty": "TEXT NOT NULL DEFAULT ''",
+            "concept_image_url": "TEXT NOT NULL DEFAULT ''",
+            "concept_image_alt": "TEXT NOT NULL DEFAULT ''",
+            "sort_order": "INTEGER NOT NULL DEFAULT 0",
+            "updated_at": "TEXT NOT NULL DEFAULT ''",
+        }
+        for column, definition in card_column_definitions.items():
+            if column not in card_columns:
+                conn.execute(f"ALTER TABLE cards ADD COLUMN {column} {definition}")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_cards_category ON cards(category)")
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS card_progress (
@@ -486,6 +564,41 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
 
+        if seed_rows:
+            now = utc_now_iso()
+            conn.executemany(
+                """
+                INSERT OR IGNORE INTO cards
+                    (card_id, term, english, category, alphabet_index, korean_initial, definition, detailed_explanation,
+                     related_concepts, source_files, exam_note, bok_appeared, importance, difficulty,
+                     concept_image_url, concept_image_alt, sort_order, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                [
+                    (
+                        row["id"],
+                        row.get("term") or "",
+                        row.get("english") or "",
+                        row.get("category") or "",
+                        row.get("alphabet_index") or "",
+                        row.get("korean_initial") or "",
+                        row.get("definition") or "",
+                        row.get("detailed_explanation") or "",
+                        row.get("related_concepts") or "",
+                        row.get("source_files") or "",
+                        row.get("exam_note") or "",
+                        row.get("bok_appeared") or "",
+                        row.get("importance") or "",
+                        row.get("difficulty") or "",
+                        row.get("concept_image_url") or "",
+                        row.get("concept_image_alt") or "",
+                        index,
+                        now,
+                    )
+                    for index, row in enumerate(seed_rows)
+                    if row.get("id")
+                ],
+            )
         if not existed and seed_rows:
             now = utc_now_iso()
             conn.executemany(
@@ -530,6 +643,22 @@ def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     return progress
 
 
+def read_card_content(progress_db_path: Path) -> tuple[list[dict[str, str]], list[str]]:
+    ensure_progress_db(progress_db_path)
+    select_fields = ["card_id", *CARD_CONTENT_DB_COLUMNS]
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        rows = conn.execute(
+            f"SELECT {', '.join(select_fields)} FROM cards ORDER BY sort_order ASC, card_id ASC"
+        ).fetchall()
+    cards: list[dict[str, str]] = []
+    for row in rows:
+        item = {"id": row["card_id"] or ""}
+        for field in CARD_CONTENT_DB_COLUMNS:
+            item[field] = row[field] or ""
+        cards.append(item)
+    return cards, content_fieldnames()
+
+
 def read_legacy_ai_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     ensure_progress_db(progress_db_path)
     select_fields = ["card_id", *AI_PROGRESS_FIELDS]
@@ -564,38 +693,34 @@ def clear_legacy_ai_progress(progress_db_path: Path, card_ids: list[str]) -> int
         return conn.total_changes - before
 
 
-def sync_legacy_ai_progress_to_csv(
-    csv_path: Path,
-    progress_db_path: Path,
-    rows: list[dict[str, str]] | None = None,
-    fieldnames: list[str] | None = None,
-) -> bool:
+def sync_legacy_ai_progress_to_db(progress_db_path: Path) -> bool:
     legacy = read_legacy_ai_progress(progress_db_path)
     if not legacy:
         return False
-    if rows is None or fieldnames is None:
-        rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
-    assert rows is not None
-    assert fieldnames is not None
-    writable_fields = list(fieldnames)
-    for field in AI_PROGRESS_FIELDS:
-        if field not in writable_fields:
-            writable_fields.append(field)
-    row_by_id = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
+    ensure_progress_db(progress_db_path)
     migrated_ids: list[str] = []
     changed = False
-    for card_id, updates in legacy.items():
-        row = row_by_id.get(card_id)
-        if row is None:
-            continue
-        migrated_ids.append(card_id)
-        for field, value in updates.items():
-            normalized = normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
-            if str(row.get(field) or "") != normalized:
-                row[field] = normalized
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        for card_id, updates in legacy.items():
+            current = conn.execute(
+                "SELECT definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt FROM cards WHERE card_id=?",
+                (card_id,),
+            ).fetchone()
+            if current is None:
+                continue
+            normalized_updates = {
+                field: normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
+                for field, value in updates.items()
+            }
+            if any(str(current[field] or "") != value for field, value in normalized_updates.items()):
+                assignments = ", ".join(f"{field}=?" for field in normalized_updates)
+                conn.execute(
+                    f"UPDATE cards SET {assignments}, updated_at=? WHERE card_id=?",
+                    [*normalized_updates.values(), utc_now_iso(), card_id],
+                )
                 changed = True
-    if changed:
-        write_cards(rows, writable_fields, csv_path)
+            migrated_ids.append(card_id)
+        conn.commit()
     if migrated_ids:
         clear_legacy_ai_progress(progress_db_path, migrated_ids)
     return changed
@@ -610,6 +735,9 @@ def merge_progress(
     question_stats = question_stats or {}
     for row in rows:
         item = dict(row)
+        item.setdefault("known_status", "")
+        item.setdefault("last_reviewed", "")
+        item.setdefault("review_count", "0")
         item.setdefault("bookmarked", "0")
         item.setdefault("memo", "")
         item.setdefault("memo_updated_at", "")
@@ -633,13 +761,14 @@ def merge_progress(
 
 
 def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
-    raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
     db_path = progress_db_for(csv_path, progress_db_path)
-    ensure_progress_db(db_path, raw_rows)
-    if sync_legacy_ai_progress_to_csv(csv_path, db_path, rows=raw_rows, fieldnames=fieldnames):
-        raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
-    clean_rows, _ = read_csv_cards(csv_path, keep_csv_progress=False)
-    rows = merge_progress(clean_rows, read_progress(db_path), read_question_attempt_stats(db_path))
+    seed_rows = seed_rows_from_csv(csv_path)
+    ensure_progress_db(db_path, seed_rows)
+    sync_legacy_ai_progress_to_db(db_path)
+    card_rows, fieldnames = read_card_content(db_path)
+    if not card_rows:
+        raise FileNotFoundError(f"Card content not found in SQLite: {db_path}")
+    rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
 
 
@@ -648,51 +777,41 @@ def update_card_content_fields(
     updates: dict[str, str],
     csv_path: Path = CSV_PATH,
     backup_dir: Path = BACKUP_DIR,
+    progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
-    rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
-    writable_fields = list(fieldnames)
-    for field in AI_PROGRESS_FIELDS:
-        if field not in writable_fields:
-            writable_fields.append(field)
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+    sync_legacy_ai_progress_to_db(db_path)
+    rows, _ = read_card_content(db_path)
     target = next((row for row in rows if row.get("id") == card_id), None)
     if target is None:
         raise KeyError(card_id)
-    changed = False
+    changed_updates: dict[str, str] = {}
     for field, value in updates.items():
         normalized = normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
         if str(target.get(field) or "") != normalized:
-            target[field] = normalized
-            changed = True
-    backup_path = backup_csv(csv_path, backup_dir) if changed else None
-    if changed:
-        write_cards(rows, writable_fields, csv_path)
+            changed_updates[field] = normalized
+    backup_path = backup_progress_db(db_path, backup_dir) if changed_updates else None
+    if changed_updates:
+        assignments = ", ".join(f"{field}=?" for field in changed_updates)
+        with closing(connect_progress_db(db_path)) as conn:
+            conn.execute(
+                f"UPDATE cards SET {assignments}, updated_at=? WHERE card_id=?",
+                [*changed_updates.values(), utc_now_iso(), card_id],
+            )
+            conn.commit()
+        target.update(changed_updates)
     return dict(target), backup_path
 
 
-def write_cards(rows: list[dict[str, str]], fieldnames: list[str], csv_path: Path = CSV_PATH) -> None:
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
-    fd, temp_name = tempfile.mkstemp(prefix=f".{csv_path.name}.", suffix=".tmp", dir=csv_path.parent)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
-            writer.writeheader()
-            writer.writerows(rows)
-        os.replace(temp_name, csv_path)
-    except Exception:
-        try:
-            os.unlink(temp_name)
-        except FileNotFoundError:
-            pass
-        raise
-
-
-def backup_csv(csv_path: Path = CSV_PATH, backup_dir: Path = BACKUP_DIR) -> Path | None:
-    if not csv_path.exists():
+def backup_progress_db(progress_db_path: Path = PROGRESS_DB_PATH, backup_dir: Path = BACKUP_DIR) -> Path | None:
+    if not progress_db_path.exists():
         return None
     backup_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    dest = backup_dir / f"{csv_path.stem}_{stamp}{csv_path.suffix}"
-    shutil.copy2(csv_path, dest)
+    dest = backup_dir / f"{progress_db_path.stem}_{stamp}{progress_db_path.suffix}"
+    with closing(connect_progress_db(progress_db_path)) as source_conn, closing(sqlite3.connect(dest)) as dest_conn:
+        source_conn.backup(dest_conn)
     return dest
 
 
@@ -1022,13 +1141,14 @@ def update_card_ai_content(
             changed_updates[field] = normalized
     if not changed_updates:
         return target, None
-    updated_row, backup_path = update_card_content_fields(card_id, changed_updates, csv_path, backup_dir)
+    updated_row, backup_path = update_card_content_fields(card_id, changed_updates, csv_path, backup_dir, db_path)
     clear_legacy_ai_progress(db_path, [card_id])
     updated_rows, _ = read_cards(csv_path, db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
             return row, backup_path
     return updated_row, backup_path
+
 AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
 
 
@@ -1204,11 +1324,13 @@ def apply_ai_concept_image(
         {"concept_image_url": next_url, "concept_image_alt": next_alt},
         csv_path,
         backup_dir,
+        db_path,
     )
     clear_legacy_ai_progress(db_path, [card_id])
     try:
         preview_path.unlink(missing_ok=True)
         preview_path.with_suffix(".json").unlink(missing_ok=True)
+
     except TypeError:
         if preview_path.exists():
             preview_path.unlink()
@@ -2385,9 +2507,13 @@ def summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         "bookmarked": bookmarked,
         "memo_count": memo_count,
         "categories": categories,
-        "csv_path": str(CSV_PATH),
+        "csv_path": str(PROGRESS_DB_PATH),
+        "content_db_path": str(PROGRESS_DB_PATH),
+        "bootstrap_csv_path": str(CSV_PATH),
         "progress_db_path": str(PROGRESS_DB_PATH),
     }
+
+
 WIKI_TOC_ITEM_RE = re.compile(r"^(?P<indent>\s*)-\s+\[(?P<title>.+?)\]\((?P<href>[^)]+)\)\s*$")
 WIKI_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 WIKI_LIST_RE = re.compile(r"^(?P<indent>\s*)(?P<marker>[-*+]|\d+\.)\s+(?P<body>.*)$")
@@ -3496,8 +3622,10 @@ def health() -> dict[str, Any]:
         wiki_book_exists = False
     return {
         "ok": True,
-        "csv_path": str(CSV_PATH),
-        "csv_exists": CSV_PATH.exists(),
+        "content_db_path": str(PROGRESS_DB_PATH),
+        "content_db_exists": PROGRESS_DB_PATH.exists(),
+        "bootstrap_csv_path": str(CSV_PATH),
+        "bootstrap_csv_exists": CSV_PATH.exists(),
         "progress_db_path": str(PROGRESS_DB_PATH),
         "progress_db_exists": PROGRESS_DB_PATH.exists(),
         "wiki_book_dir": str(resolved_wiki_book_dir),
