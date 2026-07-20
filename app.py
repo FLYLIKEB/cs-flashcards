@@ -1190,6 +1190,11 @@ def normalize_question_attempt_judgment(value: str | None, is_correct: bool | No
 def normalize_question_bank_text(value: Any, *, limit: int) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()[:limit]
 
+def normalize_question_bank_markdown(value: Any, *, limit: int) -> str:
+    text = str(value or "").replace("\r\n", "\n").replace("\r", "\n").strip()
+    return text[:limit]
+
+
 
 def normalize_question_bank_list(values: Any, *, item_limit: int = 255) -> list[str]:
     raw_items: list[Any]
@@ -1274,7 +1279,7 @@ def normalize_question_bank_entry(
     question_type = str(raw.get("question_type") or "").strip().lower()
     if question_type not in SUPPORTED_QUESTION_TYPES:
         raise ValueError(f"Unsupported question type: {raw.get('question_type')}")
-    prompt = normalize_question_bank_text(raw.get("prompt"), limit=4000)
+    prompt = normalize_question_bank_markdown(raw.get("prompt"), limit=4000)
     if not prompt:
         raise ValueError("question prompt is required")
     card_id = normalize_question_bank_text(raw.get("card_id"), limit=255)
@@ -1293,9 +1298,9 @@ def normalize_question_bank_entry(
         "card_id": card_id,
         "question_type": question_type,
         "prompt": prompt,
-        "body": normalize_question_bank_text(raw.get("body"), limit=12000),
-        "answer": normalize_question_bank_text(raw.get("answer"), limit=20000),
-        "explanation": normalize_question_bank_text(raw.get("explanation"), limit=50000),
+        "body": normalize_question_bank_markdown(raw.get("body"), limit=12000),
+        "answer": normalize_question_bank_markdown(raw.get("answer"), limit=20000),
+        "explanation": normalize_question_bank_markdown(raw.get("explanation"), limit=50000),
         "rubric": normalize_question_bank_list(raw.get("rubric"), item_limit=2000),
         "choices": choices,
         "answer_index": answer_index,
@@ -1308,7 +1313,7 @@ def normalize_question_bank_entry(
         "section": normalize_question_bank_text(raw.get("section"), limit=64),
         "points": raw.get("points"),
         "expected_time_seconds": raw.get("expected_time_seconds"),
-        "answer_guide": normalize_question_bank_text(raw.get("answer_guide"), limit=255),
+        "answer_guide": normalize_question_bank_markdown(raw.get("answer_guide"), limit=255),
         "session_mode": normalize_question_bank_text(raw.get("session_mode") or "practice", limit=32) or "practice",
     }
     normalized["fingerprint"] = question_bank_fingerprint(normalized)

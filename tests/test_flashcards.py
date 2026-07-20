@@ -797,6 +797,55 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed['summary']['total'], 1)
             self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
 
+    def test_question_bank_preserves_markdown_blocks(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            prompt = '## 제목\n\n다음 그림을 보고 답하시오.\n\n![문제 그림](/static/favicon.svg)'
+            body = '- 첫째 줄\n- 둘째 줄\n\n```sql\nSELECT *\nFROM exam_questions;\n```'
+            answer = '1. 중복 제거\n2. 이상 현상 방지'
+            explanation = '### 해설\n\n|항목|설명|\n|---|---|\n|정규화|중복 감소|'
+            answer_guide = '1단락으로 요약하고\n2단락에서 예시를 쓰시오.'
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': prompt,
+                        'body': body,
+                        'answer': answer,
+                        'explanation': explanation,
+                        'rubric': ['중복 제거'],
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '2013년 학술파트 2',
+                        'answer_guide': answer_guide,
+                    }
+                ],
+                csv_path,
+                db_path,
+            )
+            item = saved['items'][0]
+            self.assertEqual(item['prompt'], prompt)
+            self.assertEqual(item['body'], body)
+            self.assertEqual(item['answer'], answer)
+            self.assertEqual(item['explanation'], explanation)
+            self.assertEqual(item['answer_guide'], answer_guide)
+
+            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, issuer='한국은행', limit=10)
+            self.assertEqual(listed['summary']['total'], 1)
+            listed_item = listed['items'][0]
+            self.assertEqual(listed_item['prompt'], prompt)
+            self.assertEqual(listed_item['body'], body)
+            self.assertEqual(listed_item['answer'], answer)
+            self.assertEqual(listed_item['explanation'], explanation)
+            self.assertEqual(listed_item['answer_guide'], answer_guide)
     def test_api_generate_questions_persists_question_bank_rows(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
