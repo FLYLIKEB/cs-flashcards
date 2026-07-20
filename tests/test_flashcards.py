@@ -949,10 +949,10 @@ class FlashcardProgressTests(unittest.TestCase):
             (pages / '05-14-44-한국은행-2009-전산학술-발췌.md').write_text(
                 '# 05-14-44. 한국은행 2009 전산학술 발췌\n\n'
                 '## Ⅰ. 다음 문제를 읽고 가장 적당한 답의 기호를 고르시오.\n\n'
-                '### 1. 다음 설명으로 옳은 것은?\n\n'
-                'A. 정답 A\n\n'
-                'B. 정답 B\n\n'
-                'C. 정답 C\n',
+                '### 1. 해시 테이블에 대한 다음 설명으로 옳은 것은?\n\n'
+                'A. 충돌을 줄이는 방법이다.\n\n'
+                'B. 연결 리스트를 이용한 체이닝 기법이다.\n\n'
+                'C. 이진 탐색 트리와 동일하다.\n',
                 encoding='utf-8',
             )
 
@@ -965,6 +965,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(database['topic'], '데이터베이스')
             self.assertEqual(database['field_name'], '컴퓨터공학 학술')
             self.assertEqual(database['issuer'], '한국은행')
+            self.assertEqual(database['category'], '데이터베이스')
             self.assertEqual(database['answer'], '')
             self.assertEqual(database['explanation'], '')
             self.assertIn('| 항목 | 값 |', database['body'])
@@ -980,17 +981,19 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIn('### 유의사항', essay['body'])
             self.assertIn('### 문제', essay['body'])
             self.assertEqual(essay['section'], '전공논술')
+            self.assertEqual(essay['category'], '클라우드·분산시스템')
             self.assertEqual(essay['points'], 20)
             self.assertEqual(essay['expected_time_seconds'], 54 * 60)
             self.assertEqual(essay['answer'], '')
 
             multiple_choice = next(item for item in entries if item['question_type'] == 'multiple_choice')
-            self.assertEqual(multiple_choice['prompt'], '### 1. 다음 설명으로 옳은 것은?')
-            self.assertEqual(multiple_choice['choices'], ['정답 A', '정답 B', '정답 C'])
+            self.assertEqual(multiple_choice['prompt'], '### 1. 해시 테이블에 대한 다음 설명으로 옳은 것은?')
+            self.assertEqual(multiple_choice['choices'], ['충돌을 줄이는 방법이다.', '연결 리스트를 이용한 체이닝 기법이다.', '이진 탐색 트리와 동일하다.'])
             self.assertEqual(multiple_choice['answer'], '')
             self.assertEqual(multiple_choice['section'], '전공필기')
             self.assertIsNone(multiple_choice['points'])
             self.assertEqual(multiple_choice['session_mode'], 'bok')
+            self.assertEqual(multiple_choice['category'], '자료구조·알고리즘')
 
     def test_sync_bok_question_bank_entries_upserts_empty_answers(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1031,6 +1034,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed['summary']['total'], 3)
             self.assertTrue(all(item['answer'] == '' for item in listed['items']))
             self.assertTrue(all(item['session_mode'] == 'bok' for item in listed['items']))
+            self.assertTrue(all(item['category'] for item in listed['items']))
             self.assertEqual({item['source_location'] for item in listed['items']}, {
                 '한국은행 2021 컴퓨터공학 학술 파트 I · 1. 데이터베이스',
                 '한국은행 2021 컴퓨터공학 학술 파트 I · 2. 네트워크',

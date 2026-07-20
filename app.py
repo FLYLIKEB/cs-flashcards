@@ -1497,12 +1497,12 @@ QUESTION_BANK_CATEGORIES = (
 QUESTION_BANK_CATEGORY_HINTS: dict[str, tuple[str, ...]] = {
     "데이터베이스": ("데이터베이스", "db", "sql", "정규화", "트랜잭션", "스키마", "erd"),
     "운영체제": ("운영체제", "os", "프로세스", "스레드", "교착상태", "스케줄링", "페이지", "세마포어", "스래싱", "메모리 관리"),
-    "네트워크": ("네트워크", "dns", "라우팅", "tcp", "udp", "ipv", "cdma", "브리지", "ftp", "http", "데이터 통신"),
-    "보안": ("보안", "정보보호", "암호", "전자서명", "pki", "xss", "csrf", "사회공학", "arp 공격", "접근통제"),
-    "소프트웨어공학": ("소프트웨어공학", "소프트웨어 공학", "mvc", "애자일", "테스트", "형상관리", "요구사항", "프로젝트"),
-    "컴퓨터구조": ("컴퓨터구조", "컴퓨터 구조", "캐시", "raid", "파이프라인", "instruction", "clock frequency"),
+    "네트워크": ("네트워크", "dns", "라우팅", "tcp", "udp", "ipv", "cdma", "브리지", "ftp", "http", "데이터 통신", "crc", "cyclic redundancy check"),
+    "보안": ("보안", "정보보호", "암호", "전자서명", "pki", "xss", "csrf", "사회공학", "arp 공격", "접근통제", "사이버 침해", "사이버 테러", "ddos", "악성코드"),
+    "소프트웨어공학": ("소프트웨어공학", "소프트웨어 공학", "mvc", "애자일", "agile", "테스트", "형상관리", "요구사항", "프로젝트"),
+    "컴퓨터구조": ("컴퓨터구조", "컴퓨터 구조", "캐시", "raid", "파이프라인", "instruction", "clock frequency", "2진수", "1의 보수", "2의 보수", "overflow"),
     "자료구조·알고리즘": ("자료구조", "알고리즘", "정렬", "해시", "트리", "그래프", "kruskal", "mass", "markov"),
-    "클라우드·분산시스템": ("클라우드", "분산", "iaas", "paas", "saas", "하이브리드 클라우드", "원격근무", "vdi", "블록체인"),
+    "클라우드·분산시스템": ("클라우드", "분산", "iaas", "paas", "saas", "하이브리드 클라우드", "원격근무", "vdi", "블록체인", "soa", "web 2.0"),
     "인공지능·데이터": ("인공지능", "머신러닝", "머신 러닝", "ai", "통계", "텍스트 마이닝", "text mining", "데이터 웨어하우스"),
     "프로그래밍 언어": ("프로그래밍 언어", "java", "객체지향", "정규 표현식", "컴파일러"),
     "금융IT·신기술": ("금융it", "전자금융", "자산관리시스템", "신기술"),
@@ -2159,7 +2159,11 @@ def bok_question_bank_keywords(page_title: str, topic: str) -> list[str]:
 
 
 
-def parse_bok_question_bank_entries(repo_dir: Path | None = None) -> list[dict[str, Any]]:
+def parse_bok_question_bank_entries(
+    repo_dir: Path | None = None,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> list[dict[str, Any]]:
     entries: list[dict[str, Any]] = []
     for source_path in bok_question_bank_source_pages(repo_dir):
         text = source_path.read_text(encoding="utf-8")
@@ -2184,6 +2188,23 @@ def parse_bok_question_bank_entries(repo_dir: Path | None = None) -> list[dict[s
                 context_headings = [text for _, text in heading_snapshots.get(start_index, [])[:-1]]
                 question_type = infer_bok_question_type(page_title, prompt, body, context_headings)
                 field_name = bok_question_bank_field_name(page_title)
+                category = infer_question_bank_category(
+                    "",
+                    topic=topic,
+                    prompt=" ".join(part for part in (page_title, *context_headings, prompt) if part).strip(),
+                    body="",
+                    csv_path=csv_path,
+                    progress_db_path=progress_db_path,
+                )
+                if not category:
+                    category = infer_question_bank_category(
+                        "",
+                        topic=topic,
+                        prompt=" ".join(part for part in (page_title, *context_headings, prompt) if part).strip(),
+                        body=body,
+                        csv_path=csv_path,
+                        progress_db_path=progress_db_path,
+                    )
                 entries.append({
                     "question_type": question_type,
                     "prompt": prompt,
@@ -2195,6 +2216,7 @@ def parse_bok_question_bank_entries(repo_dir: Path | None = None) -> list[dict[s
                     "answer_index": None,
                     "topic": topic,
                     "field_name": field_name,
+                    "category": category,
                     "keywords": bok_question_bank_keywords(page_title, topic),
                     "difficulty": "",
                     "issuer": "한국은행",
@@ -2211,6 +2233,23 @@ def parse_bok_question_bank_entries(repo_dir: Path | None = None) -> list[dict[s
         body = "\n".join(lines[body_start:]).strip()
         question_type = infer_bok_question_type(page_title, f"### 1. {fallback_topic}", body, [])
         field_name = bok_question_bank_field_name(page_title)
+        category = infer_question_bank_category(
+            "",
+            topic=fallback_topic,
+            prompt=f"{page_title} ### 1. {fallback_topic}",
+            body="",
+            csv_path=csv_path,
+            progress_db_path=progress_db_path,
+        )
+        if not category:
+            category = infer_question_bank_category(
+                "",
+                topic=fallback_topic,
+                prompt=f"{page_title} ### 1. {fallback_topic}",
+                body=body,
+                csv_path=csv_path,
+                progress_db_path=progress_db_path,
+            )
         entries.append({
             "question_type": question_type,
             "prompt": f"### 1. {fallback_topic}",
@@ -2222,6 +2261,7 @@ def parse_bok_question_bank_entries(repo_dir: Path | None = None) -> list[dict[s
             "answer_index": None,
             "topic": fallback_topic,
             "field_name": field_name,
+            "category": category,
             "keywords": bok_question_bank_keywords(page_title, fallback_topic),
             "difficulty": "",
             "issuer": "한국은행",
@@ -2260,7 +2300,7 @@ def sync_bok_question_bank_entries(
     csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
-    entries = parse_bok_question_bank_entries(repo_dir)
+    entries = parse_bok_question_bank_entries(repo_dir, csv_path=csv_path, progress_db_path=progress_db_path)
     cleared = clear_bok_question_bank_entries(csv_path, progress_db_path)
     saved = upsert_question_bank_entries(entries, csv_path, progress_db_path)
     return {
