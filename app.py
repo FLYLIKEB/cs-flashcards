@@ -3666,8 +3666,9 @@ def api_cards() -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/mark")
 def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
     try:
-        card = mark_card(card_id, payload.known_status, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        card = mark_card(card_id, payload.known_status, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -3679,8 +3680,9 @@ def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/bookmark")
 def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
     try:
-        card = set_bookmark(card_id, payload.bookmarked, CSV_PATH, PROGRESS_DB_PATH)
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        card = set_bookmark(card_id, payload.bookmarked, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -3692,8 +3694,9 @@ def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/memo")
 def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
     try:
-        card = save_memo(card_id, payload.memo, CSV_PATH, PROGRESS_DB_PATH)
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        card = save_memo(card_id, payload.memo, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -3703,7 +3706,8 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/ai-rewrite/preview")
 def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
         current = next((row for row in rows if row.get("id") == card_id), None)
         if current is None:
@@ -3725,8 +3729,9 @@ def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> 
 @app.post("/api/cards/{card_id}/ai-rewrite/apply")
 def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict[str, Any]:
     try:
-        card, backup_path = update_card_ai_content(card_id, payload, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        card, backup_path = update_card_ai_content(card_id, payload, csv_path=None, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -3744,8 +3749,8 @@ def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict
 @app.post("/api/cards/{card_id}/concept-media")
 def api_card_concept_media(card_id: str, payload: CardConceptMediaRequest) -> dict[str, Any]:
     try:
-        card, backup_path = update_card_concept_media(card_id, payload, CSV_PATH, BACKUP_DIR, PROGRESS_DB_PATH)
-        rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
+        card, backup_path = update_card_concept_media(card_id, payload, csv_path=None, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
