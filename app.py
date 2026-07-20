@@ -158,6 +158,12 @@ class WikiChecklistRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     line_number: int = Field(ge=1, le=200000)
     checked: bool
+
+
+class WikiPageUpdateRequest(BaseModel):
+    source_path: str = Field(min_length=1, max_length=4096)
+    content: str = Field(max_length=2_000_000)
+    previous_content: str | None = Field(default=None, max_length=2_000_000)
 class CardAiRewriteRequest(BaseModel):
     instruction: str = Field(default="", max_length=4000)
 
@@ -2429,35 +2435,54 @@ def github_update_wiki_source(relative_path: str, content: str, sha: str, messag
     )
 
 
+def resolve_wiki_markdown_source(source_path: str, repo_dir: Path | None = None) -> tuple[Path, Path, str, str]:
+    repo = wiki_book_dir(repo_dir)
+    target = safe_wiki_path(repo, source_path)
+    if not target or not target.exists() or not target.is_file():
+        raise FileNotFoundError(f"Wiki file not found: {source_path}")
+    if target.suffix.lower() != ".md":
+        raise ValueError(f"Wiki updates support Markdown files only: {source_path}")
+    source_relative = str(target.relative_to(repo)).replace(os.sep, "/")
+    return repo, target, source_relative, target.read_text(encoding="utf-8")
+
+
+def synchronized_wiki_source_content(
+    source_relative: str,
+    local_content: str,
+    *,
+    mismatch_message: str,
+) -> tuple[str, str, str | None]:
+    sync_target = wiki_checklist_sync_target()
+    current_content = local_content
+    remote_sha: str | None = None
+    if sync_target == "github":
+        remote_content, remote_sha = github_fetch_wiki_source(source_relative)
+        if remote_content != local_content:
+            raise RuntimeError(mismatch_message)
+        current_content = remote_content
+    return sync_target, current_content, remote_sha
+
+
 def update_wiki_checklist_item(
     source_path: str,
     line_number: int,
     checked: bool,
     repo_dir: Path | None = None,
 ) -> dict[str, Any]:
-    repo = wiki_book_dir(repo_dir)
-    target = safe_wiki_path(repo, source_path)
-    if not target or not target.exists() or not target.is_file():
-        raise FileNotFoundError(f"Wiki file not found: {source_path}")
-    if target.suffix.lower() != ".md":
-        raise ValueError(f"Checklist updates support Markdown files only: {source_path}")
-    source_relative = str(target.relative_to(repo)).replace(os.sep, "/")
-    local_content = target.read_text(encoding="utf-8")
-    sync_target = wiki_checklist_sync_target()
-    if sync_target == "github":
-        remote_content, remote_sha = github_fetch_wiki_source(source_relative)
-        if remote_content != local_content:
-            raise RuntimeError("GitHub 위키 원본과 현재 배포본이 달라 체크 동기화를 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.")
-        updated_content, task_meta = set_markdown_task_state(remote_content, line_number, checked)
-        if task_meta["changed"]:
-            github_update_wiki_source(
-                source_relative,
-                updated_content,
-                remote_sha,
-                f"Toggle wiki checklist: {source_relative}#L{line_number}",
-            )
-    else:
-        updated_content, task_meta = set_markdown_task_state(local_content, line_number, checked)
+    repo, target, source_relative, local_content = resolve_wiki_markdown_source(source_path, repo_dir)
+    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
+        source_relative,
+        local_content,
+        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 체크 동기화를 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
+    )
+    updated_content, task_meta = set_markdown_task_state(current_content, line_number, checked)
+    if sync_target == "github" and task_meta["changed"] and remote_sha:
+        github_update_wiki_source(
+            source_relative,
+            updated_content,
+            remote_sha,
+            f"Toggle wiki checklist: {source_relative}#L{line_number}",
+        )
     if updated_content != local_content:
         target.write_text(updated_content, encoding="utf-8")
     return {
@@ -2466,6 +2491,39 @@ def update_wiki_checklist_item(
         "page_slug": wiki_slug_for_source(repo, target),
         "sync_target": sync_target,
         **task_meta,
+    }
+
+
+def update_wiki_page_source(
+    source_path: str,
+    content: str,
+    previous_content: str | None = None,
+    repo_dir: Path | None = None,
+) -> dict[str, Any]:
+    repo, target, source_relative, local_content = resolve_wiki_markdown_source(source_path, repo_dir)
+    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
+        source_relative,
+        local_content,
+        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 문서 저장을 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
+    )
+    if previous_content is not None and previous_content != current_content:
+        raise RuntimeError("문서 원본이 다른 내용으로 바뀌어 저장을 중단했습니다. 문서를 새로고침한 뒤 다시 수정하세요.")
+    changed = content != current_content
+    if sync_target == "github" and changed and remote_sha:
+        github_update_wiki_source(
+            source_relative,
+            content,
+            remote_sha,
+            f"Update wiki page: {source_relative}",
+        )
+    if content != local_content:
+        target.write_text(content, encoding="utf-8")
+    return {
+        "source_path": source_relative,
+        "page_slug": wiki_slug_for_source(repo, target),
+        "sync_target": sync_target,
+        "changed": changed,
+        "title": extract_markdown_title(content, target.stem),
     }
 
 
@@ -2693,6 +2751,24 @@ def api_wiki_page(page_slug: str) -> dict[str, Any]:
         return read_wiki_page(page_slug)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/wiki/page")
+def api_wiki_page_save(payload: WikiPageUpdateRequest) -> dict[str, Any]:
+    try:
+        updated = update_wiki_page_source(payload.source_path, payload.content, payload.previous_content)
+        return {
+            "page": read_wiki_page(updated["page_slug"]),
+            "updated": updated,
+        }
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 

@@ -47,10 +47,25 @@
         <p id="wikiBreadcrumbs" class="small muted"></p>
         <div class="wiki-page-actions">
           <a id="wikiRawLink" class="header-link" href="#" target="_blank" rel="noopener noreferrer">원본 보기</a>
+          <button id="wikiEditBtn" class="header-link" type="button" hidden>수정</button>
           <a id="wikiFlashcardLink" class="header-link" href="/" target="_blank" rel="noopener noreferrer" hidden>대표 카드</a>
         </div>
       </div>
       <section id="wikiLinkedCards" class="wiki-linked-cards" aria-label="연결된 플래시카드" hidden></section>
+      <section id="wikiEditorPanel" class="wiki-editor" aria-label="위키 문서 수정" hidden aria-hidden="true">
+        <div class="wiki-editor-head">
+          <div>
+            <strong>문서 수정</strong>
+            <p id="wikiEditorSource" class="wiki-editor-source"></p>
+          </div>
+          <p id="wikiEditorHint" class="wiki-editor-hint">Markdown 원문을 직접 수정합니다.</p>
+        </div>
+        <textarea id="wikiEditorTextarea" class="wiki-editor-textarea" spellcheck="false" aria-label="위키 문서 원문"></textarea>
+        <div class="wiki-editor-actions">
+          <button id="wikiEditorCancelBtn" class="header-link" type="button">취소</button>
+          <button id="wikiEditorSaveBtn" class="header-link" type="button">저장</button>
+        </div>
+      </section>
       <article id="wikiArticle" class="wiki-article" aria-live="polite"></article>
       <nav id="wikiPageNav" class="wiki-page-nav" aria-label="문서 이동" hidden></nav>
     </section>

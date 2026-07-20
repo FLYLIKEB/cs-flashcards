@@ -1089,6 +1089,93 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_TOKEN = original_token
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
 
+    def test_api_wiki_page_save_updates_local_markdown(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
+            original_prefix = flashcard_app.WIKI_GITHUB_PATH_PREFIX
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.WIKI_GITHUB_REPO = ''
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = ''
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
+                original = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                updated_content = original.replace('# 소개 문서', '# 소개 문서 수정', 1) + '\n수정된 본문입니다.\n'
+                response = flashcard_app.api_wiki_page_save(
+                    flashcard_app.WikiPageUpdateRequest(
+                        source_path='pages/intro.md',
+                        content=updated_content,
+                        previous_content=original,
+                    )
+                )
+                self.assertEqual(response['updated']['sync_target'], 'local')
+                self.assertTrue(response['updated']['changed'])
+                self.assertIn('소개 문서 수정', response['page']['html'])
+                self.assertIn('수정된 본문입니다.', response['page']['html'])
+                saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                self.assertEqual(saved, updated_content)
+            finally:
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
+
+    def test_update_wiki_page_source_syncs_github_when_configured(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            local_text = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+            updated_content = local_text + '\nGitHub 저장 테스트\n'
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
+            original_prefix = flashcard_app.WIKI_GITHUB_PATH_PREFIX
+            try:
+                flashcard_app.WIKI_GITHUB_REPO = 'owner/repo'
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = 'token'
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
+                with mock.patch.object(flashcard_app, 'github_fetch_wiki_source', return_value=(local_text, 'sha123')) as fetch_mock:
+                    with mock.patch.object(flashcard_app, 'github_update_wiki_source', return_value={}) as update_mock:
+                        updated = flashcard_app.update_wiki_page_source('pages/intro.md', updated_content, local_text, book)
+                fetch_mock.assert_called_once_with('pages/intro.md')
+                update_mock.assert_called_once_with('pages/intro.md', updated_content, 'sha123', 'Update wiki page: pages/intro.md')
+                self.assertEqual(updated['sync_target'], 'github')
+                self.assertTrue(updated['changed'])
+                saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                self.assertEqual(saved, updated_content)
+            finally:
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
+
+    def test_update_wiki_page_source_rejects_stale_editor_content(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
+            original_prefix = flashcard_app.WIKI_GITHUB_PATH_PREFIX
+            try:
+                flashcard_app.WIKI_GITHUB_REPO = ''
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = ''
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
+                original = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                (book / 'pages' / 'intro.md').write_text(original + '\n다른 사용자의 변경\n', encoding='utf-8')
+                with self.assertRaisesRegex(RuntimeError, '문서 원본이 다른 내용으로 바뀌어 저장을 중단했습니다'):
+                    flashcard_app.update_wiki_page_source('pages/intro.md', original + '\n내 수정\n', original, book)
+            finally:
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
+
     def test_wiki_book_dir_and_health_use_configured_or_fallback_location(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))

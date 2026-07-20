@@ -2,11 +2,17 @@ const WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1';
 
 const wikiState = {
   index: null,
+  page: null,
   currentSlug: '',
   query: '',
   sidebarOpen: true,
   searchOpen: false,
   expandedToc: {},
+  editorOpen: false,
+  editorLoading: false,
+  editorSaving: false,
+  editorSourcePath: '',
+  editorOriginalContent: '',
 };
 
 const wiki$ = (id) => document.getElementById(id);
@@ -24,7 +30,6 @@ function wikiPageUrl(slug) {
 function wikiApiUrl(path) {
   return new window.URL(String(path || '/'), window.location.origin).toString();
 }
-
 
 function wikiCurrentSlug() {
   const prefix = '/wiki/page/';
@@ -285,34 +290,139 @@ function wikiRenderLinkedCards(page) {
     </div>`;
 }
 
+function wikiEditablePage(page = wikiState.page) {
+  return Boolean(page?.source_path && page?.raw_url);
+}
+
+function wikiEditorValue() {
+  return wiki$('wikiEditorTextarea')?.value || '';
+}
+
+function wikiEditorHasUnsavedChanges() {
+  return wikiState.editorOpen && wikiEditorValue() !== wikiState.editorOriginalContent;
+}
+
+function wikiEditorSyncHint() {
+  return 'Markdown 원문을 직접 수정합니다.';
+}
+
+function wikiApplyEditorState() {
+  const canEdit = wikiEditablePage();
+  const open = canEdit && wikiState.editorOpen;
+  const editBtn = wiki$('wikiEditBtn');
+  const panel = wiki$('wikiEditorPanel');
+  const article = wiki$('wikiArticle');
+  const pageNav = wiki$('wikiPageNav');
+  const textarea = wiki$('wikiEditorTextarea');
+  const cancelBtn = wiki$('wikiEditorCancelBtn');
+  const saveBtn = wiki$('wikiEditorSaveBtn');
+  const source = wiki$('wikiEditorSource');
+  const hint = wiki$('wikiEditorHint');
+
+  if (editBtn) {
+    editBtn.hidden = !canEdit || open;
+    editBtn.disabled = wikiState.editorLoading || wikiState.editorSaving;
+  }
+  if (panel) {
+    panel.hidden = !open;
+    panel.setAttribute('aria-hidden', String(!open));
+  }
+  if (article) {
+    article.hidden = open;
+  }
+  if (pageNav && open) {
+    pageNav.hidden = true;
+  }
+  if (source) {
+    source.textContent = open ? (wikiState.editorSourcePath || wikiState.page?.source_path || '') : '';
+  }
+  if (hint) {
+    hint.textContent = wikiState.editorLoading ? '문서 원본을 불러오는 중입니다.' : wikiEditorSyncHint();
+  }
+  if (textarea) {
+    textarea.disabled = wikiState.editorLoading || wikiState.editorSaving;
+    textarea.placeholder = wikiState.editorLoading ? '문서를 불러오는 중입니다...' : 'Markdown 원문을 입력하세요.';
+    if (!open) {
+      textarea.value = '';
+    }
+  }
+  if (cancelBtn) {
+    cancelBtn.disabled = !open || wikiState.editorSaving;
+  }
+  if (saveBtn) {
+    saveBtn.disabled = !open || wikiState.editorLoading || wikiState.editorSaving;
+    saveBtn.textContent = wikiState.editorSaving ? '저장 중...' : '저장';
+  }
+}
+
+function wikiResetEditorState() {
+  wikiState.editorOpen = false;
+  wikiState.editorLoading = false;
+  wikiState.editorSaving = false;
+  wikiState.editorSourcePath = '';
+  wikiState.editorOriginalContent = '';
+}
+
+function wikiCloseEditor({force = false} = {}) {
+  if (!force && wikiEditorHasUnsavedChanges() && !window.confirm('저장하지 않은 변경사항을 버릴까요?')) {
+    return false;
+  }
+  wikiResetEditorState();
+  wikiApplyEditorState();
+  return true;
+}
+
+function wikiConfirmEditorNavigation() {
+  if (!wikiEditorHasUnsavedChanges()) return true;
+  return window.confirm('저장하지 않은 변경사항을 버리고 이동할까요?');
+}
+
+function wikiSyncStatusLabel(syncTarget) {
+  return syncTarget === 'github' ? 'GitHub 반영 완료' : '로컬 저장 완료';
+}
+
 function wikiApplyPage(page) {
-  wikiState.currentSlug = page.slug || '';
-  wiki$('wikiArticle').innerHTML = page.html || '<p class="muted">문서가 비어 있습니다.</p>';
-  wiki$('wikiRawLink').href = page.raw_url || '#';
-  document.title = `${page.title || '문서'} · ${wikiState.index?.book?.title || 'CS 학습 위키'}`;
+  wikiState.page = page || null;
+  wikiState.currentSlug = page?.slug || '';
+  wiki$('wikiArticle').innerHTML = page?.html || '<p class="muted">문서가 비어 있습니다.</p>';
+  wiki$('wikiRawLink').href = page?.raw_url || '#';
+  document.title = `${page?.title || '문서'} · ${wikiState.index?.book?.title || 'CS 학습 위키'}`;
   wikiRenderBreadcrumbs(page);
   wikiRenderLinkedCards(page);
   wikiRenderPageNav(page);
   wikiRenderToc();
-  wikiStatus(`${page.title || '문서'} 열람 중`);
+  wikiApplyEditorState();
+  wikiStatus(`${page?.title || '문서'} 열람 중`);
+}
+
+async function wikiResponseError(res) {
+  const raw = await res.text();
+  let message = raw || `${res.status}`;
+  try {
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.detail === 'string' && parsed.detail.trim()) {
+      message = parsed.detail.trim();
+    }
+  } catch (_error) {
+    // Fall back to the raw text body.
+  }
+  return message;
 }
 
 async function wikiFetchJson(url, options = null) {
   const res = await fetch(url, options || undefined);
   if (!res.ok) {
-    const raw = await res.text();
-    let message = raw || `${res.status}`;
-    try {
-      const parsed = JSON.parse(raw);
-      if (typeof parsed?.detail === 'string' && parsed.detail.trim()) {
-        message = parsed.detail.trim();
-      }
-    } catch (_error) {
-      // Fall back to the raw text body.
-    }
-    throw new Error(message);
+    throw new Error(await wikiResponseError(res));
   }
   return res.json();
+}
+
+async function wikiFetchText(url, options = null) {
+  const res = await fetch(url, options || undefined);
+  if (!res.ok) {
+    throw new Error(await wikiResponseError(res));
+  }
+  return res.text();
 }
 
 async function wikiLoadPage(slug, {push = false} = {}) {
@@ -322,6 +432,71 @@ async function wikiLoadPage(slug, {push = false} = {}) {
     window.history.pushState({}, '', wikiPageUrl(page.slug));
   }
   wikiApplyPage(page);
+}
+
+async function wikiStartEdit() {
+  const page = wikiState.page;
+  if (!wikiEditablePage(page) || wikiState.editorLoading || wikiState.editorSaving) return;
+  if (wikiState.editorOpen) {
+    wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
+    return;
+  }
+  wikiState.editorOpen = true;
+  wikiState.editorLoading = true;
+  wikiState.editorSourcePath = page?.source_path || '';
+  wikiState.editorOriginalContent = '';
+  wikiApplyEditorState();
+  try {
+    const text = await wikiFetchText(wikiApiUrl(page?.raw_url || '#'));
+    if (!wikiState.editorOpen || wikiState.editorSourcePath !== (page?.source_path || '')) return;
+    wikiState.editorOriginalContent = text;
+    const textarea = wiki$('wikiEditorTextarea');
+    if (textarea) {
+      textarea.value = text;
+    }
+    wikiStatus(`${page?.title || '문서'} 원본을 불러왔습니다.`);
+  } catch (error) {
+    wikiStatus(`문서 원본 불러오기 실패: ${error.message || error}`, true);
+    wikiCloseEditor({force: true});
+    return;
+  } finally {
+    wikiState.editorLoading = false;
+    wikiApplyEditorState();
+  }
+  wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
+}
+
+async function wikiSaveEditor() {
+  if (!wikiState.editorOpen || wikiState.editorLoading || wikiState.editorSaving) return;
+  const sourcePath = String(wikiState.editorSourcePath || wikiState.page?.source_path || '').trim();
+  if (!sourcePath) {
+    wikiStatus('문서 저장 실패: 원본 경로를 찾지 못했습니다.', true);
+    return;
+  }
+  wikiState.editorSaving = true;
+  wikiApplyEditorState();
+  try {
+    const response = await wikiFetchJson(wikiApiUrl('/api/wiki/page'), {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        source_path: sourcePath,
+        content: wikiEditorValue(),
+        previous_content: wikiState.editorOriginalContent,
+      }),
+    });
+    wikiResetEditorState();
+    if (response?.page) {
+      wikiApplyPage(response.page);
+    } else {
+      wikiApplyEditorState();
+    }
+    wikiStatus(`${response?.page?.title || '문서'} 저장됨 · ${wikiSyncStatusLabel(response?.updated?.sync_target)}`);
+  } catch (error) {
+    wikiState.editorSaving = false;
+    wikiApplyEditorState();
+    wikiStatus(`문서 저장 실패: ${error.message || error}`, true);
+  }
 }
 
 async function wikiToggleChecklist(checkbox) {
@@ -349,8 +524,7 @@ async function wikiToggleChecklist(checkbox) {
     if (response?.page) {
       wikiApplyPage(response.page);
     }
-    const syncLabel = response?.updated?.sync_target === 'github' ? 'GitHub 반영 완료' : '로컬 저장 완료';
-    wikiStatus(`${response?.page?.title || '문서'} 체크 저장됨 · ${syncLabel}`);
+    wikiStatus(`${response?.page?.title || '문서'} 체크 저장됨 · ${wikiSyncStatusLabel(response?.updated?.sync_target)}`);
   } catch (error) {
     checkbox.checked = !nextChecked;
     checkbox.disabled = false;
@@ -363,6 +537,7 @@ async function wikiInit() {
   wikiState.sidebarOpen = readSavedWikiSidebarState();
   applyWikiSidebarState({persist: false});
   applyWikiSearchState({focus: false});
+  wikiApplyEditorState();
   try {
     wikiState.index = await wikiFetchJson(wikiApiUrl('/api/wiki/index'));
     wiki$('wikiBookTitle').textContent = wikiState.index.book?.title || 'CS 학습 위키';
@@ -404,12 +579,33 @@ wiki$('wikiToc')?.addEventListener('click', (event) => {
 });
 
 wiki$('wikiSidebarToggleBtn')?.addEventListener('click', () => toggleWikiSidebar());
+wiki$('wikiEditBtn')?.addEventListener('click', () => {
+  wikiStartEdit();
+});
+wiki$('wikiEditorCancelBtn')?.addEventListener('click', () => {
+  wikiCloseEditor();
+});
+wiki$('wikiEditorSaveBtn')?.addEventListener('click', () => {
+  wikiSaveEditor();
+});
 
 window.addEventListener('popstate', () => {
   if (!wikiState.index) return;
-  wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || '_book').catch((error) => {
+  if (!wikiConfirmEditorNavigation()) {
+    window.history.pushState({}, '', wikiPageUrl(wikiState.currentSlug || wikiState.index.default_page_slug || '_book'));
+    return;
+  }
+  wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || '_book').then(() => {
+    wikiCloseEditor({force: true});
+  }).catch((error) => {
     wikiStatus(`문서 이동 실패: ${error.message || error}`, true);
   });
+});
+
+window.addEventListener('beforeunload', (event) => {
+  if (!wikiEditorHasUnsavedChanges()) return;
+  event.preventDefault();
+  event.returnValue = '';
 });
 
 document.addEventListener('click', (event) => {
@@ -419,9 +615,14 @@ document.addEventListener('click', (event) => {
   if (!link) return;
   const href = link.getAttribute('href') || '';
   if (!href.startsWith('/wiki/page/')) return;
+  if (!wikiConfirmEditorNavigation()) {
+    event.preventDefault();
+    return;
+  }
   const slug = decodeURIComponent(href.replace('/wiki/page/', '')).replace(/^\/+|\/+$/g, '');
   event.preventDefault();
   wikiLoadPage(slug, {push: true}).then(() => {
+    wikiCloseEditor({force: true});
     closeWikiSidebarOnMobile();
     closeWikiSearch();
   }).catch((error) => {
@@ -433,6 +634,14 @@ document.addEventListener('change', (event) => {
   const checkbox = event.target.closest('input[data-wiki-task-checkbox="1"]');
   if (!checkbox) return;
   wikiToggleChecklist(checkbox);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (!wikiState.editorOpen) return;
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+    event.preventDefault();
+    wikiSaveEditor();
+  }
 });
 
 wikiInit();

@@ -41,7 +41,8 @@ http://127.0.0.1:8000
 - 다른 위치의 문서를 배포하려면 `CS_FLASHCARDS_WIKI_BOOK_SRC`를 지정합니다.
 - 위키 마크다운의 `- [ ]` / `- [x]` 체크리스트는 `/wiki`에서 실제 체크박스로 렌더링됩니다.
 - 체크를 누르면 배포된 `wiki_book` 마크다운이 바로 갱신됩니다.
-- 체크 상태를 GitHub에도 같이 반영하려면 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정합니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
+- 문서 상단 `수정` 버튼으로 Markdown 원문을 직접 편집할 수 있고, 저장하면 배포된 `wiki_book`와 현재 문서 화면이 즉시 갱신됩니다.
+- 체크 상태와 문서 수정을 GitHub에도 같이 반영하려면 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정합니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
 - 위키 문서는 제목/출처 파일 기준으로 연결된 플래시카드를 찾아 `대표 카드` 버튼과 관련 카드 칩을 보여줍니다.
 - 위키에서 카드를 열면 URL 쿼리로 해당 카드에 바로 점프합니다.
 

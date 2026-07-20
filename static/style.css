@@ -6049,6 +6049,64 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   transform: none;
 }
 
+.wiki-editor {
+  max-width: 48rem;
+  margin: 0 auto 1rem;
+  padding: 1rem;
+  border: 1px solid var(--wiki-border-soft);
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.wiki-editor[hidden] {
+  display: none;
+}
+
+.wiki-editor-head {
+  display: flex;
+  gap: .8rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: .8rem;
+  flex-wrap: wrap;
+}
+
+.wiki-editor-source,
+.wiki-editor-hint {
+  margin: .22rem 0 0;
+  color: #777777;
+  font-size: .84rem;
+}
+
+.wiki-editor-source {
+  word-break: break-all;
+}
+
+.wiki-editor-textarea {
+  width: 100%;
+  min-height: min(68vh, 900px);
+  padding: .9rem 1rem;
+  border: 1px solid var(--wiki-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #222222;
+  font: 500 .95rem/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  resize: vertical;
+}
+
+.wiki-editor-textarea:focus-visible {
+  outline: 2px solid rgba(51, 122, 183, .22);
+  outline-offset: 1px;
+  border-color: #9ec6e4;
+}
+
+.wiki-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+  margin-top: .8rem;
+  flex-wrap: wrap;
+}
 .wiki-article {
   max-width: 48rem;
   margin: 0 auto;
@@ -6430,6 +6488,10 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   }
 
   .wiki-article {
+    max-width: none;
+  }
+
+  .wiki-editor {
     max-width: none;
   }
   .wiki-page-nav {
