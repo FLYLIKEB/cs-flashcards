@@ -2661,6 +2661,11 @@ def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/question-bank")
+def question_bank_shell() -> FileResponse:
+    return FileResponse(STATIC_DIR / "question-bank.html")
+
+
 @app.get("/wiki")
 def wiki_shell() -> FileResponse:
     return FileResponse(STATIC_DIR / "wiki.html")

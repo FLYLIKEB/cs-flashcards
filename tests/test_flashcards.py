@@ -1118,6 +1118,9 @@ class WikiBookTests(unittest.TestCase):
                 shell_response = flashcard_app.wiki_page_shell('intro')
                 self.assertTrue(str(shell_response.path).endswith('static/wiki.html'))
 
+                question_bank_shell = flashcard_app.question_bank_shell()
+                self.assertTrue(str(question_bank_shell.path).endswith('static/question-bank.html'))
+
                 raw_response = flashcard_app.api_wiki_raw('pages/intro.md')
                 self.assertTrue(str(raw_response.path).endswith('pages/intro.md'))
             finally:

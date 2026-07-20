@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>문제은행 표</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="apple-touch-icon" href="/static/favicon.svg" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script defer src="/static/question-bank.js"></script>
+</head>
+<body class="question-bank-page">
+  <header class="question-bank-shell-topbar">
+    <div class="question-bank-shell-topbar-inner">
+      <a class="question-bank-shell-home" href="/">플래시카드</a>
+      <div class="question-bank-shell-title-wrap">
+        <p class="question-bank-shell-kicker">Question Bank</p>
+        <h1>문제은행 표</h1>
+      </div>
+      <div class="question-bank-shell-actions">
+        <button id="bankPageRefreshBtn" class="question-toolbar-button" type="button">조회</button>
+        <button id="bankPageLaunchBtn" class="question-toolbar-button is-primary" type="button">현재 목록 풀기</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="question-bank-shell">
+    <section class="question-bank-shell-panel panel" aria-label="문제은행 목록">
+      <div class="question-bank-shell-head">
+        <div>
+          <h2>필터</h2>
+          <p id="bankPageSummary" class="muted question-bank-shell-summary">문제은행을 불러오는 중입니다.</p>
+        </div>
+        <p class="question-bank-shell-help">행을 누르면 해당 문제부터 바로 풉니다.</p>
+      </div>
+
+      <div class="question-bank-filter-grid question-bank-shell-filters">
+        <input id="bankPageQueryInput" type="search" placeholder="문제/정답/키워드 검색" />
+        <input id="bankPageTopicInput" type="search" placeholder="문제유형(예: 데이터베이스)" />
+        <input id="bankPageFieldInput" type="search" placeholder="분야(예: 전산학술)" />
+        <input id="bankPageIssuerInput" type="search" placeholder="출제기관(예: 한국은행)" />
+        <input id="bankPageSourceInput" type="search" placeholder="출제위치(예: 2013년 학술파트 1)" />
+        <select id="bankPageDifficultySelect">
+          <option value="">난이도 *</option>
+          <option value="상">상</option>
+          <option value="중">중</option>
+          <option value="하">하</option>
+        </select>
+        <select id="bankPageTypeSelect">
+          <option value="">형식 *</option>
+          <option value="short">주관식</option>
+          <option value="subjective">서술형</option>
+          <option value="multiple_choice">객관식</option>
+          <option value="essay">논술형</option>
+        </select>
+        <input id="bankPageSectionInput" type="search" placeholder="섹션(예: 전공필기)" />
+      </div>
+
+      <div class="question-bank-table-wrap">
+        <table class="question-bank-table">
+          <colgroup>
+            <col class="question-bank-col question-bank-col-index" />
+            <col class="question-bank-col question-bank-col-title" />
+            <col class="question-bank-col question-bank-col-type" />
+            <col class="question-bank-col question-bank-col-field" />
+            <col class="question-bank-col question-bank-col-issuer" />
+            <col class="question-bank-col question-bank-col-difficulty" />
+            <col class="question-bank-col question-bank-col-source" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">번호</th>
+              <th scope="col">문제</th>
+              <th scope="col">형식</th>
+              <th scope="col">문제유형</th>
+              <th scope="col">기관</th>
+              <th scope="col">난이도</th>
+              <th scope="col">출처</th>
+            </tr>
+          </thead>
+          <tbody id="bankPageList" class="question-bank-list"></tbody>
+        </table>
+      </div>
+      <p id="bankPageError" class="message question-bank-error" role="status"></p>
+    </section>
+
+    <aside class="question-bank-shell-note panel" aria-label="문제은행 사용 안내">
+      <h2>사용 방식</h2>
+      <ul>
+        <li>현재 필터 결과 전체를 한 번에 세트로 열 수 있습니다.</li>
+        <li>표의 특정 행을 누르면 그 문제부터 풀이를 시작합니다.</li>
+        <li>필터는 URL 쿼리에 반영되어 다시 열어도 유지됩니다.</li>
+      </ul>
+    </aside>
+  </main>
+</body>
+</html>

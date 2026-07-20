@@ -5,9 +5,10 @@ ROOT = Path(__file__).resolve().parents[1]
 APP_JS = (ROOT / 'static' / 'app.js').read_text(encoding='utf-8')
 INDEX_HTML = (ROOT / 'static' / 'index.html').read_text(encoding='utf-8')
 WIKI_HTML = (ROOT / 'static' / 'wiki.html').read_text(encoding='utf-8')
+QUESTION_BANK_HTML = (ROOT / 'static' / 'question-bank.html').read_text(encoding='utf-8')
 WIKI_JS = (ROOT / 'static' / 'wiki.js').read_text(encoding='utf-8')
+QUESTION_BANK_JS = (ROOT / 'static' / 'question-bank.js').read_text(encoding='utf-8')
 STYLE_CSS = (ROOT / 'static' / 'style.css').read_text(encoding='utf-8')
-
 
 
 class StaticFrontendTests(unittest.TestCase):
@@ -150,16 +151,22 @@ class StaticFrontendTests(unittest.TestCase):
 
     def test_wiki_ui_and_flashcard_links_are_present(self):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
+        self.assertIn('id="questionBankPageLink"', INDEX_HTML)
         self.assertIn('href="/wiki"', INDEX_HTML)
+        self.assertIn('href="/question-bank"', INDEX_HTML)
         self.assertIn('target="_blank"', INDEX_HTML)
         menu_popover = INDEX_HTML.split('id="menuPopover"', 1)[1].split('</div>', 1)[0]
         self.assertIn('id="wikiHomeLink"', menu_popover)
+        self.assertIn('id="questionBankPageLink"', menu_popover)
         self.assertIn('function renderSourceLinks(sourceFiles)', APP_JS)
         self.assertIn("$('sources').innerHTML = renderSourceLinks(c.source_files);", APP_JS)
         self.assertIn('/wiki/page/', APP_JS)
         self.assertIn('id="frontWikiLink"', INDEX_HTML)
         self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
+        self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
+        self.assertIn('/api/question-bank', QUESTION_BANK_JS)
+        self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
         self.assertIn('id="wikiSearchToggleBtn"', WIKI_HTML)
         self.assertIn('id="wikiSearch"', WIKI_HTML)
         self.assertIn('id="wikiSidebarToggleBtn"', WIKI_HTML)
@@ -351,6 +358,8 @@ class StaticFrontendTests(unittest.TestCase):
             'function fetchQuestionBankEntries()',
             'function renderQuestionBankBrowser()',
             'function openQuestionBankSession(startIndex = 0)',
+            'function consumePendingQuestionBankLaunch()',
+            'PENDING_QUESTION_BANK_LAUNCH_KEY',
             'function renderQuestionMarkdown(source)',
             'question-md-image',
             'question-bank-item',
@@ -438,6 +447,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-bank-list', STYLE_CSS)
         self.assertIn('.question-markdown', STYLE_CSS)
         self.assertIn('.question-md-image', STYLE_CSS)
+        self.assertIn('question-bank-shell-topbar', QUESTION_BANK_HTML)
+        self.assertIn('.question-bank-shell', STYLE_CSS)
+        self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
 
 
 if __name__ == '__main__':

@@ -6441,3 +6441,114 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
     text-align: left;
   }
 }
+.question-bank-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: var(--text);
+}
+.question-bank-shell-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(10px);
+}
+.question-bank-shell-topbar-inner {
+  width: min(1280px, calc(100vw - 2rem));
+  margin: 0 auto;
+  min-height: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.question-bank-shell-home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0 .9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+.question-bank-shell-title-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.question-bank-shell-kicker {
+  margin: 0 0 .18rem;
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.question-bank-shell-title-wrap h1 {
+  margin: 0;
+  font-size: 1.28rem;
+  letter-spacing: -.03em;
+}
+.question-bank-shell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+.question-bank-shell {
+  width: min(1280px, calc(100vw - 2rem));
+  margin: 1rem auto 2rem;
+  display: grid;
+  gap: 1rem;
+}
+.question-bank-shell-panel,
+.question-bank-shell-note {
+  padding: 1rem;
+}
+.question-bank-shell-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .9rem;
+}
+.question-bank-shell-head h2,
+.question-bank-shell-note h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.question-bank-shell-summary,
+.question-bank-shell-help {
+  margin: .28rem 0 0;
+  line-height: 1.5;
+}
+.question-bank-shell-help {
+  color: var(--muted);
+  font-size: .82rem;
+}
+.question-bank-shell-filters {
+  margin-bottom: .9rem;
+}
+.question-bank-shell-note ul {
+  margin: .7rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+@media (max-width: 900px) {
+  .question-bank-shell-topbar-inner,
+  .question-bank-shell {
+    width: min(100vw - 1rem, 1280px);
+  }
+  .question-bank-shell-topbar-inner,
+  .question-bank-shell-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .question-bank-shell-actions {
+    width: 100%;
+  }
+}

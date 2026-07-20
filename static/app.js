@@ -91,6 +91,7 @@ const cardEl = $('card');
 const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
+const PENDING_QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const FLASHCARD_TABLE_COLUMN_ORDER_KEY = 'csFlashcardsTableColumnOrder:v1';
 const FLASHCARD_TABLE_DEFAULT_COLUMNS = ['bookmark', 'index', 'term', 'english', 'category', 'status'];
 const FLASHCARD_TABLE_COLUMNS = {
@@ -375,6 +376,35 @@ function applyInitialCardQuery() {
   renderCard();
   setMessage(`${card.term} 카드로 바로 이동했습니다.`);
   return true;
+}
+function consumePendingQuestionBankLaunch() {
+  let raw = '';
+  try {
+    raw = window.sessionStorage.getItem(PENDING_QUESTION_BANK_LAUNCH_KEY) || '';
+  } catch (_error) {
+    return false;
+  }
+  if (!raw) return false;
+  try {
+    window.sessionStorage.removeItem(PENDING_QUESTION_BANK_LAUNCH_KEY);
+  } catch (_error) {}
+  try {
+    const parsed = JSON.parse(raw);
+    const items = Array.isArray(parsed?.items) ? parsed.items.filter((item) => item && typeof item === 'object') : [];
+    if (!items.length) return false;
+    const parsedStart = Number.parseInt(String(parsed?.startIndex ?? '0'), 10);
+    const startIndex = Number.isInteger(parsedStart) ? parsedStart : 0;
+    state.questionBankItems = items;
+    state.questionBankSummary = {total: items.length, returned: items.length, limit: items.length};
+    state.questionBankError = '';
+    state.questionBankOpen = false;
+    const selected = items[Math.max(0, Math.min(items.length - 1, startIndex))];
+    state.questionBankSelectedId = String(selected?.question_bank_id || '');
+    openQuestionBankSession(startIndex);
+    return true;
+  } catch (_error) {
+    return false;
+  }
 }
 
 function normalizeTerm(value) {
@@ -2145,6 +2175,7 @@ async function loadCards() {
   $('csvPath').textContent = data.summary.csv_path;
   setAudioButtons();
   updateAudioEstimate();
+  consumePendingQuestionBankLaunch();
 }
 
 async function refreshCards(options = {}) {
@@ -2927,27 +2958,31 @@ function renderFlashcardTableWindow() {
     ${rows.length ? `<div class="table-wrap"><table><thead><tr>${headerHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
   </div>
   <script>
-    const activateRow = (row) => {
+    const invokeOpener = (callbackName, ...args) => {
       const openerRef = window.opener;
-      if (!row || !openerRef || openerRef.closed || typeof openerRef.__csFlashcardsSelectCardFromTable !== 'function') return;
-      openerRef.__csFlashcardsSelectCardFromTable(row.dataset.rowCardId || '');
+      if (!openerRef || openerRef.closed || typeof openerRef[callbackName] !== 'function') return false;
+      window.setTimeout(() => {
+        try {
+          openerRef[callbackName](...args);
+        } catch (_error) {}
+      }, 0);
+      return true;
+    };
+    const activateRow = (row) => {
+      if (!row) return;
+      invokeOpener('__csFlashcardsSelectCardFromTable', row.dataset.rowCardId || '');
     };
     document.addEventListener('click', (event) => {
-      const openerRef = window.opener;
       const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
       if (bookmarkButton) {
         event.preventDefault();
-        if (openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsToggleBookmarkFromTable === 'function') {
-          openerRef.__csFlashcardsToggleBookmarkFromTable(bookmarkButton.dataset.bookmarkCardId || '');
-        }
+        invokeOpener('__csFlashcardsToggleBookmarkFromTable', bookmarkButton.dataset.bookmarkCardId || '');
         return;
       }
       const statusButton = event.target.closest('[data-status-card-id]');
       if (statusButton) {
         event.preventDefault();
-        if (openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsSetStatusFromTable === 'function') {
-          openerRef.__csFlashcardsSetStatusFromTable(statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
-        }
+        invokeOpener('__csFlashcardsSetStatusFromTable', statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
         return;
       }
       const row = event.target.closest('[data-row-card-id]');
@@ -2983,10 +3018,9 @@ function renderFlashcardTableWindow() {
       header.addEventListener('drop', (event) => {
         event.preventDefault();
         header.classList.remove('drop-target');
-        const openerRef = window.opener;
         const targetKey = header.dataset.columnKey || '';
-        if (draggingColumnKey && targetKey && draggingColumnKey !== targetKey && openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsMoveTableColumn === 'function') {
-          openerRef.__csFlashcardsMoveTableColumn(draggingColumnKey, targetKey);
+        if (draggingColumnKey && targetKey && draggingColumnKey !== targetKey) {
+          invokeOpener('__csFlashcardsMoveTableColumn', draggingColumnKey, targetKey);
         }
       });
       header.addEventListener('dragend', () => {
@@ -2994,7 +3028,6 @@ function renderFlashcardTableWindow() {
         headers.forEach((item) => item.classList.remove('dragging', 'drop-target'));
       });
     });
-
   </script>
 </body>
 </html>`);
