@@ -820,11 +820,13 @@ def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) 
     db_path = progress_db_for(None, progress_db_path)
     ensure_progress_db(db_path)
     sync_legacy_ai_progress_to_db(db_path)
+    sync_ai_image_files_to_db(db_path)
     card_rows, fieldnames = read_card_content(db_path)
     if not card_rows:
         raise FileNotFoundError(f"Card content not found in SQLite: {db_path}")
     rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
+
 
 
 
@@ -840,6 +842,7 @@ def update_card_content_fields(
     db_path = progress_db_for(None, progress_db_path)
     ensure_progress_db(db_path)
     sync_legacy_ai_progress_to_db(db_path)
+    sync_ai_image_files_to_db(db_path)
 
     rows, _ = read_card_content(db_path)
     target = next((row for row in rows if row.get("id") == card_id), None)
@@ -1247,6 +1250,70 @@ def update_card_concept_media(
     return updated_row, backup_path
 
 AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
+AI_IMAGE_ARTIFACT_RE = re.compile(
+    r"^(?P<card_id>.+)-(?P<stamp>\d{8}-\d{6})-(?P<token>[0-9a-f]{8})\.(?P<ext>png|jpg|jpeg|webp|gif)$",
+    re.IGNORECASE,
+)
+
+
+def runtime_ai_image_url(name: str) -> str:
+    return f"/api/ai-images/{validated_ai_image_name(name)}"
+
+
+def latest_ai_image_urls_by_card_id(image_dir: Path | None = None) -> dict[str, str]:
+    root = image_dir or AI_IMAGE_DIR
+    if not root.exists() or not root.is_dir():
+        return {}
+    latest: dict[str, tuple[str, str]] = {}
+    for path in root.iterdir():
+        if not path.is_file():
+            continue
+        match = AI_IMAGE_ARTIFACT_RE.fullmatch(path.name)
+        if not match:
+            continue
+        card_id = str(match.group("card_id") or "").strip()
+        stamp = str(match.group("stamp") or "")
+        previous = latest.get(card_id)
+        if previous is None or (stamp, path.name) > previous:
+            latest[card_id] = (stamp, path.name)
+    return {
+        card_id: runtime_ai_image_url(name)
+        for card_id, (_stamp, name) in latest.items()
+    }
+
+
+def sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = None) -> bool:
+    recovered_urls = latest_ai_image_urls_by_card_id(image_dir)
+    if not recovered_urls:
+        return False
+    ensure_progress_db(progress_db_path)
+    changed = False
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        rows = conn.execute(
+            "SELECT card_id, concept_image_url, concept_media_type, concept_media_payload FROM cards"
+        ).fetchall()
+        for row in rows:
+            card_id = str(row["card_id"] or "").strip()
+            recovered_url = recovered_urls.get(card_id)
+            if not recovered_url:
+                continue
+            media_type = normalized_concept_media_type(row["concept_media_type"]) if row["concept_media_type"] else ""
+            if media_type in {"gif", "video", "mermaid", "html"}:
+                continue
+            current_url = normalized_runtime_media_url(row["concept_image_url"])
+            current_payload = str(row["concept_media_payload"] or "")
+            if media_type in {"image", "gif", "video"}:
+                current_payload = normalized_runtime_media_url(current_payload)
+            if current_url == recovered_url and media_type == "image" and current_payload == recovered_url:
+                continue
+            conn.execute(
+                "UPDATE cards SET concept_image_url=?, concept_media_type='image', concept_media_payload=?, updated_at=? WHERE card_id=?",
+                (recovered_url, recovered_url, utc_now_iso(), card_id),
+            )
+            changed = True
+        conn.commit()
+    return changed
+
 
 
 def concept_image_alt_text(card: dict[str, str]) -> str:

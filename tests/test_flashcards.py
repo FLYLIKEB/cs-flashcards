@@ -284,6 +284,30 @@ class FlashcardProgressTests(unittest.TestCase):
             rows, _ = read_cards(None, db_path)
             self.assertEqual(rows[0]['concept_image_url'], '/api/ai-images/legacy.png')
 
+    def test_read_cards_recovers_saved_ai_image_files(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = Path(td) / 'cards.csv'
+            db_path = Path(td) / 'progress.sqlite'
+            image_dir = Path(td) / 'ai_images'
+            write_sample(csv_path, include_image=True)
+            bootstrap_runtime_db(csv_path, db_path)
+            image_dir.mkdir(parents=True, exist_ok=True)
+            image_name = 'CS-001-20260720-223000-deadbeef.png'
+            (image_dir / image_name).write_bytes(b'\x89PNG\r\n\x1a\nrestored')
+            original_image_dir = flashcard_app.AI_IMAGE_DIR
+            try:
+                flashcard_app.AI_IMAGE_DIR = image_dir
+                rows, _ = read_cards(None, db_path)
+            finally:
+                flashcard_app.AI_IMAGE_DIR = original_image_dir
+            self.assertEqual(rows[0]['concept_image_url'], f'/api/ai-images/{image_name}')
+            self.assertEqual(rows[0]['concept_media_type'], 'image')
+            self.assertEqual(rows[0]['concept_media_payload'], f'/api/ai-images/{image_name}')
+            saved = sqlite_card_status(db_path)
+            self.assertEqual(saved['concept_image_url'], f'/api/ai-images/{image_name}')
+            self.assertEqual(saved['concept_media_type'], 'image')
+            self.assertEqual(saved['concept_media_payload'], f'/api/ai-images/{image_name}')
+
 
     def test_api_cards_reads_sqlite_when_runtime_csv_missing(self):
         with tempfile.TemporaryDirectory() as td:
