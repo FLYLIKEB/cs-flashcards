@@ -194,6 +194,20 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('state.mindMapWindow = popup;', open_block)
         self.assertIn('popup.focus();', open_block)
 
+    def test_mind_map_popup_uses_grouped_category_tree_layout(self):
+        popup_block = APP_JS.split('function renderMindMapWindow() {', 1)[1].split('function bootstrapMindMapPopupWindow() {', 1)[0]
+        for snippet in [
+            '카테고리형 마인드맵',
+            '현재 필터 카드 → 대분류 → 카드',
+            'mindmap-root-card',
+            'mindmap-category-branch',
+            'mindmap-category-node',
+            'mindmap-leaf-grid',
+            '대분류',
+            '직접 연결',
+        ]:
+            self.assertIn(snippet, popup_block)
+
     def test_wiki_ui_and_flashcard_links_are_present(self):
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
         self.assertIn('id="questionBankPageLink"', INDEX_HTML)

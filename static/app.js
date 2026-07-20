@@ -2795,52 +2795,57 @@ window.__csFlashcardsMindMapClosed = () => {
 function buildMindMapGraphData(cards = state.filtered, currentCardId = state.filtered[state.index]?.id || '') {
   const visibleCards = Array.isArray(cards) ? cards.filter((card) => card && card.id) : [];
   const currentCard = visibleCards.find((card) => card.id === currentCardId) || visibleCards[0] || null;
+  const relatedKeysCache = new Map();
+  const identityKeysCache = new Map();
   const visibleByConcept = new Map();
-  const edgeMap = new Map();
-  const currentRelated = new Set(currentCard ? uniqueRelatedConcepts(currentCard.related_concepts).map((term) => normalizeTerm(term)) : []);
-  const currentKeys = new Set(currentCard ? [normalizeTerm(currentCard.term), normalizeTerm(currentCard.english)].filter(Boolean) : []);
+  const visibleNeighbors = new Map(visibleCards.map((card) => [card.id, new Set()]));
 
-  const registerVisibleCard = (card) => {
-    [card.term, card.english].map((value) => normalizeTerm(value)).filter(Boolean).forEach((key) => {
-      if (!visibleByConcept.has(key)) visibleByConcept.set(key, card);
-    });
+  const identityKeysFor = (card) => {
+    if (!card) return [];
+    if (identityKeysCache.has(card.id)) return identityKeysCache.get(card.id);
+    const keys = [card.term, card.english].map((value) => normalizeTerm(value)).filter(Boolean);
+    identityKeysCache.set(card.id, keys);
+    return keys;
   };
-  const cardsDirectlyRelated = (source, target) => {
-    if (!source || !target || source.id === target.id) return false;
-    const sourceRelated = new Set(uniqueRelatedConcepts(source.related_concepts).map((term) => normalizeTerm(term)));
-    const sourceKeys = [normalizeTerm(source.term), normalizeTerm(source.english)].filter(Boolean);
-    const targetKeys = [normalizeTerm(target.term), normalizeTerm(target.english)].filter(Boolean);
-    return sourceKeys.some((key) => targetKeys.includes(key))
-      || targetKeys.some((key) => sourceRelated.has(key))
-      || sourceKeys.some((key) => {
-        const targetRelated = uniqueRelatedConcepts(target.related_concepts).map((term) => normalizeTerm(term));
-        return targetRelated.includes(key);
-      });
+  const relatedKeysFor = (card) => {
+    if (!card) return new Set();
+    if (relatedKeysCache.has(card.id)) return relatedKeysCache.get(card.id);
+    const keys = new Set(uniqueRelatedConcepts(card.related_concepts).map((term) => normalizeTerm(term)).filter(Boolean));
+    relatedKeysCache.set(card.id, keys);
+    return keys;
   };
-  const setEdge = (sourceId, targetId, kind = 'related') => {
-    if (!sourceId || !targetId || sourceId === targetId) return;
-    const [from, to] = [sourceId, targetId].sort();
-    const key = `${from}::${to}`;
-    const previous = edgeMap.get(key);
-    if (!previous || previous.kind === 'current-visible' || kind === 'current-related') {
-      edgeMap.set(key, {sourceId: from, targetId: to, kind});
-    }
+  const registerVisibleCard = (key, card) => {
+    if (!key) return;
+    if (!visibleByConcept.has(key)) visibleByConcept.set(key, []);
+    visibleByConcept.get(key).push(card);
   };
-
-  visibleCards.forEach(registerVisibleCard);
 
   visibleCards.forEach((card) => {
-    uniqueRelatedConcepts(card.related_concepts).forEach((term) => {
-      const target = visibleByConcept.get(normalizeTerm(term));
-      if (target && target.id !== card.id) setEdge(card.id, target.id, 'related');
+    identityKeysFor(card).forEach((key) => registerVisibleCard(key, card));
+  });
+  visibleCards.forEach((card) => {
+    relatedKeysFor(card).forEach((key) => {
+      (visibleByConcept.get(key) || []).forEach((target) => {
+        if (!target || target.id === card.id) return;
+        visibleNeighbors.get(card.id)?.add(target.id);
+        visibleNeighbors.get(target.id)?.add(card.id);
+      });
     });
   });
 
-  const nodes = visibleCards.map((card) => {
+  const currentIdentityKeys = currentCard ? new Set(identityKeysFor(currentCard)) : new Set();
+  const currentRelatedKeys = currentCard ? relatedKeysFor(currentCard) : new Set();
+  const groups = new Map();
+
+  visibleCards.forEach((card) => {
+    const categoryKey = card.category || '미분류';
     const meta = categoryMeta(card.category);
-    const keys = [normalizeTerm(card.term), normalizeTerm(card.english)].filter(Boolean);
-    const connectedToCurrent = !currentCard || card.id === currentCard.id || keys.some((key) => currentRelated.has(key)) || [...currentKeys].some((key) => uniqueRelatedConcepts(card.related_concepts).map((term) => normalizeTerm(term)).includes(key));
-    return {
+    const visibleLinkCount = visibleNeighbors.get(card.id)?.size || 0;
+    const directToCurrent = Boolean(currentCard && card.id !== currentCard.id && (
+      identityKeysFor(card).some((key) => currentRelatedKeys.has(key))
+      || [...relatedKeysFor(card)].some((key) => currentIdentityKeys.has(key))
+    ));
+    const cardNode = {
       id: card.id,
       term: card.term || card.id,
       english: card.english || '',
@@ -2849,76 +2854,61 @@ function buildMindMapGraphData(cards = state.filtered, currentCardId = state.fil
       emoji: meta.emoji,
       className: meta.className,
       color: CATEGORY_COLORS[card.category] || '#1f3a5f',
-      relatedCount: uniqueRelatedConcepts(card.related_concepts).length,
+      visibleLinkCount,
+      directToCurrent,
       isCurrent: Boolean(currentCard && card.id === currentCard.id),
-      connectedToCurrent,
     };
+    if (!groups.has(categoryKey)) {
+      groups.set(categoryKey, {
+        key: categoryKey,
+        label: card.category || '미분류',
+        categoryLabel: categoryLabel(card.category),
+        emoji: meta.emoji,
+        className: meta.className,
+        color: CATEGORY_COLORS[card.category] || '#1f3a5f',
+        cards: [],
+      });
+    }
+    groups.get(categoryKey).cards.push(cardNode);
   });
 
-  if (currentCard) {
-    nodes.forEach((node) => {
-      if (node.id === currentCard.id) return;
-      setEdge(currentCard.id, node.id, node.connectedToCurrent ? 'current-related' : 'current-visible');
-    });
-    visibleCards.forEach((card) => {
-      if (card.id === currentCard.id) return;
-      if (cardsDirectlyRelated(currentCard, card)) setEdge(currentCard.id, card.id, 'current-related');
-    });
-  }
+  const categoryGroups = [...groups.values()].map((group) => {
+    group.cards.sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent)
+      || Number(b.directToCurrent) - Number(a.directToCurrent)
+      || b.visibleLinkCount - a.visibleLinkCount
+      || a.term.localeCompare(b.term, 'ko'));
+    group.count = group.cards.length;
+    group.hasCurrent = group.cards.some((card) => card.isCurrent);
+    group.directCount = group.cards.filter((card) => card.directToCurrent).length;
+    return group;
+  }).sort((a, b) => Number(b.hasCurrent) - Number(a.hasCurrent)
+    || Number(b.directCount > 0) - Number(a.directCount > 0)
+    || b.directCount - a.directCount
+    || b.count - a.count
+    || a.label.localeCompare(b.label, 'ko'));
+
+  const shouldOpenAll = categoryGroups.length <= 4 || visibleCards.length <= 36;
+  categoryGroups.forEach((group) => {
+    group.defaultOpen = shouldOpenAll || group.hasCurrent || group.directCount > 0;
+  });
 
   return {
     currentCard,
-    nodes,
-    edges: [...edgeMap.values()],
     cards: visibleCards,
+    categoryGroups,
   };
 }
 
 function buildMindMapLayout(graph) {
-  const nodes = Array.isArray(graph?.nodes) ? [...graph.nodes] : [];
-  const currentNode = nodes.find((node) => node.isCurrent) || nodes[0] || null;
-  const others = nodes.filter((node) => !currentNode || node.id !== currentNode.id)
-    .sort((a, b) => Number(b.connectedToCurrent) - Number(a.connectedToCurrent)
-      || b.relatedCount - a.relatedCount
-      || a.categoryLabel.localeCompare(b.categoryLabel)
-      || a.term.localeCompare(b.term));
-  const ringSize = 10;
-  const ringCount = others.length ? Math.ceil(others.length / ringSize) : 0;
-  const width = Math.max(980, 760 + Math.min(others.length, 18) * 56);
-  const height = Math.max(680, 620 + Math.max(0, ringCount - 1) * 120);
-  const centerX = width / 2;
-  const centerY = Math.max(280, height / 2 - 24);
-  const positioned = new Map();
-
-  if (currentNode) {
-    positioned.set(currentNode.id, {...currentNode, x: centerX, y: centerY, width: 208, height: 96});
-  }
-
-  others.forEach((node, index) => {
-    const ringIndex = Math.floor(index / ringSize);
-    const ringStart = ringIndex * ringSize;
-    const nodesInRing = Math.min(ringSize, others.length - ringStart);
-    const offset = index - ringStart;
-    const angle = -Math.PI / 2 + ((Math.PI * 2) / Math.max(nodesInRing, 1)) * offset;
-    const radius = 220 + ringIndex * 142;
-    positioned.set(node.id, {
-      ...node,
-      x: centerX + Math.cos(angle) * radius,
-      y: centerY + Math.sin(angle) * radius,
-      width: 168,
-      height: 82,
-    });
-  });
-
+  const categoryGroups = Array.isArray(graph?.categoryGroups) ? graph.categoryGroups : [];
   return {
-    width,
-    height,
-    nodes: [...positioned.values()],
-    edges: (graph?.edges || []).map((edge) => ({
-      ...edge,
-      source: positioned.get(edge.sourceId) || null,
-      target: positioned.get(edge.targetId) || null,
-    })).filter((edge) => edge.source && edge.target),
+    currentCard: graph?.currentCard || null,
+    cards: Array.isArray(graph?.cards) ? graph.cards : [],
+    categoryGroups,
+    totalCards: Array.isArray(graph?.cards) ? graph.cards.length : 0,
+    totalCategories: categoryGroups.length,
+    directCardCount: categoryGroups.reduce((sum, group) => sum + (group.directCount || 0), 0),
+    connectedCategoryCount: categoryGroups.filter((group) => group.hasCurrent || group.directCount > 0).length,
   };
 }
 
@@ -2930,12 +2920,10 @@ function renderMindMapWindow() {
   }
   const graph = buildMindMapGraphData();
   const layout = buildMindMapLayout(graph);
-  const currentCard = graph.currentCard;
+  const currentCard = layout.currentCard;
   const summaryText = flashcardTableSummaryText();
-  const nodes = layout.nodes;
-  const listCards = [...nodes].sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent)
-    || Number(b.connectedToCurrent) - Number(a.connectedToCurrent)
-    || a.term.localeCompare(b.term));
+  const rootColor = CATEGORY_COLORS[currentCard?.category] || '#2563eb';
+  const rootSoft = `${rootColor}18`;
   try {
     popup.document.open();
     popup.document.write(`<!doctype html>
@@ -2948,116 +2936,420 @@ function renderMindMapWindow() {
     :root {
       color-scheme: light;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
-      background: #f8fafc;
+      background: #f6f8fc;
       color: #0f172a;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%); color: #0f172a; }
-    .mindmap-shell { min-height: 100vh; padding: 18px; display: grid; gap: 16px; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(191, 219, 254, 0.36), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(221, 214, 254, 0.28), transparent 28%),
+        #f6f8fc;
+      color: #0f172a;
+    }
+    button { font: inherit; }
+    .mindmap-shell {
+      min-height: 100vh;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
     .mindmap-panel {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.10);
+    }
+    .mindmap-head {
+      padding: 22px 24px 18px;
+      display: grid;
+      gap: 8px;
+    }
+    .mindmap-kicker {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #2563eb;
+    }
+    .mindmap-title {
+      margin: 0;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      font-weight: 900;
+      line-height: 1.15;
+    }
+    .mindmap-summary,
+    .mindmap-hint {
+      margin: 0;
+      color: #475569;
+      font-size: .96rem;
+    }
+    .mindmap-tree-panel {
+      padding: 0 18px 18px;
+    }
+    .mindmap-tree {
+      display: grid;
+      grid-template-columns: minmax(248px, 292px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .mindmap-root-card {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid ${rootColor}42;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #ffffff 0%, ${rootSoft} 100%);
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+    }
+    .mindmap-root-card::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -18px;
+      width: 18px;
+      border-top: 2px solid rgba(148, 163, 184, 0.55);
+    }
+    .mindmap-root-kicker {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #334155;
+    }
+    .mindmap-root-title {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+    .mindmap-root-summary {
+      margin: 0;
+      color: #475569;
+      font-size: .92rem;
+      line-height: 1.5;
+    }
+    .mindmap-current-card {
+      display: grid;
+      gap: 4px;
+      padding: 12px 14px;
+      border-radius: 18px;
       background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(148, 163, 184, 0.32);
-      border-radius: 22px;
-      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+    .mindmap-current-card span,
+    .mindmap-current-card small,
+    .mindmap-current-card em {
+      color: #475569;
+      font-style: normal;
+    }
+    .mindmap-current-card strong {
+      font-size: 1.02rem;
+      line-height: 1.25;
+    }
+    .mindmap-root-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .mindmap-metric {
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .mindmap-metric strong {
+      display: block;
+      font-size: 1rem;
+    }
+    .mindmap-metric small {
+      display: block;
+      margin-top: 4px;
+      color: #64748b;
+    }
+    .mindmap-branches {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding-left: 26px;
+    }
+    .mindmap-branches::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 22px;
+      bottom: 22px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(148, 163, 184, 0.28), rgba(148, 163, 184, 0.7), rgba(148, 163, 184, 0.28));
+    }
+    .mindmap-category-branch {
+      position: relative;
+      margin: 0;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
       overflow: hidden;
     }
-    .mindmap-head { padding: 18px 20px 10px; display: grid; gap: 6px; }
-    .mindmap-kicker { margin: 0; font-size: 12px; font-weight: 700; color: #2563eb; }
-    .mindmap-title { margin: 0; font-size: 28px; font-weight: 800; }
-    .mindmap-summary, .mindmap-hint { margin: 0; color: #475569; font-size: 14px; }
-    .mindmap-stage-wrap { padding: 0 12px 12px; }
-    .mindmap-stage {
-      position: relative;
-      min-height: 360px;
-      overflow: auto;
-      border-radius: 18px;
-      background: radial-gradient(circle at top, rgba(219, 234, 254, 0.72), rgba(248, 250, 252, 0.96));
-    }
-    .mindmap-svg { display: block; }
-    .mindmap-edge { stroke: rgba(71, 85, 105, 0.32); stroke-width: 2; }
-    .mindmap-edge.current-related { stroke: rgba(37, 99, 235, 0.46); stroke-width: 3; }
-    .mindmap-edge.related { stroke: rgba(14, 116, 144, 0.26); }
-    .mindmap-node {
+    .mindmap-category-branch::before {
+      content: '';
       position: absolute;
-      transform: translate(-50%, -50%);
-      border: 0;
-      border-radius: 18px;
-      padding: 12px 14px;
-      text-align: left;
-      background: #fff;
-      color: #0f172a;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
-      cursor: pointer;
+      left: -26px;
+      top: 26px;
+      width: 26px;
+      border-top: 2px solid rgba(148, 163, 184, 0.46);
     }
-    .mindmap-node.current {
-      border-radius: 22px;
-      box-shadow: 0 18px 36px rgba(37, 99, 235, 0.22);
-    }
-    .mindmap-node.connected {
-      outline: 2px solid rgba(37, 99, 235, 0.16);
-      outline-offset: 0;
-    }
-    .mindmap-node-meta { display: block; font-size: 12px; color: #475569; margin-bottom: 4px; }
-    .mindmap-node-term { display: block; font-size: 16px; font-weight: 800; line-height: 1.3; }
-    .mindmap-node-english { display: block; margin-top: 4px; font-size: 12px; color: #334155; }
-    .mindmap-list { padding: 0 12px 12px; }
-    .mindmap-list-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
+    .mindmap-category-node {
       list-style: none;
-      padding: 0;
-      margin: 0;
+      cursor: pointer;
+      display: grid;
+      gap: 4px;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, #ffffff, rgba(241, 245, 249, 0.94));
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      position: relative;
     }
-    .mindmap-list button {
-      width: 100%;
-      border: 1px solid rgba(148, 163, 184, 0.3);
+    .mindmap-category-node::-webkit-details-marker { display: none; }
+    .mindmap-category-node::after {
+      content: '▾';
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      color: #64748b;
+      font-size: .95rem;
+      transition: transform .18s ease;
+    }
+    .mindmap-category-branch:not([open]) .mindmap-category-node::after {
+      transform: rotate(-90deg);
+    }
+    .mindmap-category-kicker {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+    .mindmap-category-node strong {
+      display: block;
+      padding-right: 24px;
+      font-size: 1.05rem;
+      line-height: 1.25;
+    }
+    .mindmap-category-node small {
+      color: #475569;
+      font-size: .9rem;
+    }
+    .mindmap-branch-body {
+      display: grid;
+      gap: 12px;
+      padding: 14px 16px 16px;
+    }
+    .mindmap-branch-caption {
+      padding: 10px 12px;
       border-radius: 16px;
-      background: #fff;
-      padding: 12px 14px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+    .mindmap-leaf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
+      gap: 10px;
+    }
+    .mindmap-leaf {
+      display: grid;
+      gap: 6px;
+      padding: 12px 13px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      color: inherit;
       text-align: left;
       cursor: pointer;
-      color: inherit;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
     }
-    .mindmap-list button.current {
-      border-color: rgba(37, 99, 235, 0.38);
-      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.16);
+    .mindmap-leaf:hover,
+    .mindmap-leaf:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 24px rgba(15, 23, 42, 0.10);
     }
-    .mindmap-list-term { display: block; font-weight: 800; }
-    .mindmap-list-meta, .mindmap-list-english { display: block; margin-top: 4px; font-size: 12px; color: #475569; }
-    .mindmap-empty { padding: 56px 20px; text-align: center; color: #475569; }
+    .mindmap-leaf.current {
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12), 0 16px 26px rgba(37, 99, 235, 0.14);
+    }
+    .mindmap-leaf-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 22px;
+    }
+    .mindmap-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .01em;
+      background: #eef2ff;
+      color: #4338ca;
+    }
+    .mindmap-badge.current {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+    .mindmap-badge.direct {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .mindmap-badge.links {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .mindmap-leaf strong {
+      display: block;
+      font-size: .98rem;
+      line-height: 1.3;
+    }
+    .mindmap-leaf-english,
+    .mindmap-leaf small {
+      color: #475569;
+      line-height: 1.4;
+    }
+    .mindmap-empty {
+      padding: 64px 22px;
+      text-align: center;
+      color: #64748b;
+      font-size: 1rem;
+    }
+    @media (max-width: 1100px) {
+      .mindmap-tree {
+        grid-template-columns: 1fr;
+      }
+      .mindmap-root-card {
+        position: static;
+      }
+      .mindmap-root-card::after {
+        display: none;
+      }
+      .mindmap-branches {
+        padding-left: 18px;
+      }
+      .mindmap-branches::before {
+        left: 0;
+      }
+    }
+    @media (max-width: 760px) {
+      .mindmap-shell {
+        padding: 14px;
+      }
+      .mindmap-head {
+        padding: 18px 18px 14px;
+      }
+      .mindmap-tree-panel {
+        padding: 0 12px 12px;
+      }
+      .mindmap-root-metrics {
+        grid-template-columns: 1fr;
+      }
+      .mindmap-leaf-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="mindmap-shell">
     <section class="mindmap-panel">
       <header class="mindmap-head">
-        <p class="mindmap-kicker">현재 필터 기준 마인드맵</p>
-        <h1 class="mindmap-title">${escapeHtml(currentCard ? currentCard.term || currentCard.id : '표시할 카드 없음')}</h1>
-        <p class="mindmap-summary">${escapeHtml(summaryText)} · ${graph.cards.length}개 · 현재 ${graph.cards.length ? state.index + 1 : 0}</p>
-        <p class="mindmap-hint">노드나 목록을 누르면 원본 창 카드로 이동합니다.</p>
+        <p class="mindmap-kicker">카테고리형 마인드맵</p>
+        <h1 class="mindmap-title">현재 필터 카드 → 대분류 → 카드</h1>
+        <p class="mindmap-summary">${escapeHtml(summaryText)} · 펼친 카드 ${layout.totalCards}개 · 대분류 ${layout.totalCategories}개</p>
+        <p class="mindmap-hint">현재 필터 카드들을 대분류별로 묶었습니다. 대분류를 펼치면 카드로 내려가고, 카드를 누르면 원본 창으로 이동합니다.</p>
       </header>
-      <div class="mindmap-stage-wrap">
-        <div class="mindmap-stage">
-          ${nodes.length ? `
-            <svg class="mindmap-svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}" aria-hidden="true">
-              ${layout.edges.map((edge) => `<line class="mindmap-edge ${escapeHtml(edge.kind)}" x1="${edge.source.x}" y1="${edge.source.y}" x2="${edge.target.x}" y2="${edge.target.y}" />`).join('')}
-            </svg>
-            ${nodes.map((node) => {
-              const shadowColor = `${node.color}22`;
-              return `<button class="mindmap-node${node.isCurrent ? ' current' : ''}${node.connectedToCurrent ? ' connected' : ''}" type="button" data-card-id="${escapeHtml(node.id)}" style="left:${node.x}px;top:${node.y}px;width:${node.width}px;min-height:${node.height}px;border:1px solid ${escapeHtml(node.color)}44;background:linear-gradient(180deg, #ffffff 0%, ${escapeHtml(shadowColor)} 100%);">
-                <span class="mindmap-node-meta">${escapeHtml(node.categoryLabel)}</span>
-                <strong class="mindmap-node-term">${escapeHtml(node.emoji)} ${escapeHtml(node.term)}</strong>
-                ${node.english ? `<span class="mindmap-node-english">${escapeHtml(node.english)}</span>` : ''}
-              </button>`;
-            }).join('')}
-          ` : `<div class="mindmap-empty">현재 필터 조건에 맞는 카드가 없습니다.</div>`}
-        </div>
-      </div>
-      <div class="mindmap-list">
-        <ul class="mindmap-list-grid">
-          ${listCards.map((node) => `<li><button class="${node.isCurrent ? 'current' : ''}" type="button" data-card-id="${escapeHtml(node.id)}"><strong class="mindmap-list-term">${escapeHtml(node.term)}</strong><span class="mindmap-list-meta">${escapeHtml(node.categoryLabel)}${node.connectedToCurrent && !node.isCurrent ? ' · 중심 카드와 연결' : ''}</span>${node.english ? `<span class="mindmap-list-english">${escapeHtml(node.english)}</span>` : ''}</button></li>`).join('')}
-        </ul>
+      <div class="mindmap-tree-panel">
+        ${layout.totalCards ? `
+          <div class="mindmap-tree">
+            <article class="mindmap-root-card">
+              <p class="mindmap-root-kicker">현재 필터 카드</p>
+              <h2 class="mindmap-root-title">${escapeHtml(summaryText || '전체 카드')}</h2>
+              <p class="mindmap-root-summary">현재 카드 중심으로 직접 연결 카드와 같은 필터 카드들을 대분류 → 카드 순서로 정리했습니다.</p>
+              ${currentCard ? `
+                <div class="mindmap-current-card">
+                  <span>현재 카드</span>
+                  <strong>${escapeHtml(currentCard.term || currentCard.id)}</strong>
+                  ${currentCard.english ? `<small>${escapeHtml(currentCard.english)}</small>` : ''}
+                  <em>${escapeHtml(categoryLabel(currentCard.category))}</em>
+                </div>
+              ` : `
+                <div class="mindmap-current-card">
+                  <span>현재 카드</span>
+                  <strong>표시할 카드가 없습니다.</strong>
+                </div>
+              `}
+              <div class="mindmap-root-metrics">
+                <div class="mindmap-metric">
+                  <strong>${layout.totalCategories}개</strong>
+                  <small>대분류</small>
+                </div>
+                <div class="mindmap-metric">
+                  <strong>${layout.directCardCount}개</strong>
+                  <small>직접 연결 카드</small>
+                </div>
+                <div class="mindmap-metric">
+                  <strong>${layout.connectedCategoryCount}개</strong>
+                  <small>연결된 대분류</small>
+                </div>
+                <div class="mindmap-metric">
+                  <strong>${layout.totalCards}개</strong>
+                  <small>현재 필터 카드</small>
+                </div>
+              </div>
+            </article>
+            <div class="mindmap-branches">
+              ${layout.categoryGroups.map((group) => {
+                const borderColor = `${group.color}3d`;
+                const branchSoft = `${group.color}14`;
+                const categoryHint = group.hasCurrent
+                  ? '현재 카드가 포함된 대분류입니다.'
+                  : group.directCount
+                    ? `현재 카드와 직접 연결된 카드 ${group.directCount}개가 포함된 대분류입니다.`
+                    : '현재 필터에 포함된 카드들을 정리한 대분류입니다.';
+                return `<details class="mindmap-category-branch${group.hasCurrent ? ' current-branch' : ''}"${group.defaultOpen ? ' open' : ''}>
+                  <summary class="mindmap-category-node" style="border-left: 4px solid ${escapeHtml(group.color)}; background: linear-gradient(135deg, #ffffff 0%, ${escapeHtml(branchSoft)} 100%);">
+                    <span class="mindmap-category-kicker">대분류${group.hasCurrent ? ' · 현재 카드 포함' : group.directCount ? ' · 직접 연결 포함' : ''}</span>
+                    <strong>${escapeHtml(group.categoryLabel)}</strong>
+                    <small>${group.count}개 카드 · 직접 연결 ${group.directCount}개</small>
+                  </summary>
+                  <div class="mindmap-branch-body">
+                    <div class="mindmap-branch-caption">${escapeHtml(categoryHint)}</div>
+                    <div class="mindmap-leaf-grid">
+                      ${group.cards.map((node) => {
+                        const cardSoft = `${node.color}14`;
+                        const badges = [
+                          node.isCurrent ? '<span class="mindmap-badge current">현재 카드</span>' : '',
+                          node.directToCurrent ? '<span class="mindmap-badge direct">직접 연결</span>' : '',
+                          `<span class="mindmap-badge links">연결 ${node.visibleLinkCount}개</span>`,
+                        ].join('');
+                        return `<button class="mindmap-leaf${node.isCurrent ? ' current' : ''}" type="button" data-card-id="${escapeHtml(node.id)}" style="border-color: ${escapeHtml(borderColor)}; background: linear-gradient(180deg, #ffffff 0%, ${escapeHtml(cardSoft)} 100%);">
+                          <span class="mindmap-leaf-badges">${badges}</span>
+                          <strong>${escapeHtml(node.term)}</strong>
+                          ${node.english ? `<span class="mindmap-leaf-english">${escapeHtml(node.english)}</span>` : ''}
+                          <small>${node.visibleLinkCount ? `현재 필터 연결 ${node.visibleLinkCount}개` : '현재 필터 연결 없음'}</small>
+                        </button>`;
+                      }).join('')}
+                    </div>
+                  </div>
+                </details>`;
+              }).join('')}
+            </div>
+          </div>
+        ` : `<div class="mindmap-empty">현재 필터 조건에 맞는 카드가 없습니다.</div>`}
       </div>
     </section>
   </main>
@@ -3093,6 +3385,7 @@ function renderMindMapWindow() {
 }
 
 function bootstrapMindMapPopupWindow() {
+
   if (!mindMapPopupRequested()) return false;
   const openerRef = window.opener;
   if (!openerRef || openerRef.closed || typeof openerRef.__csFlashcardsRegisterMindMapWindow !== 'function') {
