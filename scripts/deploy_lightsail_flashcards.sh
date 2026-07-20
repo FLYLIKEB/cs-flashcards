@@ -278,11 +278,10 @@ python3 -m venv .venv
 .venv/bin/python - <<'PY'
 import json
 import app
-seed_rows = app.seed_rows_from_csv(app.CSV_PATH) or []
-app.ensure_progress_db(app.PROGRESS_DB_PATH, seed_rows)
-app.sync_legacy_ai_progress_to_db(app.PROGRESS_DB_PATH)
+count = app.bootstrap_cards_from_csv(app.CSV_PATH, app.PROGRESS_DB_PATH)
 cards, _ = app.read_card_content(app.PROGRESS_DB_PATH)
 print("SQLite card bootstrap:", json.dumps({
+    "imported_from_csv": count,
     "count": len(cards),
 }, ensure_ascii=False))
 PY

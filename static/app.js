@@ -2001,11 +2001,15 @@ function normalizedConceptMediaType(value) {
   return CONCEPT_MEDIA_TYPES.includes(mediaType) ? mediaType : '';
 }
 
-function conceptImageUrl(card) {
-  const url = String(card?.concept_image_url || card?.image_url || '').trim();
+function normalizedConceptMediaUrl(value) {
+  const url = String(value || '').trim();
   if (!url) return '';
-  if (url.startsWith('/static/generated/') || url.startsWith('/api/concept-images/')) return '';
+  if (url.startsWith('/static/generated/')) return `/api/ai-images/${url.slice('/static/generated/'.length).replace(/^\/+/, '')}`;
+  if (url.startsWith('/api/concept-images/')) return `/api/ai-images/${url.slice('/api/concept-images/'.length).replace(/^\/+/, '')}`;
   return url;
+}
+function conceptImageUrl(card) {
+  return normalizedConceptMediaUrl(card?.concept_image_url || card?.image_url || '');
 }
 
 function conceptImagePreviewActive(card) {
@@ -2040,7 +2044,8 @@ function conceptMediaDisplayState(card) {
     };
   }
   const mediaType = normalizedConceptMediaType(card?.concept_media_type);
-  const payload = String(card?.concept_media_payload || '').trim();
+  const rawPayload = String(card?.concept_media_payload || '').trim();
+  const payload = ['image', 'gif', 'video'].includes(mediaType) ? normalizedConceptMediaUrl(rawPayload) : rawPayload;
   if (mediaType && payload) {
     return {
       previewActive: false,

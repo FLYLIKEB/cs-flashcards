@@ -140,7 +140,7 @@ class QuestionGeneratorTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             missing_csv = root / 'missing.csv'
             write_cards(csv_path)
-            flashcard_app.read_cards(csv_path, db_path)
+            flashcard_app.bootstrap_cards_from_csv(csv_path, db_path)
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:

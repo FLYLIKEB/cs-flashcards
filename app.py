@@ -87,6 +87,8 @@ CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "c
 # are flushed into the canonical card-content rows.
 AI_PROGRESS_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt")
 CONCEPT_MEDIA_TYPES = {"", "image", "gif", "video", "mermaid", "html"}
+LEGACY_CONCEPT_MEDIA_PREFIXES = ("/static/generated/", "/api/concept-images/")
+
 
 OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
 OPENAI_API_BASE = str(os.environ.get("CS_FLASHCARDS_OPENAI_API_BASE", "https://api.openai.com/v1")).rstrip("/")
@@ -350,6 +352,16 @@ def seed_rows_from_csv(csv_path: Path = CSV_PATH) -> list[dict[str, str]] | None
     rows, _ = read_csv_cards(csv_path, keep_csv_progress=True)
     return rows
 
+def bootstrap_cards_from_csv(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> int:
+    seed_rows = seed_rows_from_csv(csv_path)
+    if not seed_rows:
+        return 0
+    db_path = progress_db_for(None, progress_db_path)
+    ensure_progress_db(db_path, seed_rows)
+    sync_legacy_ai_progress_to_db(db_path)
+    return len(seed_rows)
+
+
 
 def progress_row_is_meaningful(row: dict[str, str]) -> bool:
     return bool(
@@ -359,6 +371,17 @@ def progress_row_is_meaningful(row: dict[str, str]) -> bool:
         or normalized_bookmarked(row.get("bookmarked")) == "1"
         or (row.get("memo") or "").strip()
     )
+
+def normalized_runtime_media_url(value: Any) -> str:
+    url = str(value or "").strip()
+    if not url:
+        return ""
+    for prefix in LEGACY_CONCEPT_MEDIA_PREFIXES:
+        if url.startswith(prefix):
+            tail = url[len(prefix):].lstrip("/")
+            return f"/api/ai-images/{tail}" if tail else ""
+    return url
+
 
 
 def connect_progress_db(progress_db_path: Path) -> sqlite3.Connection:
@@ -682,7 +705,12 @@ def read_card_content(progress_db_path: Path) -> tuple[list[dict[str, str]], lis
         item = {"id": row["card_id"] or ""}
         for field in CARD_CONTENT_DB_COLUMNS:
             item[field] = row[field] or ""
+        item["concept_image_url"] = normalized_runtime_media_url(item.get("concept_image_url"))
+        media_type = normalized_concept_media_type(item.get("concept_media_type")) if item.get("concept_media_type") else ""
+        if media_type in {"image", "gif", "video"}:
+            item["concept_media_payload"] = normalized_runtime_media_url(item.get("concept_media_payload"))
         cards.append(item)
+
     return cards, content_fieldnames()
 
 
@@ -788,21 +816,16 @@ def merge_progress(
 
 
 def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
-    db_path = progress_db_for(csv_path, progress_db_path)
-    seed_rows = seed_rows_from_csv(csv_path) if csv_path is not None and (not db_path.exists()) else None
-    ensure_progress_db(db_path, seed_rows)
+    del csv_path  # Runtime card reads are SQLite-only.
+    db_path = progress_db_for(None, progress_db_path)
+    ensure_progress_db(db_path)
     sync_legacy_ai_progress_to_db(db_path)
     card_rows, fieldnames = read_card_content(db_path)
-    if not card_rows and csv_path is not None:
-        seed_rows = seed_rows or seed_rows_from_csv(csv_path)
-        if seed_rows:
-            ensure_progress_db(db_path, seed_rows)
-            sync_legacy_ai_progress_to_db(db_path)
-            card_rows, fieldnames = read_card_content(db_path)
     if not card_rows:
         raise FileNotFoundError(f"Card content not found in SQLite: {db_path}")
     rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
+
 
 
 
@@ -814,9 +837,8 @@ def update_card_content_fields(
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
-    db_path = progress_db_for(csv_path, progress_db_path)
-    seed_rows = seed_rows_from_csv(csv_path) if csv_path is not None and (not db_path.exists()) else None
-    ensure_progress_db(db_path, seed_rows)
+    db_path = progress_db_for(None, progress_db_path)
+    ensure_progress_db(db_path)
     sync_legacy_ai_progress_to_db(db_path)
 
     rows, _ = read_card_content(db_path)
@@ -3966,6 +3988,10 @@ def api_ai_image_file(image_name: str) -> FileResponse:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return FileResponse(image_path)
+
+@app.get("/api/concept-images/{image_name}")
+def api_legacy_concept_image_file(image_name: str) -> FileResponse:
+    return api_ai_image_file(image_name)
 
 
 @app.post("/api/cards/{card_id}/ai-image/preview")

@@ -21,6 +21,11 @@ class StaticFrontendTests(unittest.TestCase):
     def test_frontend_shows_content_db_source(self):
         self.assertIn('id="contentDbPath"', INDEX_HTML)
         self.assertIn("$('contentDbPath').textContent = data.summary.content_db_path;", APP_JS)
+
+    def test_frontend_normalizes_legacy_ai_image_urls(self):
+        self.assertIn('function normalizedConceptMediaUrl(value)', APP_JS)
+        self.assertIn("/api/concept-images/", APP_JS)
+        self.assertIn("/api/ai-images/", APP_JS)
     def test_concept_jump_saves_and_restores_full_view_state(self):
         self.assertIn('conceptHistory: []', APP_JS)
         self.assertIn('function currentViewSnapshot()', APP_JS)

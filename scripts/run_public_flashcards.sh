@@ -115,6 +115,10 @@ if ! is_running; then
       sleep 0.3
     fi
   fi
+  "$VENV_DIR/bin/python" - <<'PY'
+import app
+app.bootstrap_cards_from_csv(app.CSV_PATH, app.PROGRESS_DB_PATH)
+PY
   printf '비밀번호 보호 서버 시작 중: %s\n' "$URL"
   CS_FLASHCARDS_USERNAME="$USERNAME" \
   CS_FLASHCARDS_PASSWORD="$PASSWORD" \

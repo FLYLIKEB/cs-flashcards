@@ -56,6 +56,10 @@ fi
 printf '의존성 확인/설치 중...\n'
 "$VENV_DIR/bin/python" -m pip install -q --upgrade pip
 "$VENV_DIR/bin/python" -m pip install -q -r requirements.txt
+"$VENV_DIR/bin/python" - <<'PY'
+import app
+app.bootstrap_cards_from_csv(app.CSV_PATH, app.PROGRESS_DB_PATH)
+PY
 
 printf 'CS 플래시카드 서버 시작 중: %s\n' "$URL"
 nohup "$VENV_DIR/bin/uvicorn" app:app --host "$HOST" --port "$PORT" >"$LOG_FILE" 2>&1 &
