@@ -25,6 +25,7 @@ const state = {
   conceptImageScale: 1,
 
   menuOpen: false,
+  flashcardTableWindow: null,
   speechHighlight: null,
   speechCurrent: null,
   speechUtterance: null,
@@ -2637,6 +2638,161 @@ function closeBookmarkList() {
   if (dialog) dialog.hidden = true;
 }
 
+function flashcardTableSummaryText() {
+  const parts = [];
+  const searchValue = String($('searchInput')?.value || '').trim();
+  const categoryValue = $('categorySelect')?.value || '';
+  if (searchValue) parts.push(`검색 ${searchValue}`);
+  if (categoryValue) parts.push(categoryLabel(categoryValue));
+  if (state.importanceFilter) parts.push(`중요도 ${state.importanceFilter}`);
+  if (state.difficultyFilter) parts.push(`난도 ${state.difficultyFilter}`);
+  if (state.bokFilter) parts.push(`기출 ${state.bokFilter}`);
+  if (state.statusFilter) parts.push(`상태 ${statusLabel(state.statusFilter)}`);
+  if (state.bookmarkFilter) parts.push('북마크만');
+  return parts.join(' · ') || '전체 카드';
+}
+
+function selectCardFromFlashcardTable(cardId) {
+  if (state.questionMode) toggleQuestionMode(false);
+  const card = state.cards.find((item) => item.id === cardId);
+  if (!card) {
+    setMessage('표 목록에서 선택한 카드를 찾지 못했습니다.', true);
+    return false;
+  }
+  const filteredIndex = state.filtered.findIndex((item) => item.id === cardId);
+  if (filteredIndex >= 0) {
+    state.index = filteredIndex;
+    state.flipped = false;
+    state.backPage = 0;
+    renderCard();
+    setMessage(`${card.term} 카드로 이동했습니다.`);
+    focusAppCard();
+    return true;
+  }
+  return jumpToCard(card);
+}
+
+window.__csFlashcardsSelectCardFromTable = selectCardFromFlashcardTable;
+window.__csFlashcardsTableClosed = () => {
+  state.flashcardTableWindow = null;
+};
+
+function renderFlashcardTableWindow() {
+  const popup = state.flashcardTableWindow;
+  if (!popup || popup.closed) {
+    state.flashcardTableWindow = null;
+    return;
+  }
+  const rows = state.filtered;
+  const currentCardId = rows[state.index]?.id || '';
+  const summaryText = flashcardTableSummaryText();
+  const rowsHtml = rows.length ? rows.map((card, index) => `
+    <tr class="${card.id === currentCardId ? 'active' : ''}" data-card-id="${escapeHtml(card.id)}" tabindex="0">
+      <td>${index + 1}</td>
+      <td class="term-cell">${isCardBookmarked(card) ? '<span class="bookmark">★</span> ' : ''}${escapeHtml(card.term || card.id)}</td>
+      <td>${escapeHtml(card.english || '—')}</td>
+      <td>${escapeHtml(categoryLabel(card.category))}</td>
+      <td><span class="status-badge">${escapeHtml(statusLabel(card.known_status))}</span></td>
+    </tr>
+  `).join('') : `
+    <div class="empty-state">현재 조건에 맞는 카드가 없습니다.</div>
+  `;
+  try {
+    popup.document.open();
+    popup.document.write(`<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>플래시카드 표 목록</title>
+  <style>
+    :root { color-scheme: light; --bg: #f6f5f2; --panel: rgba(255,255,255,.82); --line: #e7e3dc; --text: #171717; --muted: #6f6f6a; --accent: #1f3a5f; --accent-soft: #eef3f8; --shadow: 0 24px 70px rgba(29, 25, 20, .12); }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; color: var(--text); background: radial-gradient(circle at top left, rgba(31, 58, 95, .08), transparent 22rem), linear-gradient(180deg, #fff, var(--bg)); }
+    .shell { padding: 24px; }
+    .panel { max-width: 1200px; margin: 0 auto; padding: 22px; border: 1px solid var(--line); border-radius: 28px; background: var(--panel); box-shadow: var(--shadow); backdrop-filter: blur(24px); }
+    .header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+    h1 { margin: 0; font-size: 1.45rem; letter-spacing: -.04em; }
+    .subtitle, .hint { margin: 6px 0 0; color: var(--muted); font-size: .94rem; }
+    .pill { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 700; white-space: nowrap; }
+    .table-wrap { overflow: auto; border-radius: 22px; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0 10px; table-layout: fixed; }
+    th, td { padding: 14px 16px; text-align: left; background: rgba(255,255,255,.92); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: .95rem; }
+    th { position: sticky; top: 0; z-index: 1; color: var(--muted); font-size: .82rem; letter-spacing: .01em; text-transform: uppercase; background: rgba(247,247,244,.96); }
+    th:first-child, td:first-child { border-left: 1px solid var(--line); border-radius: 16px 0 0 16px; width: 72px; }
+    th:last-child, td:last-child { border-right: 1px solid var(--line); border-radius: 0 16px 16px 0; width: 88px; }
+    tbody tr { cursor: pointer; outline: none; }
+    tbody tr.active td { border-color: rgba(31, 58, 95, .24); background: linear-gradient(180deg, #fff, #f8fbff); box-shadow: 0 14px 34px rgba(31, 58, 95, .08); }
+    tbody tr:focus-visible td, tbody tr:hover td { border-color: rgba(31, 58, 95, .24); }
+    .term-cell { font-weight: 700; }
+    .bookmark { color: #ca8a04; }
+    .status-badge { display: inline-flex; min-width: 34px; justify-content: center; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: #fff; }
+    .empty-state { padding: 44px 18px; text-align: center; color: var(--muted); border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,.92); }
+    @media (max-width: 780px) { .shell { padding: 14px; } .panel { padding: 16px; border-radius: 22px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <div class="header">
+        <div>
+          <h1>플래시카드 표 목록</h1>
+          <p class="subtitle">${escapeHtml(summaryText)} · ${rows.length}개</p>
+          <p class="hint">행을 누르면 원래 창의 카드로 바로 이동합니다.</p>
+        </div>
+        <div class="pill">현재 ${rows.length ? state.index + 1 : 0} / ${rows.length}</div>
+      </div>
+      ${rows.length ? `<div class="table-wrap"><table><thead><tr><th>#</th><th>용어</th><th>영문</th><th>분류</th><th>상태</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
+    </div>
+  </div>
+  <script>
+    const activateRow = (row) => {
+      const openerRef = window.opener;
+      if (!row || !openerRef || openerRef.closed || typeof openerRef.__csFlashcardsSelectCardFromTable !== 'function') return;
+      openerRef.__csFlashcardsSelectCardFromTable(row.dataset.cardId || '');
+      openerRef.focus();
+    };
+    document.addEventListener('click', (event) => {
+      const row = event.target.closest('[data-card-id]');
+      if (row) activateRow(row);
+    });
+    document.addEventListener('keydown', (event) => {
+      const row = event.target.closest('[data-card-id]');
+      if (!row || (event.key !== 'Enter' && event.key !== ' ')) return;
+      event.preventDefault();
+      activateRow(row);
+    });
+    window.addEventListener('beforeunload', () => {
+      const openerRef = window.opener;
+      if (openerRef && !openerRef.closed && typeof openerRef.__csFlashcardsTableClosed === 'function') openerRef.__csFlashcardsTableClosed();
+    });
+  </script>
+</body>
+</html>`);
+    popup.document.close();
+  } catch (_error) {
+    state.flashcardTableWindow = null;
+    setMessage('표 목록 창을 새로 열어주세요.', true);
+  }
+}
+
+function openFlashcardTableWindow() {
+  toggleMenu(false);
+  if (state.flashcardTableWindow && !state.flashcardTableWindow.closed) {
+    renderFlashcardTableWindow();
+    state.flashcardTableWindow.focus();
+    return;
+  }
+  const popup = window.open('', 'csFlashcardTableWindow', 'popup=yes,width=1120,height=760,resizable=yes,scrollbars=yes');
+  if (!popup) {
+    setMessage('팝업이 차단되어 표 목록을 열지 못했습니다.', true);
+    return;
+  }
+  state.flashcardTableWindow = popup;
+  renderFlashcardTableWindow();
+  popup.focus();
+}
+
 function formatQuestionAttemptUpdatedAt(value) {
   if (!value) return '';
   const date = new Date(value);
@@ -4277,6 +4433,7 @@ function renderCard() {
     updateConceptBackButton();
     renderPersonalControls(null);
     saveViewState();
+    renderFlashcardTableWindow();
     return;
   }
 
@@ -4333,6 +4490,7 @@ function renderCard() {
   state.renderedFlipped = state.flipped;
   updateConceptBackButton();
   saveViewState();
+  renderFlashcardTableWindow();
 }
 
 
@@ -4743,6 +4901,7 @@ $('menuBtn').addEventListener('click', (event) => {
 });
 $('memoListBtn').addEventListener('click', openMemoList);
 $('bookmarkListBtn').addEventListener('click', openBookmarkList);
+$('flashcardTableBtn')?.addEventListener('click', openFlashcardTableWindow);
 $('bookmarkFilterBtn').addEventListener('click', toggleBookmarkFilter);
 $('questionPracticeBtn')?.addEventListener('click', openQuestionPracticeFromMenu);
 $('memoListCloseBtn').addEventListener('click', closeMemoList);
