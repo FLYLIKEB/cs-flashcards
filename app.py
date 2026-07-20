@@ -3639,3 +3639,34 @@ def health() -> dict[str, Any]:
         "codex_model": CODEX_MODEL,
         "ai_image_model": IMAGE_MODEL,
     }
+class WikiRenderPreviewRequest(BaseModel):
+    source_path: str = Field(min_length=1, max_length=4096)
+    content: str = Field(max_length=2_000_000)
+
+
+def render_wiki_markdown_preview(
+    source_path: str,
+    content: str,
+    repo_dir: Path | None = None,
+) -> dict[str, Any]:
+    repo, target, source_relative, _ = resolve_wiki_markdown_source(source_path, repo_dir)
+    return {
+        "source_path": source_relative,
+        "page_slug": wiki_slug_for_source(repo, target),
+        "title": extract_markdown_title(content, target.stem),
+        "html": render_markdown_page(content, repo, target),
+    }
+
+
+
+@app.post("/api/wiki/render-preview")
+def api_wiki_render_preview(payload: WikiRenderPreviewRequest) -> dict[str, Any]:
+    try:
+        return render_wiki_markdown_preview(payload.source_path, payload.content)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+

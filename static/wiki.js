@@ -20,6 +20,9 @@ const wikiState = {
 
 const wiki$ = (id) => document.getElementById(id);
 const wikiAiTools = window.CsAiTools || null;
+let wikiMarkdownEditor = null;
+let wikiMarkdownPreviewSideBySide = false;
+let wikiPreviewRequestToken = 0;
 
 function wikiEscapeHtml(value) {
   return String(value || '').replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -298,8 +301,134 @@ function wikiEditablePage(page = wikiState.page) {
   return Boolean(page?.source_path && page?.raw_url);
 }
 
+function wikiEditorInstance() {
+  return wikiMarkdownEditor;
+}
+
 function wikiEditorValue() {
-  return wiki$('wikiEditorTextarea')?.value || '';
+  const editor = wikiEditorInstance();
+  return editor ? editor.value() : (wiki$('wikiEditorTextarea')?.value || '');
+}
+
+function wikiSetEditorValue(value, {clearHistory = false} = {}) {
+  const nextValue = String(value || '');
+  const editor = wikiEditorInstance();
+  if (editor?.codemirror) {
+    editor.value(nextValue);
+    if (clearHistory) editor.codemirror.clearHistory();
+    return;
+  }
+  const textarea = wiki$('wikiEditorTextarea');
+  if (textarea) textarea.value = nextValue;
+}
+
+function wikiFocusEditor() {
+  const editor = wikiEditorInstance();
+  if (editor?.codemirror) {
+    editor.codemirror.refresh();
+    editor.codemirror.focus();
+    return;
+  }
+  wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
+}
+
+function wikiEditorPreviewPlaceholder(text = '미리보기를 불러오는 중입니다.') {
+  return `<p class="wiki-editor-preview-loading">${wikiEscapeHtml(text)}</p>`;
+}
+
+function wikiEditorPreviewSourcePath() {
+  return String(wikiState.editorSourcePath || wikiState.page?.source_path || '').trim();
+}
+
+async function wikiRenderPreviewMarkdown(sourcePath, content) {
+  if (wikiAiTools?.postJson) {
+    return wikiAiTools.postJson(wikiApiUrl('/api/wiki/render-preview'), {
+      source_path: sourcePath,
+      content,
+    });
+  }
+  return wikiFetchJson(wikiApiUrl('/api/wiki/render-preview'), {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      source_path: sourcePath,
+      content,
+    }),
+  });
+}
+
+function wikiEnsureMarkdownEditor() {
+  if (wikiMarkdownEditor) return wikiMarkdownEditor;
+  if (typeof window.EasyMDE !== 'function') return null;
+  const textarea = wiki$('wikiEditorTextarea');
+  if (!textarea) return null;
+  wikiMarkdownEditor = new window.EasyMDE({
+    element: textarea,
+    autoDownloadFontAwesome: false,
+    autofocus: false,
+    autoRefresh: {delay: 120},
+    forceSync: true,
+    inputStyle: 'textarea',
+    lineNumbers: true,
+    minHeight: '420px',
+    nativeSpellcheck: false,
+    placeholder: 'Markdown 원문을 입력하세요.',
+    previewClass: ['wiki-article', 'wiki-editor-preview'],
+    previewRender: (plainText, previewEl) => {
+      const preview = previewEl || null;
+      const sourcePath = wikiEditorPreviewSourcePath();
+      const token = ++wikiPreviewRequestToken;
+      const loadingHtml = wikiEditorPreviewPlaceholder();
+      if (!preview) return loadingHtml;
+      preview.innerHTML = loadingHtml;
+      if (!sourcePath) {
+        preview.innerHTML = wikiEditorPreviewPlaceholder('미리보기에 필요한 원본 경로를 찾지 못했습니다.');
+        return loadingHtml;
+      }
+      wikiRenderPreviewMarkdown(sourcePath, plainText).then((data) => {
+        if (token !== wikiPreviewRequestToken || !preview.isConnected) return;
+        preview.innerHTML = data?.html || '<p class="muted">미리보기 결과가 비어 있습니다.</p>';
+      }).catch((error) => {
+        if (token !== wikiPreviewRequestToken || !preview.isConnected) return;
+        preview.innerHTML = `<p class="error-text">${wikiEscapeHtml(error.message || error)}</p>`;
+      });
+      return loadingHtml;
+    },
+    sideBySideFullscreen: false,
+    spellChecker: false,
+    status: false,
+    syncSideBySidePreviewScroll: true,
+    toolbar: [
+      'bold',
+      'italic',
+      'heading',
+      '|',
+      'quote',
+      'unordered-list',
+      'ordered-list',
+      '|',
+      'link',
+      'table',
+      'code',
+      '|',
+      'preview',
+      'side-by-side',
+      '|',
+      'guide',
+    ],
+  });
+  if (!wikiMarkdownPreviewSideBySide && typeof wikiMarkdownEditor.toggleSideBySide === 'function') {
+    wikiMarkdownEditor.toggleSideBySide();
+    wikiMarkdownPreviewSideBySide = true;
+  }
+  wikiMarkdownEditor.codemirror.on('change', () => {
+    if (!wikiState.editorOpen) return;
+    if (wikiState.editorAiStatus && !wikiState.editorAiStatusError) {
+      wikiState.editorAiStatus = '';
+      wikiApplyEditorState();
+    }
+  });
+  return wikiMarkdownEditor;
 }
 
 function wikiEditorHasUnsavedChanges() {
@@ -307,7 +436,9 @@ function wikiEditorHasUnsavedChanges() {
 }
 
 function wikiEditorSyncHint() {
-  return 'Markdown 원문을 직접 수정합니다.';
+  return wikiEditorInstance() || typeof window.EasyMDE === 'function'
+    ? 'Markdown 편집기와 실시간 미리보기로 문서를 수정합니다.'
+    : 'Markdown 원문을 직접 수정합니다. 편집기 플러그인을 불러오지 못했습니다.';
 }
 
 function wikiEditorAiStatusText() {
@@ -318,6 +449,7 @@ function wikiEditorAiStatusText() {
 function wikiApplyEditorState() {
   const canEdit = wikiEditablePage();
   const open = canEdit && wikiState.editorOpen;
+  const editor = open ? wikiEnsureMarkdownEditor() : wikiEditorInstance();
   const editBtn = wiki$('wikiEditBtn');
   const panel = wiki$('wikiEditorPanel');
   const article = wiki$('wikiArticle');
@@ -334,7 +466,7 @@ function wikiApplyEditorState() {
 
   if (editBtn) {
     editBtn.hidden = !canEdit || open;
-    editBtn.disabled = wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading;
+    editBtn.disabled = editorBusy;
   }
   if (panel) {
     panel.hidden = !open;
@@ -352,7 +484,10 @@ function wikiApplyEditorState() {
   if (hint) {
     hint.textContent = wikiState.editorLoading ? '문서 원본을 불러오는 중입니다.' : wikiEditorSyncHint();
   }
-  if (textarea) {
+  if (editor?.codemirror) {
+    editor.codemirror.setOption('readOnly', editorBusy ? 'nocursor' : false);
+    if (open) window.requestAnimationFrame(() => editor.codemirror.refresh());
+  } else if (textarea) {
     textarea.disabled = editorBusy;
     textarea.placeholder = wikiState.editorLoading ? '문서를 불러오는 중입니다...' : 'Markdown 원문을 입력하세요.';
     if (!open) {
@@ -490,7 +625,7 @@ async function wikiStartEdit() {
   const page = wikiState.page;
   if (!wikiEditablePage(page) || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading) return;
   if (wikiState.editorOpen) {
-    wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
+    wikiFocusEditor();
     return;
   }
   wikiState.editorOpen = true;
@@ -505,10 +640,7 @@ async function wikiStartEdit() {
     const text = await wikiFetchText(wikiApiUrl(page?.raw_url || '#'));
     if (!wikiState.editorOpen || wikiState.editorSourcePath !== (page?.source_path || '')) return;
     wikiState.editorOriginalContent = text;
-    const textarea = wiki$('wikiEditorTextarea');
-    if (textarea) {
-      textarea.value = text;
-    }
+    wikiSetEditorValue(text, {clearHistory: true});
     wikiStatus(`${page?.title || '문서'} 원본을 불러왔습니다.`);
   } catch (error) {
     wikiStatus(`문서 원본 불러오기 실패: ${error.message || error}`, true);
@@ -518,15 +650,14 @@ async function wikiStartEdit() {
     wikiState.editorLoading = false;
     wikiApplyEditorState();
   }
-  wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
+  wikiFocusEditor();
 }
 
 async function wikiRunAiRewrite() {
   if (!wikiState.editorOpen || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading) return;
-  const sourcePath = String(wikiState.editorSourcePath || wikiState.page?.source_path || '').trim();
-  const textarea = wiki$('wikiEditorTextarea');
+  const sourcePath = wikiEditorPreviewSourcePath();
   const instructionInput = wiki$('wikiEditorAiInstruction');
-  const content = textarea?.value || '';
+  const content = wikiEditorValue();
   if (!sourcePath) {
     wikiState.editorAiStatus = 'AI 수정 실패: 원본 경로를 찾지 못했습니다.';
     wikiState.editorAiStatusError = true;
@@ -553,14 +684,13 @@ async function wikiRunAiRewrite() {
             instruction: instructionInput?.value || '',
           }),
         });
-    if (!wikiState.editorOpen || String(wikiState.editorSourcePath || '').trim() !== sourcePath) return;
+    if (!wikiState.editorOpen || wikiEditorPreviewSourcePath() !== sourcePath) return;
     const nextContent = String(response?.proposal?.content ?? '');
-    if (!textarea) throw new Error('편집기를 찾지 못했습니다.');
-    textarea.value = nextContent;
+    wikiSetEditorValue(nextContent);
     wikiState.editorAiStatus = `${response?.title || wikiState.page?.title || '문서'} AI 초안을 편집기에 반영했습니다. 검토 후 저장하세요.`;
     wikiState.editorAiStatusError = false;
     wikiStatus(`${response?.title || wikiState.page?.title || '문서'} AI 초안 반영 완료`);
-    textarea.focus({preventScroll: true});
+    wikiFocusEditor();
   } catch (error) {
     wikiState.editorAiStatus = `AI 수정 실패: ${error.message || error}`;
     wikiState.editorAiStatusError = true;

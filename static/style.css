@@ -6109,6 +6109,60 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   border-color: #9ec6e4;
 }
 
+.wiki-editor .EasyMDEContainer {
+  margin-top: .25rem;
+}
+
+.wiki-editor .EasyMDEContainer .editor-toolbar {
+  border: 1px solid var(--wiki-border);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: #ffffff;
+}
+
+.wiki-editor .EasyMDEContainer .CodeMirror,
+.wiki-editor .EasyMDEContainer .CodeMirror-sided,
+.wiki-editor .EasyMDEContainer .editor-preview-side {
+  min-height: min(68vh, 900px);
+  border-color: var(--wiki-border);
+}
+
+.wiki-editor .EasyMDEContainer .CodeMirror {
+  border-radius: 0 0 0 8px;
+  font: 500 .95rem/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.wiki-editor .EasyMDEContainer .CodeMirror-sided,
+.wiki-editor .EasyMDEContainer .editor-preview-side {
+  width: 50%;
+}
+
+.wiki-editor .EasyMDEContainer .editor-preview-side {
+  padding: 1rem 1.05rem;
+  border-left: 0;
+  border-radius: 0 0 8px 0;
+  background: #ffffff;
+}
+
+.wiki-editor .EasyMDEContainer .editor-preview-side.wiki-article {
+  max-width: none;
+  margin: 0;
+}
+
+.wiki-editor .EasyMDEContainer .CodeMirror-cursor {
+  border-left-color: #222222;
+}
+
+.wiki-editor .EasyMDEContainer .CodeMirror-focused {
+  outline: 2px solid rgba(51, 122, 183, .22);
+  outline-offset: -2px;
+}
+
+.wiki-editor-preview-loading {
+  color: #666666;
+  font-size: .9rem;
+}
+
 .wiki-editor-ai {
   margin-top: .85rem;
   padding: .82rem .9rem;
@@ -6550,6 +6604,10 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   .wiki-editor {
     max-width: none;
   }
+  .wiki-editor .EasyMDEContainer .CodeMirror-sided,
+  .wiki-editor .EasyMDEContainer .editor-preview-side {
+    width: 100%;
+  }
   .wiki-page-nav {
     max-width: none;
     grid-template-columns: 1fr;
@@ -6681,9 +6739,15 @@ body.question-bank-embed #closeQuestionModeBtn {
   display: none !important;
 }
 
+body.question-bank-embed {
+  overflow: hidden;
+  background: #fff;
+}
+
 body.question-bank-embed .layout,
 body.question-bank-embed.controls-collapsed .layout {
   max-width: none;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
   grid-template-columns: minmax(0, 1fr) !important;
@@ -6691,12 +6755,21 @@ body.question-bank-embed.controls-collapsed .layout {
 }
 
 body.question-bank-embed .study-area {
+  min-height: 100vh;
   gap: 0;
+}
+
+body.question-bank-embed #questionBankToggleBtn,
+body.question-bank-embed #questionBankBrowser {
+  display: none !important;
 }
 
 body.question-bank-embed .question-panel {
   min-height: 100vh;
+  height: 100vh;
   margin: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
   border-radius: 0;
   border-left: 0;
   border-right: 0;

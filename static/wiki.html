@@ -7,8 +7,10 @@
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
   <link rel="apple-touch-icon" href="/static/favicon.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" />
   <link rel="stylesheet" href="/static/style.css" />
   <script defer src="/static/ai-tools.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
   <script defer src="/static/wiki.js"></script>
 </head>
 <body class="wiki-page-shell">
@@ -54,7 +56,7 @@
             <strong>문서 수정</strong>
             <p id="wikiEditorSource" class="wiki-editor-source"></p>
           </div>
-          <p id="wikiEditorHint" class="wiki-editor-hint">Markdown 원문을 직접 수정합니다.</p>
+          <p id="wikiEditorHint" class="wiki-editor-hint">Markdown 편집기와 실시간 미리보기로 문서를 수정합니다.</p>
         </div>
         <textarea id="wikiEditorTextarea" class="wiki-editor-textarea" spellcheck="false" aria-label="위키 문서 원문"></textarea>
         <div class="wiki-editor-ai" aria-label="AI 위키 수정">
