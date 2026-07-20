@@ -165,6 +165,50 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['known_status'], 'O')
             self.assertEqual(rows[0]['review_count'], '4')
 
+    def test_read_cards_flushes_legacy_ai_overrides_into_csv(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = Path(td) / 'cards.csv'
+            db_path = Path(td) / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute(
+                    """
+                    INSERT INTO card_progress (card_id, definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(card_id) DO UPDATE SET
+                        definition=excluded.definition,
+                        detailed_explanation=excluded.detailed_explanation,
+                        exam_note=excluded.exam_note,
+                        concept_image_url=excluded.concept_image_url,
+                        concept_image_alt=excluded.concept_image_alt,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        'CS-001',
+                        '레거시 정의',
+                        '의미: 레거시 상세. 활용: 레거시 예시.',
+                        '레거시 포인트',
+                        '/api/ai-images/legacy.png',
+                        '레거시 이미지 설명',
+                        '2026-07-20T00:00:00+09:00',
+                    ),
+                )
+                conn.commit()
+
+            rows, _ = read_cards(csv_path, db_path)
+            self.assertEqual(rows[0]['definition'], '레거시 정의')
+            saved = csv_status(csv_path)
+            self.assertEqual(saved['definition'], '레거시 정의')
+            self.assertEqual(saved['concept_image_url'], '/api/ai-images/legacy.png')
+            with closing(sqlite3.connect(db_path)) as conn:
+                legacy = conn.execute(
+                    'SELECT definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt FROM card_progress WHERE card_id=?',
+                    ('CS-001',),
+                ).fetchone()
+            self.assertEqual(legacy, ('', '', '', '', ''))
+
     def test_mark_card_persists_status_to_sqlite_not_csv(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -241,7 +285,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(cleared['memo'], '')
             self.assertEqual(cleared['memo_updated_at'], '')
 
-    def test_update_card_ai_content_persists_overrides_in_progress_db(self):
+    def test_update_card_ai_content_updates_csv_content(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
@@ -263,10 +307,10 @@ class FlashcardProgressTests(unittest.TestCase):
             )
 
             self.assertEqual(updated['definition'], '새 정의')
-            self.assertIsNone(backup_path)
+            self.assertIsNotNone(backup_path)
             raw = csv_status(csv_path)
-            self.assertEqual(raw['definition'], '정의')
-            self.assertEqual(raw['concept_image_alt'], '테스트 개념 이해 이미지')
+            self.assertEqual(raw['definition'], '새 정의')
+            self.assertEqual(raw['concept_image_alt'], '새 학습 이미지 설명')
             self.assertEqual(raw['known_status'], 'O')
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['definition'], '새 정의')
@@ -275,8 +319,7 @@ class FlashcardProgressTests(unittest.TestCase):
                     'SELECT definition, detailed_explanation, exam_note, concept_image_alt FROM card_progress WHERE card_id=?',
                     ('CS-001',),
                 ).fetchone()
-            self.assertEqual(saved[0], '새 정의')
-            self.assertEqual(saved[3], '새 학습 이미지 설명')
+            self.assertEqual(saved, ('', '', '', ''))
     def test_rewrite_card_with_codex_parses_json_output(self):
         original_key = flashcard_app.OPENAI_API_KEY
         try:
@@ -363,8 +406,8 @@ class FlashcardProgressTests(unittest.TestCase):
                     ),
                 )
                 self.assertEqual(data['card']['definition'], '적용 정의')
-                self.assertEqual(data['backup_path'], '')
-                self.assertEqual(csv_status(csv_path)['exam_note'], '포인트')
+                self.assertTrue(data['backup_path'])
+                self.assertEqual(csv_status(csv_path)['exam_note'], '적용 포인트')
                 rows, _ = read_cards(csv_path, db_path)
                 self.assertEqual(rows[0]['exam_note'], '적용 포인트')
             finally:
@@ -435,10 +478,10 @@ class FlashcardProgressTests(unittest.TestCase):
 
             self.assertTrue(image_url.startswith('/api/ai-images/CS-001-'))
             self.assertEqual(updated['concept_image_alt'], 'AI 생성 새 이미지 설명')
-            self.assertIsNone(backup_path)
+            self.assertIsNotNone(backup_path)
             saved = csv_status(csv_path)
-            self.assertEqual(saved['concept_image_alt'], '테스트 개념 이해 이미지')
-            self.assertEqual(saved['concept_image_url'], 'https://example.com/test-concept.png')
+            self.assertEqual(saved['concept_image_alt'], 'AI 생성 새 이미지 설명')
+            self.assertEqual(saved['concept_image_url'], image_url)
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['concept_image_url'], image_url)
             self.assertEqual(rows[0]['concept_image_alt'], 'AI 생성 새 이미지 설명')
@@ -846,6 +889,126 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed_item['answer'], answer)
             self.assertEqual(listed_item['explanation'], explanation)
             self.assertEqual(listed_item['answer_guide'], answer_guide)
+    def test_parse_bok_question_bank_entries_splits_and_preserves_markdown(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+            (pages / '05-14-01-한국은행-2021-컴퓨터공학-학술-파트-I.md').write_text(
+                '# 05-14-01. 한국은행 2021 컴퓨터공학 학술 파트 I\n\n'
+                '## 2021 파트 I\n\n'
+                '### 1. 데이터베이스\n\n'
+                '다음 테이블을 보고 답하시오.\n\n'
+                '| 항목 | 값 |\n|---|---|\n| PK | 학번 |\n\n'
+                '```sql\nSELECT *\nFROM student;\n```\n\n'
+                '### 2. 네트워크\n\n'
+                'DNS의 기능을 2가지 이상 서술하시오.\n',
+                encoding='utf-8',
+            )
+            (pages / '05-14-03-한국은행-2021-컴퓨터공학-학술-파트-II.md').write_text(
+                '# 05-14-03. 한국은행 2021 컴퓨터공학 학술 파트 II\n\n'
+                '## 2021 파트 II\n\n'
+                '다음을 기술하시오.\n\n'
+                '### 유의사항\n\n'
+                '1. 답안은 한 페이지 이내로 작성하시오.\n\n'
+                '### 문제\n\n'
+                '#### 원격근무(VDI) 환경 참고 그림\n\n'
+                '![문제 그림](https://example.com/vdi.png)\n\n'
+                '현재 원격근무 환경의 한계와 개선방안을 논술하시오.\n',
+                encoding='utf-8',
+            )
+            (pages / '05-14-44-한국은행-2009-전산학술-발췌.md').write_text(
+                '# 05-14-44. 한국은행 2009 전산학술 발췌\n\n'
+                '## Ⅰ. 다음 문제를 읽고 가장 적당한 답의 기호를 고르시오.\n\n'
+                '### 1. 다음 설명으로 옳은 것은?\n\n'
+                'A. 정답 A\n\n'
+                'B. 정답 B\n\n'
+                'C. 정답 C\n',
+                encoding='utf-8',
+            )
+
+            entries = flashcard_app.parse_bok_question_bank_entries(wiki_root)
+            self.assertEqual(len(entries), 4)
+
+            database = entries[0]
+            self.assertEqual(database['prompt'], '### 1. 데이터베이스')
+            self.assertEqual(database['question_type'], 'subjective')
+            self.assertEqual(database['topic'], '데이터베이스')
+            self.assertEqual(database['field_name'], '컴퓨터공학 학술')
+            self.assertEqual(database['issuer'], '한국은행')
+            self.assertEqual(database['answer'], '')
+            self.assertEqual(database['explanation'], '')
+            self.assertIn('| 항목 | 값 |', database['body'])
+            self.assertIn('```sql\nSELECT *\nFROM student;\n```', database['body'])
+            self.assertEqual(database['section'], '전공필기')
+            self.assertEqual(database['points'], 10)
+            self.assertEqual(database['expected_time_seconds'], 12 * 60)
+            self.assertEqual(database['session_mode'], 'bok')
+            self.assertEqual(database['source_location'], '한국은행 2021 컴퓨터공학 학술 파트 I · 1. 데이터베이스')
+
+            essay = next(item for item in entries if item['question_type'] == 'essay')
+            self.assertEqual(essay['prompt'], '### 1. 원격근무(VDI) 환경 참고 그림')
+            self.assertIn('### 유의사항', essay['body'])
+            self.assertIn('### 문제', essay['body'])
+            self.assertEqual(essay['section'], '전공논술')
+            self.assertEqual(essay['points'], 20)
+            self.assertEqual(essay['expected_time_seconds'], 54 * 60)
+            self.assertEqual(essay['answer'], '')
+
+            multiple_choice = next(item for item in entries if item['question_type'] == 'multiple_choice')
+            self.assertEqual(multiple_choice['prompt'], '### 1. 다음 설명으로 옳은 것은?')
+            self.assertEqual(multiple_choice['choices'], ['정답 A', '정답 B', '정답 C'])
+            self.assertEqual(multiple_choice['answer'], '')
+            self.assertEqual(multiple_choice['section'], '전공필기')
+            self.assertIsNone(multiple_choice['points'])
+            self.assertEqual(multiple_choice['session_mode'], 'bok')
+
+    def test_sync_bok_question_bank_entries_upserts_empty_answers(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+            write_sample(csv_path)
+            (pages / '05-14-01-한국은행-2021-컴퓨터공학-학술-파트-I.md').write_text(
+                '# 05-14-01. 한국은행 2021 컴퓨터공학 학술 파트 I\n\n'
+                '## 2021 파트 I\n\n'
+                '### 1. 데이터베이스\n\n'
+                '정규화의 장단점을 설명하시오.\n\n'
+                '### 2. 네트워크\n\n'
+                'DNS의 기능을 2가지 이상 서술하시오.\n',
+                encoding='utf-8',
+            )
+            (pages / '05-14-03-한국은행-2021-컴퓨터공학-학술-파트-II.md').write_text(
+                '# 05-14-03. 한국은행 2021 컴퓨터공학 학술 파트 II\n\n'
+                '## 2021 파트 II\n\n'
+                '다음을 기술하시오.\n\n'
+                '### 문제\n\n'
+                '#### 원격근무(VDI) 환경 참고 그림\n\n'
+                '현재 원격근무 환경의 한계와 개선방안을 논술하시오.\n',
+                encoding='utf-8',
+            )
+
+            saved = flashcard_app.sync_bok_question_bank_entries(wiki_root, csv_path, db_path)
+            self.assertEqual(saved['pages'], 2)
+            self.assertEqual(saved['count'], 3)
+
+            saved_again = flashcard_app.sync_bok_question_bank_entries(wiki_root, csv_path, db_path)
+            self.assertEqual(saved_again['count'], 3)
+
+            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, issuer='한국은행', limit=10)
+            self.assertEqual(listed['summary']['total'], 3)
+            self.assertTrue(all(item['answer'] == '' for item in listed['items']))
+            self.assertTrue(all(item['session_mode'] == 'bok' for item in listed['items']))
+            self.assertEqual({item['source_location'] for item in listed['items']}, {
+                '한국은행 2021 컴퓨터공학 학술 파트 I · 1. 데이터베이스',
+                '한국은행 2021 컴퓨터공학 학술 파트 I · 2. 네트워크',
+                '한국은행 2021 컴퓨터공학 학술 파트 II · 1. 원격근무(VDI) 환경 참고 그림',
+            })
+
     def test_api_generate_questions_persists_question_bank_rows(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

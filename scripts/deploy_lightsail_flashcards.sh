@@ -165,8 +165,8 @@ sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot pytho
 
 mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
 
-# Preserve learning progress before the content CSV is replaced by deployment.
-# Existing SQLite rows win; old CSV progress is imported only for cards not yet in the DB.
+# Preserve learning progress and current card content before deployment replaces the CSV.
+# Existing SQLite rows win; old remote CSV values are imported only when the DB is still blank for that card/field.
 python3 - "$REMOTE_DIR/data/CS_encyclopedia_300plus.csv" "$REMOTE_DIR/state/progress.sqlite" <<'PY'
 from __future__ import annotations
 import csv
@@ -213,7 +213,7 @@ if csv_path.exists():
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
         now = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
         imported = 0
-        migrated_ai_images = 0
+        migrated_card_content = 0
         with csv_path.open(encoding="utf-8-sig", newline="") as f:
             for row in csv.DictReader(f):
                 card_id = row.get("id") or ""
@@ -222,35 +222,41 @@ if csv_path.exists():
                     status = ""
                 last_reviewed = row.get("last_reviewed") or ""
                 count = review_count(row.get("review_count"))
+                definition = (row.get("definition") or "").strip()
+                detailed = (row.get("detailed_explanation") or "").strip()
+                exam_note = (row.get("exam_note") or "").strip()
                 image_url = (row.get("concept_image_url") or "").strip()
                 image_alt = (row.get("concept_image_alt") or "").strip()
                 has_progress = bool(status or last_reviewed or count > 0)
-                has_ai_image = image_url.startswith("/api/ai-images/")
-                if not card_id or not (has_progress or has_ai_image):
+                has_card_content = bool(definition or detailed or exam_note or image_url or image_alt)
+                if not card_id or not (has_progress or has_card_content):
                     continue
                 before = conn.total_changes
                 conn.execute(
                     """
                     INSERT INTO card_progress
-                        (card_id, known_status, last_reviewed, review_count, concept_image_url, concept_image_alt, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                        (card_id, known_status, last_reviewed, review_count, definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(card_id) DO UPDATE SET
                         known_status=CASE WHEN card_progress.known_status='' THEN excluded.known_status ELSE card_progress.known_status END,
                         last_reviewed=CASE WHEN card_progress.last_reviewed='' THEN excluded.last_reviewed ELSE card_progress.last_reviewed END,
                         review_count=CASE WHEN card_progress.review_count=0 THEN excluded.review_count ELSE card_progress.review_count END,
+                        definition=CASE WHEN card_progress.definition='' THEN excluded.definition ELSE card_progress.definition END,
+                        detailed_explanation=CASE WHEN card_progress.detailed_explanation='' THEN excluded.detailed_explanation ELSE card_progress.detailed_explanation END,
+                        exam_note=CASE WHEN card_progress.exam_note='' THEN excluded.exam_note ELSE card_progress.exam_note END,
                         concept_image_url=CASE WHEN card_progress.concept_image_url='' THEN excluded.concept_image_url ELSE card_progress.concept_image_url END,
-                        concept_image_alt=CASE WHEN card_progress.concept_image_url='' AND card_progress.concept_image_alt='' THEN excluded.concept_image_alt ELSE card_progress.concept_image_alt END,
+                        concept_image_alt=CASE WHEN card_progress.concept_image_alt='' THEN excluded.concept_image_alt ELSE card_progress.concept_image_alt END,
                         updated_at=CASE WHEN card_progress.updated_at='' THEN excluded.updated_at ELSE card_progress.updated_at END
                     """,
-                    (card_id, status, last_reviewed, count, image_url if has_ai_image else "", image_alt if has_ai_image else "", now),
+                    (card_id, status, last_reviewed, count, definition, detailed, exam_note, image_url, image_alt, now),
                 )
                 delta = conn.total_changes - before
                 if has_progress:
                     imported += delta
-                if has_ai_image:
-                    migrated_ai_images += delta
+                if has_card_content:
+                    migrated_card_content += delta
         conn.commit()
-        print(f"progress migration: imported {imported} row(s) from existing remote CSV; migrated {migrated_ai_images} AI image row(s)")
+        print(f"progress migration: imported {imported} row(s) from existing remote CSV; preserved {migrated_card_content} card-content row(s)")
     finally:
         conn.close()
 else:

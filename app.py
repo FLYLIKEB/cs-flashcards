@@ -63,6 +63,8 @@ WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).s
 WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX", "")).strip().strip("/")
 WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
 CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_alt")
+# Legacy-only SQLite columns that older deployments may still carry until they
+# are flushed back into the canonical CSV content source.
 AI_PROGRESS_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt")
 OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
 OPENAI_API_BASE = str(os.environ.get("CS_FLASHCARDS_OPENAI_API_BASE", "https://api.openai.com/v1")).rstrip("/")
@@ -506,12 +508,12 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
 
 def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     ensure_progress_db(progress_db_path)
-    select_fields = ["card_id", "known_status", "last_reviewed", "review_count", "bookmarked", "memo", "memo_updated_at", *AI_PROGRESS_FIELDS]
+    select_fields = ["card_id", "known_status", "last_reviewed", "review_count", "bookmarked", "memo", "memo_updated_at"]
     with closing(connect_progress_db(progress_db_path)) as conn:
         rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM card_progress").fetchall()
     progress: dict[str, dict[str, str]] = {}
     for row in rows:
-        item = {
+        progress[row["card_id"]] = {
             "known_status": row["known_status"] if row["known_status"] in VALID_STATUSES else "",
             "last_reviewed": row["last_reviewed"] or "",
             "review_count": normalized_review_count(str(row["review_count"])),
@@ -519,12 +521,78 @@ def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
             "memo": row["memo"] or "",
             "memo_updated_at": row["memo_updated_at"] or "",
         }
+    return progress
+
+
+def read_legacy_ai_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
+    ensure_progress_db(progress_db_path)
+    select_fields = ["card_id", *AI_PROGRESS_FIELDS]
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM card_progress").fetchall()
+    legacy: dict[str, dict[str, str]] = {}
+    for row in rows:
+        updates = {}
         for field in AI_PROGRESS_FIELDS:
             value = str(row[field] or "").strip()
             if value:
-                item[field] = value
-        progress[row["card_id"]] = item
-    return progress
+                updates[field] = value
+        if updates:
+            legacy[row["card_id"]] = updates
+    return legacy
+
+
+def clear_legacy_ai_progress(progress_db_path: Path, card_ids: list[str]) -> int:
+    normalized_ids = [str(card_id or "").strip() for card_id in card_ids if str(card_id or "").strip()]
+    if not normalized_ids:
+        return 0
+    ensure_progress_db(progress_db_path)
+    assignments = ", ".join(f"{field}=''" for field in AI_PROGRESS_FIELDS)
+    placeholders = ", ".join("?" for _ in normalized_ids)
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        before = conn.total_changes
+        conn.execute(
+            f"UPDATE card_progress SET {assignments} WHERE card_id IN ({placeholders})",
+            normalized_ids,
+        )
+        conn.commit()
+        return conn.total_changes - before
+
+
+def sync_legacy_ai_progress_to_csv(
+    csv_path: Path,
+    progress_db_path: Path,
+    rows: list[dict[str, str]] | None = None,
+    fieldnames: list[str] | None = None,
+) -> bool:
+    legacy = read_legacy_ai_progress(progress_db_path)
+    if not legacy:
+        return False
+    if rows is None or fieldnames is None:
+        rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
+    assert rows is not None
+    assert fieldnames is not None
+    writable_fields = list(fieldnames)
+    for field in AI_PROGRESS_FIELDS:
+        if field not in writable_fields:
+            writable_fields.append(field)
+    row_by_id = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
+    migrated_ids: list[str] = []
+    changed = False
+    for card_id, updates in legacy.items():
+        row = row_by_id.get(card_id)
+        if row is None:
+            continue
+        migrated_ids.append(card_id)
+        for field, value in updates.items():
+            normalized = normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
+            if str(row.get(field) or "") != normalized:
+                row[field] = normalized
+                changed = True
+    if changed:
+        write_cards(rows, writable_fields, csv_path)
+    if migrated_ids:
+        clear_legacy_ai_progress(progress_db_path, migrated_ids)
+    return changed
 
 
 def merge_progress(
@@ -560,50 +628,39 @@ def merge_progress(
 
 def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
     raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
-    clean_rows, _ = read_csv_cards(csv_path, keep_csv_progress=False)
     db_path = progress_db_for(csv_path, progress_db_path)
     ensure_progress_db(db_path, raw_rows)
+    if sync_legacy_ai_progress_to_csv(csv_path, db_path, rows=raw_rows, fieldnames=fieldnames):
+        raw_rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
+    clean_rows, _ = read_csv_cards(csv_path, keep_csv_progress=False)
     rows = merge_progress(clean_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
 
 
-def save_card_progress_overrides(
+def update_card_content_fields(
     card_id: str,
     updates: dict[str, str],
-    progress_db_path: Path,
-) -> bool:
-    effective_updates = {
-        field: normalized_card_text(value, limit=AI_PROGRESS_FIELD_LIMITS[field])
-        for field, value in updates.items()
-        if field in AI_PROGRESS_FIELDS and value is not None
-    }
-    if not effective_updates:
-        return False
-    ensure_progress_db(progress_db_path)
-    now = utc_now_iso()
-    assignments = ", ".join(f"{field}=?" for field in effective_updates)
-    values = list(effective_updates.values())
-    with closing(connect_progress_db(progress_db_path)) as conn:
-        conn.execute(
-            """
-            INSERT INTO card_progress (card_id, updated_at)
-            VALUES (?, ?)
-            ON CONFLICT(card_id) DO NOTHING
-            """,
-            (card_id, now),
-        )
-        before = conn.execute(
-            f"SELECT {', '.join(effective_updates.keys())} FROM card_progress WHERE card_id=?",
-            (card_id,),
-        ).fetchone()
-        changed = any(str((before[field] if before else "") or "") != value for field, value in effective_updates.items())
-        if changed:
-            conn.execute(
-                f"UPDATE card_progress SET {assignments}, updated_at=? WHERE card_id=?",
-                [*values, now, card_id],
-            )
-            conn.commit()
-    return changed
+    csv_path: Path = CSV_PATH,
+    backup_dir: Path = BACKUP_DIR,
+) -> tuple[dict[str, str], Path | None]:
+    rows, fieldnames = read_csv_cards(csv_path, keep_csv_progress=True)
+    writable_fields = list(fieldnames)
+    for field in AI_PROGRESS_FIELDS:
+        if field not in writable_fields:
+            writable_fields.append(field)
+    target = next((row for row in rows if row.get("id") == card_id), None)
+    if target is None:
+        raise KeyError(card_id)
+    changed = False
+    for field, value in updates.items():
+        normalized = normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
+        if str(target.get(field) or "") != normalized:
+            target[field] = normalized
+            changed = True
+    backup_path = backup_csv(csv_path, backup_dir) if changed else None
+    if changed:
+        write_cards(rows, writable_fields, csv_path)
+    return dict(target), backup_path
 
 
 def write_cards(rows: list[dict[str, str]], fieldnames: list[str], csv_path: Path = CSV_PATH) -> None:
@@ -755,7 +812,7 @@ AI_REWRITE_FIELD_LIMITS = {
     "exam_note": 20000,
     "concept_image_alt": 4000,
 }
-AI_PROGRESS_FIELD_LIMITS = {
+AI_CARD_FIELD_LIMITS = {
     **AI_REWRITE_FIELD_LIMITS,
     "concept_image_url": 4096,
 }
@@ -906,7 +963,6 @@ def update_card_ai_content(
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
-    del backup_dir
     db_path = progress_db_for(csv_path, progress_db_path)
     rows, _ = read_cards(csv_path, db_path)
     target = next((row for row in rows if row.get("id") == card_id), None)
@@ -925,12 +981,15 @@ def update_card_ai_content(
         normalized = normalized_card_text(value, limit=AI_REWRITE_FIELD_LIMITS[field])
         if str(target.get(field, "")) != normalized:
             changed_updates[field] = normalized
-    save_card_progress_overrides(card_id, changed_updates, db_path)
+    if not changed_updates:
+        return target, None
+    updated_row, backup_path = update_card_content_fields(card_id, changed_updates, csv_path, backup_dir)
+    clear_legacy_ai_progress(db_path, [card_id])
     updated_rows, _ = read_cards(csv_path, db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
-            return row, None
-    raise KeyError(card_id)
+            return row, backup_path
+    return updated_row, backup_path
 AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
 
 
@@ -1086,7 +1145,6 @@ def apply_ai_concept_image(
     image_dir: Path = AI_IMAGE_DIR,
     preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
 ) -> tuple[dict[str, str], Path | None, str]:
-    del backup_dir
     db_path = progress_db_for(csv_path, progress_db_path)
     rows, _ = read_cards(csv_path, db_path)
     target = next((row for row in rows if row.get("id") == card_id), None)
@@ -1102,11 +1160,13 @@ def apply_ai_concept_image(
     shutil.copy2(preview_path, final_path)
     next_url = f"/api/ai-images/{final_name}"
     next_alt = normalized_card_text(metadata.get("alt", concept_image_alt_text(target)), limit=4000)
-    save_card_progress_overrides(
+    updated_row, backup_path = update_card_content_fields(
         card_id,
         {"concept_image_url": next_url, "concept_image_alt": next_alt},
-        db_path,
+        csv_path,
+        backup_dir,
     )
+    clear_legacy_ai_progress(db_path, [card_id])
     try:
         preview_path.unlink(missing_ok=True)
         preview_path.with_suffix(".json").unlink(missing_ok=True)
@@ -1119,8 +1179,8 @@ def apply_ai_concept_image(
     updated_rows, _ = read_cards(csv_path, db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
-            return row, None, next_url
-    raise KeyError(card_id)
+            return row, backup_path, next_url
+    return updated_row, backup_path, next_url
 
 
 def discard_ai_concept_image_preview(
@@ -1648,6 +1708,278 @@ def attach_generated_question_bank_ids(
     payload["questions"] = questions
     payload["question_bank_saved"] = len(saved.get("items") or [])
     return payload
+
+BOK_QUESTION_BANK_PAGE_GLOB = "05-14-[0-9][0-9]-*.md"
+BOK_ANY_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
+BOK_NUMBERED_HEADING_RE = re.compile(r"^(#{2,6})\s+(\d+)\.\s+(.+?)\s*$")
+BOK_OPTION_LINE_RE = re.compile(r"^[A-E]\.\s+(.+?)\s*$")
+BOK_TITLE_PREFIX_RE = re.compile(r"^\d{2}-\d{2}-\d{2}\.\s*")
+BOK_YEAR_RE = re.compile(r"\b(20\d{2})\b")
+BOK_SUBJECTIVE_POINTS = 10
+BOK_ESSAY_POINTS = 20
+BOK_SUBJECTIVE_EXPECTED_SECONDS = 12 * 60
+BOK_ESSAY_EXPECTED_SECONDS = 54 * 60
+BOK_SUBJECTIVE_ANSWER_GUIDE = "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장"
+BOK_ESSAY_ANSWER_GUIDE = "정의 → 원리 → 비교 → 사례 → 금융IT 적용 → 결론 순으로 12~15문장"
+
+
+
+def clean_bok_question_bank_title(value: str) -> str:
+    return BOK_TITLE_PREFIX_RE.sub("", str(value or "").strip())
+
+
+
+def bok_question_bank_field_name(page_title: str) -> str:
+    title = str(page_title or "")
+    if "일반논술" in title:
+        return "일반논술"
+    if "전산논술" in title or "논술 (IT·컴퓨터공학)" in title:
+        return "전산논술"
+    if "전산학술" in title:
+        return "전산학술"
+    if "컴퓨터공학 학술" in title:
+        return "컴퓨터공학 학술"
+    return "한국은행"
+
+
+
+def bok_question_bank_source_pages(repo_dir: Path | None = None) -> list[Path]:
+    repo = wiki_book_dir(repo_dir)
+    pages = wiki_pages_dir(repo)
+    return sorted(path for path in pages.glob(BOK_QUESTION_BANK_PAGE_GLOB) if path.is_file())
+
+
+
+def bok_heading_stack_by_line(lines: list[str]) -> dict[int, list[tuple[int, str]]]:
+    stack: list[tuple[int, str]] = []
+    snapshots: dict[int, list[tuple[int, str]]] = {}
+    for index, line in enumerate(lines):
+        match = BOK_ANY_HEADING_RE.match(line)
+        if not match:
+            continue
+        level = len(match.group(1))
+        text = match.group(2).strip()
+        while stack and stack[-1][0] >= level:
+            stack.pop()
+        stack.append((level, text))
+        snapshots[index] = list(stack)
+    return snapshots
+
+
+
+def bok_fallback_topic(lines: list[str], page_title: str) -> str:
+    problem_index = next((index for index, line in enumerate(lines) if line.strip() == "### 문제"), None)
+    search_lines = lines[problem_index + 1 :] if problem_index is not None else lines
+    for line in search_lines:
+        heading_match = BOK_ANY_HEADING_RE.match(line)
+        if heading_match and len(heading_match.group(1)) >= 4:
+            return heading_match.group(2).strip()
+        stripped = line.strip()
+        if stripped.startswith("**") and stripped.endswith("**") and len(stripped) > 4:
+            return stripped[2:-2].strip()
+    for line in search_lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith(("#", ">", "!", "|", "-", "*")):
+            continue
+        if re.match(r"^\d+[.)]\s+", stripped):
+            continue
+        if any(keyword in stripped for keyword in ("하시오", "기술하시오", "논술하시오")):
+            return stripped
+    return page_title or "한국은행 문제"
+
+
+
+def bok_fallback_body_start(lines: list[str]) -> int:
+    first_h2 = next((index for index, line in enumerate(lines) if line.startswith("## ")), None)
+    return 0 if first_h2 is None else first_h2 + 1
+
+
+
+def bok_question_bank_choices(markdown_text: str) -> list[str]:
+    choices = [match.group(1).strip() for line in str(markdown_text or "").splitlines() if (match := BOK_OPTION_LINE_RE.match(line.strip()))]
+    return choices if len(choices) >= 2 else []
+
+
+
+def infer_bok_question_type(page_title: str, prompt: str, body: str, context_headings: list[str]) -> str:
+    title = str(page_title or "")
+    combined_context = "\n".join([title, prompt, body, *context_headings])
+    choices = bok_question_bank_choices(body)
+    if "논술" in title or "### 문제" in body or ("### 유의사항" in body and ("논술하시오" in combined_context or "기술하시오" in combined_context)):
+        return "essay"
+    if choices:
+        return "multiple_choice"
+    return "subjective"
+
+
+
+def bok_question_bank_section_name(field_name: str, question_type: str) -> str:
+    if field_name == "일반논술":
+        return "일반논술"
+    if question_type == "essay" or field_name == "전산논술":
+        return "전공논술"
+    return "전공필기"
+
+
+
+def bok_question_bank_points(question_type: str) -> int | None:
+    if question_type == "essay":
+        return BOK_ESSAY_POINTS
+    if question_type == "subjective":
+        return BOK_SUBJECTIVE_POINTS
+    return None
+
+
+
+def bok_question_bank_expected_seconds(question_type: str) -> int | None:
+    if question_type == "essay":
+        return BOK_ESSAY_EXPECTED_SECONDS
+    if question_type == "subjective":
+        return BOK_SUBJECTIVE_EXPECTED_SECONDS
+    return None
+
+
+
+def bok_question_bank_answer_guide(question_type: str) -> str:
+    if question_type == "essay":
+        return BOK_ESSAY_ANSWER_GUIDE
+    if question_type == "subjective":
+        return BOK_SUBJECTIVE_ANSWER_GUIDE
+    return ""
+
+
+
+def bok_question_bank_keywords(page_title: str, topic: str) -> list[str]:
+    keywords: list[str] = ["한국은행"]
+    year_match = BOK_YEAR_RE.search(page_title)
+    if year_match:
+        keywords.append(year_match.group(1))
+    field_name = bok_question_bank_field_name(page_title)
+    if field_name:
+        keywords.append(field_name)
+    if topic:
+        keywords.append(topic)
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for item in keywords:
+        normalized = str(item or "").strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        ordered.append(normalized)
+    return ordered
+
+
+
+def parse_bok_question_bank_entries(repo_dir: Path | None = None) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for source_path in bok_question_bank_source_pages(repo_dir):
+        text = source_path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+        if not lines:
+            continue
+        page_title = clean_bok_question_bank_title(extract_markdown_title(text, source_path.stem))
+        heading_snapshots = bok_heading_stack_by_line(lines)
+        numbered_headings: list[tuple[int, int, int, str]] = []
+        for index, line in enumerate(lines):
+            match = BOK_NUMBERED_HEADING_RE.match(line)
+            if not match:
+                continue
+            numbered_headings.append((index, len(match.group(1)), int(match.group(2)), match.group(3).strip()))
+        if numbered_headings:
+            major_level = min(level for _, level, _, _ in numbered_headings)
+            major_sections = [item for item in numbered_headings if item[1] == major_level]
+            for offset, (start_index, _level, question_no, topic) in enumerate(major_sections):
+                end_index = major_sections[offset + 1][0] if offset + 1 < len(major_sections) else len(lines)
+                prompt = lines[start_index].strip()
+                body = "\n".join(lines[start_index + 1 : end_index]).strip()
+                context_headings = [text for _, text in heading_snapshots.get(start_index, [])[:-1]]
+                question_type = infer_bok_question_type(page_title, prompt, body, context_headings)
+                field_name = bok_question_bank_field_name(page_title)
+                entries.append({
+                    "question_type": question_type,
+                    "prompt": prompt,
+                    "body": body,
+                    "answer": "",
+                    "explanation": "",
+                    "rubric": [],
+                    "choices": bok_question_bank_choices(body) if question_type == "multiple_choice" else [],
+                    "answer_index": None,
+                    "topic": topic,
+                    "field_name": field_name,
+                    "keywords": bok_question_bank_keywords(page_title, topic),
+                    "difficulty": "",
+                    "issuer": "한국은행",
+                    "source_location": f"{page_title} · {question_no}. {topic}" if topic else f"{page_title} · {question_no}",
+                    "section": bok_question_bank_section_name(field_name, question_type),
+                    "points": bok_question_bank_points(question_type),
+                    "expected_time_seconds": bok_question_bank_expected_seconds(question_type),
+                    "answer_guide": bok_question_bank_answer_guide(question_type),
+                    "session_mode": "bok",
+                })
+            continue
+        fallback_topic = bok_fallback_topic(lines, page_title)
+        body_start = bok_fallback_body_start(lines)
+        body = "\n".join(lines[body_start:]).strip()
+        question_type = infer_bok_question_type(page_title, f"### 1. {fallback_topic}", body, [])
+        field_name = bok_question_bank_field_name(page_title)
+        entries.append({
+            "question_type": question_type,
+            "prompt": f"### 1. {fallback_topic}",
+            "body": body,
+            "answer": "",
+            "explanation": "",
+            "rubric": [],
+            "choices": bok_question_bank_choices(body) if question_type == "multiple_choice" else [],
+            "answer_index": None,
+            "topic": fallback_topic,
+            "field_name": field_name,
+            "keywords": bok_question_bank_keywords(page_title, fallback_topic),
+            "difficulty": "",
+            "issuer": "한국은행",
+            "source_location": f"{page_title} · 1. {fallback_topic}" if fallback_topic else f"{page_title} · 1",
+            "section": bok_question_bank_section_name(field_name, question_type),
+            "points": bok_question_bank_points(question_type),
+            "expected_time_seconds": bok_question_bank_expected_seconds(question_type),
+            "answer_guide": bok_question_bank_answer_guide(question_type),
+            "session_mode": "bok",
+        })
+    return entries
+
+
+
+def clear_bok_question_bank_entries(
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> int:
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        count = int(conn.execute(
+            "SELECT COUNT(*) FROM question_bank WHERE issuer = ? AND session_mode = ?",
+            ("한국은행", "bok"),
+        ).fetchone()[0] or 0)
+        conn.execute(
+            "DELETE FROM question_bank WHERE issuer = ? AND session_mode = ?",
+            ("한국은행", "bok"),
+        )
+        conn.commit()
+    return count
+
+
+def sync_bok_question_bank_entries(
+    repo_dir: Path | None = None,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> dict[str, Any]:
+    entries = parse_bok_question_bank_entries(repo_dir)
+    saved = upsert_question_bank_entries(entries, csv_path, progress_db_path)
+    return {
+        "pages": len(bok_question_bank_source_pages(repo_dir)),
+        "count": saved.get("count", 0),
+        "items": saved.get("items", []),
+    }
+
 
 def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     if row is None:
