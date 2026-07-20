@@ -2699,7 +2699,6 @@ function selectCardFromFlashcardTable(cardId) {
     state.backPage = 0;
     renderCard();
     setMessage(`${card.term} 카드로 이동했습니다.`);
-    focusAppCard();
     return true;
   }
   return jumpToCard(card);
@@ -2916,7 +2915,6 @@ function renderFlashcardTableWindow() {
       const openerRef = window.opener;
       if (!row || !openerRef || openerRef.closed || typeof openerRef.__csFlashcardsSelectCardFromTable !== 'function') return;
       openerRef.__csFlashcardsSelectCardFromTable(row.dataset.rowCardId || '');
-      openerRef.focus();
     };
     document.addEventListener('click', (event) => {
       const openerRef = window.opener;
