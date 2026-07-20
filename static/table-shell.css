@@ -1,0 +1,223 @@
+:root {
+  color-scheme: light;
+  --cs-table-line: #d7d7d7;
+  --cs-table-text: #111111;
+  --cs-table-muted: #666666;
+  --cs-table-bg: #ffffff;
+  --cs-table-row: #f3f3f3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body.cs-table-page {
+  margin: 0;
+  background: var(--cs-table-bg);
+  color: var(--cs-table-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+}
+
+.cs-table-shell {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.cs-table-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cs-table-title {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cs-table-summary,
+.cs-table-hint,
+.cs-table-error {
+  margin: 0;
+  color: var(--cs-table-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.cs-table-error {
+  color: #9f1239;
+}
+
+.cs-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cs-table-button,
+.cs-table-control {
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--cs-table-line);
+  background: #ffffff;
+  color: inherit;
+  font: inherit;
+}
+
+.cs-table-button {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.cs-table-button-primary {
+  background: #111111;
+  border-color: #111111;
+  color: #ffffff;
+}
+
+.cs-table-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.cs-table-control {
+  width: 100%;
+}
+
+.cs-table-wrap {
+  overflow: auto;
+}
+
+.cs-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 12px;
+}
+
+.cs-table th,
+.cs-table td {
+  padding: 7px 9px;
+  border: 1px solid var(--cs-table-line);
+  text-align: left;
+  vertical-align: middle;
+  line-height: 1.35;
+}
+
+.cs-table th {
+  background: #fafafa;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.column-header {
+  cursor: grab;
+  user-select: none;
+}
+
+.column-header.dragging {
+  opacity: .45;
+}
+
+.column-header.drop-target {
+  background: #f0f0f0;
+}
+
+.cs-table tbody tr {
+  cursor: pointer;
+}
+
+.cs-table tbody tr:hover td,
+.cs-table tbody tr:focus-visible td,
+.cs-table tbody tr.current-row td,
+.cs-table tbody tr.active td {
+  background: var(--cs-table-row);
+}
+
+.cs-table tbody tr:focus-visible {
+  outline: none;
+}
+
+.term-cell {
+  font-weight: 600;
+}
+
+.bookmark-cell {
+  width: 42px;
+  text-align: center;
+}
+
+.table-action,
+.question-bank-row-trigger {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.table-action:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.bookmark-action {
+  width: 100%;
+  text-align: center;
+}
+
+.bookmark-action.active,
+.status-action.active {
+  font-weight: 700;
+}
+
+.status-actions {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.status-action.active {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.question-bank-row-trigger {
+  width: 100%;
+  text-align: left;
+}
+
+.question-bank-item-title {
+  display: block;
+  font-weight: 600;
+}
+
+.question-bank-item-preview {
+  display: block;
+  margin-top: 2px;
+  color: var(--cs-table-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.cs-table-empty {
+  margin: 0;
+  padding: 14px 10px;
+  border: 1px solid var(--cs-table-line);
+  color: var(--cs-table-muted);
+  font-size: 12px;
+}
+
+@media (max-width: 780px) {
+  .cs-table-shell {
+    padding: 8px;
+  }
+
+  .cs-table th,
+  .cs-table td {
+    padding: 6px 8px;
+  }
+}

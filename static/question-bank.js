@@ -1,5 +1,15 @@
 const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
+const QUESTION_BANK_COLUMN_ORDER_KEY = 'csQuestionBankTableColumnOrder:v1';
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
+const QUESTION_BANK_COLUMNS = [
+  {key: 'index', label: '#', width: '56px'},
+  {key: 'prompt', label: '문제', width: '36rem', cellClassName: 'term-cell'},
+  {key: 'type', label: '형식', width: '8.5rem'},
+  {key: 'topic', label: '문제유형', width: '12rem'},
+  {key: 'issuer', label: '기관', width: '9rem'},
+  {key: 'difficulty', label: '난이도', width: '7rem'},
+  {key: 'source', label: '출처', width: '13rem'},
+];
 const $ = (id) => document.getElementById(id);
 
 const bankState = {
@@ -11,12 +21,7 @@ const bankState = {
 };
 
 function escapeHtml(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+  return window.CSTableShell?.escapeHtml ? window.CSTableShell.escapeHtml(value) : String(value ?? '');
 }
 
 function markdownPreviewText(source) {
@@ -83,22 +88,8 @@ async function fetchEntries() {
   return res.json();
 }
 
-function renderTable() {
-  const summary = $('bankPageSummary');
-  const list = $('bankPageList');
-  const error = $('bankPageError');
-  if (!summary || !list || !error) return;
-  const total = Number(bankState.summary?.total || 0);
-  const returned = Number(bankState.summary?.returned || bankState.items.length || 0);
-  summary.textContent = bankState.loading
-    ? '문제은행을 불러오는 중입니다.'
-    : `총 ${total}문항 · 현재 ${returned}문항 · 표의 행을 누르면 해당 문제부터 풉니다.`;
-  error.textContent = bankState.error || '';
-  if (!bankState.items.length) {
-    list.innerHTML = '<tr><td colspan="7" class="question-bank-empty muted">조건에 맞는 문제가 없습니다.</td></tr>';
-    return;
-  }
-  list.innerHTML = bankState.items.map((item, index) => {
+function tableRows() {
+  return bankState.items.map((item, index) => {
     const active = bankState.selectedId && bankState.selectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
     const typeLabel = escapeHtml(questionTypeLabel(item));
@@ -107,8 +98,49 @@ function renderTable() {
     const difficulty = escapeHtml(item.difficulty || '');
     const source = escapeHtml(item.source_location || '');
     const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 96);
-    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}"><td class="question-bank-col-index">${index + 1}</td><td class="question-bank-col-title"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td><td class="question-bank-col-type">${typeLabel || '—'}</td><td class="question-bank-col-field">${topic || '—'}</td><td class="question-bank-col-issuer">${issuer || '—'}</td><td class="question-bank-col-difficulty">${difficulty || '—'}</td><td class="question-bank-col-source">${source || '—'}</td></tr>`;
-  }).join('');
+    return {
+      id: String(item.question_bank_id || index + 1),
+      className: active ? 'current-row active' : '',
+      cells: {
+        index: String(index + 1),
+        prompt: `<span class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</span>`,
+        type: typeLabel || '—',
+        topic: topic || '—',
+        issuer: issuer || '—',
+        difficulty: difficulty || '—',
+        source: source || '—',
+      },
+    };
+  });
+}
+
+function renderTable() {
+  const summary = $('bankPageSummary');
+  const mount = $('bankPageList');
+  const error = $('bankPageError');
+  if (!summary || !mount || !error || !window.CSTableShell) return;
+  const total = Number(bankState.summary?.total || 0);
+  const returned = Number(bankState.summary?.returned || bankState.items.length || 0);
+  summary.textContent = bankState.loading
+    ? '문제은행을 불러오는 중입니다.'
+    : `총 ${total}문항 · 현재 ${returned}문항 · 행 클릭 이동 · 열 제목 드래그로 순서 변경`;
+  error.textContent = bankState.error || '';
+  window.CSTableShell.renderTable(mount, {
+    columns: QUESTION_BANK_COLUMNS,
+    rows: tableRows(),
+    storageKey: QUESTION_BANK_COLUMN_ORDER_KEY,
+    tableMinWidth: '1100px',
+    emptyText: '조건에 맞는 문제가 없습니다.',
+    onRowActivate: (_row, index) => {
+      bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
+      renderTable();
+      launch(index);
+    },
+    onColumnMove: (sourceKey, targetKey) => {
+      window.CSTableShell.moveColumnOrder(QUESTION_BANK_COLUMN_ORDER_KEY, QUESTION_BANK_COLUMNS.map((column) => column.key), sourceKey, targetKey);
+      renderTable();
+    },
+  });
 }
 
 function launch(startIndex = 0) {
@@ -165,13 +197,4 @@ $('bankPageLaunchBtn')?.addEventListener('click', () => launch(0));
       loadQuestionBankPage().catch(() => {});
     }
   });
-});
-$('bankPageList')?.addEventListener('click', (event) => {
-  const row = event.target.closest('[data-question-bank-index]');
-  if (!row) return;
-  const index = Number.parseInt(row.dataset.questionBankIndex || '', 10);
-  if (!Number.isInteger(index)) return;
-  bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
-  renderTable();
-  launch(index);
 });

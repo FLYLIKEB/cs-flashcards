@@ -2911,20 +2911,27 @@ function renderFlashcardTableWindow() {
   const currentCardId = rows[state.index]?.id || '';
   const summaryText = flashcardTableSummaryText();
   const columnOrder = flashcardTableColumnOrder();
-  const headerHtml = columnOrder.map((key) => {
+  // Shared table shell owns draggable="true", data-column-key, dragstart, and drop-target header behavior.
+  const columns = columnOrder.map((key) => {
     const column = FLASHCARD_TABLE_COLUMNS[key];
-    const widthAttr = column.width ? ` style="width:${column.width}px;"` : '';
-    const classAttr = `column-header${column.className ? ` ${column.className}` : ''}`;
-    return `<th scope="col" class="${classAttr}"${widthAttr} draggable="true" data-column-key="${escapeHtml(key)}" title="드래그해서 열 위치 변경">${escapeHtml(column.label)}</th>`;
-  }).join('');
-  const rowsHtml = rows.length ? rows.map((card, index) => `
-    <tr class="${card.id === currentCardId ? 'current-row' : ''}" data-row-card-id="${escapeHtml(card.id)}" tabindex="0">
-      ${columnOrder.map((key) => {
-        const column = FLASHCARD_TABLE_COLUMNS[key];
-        return `<td${column.className ? ` class="${column.className}"` : ''}>${column.render(card, index)}</td>`;
-      }).join('')}
-    </tr>
-  `).join('') : '<p class="empty-state">현재 조건에 맞는 카드가 없습니다.</p>';
+    return {
+      key,
+      label: column.label,
+      width: column.width ? `${column.width}px` : '',
+      headerClassName: column.className || '',
+      cellClassName: column.className || '',
+    };
+  });
+  const popupConfig = {
+    columns,
+    rows: rows.map((card, index) => ({
+      id: card.id,
+      className: card.id === currentCardId ? 'current-row' : '',
+      attributes: {'data-row-card-id': card.id},
+      cells: Object.fromEntries(columnOrder.map((key) => [key, FLASHCARD_TABLE_COLUMNS[key].render(card, index)])),
+    })),
+  };
+  const popupConfigJson = JSON.stringify(popupConfig).replace(/</g, '\\u003c');
   try {
     popup.document.open();
     popup.document.write(`<!doctype html>
@@ -2933,45 +2940,20 @@ function renderFlashcardTableWindow() {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>플래시카드 표 목록</title>
-  <style>
-    :root { color-scheme: light; --line: #d7d7d7; --text: #111; --muted: #666; --bg: #fff; --row: #f3f3f3; }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; }
-    .shell { padding: 12px; }
-    .meta { margin: 0 0 8px; }
-    h1 { margin: 0 0 2px; font-size: 14px; font-weight: 700; }
-    .summary, .hint { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
-    .table-wrap { overflow: auto; }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
-    th, td { padding: 7px 9px; border: 1px solid var(--line); text-align: left; vertical-align: middle; line-height: 1.35; }
-    th { background: #fafafa; font-weight: 600; }
-    .column-header { cursor: grab; user-select: none; }
-    .column-header.dragging { opacity: .45; }
-    .column-header.drop-target { background: #f0f0f0; }
-    tbody tr { cursor: pointer; }
-    tbody tr:hover td, tbody tr:focus-visible td, tbody tr.current-row td { background: var(--row); }
-    tbody tr:focus-visible { outline: none; }
-    .term-cell { font-weight: 600; }
-    .bookmark-cell { width: 42px; text-align: center; }
-    .table-action { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; }
-    .table-action:disabled { opacity: .35; cursor: default; }
-    .bookmark-action { width: 100%; text-align: center; }
-    .bookmark-action.active, .status-action.active { font-weight: 700; }
-    .status-actions { display: inline-flex; gap: 5px; }
-    .status-action.active { text-decoration: underline; text-underline-offset: 2px; }
-    .empty-state { margin: 0; padding: 14px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-    @media (max-width: 780px) { .shell { padding: 8px; } th, td { padding: 6px 8px; } }
-  </style>
+  <link rel="stylesheet" href="/static/table-shell.css" />
 </head>
-<body>
-  <div class="shell">
-    <div class="meta">
-      <h1>플래시카드 표 목록</h1>
-      <p class="summary">${escapeHtml(summaryText)} · ${rows.length}개 · 현재 ${rows.length ? state.index + 1 : 0}</p>
-      <p class="hint">열 제목 드래그로 순서 변경 · 행 클릭 이동 · 별/O/X/– 바로 수정</p>
+<body class="cs-table-page">
+  <main class="cs-table-shell">
+    <div class="cs-table-meta">
+      <div>
+        <h1 class="cs-table-title">플래시카드 표 목록</h1>
+        <p class="summary cs-table-summary">${escapeHtml(summaryText)} · ${rows.length}개 · 현재 ${rows.length ? state.index + 1 : 0}</p>
+        <p class="hint cs-table-hint">열 제목 드래그로 순서 변경 · 행 클릭 이동 · 별/O/X/– 바로 수정</p>
+      </div>
     </div>
-    ${rows.length ? `<div class="table-wrap"><table><thead><tr>${headerHtml}</tr></thead><tbody>${rowsHtml}</tbody></table></div>` : rowsHtml}
-  </div>
+    <div id="flashcardTableMount"></div>
+  </main>
+  <script src="/static/table-shell.js"></script>
   <script>
     const invokeOpener = (callbackName, ...args) => {
       const openerRef = window.opener;
@@ -2984,66 +2966,37 @@ function renderFlashcardTableWindow() {
       }, 0);
       return true;
     };
-    const activateRow = (row) => {
-      if (!row) return;
-      try { row.focus({preventScroll: true}); } catch (_error) {}
-      invokeOpener('__csFlashcardsSelectCardFromTable', row.dataset.rowCardId || '');
-    };
-    document.addEventListener('click', (event) => {
-      const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
-      if (bookmarkButton) {
-        event.preventDefault();
-        invokeOpener('__csFlashcardsToggleBookmarkFromTable', bookmarkButton.dataset.bookmarkCardId || '');
-        return;
-      }
-      const statusButton = event.target.closest('[data-status-card-id]');
-      if (statusButton) {
-        event.preventDefault();
-        invokeOpener('__csFlashcardsSetStatusFromTable', statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
-        return;
-      }
-      const row = event.target.closest('[data-row-card-id]');
-      if (row) activateRow(row);
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.target.closest('button')) return;
-      const row = event.target.closest('[data-row-card-id]');
-      if (!row || (event.key !== 'Enter' && event.key !== ' ')) return;
-      event.preventDefault();
-      activateRow(row);
-    });
-    const headers = [...document.querySelectorAll('[data-column-key]')];
-    let draggingColumnKey = '';
-    headers.forEach((header) => {
-      header.addEventListener('dragstart', (event) => {
-        draggingColumnKey = header.dataset.columnKey || '';
-        header.classList.add('dragging');
-        if (event.dataTransfer) {
-          event.dataTransfer.effectAllowed = 'move';
-          event.dataTransfer.setData('text/plain', draggingColumnKey);
+    const config = ${popupConfigJson};
+    const mount = document.getElementById('flashcardTableMount');
+    window.CSTableShell.renderTable(mount, {
+      columns: config.columns,
+      rows: config.rows,
+      emptyText: '현재 조건에 맞는 카드가 없습니다.',
+      tableMinWidth: '720px',
+      onAction: (event) => {
+        const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
+        if (bookmarkButton) {
+          event.preventDefault();
+          invokeOpener('__csFlashcardsToggleBookmarkFromTable', bookmarkButton.dataset.bookmarkCardId || '');
+          return true;
         }
-      });
-      header.addEventListener('dragover', (event) => {
-        if (!draggingColumnKey || draggingColumnKey === (header.dataset.columnKey || '')) return;
-        event.preventDefault();
-        header.classList.add('drop-target');
-        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
-      });
-      header.addEventListener('dragleave', () => {
-        header.classList.remove('drop-target');
-      });
-      header.addEventListener('drop', (event) => {
-        event.preventDefault();
-        header.classList.remove('drop-target');
-        const targetKey = header.dataset.columnKey || '';
-        if (draggingColumnKey && targetKey && draggingColumnKey !== targetKey) {
-          invokeOpener('__csFlashcardsMoveTableColumn', draggingColumnKey, targetKey);
+        const statusButton = event.target.closest('[data-status-card-id]');
+        if (statusButton) {
+          event.preventDefault();
+          invokeOpener('__csFlashcardsSetStatusFromTable', statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
+          return true;
         }
-      });
-      header.addEventListener('dragend', () => {
-        draggingColumnKey = '';
-        headers.forEach((item) => item.classList.remove('dragging', 'drop-target'));
-      });
+        return false;
+      },
+      onRowActivate: (row) => {
+        invokeOpener('__csFlashcardsSelectCardFromTable', row?.attributes?.['data-row-card-id'] || row?.id || '');
+      },
+      onColumnMove: (sourceKey, targetKey) => {
+        invokeOpener('__csFlashcardsMoveTableColumn', sourceKey, targetKey);
+      },
+    });
+    window.addEventListener('beforeunload', () => {
+      invokeOpener('__csFlashcardsTableClosed');
     });
   </script>
 </body>
