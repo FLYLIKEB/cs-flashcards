@@ -164,7 +164,7 @@ python3 scripts/generate_concept_images.py --write-csv
 | 서술형 | `definition`, `detailed_explanation`, `exam_note` | 면접식 설명 연습 |
 | 논술형 | 관련 개념 비교와 채점 포인트 포함 | 긴 답안 구조화 |
 
-가져오기 형식은 JSON 배열 또는 `{"questions": [...]}` 객체입니다. 각 문항에는 최소 `question_type`, `prompt`, 그리고 현재 카드와 연결될 `card_id` 또는 `concept_term`/`term`이 필요합니다. 한은형 세트는 최상위 `session_mode: "bok"`와 문항별 `section`, `points`, `expected_time_minutes`, `answer_guide`를 함께 넣으면 화면과 기록에 그대로 반영됩니다. 예시는 다음과 같습니다.
+가져오기 형식은 JSON 배열 또는 `{"questions": [...]}` 객체입니다. 각 문항에는 최소 `question_type`, `prompt`, 그리고 현재 카드와 연결될 `card_id` 또는 `concept_term`/`term`이 필요합니다. 한은형 세트는 최상위 `session_mode: "bok"`와 문항별 `section`, `points`, `expected_time_minutes`, `answer_guide`를 함께 넣으면 화면과 기록에 그대로 반영됩니다. 이제 가져온 문제와 생성 문제는 모두 같은 SQLite DB 안의 `question_bank` 테이블에도 저장되며, 문제 본문/정답 외에 `topic`(예: 데이터베이스), `field_name`(예: 전산학술), `keywords`, `difficulty`, `issuer`, `source_location` 같은 출제 메타데이터를 함께 보존합니다. 예시는 다음과 같습니다.
 
 ```json
 {
@@ -175,6 +175,12 @@ python3 scripts/generate_concept_images.py --write-csv
     {
       "concept_term": "교착상태",
       "question_type": "subjective",
+      "topic": "운영체제",
+      "field_name": "전공필기",
+      "keywords": ["교착상태", "상호배제", "환형대기"],
+      "difficulty": "중",
+      "issuer": "한국은행",
+      "source_location": "2013년 학술파트 1",
       "section": "전공필기",
       "points": 10,
       "expected_time_minutes": 12,
@@ -188,7 +194,7 @@ python3 scripts/generate_concept_images.py --write-csv
 }
 ```
 
-백엔드 API는 `/api/questions/generate`이며, 생성형 문제는 CSV 원본을 수정하지 않고 즉석 생성합니다. `AI 검색` 버튼은 선택한 문제 유형과 문제 수를 바탕으로 현재 필터된 카드 개념명 목록을 Google AI 검색 프롬프트로 열어 외부 AI 퀴즈 생성도 바로 요청할 수 있게 합니다. 객관식/주관식/서술형/논술형 모두 `정답/해설 보기` 뒤 `맞음 저장`/`애매함 저장`/`틀림 저장`/`모름 저장`으로 자가 채점할 수 있고, 오답노트를 남길 수 있으며, 문제 시도 이력은 같은 SQLite DB 안의 별도 테이블에 저장됩니다.
+백엔드 API는 `/api/questions/generate`이며, 생성형 문제는 CSV 원본을 수정하지 않고 즉석 생성합니다. `/api/question-bank`는 문제은행 저장/조회용 엔드포인트로, 생성/가져오기 문제를 DB에 적재할 때 사용합니다. `AI 검색` 버튼은 선택한 문제 유형과 문제 수를 바탕으로 현재 필터된 카드 개념명 목록을 Google AI 검색 프롬프트로 열어 외부 AI 퀴즈 생성도 바로 요청할 수 있게 합니다. 객관식/주관식/서술형/논술형 모두 `정답/해설 보기` 뒤 `맞음 저장`/`애매함 저장`/`틀림 저장`/`모름 저장`으로 자가 채점할 수 있고, 오답노트를 남길 수 있으며, 문제 시도 이력은 같은 SQLite DB 안의 별도 테이블에 저장됩니다.
 
 ## 내용을 수정하고 반영하기
 

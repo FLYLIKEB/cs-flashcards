@@ -3003,6 +3003,12 @@ function buildImportedQuestions(rawQuestions) {
     const explanation = String(rawQuestion.explanation ?? rawQuestion.commentary ?? rawQuestion.finance_it_application ?? '').trim();
     const rubric = normalizeImportedStringArray(rawQuestion.rubric ?? rawQuestion.scoring_points ?? rawQuestion.grading_points ?? rawQuestion.trap_points);
     const choices = type === 'multiple_choice' ? normalizeImportedStringArray(rawQuestion.choices ?? rawQuestion.options) : [];
+    const topic = String(rawQuestion.topic ?? rawQuestion.question_topic ?? rawQuestion.problem_type ?? rawQuestion.subject ?? rawQuestion.category ?? card.category ?? '').trim();
+    const fieldName = String(rawQuestion.field_name ?? rawQuestion.field ?? rawQuestion.domain ?? rawQuestion.area ?? '').trim();
+    const keywords = normalizeImportedStringArray(rawQuestion.keywords ?? rawQuestion.keyword ?? rawQuestion.tags ?? rawQuestion.tag_list);
+    const difficulty = String(rawQuestion.difficulty ?? rawQuestion.level ?? '').trim();
+    const issuer = String(rawQuestion.issuer ?? rawQuestion.organization ?? rawQuestion.exam_org ?? rawQuestion.bank ?? '').trim();
+    const sourceLocation = String(rawQuestion.source_location ?? rawQuestion.source ?? rawQuestion.exam_source ?? rawQuestion.reference ?? '').trim();
     const section = String(rawQuestion.section ?? rawQuestion.exam_section ?? rawQuestion.part ?? '').trim();
     const pointsValue = Number.parseInt(rawQuestion.points ?? rawQuestion.score ?? rawQuestion.weight ?? '', 10);
     const expectedMinutes = Number.parseInt(rawQuestion.expected_time_minutes ?? rawQuestion.estimated_minutes ?? rawQuestion.recommended_minutes ?? '', 10);
@@ -3015,11 +3021,18 @@ function buildImportedQuestions(rawQuestions) {
     }
     return {
       id: `import-${Date.now()}-${index + 1}`,
+      questionBankId: String(rawQuestion.question_bank_id ?? rawQuestion.questionBankId ?? '').trim(),
       card_id: card.id,
       type,
       type_label: QUESTION_TYPE_LABELS[type],
       term: String(rawQuestion.concept_term || rawQuestion.term || card.term || card.english || card.id || '').trim(),
-      category: String(rawQuestion.subject || rawQuestion.category || card.category || '').trim(),
+      category: topic || String(card.category || '').trim(),
+      topic,
+      fieldName,
+      keywords,
+      difficulty,
+      issuer,
+      sourceLocation,
       prompt,
       body,
       answer,
@@ -3039,11 +3052,73 @@ function buildImportedQuestions(rawQuestions) {
   });
 }
 
-function importQuestionsFromText() {
+function questionBankEntryPayload(question) {
+  const current = hydrateQuestionState({...question});
+  if (!current) return null;
+  return {
+    question_bank_id: current.questionBankId || '',
+    card_id: current.card_id || '',
+    question_type: current.type || '',
+    prompt: current.prompt || '',
+    body: current.body || '',
+    answer: current.answer || '',
+    explanation: current.explanation || '',
+    rubric: Array.isArray(current.rubric) ? current.rubric : [],
+    choices: Array.isArray(current.choices) ? current.choices : [],
+    answer_index: Number.isInteger(current.answer_index) ? current.answer_index : null,
+    topic: current.topic || current.category || '',
+    field_name: current.fieldName || current.field_name || '',
+    keywords: Array.isArray(current.keywords) ? current.keywords : [],
+    difficulty: current.difficulty || '',
+    issuer: current.issuer || '',
+    source_location: current.sourceLocation || current.source_location || '',
+    section: current.section || '',
+    points: Number.isInteger(current.points) ? current.points : null,
+    expected_time_seconds: Number.isInteger(current.expectedTimeSeconds) ? current.expectedTimeSeconds : null,
+    answer_guide: current.answerGuide || '',
+    session_mode: current.sessionMode || 'practice',
+  };
+}
+
+async function persistQuestionBankEntries(questions) {
+  const payload = {
+    questions: questions.map((question) => questionBankEntryPayload(question)).filter(Boolean),
+  };
+  if (!payload.questions.length) return {items: [], count: 0};
+  const res = await fetch('/api/question-bank', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function mergeQuestionBankEntries(questions, savedItems) {
+  return questions.map((question, index) => {
+    const stored = savedItems[index] || {};
+    return {
+      ...question,
+      questionBankId: String(stored.question_bank_id || question.questionBankId || question.question_bank_id || ''),
+      topic: String(stored.topic || question.topic || question.category || ''),
+      fieldName: String(stored.field_name || question.fieldName || question.field_name || ''),
+      keywords: Array.isArray(stored.keywords) ? stored.keywords : Array.isArray(question.keywords) ? question.keywords : [],
+      difficulty: String(stored.difficulty || question.difficulty || ''),
+      issuer: String(stored.issuer || question.issuer || ''),
+      sourceLocation: String(stored.source_location || question.sourceLocation || question.source_location || ''),
+    };
+  });
+}
+
+async function importQuestionsFromText() {
   if (state.questionLoading || state.questionSaving) return;
+  state.questionLoading = true;
+  renderQuestionPanel();
   try {
     const payload = importedQuestionSetPayload($('questionImportInput')?.value || '');
-    const questions = buildImportedQuestions(payload.questions);
+    const parsedQuestions = buildImportedQuestions(payload.questions);
+    const saved = await persistQuestionBankEntries(parsedQuestions);
+    const questions = mergeQuestionBankEntries(parsedQuestions, saved.items || []);
     syncQuestionSessionModeSelect(payload.sessionMode);
     if (Number.isFinite(payload.timeLimitSeconds) && payload.timeLimitSeconds >= 0) {
       syncQuestionTimeLimitSelect(payload.timeLimitSeconds);
@@ -3061,6 +3136,9 @@ function importQuestionsFromText() {
     setMessage(`가져온 모의 세트 ${questions.length}문항을 불러왔습니다.`);
   } catch (error) {
     setQuestionImportError(error.message || String(error));
+  } finally {
+    state.questionLoading = false;
+    renderQuestionPanel();
   }
 }
 
@@ -3087,6 +3165,13 @@ function hydrateQuestionState(question) {
   if (!Number.isInteger(question.points)) question.points = null;
   if (!Number.isInteger(question.expectedTimeSeconds)) question.expectedTimeSeconds = null;
   if (typeof question.answerGuide !== 'string') question.answerGuide = '';
+  if (typeof question.questionBankId !== 'string') question.questionBankId = String(question.question_bank_id || '');
+  if (typeof question.topic !== 'string') question.topic = String(question.category || '');
+  if (typeof question.fieldName !== 'string') question.fieldName = String(question.field_name || '');
+  if (!Array.isArray(question.keywords)) question.keywords = [];
+  if (typeof question.difficulty !== 'string') question.difficulty = '';
+  if (typeof question.issuer !== 'string') question.issuer = '';
+  if (typeof question.sourceLocation !== 'string') question.sourceLocation = String(question.source_location || '');
   if (!Number.isFinite(question.questionActiveSinceMs)) question.questionActiveSinceMs = 0;
   return question;
 }
@@ -3317,6 +3402,7 @@ function questionAttemptPayload(question) {
   if (!current) return null;
   return {
     question_id: current.id,
+    question_bank_id: current.questionBankId || current.question_bank_id || '',
     card_id: current.card_id,
     question_type: current.type,
     prompt: current.prompt || '',

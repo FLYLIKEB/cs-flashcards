@@ -99,8 +99,38 @@ class QuestionGenerateRequest(BaseModel):
     count: int = Field(default=10, ge=1, le=100)
     seed: int | None = None
 
+
+class QuestionBankEntryRequest(BaseModel):
+    question_bank_id: str | None = Field(default=None, max_length=255)
+    card_id: str | None = Field(default=None, max_length=255)
+    question_type: str = Field(min_length=1, max_length=64)
+    prompt: str = Field(min_length=1, max_length=4000)
+    body: str = Field(default="", max_length=12000)
+    answer: str = Field(default="", max_length=20000)
+    explanation: str = Field(default="", max_length=50000)
+    rubric: list[str] = Field(default_factory=list)
+    choices: list[str] = Field(default_factory=list)
+    answer_index: int | None = Field(default=None, ge=0, le=100)
+    topic: str = Field(default="", max_length=255)
+    field_name: str = Field(default="", max_length=255)
+    keywords: list[str] = Field(default_factory=list)
+    difficulty: str = Field(default="", max_length=64)
+    issuer: str = Field(default="", max_length=255)
+    source_location: str = Field(default="", max_length=255)
+    section: str = Field(default="", max_length=64)
+    points: int | None = Field(default=None, ge=0, le=1000)
+    expected_time_seconds: int | None = Field(default=None, ge=0, le=86400)
+    answer_guide: str = Field(default="", max_length=255)
+    session_mode: str = Field(default="practice", max_length=32)
+
+
+class QuestionBankUpsertRequest(BaseModel):
+    questions: list[QuestionBankEntryRequest] = Field(min_length=1, max_length=500)
+
+
 class QuestionAttemptRequest(BaseModel):
     question_id: str = Field(min_length=1, max_length=255)
+    question_bank_id: str | None = Field(default=None, max_length=255)
     card_id: str = Field(min_length=1, max_length=255)
     question_type: str = Field(min_length=1, max_length=64)
     prompt: str = Field(default="", max_length=4000)
@@ -123,7 +153,6 @@ class QuestionAttemptRequest(BaseModel):
     time_limit_seconds: int | None = Field(default=None, ge=0, le=86400)
     question_started_at: str = Field(default="", max_length=64)
     answered_at: str = Field(default="", max_length=64)
-
 
 class WikiChecklistRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
@@ -318,8 +347,76 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_bookmarked ON card_progress(bookmarked)")
         conn.execute(
             """
+            CREATE TABLE IF NOT EXISTS question_bank (
+                id TEXT PRIMARY KEY,
+                fingerprint TEXT NOT NULL UNIQUE,
+                card_id TEXT,
+                question_type TEXT NOT NULL,
+                prompt TEXT NOT NULL DEFAULT '',
+                body TEXT NOT NULL DEFAULT '',
+                answer TEXT NOT NULL DEFAULT '',
+                explanation TEXT NOT NULL DEFAULT '',
+                rubric_json TEXT NOT NULL DEFAULT '[]',
+                choices_json TEXT NOT NULL DEFAULT '[]',
+                answer_index INTEGER,
+                topic TEXT NOT NULL DEFAULT '',
+                field_name TEXT NOT NULL DEFAULT '',
+                keywords_json TEXT NOT NULL DEFAULT '[]',
+                difficulty TEXT NOT NULL DEFAULT '',
+                issuer TEXT NOT NULL DEFAULT '',
+                source_location TEXT NOT NULL DEFAULT '',
+                section TEXT NOT NULL DEFAULT '',
+                points INTEGER,
+                expected_time_seconds INTEGER,
+                answer_guide TEXT NOT NULL DEFAULT '',
+                session_mode TEXT NOT NULL DEFAULT 'practice',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE SET NULL
+            )
+            """
+        )
+        question_bank_columns = {row["name"] for row in conn.execute("PRAGMA table_info(question_bank)").fetchall()}
+        question_bank_column_definitions = {
+            "fingerprint": "TEXT NOT NULL DEFAULT ''",
+            "card_id": "TEXT",
+            "question_type": "TEXT NOT NULL DEFAULT ''",
+            "prompt": "TEXT NOT NULL DEFAULT ''",
+            "body": "TEXT NOT NULL DEFAULT ''",
+            "answer": "TEXT NOT NULL DEFAULT ''",
+            "explanation": "TEXT NOT NULL DEFAULT ''",
+            "rubric_json": "TEXT NOT NULL DEFAULT '[]'",
+            "choices_json": "TEXT NOT NULL DEFAULT '[]'",
+            "answer_index": "INTEGER",
+            "topic": "TEXT NOT NULL DEFAULT ''",
+            "field_name": "TEXT NOT NULL DEFAULT ''",
+            "keywords_json": "TEXT NOT NULL DEFAULT '[]'",
+            "difficulty": "TEXT NOT NULL DEFAULT ''",
+            "issuer": "TEXT NOT NULL DEFAULT ''",
+            "source_location": "TEXT NOT NULL DEFAULT ''",
+            "section": "TEXT NOT NULL DEFAULT ''",
+            "points": "INTEGER",
+            "expected_time_seconds": "INTEGER",
+            "answer_guide": "TEXT NOT NULL DEFAULT ''",
+            "session_mode": "TEXT NOT NULL DEFAULT 'practice'",
+            "created_at": "TEXT NOT NULL DEFAULT ''",
+            "updated_at": "TEXT NOT NULL DEFAULT ''",
+        }
+        for column, definition in question_bank_column_definitions.items():
+            if column not in question_bank_columns:
+                conn.execute(f"ALTER TABLE question_bank ADD COLUMN {column} {definition}")
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_question_bank_fingerprint ON question_bank(fingerprint)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_card_id ON question_bank(card_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_type ON question_bank(question_type)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_topic ON question_bank(topic)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_field_name ON question_bank(field_name)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_issuer ON question_bank(issuer)")
+
+        conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS question_attempts (
                 question_id TEXT PRIMARY KEY,
+                question_bank_id TEXT,
                 card_id TEXT NOT NULL,
                 question_type TEXT NOT NULL,
                 prompt TEXT NOT NULL DEFAULT '',
@@ -344,12 +441,14 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 answered_at TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
-                FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE
+                FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE,
+                FOREIGN KEY(question_bank_id) REFERENCES question_bank(id) ON DELETE SET NULL
             )
             """
         )
         question_columns = {row["name"] for row in conn.execute("PRAGMA table_info(question_attempts)").fetchall()}
         question_column_definitions = {
+            "question_bank_id": "TEXT",
             "judgment": "TEXT NOT NULL DEFAULT 'pending'",
             "session_id": "TEXT NOT NULL DEFAULT ''",
             "session_title": "TEXT NOT NULL DEFAULT ''",
@@ -369,6 +468,7 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
             if column not in question_columns:
                 conn.execute(f"ALTER TABLE question_attempts ADD COLUMN {column} {definition}")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_card_id ON question_attempts(card_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_bank_id ON question_attempts(question_bank_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
 
@@ -1086,6 +1186,379 @@ def normalize_question_attempt_judgment(value: str | None, is_correct: bool | No
     return normalized
 
 
+
+def normalize_question_bank_text(value: Any, *, limit: int) -> str:
+    return re.sub(r"\s+", " ", str(value or "")).strip()[:limit]
+
+
+def normalize_question_bank_list(values: Any, *, item_limit: int = 255) -> list[str]:
+    raw_items: list[Any]
+    if isinstance(values, (list, tuple, set)):
+        raw_items = list(values)
+    elif values is None:
+        raw_items = []
+    else:
+        raw_items = [values]
+    seen: set[str] = set()
+    normalized: list[str] = []
+    for value in raw_items:
+        text = normalize_question_bank_text(value, limit=item_limit)
+        if not text:
+            continue
+        key = text.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        normalized.append(text)
+    return normalized
+
+
+def question_bank_json_text(values: Any, *, item_limit: int = 255) -> str:
+    return json.dumps(normalize_question_bank_list(values, item_limit=item_limit), ensure_ascii=False)
+
+
+
+def question_bank_json_list(value: Any) -> list[str]:
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            parsed = []
+    else:
+        parsed = value
+    return normalize_question_bank_list(parsed)
+
+
+def question_bank_keywords_for_card(card: dict[str, Any]) -> list[str]:
+    related = re.split(r"\[\[|\]\]|[,;/\n]", str(card.get("related_concepts") or ""))
+    return normalize_question_bank_list([
+        card.get("term") or "",
+        card.get("english") or "",
+        *related,
+    ])
+
+
+def question_bank_fingerprint(entry: dict[str, Any]) -> str:
+    canonical = {
+        "card_id": entry["card_id"],
+        "question_type": entry["question_type"],
+        "prompt": entry["prompt"],
+        "body": entry["body"],
+        "answer": entry["answer"],
+        "explanation": entry["explanation"],
+        "rubric": entry["rubric"],
+        "choices": entry["choices"],
+        "answer_index": entry["answer_index"],
+        "topic": entry["topic"],
+        "field_name": entry["field_name"],
+        "keywords": entry["keywords"],
+        "difficulty": entry["difficulty"],
+        "issuer": entry["issuer"],
+        "source_location": entry["source_location"],
+        "section": entry["section"],
+        "points": entry["points"],
+        "expected_time_seconds": entry["expected_time_seconds"],
+        "answer_guide": entry["answer_guide"],
+        "session_mode": entry["session_mode"],
+    }
+    encoded = json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def normalize_question_bank_entry(
+    payload: QuestionBankEntryRequest | dict[str, Any],
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> dict[str, Any]:
+    raw = payload.model_dump() if isinstance(payload, BaseModel) else dict(payload or {})
+    question_type = str(raw.get("question_type") or "").strip().lower()
+    if question_type not in SUPPORTED_QUESTION_TYPES:
+        raise ValueError(f"Unsupported question type: {raw.get('question_type')}")
+    prompt = normalize_question_bank_text(raw.get("prompt"), limit=4000)
+    if not prompt:
+        raise ValueError("question prompt is required")
+    card_id = normalize_question_bank_text(raw.get("card_id"), limit=255)
+    if card_id:
+        _ensure_card_exists(card_id, csv_path, progress_db_path)
+    choices = normalize_question_bank_list(raw.get("choices"), item_limit=2000)
+    answer_index = raw.get("answer_index")
+    if answer_index is not None:
+        answer_index = int(answer_index)
+        if answer_index < 0 or answer_index > 100:
+            raise ValueError(f"Invalid answer_index: {answer_index}")
+    if question_type == "multiple_choice" and answer_index is not None and answer_index >= len(choices):
+        raise ValueError("Multiple-choice answer_index must point to an existing choice")
+    normalized = {
+        "question_bank_id": normalize_question_bank_text(raw.get("question_bank_id"), limit=255),
+        "card_id": card_id,
+        "question_type": question_type,
+        "prompt": prompt,
+        "body": normalize_question_bank_text(raw.get("body"), limit=12000),
+        "answer": normalize_question_bank_text(raw.get("answer"), limit=20000),
+        "explanation": normalize_question_bank_text(raw.get("explanation"), limit=50000),
+        "rubric": normalize_question_bank_list(raw.get("rubric"), item_limit=2000),
+        "choices": choices,
+        "answer_index": answer_index,
+        "topic": normalize_question_bank_text(raw.get("topic"), limit=255),
+        "field_name": normalize_question_bank_text(raw.get("field_name"), limit=255),
+        "keywords": normalize_question_bank_list(raw.get("keywords"), item_limit=255),
+        "difficulty": normalize_question_bank_text(raw.get("difficulty"), limit=64),
+        "issuer": normalize_question_bank_text(raw.get("issuer"), limit=255),
+        "source_location": normalize_question_bank_text(raw.get("source_location"), limit=255),
+        "section": normalize_question_bank_text(raw.get("section"), limit=64),
+        "points": raw.get("points"),
+        "expected_time_seconds": raw.get("expected_time_seconds"),
+        "answer_guide": normalize_question_bank_text(raw.get("answer_guide"), limit=255),
+        "session_mode": normalize_question_bank_text(raw.get("session_mode") or "practice", limit=32) or "practice",
+    }
+    normalized["fingerprint"] = question_bank_fingerprint(normalized)
+    normalized["question_bank_id"] = normalized["question_bank_id"] or f"qb-{normalized['fingerprint'][:24]}"
+    return normalized
+
+
+def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
+    if row is None:
+        return None
+    return {
+        "question_bank_id": row["id"],
+        "card_id": row["card_id"] or "",
+        "question_type": row["question_type"] or "",
+        "prompt": row["prompt"] or "",
+        "body": row["body"] or "",
+        "answer": row["answer"] or "",
+        "explanation": row["explanation"] or "",
+        "rubric": question_bank_json_list(row["rubric_json"] if "rubric_json" in row.keys() else "[]"),
+        "choices": question_bank_json_list(row["choices_json"] if "choices_json" in row.keys() else "[]"),
+        "answer_index": row["answer_index"] if "answer_index" in row.keys() else None,
+        "topic": row["topic"] if "topic" in row.keys() else "",
+        "field_name": row["field_name"] if "field_name" in row.keys() else "",
+        "keywords": question_bank_json_list(row["keywords_json"] if "keywords_json" in row.keys() else "[]"),
+        "difficulty": row["difficulty"] if "difficulty" in row.keys() else "",
+        "issuer": row["issuer"] if "issuer" in row.keys() else "",
+        "source_location": row["source_location"] if "source_location" in row.keys() else "",
+        "section": row["section"] if "section" in row.keys() else "",
+        "points": row["points"] if "points" in row.keys() else None,
+        "expected_time_seconds": row["expected_time_seconds"] if "expected_time_seconds" in row.keys() else None,
+        "answer_guide": row["answer_guide"] if "answer_guide" in row.keys() else "",
+        "session_mode": row["session_mode"] if "session_mode" in row.keys() else "practice",
+        "created_at": row["created_at"] if "created_at" in row.keys() else "",
+        "updated_at": row["updated_at"] if "updated_at" in row.keys() else "",
+    }
+
+
+def upsert_question_bank_entries(
+    entries: list[QuestionBankEntryRequest | dict[str, Any]],
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> dict[str, Any]:
+    normalized_entries = [normalize_question_bank_entry(entry, csv_path, progress_db_path) for entry in entries]
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    saved_items: list[dict[str, Any]] = []
+    with closing(connect_progress_db(db_path)) as conn:
+        for entry in normalized_entries:
+            existing = conn.execute(
+                "SELECT id, created_at FROM question_bank WHERE fingerprint = ?",
+                (entry["fingerprint"],),
+            ).fetchone()
+            now = utc_now_iso()
+            if entry["card_id"]:
+                conn.execute(
+                    """
+                    INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+                    VALUES (?, '', '', 0, 0, '', '', ?)
+                    ON CONFLICT(card_id) DO NOTHING
+                    """,
+                    (entry["card_id"], now),
+                )
+            conn.execute(
+                """
+                INSERT INTO question_bank (
+                    id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
+                    rubric_json, choices_json, answer_index, topic, field_name, keywords_json,
+                    difficulty, issuer, source_location, section, points, expected_time_seconds,
+                    answer_guide, session_mode, created_at, updated_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(fingerprint) DO UPDATE SET
+                    card_id = excluded.card_id,
+                    question_type = excluded.question_type,
+                    prompt = excluded.prompt,
+                    body = excluded.body,
+                    answer = excluded.answer,
+                    explanation = excluded.explanation,
+                    rubric_json = excluded.rubric_json,
+                    choices_json = excluded.choices_json,
+                    answer_index = excluded.answer_index,
+                    topic = excluded.topic,
+                    field_name = excluded.field_name,
+                    keywords_json = excluded.keywords_json,
+                    difficulty = excluded.difficulty,
+                    issuer = excluded.issuer,
+                    source_location = excluded.source_location,
+                    section = excluded.section,
+                    points = excluded.points,
+                    expected_time_seconds = excluded.expected_time_seconds,
+                    answer_guide = excluded.answer_guide,
+                    session_mode = excluded.session_mode,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    entry["question_bank_id"],
+                    entry["fingerprint"],
+                    entry["card_id"] or None,
+                    entry["question_type"],
+                    entry["prompt"],
+                    entry["body"],
+                    entry["answer"],
+                    entry["explanation"],
+                    question_bank_json_text(entry["rubric"], item_limit=2000),
+                    question_bank_json_text(entry["choices"], item_limit=2000),
+                    entry["answer_index"],
+                    entry["topic"],
+                    entry["field_name"],
+                    question_bank_json_text(entry["keywords"], item_limit=255),
+                    entry["difficulty"],
+                    entry["issuer"],
+                    entry["source_location"],
+                    entry["section"],
+                    entry["points"],
+                    entry["expected_time_seconds"],
+                    entry["answer_guide"],
+                    entry["session_mode"],
+                    existing["created_at"] if existing else now,
+                    now,
+                ),
+            )
+            saved = conn.execute(
+                """
+                SELECT id, card_id, question_type, prompt, body, answer, explanation,
+                       rubric_json, choices_json, answer_index, topic, field_name, keywords_json,
+                       difficulty, issuer, source_location, section, points, expected_time_seconds,
+                       answer_guide, session_mode, created_at, updated_at
+                FROM question_bank
+                WHERE fingerprint = ?
+                """,
+                (entry["fingerprint"],),
+            ).fetchone()
+            saved_items.append(question_bank_row_to_dict(saved) or {})
+        conn.commit()
+    return {
+        "items": saved_items,
+        "count": len(saved_items),
+    }
+
+
+def read_question_bank_entries(
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+    *,
+    card_id: str = "",
+    question_type: str = "",
+    topic: str = "",
+    field_name: str = "",
+    issuer: str = "",
+    source_location: str = "",
+    limit: int = 200,
+) -> dict[str, Any]:
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    safe_limit = max(1, min(int(limit or 200), 500))
+    filters = {
+        "card_id": normalize_question_bank_text(card_id, limit=255),
+        "question_type": normalize_question_bank_text(question_type, limit=64).lower(),
+        "topic": normalize_question_bank_text(topic, limit=255),
+        "field_name": normalize_question_bank_text(field_name, limit=255),
+        "issuer": normalize_question_bank_text(issuer, limit=255),
+        "source_location": normalize_question_bank_text(source_location, limit=255),
+    }
+    where_clauses: list[str] = []
+    params: list[Any] = []
+    for column, value in filters.items():
+        if not value:
+            continue
+        where_clauses.append(f"{column} = ?")
+        params.append(value)
+    where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    with closing(connect_progress_db(db_path)) as conn:
+        total_row = conn.execute(
+            f"SELECT COUNT(*) AS total_count FROM question_bank {where_sql}",
+            tuple(params),
+        ).fetchone()
+        rows = conn.execute(
+            f"""
+            SELECT id, card_id, question_type, prompt, body, answer, explanation,
+                   rubric_json, choices_json, answer_index, topic, field_name, keywords_json,
+                   difficulty, issuer, source_location, section, points, expected_time_seconds,
+                   answer_guide, session_mode, created_at, updated_at
+            FROM question_bank
+            {where_sql}
+            ORDER BY updated_at DESC, created_at DESC, id DESC
+            LIMIT ?
+            """,
+            tuple(params + [safe_limit]),
+        ).fetchall()
+    items = [question_bank_row_to_dict(row) or {} for row in rows]
+    return {
+        "items": items,
+        "summary": {
+            "total": int(total_row["total_count"] or 0) if total_row else 0,
+            "returned": len(items),
+            "limit": safe_limit,
+            **filters,
+        },
+    }
+
+
+def generated_question_bank_entry(question: dict[str, Any], card: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "card_id": question.get("card_id") or card.get("id") or "",
+        "question_type": question.get("type") or "",
+        "prompt": question.get("prompt") or "",
+        "body": question.get("body") or "",
+        "answer": question.get("answer") or "",
+        "explanation": question.get("explanation") or "",
+        "rubric": question.get("rubric") or [],
+        "choices": question.get("choices") or [],
+        "answer_index": question.get("answer_index") if isinstance(question.get("answer_index"), int) else None,
+        "topic": card.get("category") or "",
+        "field_name": "",
+        "keywords": question_bank_keywords_for_card(card),
+        "difficulty": card.get("difficulty") or "",
+        "issuer": "카드 생성",
+        "source_location": card.get("source_files") or card.get("id") or "",
+        "section": question.get("section") or "",
+        "points": question.get("points") if isinstance(question.get("points"), int) else None,
+        "expected_time_seconds": question.get("expected_time_seconds") if isinstance(question.get("expected_time_seconds"), int) else None,
+        "answer_guide": question.get("answer_guide") or "",
+        "session_mode": question.get("session_mode") or "practice",
+    }
+
+
+def attach_generated_question_bank_ids(
+    payload: dict[str, Any],
+    rows: list[dict[str, Any]],
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> dict[str, Any]:
+    questions = list(payload.get("questions") or [])
+    if not questions:
+        return payload
+    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
+    bank_payloads = [generated_question_bank_entry(question, card_map.get(str(question.get("card_id") or ""), {})) for question in questions]
+    saved = upsert_question_bank_entries(bank_payloads, csv_path, progress_db_path)
+    for question, stored in zip(questions, saved.get("items") or []):
+        question["question_bank_id"] = stored.get("question_bank_id") or ""
+        question["topic"] = stored.get("topic") or question.get("topic") or ""
+        question["field_name"] = stored.get("field_name") or question.get("field_name") or ""
+        question["keywords"] = stored.get("keywords") or question.get("keywords") or []
+        question["difficulty"] = stored.get("difficulty") or question.get("difficulty") or ""
+        question["issuer"] = stored.get("issuer") or question.get("issuer") or ""
+        question["source_location"] = stored.get("source_location") or question.get("source_location") or ""
+    payload["questions"] = questions
+    payload["question_bank_saved"] = len(saved.get("items") or [])
+    return payload
+
 def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     if row is None:
         return None
@@ -1094,6 +1567,7 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
     judgment = resolved_question_attempt_judgment(row["judgment"] if "judgment" in row.keys() else None, is_correct)
     return {
         "question_id": row["question_id"],
+        "question_bank_id": row["question_bank_id"] if "question_bank_id" in row.keys() else "",
         "card_id": row["card_id"],
         "question_type": row["question_type"],
         "prompt": row["prompt"] or "",
@@ -1120,6 +1594,7 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
         "created_at": row["created_at"] or "",
         "updated_at": row["updated_at"] or "",
     }
+
 
 
 def normalize_question_attempt_result(value: str | None) -> str:
@@ -1201,12 +1676,12 @@ def read_question_attempts(
         ).fetchone()
         attempt_rows = conn.execute(
             f"""
-            SELECT question_id, card_id, question_type, prompt, body, user_answer,
-                   selected_choice_index, is_correct, judgment, wrong_note, session_id,
-                   session_title, session_mode, section, points, expected_time_seconds,
-                   answer_guide, question_order, question_elapsed_seconds,
-                   session_elapsed_seconds, time_limit_seconds, question_started_at,
-                   answered_at, created_at, updated_at
+SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user_answer,
+       selected_choice_index, is_correct, judgment, wrong_note, session_id,
+       session_title, session_mode, section, points, expected_time_seconds,
+       answer_guide, question_order, question_elapsed_seconds,
+       session_elapsed_seconds, time_limit_seconds, question_started_at,
+       answered_at, created_at, updated_at
             FROM question_attempts
             {list_where}
             ORDER BY updated_at DESC, created_at DESC, question_id DESC
@@ -1322,6 +1797,7 @@ def save_question_attempt(
     session_mode = str(payload.session_mode or "practice")[:32] or "practice"
     section = str(payload.section or "")[:64]
     answer_guide = str(payload.answer_guide or "")[:255]
+    question_bank_id = str(payload.question_bank_id or "").strip()[:255]
     with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
             """
@@ -1331,6 +1807,10 @@ def save_question_attempt(
             """,
             (payload.card_id, now),
         )
+        if question_bank_id:
+            linked = conn.execute("SELECT id FROM question_bank WHERE id = ?", (question_bank_id,)).fetchone()
+            if linked is None:
+                raise ValueError(f"Unknown question_bank_id: {question_bank_id}")
         existing = conn.execute(
             "SELECT created_at, question_started_at FROM question_attempts WHERE question_id = ?",
             (question_id,),
@@ -1338,15 +1818,16 @@ def save_question_attempt(
         conn.execute(
             """
             INSERT INTO question_attempts (
-                question_id, card_id, question_type, prompt, body,
+                question_id, question_bank_id, card_id, question_type, prompt, body,
                 user_answer, selected_choice_index, is_correct, judgment, wrong_note,
                 session_id, session_title, session_mode, section, points,
                 expected_time_seconds, answer_guide, question_order, question_elapsed_seconds,
                 session_elapsed_seconds, time_limit_seconds, question_started_at,
                 answered_at, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(question_id) DO UPDATE SET
+                question_bank_id = excluded.question_bank_id,
                 card_id = excluded.card_id,
                 question_type = excluded.question_type,
                 prompt = excluded.prompt,
@@ -1373,6 +1854,7 @@ def save_question_attempt(
             """,
             (
                 question_id,
+                question_bank_id or None,
                 payload.card_id,
                 question_type,
                 str(payload.prompt or "")[:4000],
@@ -1402,7 +1884,7 @@ def save_question_attempt(
         conn.commit()
         saved = conn.execute(
             """
-            SELECT question_id, card_id, question_type, prompt, body, user_answer,
+            SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user_answer,
                    selected_choice_index, is_correct, judgment, wrong_note, session_id,
                    session_title, session_mode, section, points, expected_time_seconds,
                    answer_guide, question_order, question_elapsed_seconds,
@@ -2340,15 +2822,53 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
 def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
     try:
         rows, _ = read_cards(CSV_PATH, PROGRESS_DB_PATH)
-        return generate_questions(
+        generated = generate_questions(
             rows,
             card_ids=payload.card_ids,
             types=payload.types,
             count=payload.count,
             seed=payload.seed,
         )
+        return attach_generated_question_bank_ids(generated, rows, CSV_PATH, PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {exc}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/question-bank")
+def api_question_bank_upsert(payload: QuestionBankUpsertRequest) -> dict[str, Any]:
+    try:
+        return upsert_question_bank_entries(payload.questions, CSV_PATH, PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Card not found: {exc}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.get("/api/question-bank")
+def api_question_bank(request: Request) -> dict[str, Any]:
+    raw_limit = str(request.query_params.get("limit") or "200").strip()
+    try:
+        limit = int(raw_limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid limit: {raw_limit}") from exc
+    try:
+        return read_question_bank_entries(
+            CSV_PATH,
+            PROGRESS_DB_PATH,
+            card_id=request.query_params.get("card_id", ""),
+            question_type=request.query_params.get("question_type", ""),
+            topic=request.query_params.get("topic", ""),
+            field_name=request.query_params.get("field_name", request.query_params.get("field", "")),
+            issuer=request.query_params.get("issuer", ""),
+            source_location=request.query_params.get("source_location", ""),
+            limit=limit,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
@@ -2386,6 +2906,7 @@ def api_question_attempts(request: Request) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
 
 @app.get("/api/questions/types")
 def api_question_types() -> dict[str, Any]:

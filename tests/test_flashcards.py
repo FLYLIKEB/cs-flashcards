@@ -691,6 +691,141 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['known_status'], 'X')
             self.assertEqual(rows[0]['review_count'], '1')
 
+    def test_question_bank_upsert_deduplicates_and_links_attempts(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '정규화의 목적을 설명하시오.',
+                        'body': '데이터베이스 설계 관점에서 답하시오.',
+                        'answer': '중복을 줄이고 이상 현상을 방지하기 위해 정규화를 수행한다.',
+                        'explanation': '삽입/삭제/갱신 이상을 줄이는 것이 핵심이다.',
+                        'rubric': ['중복 제거', '이상 현상 방지'],
+                        'choices': [],
+                        'answer_index': None,
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'keywords': ['정규화', '이상 현상'],
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '2013년 학술파트 1',
+                        'section': '전공필기',
+                        'points': 10,
+                        'expected_time_seconds': 600,
+                        'answer_guide': '정의와 목적을 3문장 이상으로 설명',
+                        'session_mode': 'bok',
+                    }
+                ],
+                csv_path,
+                db_path,
+            )
+            self.assertEqual(saved['count'], 1)
+            item = saved['items'][0]
+            self.assertEqual(item['topic'], '데이터베이스')
+            self.assertEqual(item['field_name'], '전산학술')
+            self.assertEqual(item['issuer'], '한국은행')
+            self.assertEqual(item['source_location'], '2013년 학술파트 1')
+            self.assertEqual(item['keywords'], ['정규화', '이상 현상'])
+            self.assertEqual(item['rubric'], ['중복 제거', '이상 현상 방지'])
+
+            saved_again = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '정규화의 목적을 설명하시오.',
+                        'body': '데이터베이스 설계 관점에서 답하시오.',
+                        'answer': '중복을 줄이고 이상 현상을 방지하기 위해 정규화를 수행한다.',
+                        'explanation': '삽입/삭제/갱신 이상을 줄이는 것이 핵심이다.',
+                        'rubric': ['중복 제거', '이상 현상 방지'],
+                        'choices': [],
+                        'answer_index': None,
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'keywords': ['정규화', '이상 현상'],
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '2013년 학술파트 1',
+                        'section': '전공필기',
+                        'points': 10,
+                        'expected_time_seconds': 600,
+                        'answer_guide': '정의와 목적을 3문장 이상으로 설명',
+                        'session_mode': 'bok',
+                    }
+                ],
+                csv_path,
+                db_path,
+            )
+            self.assertEqual(saved_again['count'], 1)
+            self.assertEqual(saved_again['items'][0]['question_bank_id'], item['question_bank_id'])
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                question_bank_count = conn.execute('SELECT COUNT(*) FROM question_bank').fetchone()[0]
+            self.assertEqual(question_bank_count, 1)
+
+            attempt = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='bank-linked-1',
+                    question_bank_id=item['question_bank_id'],
+                    card_id='CS-001',
+                    question_type='subjective',
+                    prompt='정규화의 목적을 설명하시오.',
+                    body='데이터베이스 설계 관점에서 답하시오.',
+                    user_answer='중복 제거와 이상 현상 방지',
+                    is_correct=True,
+                    judgment='correct',
+                ),
+                csv_path,
+                db_path,
+            )
+            self.assertEqual(attempt['attempt']['question_bank_id'], item['question_bank_id'])
+
+            listed = flashcard_app.read_question_bank_entries(
+                csv_path,
+                db_path,
+                topic='데이터베이스',
+                issuer='한국은행',
+                limit=10,
+            )
+            self.assertEqual(listed['summary']['total'], 1)
+            self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
+
+    def test_api_generate_questions_persists_question_bank_rows(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            original_csv = flashcard_app.CSV_PATH
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            try:
+                flashcard_app.CSV_PATH = csv_path
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                payload = flashcard_app.QuestionGenerateRequest(card_ids=['CS-001'], types=['short'], count=1, seed=7)
+                generated = flashcard_app.api_generate_questions(payload)
+            finally:
+                flashcard_app.CSV_PATH = original_csv
+                flashcard_app.PROGRESS_DB_PATH = original_db
+
+            self.assertEqual(len(generated['questions']), 1)
+            question = generated['questions'][0]
+            self.assertTrue(question['question_bank_id'])
+            self.assertEqual(question['topic'], '소프트웨어공학')
+            self.assertEqual(question['difficulty'], '중')
+            self.assertEqual(question['issuer'], '카드 생성')
+            self.assertEqual(question['source_location'], 'sample.md')
+
+            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, card_id='CS-001', limit=10)
+            self.assertEqual(listed['summary']['total'], 1)
+            self.assertEqual(listed['items'][0]['question_bank_id'], question['question_bank_id'])
+
     def test_old_progress_schema_migrates_for_bookmark_and_memo_columns(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
