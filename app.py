@@ -134,6 +134,7 @@ class QuestionBankEntryRequest(BaseModel):
     answer_index: int | None = Field(default=None, ge=0, le=100)
     topic: str = Field(default="", max_length=255)
     field_name: str = Field(default="", max_length=255)
+    category: str = Field(default="", max_length=128)
     keywords: list[str] = Field(default_factory=list)
     difficulty: str = Field(default="", max_length=64)
     issuer: str = Field(default="", max_length=255)
@@ -185,6 +186,11 @@ class WikiPageUpdateRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     content: str = Field(max_length=2_000_000)
     previous_content: str | None = Field(default=None, max_length=2_000_000)
+
+
+class WikiRenderPreviewRequest(BaseModel):
+    source_path: str = Field(min_length=1, max_length=4096)
+    content: str = Field(max_length=2_000_000)
 
 
 class WikiAiRewriteRequest(BaseModel):
@@ -453,6 +459,8 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                 answer_index INTEGER,
                 topic TEXT NOT NULL DEFAULT '',
                 field_name TEXT NOT NULL DEFAULT '',
+                category TEXT NOT NULL DEFAULT '',
+
                 keywords_json TEXT NOT NULL DEFAULT '[]',
                 difficulty TEXT NOT NULL DEFAULT '',
                 issuer TEXT NOT NULL DEFAULT '',
@@ -482,6 +490,8 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
             "answer_index": "INTEGER",
             "topic": "TEXT NOT NULL DEFAULT ''",
             "field_name": "TEXT NOT NULL DEFAULT ''",
+            "category": "TEXT NOT NULL DEFAULT ''",
+
             "keywords_json": "TEXT NOT NULL DEFAULT '[]'",
             "difficulty": "TEXT NOT NULL DEFAULT ''",
             "issuer": "TEXT NOT NULL DEFAULT ''",
@@ -502,6 +512,7 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_type ON question_bank(question_type)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_topic ON question_bank(topic)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_field_name ON question_bank(field_name)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_category ON question_bank(category)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_issuer ON question_bank(issuer)")
 
         conn.execute(
@@ -1430,7 +1441,7 @@ def normalize_question_bank_list(values: Any, *, item_limit: int = 255) -> list[
     elif values is None:
         raw_items = []
     else:
-        raw_items = [values]
+        raw_items = [part for part in re.split(r"[,;\n]+", str(values or ""))]
     seen: set[str] = set()
     normalized: list[str] = []
     for value in raw_items:
@@ -1469,6 +1480,89 @@ def question_bank_keywords_for_card(card: dict[str, Any]) -> list[str]:
         *related,
     ])
 
+QUESTION_BANK_CATEGORIES = (
+    "금융IT·신기술",
+    "네트워크",
+    "데이터베이스",
+    "보안",
+    "소프트웨어공학",
+    "운영체제",
+    "인공지능·데이터",
+    "자료구조·알고리즘",
+    "컴퓨터구조",
+    "클라우드·분산시스템",
+    "프로그래밍 언어",
+)
+
+QUESTION_BANK_CATEGORY_HINTS: dict[str, tuple[str, ...]] = {
+    "데이터베이스": ("데이터베이스", "db", "sql", "정규화", "트랜잭션", "스키마", "erd"),
+    "운영체제": ("운영체제", "os", "프로세스", "스레드", "교착상태", "스케줄링", "페이지", "세마포어", "스래싱", "메모리 관리"),
+    "네트워크": ("네트워크", "dns", "라우팅", "tcp", "udp", "ipv", "cdma", "브리지", "ftp", "http", "데이터 통신"),
+    "보안": ("보안", "정보보호", "암호", "전자서명", "pki", "xss", "csrf", "사회공학", "arp 공격", "접근통제"),
+    "소프트웨어공학": ("소프트웨어공학", "소프트웨어 공학", "mvc", "애자일", "테스트", "형상관리", "요구사항", "프로젝트"),
+    "컴퓨터구조": ("컴퓨터구조", "컴퓨터 구조", "캐시", "raid", "파이프라인", "instruction", "clock frequency"),
+    "자료구조·알고리즘": ("자료구조", "알고리즘", "정렬", "해시", "트리", "그래프", "kruskal", "mass", "markov"),
+    "클라우드·분산시스템": ("클라우드", "분산", "iaas", "paas", "saas", "하이브리드 클라우드", "원격근무", "vdi", "블록체인"),
+    "인공지능·데이터": ("인공지능", "머신러닝", "머신 러닝", "ai", "통계", "텍스트 마이닝", "text mining", "데이터 웨어하우스"),
+    "프로그래밍 언어": ("프로그래밍 언어", "java", "객체지향", "정규 표현식", "컴파일러"),
+    "금융IT·신기술": ("금융it", "전자금융", "자산관리시스템", "신기술"),
+}
+
+
+
+def question_bank_categories_from_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> list[str]:
+    rows, _ = read_cards(csv_path, progress_db_path)
+    seen: set[str] = set()
+    categories: list[str] = []
+    for category in QUESTION_BANK_CATEGORIES:
+        normalized = normalize_question_bank_text(category, limit=128)
+        if not normalized:
+            continue
+        seen.add(normalized.casefold())
+        categories.append(normalized)
+    for row in rows:
+        category = normalize_question_bank_text(row.get("category"), limit=128)
+        if not category:
+            continue
+        key = category.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        categories.append(category)
+    return categories
+
+
+
+def infer_question_bank_category(
+    raw_category: Any,
+    *,
+    card_category: Any = "",
+    topic: Any = "",
+    prompt: Any = "",
+    body: Any = "",
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> str:
+    allowed_categories = question_bank_categories_from_cards(csv_path, progress_db_path)
+    allowed_lookup = {item.casefold(): item for item in allowed_categories}
+    for candidate in (raw_category, card_category):
+        normalized = normalize_question_bank_text(candidate, limit=128)
+        if normalized and normalized.casefold() in allowed_lookup:
+            return allowed_lookup[normalized.casefold()]
+    combined = " ".join(str(value or "") for value in (topic, prompt, body)).casefold()
+    for category in allowed_categories:
+        if category.casefold() in combined:
+            return category
+    for category, hints in QUESTION_BANK_CATEGORY_HINTS.items():
+        if category.casefold() not in allowed_lookup:
+            continue
+        if any(str(hint).casefold() in combined for hint in hints):
+            return allowed_lookup[category.casefold()]
+    if raw_category:
+        raise ValueError(f"Unsupported question bank category: {raw_category}")
+    normalized_card_category = normalize_question_bank_text(card_category, limit=128)
+    return allowed_lookup.get(normalized_card_category.casefold(), "")
+
 
 def question_bank_fingerprint(entry: dict[str, Any]) -> str:
     canonical = {
@@ -1483,6 +1577,7 @@ def question_bank_fingerprint(entry: dict[str, Any]) -> str:
         "answer_index": entry["answer_index"],
         "topic": entry["topic"],
         "field_name": entry["field_name"],
+        "category": entry["category"],
         "keywords": entry["keywords"],
         "difficulty": entry["difficulty"],
         "issuer": entry["issuer"],
@@ -1510,8 +1605,11 @@ def normalize_question_bank_entry(
     if not prompt:
         raise ValueError("question prompt is required")
     card_id = normalize_question_bank_text(raw.get("card_id"), limit=255)
+    card: dict[str, Any] = {}
     if card_id:
         _ensure_card_exists(card_id, csv_path, progress_db_path)
+        rows, _ = read_cards(csv_path, progress_db_path)
+        card = next((row for row in rows if str(row.get("id") or "").strip() == card_id), {})
     choices = normalize_question_bank_list(raw.get("choices"), item_limit=2000)
     answer_index = raw.get("answer_index")
     if answer_index is not None:
@@ -1520,19 +1618,30 @@ def normalize_question_bank_entry(
             raise ValueError(f"Invalid answer_index: {answer_index}")
     if question_type == "multiple_choice" and answer_index is not None and answer_index >= len(choices):
         raise ValueError("Multiple-choice answer_index must point to an existing choice")
+    topic = normalize_question_bank_text(raw.get("topic"), limit=255)
+    body = normalize_question_bank_markdown(raw.get("body"), limit=12000)
     normalized = {
         "question_bank_id": normalize_question_bank_text(raw.get("question_bank_id"), limit=255),
         "card_id": card_id,
         "question_type": question_type,
         "prompt": prompt,
-        "body": normalize_question_bank_markdown(raw.get("body"), limit=12000),
+        "body": body,
         "answer": normalize_question_bank_markdown(raw.get("answer"), limit=20000),
         "explanation": normalize_question_bank_markdown(raw.get("explanation"), limit=50000),
         "rubric": normalize_question_bank_list(raw.get("rubric"), item_limit=2000),
         "choices": choices,
         "answer_index": answer_index,
-        "topic": normalize_question_bank_text(raw.get("topic"), limit=255),
+        "topic": topic,
         "field_name": normalize_question_bank_text(raw.get("field_name"), limit=255),
+        "category": infer_question_bank_category(
+            raw.get("category") or raw.get("card_category") or "",
+            card_category=card.get("category") if isinstance(card, dict) else "",
+            topic=topic,
+            prompt=prompt,
+            body=body,
+            csv_path=csv_path,
+            progress_db_path=progress_db_path,
+        ),
         "keywords": normalize_question_bank_list(raw.get("keywords"), item_limit=255),
         "difficulty": normalize_question_bank_text(raw.get("difficulty"), limit=64),
         "issuer": normalize_question_bank_text(raw.get("issuer"), limit=255),
@@ -1543,6 +1652,8 @@ def normalize_question_bank_entry(
         "answer_guide": normalize_question_bank_markdown(raw.get("answer_guide"), limit=255),
         "session_mode": normalize_question_bank_text(raw.get("session_mode") or "practice", limit=32) or "practice",
     }
+    if not normalized["category"]:
+        raise ValueError("question category is required and must match an existing flashcard category")
     normalized["fingerprint"] = question_bank_fingerprint(normalized)
     normalized["question_bank_id"] = normalized["question_bank_id"] or f"qb-{normalized['fingerprint'][:24]}"
     return normalized
@@ -1564,6 +1675,7 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
         "answer_index": row["answer_index"] if "answer_index" in row.keys() else None,
         "topic": row["topic"] if "topic" in row.keys() else "",
         "field_name": row["field_name"] if "field_name" in row.keys() else "",
+        "category": row["category"] if "category" in row.keys() else "",
         "keywords": question_bank_json_list(row["keywords_json"] if "keywords_json" in row.keys() else "[]"),
         "difficulty": row["difficulty"] if "difficulty" in row.keys() else "",
         "issuer": row["issuer"] if "issuer" in row.keys() else "",
@@ -1607,11 +1719,11 @@ def upsert_question_bank_entries(
                 """
                 INSERT INTO question_bank (
                     id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
-                    rubric_json, choices_json, answer_index, topic, field_name, keywords_json,
+                    rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
                     difficulty, issuer, source_location, section, points, expected_time_seconds,
                     answer_guide, session_mode, created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(fingerprint) DO UPDATE SET
                     card_id = excluded.card_id,
                     question_type = excluded.question_type,
@@ -1624,6 +1736,7 @@ def upsert_question_bank_entries(
                     answer_index = excluded.answer_index,
                     topic = excluded.topic,
                     field_name = excluded.field_name,
+                    category = excluded.category,
                     keywords_json = excluded.keywords_json,
                     difficulty = excluded.difficulty,
                     issuer = excluded.issuer,
@@ -1649,6 +1762,8 @@ def upsert_question_bank_entries(
                     entry["answer_index"],
                     entry["topic"],
                     entry["field_name"],
+                    entry["category"],
+
                     question_bank_json_text(entry["keywords"], item_limit=255),
                     entry["difficulty"],
                     entry["issuer"],
@@ -1665,7 +1780,7 @@ def upsert_question_bank_entries(
             saved = conn.execute(
                 """
                 SELECT id, card_id, question_type, prompt, body, answer, explanation,
-                       rubric_json, choices_json, answer_index, topic, field_name, keywords_json,
+                       rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
                        difficulty, issuer, source_location, section, points, expected_time_seconds,
                        answer_guide, session_mode, created_at, updated_at
                 FROM question_bank
@@ -1731,6 +1846,7 @@ def read_question_bank_entries(
     question_type: str = "",
     topic: str = "",
     field_name: str = "",
+    category: str = "",
     issuer: str = "",
     difficulty: str = "",
     section: str = "",
@@ -1747,6 +1863,7 @@ def read_question_bank_entries(
         "question_type": normalize_question_bank_text(question_type, limit=64).lower(),
         "topic": normalize_question_bank_text(topic, limit=255),
         "field_name": normalize_question_bank_text(field_name, limit=255),
+        "category": normalize_question_bank_text(category, limit=128),
         "issuer": normalize_question_bank_text(issuer, limit=255),
         "difficulty": normalize_question_bank_text(difficulty, limit=64),
         "section": normalize_question_bank_text(section, limit=64),
@@ -1755,7 +1872,7 @@ def read_question_bank_entries(
     }
     where_clauses: list[str] = []
     params: list[Any] = []
-    for column in ("card_id", "topic", "field_name", "issuer", "difficulty", "section", "source_location"):
+    for column in ("card_id", "topic", "field_name", "category", "issuer", "difficulty", "section", "source_location"):
         value = filters[column]
         if not value:
             continue
@@ -1773,13 +1890,14 @@ def read_question_bank_entries(
                 "LOWER(explanation) LIKE ?",
                 "LOWER(topic) LIKE ?",
                 "LOWER(field_name) LIKE ?",
+                "LOWER(category) LIKE ?",
                 "LOWER(issuer) LIKE ?",
                 "LOWER(source_location) LIKE ?",
                 "LOWER(keywords_json) LIKE ?",
             ]) + ")"
         )
         needle = f"%{filters['query'].lower()}%"
-        params.extend([needle] * 9)
+        params.extend([needle] * 10)
     where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
     rows, _ = read_cards(csv_path, db_path)
     card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
@@ -1788,10 +1906,16 @@ def read_question_bank_entries(
             f"SELECT COUNT(*) AS total_count FROM question_bank {where_sql}",
             tuple(params),
         ).fetchone()
+        issuer_rows = conn.execute(
+            "SELECT DISTINCT issuer FROM question_bank WHERE TRIM(issuer) <> '' ORDER BY issuer COLLATE NOCASE ASC"
+        ).fetchall()
+        category_rows = conn.execute(
+            "SELECT DISTINCT category FROM question_bank WHERE TRIM(category) <> '' ORDER BY category COLLATE NOCASE ASC"
+        ).fetchall()
         query_rows = conn.execute(
             f"""
             SELECT id, card_id, question_type, prompt, body, answer, explanation,
-                   rubric_json, choices_json, answer_index, topic, field_name, keywords_json,
+                   rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
                    difficulty, issuer, source_location, section, points, expected_time_seconds,
                    answer_guide, session_mode, created_at, updated_at
             FROM question_bank
@@ -1816,6 +1940,8 @@ def read_question_bank_entries(
             "total": int(total_row["total_count"] or 0) if total_row else 0,
             "returned": len(items),
             "limit": safe_limit,
+            "available_issuers": [str(row[0] or "").strip() for row in issuer_rows if str(row[0] or "").strip()],
+            "available_categories": [str(row[0] or "").strip() for row in category_rows if str(row[0] or "").strip()],
             **filters,
         },
     }
@@ -1834,6 +1960,7 @@ def generated_question_bank_entry(question: dict[str, Any], card: dict[str, Any]
         "answer_index": question.get("answer_index") if isinstance(question.get("answer_index"), int) else None,
         "topic": card.get("category") or "",
         "field_name": "",
+        "category": question.get("category") or card.get("category") or "",
         "keywords": question_bank_keywords_for_card(card),
         "difficulty": card.get("difficulty") or "",
         "issuer": "카드 생성",
@@ -3026,6 +3153,20 @@ def update_wiki_page_source(
     }
 
 
+def render_wiki_markdown_preview(
+    source_path: str,
+    content: str,
+    repo_dir: Path | None = None,
+) -> dict[str, Any]:
+    repo, target, source_relative, _ = resolve_wiki_markdown_source(source_path, repo_dir)
+    return {
+        "source_path": source_relative,
+        "page_slug": wiki_slug_for_source(repo, target),
+        "title": extract_markdown_title(content, target.stem),
+        "html": render_markdown_page(content, repo, target),
+    }
+
+
 
 
 def read_wiki_index(repo_dir: Path | None = None) -> dict[str, Any]:
@@ -3277,6 +3418,18 @@ def api_wiki_ai_rewrite_preview(payload: WikiAiRewriteRequest) -> dict[str, Any]
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+
+
+@app.post("/api/wiki/render-preview")
+def api_wiki_render_preview(payload: WikiRenderPreviewRequest) -> dict[str, Any]:
+    try:
+        return render_wiki_markdown_preview(payload.source_path, payload.content)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 @app.post("/api/wiki/page")
 def api_wiki_page_save(payload: WikiPageUpdateRequest) -> dict[str, Any]:
@@ -3553,6 +3706,7 @@ def api_question_bank(request: Request) -> dict[str, Any]:
             question_type=request.query_params.get("question_type", ""),
             topic=request.query_params.get("topic", ""),
             field_name=request.query_params.get("field_name", request.query_params.get("field", "")),
+            category=request.query_params.get("category", request.query_params.get("card_category", "")),
             issuer=request.query_params.get("issuer", ""),
             difficulty=request.query_params.get("difficulty", ""),
             section=request.query_params.get("section", ""),
@@ -3639,34 +3793,3 @@ def health() -> dict[str, Any]:
         "codex_model": CODEX_MODEL,
         "ai_image_model": IMAGE_MODEL,
     }
-class WikiRenderPreviewRequest(BaseModel):
-    source_path: str = Field(min_length=1, max_length=4096)
-    content: str = Field(max_length=2_000_000)
-
-
-def render_wiki_markdown_preview(
-    source_path: str,
-    content: str,
-    repo_dir: Path | None = None,
-) -> dict[str, Any]:
-    repo, target, source_relative, _ = resolve_wiki_markdown_source(source_path, repo_dir)
-    return {
-        "source_path": source_relative,
-        "page_slug": wiki_slug_for_source(repo, target),
-        "title": extract_markdown_title(content, target.stem),
-        "html": render_markdown_page(content, repo, target),
-    }
-
-
-
-@app.post("/api/wiki/render-preview")
-def api_wiki_render_preview(payload: WikiRenderPreviewRequest) -> dict[str, Any]:
-    try:
-        return render_wiki_markdown_preview(payload.source_path, payload.content)
-    except FileNotFoundError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-

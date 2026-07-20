@@ -775,7 +775,8 @@ class FlashcardProgressTests(unittest.TestCase):
                         'answer_index': None,
                         'topic': '데이터베이스',
                         'field_name': '전산학술',
-                        'keywords': ['정규화', '이상 현상'],
+                        'category': '데이터베이스',
+                        'keywords': '정규화, 이상 현상; 정규화',
                         'difficulty': '중',
                         'issuer': '한국은행',
                         'source_location': '2013년 학술파트 1',
@@ -784,6 +785,7 @@ class FlashcardProgressTests(unittest.TestCase):
                         'expected_time_seconds': 600,
                         'answer_guide': '정의와 목적을 3문장 이상으로 설명',
                         'session_mode': 'bok',
+
                     }
                 ],
                 csv_path,
@@ -793,6 +795,8 @@ class FlashcardProgressTests(unittest.TestCase):
             item = saved['items'][0]
             self.assertEqual(item['topic'], '데이터베이스')
             self.assertEqual(item['field_name'], '전산학술')
+            self.assertEqual(item['category'], '데이터베이스')
+
             self.assertEqual(item['issuer'], '한국은행')
             self.assertEqual(item['source_location'], '2013년 학술파트 1')
             self.assertEqual(item['keywords'], ['정규화', '이상 현상'])
@@ -812,7 +816,8 @@ class FlashcardProgressTests(unittest.TestCase):
                         'answer_index': None,
                         'topic': '데이터베이스',
                         'field_name': '전산학술',
-                        'keywords': ['정규화', '이상 현상'],
+                        'category': '데이터베이스',
+                        'keywords': '정규화, 이상 현상; 정규화',
                         'difficulty': '중',
                         'issuer': '한국은행',
                         'source_location': '2013년 학술파트 1',
@@ -821,6 +826,7 @@ class FlashcardProgressTests(unittest.TestCase):
                         'expected_time_seconds': 600,
                         'answer_guide': '정의와 목적을 3문장 이상으로 설명',
                         'session_mode': 'bok',
+
                     }
                 ],
                 csv_path,
@@ -858,6 +864,8 @@ class FlashcardProgressTests(unittest.TestCase):
                 limit=10,
             )
             self.assertEqual(listed['summary']['total'], 1)
+            self.assertIn('한국은행', listed['summary']['available_issuers'])
+            self.assertIn('데이터베이스', listed['summary']['available_categories'])
             self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
 
     def test_question_bank_preserves_markdown_blocks(self):

@@ -109,6 +109,21 @@ function applyFiltersFromUrl() {
   if ($('bankPageSectionInput')) $('bankPageSectionInput').value = params.get('section') || '';
 }
 
+function populateIssuerOptions(issuers, selected = '') {
+  const select = $('bankPageIssuerInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || new URLSearchParams(window.location.search).get('issuer') || '').trim();
+  const options = ['<option value="">출제기관 *</option>'];
+  (Array.isArray(issuers) ? issuers : []).forEach((issuer) => {
+    const value = String(issuer || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(issuers) && issuers.includes(selectedValue)) ? selectedValue : '';
+}
+
+
 function queryString() {
   const params = new URLSearchParams();
   Object.entries(filterValues()).forEach(([key, value]) => {
@@ -254,11 +269,14 @@ async function loadQuestionBankPage() {
     const previousSelectedId = bankState.selectedId;
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
+    populateIssuerOptions(bankState.summary?.available_issuers || [], filterValues().issuer);
+
     const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
     bankState.selectedId = String(bankState.items[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
   } catch (error) {
     bankState.items = [];
     bankState.summary = {total: 0, returned: 0};
+    populateIssuerOptions([], filterValues().issuer);
     bankState.error = error.message || String(error);
     bankState.practiceLoaded = false;
   } finally {
