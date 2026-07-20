@@ -3576,6 +3576,13 @@ select,
   border-radius: 18px;
   background: rgba(255, 255, 255, .72);
 }
+.concept-media-surface[hidden],
+.concept-image[hidden],
+.concept-video[hidden],
+.concept-media-iframe[hidden],
+.concept-media-mermaid[hidden] {
+  display: none !important;
+}
 .concept-image {
   width: auto;
   object-fit: contain;

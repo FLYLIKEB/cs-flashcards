@@ -169,6 +169,8 @@ class StaticFrontendTests(unittest.TestCase):
             'AI 이미지 생성 중',
         ]:
             self.assertIn(snippet, APP_JS)
+        self.assertIn('function setConceptMediaSurfaceVisible(element, visible)', APP_JS)
+        self.assertIn("element.style.display = 'none';", APP_JS)
         self.assertIn("window.setTimeout(() => {\n        try {\n          openerRef[callbackName](...args);\n          openerRef.focus?.();\n        } catch (_error) {}\n      }, 0);", APP_JS)
         self.assertNotIn("}, 0);\n      }, 0);", APP_JS)
         self.assertNotIn("openerRef.focus?.();\n          window.focus();", APP_JS)
@@ -194,6 +196,8 @@ class StaticFrontendTests(unittest.TestCase):
             self.assertIn(snippet, STYLE_CSS)
         self.assertIn('max-height: calc(clamp(165px, 30vh, 280px) * var(--concept-image-scale, 1));', STYLE_CSS)
         self.assertIn('max-height: calc(205px * var(--concept-image-scale, 1));', STYLE_CSS)
+        self.assertIn('.concept-media-surface[hidden]', STYLE_CSS)
+        self.assertIn('display: none !important;', STYLE_CSS)
         self.assertIn('id="conceptImageZoomOutBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageZoomInBtn"', INDEX_HTML)
         self.assertIn('id="conceptImageZoomBtn"', INDEX_HTML)

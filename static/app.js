@@ -2221,6 +2221,16 @@ async function renderConceptMermaidInto(container, source, {modal = false} = {})
   }
 }
 
+function setConceptMediaSurfaceVisible(element, visible) {
+  if (!element) return;
+  element.hidden = !visible;
+  if (visible) {
+    element.style.removeProperty('display');
+    return;
+  }
+  element.style.display = 'none';
+}
+
 function resetMainConceptMedia() {
   const image = $('backConceptImage');
   const video = $('backConceptVideo');
@@ -2231,7 +2241,7 @@ function resetMainConceptMedia() {
     image.removeAttribute('title');
     image.alt = '';
     image.dataset.expectedSrc = '';
-    image.hidden = true;
+    setConceptMediaSurfaceVisible(image, false);
   }
   if (video) {
     video.pause();
@@ -2239,20 +2249,21 @@ function resetMainConceptMedia() {
     video.removeAttribute('title');
     video.removeAttribute('aria-label');
     video.dataset.expectedSrc = '';
-    video.hidden = true;
+    setConceptMediaSurfaceVisible(video, false);
     video.load();
   }
   if (frame) {
     clearConceptMediaIframe(frame);
-    frame.hidden = true;
+    setConceptMediaSurfaceVisible(frame, false);
   }
   if (mermaid) {
-    mermaid.hidden = true;
+    setConceptMediaSurfaceVisible(mermaid, false);
     mermaid.classList.remove('is-loading');
     mermaid.textContent = '';
     mermaid.innerHTML = '';
   }
 }
+
 
 async function renderConceptImageDialogContent(card) {
   const stage = $('conceptImageDialogStage');
@@ -2531,7 +2542,7 @@ function renderConceptImage(card) {
       video.src = payload;
       video.title = `${card.term} 개념 비디오 크게 보기`;
       video.setAttribute('aria-label', alt);
-      video.hidden = false;
+      setConceptMediaSurfaceVisible(video, true);
       placeholder.hidden = true;
       video.play().catch(() => {});
     } else if (mediaType === 'html') {
@@ -2539,21 +2550,21 @@ function renderConceptImage(card) {
       frame.dataset.alt = alt;
       frame.title = alt || `${card.term} 개념 위젯`;
       frame.srcdoc = conceptMediaIframeSrcdoc(payload, alt);
-      frame.hidden = false;
+      setConceptMediaSurfaceVisible(frame, true);
       placeholder.hidden = true;
     } else if (mediaType === 'mermaid') {
-      mermaid.hidden = false;
+      setConceptMediaSurfaceVisible(mermaid, true);
       placeholder.hidden = true;
       renderConceptMermaidInto(mermaid, payload);
     } else {
       image.dataset.expectedSrc = payload;
       image.alt = alt;
       image.title = previewActive ? `${card.term} AI 이미지 미리보기 크게 보기` : `${card.term} 이미지 크게 보기`;
-      image.hidden = false;
+      setConceptMediaSurfaceVisible(image, true);
       if (image.getAttribute('src') !== payload) image.src = payload;
       if (image.complete) {
         const loaded = image.naturalWidth > 0;
-        image.hidden = !loaded;
+        setConceptMediaSurfaceVisible(image, loaded);
         placeholder.hidden = loaded;
       } else {
         placeholder.hidden = true;
