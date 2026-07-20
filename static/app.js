@@ -3562,13 +3562,13 @@ function renderQuestionBankBrowser() {
   list.innerHTML = state.questionBankItems.map((item, index) => {
     const active = state.questionBankSelectedId && state.questionBankSelectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
-    const topic = escapeHtml(item.topic || item.card_category || questionTypeBadge(item) || '');
-    const field = escapeHtml(item.field_name || '');
+    const typeLabel = escapeHtml(questionTypeBadge(item) || '');
+    const topic = escapeHtml(item.topic || item.card_category || '');
     const issuer = escapeHtml(item.issuer || '');
     const difficulty = escapeHtml(item.difficulty || '');
     const source = escapeHtml(item.source_location || '');
-    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 140);
-    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}"><td class="question-bank-col-index">${index + 1}</td><td class="question-bank-col-title"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td><td>${topic || '—'}</td><td>${field || '—'}</td><td>${issuer || '—'}</td><td>${difficulty || '—'}</td><td>${source || '—'}</td></tr>`;
+    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 96);
+    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}"><td class="question-bank-col-index">${index + 1}</td><td class="question-bank-col-title"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td><td class="question-bank-col-type">${typeLabel || '—'}</td><td class="question-bank-col-field">${topic || '—'}</td><td class="question-bank-col-issuer">${issuer || '—'}</td><td class="question-bank-col-difficulty">${difficulty || '—'}</td><td class="question-bank-col-source">${source || '—'}</td></tr>`;
   }).join('');
 }
 
