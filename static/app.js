@@ -2886,6 +2886,21 @@ window.__csFlashcardsTableClosed = () => {
   state.flashcardTableWindow = null;
 };
 
+function syncFlashcardTableWindowSelection() {
+  const popup = state.flashcardTableWindow;
+  if (!popup || popup.closed) {
+    state.flashcardTableWindow = null;
+    return false;
+  }
+  const doc = popup.document;
+  const rows = [...doc.querySelectorAll('[data-row-card-id]')];
+  const summary = doc.querySelector('.summary');
+  if (summary) summary.textContent = `${flashcardTableSummaryText()} · ${state.filtered.length}개 · 현재 ${state.filtered.length ? state.index + 1 : 0}`;
+  if (!rows.length) return false;
+  const currentCardId = state.filtered[state.index]?.id || '';
+  rows.forEach((row) => row.classList.toggle('current-row', row.dataset.rowCardId === currentCardId));
+  return true;
+}
 function renderFlashcardTableWindow() {
   const popup = state.flashcardTableWindow;
   if (!popup || popup.closed) {
@@ -4716,6 +4731,7 @@ function applyFilters(keepCurrentId = null) {
   }
   if (state.questionHistoryOpen) loadQuestionHistory();
   updateAudioEstimate();
+  renderFlashcardTableWindow();
 }
 
 function renderCard() {
@@ -4746,7 +4762,7 @@ function renderCard() {
     updateConceptBackButton();
     renderPersonalControls(null);
     saveViewState();
-    renderFlashcardTableWindow();
+    syncFlashcardTableWindowSelection();
     return;
   }
 
@@ -4803,7 +4819,7 @@ function renderCard() {
   state.renderedFlipped = state.flipped;
   updateConceptBackButton();
   saveViewState();
-  renderFlashcardTableWindow();
+  syncFlashcardTableWindowSelection();
 }
 
 
