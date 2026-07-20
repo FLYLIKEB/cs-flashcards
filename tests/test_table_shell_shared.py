@@ -16,14 +16,17 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
         self.assertIn('열 제목 드래그로 순서 변경', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
         self.assertIn('question-bank-shell-grid', QUESTION_BANK_HTML)
 
     def test_question_bank_page_uses_shared_renderer(self):
         self.assertIn('QUESTION_BANK_COLUMN_ORDER_KEY', QUESTION_BANK_JS)
+        self.assertIn('QUESTION_BANK_PRACTICE_COLLAPSED_KEY', QUESTION_BANK_JS)
         self.assertIn('window.CSTableShell.renderTable', QUESTION_BANK_JS)
         self.assertIn('window.CSTableShell.moveColumnOrder', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_COLUMNS', QUESTION_BANK_JS)
         self.assertIn('function practiceFrameUrl()', QUESTION_BANK_JS)
+        self.assertIn('function setPracticeCollapsed(', QUESTION_BANK_JS)
         self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
 
     def test_flashcard_popup_uses_shared_renderer(self):
@@ -42,6 +45,8 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('.question-bank-item-preview', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-shell-grid', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-frame', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
 
 
 if __name__ == '__main__':

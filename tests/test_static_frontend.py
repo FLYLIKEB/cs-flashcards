@@ -9,6 +9,7 @@ QUESTION_BANK_HTML = (ROOT / 'static' / 'question-bank.html').read_text(encoding
 WIKI_JS = (ROOT / 'static' / 'wiki.js').read_text(encoding='utf-8')
 QUESTION_BANK_JS = (ROOT / 'static' / 'question-bank.js').read_text(encoding='utf-8')
 STYLE_CSS = (ROOT / 'static' / 'style.css').read_text(encoding='utf-8')
+TABLE_SHELL_CSS = (ROOT / 'static' / 'table-shell.css').read_text(encoding='utf-8')
 AI_TOOLS_JS = (ROOT / 'static' / 'ai-tools.js').read_text(encoding='utf-8')
 
 
@@ -177,11 +178,14 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
+        self.assertIn('QUESTION_BANK_PRACTICE_COLLAPSED_KEY', QUESTION_BANK_JS)
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
         self.assertIn('function practiceFrameUrl()', QUESTION_BANK_JS)
+        self.assertIn('function setPracticeCollapsed(', QUESTION_BANK_JS)
         self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
         self.assertIn("get('question-bank-embed') === '1'", APP_JS)
         self.assertIn('id="wikiSearchToggleBtn"', WIKI_HTML)
@@ -502,6 +506,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-bank-shell', STYLE_CSS)
         self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
         self.assertIn('.question-bank-embed .topbar', STYLE_CSS)
+        self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
 
 
 if __name__ == '__main__':

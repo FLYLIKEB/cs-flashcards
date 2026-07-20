@@ -1,5 +1,6 @@
 const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const QUESTION_BANK_COLUMN_ORDER_KEY = 'csQuestionBankTableColumnOrder:v1';
+const QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1';
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_BANK_COLUMNS = [
   {key: 'index', label: '#', width: '56px'},
@@ -21,6 +22,7 @@ const bankState = {
   practiceLoaded: false,
   practiceStartIndex: 0,
   practiceNonce: 0,
+  practiceCollapsed: false,
 };
 
 function escapeHtml(value) {
@@ -48,6 +50,38 @@ function selectedIndex(fallback = 0) {
 
 function practiceFrameUrl() {
   return `/?question-bank-embed=1&question-bank-run=${Date.now()}-${bankState.practiceNonce}`;
+}
+
+function persistedPracticeCollapsed() {
+  try {
+    return window.localStorage.getItem(QUESTION_BANK_PRACTICE_COLLAPSED_KEY) === '1';
+  } catch (_error) {
+    return false;
+  }
+}
+
+function renderPracticeToggle() {
+  const toggleButton = $('bankPageTogglePracticeBtn');
+  if (!toggleButton) return;
+  const expanded = !bankState.practiceCollapsed;
+  toggleButton.textContent = expanded ? '풀이 숨기기' : '풀이 보기';
+  toggleButton.setAttribute('aria-expanded', String(expanded));
+}
+
+function setPracticeCollapsed(collapsed, {persist = true} = {}) {
+  bankState.practiceCollapsed = Boolean(collapsed);
+  document.body.classList.toggle('question-bank-practice-collapsed', bankState.practiceCollapsed);
+  renderPracticeToggle();
+  if (!persist) return;
+  try {
+    window.localStorage.setItem(QUESTION_BANK_PRACTICE_COLLAPSED_KEY, bankState.practiceCollapsed ? '1' : '0');
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+}
+
+function togglePracticeCollapsed() {
+  setPracticeCollapsed(!bankState.practiceCollapsed);
 }
 
 function filterValues() {
@@ -160,7 +194,7 @@ function renderTable() {
   const returned = Number(bankState.summary?.returned || bankState.items.length || 0);
   summary.textContent = bankState.loading
     ? '문제은행을 불러오는 중입니다.'
-    : `총 ${total}문항 · 현재 ${returned}문항 · 왼쪽 표와 오른쪽 문제 풀이가 한 화면에서 함께 동작합니다.`;
+    : `총 ${total}문항 · 현재 ${returned}문항 · ${bankState.practiceCollapsed ? '문제 풀이 패널 숨김 상태' : '왼쪽 표와 오른쪽 문제 풀이가 한 화면에서 함께 동작합니다.'}`;
   error.textContent = bankState.error || '';
   window.CSTableShell.renderTable(mount, {
     columns: QUESTION_BANK_COLUMNS,
@@ -181,7 +215,7 @@ function renderTable() {
   });
 }
 
-function launch(startIndex = 0) {
+function launch(startIndex = 0, {reveal = true} = {}) {
   if (!bankState.items.length) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
     renderTable();
@@ -193,6 +227,7 @@ function launch(startIndex = 0) {
   bankState.selectedId = String(bankState.items[safeStart]?.question_bank_id || '');
   bankState.practiceLoaded = true;
   bankState.practiceStartIndex = safeStart;
+  if (reveal) setPracticeCollapsed(false);
   renderTable();
   renderPracticePane();
   try {
@@ -232,17 +267,19 @@ async function loadQuestionBankPage() {
     bankState.loading = false;
     renderTable();
     renderPracticePane();
-    if (bankState.items.length) launch(selectedIndex());
+    if (bankState.items.length) launch(selectedIndex(), {reveal: false});
   }
 }
 
 applyFiltersFromUrl();
+setPracticeCollapsed(persistedPracticeCollapsed(), {persist: false});
 renderTable();
 renderPracticePane();
 loadQuestionBankPage().catch(() => {});
 
 $('bankPageRefreshBtn')?.addEventListener('click', () => loadQuestionBankPage().catch(() => {}));
 $('bankPageLaunchBtn')?.addEventListener('click', () => launch(selectedIndex()));
+$('bankPageTogglePracticeBtn')?.addEventListener('click', togglePracticeCollapsed);
 ['bankPageQueryInput', 'bankPageTopicInput', 'bankPageFieldInput', 'bankPageIssuerInput', 'bankPageSourceInput', 'bankPageDifficultySelect', 'bankPageTypeSelect', 'bankPageSectionInput'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankPage().catch(() => {}));
   $(id)?.addEventListener('keydown', (event) => {
