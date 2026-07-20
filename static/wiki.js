@@ -11,11 +11,15 @@ const wikiState = {
   editorOpen: false,
   editorLoading: false,
   editorSaving: false,
+  editorAiLoading: false,
+  editorAiStatus: '',
+  editorAiStatusError: false,
   editorSourcePath: '',
   editorOriginalContent: '',
 };
 
 const wiki$ = (id) => document.getElementById(id);
+const wikiAiTools = window.CsAiTools || null;
 
 function wikiEscapeHtml(value) {
   return String(value || '').replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -306,6 +310,11 @@ function wikiEditorSyncHint() {
   return 'Markdown 원문을 직접 수정합니다.';
 }
 
+function wikiEditorAiStatusText() {
+  if (wikiState.editorAiLoading) return 'AI가 현재 문서 초안을 생성하는 중입니다.';
+  return wikiState.editorAiStatus || '현재 Markdown과 지시문을 기준으로 AI 초안을 편집기에 반영합니다.';
+}
+
 function wikiApplyEditorState() {
   const canEdit = wikiEditablePage();
   const open = canEdit && wikiState.editorOpen;
@@ -314,14 +323,18 @@ function wikiApplyEditorState() {
   const article = wiki$('wikiArticle');
   const pageNav = wiki$('wikiPageNav');
   const textarea = wiki$('wikiEditorTextarea');
+  const aiInstruction = wiki$('wikiEditorAiInstruction');
+  const aiButton = wiki$('wikiEditorAiBtn');
+  const aiStatus = wiki$('wikiEditorAiStatus');
   const cancelBtn = wiki$('wikiEditorCancelBtn');
   const saveBtn = wiki$('wikiEditorSaveBtn');
   const source = wiki$('wikiEditorSource');
   const hint = wiki$('wikiEditorHint');
+  const editorBusy = wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading;
 
   if (editBtn) {
     editBtn.hidden = !canEdit || open;
-    editBtn.disabled = wikiState.editorLoading || wikiState.editorSaving;
+    editBtn.disabled = wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading;
   }
   if (panel) {
     panel.hidden = !open;
@@ -340,17 +353,48 @@ function wikiApplyEditorState() {
     hint.textContent = wikiState.editorLoading ? '문서 원본을 불러오는 중입니다.' : wikiEditorSyncHint();
   }
   if (textarea) {
-    textarea.disabled = wikiState.editorLoading || wikiState.editorSaving;
+    textarea.disabled = editorBusy;
     textarea.placeholder = wikiState.editorLoading ? '문서를 불러오는 중입니다...' : 'Markdown 원문을 입력하세요.';
     if (!open) {
       textarea.value = '';
     }
   }
+  if (aiInstruction) {
+    aiInstruction.disabled = !open || editorBusy;
+    if (!open) {
+      aiInstruction.value = '';
+    }
+  }
+  if (aiButton) {
+    if (wikiAiTools?.setButtonBusy) {
+      wikiAiTools.setButtonBusy(aiButton, {
+        busy: wikiState.editorAiLoading,
+        disabled: !open || editorBusy,
+        idleLabel: 'AI',
+        busyLabel: '…',
+        idleTitle: 'AI로 문서 다듬기',
+        busyTitle: 'AI가 문서를 다듬는 중입니다',
+        idleTip: '위키 AI',
+        busyTip: '변환 중',
+      });
+    } else {
+      aiButton.disabled = !open || editorBusy;
+      aiButton.textContent = wikiState.editorAiLoading ? '…' : 'AI';
+    }
+  }
+  if (aiStatus) {
+    if (wikiAiTools?.setStatus) {
+      wikiAiTools.setStatus(aiStatus, open ? wikiEditorAiStatusText() : '', open && wikiState.editorAiStatusError);
+    } else {
+      aiStatus.textContent = open ? wikiEditorAiStatusText() : '';
+      aiStatus.classList.toggle('error-text', Boolean(open && wikiState.editorAiStatusError));
+    }
+  }
   if (cancelBtn) {
-    cancelBtn.disabled = !open || wikiState.editorSaving;
+    cancelBtn.disabled = !open || wikiState.editorSaving || wikiState.editorAiLoading;
   }
   if (saveBtn) {
-    saveBtn.disabled = !open || wikiState.editorLoading || wikiState.editorSaving;
+    saveBtn.disabled = !open || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading;
     saveBtn.textContent = wikiState.editorSaving ? '저장 중...' : '저장';
   }
 }
@@ -359,6 +403,9 @@ function wikiResetEditorState() {
   wikiState.editorOpen = false;
   wikiState.editorLoading = false;
   wikiState.editorSaving = false;
+  wikiState.editorAiLoading = false;
+  wikiState.editorAiStatus = '';
+  wikiState.editorAiStatusError = false;
   wikiState.editorSourcePath = '';
   wikiState.editorOriginalContent = '';
 }
@@ -373,6 +420,10 @@ function wikiCloseEditor({force = false} = {}) {
 }
 
 function wikiConfirmEditorNavigation() {
+  if (wikiState.editorAiLoading) {
+    wikiStatus('AI 초안 생성이 끝난 뒤 이동하세요.', true);
+    return false;
+  }
   if (!wikiEditorHasUnsavedChanges()) return true;
   return window.confirm('저장하지 않은 변경사항을 버리고 이동할까요?');
 }
@@ -396,6 +447,7 @@ function wikiApplyPage(page) {
 }
 
 async function wikiResponseError(res) {
+  if (wikiAiTools?.responseErrorText) return wikiAiTools.responseErrorText(res);
   const raw = await res.text();
   let message = raw || `${res.status}`;
   try {
@@ -436,13 +488,16 @@ async function wikiLoadPage(slug, {push = false} = {}) {
 
 async function wikiStartEdit() {
   const page = wikiState.page;
-  if (!wikiEditablePage(page) || wikiState.editorLoading || wikiState.editorSaving) return;
+  if (!wikiEditablePage(page) || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading) return;
   if (wikiState.editorOpen) {
     wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
     return;
   }
   wikiState.editorOpen = true;
   wikiState.editorLoading = true;
+  wikiState.editorAiLoading = false;
+  wikiState.editorAiStatus = '';
+  wikiState.editorAiStatusError = false;
   wikiState.editorSourcePath = page?.source_path || '';
   wikiState.editorOriginalContent = '';
   wikiApplyEditorState();
@@ -466,8 +521,58 @@ async function wikiStartEdit() {
   wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
 }
 
+async function wikiRunAiRewrite() {
+  if (!wikiState.editorOpen || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading) return;
+  const sourcePath = String(wikiState.editorSourcePath || wikiState.page?.source_path || '').trim();
+  const textarea = wiki$('wikiEditorTextarea');
+  const instructionInput = wiki$('wikiEditorAiInstruction');
+  const content = textarea?.value || '';
+  if (!sourcePath) {
+    wikiState.editorAiStatus = 'AI 수정 실패: 원본 경로를 찾지 못했습니다.';
+    wikiState.editorAiStatusError = true;
+    wikiApplyEditorState();
+    return;
+  }
+  wikiState.editorAiLoading = true;
+  wikiState.editorAiStatus = 'AI가 Markdown 초안을 생성하는 중입니다.';
+  wikiState.editorAiStatusError = false;
+  wikiApplyEditorState();
+  try {
+    const response = wikiAiTools?.postJson
+      ? await wikiAiTools.postJson(wikiApiUrl('/api/wiki/ai-rewrite/preview'), {
+          source_path: sourcePath,
+          content,
+          instruction: instructionInput?.value || '',
+        })
+      : await wikiFetchJson(wikiApiUrl('/api/wiki/ai-rewrite/preview'), {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            source_path: sourcePath,
+            content,
+            instruction: instructionInput?.value || '',
+          }),
+        });
+    if (!wikiState.editorOpen || String(wikiState.editorSourcePath || '').trim() !== sourcePath) return;
+    const nextContent = String(response?.proposal?.content ?? '');
+    if (!textarea) throw new Error('편집기를 찾지 못했습니다.');
+    textarea.value = nextContent;
+    wikiState.editorAiStatus = `${response?.title || wikiState.page?.title || '문서'} AI 초안을 편집기에 반영했습니다. 검토 후 저장하세요.`;
+    wikiState.editorAiStatusError = false;
+    wikiStatus(`${response?.title || wikiState.page?.title || '문서'} AI 초안 반영 완료`);
+    textarea.focus({preventScroll: true});
+  } catch (error) {
+    wikiState.editorAiStatus = `AI 수정 실패: ${error.message || error}`;
+    wikiState.editorAiStatusError = true;
+    wikiStatus(`AI 수정 실패: ${error.message || error}`, true);
+  } finally {
+    wikiState.editorAiLoading = false;
+    wikiApplyEditorState();
+  }
+}
+
 async function wikiSaveEditor() {
-  if (!wikiState.editorOpen || wikiState.editorLoading || wikiState.editorSaving) return;
+  if (!wikiState.editorOpen || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading) return;
   const sourcePath = String(wikiState.editorSourcePath || wikiState.page?.source_path || '').trim();
   if (!sourcePath) {
     wikiStatus('문서 저장 실패: 원본 경로를 찾지 못했습니다.', true);
@@ -587,6 +692,9 @@ wiki$('wikiEditorCancelBtn')?.addEventListener('click', () => {
 });
 wiki$('wikiEditorSaveBtn')?.addEventListener('click', () => {
   wikiSaveEditor();
+});
+wiki$('wikiEditorAiBtn')?.addEventListener('click', () => {
+  wikiRunAiRewrite();
 });
 
 window.addEventListener('popstate', () => {

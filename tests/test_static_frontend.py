@@ -9,6 +9,7 @@ QUESTION_BANK_HTML = (ROOT / 'static' / 'question-bank.html').read_text(encoding
 WIKI_JS = (ROOT / 'static' / 'wiki.js').read_text(encoding='utf-8')
 QUESTION_BANK_JS = (ROOT / 'static' / 'question-bank.js').read_text(encoding='utf-8')
 STYLE_CSS = (ROOT / 'static' / 'style.css').read_text(encoding='utf-8')
+AI_TOOLS_JS = (ROOT / 'static' / 'ai-tools.js').read_text(encoding='utf-8')
 
 
 class StaticFrontendTests(unittest.TestCase):
@@ -58,6 +59,7 @@ class StaticFrontendTests(unittest.TestCase):
             'id="bookmarkListDialog"',
             'id="bookmarkListBody"',
             'id="flashcardTableBtn"',
+            'id="mindMapBtn"',
             'id="definitionAiBtn"',
             'id="detailAiBtn"',
             'id="examAiBtn"',
@@ -86,6 +88,15 @@ class StaticFrontendTests(unittest.TestCase):
             '__csFlashcardsRegisterTableWindow',
             'function bootstrapFlashcardTablePopupWindow()',
             "popupUrl.searchParams.set('popup', 'flashcard-table')",
+            'mindMapWindow: null,',
+            'function buildMindMapGraphData(cards = state.filtered',
+            'function renderMindMapWindow()',
+            'function registerMindMapWindow(popupWindow = null)',
+            '__csFlashcardsRegisterMindMapWindow',
+            '__csFlashcardsSelectCardFromMindMap',
+            'function bootstrapMindMapPopupWindow()',
+            'function openMindMapWindow()',
+            "popupUrl.searchParams.set('popup', 'mind-map')",
             'function toggleFlashcardBookmarkFromTable(cardId)',
             'function setFlashcardStatusFromTable(cardId, status)',
             '__csFlashcardsToggleBookmarkFromTable',
@@ -158,6 +169,7 @@ class StaticFrontendTests(unittest.TestCase):
         menu_popover = INDEX_HTML.split('id="menuPopover"', 1)[1].split('</div>', 1)[0]
         self.assertIn('id="wikiHomeLink"', menu_popover)
         self.assertIn('id="questionBankPageLink"', menu_popover)
+        self.assertIn('id="mindMapBtn"', menu_popover)
         self.assertIn('function renderSourceLinks(sourceFiles)', APP_JS)
         self.assertIn("$('sources').innerHTML = renderSourceLinks(c.source_files);", APP_JS)
         self.assertIn('/wiki/page/', APP_JS)
@@ -187,9 +199,16 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="wikiEditorTextarea"', WIKI_HTML)
         self.assertIn('id="wikiEditorSaveBtn"', WIKI_HTML)
         self.assertIn('id="wikiEditorCancelBtn"', WIKI_HTML)
+        self.assertIn('id="wikiEditorAiBtn"', WIKI_HTML)
+        self.assertIn('id="wikiEditorAiInstruction"', WIKI_HTML)
+        self.assertIn('id="wikiEditorAiStatus"', WIKI_HTML)
         self.assertLess(WIKI_HTML.index('id="wikiPageNav"'), WIKI_HTML.index('id="wikiRawLink"'))
         self.assertLess(WIKI_HTML.index('id="wikiArticle"'), WIKI_HTML.index('id="wikiRawLink"'))
         self.assertIn('pretendard.css', WIKI_HTML)
+        self.assertIn('/static/ai-tools.js', INDEX_HTML)
+        self.assertIn('/static/ai-tools.js', WIKI_HTML)
+        self.assertIn('window.CsAiTools', AI_TOOLS_JS)
+        self.assertIn('function setButtonBusy(', AI_TOOLS_JS)
         self.assertIn('WIKI_SIDEBAR_STATE_KEY', WIKI_JS)
         self.assertIn('function applyWikiSidebarState(', WIKI_JS)
         self.assertIn('function applyWikiSearchState(', WIKI_JS)
@@ -206,6 +225,12 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('function wikiEditorHasUnsavedChanges()', WIKI_JS)
         self.assertIn('function wikiFetchText(', WIKI_JS)
         self.assertIn('/api/wiki/page', WIKI_JS)
+        self.assertIn('function wikiRunAiRewrite()', WIKI_JS)
+        self.assertIn('/api/wiki/ai-rewrite/preview', WIKI_JS)
+        self.assertIn('wikiEditorAiBtn', WIKI_JS)
+        self.assertIn('wikiEditorAiInstruction', WIKI_JS)
+        self.assertIn('wikiEditorAiStatus', WIKI_JS)
+        self.assertIn('window.CsAiTools', APP_JS)
         self.assertIn("event.key.toLowerCase() === 's'", WIKI_JS)
         self.assertIn('wikiRenderPageNav(page);', WIKI_JS)
         self.assertIn('closeWikiSidebarOnMobile()', WIKI_JS)
@@ -236,6 +261,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.wiki-editor', STYLE_CSS)
         self.assertIn('.wiki-editor-textarea', STYLE_CSS)
         self.assertIn('.wiki-editor-actions', STYLE_CSS)
+        self.assertIn('.wiki-editor-ai', STYLE_CSS)
+        self.assertIn('.wiki-editor-ai-input', STYLE_CSS)
+        self.assertIn('.wiki-editor-ai-status', STYLE_CSS)
         self.assertIn('--wiki-font-family: "Pretendard"', STYLE_CSS)
         self.assertIn('.wiki-page-shell :where(h1, h2, h3, h4, h5, h6, pre, code, kbd, samp)', STYLE_CSS)
         self.assertIn('expandedToc: {}', WIKI_JS)

@@ -166,6 +166,12 @@ class WikiPageUpdateRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     content: str = Field(max_length=2_000_000)
     previous_content: str | None = Field(default=None, max_length=2_000_000)
+
+
+class WikiAiRewriteRequest(BaseModel):
+    source_path: str = Field(min_length=1, max_length=4096)
+    content: str = Field(max_length=2_000_000)
+    instruction: str = Field(default="", max_length=4000)
 class CardAiRewriteRequest(BaseModel):
     instruction: str = Field(default="", max_length=4000)
 
@@ -869,7 +875,7 @@ def openai_error_message(raw: str, fallback: str) -> str:
     return str(message or raw or fallback).strip()
 
 
-def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict[str, str]:
+def request_codex_json_object(system_text: str, user_payload: dict[str, Any], *, parse_error_message: str) -> dict[str, Any]:
     if not OPENAI_API_KEY:
         raise RuntimeError("OPENAI_API_KEY가 설정되지 않아 Codex AI 초안을 만들 수 없습니다.")
     payload = {
@@ -880,14 +886,7 @@ def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict
                 "content": [
                     {
                         "type": "input_text",
-                        "text": (
-                            "You rewrite Korean CS flashcard content. Return only one JSON object with the keys "
-                            "definition, detailed_explanation, exam_note, concept_image_alt. Keep facts grounded in the "
-                            "provided card. Do not invent source files, links, or citations. definition should be 1-2 "
-                            "sentences. detailed_explanation must stay in Korean and include both '의미:' and '활용:' "
-                            "sections. exam_note should be concise interview/exam guidance. concept_image_alt should be a "
-                            "short Korean alt text only, not a URL."
-                        ),
+                        "text": system_text,
                     }
                 ],
             },
@@ -896,26 +895,7 @@ def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict
                 "content": [
                     {
                         "type": "input_text",
-                        "text": json.dumps(
-                            {
-                                "instruction": str(instruction or "").strip() or "현재 카드 내용을 더 명확하고 학습 친화적으로 다듬어 주세요.",
-                                "card": {
-                                    "id": card.get("id", ""),
-                                    "term": card.get("term", ""),
-                                    "english": card.get("english", ""),
-                                    "category": card.get("category", ""),
-                                    "definition": card.get("definition", ""),
-                                    "detailed_explanation": card.get("detailed_explanation", ""),
-                                    "related_concepts": card.get("related_concepts", ""),
-                                    "exam_note": card.get("exam_note", ""),
-                                    "bok_appeared": card.get("bok_appeared", ""),
-                                    "importance": card.get("importance", ""),
-                                    "difficulty": card.get("difficulty", ""),
-                                    "concept_image_alt": card.get("concept_image_alt", ""),
-                                },
-                            },
-                            ensure_ascii=False,
-                        ),
+                        "text": json.dumps(user_payload, ensure_ascii=False),
                     }
                 ],
             },
@@ -946,7 +926,41 @@ def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict
     try:
         parsed = json.loads(extract_json_object_text(raw_text))
     except (json.JSONDecodeError, ValueError) as exc:
-        raise RuntimeError("Codex 응답을 카드 초안 JSON으로 해석하지 못했습니다.") from exc
+        raise RuntimeError(parse_error_message) from exc
+    if not isinstance(parsed, dict):
+        raise RuntimeError(parse_error_message)
+    return parsed
+
+
+def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict[str, str]:
+    parsed = request_codex_json_object(
+        (
+            "You rewrite Korean CS flashcard content. Return only one JSON object with the keys "
+            "definition, detailed_explanation, exam_note, concept_image_alt. Keep facts grounded in the "
+            "provided card. Do not invent source files, links, or citations. definition should be 1-2 "
+            "sentences. detailed_explanation must stay in Korean and include both '의미:' and '활용:' "
+            "sections. exam_note should be concise interview/exam guidance. concept_image_alt should be a "
+            "short Korean alt text only, not a URL."
+        ),
+        {
+            "instruction": str(instruction or "").strip() or "현재 카드 내용을 더 명확하고 학습 친화적으로 다듬어 주세요.",
+            "card": {
+                "id": card.get("id", ""),
+                "term": card.get("term", ""),
+                "english": card.get("english", ""),
+                "category": card.get("category", ""),
+                "definition": card.get("definition", ""),
+                "detailed_explanation": card.get("detailed_explanation", ""),
+                "related_concepts": card.get("related_concepts", ""),
+                "exam_note": card.get("exam_note", ""),
+                "bok_appeared": card.get("bok_appeared", ""),
+                "importance": card.get("importance", ""),
+                "difficulty": card.get("difficulty", ""),
+                "concept_image_alt": card.get("concept_image_alt", ""),
+            },
+        },
+        parse_error_message="Codex 응답을 카드 초안 JSON으로 해석하지 못했습니다.",
+    )
     rewritten: dict[str, str] = {}
     for field in CARD_AI_EDITABLE_FIELDS:
         rewritten[field] = normalized_card_text(
@@ -954,6 +968,31 @@ def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict
             limit=AI_REWRITE_FIELD_LIMITS[field],
         )
     return rewritten
+
+
+def rewrite_wiki_markdown_with_codex(source_path: str, content: str, instruction: str = "") -> str:
+    title = extract_markdown_title(content, PurePosixPath(str(source_path or "wiki.md")).stem or "문서")
+    parsed = request_codex_json_object(
+        (
+            "You rewrite Korean CS wiki markdown. Return only one JSON object with the key content. "
+            "Keep markdown valid and preserve headings, checklists, tables, code fences, relative links, and "
+            "file paths unless the instruction explicitly changes them. Keep facts grounded in the provided "
+            "document. Do not invent citations, URLs, or source files."
+        ),
+        {
+            "instruction": str(instruction or "").strip() or "현재 위키 문서를 더 명확하고 학습 친화적으로 다듬어 주세요. Markdown 구조와 링크는 유지해 주세요.",
+            "page": {
+                "source_path": str(source_path or "").strip(),
+                "title": title,
+                "content": content,
+            },
+        },
+        parse_error_message="Codex 응답을 위키 초안 JSON으로 해석하지 못했습니다.",
+    )
+    rewritten = parsed.get("content")
+    if not isinstance(rewritten, str):
+        raise RuntimeError("Codex 응답에서 위키 Markdown 초안을 찾지 못했습니다.")
+    return rewritten.replace("\r\n", "\n")[:2_000_000]
 
 
 def update_card_ai_content(
@@ -3085,6 +3124,30 @@ def api_wiki_page(page_slug: str) -> dict[str, Any]:
         return read_wiki_page(page_slug)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/wiki/ai-rewrite/preview")
+def api_wiki_ai_rewrite_preview(payload: WikiAiRewriteRequest) -> dict[str, Any]:
+    try:
+        repo, target, source_relative, _ = resolve_wiki_markdown_source(payload.source_path)
+        proposal_content = rewrite_wiki_markdown_with_codex(source_relative, payload.content, payload.instruction)
+        return {
+            "source_path": source_relative,
+            "page_slug": wiki_slug_for_source(repo, target),
+            "title": extract_markdown_title(proposal_content, target.stem),
+            "model": CODEX_MODEL,
+            "proposal": {
+                "content": proposal_content,
+            },
+        }
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 

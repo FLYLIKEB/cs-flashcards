@@ -8,6 +8,7 @@
   <link rel="apple-touch-icon" href="/static/favicon.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
   <link rel="stylesheet" href="/static/style.css" />
+  <script defer src="/static/ai-tools.js"></script>
   <script defer src="/static/wiki.js"></script>
 </head>
 <body class="wiki-page-shell">
@@ -56,6 +57,14 @@
           <p id="wikiEditorHint" class="wiki-editor-hint">Markdown 원문을 직접 수정합니다.</p>
         </div>
         <textarea id="wikiEditorTextarea" class="wiki-editor-textarea" spellcheck="false" aria-label="위키 문서 원문"></textarea>
+        <div class="wiki-editor-ai" aria-label="AI 위키 수정">
+          <div class="wiki-editor-ai-head">
+            <label class="wiki-editor-ai-label" for="wikiEditorAiInstruction">AI 수정 지시</label>
+            <button id="wikiEditorAiBtn" class="inline-ai-btn has-tip" type="button" title="AI로 문서 다듬기" data-tip="위키 AI">AI</button>
+          </div>
+          <textarea id="wikiEditorAiInstruction" class="wiki-editor-ai-input" rows="2" maxlength="4000" placeholder="예: 면접 답변용으로 더 간결하게 정리하고 Markdown 표/링크 구조는 유지"></textarea>
+          <p id="wikiEditorAiStatus" class="wiki-editor-ai-status">현재 Markdown과 지시문을 기준으로 AI 초안을 편집기에 반영합니다.</p>
+        </div>
         <div class="wiki-editor-actions">
           <button id="wikiEditorCancelBtn" class="header-link" type="button">취소</button>
           <button id="wikiEditorSaveBtn" class="header-link" type="button">저장</button>
