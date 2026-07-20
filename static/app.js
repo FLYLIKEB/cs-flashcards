@@ -26,6 +26,7 @@ const state = {
 
   menuOpen: false,
   flashcardTableWindow: null,
+  mindMapWindow: null,
   speechHighlight: null,
   speechCurrent: null,
   speechUtterance: null,
@@ -2763,6 +2764,363 @@ function selectCardFromFlashcardTable(cardId) {
 }
 
 window.__csFlashcardsSelectCardFromTable = selectCardFromFlashcardTable;
+function selectCardFromMindMap(cardId) {
+  const moved = selectCardFromFlashcardTable(cardId);
+  if (moved) focusAppCard();
+  return moved;
+}
+
+window.__csFlashcardsSelectCardFromMindMap = selectCardFromMindMap;
+
+function mindMapPopupRequested() {
+  try {
+    return new URLSearchParams(window.location.search).get('popup') === 'mind-map';
+  } catch (_error) {
+    return false;
+  }
+}
+
+function registerMindMapWindow(popupWindow = null) {
+  if (!popupWindow || popupWindow.closed) return false;
+  state.mindMapWindow = popupWindow;
+  renderMindMapWindow();
+  return true;
+}
+
+window.__csFlashcardsRegisterMindMapWindow = registerMindMapWindow;
+window.__csFlashcardsMindMapClosed = () => {
+  state.mindMapWindow = null;
+};
+
+function buildMindMapGraphData(cards = state.filtered, currentCardId = state.filtered[state.index]?.id || '') {
+  const visibleCards = Array.isArray(cards) ? cards.filter((card) => card && card.id) : [];
+  const currentCard = visibleCards.find((card) => card.id === currentCardId) || visibleCards[0] || null;
+  const visibleByConcept = new Map();
+  const edgeMap = new Map();
+  const currentRelated = new Set(currentCard ? uniqueRelatedConcepts(currentCard.related_concepts).map((term) => normalizeTerm(term)) : []);
+  const currentKeys = new Set(currentCard ? [normalizeTerm(currentCard.term), normalizeTerm(currentCard.english)].filter(Boolean) : []);
+
+  const registerVisibleCard = (card) => {
+    [card.term, card.english].map((value) => normalizeTerm(value)).filter(Boolean).forEach((key) => {
+      if (!visibleByConcept.has(key)) visibleByConcept.set(key, card);
+    });
+  };
+  const cardsDirectlyRelated = (source, target) => {
+    if (!source || !target || source.id === target.id) return false;
+    const sourceRelated = new Set(uniqueRelatedConcepts(source.related_concepts).map((term) => normalizeTerm(term)));
+    const sourceKeys = [normalizeTerm(source.term), normalizeTerm(source.english)].filter(Boolean);
+    const targetKeys = [normalizeTerm(target.term), normalizeTerm(target.english)].filter(Boolean);
+    return sourceKeys.some((key) => targetKeys.includes(key))
+      || targetKeys.some((key) => sourceRelated.has(key))
+      || sourceKeys.some((key) => {
+        const targetRelated = uniqueRelatedConcepts(target.related_concepts).map((term) => normalizeTerm(term));
+        return targetRelated.includes(key);
+      });
+  };
+  const setEdge = (sourceId, targetId, kind = 'related') => {
+    if (!sourceId || !targetId || sourceId === targetId) return;
+    const [from, to] = [sourceId, targetId].sort();
+    const key = `${from}::${to}`;
+    const previous = edgeMap.get(key);
+    if (!previous || previous.kind === 'current-visible' || kind === 'current-related') {
+      edgeMap.set(key, {sourceId: from, targetId: to, kind});
+    }
+  };
+
+  visibleCards.forEach(registerVisibleCard);
+
+  visibleCards.forEach((card) => {
+    uniqueRelatedConcepts(card.related_concepts).forEach((term) => {
+      const target = visibleByConcept.get(normalizeTerm(term));
+      if (target && target.id !== card.id) setEdge(card.id, target.id, 'related');
+    });
+  });
+
+  const nodes = visibleCards.map((card) => {
+    const meta = categoryMeta(card.category);
+    const keys = [normalizeTerm(card.term), normalizeTerm(card.english)].filter(Boolean);
+    const connectedToCurrent = !currentCard || card.id === currentCard.id || keys.some((key) => currentRelated.has(key)) || [...currentKeys].some((key) => uniqueRelatedConcepts(card.related_concepts).map((term) => normalizeTerm(term)).includes(key));
+    return {
+      id: card.id,
+      term: card.term || card.id,
+      english: card.english || '',
+      category: card.category || '',
+      categoryLabel: categoryLabel(card.category),
+      emoji: meta.emoji,
+      className: meta.className,
+      color: CATEGORY_COLORS[card.category] || '#1f3a5f',
+      relatedCount: uniqueRelatedConcepts(card.related_concepts).length,
+      isCurrent: Boolean(currentCard && card.id === currentCard.id),
+      connectedToCurrent,
+    };
+  });
+
+  if (currentCard) {
+    nodes.forEach((node) => {
+      if (node.id === currentCard.id) return;
+      setEdge(currentCard.id, node.id, node.connectedToCurrent ? 'current-related' : 'current-visible');
+    });
+    visibleCards.forEach((card) => {
+      if (card.id === currentCard.id) return;
+      if (cardsDirectlyRelated(currentCard, card)) setEdge(currentCard.id, card.id, 'current-related');
+    });
+  }
+
+  return {
+    currentCard,
+    nodes,
+    edges: [...edgeMap.values()],
+    cards: visibleCards,
+  };
+}
+
+function buildMindMapLayout(graph) {
+  const nodes = Array.isArray(graph?.nodes) ? [...graph.nodes] : [];
+  const currentNode = nodes.find((node) => node.isCurrent) || nodes[0] || null;
+  const others = nodes.filter((node) => !currentNode || node.id !== currentNode.id)
+    .sort((a, b) => Number(b.connectedToCurrent) - Number(a.connectedToCurrent)
+      || b.relatedCount - a.relatedCount
+      || a.categoryLabel.localeCompare(b.categoryLabel)
+      || a.term.localeCompare(b.term));
+  const ringSize = 10;
+  const ringCount = others.length ? Math.ceil(others.length / ringSize) : 0;
+  const width = Math.max(980, 760 + Math.min(others.length, 18) * 56);
+  const height = Math.max(680, 620 + Math.max(0, ringCount - 1) * 120);
+  const centerX = width / 2;
+  const centerY = Math.max(280, height / 2 - 24);
+  const positioned = new Map();
+
+  if (currentNode) {
+    positioned.set(currentNode.id, {...currentNode, x: centerX, y: centerY, width: 208, height: 96});
+  }
+
+  others.forEach((node, index) => {
+    const ringIndex = Math.floor(index / ringSize);
+    const ringStart = ringIndex * ringSize;
+    const nodesInRing = Math.min(ringSize, others.length - ringStart);
+    const offset = index - ringStart;
+    const angle = -Math.PI / 2 + ((Math.PI * 2) / Math.max(nodesInRing, 1)) * offset;
+    const radius = 220 + ringIndex * 142;
+    positioned.set(node.id, {
+      ...node,
+      x: centerX + Math.cos(angle) * radius,
+      y: centerY + Math.sin(angle) * radius,
+      width: 168,
+      height: 82,
+    });
+  });
+
+  return {
+    width,
+    height,
+    nodes: [...positioned.values()],
+    edges: (graph?.edges || []).map((edge) => ({
+      ...edge,
+      source: positioned.get(edge.sourceId) || null,
+      target: positioned.get(edge.targetId) || null,
+    })).filter((edge) => edge.source && edge.target),
+  };
+}
+
+function renderMindMapWindow() {
+  const popup = state.mindMapWindow;
+  if (!popup || popup.closed) {
+    state.mindMapWindow = null;
+    return;
+  }
+  const graph = buildMindMapGraphData();
+  const layout = buildMindMapLayout(graph);
+  const currentCard = graph.currentCard;
+  const summaryText = flashcardTableSummaryText();
+  const nodes = layout.nodes;
+  const listCards = [...nodes].sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent)
+    || Number(b.connectedToCurrent) - Number(a.connectedToCurrent)
+    || a.term.localeCompare(b.term));
+  try {
+    popup.document.open();
+    popup.document.write(`<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>플래시카드 마인드맵</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%); color: #0f172a; }
+    .mindmap-shell { min-height: 100vh; padding: 18px; display: grid; gap: 16px; }
+    .mindmap-panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      border-radius: 22px;
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
+      overflow: hidden;
+    }
+    .mindmap-head { padding: 18px 20px 10px; display: grid; gap: 6px; }
+    .mindmap-kicker { margin: 0; font-size: 12px; font-weight: 700; color: #2563eb; }
+    .mindmap-title { margin: 0; font-size: 28px; font-weight: 800; }
+    .mindmap-summary, .mindmap-hint { margin: 0; color: #475569; font-size: 14px; }
+    .mindmap-stage-wrap { padding: 0 12px 12px; }
+    .mindmap-stage {
+      position: relative;
+      min-height: 360px;
+      overflow: auto;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, rgba(219, 234, 254, 0.72), rgba(248, 250, 252, 0.96));
+    }
+    .mindmap-svg { display: block; }
+    .mindmap-edge { stroke: rgba(71, 85, 105, 0.32); stroke-width: 2; }
+    .mindmap-edge.current-related { stroke: rgba(37, 99, 235, 0.46); stroke-width: 3; }
+    .mindmap-edge.related { stroke: rgba(14, 116, 144, 0.26); }
+    .mindmap-node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border: 0;
+      border-radius: 18px;
+      padding: 12px 14px;
+      text-align: left;
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+      cursor: pointer;
+    }
+    .mindmap-node.current {
+      border-radius: 22px;
+      box-shadow: 0 18px 36px rgba(37, 99, 235, 0.22);
+    }
+    .mindmap-node.connected {
+      outline: 2px solid rgba(37, 99, 235, 0.16);
+      outline-offset: 0;
+    }
+    .mindmap-node-meta { display: block; font-size: 12px; color: #475569; margin-bottom: 4px; }
+    .mindmap-node-term { display: block; font-size: 16px; font-weight: 800; line-height: 1.3; }
+    .mindmap-node-english { display: block; margin-top: 4px; font-size: 12px; color: #334155; }
+    .mindmap-list { padding: 0 12px 12px; }
+    .mindmap-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .mindmap-list button {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 16px;
+      background: #fff;
+      padding: 12px 14px;
+      text-align: left;
+      cursor: pointer;
+      color: inherit;
+    }
+    .mindmap-list button.current {
+      border-color: rgba(37, 99, 235, 0.38);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.16);
+    }
+    .mindmap-list-term { display: block; font-weight: 800; }
+    .mindmap-list-meta, .mindmap-list-english { display: block; margin-top: 4px; font-size: 12px; color: #475569; }
+    .mindmap-empty { padding: 56px 20px; text-align: center; color: #475569; }
+  </style>
+</head>
+<body>
+  <main class="mindmap-shell">
+    <section class="mindmap-panel">
+      <header class="mindmap-head">
+        <p class="mindmap-kicker">현재 필터 기준 마인드맵</p>
+        <h1 class="mindmap-title">${escapeHtml(currentCard ? currentCard.term || currentCard.id : '표시할 카드 없음')}</h1>
+        <p class="mindmap-summary">${escapeHtml(summaryText)} · ${graph.cards.length}개 · 현재 ${graph.cards.length ? state.index + 1 : 0}</p>
+        <p class="mindmap-hint">노드나 목록을 누르면 원본 창 카드로 이동합니다.</p>
+      </header>
+      <div class="mindmap-stage-wrap">
+        <div class="mindmap-stage">
+          ${nodes.length ? `
+            <svg class="mindmap-svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}" aria-hidden="true">
+              ${layout.edges.map((edge) => `<line class="mindmap-edge ${escapeHtml(edge.kind)}" x1="${edge.source.x}" y1="${edge.source.y}" x2="${edge.target.x}" y2="${edge.target.y}" />`).join('')}
+            </svg>
+            ${nodes.map((node) => {
+              const shadowColor = `${node.color}22`;
+              return `<button class="mindmap-node${node.isCurrent ? ' current' : ''}${node.connectedToCurrent ? ' connected' : ''}" type="button" data-card-id="${escapeHtml(node.id)}" style="left:${node.x}px;top:${node.y}px;width:${node.width}px;min-height:${node.height}px;border:1px solid ${escapeHtml(node.color)}44;background:linear-gradient(180deg, #ffffff 0%, ${escapeHtml(shadowColor)} 100%);">
+                <span class="mindmap-node-meta">${escapeHtml(node.categoryLabel)}</span>
+                <strong class="mindmap-node-term">${escapeHtml(node.emoji)} ${escapeHtml(node.term)}</strong>
+                ${node.english ? `<span class="mindmap-node-english">${escapeHtml(node.english)}</span>` : ''}
+              </button>`;
+            }).join('')}
+          ` : `<div class="mindmap-empty">현재 필터 조건에 맞는 카드가 없습니다.</div>`}
+        </div>
+      </div>
+      <div class="mindmap-list">
+        <ul class="mindmap-list-grid">
+          ${listCards.map((node) => `<li><button class="${node.isCurrent ? 'current' : ''}" type="button" data-card-id="${escapeHtml(node.id)}"><strong class="mindmap-list-term">${escapeHtml(node.term)}</strong><span class="mindmap-list-meta">${escapeHtml(node.categoryLabel)}${node.connectedToCurrent && !node.isCurrent ? ' · 중심 카드와 연결' : ''}</span>${node.english ? `<span class="mindmap-list-english">${escapeHtml(node.english)}</span>` : ''}</button></li>`).join('')}
+        </ul>
+      </div>
+    </section>
+  </main>
+  <script>
+    const invokeOpener = (callbackName, ...args) => {
+      const openerRef = window.opener;
+      if (!openerRef || openerRef.closed || typeof openerRef[callbackName] !== 'function') return false;
+      window.setTimeout(() => {
+        try {
+          openerRef[callbackName](...args);
+          openerRef.focus?.();
+        } catch (_error) {}
+      }, 0);
+      return true;
+    };
+    document.addEventListener('click', (event) => {
+      const trigger = event.target.closest('[data-card-id]');
+      if (!trigger) return;
+      event.preventDefault();
+      invokeOpener('__csFlashcardsSelectCardFromMindMap', trigger.dataset.cardId || '');
+    });
+    window.addEventListener('beforeunload', () => {
+      invokeOpener('__csFlashcardsMindMapClosed');
+    });
+  </script>
+</body>
+</html>`);
+    popup.document.close();
+  } catch (_error) {
+    state.mindMapWindow = null;
+    setMessage('마인드맵 창을 새로 열어주세요.', true);
+  }
+}
+
+function bootstrapMindMapPopupWindow() {
+  if (!mindMapPopupRequested()) return false;
+  const openerRef = window.opener;
+  if (!openerRef || openerRef.closed || typeof openerRef.__csFlashcardsRegisterMindMapWindow !== 'function') {
+    document.body.innerHTML = '<div style="padding:16px;font:12px -apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans KR,sans-serif;color:#444;">원본 창을 먼저 연 뒤 다시 시도하세요.</div>';
+    return true;
+  }
+  openerRef.__csFlashcardsRegisterMindMapWindow(window);
+  return true;
+}
+
+function openMindMapWindow() {
+  toggleMenu(false);
+  if (state.mindMapWindow && !state.mindMapWindow.closed) {
+    renderMindMapWindow();
+    state.mindMapWindow.focus();
+    return;
+  }
+  const popupUrl = new window.URL(window.location.href);
+  popupUrl.searchParams.set('popup', 'mind-map');
+  const popup = window.open(popupUrl.toString(), 'csFlashcardsMindMapWindow', 'popup=yes,width=1280,height=900,resizable=yes,scrollbars=yes');
+  if (!popup) {
+    setMessage('팝업이 차단되어 마인드맵을 열지 못했습니다.', true);
+    return;
+  }
+  state.mindMapWindow = popup;
+  renderMindMapWindow();
+  popup.focus();
+}
 
 function flashcardTablePopupRequested() {
   try {
@@ -4745,6 +5103,7 @@ function renderCard() {
     renderPersonalControls(null);
     saveViewState();
     syncFlashcardTableWindowSelection();
+    renderMindMapWindow();
     return;
   }
 
@@ -4802,6 +5161,7 @@ function renderCard() {
   updateConceptBackButton();
   saveViewState();
   syncFlashcardTableWindowSelection();
+  renderMindMapWindow();
 }
 
 
@@ -5214,6 +5574,7 @@ $('menuBtn').addEventListener('click', (event) => {
 $('memoListBtn').addEventListener('click', openMemoList);
 $('bookmarkListBtn').addEventListener('click', openBookmarkList);
 $('flashcardTableBtn')?.addEventListener('click', openFlashcardTableWindow);
+$('mindMapBtn')?.addEventListener('click', openMindMapWindow);
 $('bookmarkFilterBtn').addEventListener('click', toggleBookmarkFilter);
 $('questionPracticeBtn')?.addEventListener('click', openQuestionPracticeFromMenu);
 $('memoListCloseBtn').addEventListener('click', closeMemoList);
@@ -5412,7 +5773,7 @@ updateRandomButtons();
 updateQuestionPracticeButton();
 document.body.classList.toggle('question-bank-embed', questionBankEmbedMode());
 
-if (!bootstrapFlashcardTablePopupWindow()) {
+if (!bootstrapFlashcardTablePopupWindow() && !bootstrapMindMapPopupWindow()) {
   loadCards().catch((err) => {
     setMessage(`로딩 실패: ${err.message}`, true);
     applyFrontIllustration({term: '로딩 실패', english: '', category: ''});

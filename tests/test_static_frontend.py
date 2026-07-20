@@ -98,6 +98,13 @@ class StaticFrontendTests(unittest.TestCase):
             'function bootstrapMindMapPopupWindow()',
             'function openMindMapWindow()',
             "popupUrl.searchParams.set('popup', 'mind-map')",
+            'window.__csFlashcardsMindMapClosed',
+            "$('mindMapBtn')?.addEventListener('click', openMindMapWindow);",
+            'openerRef.focus?.();',
+            'focusAppCard();',
+            'renderMindMapWindow();',
+            'if (!bootstrapFlashcardTablePopupWindow() && !bootstrapMindMapPopupWindow()) {',
+            "window.setTimeout(() => {\n        try {\n          openerRef[callbackName](...args);\n          openerRef.focus?.();\n        } catch (_error) {}\n      }, 0);",
             'function toggleFlashcardBookmarkFromTable(cardId)',
             'function setFlashcardStatusFromTable(cardId, status)',
             '__csFlashcardsToggleBookmarkFromTable',
@@ -140,6 +147,9 @@ class StaticFrontendTests(unittest.TestCase):
             'AI 이미지 생성 중',
         ]:
             self.assertIn(snippet, APP_JS)
+        self.assertIn("window.setTimeout(() => {\n        try {\n          openerRef[callbackName](...args);\n          openerRef.focus?.();\n        } catch (_error) {}\n      }, 0);", APP_JS)
+        self.assertNotIn("}, 0);\n      }, 0);", APP_JS)
+        self.assertNotIn("openerRef.focus?.();\n          window.focus();", APP_JS)
         for snippet in [
             '.section-title-row',
             '.inline-ai-actions',
