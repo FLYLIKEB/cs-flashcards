@@ -247,6 +247,9 @@
             <input id="questionBankQueryInput" type="search" placeholder="문제/정답/키워드 검색" />
             <input id="questionBankTopicInput" type="search" placeholder="문제유형(예: 데이터베이스)" />
             <input id="questionBankFieldInput" type="search" placeholder="분야(예: 전산학술)" />
+            <select id="questionBankCategoryInput" aria-label="카테고리">
+              <option value="">카테고리 *</option>
+            </select>
             <select id="questionBankIssuerInput" aria-label="출제기관">
               <option value="">출제기관 *</option>
             </select>
@@ -282,7 +285,7 @@
                   <th scope="col">번호</th>
                   <th scope="col">문제</th>
                   <th scope="col">형식</th>
-                  <th scope="col">문제유형</th>
+                  <th scope="col">카테고리 · 문제유형</th>
                   <th scope="col">기관</th>
                   <th scope="col">난이도</th>
                   <th scope="col">출처</th>

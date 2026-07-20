@@ -6,7 +6,7 @@ const QUESTION_BANK_COLUMNS = [
   {key: 'index', label: '#', width: '56px'},
   {key: 'prompt', label: '문제', width: '36rem', cellClassName: 'term-cell'},
   {key: 'type', label: '형식', width: '8.5rem'},
-  {key: 'topic', label: '문제유형', width: '12rem'},
+  {key: 'topic', label: '카테고리 · 문제유형', width: '14rem'},
   {key: 'issuer', label: '기관', width: '9rem'},
   {key: 'difficulty', label: '난이도', width: '7rem'},
   {key: 'source', label: '출처', width: '13rem'},
@@ -89,6 +89,7 @@ function filterValues() {
     q: $('bankPageQueryInput')?.value?.trim() || '',
     topic: $('bankPageTopicInput')?.value?.trim() || '',
     field_name: $('bankPageFieldInput')?.value?.trim() || '',
+    category: $('bankPageCategoryInput')?.value?.trim() || '',
     issuer: $('bankPageIssuerInput')?.value?.trim() || '',
     source_location: $('bankPageSourceInput')?.value?.trim() || '',
     difficulty: $('bankPageDifficultySelect')?.value || '',
@@ -102,6 +103,7 @@ function applyFiltersFromUrl() {
   if ($('bankPageQueryInput')) $('bankPageQueryInput').value = params.get('q') || '';
   if ($('bankPageTopicInput')) $('bankPageTopicInput').value = params.get('topic') || '';
   if ($('bankPageFieldInput')) $('bankPageFieldInput').value = params.get('field_name') || '';
+  if ($('bankPageCategoryInput')) $('bankPageCategoryInput').value = params.get('category') || params.get('card_category') || '';
   if ($('bankPageIssuerInput')) $('bankPageIssuerInput').value = params.get('issuer') || '';
   if ($('bankPageSourceInput')) $('bankPageSourceInput').value = params.get('source_location') || '';
   if ($('bankPageDifficultySelect')) $('bankPageDifficultySelect').value = params.get('difficulty') || '';
@@ -121,6 +123,20 @@ function populateIssuerOptions(issuers, selected = '') {
   });
   select.innerHTML = options.join('');
   select.value = (Array.isArray(issuers) && issuers.includes(selectedValue)) ? selectedValue : '';
+}
+
+function populateCategoryOptions(categories, selected = '') {
+  const select = $('bankPageCategoryInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || new URLSearchParams(window.location.search).get('category') || '').trim();
+  const options = ['<option value="">카테고리 *</option>'];
+  (Array.isArray(categories) ? categories : []).forEach((category) => {
+    const value = String(category || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(categories) && categories.includes(selectedValue)) ? selectedValue : '';
 }
 
 
@@ -154,7 +170,10 @@ function tableRows() {
     const active = bankState.selectedId && bankState.selectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
     const typeLabel = escapeHtml(questionTypeLabel(item));
-    const topic = escapeHtml(item.topic || item.card_category || '');
+    const topic = escapeHtml([
+      String(item.category || item.card_category || '').trim(),
+      String(item.topic || '').trim(),
+    ].filter((value, index, array) => value && array.indexOf(value) === index).join(' · '));
     const issuer = escapeHtml(item.issuer || '');
     const difficulty = escapeHtml(item.difficulty || '');
     const source = escapeHtml(item.source_location || '');
@@ -270,6 +289,7 @@ async function loadQuestionBankPage() {
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
     populateIssuerOptions(bankState.summary?.available_issuers || [], filterValues().issuer);
+    populateCategoryOptions(bankState.summary?.available_categories || [], filterValues().category);
 
     const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
     bankState.selectedId = String(bankState.items[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
@@ -277,6 +297,7 @@ async function loadQuestionBankPage() {
     bankState.items = [];
     bankState.summary = {total: 0, returned: 0};
     populateIssuerOptions([], filterValues().issuer);
+    populateCategoryOptions([], filterValues().category);
     bankState.error = error.message || String(error);
     bankState.practiceLoaded = false;
   } finally {
@@ -296,7 +317,7 @@ loadQuestionBankPage().catch(() => {});
 $('bankPageRefreshBtn')?.addEventListener('click', () => loadQuestionBankPage().catch(() => {}));
 $('bankPageLaunchBtn')?.addEventListener('click', () => launch(selectedIndex()));
 $('bankPageTogglePracticeBtn')?.addEventListener('click', togglePracticeCollapsed);
-['bankPageQueryInput', 'bankPageTopicInput', 'bankPageFieldInput', 'bankPageIssuerInput', 'bankPageSourceInput', 'bankPageDifficultySelect', 'bankPageTypeSelect', 'bankPageSectionInput'].forEach((id) => {
+['bankPageQueryInput', 'bankPageTopicInput', 'bankPageFieldInput', 'bankPageCategoryInput', 'bankPageIssuerInput', 'bankPageSourceInput', 'bankPageDifficultySelect', 'bankPageTypeSelect', 'bankPageSectionInput'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankPage().catch(() => {}));
   $(id)?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
