@@ -5346,6 +5346,200 @@ select,
   }
 }
 
+/* Minimal question practice override */
+.question-panel::before,
+.question-panel::after {
+  display: none;
+}
+.question-panel,
+.question-toolbar-main,
+.question-toolbar-group,
+.question-bank-browser,
+.question-card-shell,
+.question-actions,
+.question-surface,
+.question-side-note,
+.question-review-box,
+.question-answer,
+.question-session-lock,
+.question-session-summary {
+  background: #fff;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.question-panel {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+.question-toolbar-main,
+.question-toolbar-group,
+.question-bank-browser,
+.question-card-shell,
+.question-actions,
+.question-surface,
+.question-side-note,
+.question-review-box,
+.question-answer,
+.question-session-lock,
+.question-session-summary {
+  border: 1px solid var(--line);
+}
+.question-toolbar-main,
+.question-toolbar-group,
+.question-bank-browser,
+.question-card-shell,
+.question-actions {
+  border-radius: 16px;
+}
+.question-toolbar-eyebrow,
+.question-card-kicker,
+.question-count-label span,
+.question-side-note-label,
+.question-review-label,
+.question-answer-label {
+  background: none;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+.question-toolbar strong,
+.question-card-title,
+.question-bank-head strong {
+  color: var(--text);
+}
+.question-toolbar-button.is-primary {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+  box-shadow: none;
+}
+.question-toolbar-button,
+.question-action-button,
+.question-grade-button,
+.question-count-label,
+.question-review-actions .mark,
+.question-choice,
+.question-bank-row-trigger {
+  background: #fff;
+  box-shadow: none;
+}
+.question-toolbar-button:hover,
+.question-action-button:hover,
+.question-grade-button:hover,
+.question-choice:hover,
+.question-bank-row-trigger:hover,
+.question-bank-row:hover {
+  background: var(--surface-soft);
+  border-color: var(--line-strong);
+  box-shadow: none;
+  transform: none;
+}
+.question-type-row span {
+  background: #fff;
+  box-shadow: none;
+}
+.question-type-row input:checked + span {
+  background: var(--surface-soft);
+  box-shadow: none;
+}
+.question-card-progress {
+  height: 2px;
+  background: var(--line);
+}
+.question-card-progress span {
+  background: var(--text);
+}
+.question-card-head {
+  margin-top: .8rem;
+  padding-bottom: .8rem;
+}
+.question-meta .badge {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+.question-bank-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.question-bank-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+.question-bank-table th,
+.question-bank-table td {
+  padding: .62rem .7rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: .82rem;
+  color: var(--text);
+}
+.question-bank-table th {
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 800;
+}
+.question-bank-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.question-bank-row.active td {
+  background: var(--surface-soft);
+}
+.question-bank-col-index {
+  width: 4.2rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.question-bank-col-title {
+  width: 36%;
+}
+.question-bank-row-trigger {
+  width: 100%;
+  display: grid;
+  gap: .22rem;
+  padding: 0;
+  border: 0;
+  text-align: left;
+  color: inherit;
+}
+.question-bank-item-title {
+  color: var(--text);
+  font-size: .84rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+.question-bank-item-preview {
+  color: var(--muted);
+  font-size: .76rem;
+  line-height: 1.45;
+}
+.question-bank-empty {
+  text-align: center;
+  padding: 1rem;
+}
+.question-bank-list {
+  display: table-row-group;
+}
+.question-bank-item,
+.question-bank-item.active {
+  all: unset;
+}
+@media (max-width: 760px) {
+  .question-bank-table {
+    min-width: 760px;
+  }
+  .question-panel,
+  .question-toolbar-main,
+  .question-toolbar-group,
+  .question-bank-browser,
+  .question-card-shell,
+  .question-actions {
+    border-radius: 14px;
+  }
+}
 /* Filters hidden by default on mobile: give the card the reclaimed space. */
 @media (max-width: 600px) {
   body.filters-collapsed .flashcard {

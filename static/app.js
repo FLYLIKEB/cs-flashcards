@@ -3416,24 +3416,34 @@ function renderQuestionBankBrowser() {
   const list = $('questionBankList');
   const summary = $('questionBankSummary');
   const error = $('questionBankError');
+  const toggle = $('questionBankToggleBtn');
   if (!panel || !list || !summary || !error) return;
   panel.hidden = !state.questionBankOpen;
+  if (toggle) {
+    toggle.textContent = state.questionBankOpen ? '문제은행 닫기' : '문제은행';
+    toggle.setAttribute('aria-expanded', state.questionBankOpen ? 'true' : 'false');
+  }
   if (!state.questionBankOpen) return;
   const total = Number(state.questionBankSummary?.total || 0);
   const returned = Number(state.questionBankSummary?.returned || state.questionBankItems.length || 0);
   summary.textContent = state.questionBankLoading
     ? '문제은행을 불러오는 중입니다.'
-    : `총 ${total}문항 · 현재 ${returned}문항 · 번호를 눌러 해당 문제부터 풉니다.`;
+    : `총 ${total}문항 · 현재 ${returned}문항 · 표의 행을 누르면 해당 문제부터 풉니다.`;
   error.textContent = state.questionBankError || '';
   if (!state.questionBankItems.length) {
-    list.innerHTML = '<li class="muted">조건에 맞는 문제가 없습니다.</li>';
+    list.innerHTML = '<tr><td colspan="7" class="question-bank-empty muted">조건에 맞는 문제가 없습니다.</td></tr>';
     return;
   }
   list.innerHTML = state.questionBankItems.map((item, index) => {
     const active = state.questionBankSelectedId && state.questionBankSelectedId === String(item.question_bank_id || '');
-    const meta = [item.topic || item.card_category || '', item.field_name || '', item.issuer || '', item.difficulty || '', item.source_location || ''].filter(Boolean).join(' · ');
-    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 160);
-    return `<li><button class="question-bank-item${active ? ' active' : ''}" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`)}</span><span class="question-bank-item-meta">${escapeHtml(meta || '메타데이터 없음')}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></li>`;
+    const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
+    const topic = escapeHtml(item.topic || item.card_category || questionTypeBadge(item) || '');
+    const field = escapeHtml(item.field_name || '');
+    const issuer = escapeHtml(item.issuer || '');
+    const difficulty = escapeHtml(item.difficulty || '');
+    const source = escapeHtml(item.source_location || '');
+    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 140);
+    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}"><td class="question-bank-col-index">${index + 1}</td><td class="question-bank-col-title"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td><td>${topic || '—'}</td><td>${field || '—'}</td><td>${issuer || '—'}</td><td>${difficulty || '—'}</td><td>${source || '—'}</td></tr>`;
   }).join('');
 }
 
@@ -3483,9 +3493,10 @@ async function loadQuestionBankBrowser() {
 }
 
 function toggleQuestionBankBrowser(force = !state.questionBankOpen) {
-  state.questionBankOpen = Boolean(force);
+  const next = Boolean(force);
+  state.questionBankOpen = next;
   renderQuestionBankBrowser();
-  if (state.questionBankOpen && !state.questionBankItems.length && !state.questionBankLoading) {
+  if (next && !state.questionBankItems.length && !state.questionBankLoading) {
     loadQuestionBankBrowser().catch(() => {});
   }
 }
@@ -3896,7 +3907,7 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankCloseBtn', 'questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -4812,6 +4823,7 @@ $('openQuestionImportBtn')?.addEventListener('click', openQuestionImportDialog);
 $('questionBankToggleBtn')?.addEventListener('click', () => toggleQuestionBankBrowser());
 $('questionBankRefreshBtn')?.addEventListener('click', () => loadQuestionBankBrowser().catch(() => {}));
 $('questionBankLoadBtn')?.addEventListener('click', () => openQuestionBankSession(0));
+$('questionBankCloseBtn')?.addEventListener('click', () => toggleQuestionBankBrowser(false));
 ['questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankBrowser().catch(() => {}));
   $(id)?.addEventListener('keydown', (event) => {
@@ -4828,9 +4840,9 @@ $('closeQuestionModeBtn')?.addEventListener('click', () => toggleQuestionMode(fa
 $('finishQuestionSessionBtn')?.addEventListener('click', finishQuestionSession);
 $('questionImportApplyBtn')?.addEventListener('click', importQuestionsFromText);
 $('questionBankList')?.addEventListener('click', (event) => {
-  const button = event.target.closest('[data-question-bank-index]');
-  if (!button) return;
-  const index = Number.parseInt(button.dataset.questionBankIndex || '', 10);
+  const target = event.target.closest('[data-question-bank-index]');
+  if (!target) return;
+  const index = Number.parseInt(target.dataset.questionBankIndex || '', 10);
   if (Number.isInteger(index)) openQuestionBankSession(index);
 });
 

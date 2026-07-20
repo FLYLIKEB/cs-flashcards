@@ -239,6 +239,7 @@
             <div class="question-bank-actions">
               <button id="questionBankRefreshBtn" class="question-toolbar-button" type="button">조회</button>
               <button id="questionBankLoadBtn" class="question-toolbar-button is-primary" type="button">현재 목록 풀기</button>
+              <button id="questionBankCloseBtn" class="question-toolbar-button" type="button">닫기</button>
             </div>
           </div>
           <div class="question-bank-filter-grid">
@@ -262,7 +263,22 @@
             </select>
             <input id="questionBankSectionInput" type="search" placeholder="섹션(예: 전공필기)" />
           </div>
-          <ol id="questionBankList" class="question-bank-list"></ol>
+          <div class="question-bank-table-wrap">
+            <table class="question-bank-table">
+              <thead>
+                <tr>
+                  <th scope="col">번호</th>
+                  <th scope="col">문제</th>
+                  <th scope="col">유형</th>
+                  <th scope="col">분야</th>
+                  <th scope="col">기관</th>
+                  <th scope="col">난이도</th>
+                  <th scope="col">출처</th>
+                </tr>
+              </thead>
+              <tbody id="questionBankList" class="question-bank-list"></tbody>
+            </table>
+          </div>
           <p id="questionBankError" class="message question-bank-error" role="status"></p>
         </section>
         <div class="question-stage">

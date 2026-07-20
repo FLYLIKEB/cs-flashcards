@@ -306,6 +306,9 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionBankSectionInput"',
             'id="questionBankList"',
             'id="questionBankLoadBtn"',
+            'id="questionBankCloseBtn"',
+            'class="question-bank-table"',
+
             'id="finishQuestionSessionBtn"',
             'id="openAiQuizSearchBtn"',
             'id="questionHistoryBtn"',
@@ -413,6 +416,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-card-progress', STYLE_CSS)
         self.assertIn('.question-card-grid', STYLE_CSS)
         self.assertIn('.question-bank-browser', STYLE_CSS)
+        self.assertIn('.question-bank-table', STYLE_CSS)
+        self.assertIn('.question-bank-row-trigger', STYLE_CSS)
         self.assertIn('.question-bank-list', STYLE_CSS)
         self.assertIn('.question-markdown', STYLE_CSS)
         self.assertIn('.question-md-image', STYLE_CSS)
