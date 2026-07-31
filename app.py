@@ -2797,6 +2797,8 @@ FIN_CORP_KEYWORD_DROP_TOKENS = (
     "바른 설명은",
     "해당하는 용어",
     "관련 설명",
+    "아래 지문에",
+    "IT 기술 용어",
 )
 
 
@@ -3183,16 +3185,23 @@ def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = 
         (r"^다음\s+중\s+(.+?)에서\s+없는\s+함수는\??$", r"\1"),
         (r"^다음\s+중\s+(.+?)인\s+것(?:은)?\??$", r"\1"),
         (r"^다음\s+중\s+(.+?)로\s+올바[른은].*$", r"\1"),
+        (r"^다음\s+중\s+(.+?)\s+특징은\??$", r"\1"),
         (r"^다음중\s+(.+?)에\s+해당하지\s+않은\s+것은\??$", r"\1"),
         (r"^다음\s+(.+?)\s+코드(?:의)?\s*(?:실행)?\s*결과.*$", r"\1"),
         (r"^(.+?)에서\s+문자열을\s+비교하는\s+함수는\??$", r"\1"),
+        (r"^(.+?)에서\s+우선순위\s+기준은\??$", r"\1"),
         (r"^.+?에서\s+(.+?)는\s+무엇인가\??$", r"\1"),
         (r"^(.+?)는\s+무엇인가\??$", r"\1"),
         (r"^(.+?)\s*특징으로\s+.*$", r"\1"),
+        (r"^(.+?)의\s+특징이\s+.*$", r"\1"),
+        (r"^(?:\d+\s+)?(.+?)의\s+크기는\??$", r"\1"),
+        (r"^(.+?)\s*설명\s*중\s+.*$", r"\1"),
+        (r"^(.+?)기능으로\s+.*$", r"\1"),
         (r"^(.+?)\s*(?:의)?\s*의미는\??$", r"\1"),
         (r"^(.+?)\s*뜻$", r"\1"),
         (r"^(.+?)\s+분류\s+및\s+특징.*$", r"\1"),
         (r"^(.+?)\s+관련\s+트랜잭션.*$", r"\1"),
+        (r"^(.+?)\s+별\s+시간\s*복잡도$", r"\1"),
         (r"^SQL\s+문제\s+약술\s*-\s*(.+)$", r"\1"),
         (r"^.*서브넷\s+마스크.*$", "서브넷 마스크"),
         (r"^IP\s+주소\s+.+서브넷을\s+설계하시오.*$", "서브넷 설계"),
@@ -3209,9 +3218,13 @@ def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = 
         r"\s*보여주고.*$",
         r"\s*주면서.*$",
         r"\s*에\s+대한\s+.*$",
+        r"\s*에\s+대한$",
         r"\s*에\s+관한\s+.*$",
         r"\s*에\s+대해\s+.*$",
         r"\s*관련(?:하여)?\s+.*$",
+        r"\s*설명\s*중$",
+        r"\s*기능으로$",
+        r"\s*기준은$",
         r"\s*(?:옳지 않은 것은|옳은 것은|적절한 것은|알맞은 것은|바른 설명은|해당하는 용어는|고르시오|선택하라는.*|선택.*|무엇인가\??).*$",
         r"\s*(?:계산문제|출력결과|트리그리기|손코딩|빈칸 채우기|코드(?:\s*문제)?|관련 서술식|관련 문제|문제 약술|객관식 문제|주관식 문제|문제)\s*$",
         r"\s*(?:뜻|의미|특징(?:으로)?|개념|약술|서술식|서술|설명)\s*$",
@@ -3453,6 +3466,8 @@ def fin_corp_question_bank_keyword_noise(value: str) -> bool:
         return True
     if text.endswith("번") and re.fullmatch(r"\d+번", text):
         return True
+    if re.search(r"\d", text) and re.search(r"[A-Za-z가-힣]{2,}", text):
+        return False
     if re.fullmatch(r"[0-9,./%\- ]+[A-Za-z가-힣]{0,3}", text):
         return True
     if any(token in text for token in FIN_CORP_KEYWORD_DROP_TOKENS):
@@ -3480,6 +3495,78 @@ def fin_corp_question_bank_answer_can_seed_keywords(answer: str) -> bool:
         return False
     return True
 
+def fin_corp_question_bank_choice_can_seed_keywords(choice_text: str) -> bool:
+    text = normalize_question_bank_text(choice_text, limit=120)
+    if not text:
+        return False
+    if any(symbol in text for symbol in ("=", "+", "/")) and not re.search(r"[A-Za-z]{2,}", text):
+        return False
+    if text.count(" ") >= 4:
+        return False
+    return True
+
+def fin_corp_question_bank_subject_keyword_candidates(subject: str) -> list[str]:
+    normalized = normalize_question_bank_text(subject, limit=255)
+    if not normalized:
+        return []
+    candidates = list(bok_topic_keyword_candidates(normalized))
+    split_pattern = re.compile(r"\s*(?:,|/|&|\bvs\b|와|과|및)\s*", re.IGNORECASE)
+    for piece in split_pattern.split(normalized):
+        cleaned = bok_normalize_keyword_fragment(piece)
+        if cleaned and not bok_keyword_is_noise(cleaned):
+            candidates.append(cleaned)
+    return normalize_question_bank_list(candidates, item_limit=255)
+
+
+def fin_corp_question_bank_text_contains_keyword(keyword: str, *texts: str) -> bool:
+    raw = "\n".join(str(text or "") for text in texts)
+    needle = str(keyword or "").strip()
+    if not raw or not needle:
+        return False
+    if re.search(r"[가-힣]", needle):
+        return needle.casefold() in raw.casefold()
+    if re.fullmatch(r"[A-Za-z0-9.+#\-/ ]+", needle) and len(needle) <= 4:
+        return bool(re.search(rf"(?<![0-9A-Za-z]){re.escape(needle)}(?![0-9A-Za-z])", raw, flags=re.IGNORECASE))
+    needle_key = normalize_question_bank_match_text(needle)
+    haystack_key = normalize_question_bank_match_text(raw)
+    return bool(needle_key and haystack_key and needle_key in haystack_key)
+
+
+def fin_corp_question_bank_registered_keyword_candidates(
+    rows: list[dict[str, Any]],
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    card: dict[str, Any] | None = None,
+    choice_text: str = "",
+) -> list[str]:
+    candidates: list[str] = []
+    effective_choice_text = choice_text if fin_corp_question_bank_choice_can_seed_keywords(choice_text) else ""
+    texts = (title, body, effective_choice_text)
+    current_term_key = normalize_question_bank_match_text(card.get("term")) if isinstance(card, dict) else ""
+    current_english_key = normalize_question_bank_match_text(card.get("english")) if isinstance(card, dict) else ""
+    if isinstance(card, dict) and card:
+        candidates.extend([str(card.get("term") or ""), str(card.get("english") or "")])
+    for row in rows:
+        canonical = str(row.get("term") or row.get("english") or "").strip()
+        canonical_key = normalize_question_bank_match_text(canonical)
+        if not canonical or not canonical_key:
+            continue
+        if current_term_key and canonical_key in current_term_key:
+            continue
+        if current_english_key and canonical_key in current_english_key:
+            continue
+        if re.search(r"[가-힣]", canonical) and len(canonical_key) < 4:
+            continue
+        if fin_corp_question_bank_text_contains_keyword(str(row.get("term") or ""), *texts):
+            candidates.append(canonical)
+            continue
+        if fin_corp_question_bank_text_contains_keyword(str(row.get("english") or ""), *texts):
+            candidates.append(canonical)
+    return normalize_question_bank_list(candidates, item_limit=255)
+
 
 def fin_corp_question_bank_keyword_candidates(
     title: str,
@@ -3487,15 +3574,18 @@ def fin_corp_question_bank_keyword_candidates(
     *,
     body: str = "",
     card: dict[str, Any] | None = None,
+    choice_text: str = "",
 ) -> list[str]:
     subject = fin_corp_question_bank_subject(title, card=card)
     candidates: list[str] = []
+    effective_choice_text = choice_text if fin_corp_question_bank_choice_can_seed_keywords(choice_text) else ""
     if isinstance(card, dict) and card:
         candidates.extend([str(card.get("term") or ""), str(card.get("english") or "")])
-    candidates.extend(bok_topic_keyword_candidates(subject))
-    candidates.extend(re.findall(r"[A-Za-z]{2,}(?:\d+)?", subject))
-    if not str(body or "").startswith("변환 메모:") and fin_corp_question_bank_answer_can_seed_keywords(answer):
-        candidates.extend(bok_topic_keyword_candidates(answer))
+    candidates.extend(fin_corp_question_bank_subject_keyword_candidates(subject))
+    if effective_choice_text:
+        candidates.extend(fin_corp_question_bank_subject_keyword_candidates(effective_choice_text))
+    if fin_corp_question_bank_answer_can_seed_keywords(answer):
+        candidates.extend(fin_corp_question_bank_subject_keyword_candidates(answer))
     return normalize_question_bank_list(candidates, item_limit=255)
 
 
@@ -3536,10 +3626,15 @@ def fin_corp_question_bank_keywords(
     explanation: str,
     *,
     card: dict[str, Any] | None = None,
+    rows: list[dict[str, Any]] | None = None,
+    choice_text: str = "",
 ) -> list[str]:
     ordered: list[str] = []
     seen: set[str] = set()
-    candidates = list(fin_corp_question_bank_keyword_candidates(title, answer, body=body, card=card))
+    candidates: list[str] = []
+    if isinstance(rows, list) and rows:
+        candidates.extend(fin_corp_question_bank_registered_keyword_candidates(rows, title, body, answer, explanation, card=card, choice_text=choice_text))
+    candidates.extend(fin_corp_question_bank_keyword_candidates(title, answer, body=body, card=card, choice_text=choice_text))
     if not isinstance(card, dict) or not card:
         if not str(body or "").startswith("변환 메모:") or not candidates:
             candidates.extend(bok_detect_keyword_matches(title, body, answer, explanation))
@@ -3864,6 +3959,7 @@ def parse_fin_corp_question_bank_entries(
                                 explanation = "\n\n".join(part for part in (special_choice, explanation) if part)
                             elif not explanation:
                                 explanation = special_choice
+            choice_text = choices[answer_index] if answer_index is not None and 0 <= answer_index < len(choices) else ""
             stored_body = fin_corp_question_bank_strip_duplicate_choices(body, question_type=question_type)
             entries.append({
                 "question_bank_id": f"qb-fin239-{page_code}-{offset:02d}",
@@ -3879,7 +3975,7 @@ def parse_fin_corp_question_bank_entries(
                 "topic": fin_corp_question_bank_topic(title),
                 "field_name": FIN_CORP_FIELD_NAME,
                 "category": category,
-                "keywords": fin_corp_question_bank_keywords(title, stored_body, answer, explanation, card=card),
+                "keywords": fin_corp_question_bank_keywords(title, stored_body, answer, explanation, card=card, rows=rows, choice_text=choice_text),
                 "difficulty": fin_corp_question_bank_difficulty(question_type, title, stored_body, answer, explanation, card=card),
                 "issuer": issuer,
                 "source_location": f"{page_title} · {question_number}. {title}",

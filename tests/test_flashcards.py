@@ -1480,9 +1480,45 @@ class FlashcardProgressTests(unittest.TestCase):
                         'importance': '상',
                         'difficulty': '중',
                     },
+                    {
+                        'id': 'CS-347',
+                        'term': 'XSS',
+                        'english': 'XSS',
+                        'category': '보안',
+                        'definition': '웹 페이지에 악성 스크립트를 삽입해 사용자 브라우저에서 실행시키는 공격이다.',
+                        'detailed_explanation': '입력 검증과 출력 인코딩이 핵심 방어 수단이다.',
+                        'related_concepts': '[[SQL Injection]], [[CSRF]]',
+                        'source_files': 'pages/05-01-우리은행-기출.md',
+                        'exam_note': '',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '중',
+                    },
+                    {
+                        'id': 'CS-348',
+                        'term': 'SQL Injection',
+                        'english': 'SQL Injection',
+                        'category': '보안',
+                        'definition': '입력값에 SQL 구문을 삽입해 질의를 변조하는 공격이다.',
+                        'detailed_explanation': '준비된 문장과 입력 검증으로 방어한다.',
+                        'related_concepts': '[[XSS]], [[인증]]',
+                        'source_files': 'pages/05-01-우리은행-기출.md',
+                        'exam_note': '',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '중',
+                    },
                 ],
             )
 
+            (pages / '05-01-우리은행-기출.md').write_text(
+                '# 05-01. 우리은행 기출\n\n'
+                '### 11. XSS, SQL Injection 같은 공격기법 객관식으로 주면서 아래에 해당하는 공격기법 선택하라는 문제\n'
+                '**답(AI답변):** XSS는 악성 스크립트를 웹페이지에 삽입해 사용자의 브라우저에서 실행시키는 공격이고, SQL Injection은 입력값에 SQL 구문을 삽입해 DB를 조작하는 공격이다.\n\n'
+                '### 12. 1 Petabyte의 크기는?\n'
+                '**답:** 1,024 TB\n',
+                encoding='utf-8',
+            )
             (pages / '05-03-대구은행-기출.md').write_text(
                 '# 05-03. 대구은행 기출\n\n'
                 '### 121. 퍼블릭 블록체인 특징으로 옳지 않은 것은?\n\n'
@@ -1525,6 +1561,13 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(lru['card_id'], 'CS-161')
             self.assertEqual(lru['category'], '운영체제')
             self.assertEqual(lru['keywords'], ['LRU'])
+            xss = by_id['qb-fin239-05-01-01']
+            self.assertEqual(xss['card_id'], 'CS-347')
+            self.assertEqual(xss['keywords'], ['XSS', 'SQL Injection'])
+
+            petabyte = by_id['qb-fin239-05-01-02']
+            self.assertEqual(petabyte['keywords'], ['Petabyte'])
+
 
     def test_parse_bok_question_bank_entries_splits_and_preserves_markdown(self):
         with tempfile.TemporaryDirectory() as td:
