@@ -42,7 +42,7 @@ function preferredCalendarView() {
 }
 
 function defaultCalendarSidebarOpen() {
-  return window.matchMedia ? window.matchMedia('(min-width: 981px)').matches : window.innerWidth > 980;
+  return false;
 }
 
 function readSavedCalendarSidebarState() {
@@ -51,7 +51,7 @@ function readSavedCalendarSidebarState() {
     if (saved === 'open') return true;
     if (saved === 'closed') return false;
   } catch (_error) {
-    // Ignore storage failures and use the viewport default.
+    // Ignore storage failures and use the default collapsed state.
   }
   return defaultCalendarSidebarOpen();
 }
@@ -67,6 +67,9 @@ function saveCalendarSidebarState() {
 function applyCalendarSidebarState({persist = true} = {}) {
   document.body.classList.toggle('calendar-sidebar-collapsed', !calendarState.sidebarOpen);
   $('calendarSidebar')?.setAttribute('aria-hidden', String(!calendarState.sidebarOpen));
+  if ($('calendarSidebar')) {
+    $('calendarSidebar').hidden = !calendarState.sidebarOpen;
+  }
   if (!calendarState.sidebarOpen) {
     toggleCalendarSidebarMenu(false);
   }
@@ -248,37 +251,30 @@ function renderOverview(events = filteredEvents()) {
   $('overviewHeadline').textContent = headline;
   $('overviewFocus').textContent = focus || '업데이트된 일정과 우선순위를 한 화면에 보여준다.';
 
-  const cards = [
-    {
-      label: '현재 보이는 일정',
-      value: `${events.length}건`,
-      note: calendarState.hideApproximate ? '예정 월/전후 숨김 적용' : '필터 기준으로 계산',
-    },
-    {
-      label: '진행 중',
-      value: `${openEvents.length}건`,
-      note: openEvents[0] ? openEvents[0].date_display : '열린 접수 일정 없음',
-    },
-    {
-      label: '다음 확정 일정',
-      value: nextExactEvent ? nextExactEvent.display_label : '대기 중',
-      note: nextExactEvent ? `${nextExactEvent.institution.short_name} · ${nextExactEvent.date_display}` : '확정 일정이 더 필요함',
-    },
-    {
-      label: '체크 대기 기관',
-      value: `${payload.dashboard.watch.length}곳`,
-      note: topPriority ? `${priorityLabel(topPriority)}부터 확인` : '링크만 짧게 확인',
-    },
+  const rows = [
+    ['현재 보이는 일정', `${events.length}건`, calendarState.hideApproximate ? '예정 월/전후 숨김 적용' : '필터 기준으로 계산'],
+    ['진행 중', `${openEvents.length}건`, openEvents[0] ? openEvents[0].date_display : '열린 접수 일정 없음'],
+    ['다음 확정 일정', nextExactEvent ? nextExactEvent.display_label : '대기 중', nextExactEvent ? `${nextExactEvent.institution.short_name} · ${nextExactEvent.date_display}` : '확정 일정이 더 필요함'],
+    ['체크 대기 기관', `${payload.dashboard.watch.length}곳`, topPriority ? `${priorityLabel(topPriority)}부터 확인` : '링크만 짧게 확인'],
   ];
 
-  $('overviewHighlights').innerHTML = cards.map((item) => `
-    <article class="overview-card">
-      <span>${escapeHtml(item.label)}</span>
-      <strong>${escapeHtml(item.value)}</strong>
-      <p>${escapeHtml(item.note)}</p>
-    </article>
-  `).join('');
+  $('overviewHighlights').innerHTML = `
+    <table class="compact-table compact-table--summary">
+      <tbody>
+        ${rows.map(([label, value, note]) => `
+          <tr>
+            <th scope="row">${escapeHtml(label)}</th>
+            <td>
+              <strong>${escapeHtml(value)}</strong>
+              <span class="table-note">${escapeHtml(note)}</span>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
+
 
 function renderTimeline() {
   const container = $('timelineHighlights');
@@ -288,14 +284,26 @@ function renderTimeline() {
     container.innerHTML = '<p class="event-detail-empty">표시할 타임라인이 없다.</p>';
     return;
   }
-  container.innerHTML = timeline.map((item) => `
-    <article class="timeline-card">
-      <p class="timeline-period">${escapeHtml(item.period || '')}</p>
-      <h3>${escapeHtml(item.headline || '')}</h3>
-      <p>${escapeHtml(item.focus || '')}</p>
-    </article>
-  `).join('');
+  container.innerHTML = `
+    <table class="compact-table">
+      <thead>
+        <tr><th>시기</th><th>핵심</th></tr>
+      </thead>
+      <tbody>
+        ${timeline.map((item) => `
+          <tr>
+            <td>${escapeHtml(item.period || '')}</td>
+            <td>
+              <strong>${escapeHtml(item.headline || '')}</strong>
+              <span class="table-note">${escapeHtml(item.focus || '')}</span>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
+
 
 function renderPriorityList() {
   const container = $('priorityList');
@@ -305,37 +313,53 @@ function renderPriorityList() {
     container.innerHTML = '<p class="event-detail-empty">표시할 우선순위가 없다.</p>';
     return;
   }
-  container.innerHTML = priorities.map((item) => `
-    <article class="priority-item">
-      <div class="priority-rank">${escapeHtml(item.rank)}</div>
-      <div class="priority-body">
-        <span class="priority-rank-label">우선순위 ${escapeHtml(item.rank)}</span>
-        <h3>${escapeHtml(priorityLabel(item))}</h3>
-        <p>${escapeHtml(item.reason || '')}</p>
-      </div>
-    </article>
-  `).join('');
+  container.innerHTML = `
+    <table class="compact-table">
+      <thead>
+        <tr><th>우선</th><th>대상</th><th>이유</th></tr>
+      </thead>
+      <tbody>
+        ${priorities.map((item) => `
+          <tr>
+            <td>${escapeHtml(item.rank)}</td>
+            <td>${escapeHtml(priorityLabel(item))}</td>
+            <td>${escapeHtml(item.reason || '')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
+
 
 function renderCounts() {
   const counts = calendarState.payload?.counts;
   const container = $('calendarCounts');
   if (!counts || !container) return;
   const items = [
-    ['전체 일정', counts.total_events, '공고 + 예비공고 + 연간 계획', ''],
-    ['진행 중', counts.open_events, '지금 바로 대응 가능한 일정', 'open'],
-    ['확정 날짜', counts.exact_events, '일 단위가 확정된 일정', ''],
-    ['예정/관측', counts.planned_events, '월 단위·전후 일정 포함', 'planned'],
-    ['체크 대기 기관', counts.watch_only_institutions, '짧게 확인만 해도 되는 곳', 'watch'],
+    ['전체 일정', counts.total_events, '공고 + 예비공고 + 연간 계획'],
+    ['진행 중', counts.open_events, '지금 바로 대응 가능한 일정'],
+    ['확정 날짜', counts.exact_events, '일 단위가 확정된 일정'],
+    ['예정/관측', counts.planned_events, '월 단위·전후 일정 포함'],
+    ['체크 대기 기관', counts.watch_only_institutions, '짧게 확인만 해도 되는 곳'],
   ];
-  container.innerHTML = items.map(([label, value, note, tone]) => `
-    <div class="metric-card${tone ? ` metric-card--${tone}` : ''}">
-      <dt>${escapeHtml(label)}</dt>
-      <dd><strong>${escapeHtml(value)}</strong></dd>
-      <p>${escapeHtml(note)}</p>
-    </div>
-  `).join('');
+  container.innerHTML = `
+    <table class="compact-table compact-table--summary">
+      <tbody>
+        ${items.map(([label, value, note]) => `
+          <tr>
+            <th scope="row">${escapeHtml(label)}</th>
+            <td>
+              <strong>${escapeHtml(value)}</strong>
+              <span class="table-note">${escapeHtml(note)}</span>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
+
 
 function renderDashboardList(containerId, items, emptyText) {
   const container = $(containerId);
@@ -344,19 +368,26 @@ function renderDashboardList(containerId, items, emptyText) {
     container.innerHTML = `<p class="event-detail-empty">${escapeHtml(emptyText)}</p>`;
     return;
   }
-  container.innerHTML = items.map((item) => `
-    <article class="dashboard-card">
-      <div class="event-card__top">
-        <h4>${escapeHtml(item.institution.name)}</h4>
-        <span class="event-badge">${escapeHtml(item.status)}</span>
-      </div>
-      <p>${escapeHtml(item.schedule_summary || item.note || '')}</p>
-      <div class="dashboard-links">
-        ${(item.links || []).map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join('')}
-      </div>
-      ${item.note ? `<p class="event-source">${escapeHtml(item.note)}</p>` : ''}
-    </article>
-  `).join('');
+  container.innerHTML = `
+    <table class="compact-table">
+      <thead>
+        <tr><th>기관</th><th>상태</th><th>요약</th></tr>
+      </thead>
+      <tbody>
+        ${items.map((item) => `
+          <tr>
+            <td>${escapeHtml(item.institution.short_name || item.institution.name)}</td>
+            <td>${escapeHtml(item.status)}</td>
+            <td>
+              <strong>${escapeHtml(item.schedule_summary || item.note || '')}</strong>
+              ${(item.links || []).length ? `<span class="table-links">${(item.links || []).map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join('')}</span>` : ''}
+              ${item.note && item.schedule_summary ? `<span class="table-note">${escapeHtml(item.note)}</span>` : ''}
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
 function syncSelectedEventCard() {
@@ -374,27 +405,28 @@ function renderEventList(events = filteredEvents()) {
     container.innerHTML = '<p class="event-detail-empty">현재 필터에 맞는 일정이 없다.</p>';
     return;
   }
-  container.innerHTML = events.map((event) => `
-    <button class="event-card${event.id === calendarState.selectedEventId ? ' is-selected' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">
-      <div class="event-card__top">
-        <span class="institution-pill">${escapeHtml(event.institution.short_name)}</span>
-        <span class="event-badge">${escapeHtml(event.status_label)}</span>
-      </div>
-      <h3>${escapeHtml(event.list_title || event.title)}</h3>
-      <p class="event-card__summary">${escapeHtml(event.summary || event.description || event.display_label || '')}</p>
-      <div class="event-badges">
-        <span class="event-badge">${escapeHtml(event.date_display)}</span>
-        <span class="event-badge">${escapeHtml(event.event_type_label)}</span>
-        ${event.is_approximate ? '<span class="event-badge">예정</span>' : ''}
-      </div>
-    </button>
-  `).join('');
-
+  container.innerHTML = `
+    <table class="compact-table compact-table--events">
+      <thead>
+        <tr><th>날짜</th><th>일정</th><th>상태</th></tr>
+      </thead>
+      <tbody>
+        ${events.map((event) => `
+          <tr>
+            <td>${escapeHtml(event.date_display)}</td>
+            <td>
+              <button class="table-row-button${event.id === calendarState.selectedEventId ? ' is-selected' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">${escapeHtml(event.list_title || event.title)}</button>
+              <span class="table-note">${escapeHtml(event.institution.short_name)} · ${escapeHtml(event.event_type_label)}${event.summary ? ` · ${escapeHtml(event.summary)}` : ''}</span>
+            </td>
+            <td>${escapeHtml(event.status_label)}${event.is_approximate ? ' · 예정' : ''}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
   container.querySelectorAll('[data-event-id]').forEach((element) => {
     element.addEventListener('click', () => selectEvent(element.dataset.eventId || '', {revealSidebar: true, panelId: 'detail'}));
   });
-
-
 }
 
 function renderSelectedEvent(event) {

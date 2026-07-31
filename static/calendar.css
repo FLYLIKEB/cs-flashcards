@@ -322,6 +322,92 @@ body.calendar-sidebar-collapsed .calendar-sidebar {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.compact-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.84rem;
+}
+
+.compact-table thead th,
+.compact-table tbody th,
+.compact-table td {
+  padding: 8px 6px;
+  border-top: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+
+.compact-table thead th {
+  padding-top: 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-top: 0;
+}
+
+.compact-table tbody tr:first-child th,
+.compact-table tbody tr:first-child td {
+  border-top: 0;
+}
+
+.compact-table tbody th {
+  width: 104px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.compact-table strong {
+  display: block;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.compact-table--summary tbody th {
+  width: 112px;
+}
+
+.compact-table--events td:first-child {
+  width: 88px;
+}
+
+.compact-table--events td:last-child {
+  width: 76px;
+}
+
+.table-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.table-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 4px;
+}
+
+.table-row-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+}
+
+.table-row-button:hover,
+.table-row-button:focus-visible,
+.table-row-button.is-selected {
+  outline: none;
+  text-decoration-thickness: 2px;
+}
+
 .overview-card,
 .metric-card,
 .timeline-card,
