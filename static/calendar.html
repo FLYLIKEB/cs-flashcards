@@ -22,65 +22,46 @@
         <a href="/">플래시카드</a>
         <a id="icsFeedLink" href="/api/calendar/recruitment.ics" target="_blank" rel="noopener noreferrer">ICS 피드</a>
       </nav>
-      <p class="calendar-topbar__hint">캘린더 중심으로 보고, 필요한 정보만 우측 패널에서 꺼내 본다.</p>
+      <p class="calendar-topbar__hint">상단 요약은 고정하고, 탐색은 탭으로 단순화했다.</p>
     </div>
   </header>
 
   <main class="calendar-shell">
-    <section class="calendar-layout">
-      <section class="calendar-main">
-        <div class="calendar-quickbar">
-          <div class="calendar-quickbar__summary">
-            <button id="quickNextEventBtn" class="quick-card quick-card--button" type="button">
-              <span class="quick-card__label">다음 확정 일정</span>
-              <strong id="quickNextEventTitle">불러오는 중</strong>
-              <span id="quickNextEventMeta" class="quick-card__meta">-</span>
-            </button>
-            <div class="quick-card">
-              <span class="quick-card__label">진행 중</span>
-              <strong id="quickOpenCount">0건</strong>
-            </div>
-            <div class="quick-card">
-              <span class="quick-card__label">체크 대기</span>
-              <strong id="quickWatchCount">0곳</strong>
-            </div>
-            <div class="quick-card">
-              <span class="quick-card__label">필터 상태</span>
-              <strong id="quickFilterState">전체</strong>
-            </div>
-          </div>
-          <div class="calendar-quickbar__actions">
-            <button id="quickFilterBtn" class="quick-action" type="button">필터</button>
-            <button id="quickListBtn" class="quick-action" type="button">목록</button>
-            <button id="calendarSidebarToggleBtn" class="calendar-sidebar-toggle" type="button" aria-controls="calendarSidebar" aria-expanded="false" aria-label="마지막 패널 열기" title="마지막 패널 열기">☰</button>
-            <div class="calendar-feature-menu-wrap">
-              <button id="calendarFeatureMenuBtn" class="quick-action" type="button" aria-controls="calendarSidebarMenu" aria-expanded="false">기능</button>
-              <div id="calendarSidebarMenu" class="calendar-sidebar-menu" hidden>
-                <button type="button" data-sidebar-panel-target="overview">포커스</button>
-                <button type="button" data-sidebar-panel-target="summary">요약</button>
-                <button type="button" data-sidebar-panel-target="timeline">타임라인</button>
-                <button type="button" data-sidebar-panel-target="events">일정 목록</button>
-                <button type="button" data-sidebar-panel-target="subscribe">캘린더 구독</button>
-                <button type="button" data-sidebar-panel-target="priorities">우선순위</button>
-                <button type="button" data-sidebar-panel-target="filters">필터</button>
-                <button type="button" data-sidebar-panel-target="watch">기관 현황</button>
-                <button type="button" data-sidebar-panel-target="detail">선택 일정</button>
-                <button type="button" data-sidebar-panel-target="close">패널 닫기</button>
-              </div>
-            </div>
-          </div>
-          <div class="calendar-panel-tabs" aria-label="자주 쓰는 패널">
-            <button class="panel-tab-button" type="button" data-quick-panel="filters">필터</button>
-            <button class="panel-tab-button" type="button" data-quick-panel="events">목록</button>
-            <button class="panel-tab-button" type="button" data-quick-panel="overview">포커스</button>
-            <button class="panel-tab-button" type="button" data-quick-panel="summary">요약</button>
-            <button class="panel-tab-button" type="button" data-quick-panel="watch">기관 현황</button>
-            <button class="panel-tab-button" type="button" data-quick-panel="subscribe">구독</button>
-          </div>
-        </div>
+    <div class="calendar-sticky-header">
+      <section class="calendar-summary-bar" aria-label="핵심 일정 요약">
+        <button id="summaryDeadlineBtn" class="summary-card summary-card--button" type="button">
+          <span class="summary-card__label">마감 임박</span>
+          <strong id="summaryDeadlineTitle">불러오는 중</strong>
+          <span id="summaryDeadlineMeta" class="summary-card__meta">-</span>
+        </button>
+        <button id="summaryOpenBtn" class="summary-card summary-card--button" type="button">
+          <span class="summary-card__label">진행 중</span>
+          <strong id="summaryOpenCount">0건</strong>
+          <span id="summaryOpenMeta" class="summary-card__meta">접수/공개 일정</span>
+        </button>
+        <button id="summaryNextBtn" class="summary-card summary-card--button" type="button">
+          <span class="summary-card__label">다음 일정</span>
+          <strong id="summaryNextTitle">불러오는 중</strong>
+          <span id="summaryNextMeta" class="summary-card__meta">-</span>
+        </button>
+<button id="summaryFilterBtn" class="summary-card summary-card--button" type="button">
+  <span class="summary-card__label">필터 상태</span>
+  <strong id="summaryFilterState">전체</strong>
+  <span id="summaryFilterMeta" class="summary-card__meta">조건 없음</span>
+</button>
+      </section>
 
+      <section class="calendar-main-tabs" aria-label="주요 화면 전환" role="tablist">
+        <button id="mainTabCalendarBtn" class="main-tab-button active" type="button" role="tab" aria-selected="true" aria-controls="mainPanelCalendar" data-main-tab="calendar">캘린더</button>
+        <button id="mainTabListBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelList" data-main-tab="list">목록</button>
+        <button id="mainTabFiltersBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelFilters" data-main-tab="filters">필터</button>
+        <button id="mainTabInstitutionsBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelInstitutions" data-main-tab="institutions">기관</button>
+      </section>
+    </div>
+
+    <section class="calendar-content">
+      <section id="mainPanelCalendar" class="main-panel active" data-main-panel="calendar" role="tabpanel" aria-labelledby="mainTabCalendarBtn">
         <article class="calendar-panel calendar-panel--calendar">
-
           <div class="panel-heading">
             <div>
               <p class="section-label">월간 보기</p>
@@ -90,53 +71,61 @@
           </div>
           <div id="calendar"></div>
         </article>
-      </section>
-    </section>
 
-    <div id="calendarDrawerBackdrop" class="calendar-drawer-backdrop" hidden></div>
-
-    <aside id="calendarSidebar" class="calendar-drawer calendar-sidebar" aria-hidden="true" hidden>
-      <div class="calendar-drawer__head">
+<div class="calendar-home-grid">
+  <div class="calendar-home-grid__main">
+    <article class="calendar-panel">
+      <div class="panel-heading">
         <div>
-          <p class="section-label">보조 패널</p>
-          <h2 id="calendarSidebarTitle">포커스</h2>
+          <p class="section-label">지금 할 일</p>
+          <h2 id="overviewHeadline">핵심 일정 불러오는 중...</h2>
         </div>
-        <button id="calendarSidebarCloseBtn" class="drawer-close-button" type="button" aria-label="패널 닫기">닫기</button>
       </div>
-      <div class="calendar-drawer__body">
-        <article class="calendar-panel calendar-hero" data-sidebar-panel="overview">
-          <div class="calendar-hero__copy">
-            <p class="hero-kicker">이번 시즌 포커스</p>
-            <h2 id="overviewHeadline">핵심 일정 불러오는 중...</h2>
-            <p id="overviewFocus" class="hero-description">핵심 일정과 우선순위를 계산하는 중...</p>
-          </div>
-          <div id="overviewHighlights" class="overview-highlights" aria-live="polite"></div>
-        </article>
+      <p id="overviewFocus" class="panel-caption panel-caption--body">핵심 일정과 우선순위를 계산하는 중...</p>
+      <div id="overviewHighlights" class="overview-highlights" aria-live="polite"></div>
+    </article>
 
-        <article class="calendar-panel" data-sidebar-panel="summary" hidden>
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">숫자 기준</p>
-              <h2>요약</h2>
-            </div>
-          </div>
-          <dl id="calendarCounts" class="calendar-counts"></dl>
-        </article>
+    <article class="calendar-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-label">이번 시즌 흐름</p>
+          <h2>타임라인</h2>
+        </div>
+      </div>
+      <div id="timelineHighlights" class="timeline-strip"></div>
+    </article>
+  </div>
 
-        <article class="calendar-panel" data-sidebar-panel="timeline" hidden>
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">지원 → 필기 → 면접</p>
-              <h2>타임라인</h2>
-            </div>
-          </div>
-          <div id="timelineHighlights" class="timeline-strip"></div>
-        </article>
+  <div class="calendar-home-grid__side">
+    <article class="calendar-panel calendar-panel--selected">
+      <div class="panel-heading">
+        <div>
+          <p class="section-label">선택한 일정</p>
+          <h2>빠른 확인</h2>
+        </div>
+        <button id="selectedEventOpenBtn" class="drawer-link-button" type="button">상세 열기</button>
+      </div>
+      <div id="selectedEventPeek" class="selected-event-peek">달력이나 목록에서 일정을 누르면 핵심 정보와 바로가기 링크를 보여준다.</div>
+    </article>
 
-        <article class="calendar-panel" data-sidebar-panel="events" hidden>
+    <article class="calendar-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-label">지금 볼 것만</p>
+          <h2>우선순위</h2>
+        </div>
+      </div>
+      <div id="priorityList" class="priority-list"></div>
+    </article>
+  </div>
+</div>
+      </section>
+
+      <section id="mainPanelList" class="main-panel" data-main-panel="list" role="tabpanel" aria-labelledby="mainTabListBtn" hidden>
+        <article class="calendar-panel">
           <div class="event-list-toolbar">
             <div>
-              <p class="section-label">선택 가능한 일정</p>
+              <p class="section-label">표 형태 목록</p>
               <h2>일정 목록</h2>
               <p id="eventListCount" class="panel-caption panel-caption--body"></p>
             </div>
@@ -147,46 +136,24 @@
           </div>
           <p id="eventListContext" class="panel-caption panel-caption--body">선택한 날짜 기준으로 보여준다.</p>
           <div id="eventList" class="event-list"></div>
-
         </article>
+      </section>
 
-        <article class="calendar-panel" data-sidebar-panel="subscribe" hidden>
-          <div class="panel-heading panel-heading--stacked">
-            <div>
-              <p class="section-label">캘린더 구독</p>
-              <h2>연결</h2>
-            </div>
-            <p id="calendarIntro" class="panel-caption panel-caption--body">캘린더 설명 불러오는 중...</p>
-          </div>
-          <div class="subscription-actions">
-            <a id="icsSubscribeLink" class="primary-link" href="/api/calendar/recruitment.ics" target="_blank" rel="noopener noreferrer">ICS 열기</a>
-            <button id="copyIcsLinkBtn" type="button">ICS 링크 복사</button>
-          </div>
-          <ol id="calendarNotes" class="calendar-notes"></ol>
-        </article>
-
-        <article class="calendar-panel" data-sidebar-panel="priorities" hidden>
+      <section id="mainPanelFilters" class="main-panel" data-main-panel="filters" role="tabpanel" aria-labelledby="mainTabFiltersBtn" hidden>
+        <article class="calendar-panel">
           <div class="panel-heading">
             <div>
-              <p class="section-label">지금 볼 것만</p>
-              <h2>우선순위</h2>
+              <p class="section-label">일반 필터</p>
+              <h2>조건으로 좁히기</h2>
             </div>
-          </div>
-          <div id="priorityList" class="priority-list"></div>
-        </article>
-
-        <article class="calendar-panel" data-sidebar-panel="filters" hidden>
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">필터</p>
-              <h2>정리</h2>
-            </div>
+            <button id="resetFiltersBtn" class="drawer-link-button" type="button">전체 초기화</button>
           </div>
           <div class="filter-summary-row">
             <p id="activeFilterSummary" class="panel-caption panel-caption--body">전체 보기</p>
-            <button id="resetFiltersBtn" class="drawer-link-button" type="button">전체 초기화</button>
+            <strong id="filterResultCount">0건 표시</strong>
           </div>
           <div id="activeFilterTags" class="filter-active-tags" aria-live="polite"></div>
+
           <section class="filter-section">
             <div class="filter-section__head">
               <div>
@@ -197,6 +164,7 @@
             </div>
             <div id="institutionFilters" class="filter-option-grid" role="group" aria-label="기관 필터"></div>
           </section>
+
           <section class="filter-section">
             <div class="filter-section__head">
               <div>
@@ -207,6 +175,7 @@
             </div>
             <div id="eventTypeFilters" class="filter-option-grid" role="group" aria-label="유형 필터"></div>
           </section>
+
           <section class="filter-section">
             <div class="filter-section__head">
               <div>
@@ -217,6 +186,7 @@
             </div>
             <div id="statusFilters" class="filter-option-grid" role="group" aria-label="상태 필터"></div>
           </section>
+
           <label class="filter-switch-row">
             <span>
               <strong>예정 월/전후 일정 숨기기</strong>
@@ -224,32 +194,67 @@
             </span>
             <input id="hideApproximateToggle" type="checkbox" />
           </label>
+
           <div class="filter-result-bar">
-            <strong id="filterResultCount">0건 표시</strong>
-            <button id="filterDoneBtn" class="quick-action" type="button">완료</button>
+            <button id="filterGoCalendarBtn" class="quick-action" type="button">캘린더 보기</button>
+            <button id="filterGoListBtn" class="quick-action" type="button">목록 보기</button>
           </div>
         </article>
+      </section>
 
-        <article class="calendar-panel" data-sidebar-panel="watch" hidden>
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">기관 모니터링</p>
-              <h2>현황</h2>
+      <section id="mainPanelInstitutions" class="main-panel" data-main-panel="institutions" role="tabpanel" aria-labelledby="mainTabInstitutionsBtn" hidden>
+        <div class="institution-grid">
+<article class="calendar-panel">
+  <div class="panel-heading">
+    <div>
+      <p class="section-label">숫자 기준</p>
+      <h2>요약</h2>
+    </div>
+  </div>
+  <div id="calendarCounts" class="calendar-counts"></div>
+</article>
+
+<article class="calendar-panel">
+  <div class="panel-heading panel-heading--stacked">
+    <div>
+      <p class="section-label">공개 일정 있음</p>
+      <h2>기관 현황</h2>
+    </div>
+  </div>
+  <div id="dashboardOpen" class="dashboard-list"></div>
+</article>
+
+<article class="calendar-panel">
+  <div class="panel-heading panel-heading--stacked">
+    <div>
+      <p class="section-label">공고 미확인 기관</p>
+      <h2>모니터링</h2>
+    </div>
+  </div>
+  <div id="dashboardWatch" class="dashboard-list"></div>
+</article>
+
+          <article class="calendar-panel institution-grid__wide">
+            <div class="panel-heading panel-heading--stacked">
+              <div>
+                <p class="section-label">캘린더 구독</p>
+                <h2>연결</h2>
+              </div>
+              <p id="calendarIntro" class="panel-caption panel-caption--body">캘린더 설명 불러오는 중...</p>
             </div>
-          </div>
-          <section class="dashboard-section">
-            <h3>공개 일정 있음</h3>
-            <div id="dashboardOpen" class="dashboard-list"></div>
-          </section>
-          <section class="dashboard-section">
-            <h3>공고 미확인 기관</h3>
-            <div id="dashboardWatch" class="dashboard-list"></div>
-          </section>
-        </article>
-      </div>
-    </aside>
+            <div class="subscription-actions">
+              <a id="icsSubscribeLink" class="primary-link" href="/api/calendar/recruitment.ics" target="_blank" rel="noopener noreferrer">ICS 열기</a>
+              <button id="copyIcsLinkBtn" type="button">ICS 링크 복사</button>
+            </div>
+            <ol id="calendarNotes" class="calendar-notes"></ol>
+          </article>
+        </div>
+      </section>
+    </section>
 
-    <aside id="calendarDetailDrawer" class="calendar-drawer calendar-drawer--detail" aria-hidden="true" hidden>
+    <div id="calendarDrawerBackdrop" class="calendar-drawer-backdrop" hidden></div>
+
+    <aside id="calendarDetailDrawer" class="calendar-drawer" aria-hidden="true" hidden>
       <div class="calendar-drawer__head">
         <div>
           <p class="section-label">선택한 일정</p>

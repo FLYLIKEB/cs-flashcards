@@ -1,35 +1,21 @@
 const CALENDAR_API_PATH = '/api/calendar/recruitment';
 const COMPACT_CALENDAR_MEDIA = '(max-width: 760px)';
 const EMPTY_SELECTION_TEXT = '달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.';
-const CALENDAR_SIDEBAR_STATE_KEY = 'csFlashcardsCalendarSidebar:v1';
-const CALENDAR_LAST_PANEL_KEY = 'csFlashcardsCalendarLastPanel:v1';
 
-const PANEL_TITLES = {
-  overview: '포커스',
-  summary: '요약',
-  timeline: '타임라인',
-  events: '일정 목록',
-  subscribe: '캘린더 구독',
-  priorities: '우선순위',
-  filters: '필터',
-  watch: '기관 현황',
-};
+const MAIN_TABS = new Set(['calendar', 'list', 'filters', 'institutions']);
 
 const calendarState = {
   payload: null,
   calendar: null,
+  activeTab: 'calendar',
   selectedInstitutions: new Set(),
   selectedEventTypes: new Set(),
   selectedStatuses: new Set(),
   hideApproximate: false,
   selectedEventId: '',
   selectedDateKey: '',
-  sidebarOpen: false,
-  sidebarMenuOpen: false,
-  detailOpen: false,
-  activeSidebarPanel: 'overview',
-  lastUtilityPanel: 'overview',
   eventListMode: 'selected',
+  detailOpen: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -55,133 +41,33 @@ function preferredCalendarView() {
   return compactCalendarView() ? 'listMonth' : 'dayGridMonth';
 }
 
-function defaultCalendarSidebarOpen() {
-  return false;
-}
-
-function readSavedCalendarSidebarState() {
-  try {
-    const saved = window.localStorage.getItem(CALENDAR_SIDEBAR_STATE_KEY);
-    if (saved === 'open') return true;
-    if (saved === 'closed') return false;
-  } catch (_error) {
-    // Ignore storage failures and use the default collapsed state.
-  }
-  return defaultCalendarSidebarOpen();
-}
-
-function saveCalendarSidebarState() {
-  try {
-    window.localStorage.setItem(CALENDAR_SIDEBAR_STATE_KEY, calendarState.sidebarOpen ? 'open' : 'closed');
-  } catch (_error) {
-    // Ignore storage failures.
+function setMainTab(tabId) {
+  if (!MAIN_TABS.has(tabId)) return;
+  calendarState.activeTab = tabId;
+  closeDetailDrawer();
+  applyMainTabState();
+  if (tabId === 'list') {
+    renderEventList();
   }
 }
 
-function readSavedLastUtilityPanel() {
-  try {
-    const saved = window.localStorage.getItem(CALENDAR_LAST_PANEL_KEY);
-    if (saved && PANEL_TITLES[saved]) return saved;
-  } catch (_error) {
-    // Ignore storage failures.
-  }
-  return 'overview';
-}
 
-function saveLastUtilityPanel() {
-  try {
-    window.localStorage.setItem(CALENDAR_LAST_PANEL_KEY, calendarState.lastUtilityPanel);
-  } catch (_error) {
-    // Ignore storage failures.
-  }
+function applyMainTabState() {
+  document.querySelectorAll('[data-main-tab]').forEach((button) => {
+    const active = button.dataset.mainTab === calendarState.activeTab;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-selected', String(active));
+  });
+  document.querySelectorAll('[data-main-panel]').forEach((panel) => {
+    const active = panel.dataset.mainPanel === calendarState.activeTab;
+    panel.classList.toggle('active', active);
+    panel.hidden = !active;
+  });
 }
 
 function syncBackdrop() {
-  const visible = calendarState.sidebarOpen || calendarState.detailOpen;
-  $('calendarDrawerBackdrop').hidden = !visible;
-  document.body.classList.toggle('calendar-overlay-open', visible);
-}
-
-function applyCalendarSidebarState({ persist = true } = {}) {
-  const sidebar = $('calendarSidebar');
-  document.body.classList.toggle('calendar-sidebar-collapsed', !calendarState.sidebarOpen);
-  if (sidebar) {
-    sidebar.hidden = !calendarState.sidebarOpen;
-    sidebar.setAttribute('aria-hidden', String(!calendarState.sidebarOpen));
-  }
-  if (!calendarState.sidebarOpen) {
-    toggleCalendarSidebarMenu(false);
-  }
-  syncBackdrop();
-  if (persist) saveCalendarSidebarState();
-}
-
-function toggleCalendarSidebar(force = !calendarState.sidebarOpen) {
-  calendarState.sidebarOpen = Boolean(force);
-  applyCalendarSidebarState();
-}
-
-function applyCalendarSidebarMenuState() {
-  const menu = $('calendarSidebarMenu');
-  const featureBtn = $('calendarFeatureMenuBtn');
-  if (menu) menu.hidden = !calendarState.sidebarMenuOpen;
-  if (featureBtn) featureBtn.setAttribute('aria-expanded', String(calendarState.sidebarMenuOpen));
-}
-
-function toggleCalendarSidebarMenu(force = !calendarState.sidebarMenuOpen) {
-  calendarState.sidebarMenuOpen = Boolean(force);
-  applyCalendarSidebarMenuState();
-}
-
-function renderSidebarTitle() {
-  const title = $('calendarSidebarTitle');
-  if (title) title.textContent = PANEL_TITLES[calendarState.activeSidebarPanel] || '보조 패널';
-}
-
-function applyActiveSidebarPanel() {
-  document.querySelectorAll('[data-sidebar-panel]').forEach((element) => {
-    const active = element.dataset.sidebarPanel === calendarState.activeSidebarPanel;
-    element.hidden = !active;
-    element.classList.toggle('is-active', active);
-  });
-  document.querySelectorAll('[data-sidebar-panel-target]').forEach((button) => {
-    button.classList.toggle('active', button.dataset.sidebarPanelTarget === calendarState.activeSidebarPanel);
-  });
-  document.querySelectorAll('[data-quick-panel]').forEach((button) => {
-    button.classList.toggle('active', button.dataset.quickPanel === calendarState.activeSidebarPanel);
-  });
-  renderSidebarTitle();
-}
-
-function setActiveSidebarPanel(panelId, { openSidebar = true, closeMenu = true, scroll = false } = {}) {
-  if (!PANEL_TITLES[panelId]) return;
-  calendarState.activeSidebarPanel = panelId;
-  calendarState.lastUtilityPanel = panelId;
-  saveLastUtilityPanel();
-  applyActiveSidebarPanel();
-  closeDetailDrawer();
-  if (openSidebar && !calendarState.sidebarOpen) {
-    toggleCalendarSidebar(true);
-  }
-  if (closeMenu) {
-    toggleCalendarSidebarMenu(false);
-  }
-  if (panelId === 'events') {
-    renderEventList();
-  }
-  if (scroll) {
-    const panel = document.querySelector(`[data-sidebar-panel="${panelId}"]`);
-    panel?.scrollIntoView({ block: 'nearest' });
-  }
-}
-
-
-function openLastUtilityPanel() {
-  if (calendarState.sidebarOpen) {
-    toggleCalendarSidebar(false);
-    return;
-  }
-  setActiveSidebarPanel(calendarState.lastUtilityPanel || 'overview', { openSidebar: true, closeMenu: true, scroll: false });
+  $('calendarDrawerBackdrop').hidden = !calendarState.detailOpen;
+  document.body.classList.toggle('calendar-overlay-open', calendarState.detailOpen);
 }
 
 function closeDetailDrawer() {
@@ -196,27 +82,12 @@ function closeDetailDrawer() {
 
 function openDetailDrawer() {
   calendarState.detailOpen = true;
-  toggleCalendarSidebar(false);
   const detailDrawer = $('calendarDetailDrawer');
   if (detailDrawer) {
     detailDrawer.hidden = false;
     detailDrawer.setAttribute('aria-hidden', 'false');
   }
   syncBackdrop();
-}
-
-function openSidebarPanelFromMenu(panelId) {
-  if (panelId === 'close') {
-    toggleCalendarSidebar(false);
-    toggleCalendarSidebarMenu(false);
-    return;
-  }
-  if (panelId === 'detail') {
-    toggleCalendarSidebarMenu(false);
-    openDetailDrawerFromSelection();
-    return;
-  }
-  setActiveSidebarPanel(panelId, { openSidebar: true, closeMenu: true, scroll: true });
 }
 
 function eventTimestamp(event, field = 'start') {
@@ -230,6 +101,24 @@ function sortEventsByStart(items) {
     if (delta) return delta;
     return String(left.list_title || left.title || '').localeCompare(String(right.list_title || right.title || ''), 'ko');
   });
+}
+
+function eventDateKey(event) {
+  return String(event?.start_inclusive || event?.start || '').slice(0, 10);
+}
+
+function nextUpcomingEvent(events, { exactOnly = false } = {}) {
+  const now = Date.now();
+  const sorted = sortEventsByStart(events).filter((event) => !exactOnly || !event.is_approximate);
+  return sorted.find((event) => eventTimestamp(event, 'end') >= now) || sorted[0] || null;
+}
+
+function urgentDeadlineEvent(events) {
+  const now = Date.now();
+  const openEvents = sortEventsByStart(events)
+    .filter((event) => event.status === 'open' && eventTimestamp(event, 'end') >= now)
+    .sort((left, right) => eventTimestamp(left, 'end') - eventTimestamp(right, 'end'));
+  return openEvents[0] || null;
 }
 
 function priorityLabel(item) {
@@ -266,28 +155,30 @@ function applyCalendarEventTone(info) {
   }
 }
 
+function allInstitutions() {
+  return (calendarState.payload?.institutions || []).map((item) => item.id);
+}
+
+function allEventTypes() {
+  return uniqueValues(calendarState.payload?.events || [], 'event_type');
+}
+
+function allStatuses() {
+  return uniqueValues(calendarState.payload?.events || [], 'status');
+}
+
 function matchesFilters(event) {
-  if (!calendarState.selectedInstitutions.has(event.institution.id)) return false;
-  if (!calendarState.selectedEventTypes.has(event.event_type)) return false;
-  if (!calendarState.selectedStatuses.has(event.status)) return false;
+  if (calendarState.selectedInstitutions.size !== allInstitutions().length && !calendarState.selectedInstitutions.has(event.institution.id)) return false;
+  if (calendarState.selectedEventTypes.size !== allEventTypes().length && !calendarState.selectedEventTypes.has(event.event_type)) return false;
+  if (calendarState.selectedStatuses.size !== allStatuses().length && !calendarState.selectedStatuses.has(event.status)) return false;
   if (calendarState.hideApproximate && event.is_approximate) return false;
   return true;
 }
 
+
 function filteredEvents() {
   return sortEventsByStart((calendarState.payload?.events || []).filter(matchesFilters));
 }
-
-function eventDateKey(event) {
-  return String(event?.start_inclusive || event?.start || '').slice(0, 10);
-}
-
-function nextUpcomingEvent(events, { exactOnly = false } = {}) {
-  const now = Date.now();
-  const sorted = sortEventsByStart(events).filter((event) => !exactOnly || !event.is_approximate);
-  return sorted.find((event) => eventTimestamp(event, 'end') >= now) || sorted[0] || null;
-}
-
 
 function renderFilterOptions(containerId, items, selectedSet, key, labelKey, metaKey = '') {
   const container = $(containerId);
@@ -310,18 +201,6 @@ function renderFilterOptions(containerId, items, selectedSet, key, labelKey, met
   }).join('');
 }
 
-function allInstitutions() {
-  return (calendarState.payload?.institutions || []).map((item) => item.id);
-}
-
-function allEventTypes() {
-  return uniqueValues(calendarState.payload?.events || [], 'event_type');
-}
-
-function allStatuses() {
-  return uniqueValues(calendarState.payload?.events || [], 'status');
-}
-
 function resetFilterGroup(group) {
   if (group === 'institution') {
     calendarState.selectedInstitutions = new Set(allInstitutions());
@@ -330,7 +209,7 @@ function resetFilterGroup(group) {
   } else if (group === 'status') {
     calendarState.selectedStatuses = new Set(allStatuses());
   }
-  initializeFilterChips();
+  initializeFilterOptions();
   rerenderCalendar();
 }
 
@@ -340,35 +219,44 @@ function resetFilters() {
   calendarState.selectedStatuses = new Set(allStatuses());
   calendarState.hideApproximate = false;
   if ($('hideApproximateToggle')) $('hideApproximateToggle').checked = false;
-  initializeFilterChips();
+  initializeFilterOptions();
   rerenderCalendar();
 }
 
-function renderQuickBar(events = filteredEvents()) {
+function renderSummaryBar(events = filteredEvents()) {
   const payload = calendarState.payload;
   if (!payload) return;
   const openEvents = events.filter((event) => event.status === 'open');
   const nextExactEvent = nextUpcomingEvent(events, { exactOnly: true });
-  const restrictedGroups = [
+  const deadlineEvent = urgentDeadlineEvent(events);
+
+  $('summaryOpenCount').textContent = `${openEvents.length}건`;
+  $('summaryOpenMeta').textContent = openEvents[0] ? `${openEvents[0].institution.short_name} 포함` : '진행 중 일정 없음';
+
+  if (deadlineEvent) {
+    $('summaryDeadlineTitle').textContent = `${deadlineEvent.institution.short_name} ${deadlineEvent.display_label}`;
+    $('summaryDeadlineMeta').textContent = deadlineEvent.date_display;
+  } else {
+    $('summaryDeadlineTitle').textContent = '마감 임박 일정 없음';
+    $('summaryDeadlineMeta').textContent = '열린 일정이 없거나 모두 종료 직전 아님';
+  }
+
+  if (nextExactEvent) {
+    $('summaryNextTitle').textContent = `${nextExactEvent.institution.short_name} ${nextExactEvent.display_label}`;
+    $('summaryNextMeta').textContent = nextExactEvent.date_display;
+  } else {
+    $('summaryNextTitle').textContent = '확정 일정 없음';
+    $('summaryNextMeta').textContent = '예정 일정만 남아 있다.';
+  }
+
+  const tagCount = [
     calendarState.selectedInstitutions.size !== allInstitutions().length,
     calendarState.selectedEventTypes.size !== allEventTypes().length,
     calendarState.selectedStatuses.size !== allStatuses().length,
     calendarState.hideApproximate,
   ].filter(Boolean).length;
-
-  $('quickOpenCount').textContent = `${openEvents.length}건`;
-  $('quickWatchCount').textContent = `${payload.dashboard.watch.length}곳`;
-  $('quickFilterState').textContent = restrictedGroups ? `${restrictedGroups}개 조건` : '전체';
-
-  const title = $('quickNextEventTitle');
-  const meta = $('quickNextEventMeta');
-  if (nextExactEvent) {
-    title.textContent = `${nextExactEvent.institution.short_name} ${nextExactEvent.display_label}`;
-    meta.textContent = nextExactEvent.date_display;
-  } else {
-    title.textContent = '확정 일정 없음';
-    meta.textContent = '예정 일정만 남아 있다.';
-  }
+  $('summaryFilterState').textContent = tagCount ? `${tagCount}개 적용` : '전체';
+  $('summaryFilterMeta').textContent = `${events.length}건 표시`;
 }
 
 function renderOverview(events = filteredEvents()) {
@@ -376,32 +264,25 @@ function renderOverview(events = filteredEvents()) {
   if (!payload) return;
   const openEvents = events.filter((event) => event.status === 'open');
   const nextExactEvent = nextUpcomingEvent(events, { exactOnly: true });
-  const timelineLead = payload.timeline?.[0] || null;
-  const priorities = payload.dashboard?.priorities || payload.priorities || [];
-  const topPriority = priorities[0] || null;
+  const topPriority = (payload.dashboard?.priorities || payload.priorities || [])[0] || null;
+  const deadlineEvent = urgentDeadlineEvent(events);
 
-  let headline = timelineLead?.headline || '지금 봐야 할 채용 일정만 압축했다.';
-  let focus = timelineLead?.focus || payload.calendar.description || '';
-
-  if (openEvents.length) {
-    const leadOpen = openEvents[0];
-    headline = `${leadOpen.institution.name} ${leadOpen.display_label} 진행 중`;
-    focus = `${leadOpen.date_display} · ${leadOpen.summary || leadOpen.description || '지금 바로 대응해야 하는 일정'}`;
+  if (deadlineEvent) {
+    $('overviewHeadline').textContent = `${deadlineEvent.institution.name} ${deadlineEvent.display_label}`;
+    $('overviewFocus').textContent = `${deadlineEvent.date_display} · 마감 전에 공고 확인과 지원 상태 점검이 필요하다.`;
   } else if (nextExactEvent) {
-    headline = `${nextExactEvent.institution.name} ${nextExactEvent.display_label}`;
-    focus = `${nextExactEvent.date_display} · ${nextExactEvent.summary || nextExactEvent.description || '다음 확정 일정'}`;
-  } else if (topPriority) {
-    focus = `${priorityLabel(topPriority)} 우선 · ${topPriority.reason}`;
+    $('overviewHeadline').textContent = `${nextExactEvent.institution.name} ${nextExactEvent.display_label}`;
+    $('overviewFocus').textContent = `${nextExactEvent.date_display} · ${nextExactEvent.summary || nextExactEvent.description || '다음 확정 일정'}`;
+  } else {
+    $('overviewHeadline').textContent = '지금 대응할 핵심 일정부터 본다.';
+    $('overviewFocus').textContent = topPriority ? `${priorityLabel(topPriority)} 우선 · ${topPriority.reason}` : payload.calendar.description || '';
   }
 
-  $('overviewHeadline').textContent = headline;
-  $('overviewFocus').textContent = focus || '업데이트된 일정과 우선순위를 한 화면에 보여준다.';
-
   const rows = [
-    ['현재 보이는 일정', `${events.length}건`, calendarState.hideApproximate ? '예정 월/전후 숨김 적용' : '필터 기준으로 계산'],
-    ['진행 중', `${openEvents.length}건`, openEvents[0] ? openEvents[0].date_display : '열린 접수 일정 없음'],
-    ['다음 확정 일정', nextExactEvent ? nextExactEvent.display_label : '대기 중', nextExactEvent ? `${nextExactEvent.institution.short_name} · ${nextExactEvent.date_display}` : '확정 일정이 더 필요함'],
-    ['체크 대기 기관', `${payload.dashboard.watch.length}곳`, topPriority ? `${priorityLabel(topPriority)}부터 확인` : '링크만 짧게 확인'],
+    ['보이는 일정', `${events.length}건`, calendarState.hideApproximate ? '예정 숨김 적용' : '현재 필터 기준'],
+    ['진행 중', `${openEvents.length}건`, openEvents[0] ? openEvents[0].date_display : '열린 일정 없음'],
+    ['다음 확정', nextExactEvent ? nextExactEvent.display_label : '대기 중', nextExactEvent ? `${nextExactEvent.institution.short_name} · ${nextExactEvent.date_display}` : '확정 일정 대기'],
+    ['1순위', topPriority ? priorityLabel(topPriority) : '없음', topPriority ? topPriority.reason : '우선순위 정보 없음'],
   ];
 
   $('overviewHighlights').innerHTML = `
@@ -449,6 +330,34 @@ function renderTimeline() {
   `;
 }
 
+function renderCounts() {
+  const counts = calendarState.payload?.counts;
+  const container = $('calendarCounts');
+  if (!counts || !container) return;
+  const items = [
+    ['전체 일정', counts.total_events, '공고 + 예비공고 + 연간 계획'],
+    ['진행 중', counts.open_events, '지금 바로 대응 가능'],
+    ['확정 날짜', counts.exact_events, '일 단위가 확정된 일정'],
+    ['예정/관측', counts.planned_events, '월 단위·전후 일정 포함'],
+    ['체크 대기', counts.watch_only_institutions, '짧게 확인할 기관'],
+  ];
+  container.innerHTML = `
+    <table class="compact-table compact-table--summary">
+      <tbody>
+        ${items.map(([label, value, note]) => `
+          <tr>
+            <th scope="row">${escapeHtml(label)}</th>
+            <td>
+              <strong>${escapeHtml(value)}</strong>
+              <span class="table-note">${escapeHtml(note)}</span>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
 function renderPriorityList() {
   const container = $('priorityList');
   const priorities = calendarState.payload?.dashboard?.priorities || calendarState.payload?.priorities || [];
@@ -468,34 +377,6 @@ function renderPriorityList() {
             <td>${escapeHtml(item.rank)}</td>
             <td>${escapeHtml(priorityLabel(item))}</td>
             <td>${escapeHtml(item.reason || '')}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
-
-function renderCounts() {
-  const counts = calendarState.payload?.counts;
-  const container = $('calendarCounts');
-  if (!counts || !container) return;
-  const items = [
-    ['전체 일정', counts.total_events, '공고 + 예비공고 + 연간 계획'],
-    ['진행 중', counts.open_events, '지금 바로 대응 가능한 일정'],
-    ['확정 날짜', counts.exact_events, '일 단위가 확정된 일정'],
-    ['예정/관측', counts.planned_events, '월 단위·전후 일정 포함'],
-    ['체크 대기 기관', counts.watch_only_institutions, '짧게 확인만 해도 되는 곳'],
-  ];
-  container.innerHTML = `
-    <table class="compact-table compact-table--summary">
-      <tbody>
-        ${items.map(([label, value, note]) => `
-          <tr>
-            <th scope="row">${escapeHtml(label)}</th>
-            <td>
-              <strong>${escapeHtml(value)}</strong>
-              <span class="table-note">${escapeHtml(note)}</span>
-            </td>
           </tr>
         `).join('')}
       </tbody>
@@ -668,59 +549,20 @@ function selectEvent(eventId, { openDetail = false } = {}) {
   }
 }
 
-function openDetailDrawerFromSelection() {
-  const events = filteredEvents();
-  const selected = events.find((item) => item.id === calendarState.selectedEventId) || events[0] || null;
-  if (!selected) {
-    renderSelectedEvent(null);
-    return;
-  }
-  selectEvent(selected.id, { openDetail: true });
-}
-
-function rerenderCalendar() {
-  const events = filteredEvents();
-  if (calendarState.calendar) {
-    calendarState.calendar.removeAllEvents();
-    calendarState.calendar.addEventSource(events);
-  }
-  renderActiveFilterSummary();
-  renderQuickBar(events);
-  renderOverview(events);
-  renderCounts();
-  renderTimeline();
-  renderPriorityList();
-  renderDashboardList('dashboardOpen', calendarState.payload?.dashboard?.open || [], '현재 공개된 일정이 없다.');
-  renderDashboardList('dashboardWatch', calendarState.payload?.dashboard?.watch || [], '미확인 기관이 없다.');
-  renderEventList(events);
-
-  const nextSelected = events.find((item) => item.id === calendarState.selectedEventId) || events[0] || null;
-  if (nextSelected) {
-    selectEvent(nextSelected.id);
-  } else {
-    calendarState.selectedEventId = '';
-    renderSelectedEvent(null);
-    syncSelectedEventCard();
-    closeDetailDrawer();
-  }
-}
-
-function renderActiveFilterSummary() {
+function renderActiveFilterSummary(events = filteredEvents()) {
   const tags = [];
-  const visibleCount = filteredEvents().length;
-  if (calendarState.selectedInstitutions.size !== allInstitutions().length) tags.push(`기관 ${calendarState.selectedInstitutions.size}개 선택`);
-  if (calendarState.selectedEventTypes.size !== allEventTypes().length) tags.push(`유형 ${calendarState.selectedEventTypes.size}개 선택`);
-  if (calendarState.selectedStatuses.size !== allStatuses().length) tags.push(`상태 ${calendarState.selectedStatuses.size}개 선택`);
+  if (calendarState.selectedInstitutions.size !== allInstitutions().length) tags.push(`기관 ${calendarState.selectedInstitutions.size}개`);
+  if (calendarState.selectedEventTypes.size !== allEventTypes().length) tags.push(`유형 ${calendarState.selectedEventTypes.size}개`);
+  if (calendarState.selectedStatuses.size !== allStatuses().length) tags.push(`상태 ${calendarState.selectedStatuses.size}개`);
   if (calendarState.hideApproximate) tags.push('예정 숨김');
-  $('activeFilterSummary').textContent = tags.length ? `필터 적용 중 · ${visibleCount}건 표시` : '전체 보기';
+  $('activeFilterSummary').textContent = tags.length ? `필터 적용 중 · ${events.length}건 표시` : '전체 보기';
   $('activeFilterTags').innerHTML = (tags.length ? tags : ['전체']).map((label) => `<span class="filter-tag">${escapeHtml(label)}</span>`).join('');
-  $('filterResultCount').textContent = `${visibleCount}건 표시`;
+  $('filterResultCount').textContent = `${events.length}건 표시`;
 }
 
-function bindFilterGroup(containerId, selectedSet) {
-  $(containerId)?.addEventListener('change', (event) => {
-    const input = event.target.closest('input[data-filter-value]');
-    if (!input) return;
+function bindFilterGroup(containerId, getSelectedSet) {
+  $(containerId)?.addEventListener('change', () => {
+    const selectedSet = getSelectedSet();
     selectedSet.clear();
     $(containerId).querySelectorAll('input[data-filter-value]:checked').forEach((checkbox) => {
       selectedSet.add(checkbox.dataset.filterValue || '');
@@ -729,7 +571,8 @@ function bindFilterGroup(containerId, selectedSet) {
   });
 }
 
-function initializeFilterChips() {
+
+function initializeFilterOptions() {
   const payload = calendarState.payload;
   if (!payload) return;
   renderFilterOptions('institutionFilters', payload.institutions, calendarState.selectedInstitutions, 'id', 'short_name', 'name');
@@ -747,7 +590,7 @@ function initializeFilterChips() {
     'status',
     'status_label',
   );
-  renderActiveFilterSummary();
+  renderActiveFilterSummary(filteredEvents());
 }
 
 function initializeCalendar() {
@@ -788,6 +631,33 @@ function applyResponsiveCalendarView(force = false) {
   }
 }
 
+function rerenderCalendar() {
+  const events = filteredEvents();
+  if (calendarState.calendar) {
+    calendarState.calendar.removeAllEvents();
+    calendarState.calendar.addEventSource(events);
+  }
+  renderActiveFilterSummary(events);
+  renderSummaryBar(events);
+  renderOverview(events);
+  renderTimeline();
+  renderCounts();
+  renderPriorityList();
+  renderDashboardList('dashboardOpen', calendarState.payload?.dashboard?.open || [], '현재 공개된 일정이 없다.');
+  renderDashboardList('dashboardWatch', calendarState.payload?.dashboard?.watch || [], '미확인 기관이 없다.');
+  renderEventList(events);
+
+  const nextSelected = events.find((item) => item.id === calendarState.selectedEventId) || events[0] || null;
+  if (nextSelected) {
+    selectEvent(nextSelected.id);
+  } else {
+    calendarState.selectedEventId = '';
+    renderSelectedEvent(null);
+    syncSelectedEventCard();
+    closeDetailDrawer();
+  }
+}
+
 async function copyIcsLink() {
   const link = $('icsSubscribeLink')?.href || '';
   if (!link) return;
@@ -808,9 +678,9 @@ async function loadCalendar() {
   calendarState.payload = await response.json();
   const payload = calendarState.payload;
 
-  payload.institutions.forEach((item) => calendarState.selectedInstitutions.add(item.id));
-  allEventTypes().forEach((item) => calendarState.selectedEventTypes.add(item));
-  allStatuses().forEach((item) => calendarState.selectedStatuses.add(item));
+  calendarState.selectedInstitutions = new Set(allInstitutions());
+  calendarState.selectedEventTypes = new Set(allEventTypes());
+  calendarState.selectedStatuses = new Set(allStatuses());
 
   $('calendarUpdatedAt').textContent = `마지막 업데이트 ${payload.calendar.last_updated} · 총 ${payload.counts.total_events}개 일정`;
   $('calendarIntro').textContent = payload.calendar.intro || payload.calendar.description || '';
@@ -821,63 +691,37 @@ async function loadCalendar() {
     notes.innerHTML = (payload.calendar.notes || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
   }
 
-  initializeFilterChips();
+  initializeFilterOptions();
   initializeCalendar();
   rerenderCalendar();
-  applyActiveSidebarPanel();
+  applyMainTabState();
 }
 
-calendarState.sidebarOpen = readSavedCalendarSidebarState();
-calendarState.lastUtilityPanel = readSavedLastUtilityPanel();
-calendarState.activeSidebarPanel = calendarState.lastUtilityPanel;
-applyCalendarSidebarState({ persist: false });
-applyCalendarSidebarMenuState();
-applyActiveSidebarPanel();
-
-$('calendarSidebarToggleBtn')?.addEventListener('click', (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-  openLastUtilityPanel();
+document.querySelectorAll('[data-main-tab]').forEach((button) => {
+  button.addEventListener('click', () => setMainTab(button.dataset.mainTab || 'calendar'));
 });
-$('calendarFeatureMenuBtn')?.addEventListener('click', (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-  toggleCalendarSidebarMenu();
+$('summaryDeadlineBtn')?.addEventListener('click', () => {
+  const event = urgentDeadlineEvent(filteredEvents());
+  if (event) selectEvent(event.id, { openDetail: true });
 });
-document.querySelectorAll('[data-sidebar-panel-target]').forEach((button) => {
-  button.addEventListener('click', () => openSidebarPanelFromMenu(button.dataset.sidebarPanelTarget || ''));
+$('summaryOpenBtn')?.addEventListener('click', () => {
+  calendarState.eventListMode = 'all';
+  setMainTab('list');
+  renderEventList();
 });
-$('calendarSidebarCloseBtn')?.addEventListener('click', () => toggleCalendarSidebar(false));
+$('summaryNextBtn')?.addEventListener('click', () => {
+  const event = nextUpcomingEvent(filteredEvents(), { exactOnly: true });
+  if (event) selectEvent(event.id, { openDetail: true });
+});
 $('calendarDetailCloseBtn')?.addEventListener('click', closeDetailDrawer);
-$('calendarDrawerBackdrop')?.addEventListener('click', () => {
-  toggleCalendarSidebar(false);
-  closeDetailDrawer();
-});
+$('calendarDrawerBackdrop')?.addEventListener('click', closeDetailDrawer);
 $('copyIcsLinkBtn')?.addEventListener('click', copyIcsLink);
 $('resetFiltersBtn')?.addEventListener('click', resetFilters);
 $('resetInstitutionFiltersBtn')?.addEventListener('click', () => resetFilterGroup('institution'));
 $('resetEventTypeFiltersBtn')?.addEventListener('click', () => resetFilterGroup('eventType'));
 $('resetStatusFiltersBtn')?.addEventListener('click', () => resetFilterGroup('status'));
-$('filterDoneBtn')?.addEventListener('click', () => toggleCalendarSidebar(false));
-$('quickFilterBtn')?.addEventListener('click', () => setActiveSidebarPanel('filters', { openSidebar: true, closeMenu: true, scroll: false }));
-$('quickListBtn')?.addEventListener('click', () => setActiveSidebarPanel('events', { openSidebar: true, closeMenu: true, scroll: false }));
-
-document.querySelectorAll('[data-quick-panel]').forEach((button) => {
-  button.addEventListener('click', () => {
-    const panelId = button.dataset.quickPanel || 'overview';
-    if (calendarState.sidebarOpen && calendarState.activeSidebarPanel === panelId) {
-      toggleCalendarSidebar(false);
-      return;
-    }
-    setActiveSidebarPanel(panelId, { openSidebar: true, closeMenu: true, scroll: false });
-  });
-});
-$('quickNextEventBtn')?.addEventListener('click', () => {
-  const nextExactEvent = nextUpcomingEvent(filteredEvents(), { exactOnly: true });
-  if (nextExactEvent) {
-    selectEvent(nextExactEvent.id, { openDetail: true });
-  }
-});
+$('filterGoCalendarBtn')?.addEventListener('click', () => setMainTab('calendar'));
+$('filterGoListBtn')?.addEventListener('click', () => setMainTab('list'));
 $('eventListModeSelectedBtn')?.addEventListener('click', () => setEventListMode('selected'));
 $('eventListModeAllBtn')?.addEventListener('click', () => setEventListMode('all'));
 $('hideApproximateToggle')?.addEventListener('change', (event) => {
@@ -885,21 +729,14 @@ $('hideApproximateToggle')?.addEventListener('change', (event) => {
   rerenderCalendar();
 });
 window.matchMedia?.(COMPACT_CALENDAR_MEDIA).addEventListener?.('change', () => applyResponsiveCalendarView());
-document.addEventListener('click', (event) => {
-  if (calendarState.sidebarMenuOpen && !event.target.closest('.calendar-feature-menu-wrap')) {
-    toggleCalendarSidebarMenu(false);
-  }
-});
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
-    toggleCalendarSidebarMenu(false);
     closeDetailDrawer();
-    toggleCalendarSidebar(false);
   }
 });
-bindFilterGroup('institutionFilters', calendarState.selectedInstitutions);
-bindFilterGroup('eventTypeFilters', calendarState.selectedEventTypes);
-bindFilterGroup('statusFilters', calendarState.selectedStatuses);
+bindFilterGroup('institutionFilters', () => calendarState.selectedInstitutions);
+bindFilterGroup('eventTypeFilters', () => calendarState.selectedEventTypes);
+bindFilterGroup('statusFilters', () => calendarState.selectedStatuses);
 
 loadCalendar().catch((error) => {
   $('calendarIntro').textContent = error instanceof Error ? error.message : '캘린더를 불러오지 못했다.';
