@@ -122,11 +122,13 @@ button {
 .table-links,
 .calendar-quickbar__actions,
 .mode-toggle-group,
-.calendar-quickbar__summary {
+.calendar-quickbar__summary,
+.calendar-panel-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
+
 
 .calendar-top-links a,
 .primary-link,
@@ -178,6 +180,32 @@ button {
   display: grid;
   grid-template-columns: minmax(220px, 1.35fr) repeat(3, minmax(120px, 1fr));
   gap: 10px;
+}
+
+.calendar-panel-tabs {
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.calendar-panel-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.panel-tab-button {
+  flex: 0 0 auto;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+}
+
+.panel-tab-button:hover,
+.panel-tab-button:focus-visible,
+.panel-tab-button.active {
+  border-color: var(--text);
+  background: #ffffff;
+  outline: none;
 }
 
 .quick-card {

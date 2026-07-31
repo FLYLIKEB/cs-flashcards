@@ -147,6 +147,9 @@ function applyActiveSidebarPanel() {
   document.querySelectorAll('[data-sidebar-panel-target]').forEach((button) => {
     button.classList.toggle('active', button.dataset.sidebarPanelTarget === calendarState.activeSidebarPanel);
   });
+  document.querySelectorAll('[data-quick-panel]').forEach((button) => {
+    button.classList.toggle('active', button.dataset.quickPanel === calendarState.activeSidebarPanel);
+  });
   renderSidebarTitle();
 }
 
@@ -833,6 +836,9 @@ $('copyIcsLinkBtn')?.addEventListener('click', copyIcsLink);
 $('resetFiltersBtn')?.addEventListener('click', resetFilters);
 $('quickFilterBtn')?.addEventListener('click', () => setActiveSidebarPanel('filters', { openSidebar: true, closeMenu: true, scroll: false }));
 $('quickListBtn')?.addEventListener('click', () => setActiveSidebarPanel('events', { openSidebar: true, closeMenu: true, scroll: false }));
+document.querySelectorAll('[data-quick-panel]').forEach((button) => {
+  button.addEventListener('click', () => setActiveSidebarPanel(button.dataset.quickPanel || 'overview', { openSidebar: true, closeMenu: true, scroll: false }));
+});
 $('quickNextEventBtn')?.addEventListener('click', () => {
   const nextExactEvent = nextUpcomingEvent(filteredEvents(), { exactOnly: true });
   if (nextExactEvent) {
