@@ -3,6 +3,7 @@ const COMPACT_CALENDAR_MEDIA = '(max-width: 760px)';
 const EMPTY_SELECTION_TEXT = '달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.';
 
 const MAIN_TABS = new Set(['calendar', 'list', 'filters', 'institutions']);
+const DRAWER_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const calendarState = {
   payload: null,
@@ -16,6 +17,7 @@ const calendarState = {
   selectedDateKey: '',
   eventListMode: 'all',
   detailOpen: false,
+  lastFocusedElement: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -41,22 +43,55 @@ function preferredCalendarView() {
   return compactCalendarView() ? 'listMonth' : 'dayGridMonth';
 }
 
+function mainTabButtons() {
+  return [...document.querySelectorAll('[data-main-tab]')];
+}
+
+function mainTabButton(tabId) {
+  return mainTabButtons().find((button) => button.dataset.mainTab === tabId) || null;
+}
+
+function focusMainTab(tabId) {
+  mainTabButton(tabId)?.focus();
+}
+
+function handleMainTabKeydown(event) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  const buttons = mainTabButtons();
+  const currentIndex = buttons.findIndex((button) => button === event.currentTarget);
+  if (currentIndex < 0) return;
+  event.preventDefault();
+  let nextIndex = currentIndex;
+  if (event.key === 'Home') {
+    nextIndex = 0;
+  } else if (event.key === 'End') {
+    nextIndex = buttons.length - 1;
+  } else if (event.key === 'ArrowRight') {
+    nextIndex = (currentIndex + 1) % buttons.length;
+  } else if (event.key === 'ArrowLeft') {
+    nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+  }
+  const nextTabId = buttons[nextIndex]?.dataset.mainTab || 'calendar';
+  setMainTab(nextTabId);
+  focusMainTab(nextTabId);
+}
+
 function setMainTab(tabId) {
   if (!MAIN_TABS.has(tabId)) return;
   calendarState.activeTab = tabId;
-  closeDetailDrawer();
+  closeDetailDrawer({ restoreFocus: false });
   applyMainTabState();
   if (tabId === 'list') {
     renderEventList();
   }
 }
 
-
 function applyMainTabState() {
-  document.querySelectorAll('[data-main-tab]').forEach((button) => {
+  mainTabButtons().forEach((button) => {
     const active = button.dataset.mainTab === calendarState.activeTab;
     button.classList.toggle('active', active);
     button.setAttribute('aria-selected', String(active));
+    button.setAttribute('tabindex', active ? '0' : '-1');
   });
   document.querySelectorAll('[data-main-panel]').forEach((panel) => {
     const active = panel.dataset.mainPanel === calendarState.activeTab;
@@ -70,7 +105,13 @@ function syncBackdrop() {
   document.body.classList.toggle('calendar-overlay-open', calendarState.detailOpen);
 }
 
-function closeDetailDrawer() {
+function focusableDrawerElements() {
+  const detailDrawer = $('calendarDetailDrawer');
+  if (!detailDrawer || detailDrawer.hidden) return [];
+  return [...detailDrawer.querySelectorAll(DRAWER_FOCUSABLE_SELECTOR)].filter((element) => !element.hasAttribute('hidden'));
+}
+
+function closeDetailDrawer({ restoreFocus = true } = {}) {
   calendarState.detailOpen = false;
   const detailDrawer = $('calendarDetailDrawer');
   if (detailDrawer) {
@@ -78,16 +119,26 @@ function closeDetailDrawer() {
     detailDrawer.setAttribute('aria-hidden', 'true');
   }
   syncBackdrop();
+  const focusTarget = calendarState.lastFocusedElement;
+  calendarState.lastFocusedElement = null;
+  if (restoreFocus && focusTarget && typeof focusTarget.focus === 'function' && focusTarget.isConnected !== false) {
+    focusTarget.focus();
+  }
 }
 
 function openDetailDrawer() {
-  calendarState.detailOpen = true;
   const detailDrawer = $('calendarDetailDrawer');
-  if (detailDrawer) {
-    detailDrawer.hidden = false;
-    detailDrawer.setAttribute('aria-hidden', 'false');
+  if (!detailDrawer) return;
+  if (!calendarState.detailOpen) {
+    const activeElement = document.activeElement;
+    calendarState.lastFocusedElement = activeElement && typeof activeElement.focus === 'function' ? activeElement : null;
   }
+  calendarState.detailOpen = true;
+  detailDrawer.hidden = false;
+  detailDrawer.setAttribute('aria-hidden', 'false');
   syncBackdrop();
+  const focusTarget = $('calendarDetailCloseBtn') || focusableDrawerElements()[0] || detailDrawer;
+  focusTarget.focus();
 }
 
 function eventTimestamp(event, field = 'start') {
@@ -405,8 +456,11 @@ function selectedDateEvents(events) {
 }
 
 function renderEventListModeButtons() {
-  $('eventListModeSelectedBtn')?.classList.toggle('active', calendarState.eventListMode === 'selected');
-  $('eventListModeAllBtn')?.classList.toggle('active', calendarState.eventListMode === 'all');
+  const selectedMode = calendarState.eventListMode === 'selected';
+  $('eventListModeSelectedBtn')?.classList.toggle('active', selectedMode);
+  $('eventListModeSelectedBtn')?.setAttribute('aria-pressed', String(selectedMode));
+  $('eventListModeAllBtn')?.classList.toggle('active', !selectedMode);
+  $('eventListModeAllBtn')?.setAttribute('aria-pressed', String(!selectedMode));
 }
 
 function setEventListMode(mode) {
@@ -425,7 +479,7 @@ function renderEventList(events = filteredEvents()) {
   if (calendarState.eventListMode === 'selected') {
     listEvents = selectedDateEvents(events);
     const lead = listEvents[0] || null;
-    contextText = lead ? `${lead.date_display} 일정만 표시` : '선택한 날짜 일정이 없다.';
+    contextText = lead ? `${lead.date_display} 선택 일정 기준` : '선택한 일정이 없다.';
   }
 
   renderEventListModeButtons();
@@ -522,10 +576,7 @@ function renderSelectedEvent(event) {
       </div>
     </dl>
     ${event.description ? `<p>${escapeHtml(event.description)}</p>` : ''}
-    <ul>
-      ${event.source_label ? `<li>출처: ${escapeHtml(event.source_label)}</li>` : ''}
-      ${event.details ? `<li>${escapeHtml(event.details)}</li>` : ''}
-    </ul>
+    ${event.source_label ? `<ul><li>출처: ${escapeHtml(event.source_label)}</li></ul>` : ''}
     <div class="event-actions">
       ${event.url ? `<a class="primary-link" href="${escapeHtml(event.url)}" target="_blank" rel="noopener noreferrer">공고 열기</a>` : ''}
       <a href="${escapeHtml(event.google_calendar_url)}" target="_blank" rel="noopener noreferrer">Google Calendar에 추가</a>
@@ -545,7 +596,7 @@ function selectEvent(eventId, { openDetail = false } = {}) {
   if (!event) {
     renderSelectedEvent(null);
     syncSelectedEventCard();
-    closeDetailDrawer();
+    closeDetailDrawer({ restoreFocus: false });
     return;
   }
   calendarState.selectedDateKey = eventDateKey(event);
@@ -611,12 +662,11 @@ function initializeCalendar() {
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,listMonth',
+      right: '',
     },
     buttonText: {
       today: '오늘',
       month: '월',
-      list: '목록',
     },
     events: filteredEvents(),
     eventClick(info) {
@@ -662,7 +712,7 @@ function rerenderCalendar() {
     calendarState.selectedEventId = '';
     renderSelectedEvent(null);
     syncSelectedEventCard();
-    closeDetailDrawer();
+    closeDetailDrawer({ restoreFocus: false });
   }
 }
 
@@ -707,6 +757,7 @@ async function loadCalendar() {
 
 document.querySelectorAll('[data-main-tab]').forEach((button) => {
   button.addEventListener('click', () => setMainTab(button.dataset.mainTab || 'calendar'));
+  button.addEventListener('keydown', handleMainTabKeydown);
 });
 $('summaryDeadlineBtn')?.addEventListener('click', () => {
   const event = urgentDeadlineEvent(filteredEvents());
@@ -726,8 +777,8 @@ $('selectedEventOpenBtn')?.addEventListener('click', () => {
     selectEvent(calendarState.selectedEventId, { openDetail: true });
   }
 });
-$('calendarDetailCloseBtn')?.addEventListener('click', closeDetailDrawer);
-$('calendarDrawerBackdrop')?.addEventListener('click', closeDetailDrawer);
+$('calendarDetailCloseBtn')?.addEventListener('click', () => closeDetailDrawer());
+$('calendarDrawerBackdrop')?.addEventListener('click', () => closeDetailDrawer());
 $('copyIcsLinkBtn')?.addEventListener('click', copyIcsLink);
 $('resetFiltersBtn')?.addEventListener('click', resetFilters);
 $('resetInstitutionFiltersBtn')?.addEventListener('click', () => resetFilterGroup('institution'));
@@ -743,8 +794,30 @@ $('hideApproximateToggle')?.addEventListener('change', (event) => {
 });
 window.matchMedia?.(COMPACT_CALENDAR_MEDIA).addEventListener?.('change', () => applyResponsiveCalendarView());
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') {
+  if (event.key === 'Escape' && calendarState.detailOpen) {
+    event.preventDefault();
     closeDetailDrawer();
+    return;
+  }
+  if (event.key !== 'Tab' || !calendarState.detailOpen) return;
+  const detailDrawer = $('calendarDetailDrawer');
+  const focusable = focusableDrawerElements();
+  if (!detailDrawer || !focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (!detailDrawer.contains(document.activeElement)) {
+    event.preventDefault();
+    first.focus();
+    return;
+  }
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+    return;
+  }
+  if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
   }
 });
 bindFilterGroup('institutionFilters', () => calendarState.selectedInstitutions);

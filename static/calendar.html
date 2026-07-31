@@ -55,11 +55,11 @@
 </button>
       </section>
 
-      <section class="calendar-main-tabs" aria-label="주요 화면 전환" role="tablist">
-        <button id="mainTabCalendarBtn" class="main-tab-button active" type="button" role="tab" aria-selected="true" aria-controls="mainPanelCalendar" data-main-tab="calendar">캘린더</button>
-        <button id="mainTabListBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelList" data-main-tab="list">목록</button>
-        <button id="mainTabFiltersBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelFilters" data-main-tab="filters">필터</button>
-        <button id="mainTabInstitutionsBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelInstitutions" data-main-tab="institutions">기관</button>
+<section class="calendar-main-tabs" aria-label="주요 화면 전환" role="tablist">
+  <button id="mainTabCalendarBtn" class="main-tab-button active" type="button" role="tab" aria-selected="true" aria-controls="mainPanelCalendar" tabindex="0" data-main-tab="calendar">캘린더</button>
+  <button id="mainTabListBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelList" tabindex="-1" data-main-tab="list">목록</button>
+<button id="mainTabFiltersBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelFilters" tabindex="-1" data-main-tab="filters">필터</button>
+<button id="mainTabInstitutionsBtn" class="main-tab-button" type="button" role="tab" aria-selected="false" aria-controls="mainPanelInstitutions" tabindex="-1" data-main-tab="institutions">기관</button>
       </section>
     </div>
 
@@ -123,9 +123,9 @@
               <h2>일정 목록</h2>
               <p id="eventListCount" class="panel-caption panel-caption--body"></p>
             </div>
-<div class="mode-toggle-group" role="tablist" aria-label="일정 목록 범위">
-  <button id="eventListModeSelectedBtn" class="mode-toggle" type="button">선택 날짜</button>
-  <button id="eventListModeAllBtn" class="mode-toggle active" type="button">전체</button>
+<div class="mode-toggle-group" role="group" aria-label="일정 목록 범위">
+  <button id="eventListModeSelectedBtn" class="mode-toggle" type="button" aria-pressed="false">선택 일정</button>
+  <button id="eventListModeAllBtn" class="mode-toggle active" type="button" aria-pressed="true">전체</button>
 </div>
 </div>
 <p id="eventListContext" class="panel-caption panel-caption--body">전체 일정 기준으로 보여준다.</p>
@@ -258,13 +258,13 @@
 
     <div id="calendarDrawerBackdrop" class="calendar-drawer-backdrop" hidden></div>
 
-    <aside id="calendarDetailDrawer" class="calendar-drawer" aria-hidden="true" hidden>
-      <div class="calendar-drawer__head">
-        <div>
-          <p class="section-label">선택한 일정</p>
-          <h2>상세</h2>
-        </div>
-        <button id="calendarDetailCloseBtn" class="drawer-close-button" type="button" aria-label="상세 닫기">닫기</button>
+<aside id="calendarDetailDrawer" class="calendar-drawer" role="dialog" aria-modal="true" aria-labelledby="calendarDetailHeading" aria-hidden="true" hidden>
+  <div class="calendar-drawer__head">
+    <div>
+      <p class="section-label">선택한 일정</p>
+      <h2 id="calendarDetailHeading">상세</h2>
+    </div>
+    <button id="calendarDetailCloseBtn" class="drawer-close-button" type="button" aria-label="상세 닫기">닫기</button>
       </div>
       <div class="calendar-drawer__body">
         <div class="event-list-header">
