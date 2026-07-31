@@ -41,7 +41,11 @@
         </article>
       </section>
 
-      <aside class="calendar-sidebar">
+      <div class="calendar-sidebar-dock">
+        <button id="calendarSidebarToggleBtn" class="calendar-sidebar-toggle" type="button" aria-controls="calendarSidebar" aria-expanded="true" aria-label="사이드바 숨기기" title="사이드바 숨기기">☰</button>
+      </div>
+
+      <aside id="calendarSidebar" class="calendar-sidebar" aria-hidden="false">
         <article class="calendar-panel calendar-hero">
           <div class="calendar-hero__copy">
             <p class="hero-kicker">이번 시즌 포커스</p>

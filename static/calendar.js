@@ -1,6 +1,7 @@
 const CALENDAR_API_PATH = '/api/calendar/recruitment';
 const COMPACT_CALENDAR_MEDIA = '(max-width: 760px)';
 const EMPTY_SELECTION_TEXT = '달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.';
+const CALENDAR_SIDEBAR_STATE_KEY = 'csFlashcardsCalendarSidebar:v1';
 
 const calendarState = {
   payload: null,
@@ -10,7 +11,9 @@ const calendarState = {
   selectedStatuses: new Set(),
   hideApproximate: false,
   selectedEventId: '',
+  sidebarOpen: true,
 };
+
 
 const $ = (id) => document.getElementById(id);
 
@@ -33,6 +36,46 @@ function compactCalendarView() {
 
 function preferredCalendarView() {
   return compactCalendarView() ? 'listMonth' : 'dayGridMonth';
+}
+
+function defaultCalendarSidebarOpen() {
+  return window.matchMedia ? window.matchMedia('(min-width: 981px)').matches : window.innerWidth > 980;
+}
+
+function readSavedCalendarSidebarState() {
+  try {
+    const saved = window.localStorage.getItem(CALENDAR_SIDEBAR_STATE_KEY);
+    if (saved === 'open') return true;
+    if (saved === 'closed') return false;
+  } catch (_error) {
+    // Ignore storage failures and use the viewport default.
+  }
+  return defaultCalendarSidebarOpen();
+}
+
+function saveCalendarSidebarState() {
+  try {
+    window.localStorage.setItem(CALENDAR_SIDEBAR_STATE_KEY, calendarState.sidebarOpen ? 'open' : 'closed');
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+}
+
+function applyCalendarSidebarState({persist = true} = {}) {
+  document.body.classList.toggle('calendar-sidebar-collapsed', !calendarState.sidebarOpen);
+  $('calendarSidebar')?.setAttribute('aria-hidden', String(!calendarState.sidebarOpen));
+  const toggleBtn = $('calendarSidebarToggleBtn');
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-expanded', String(calendarState.sidebarOpen));
+    toggleBtn.setAttribute('aria-label', calendarState.sidebarOpen ? '사이드바 숨기기' : '사이드바 보기');
+    toggleBtn.setAttribute('title', calendarState.sidebarOpen ? '사이드바 숨기기' : '사이드바 보기');
+  }
+  if (persist) saveCalendarSidebarState();
+}
+
+function toggleCalendarSidebar(force = !calendarState.sidebarOpen) {
+  calendarState.sidebarOpen = Boolean(force);
+  applyCalendarSidebarState();
 }
 
 function eventTimestamp(event, field = 'start') {
@@ -292,8 +335,9 @@ function renderEventList(events = filteredEvents()) {
   `).join('');
 
   container.querySelectorAll('[data-event-id]').forEach((element) => {
-    element.addEventListener('click', () => selectEvent(element.dataset.eventId || ''));
+    element.addEventListener('click', () => selectEvent(element.dataset.eventId || '', {revealSidebar: true}));
   });
+
 }
 
 function renderSelectedEvent(event) {
@@ -345,12 +389,16 @@ function renderSelectedEvent(event) {
   `;
 }
 
-function selectEvent(eventId) {
+function selectEvent(eventId, {revealSidebar = false} = {}) {
   calendarState.selectedEventId = eventId;
   const event = filteredEvents().find((item) => item.id === eventId) || null;
+  if (event && revealSidebar && !calendarState.sidebarOpen) {
+    toggleCalendarSidebar(true);
+  }
   renderSelectedEvent(event);
   syncSelectedEventCard();
 }
+
 
 function rerenderCalendar() {
   const events = filteredEvents();
@@ -422,11 +470,12 @@ function initializeCalendar() {
     events: filteredEvents(),
     eventClick(info) {
       info.jsEvent.preventDefault();
-      selectEvent(info.event.id);
+      selectEvent(info.event.id, {revealSidebar: true});
     },
     eventDidMount(info) {
       applyCalendarEventTone(info);
     },
+
   });
   calendarState.calendar.render();
   applyResponsiveCalendarView(true);
@@ -474,6 +523,10 @@ async function loadCalendar() {
   rerenderCalendar();
 }
 
+calendarState.sidebarOpen = readSavedCalendarSidebarState();
+applyCalendarSidebarState({persist: false});
+
+$('calendarSidebarToggleBtn')?.addEventListener('click', () => toggleCalendarSidebar());
 $('copyIcsLinkBtn')?.addEventListener('click', copyIcsLink);
 $('hideApproximateToggle')?.addEventListener('change', (event) => {
   calendarState.hideApproximate = Boolean(event.target.checked);
