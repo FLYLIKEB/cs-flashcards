@@ -39,10 +39,10 @@
           <strong id="summaryOpenCount">0건</strong>
           <span id="summaryOpenMeta" class="summary-card__meta">접수/공개 일정</span>
         </button>
-        <button id="summaryNextBtn" class="summary-card summary-card--button" type="button">
-          <span class="summary-card__label">다음 일정</span>
-          <strong id="summaryNextTitle">불러오는 중</strong>
-          <span id="summaryNextMeta" class="summary-card__meta">-</span>
+<button id="summaryNextBtn" class="summary-card summary-card--button" type="button">
+  <span class="summary-card__label">우선 기관</span>
+  <strong id="summaryNextTitle">불러오는 중</strong>
+  <span id="summaryNextMeta" class="summary-card__meta">-</span>
         </button>
 <button id="summaryFilterBtn" class="summary-card summary-card--button" type="button">
   <span class="summary-card__label">필터 상태</span>
@@ -129,12 +129,12 @@
               <h2>일정 목록</h2>
               <p id="eventListCount" class="panel-caption panel-caption--body"></p>
             </div>
-            <div class="mode-toggle-group" role="tablist" aria-label="일정 목록 범위">
-              <button id="eventListModeSelectedBtn" class="mode-toggle active" type="button">선택 날짜</button>
-              <button id="eventListModeAllBtn" class="mode-toggle" type="button">전체</button>
-            </div>
-          </div>
-          <p id="eventListContext" class="panel-caption panel-caption--body">선택한 날짜 기준으로 보여준다.</p>
+<div class="mode-toggle-group" role="tablist" aria-label="일정 목록 범위">
+  <button id="eventListModeSelectedBtn" class="mode-toggle" type="button">선택 날짜</button>
+  <button id="eventListModeAllBtn" class="mode-toggle active" type="button">전체</button>
+</div>
+</div>
+<p id="eventListContext" class="panel-caption panel-caption--body">전체 일정 기준으로 보여준다.</p>
           <div id="eventList" class="event-list"></div>
         </article>
       </section>

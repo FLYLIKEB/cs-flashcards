@@ -66,6 +66,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.selected-event-peek', CALENDAR_CSS)
         self.assertIn('.priority-cards', CALENDAR_CSS)
         self.assertIn('.stat-grid', CALENDAR_CSS)
+        self.assertIn('.event-row-button', CALENDAR_CSS)
+        self.assertIn('class="event-row-button', CALENDAR_JS)
         self.assertIn('.filter-option-grid', CALENDAR_CSS)
         self.assertIn('.calendar-drawer', CALENDAR_CSS)
         self.assertIn('.fc .fc-event-toned', CALENDAR_CSS)

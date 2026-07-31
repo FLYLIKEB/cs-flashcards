@@ -14,7 +14,7 @@ const calendarState = {
   hideApproximate: false,
   selectedEventId: '',
   selectedDateKey: '',
-  eventListMode: 'selected',
+  eventListMode: 'all',
   detailOpen: false,
 };
 
@@ -227,8 +227,8 @@ function renderSummaryBar(events = filteredEvents()) {
   const payload = calendarState.payload;
   if (!payload) return;
   const openEvents = events.filter((event) => event.status === 'open');
-  const nextExactEvent = nextUpcomingEvent(events, { exactOnly: true });
   const deadlineEvent = urgentDeadlineEvent(events);
+  const topPriority = (payload.dashboard?.priorities || payload.priorities || [])[0] || null;
 
   $('summaryOpenCount').textContent = `${openEvents.length}건`;
   $('summaryOpenMeta').textContent = openEvents[0] ? `${openEvents[0].institution.short_name} 포함` : '진행 중 일정 없음';
@@ -241,12 +241,12 @@ function renderSummaryBar(events = filteredEvents()) {
     $('summaryDeadlineMeta').textContent = '열린 일정이 없거나 모두 종료 직전 아님';
   }
 
-  if (nextExactEvent) {
-    $('summaryNextTitle').textContent = `${nextExactEvent.institution.short_name} ${nextExactEvent.display_label}`;
-    $('summaryNextMeta').textContent = nextExactEvent.date_display;
+  if (topPriority) {
+    $('summaryNextTitle').textContent = priorityLabel(topPriority);
+    $('summaryNextMeta').textContent = topPriority.reason || '우선 확인 대상';
   } else {
-    $('summaryNextTitle').textContent = '확정 일정 없음';
-    $('summaryNextMeta').textContent = '예정 일정만 남아 있다.';
+    $('summaryNextTitle').textContent = '우선 기관 없음';
+    $('summaryNextMeta').textContent = '지금 바로 체크할 기관이 없다.';
   }
 
   const tagCount = [
@@ -438,23 +438,18 @@ function renderEventList(events = filteredEvents()) {
   }
 
   container.innerHTML = `
-    <table class="compact-table compact-table--events">
-      <thead>
-        <tr><th>날짜</th><th>일정</th><th>상태</th></tr>
-      </thead>
-      <tbody>
-        ${listEvents.map((event) => `
-          <tr>
-            <td>${escapeHtml(event.date_display)}</td>
-            <td>
-              <button class="table-row-button${event.id === calendarState.selectedEventId ? ' is-selected' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">${escapeHtml(event.list_title || event.title)}</button>
-              <span class="table-note">${escapeHtml(event.institution.short_name)} · ${escapeHtml(event.event_type_label)}${event.summary ? ` · ${escapeHtml(event.summary)}` : ''}</span>
-            </td>
-            <td>${escapeHtml(event.status_label)}${event.is_approximate ? ' · 예정' : ''}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="event-row-list">
+      ${listEvents.map((event) => `
+        <button class="event-row-button${event.id === calendarState.selectedEventId ? ' is-selected' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">
+          <span class="event-row-button__date">${escapeHtml(event.date_display)}</span>
+          <span class="event-row-button__content">
+            <strong>${escapeHtml(event.list_title || event.title)}</strong>
+            <span class="table-note">${escapeHtml(event.institution.short_name)} · ${escapeHtml(event.event_type_label)}${event.summary ? ` · ${escapeHtml(event.summary)}` : ''}</span>
+          </span>
+          <span class="event-row-button__status">${escapeHtml(event.status_label)}${event.is_approximate ? ' · 예정' : ''}</span>
+        </button>
+      `).join('')}
+    </div>
   `;
 
   container.querySelectorAll('[data-event-id]').forEach((element) => {
@@ -722,10 +717,7 @@ $('summaryOpenBtn')?.addEventListener('click', () => {
   setMainTab('list');
   renderEventList();
 });
-$('summaryNextBtn')?.addEventListener('click', () => {
-  const event = nextUpcomingEvent(filteredEvents(), { exactOnly: true });
-  if (event) selectEvent(event.id, { openDetail: true });
-});
+$('summaryNextBtn')?.addEventListener('click', () => setMainTab('institutions'));
 $('summaryFilterBtn')?.addEventListener('click', () => setMainTab('filters'));
 $('selectedEventOpenBtn')?.addEventListener('click', () => {
   if (calendarState.selectedEventId) {

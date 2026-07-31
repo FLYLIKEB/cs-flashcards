@@ -143,7 +143,7 @@ button {
 .summary-card--button,
 .main-tab-button,
 .mode-toggle,
-.table-row-button,
+.event-row-button,
 .drawer-close-button,
 .quick-action,
 .filter-link-button,
@@ -485,12 +485,53 @@ button {
   font-weight: 600;
 }
 
-.compact-table--events td:first-child {
-  width: 92px;
+.event-row-list {
+  display: grid;
+  gap: 10px;
 }
 
-.compact-table--events td:last-child {
-  width: 88px;
+.event-row-button {
+  display: grid;
+  grid-template-columns: 138px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
+  text-align: left;
+}
+
+.event-row-button__date,
+.event-row-button__status {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.event-row-button__content {
+  min-width: 0;
+}
+
+.event-row-button__status {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--panel-strong);
+}
+
+.event-row-button:hover,
+.event-row-button:focus-visible,
+.event-row-button.is-selected {
+  border-color: var(--text);
+  outline: none;
+}
+
+.event-row-button strong {
+  display: block;
 }
 
 .table-note {
@@ -503,24 +544,6 @@ button {
 .table-links {
   gap: 4px 10px;
   margin-top: 4px;
-}
-
-.table-row-button {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--text);
-  font-weight: 600;
-  text-align: left;
-  text-decoration: underline;
-  text-underline-offset: 0.14em;
-}
-
-.table-row-button:hover,
-.table-row-button:focus-visible,
-.table-row-button.is-selected {
-  outline: none;
-  text-decoration-thickness: 2px;
 }
 
 .filter-summary-row strong {
@@ -850,6 +873,14 @@ button {
   .timeline-item,
   .priority-card {
     grid-template-columns: 1fr;
+  }
+
+  .event-row-button {
+    grid-template-columns: 1fr;
+  }
+
+  .event-row-button__status {
+    justify-self: start;
   }
 
   .institution-card__head,
