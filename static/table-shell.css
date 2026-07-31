@@ -254,6 +254,34 @@ select {
   gap: 12px;
 }
 
+.question-bank-shell-table-pane {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+  grid-template-areas:
+    "hero hero"
+    "table filter"
+    "error error";
+  align-items: start;
+}
+
+.question-bank-hero-card {
+  grid-area: hero;
+}
+
+.question-bank-table-card {
+  grid-area: table;
+}
+
+.question-bank-filter-card {
+  grid-area: filter;
+  position: sticky;
+  top: 88px;
+  align-self: start;
+}
+
+#bankPageError {
+  grid-area: error;
+}
+
 .question-bank-shell-card,
 .question-bank-practice-card {
   border: 1px solid var(--cs-table-line);
@@ -691,6 +719,21 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   background: #ffffff;
 }
 
+
+@media (max-width: 1100px) {
+  .question-bank-shell-table-pane {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "hero"
+      "filter"
+      "table"
+      "error";
+  }
+
+  .question-bank-filter-card {
+    position: static;
+  }
+}
 @media (max-width: 900px) {
   .question-bank-shell-topbar-inner,
   .cs-table-shell.question-bank-shell {
