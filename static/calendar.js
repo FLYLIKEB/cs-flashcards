@@ -311,22 +311,17 @@ function renderTimeline() {
     return;
   }
   container.innerHTML = `
-    <table class="compact-table">
-      <thead>
-        <tr><th>시기</th><th>핵심</th></tr>
-      </thead>
-      <tbody>
-        ${timeline.map((item) => `
-          <tr>
-            <td>${escapeHtml(item.period || '')}</td>
-            <td>
-              <strong>${escapeHtml(item.headline || '')}</strong>
-              <span class="table-note">${escapeHtml(item.focus || '')}</span>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="timeline-list">
+      ${timeline.map((item) => `
+        <article class="timeline-item">
+          <span class="timeline-item__period">${escapeHtml(item.period || '')}</span>
+          <div class="timeline-item__content">
+            <strong>${escapeHtml(item.headline || '')}</strong>
+            <span class="table-note">${escapeHtml(item.focus || '')}</span>
+          </div>
+        </article>
+      `).join('')}
+    </div>
   `;
 }
 
@@ -342,19 +337,15 @@ function renderCounts() {
     ['체크 대기', counts.watch_only_institutions, '짧게 확인할 기관'],
   ];
   container.innerHTML = `
-    <table class="compact-table compact-table--summary">
-      <tbody>
-        ${items.map(([label, value, note]) => `
-          <tr>
-            <th scope="row">${escapeHtml(label)}</th>
-            <td>
-              <strong>${escapeHtml(value)}</strong>
-              <span class="table-note">${escapeHtml(note)}</span>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="stat-grid">
+      ${items.map(([label, value, note]) => `
+        <article class="stat-card">
+          <span class="stat-card__label">${escapeHtml(label)}</span>
+          <strong class="stat-card__value">${escapeHtml(value)}</strong>
+          <span class="stat-card__meta">${escapeHtml(note)}</span>
+        </article>
+      `).join('')}
+    </div>
   `;
 }
 
@@ -367,20 +358,17 @@ function renderPriorityList() {
     return;
   }
   container.innerHTML = `
-    <table class="compact-table">
-      <thead>
-        <tr><th>우선</th><th>대상</th><th>이유</th></tr>
-      </thead>
-      <tbody>
-        ${priorities.map((item) => `
-          <tr>
-            <td>${escapeHtml(item.rank)}</td>
-            <td>${escapeHtml(priorityLabel(item))}</td>
-            <td>${escapeHtml(item.reason || '')}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <ol class="priority-cards">
+      ${priorities.map((item) => `
+        <li class="priority-card">
+          <span class="priority-card__rank">${escapeHtml(item.rank)}</span>
+          <div class="priority-card__body">
+            <strong>${escapeHtml(priorityLabel(item))}</strong>
+            <span class="table-note">${escapeHtml(item.reason || '')}</span>
+          </div>
+        </li>
+      `).join('')}
+    </ol>
   `;
 }
 
@@ -392,24 +380,19 @@ function renderDashboardList(containerId, items, emptyText) {
     return;
   }
   container.innerHTML = `
-    <table class="compact-table">
-      <thead>
-        <tr><th>기관</th><th>상태</th><th>요약</th></tr>
-      </thead>
-      <tbody>
-        ${items.map((item) => `
-          <tr>
-            <td>${escapeHtml(item.institution.short_name || item.institution.name)}</td>
-            <td>${escapeHtml(item.status)}</td>
-            <td>
-              <strong>${escapeHtml(item.schedule_summary || item.note || '')}</strong>
-              ${(item.links || []).length ? `<span class="table-links">${(item.links || []).map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join('')}</span>` : ''}
-              ${item.note && item.schedule_summary ? `<span class="table-note">${escapeHtml(item.note)}</span>` : ''}
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    <div class="institution-cards">
+      ${items.map((item) => `
+        <article class="institution-card">
+          <div class="institution-card__head">
+            <strong>${escapeHtml(item.institution.short_name || item.institution.name)}</strong>
+            <span class="institution-card__status">${escapeHtml(item.status)}</span>
+          </div>
+          <p class="institution-card__summary">${escapeHtml(item.schedule_summary || item.note || '')}</p>
+          ${item.note && item.schedule_summary ? `<span class="table-note">${escapeHtml(item.note)}</span>` : ''}
+          ${(item.links || []).length ? `<span class="table-links">${(item.links || []).map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join('')}</span>` : ''}
+        </article>
+      `).join('')}
+    </div>
   `;
 }
 
@@ -479,10 +462,40 @@ function renderEventList(events = filteredEvents()) {
   });
 }
 
+function renderSelectedEventPeek(event) {
+  const peek = $('selectedEventPeek');
+  const openButton = $('selectedEventOpenBtn');
+  if (!peek) return;
+  if (openButton) openButton.disabled = !event;
+  if (!event) {
+    peek.className = 'selected-event-peek event-detail-empty';
+    peek.textContent = '달력이나 목록에서 일정을 누르면 핵심 정보와 바로가기 링크를 보여준다.';
+    return;
+  }
+  peek.className = 'selected-event-peek';
+  peek.innerHTML = `
+    <div class="selected-event-peek__head">
+      <span class="event-pill">${escapeHtml(event.institution.short_name)}</span>
+      <strong class="selected-event-peek__title">${escapeHtml(event.list_title || event.title)}</strong>
+    </div>
+    <div class="selected-event-peek__facts">
+      <span>${escapeHtml(event.date_display)}</span>
+      <span>${escapeHtml(event.event_type_label)}</span>
+      <span>${escapeHtml(event.status_label)}${event.is_approximate ? ' · 예정' : ''}</span>
+    </div>
+    <p class="selected-event-peek__summary">${escapeHtml(event.summary || event.description || '공고 핵심 내용을 바로 확인한다.')}</p>
+    <div class="event-actions">
+      ${event.url ? `<a class="primary-link" href="${escapeHtml(event.url)}" target="_blank" rel="noopener noreferrer">공고 열기</a>` : ''}
+      <a href="${escapeHtml(event.google_calendar_url)}" target="_blank" rel="noopener noreferrer">Google Calendar에 추가</a>
+    </div>
+  `;
+}
+
 function renderSelectedEvent(event) {
   const detail = $('selectedEventDetail');
   const badge = $('selectedEventBadge');
   if (!detail || !badge) return;
+  renderSelectedEventPeek(event);
   if (!event) {
     badge.hidden = true;
     detail.className = 'event-detail-empty';
@@ -712,6 +725,12 @@ $('summaryOpenBtn')?.addEventListener('click', () => {
 $('summaryNextBtn')?.addEventListener('click', () => {
   const event = nextUpcomingEvent(filteredEvents(), { exactOnly: true });
   if (event) selectEvent(event.id, { openDetail: true });
+});
+$('summaryFilterBtn')?.addEventListener('click', () => setMainTab('filters'));
+$('selectedEventOpenBtn')?.addEventListener('click', () => {
+  if (calendarState.selectedEventId) {
+    selectEvent(calendarState.selectedEventId, { openDetail: true });
+  }
 });
 $('calendarDetailCloseBtn')?.addEventListener('click', closeDetailDrawer);
 $('calendarDrawerBackdrop')?.addEventListener('click', closeDetailDrawer);

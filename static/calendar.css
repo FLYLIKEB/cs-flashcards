@@ -248,6 +248,13 @@ button {
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
 }
 
+.calendar-home-grid__main,
+.calendar-home-grid__side {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
 .institution-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -327,6 +334,116 @@ button {
 .calendar-counts {
   display: grid;
   gap: 10px;
+}
+
+.timeline-list,
+.stat-grid,
+.priority-cards,
+.institution-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.timeline-item,
+.stat-card,
+.priority-card,
+.institution-card,
+.selected-event-peek {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.timeline-item__period,
+.stat-card__label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.timeline-item__content,
+.priority-card__body {
+  min-width: 0;
+}
+
+.stat-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-card {
+  display: grid;
+  gap: 4px;
+}
+
+.stat-card__value {
+  font-size: 1.15rem;
+}
+
+.stat-card__meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.priority-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.priority-card {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.priority-card__rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--panel-strong);
+  font-weight: 700;
+}
+
+.institution-card {
+  display: grid;
+  gap: 8px;
+}
+
+.institution-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.institution-card__status,
+.selected-event-peek__facts span {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--panel-strong);
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.institution-card__summary,
+.selected-event-peek__summary {
+  margin: 0;
 }
 
 .compact-table {
@@ -507,6 +624,35 @@ button {
   font-size: 0.8rem;
 }
 
+.selected-event-peek {
+  display: grid;
+  gap: 10px;
+}
+
+.selected-event-peek.event-detail-empty {
+  color: var(--muted);
+}
+
+.selected-event-peek__head {
+  display: grid;
+  gap: 8px;
+}
+
+.selected-event-peek__title {
+  font-size: 1rem;
+}
+
+.selected-event-peek__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#selectedEventOpenBtn[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -658,6 +804,9 @@ button {
   .calendar-home-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
@@ -696,5 +845,15 @@ button {
 
   .calendar-drawer {
     width: 100vw;
+  }
+
+  .timeline-item,
+  .priority-card {
+    grid-template-columns: 1fr;
+  }
+
+  .institution-card__head,
+  .selected-event-peek__facts {
+    display: grid;
   }
 }
