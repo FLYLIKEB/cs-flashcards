@@ -112,7 +112,7 @@ TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
 mkdir -p "$TMP_STAGE/data"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
-cp data/CS_encyclopedia_300plus.csv "$TMP_STAGE/data/"
+cp -R data/. "$TMP_STAGE/data/"
 if [[ -d "$WIKI_BOOK_SRC" ]]; then
   echo "위키 문서 포함: $WIKI_BOOK_SRC"
   mkdir -p "$TMP_STAGE/wiki_book"
