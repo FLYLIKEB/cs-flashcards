@@ -1,31 +1,115 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-01-01. 릴레이션-튜플-속성 SVG 인포그래픽</title>
-  <desc id="desc">릴레이션-튜플-속성</desc>
+  <title id="title">07-01-01. 릴레이션-튜플-속성 인포그래픽</title>
+  <desc id="desc">릴레이션은 표 전체, 튜플은 행, 속성은 열이며 중복 튜플을 허용하지 않고 튜플 순서는 의미가 없으며 속성명은 유일하고 각 속성은 도메인을 가진다는 개념을 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-07-01-01-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#ecfeff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ecfeff"/>
+      <stop offset="55%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
     </linearGradient>
-    <linearGradient id="line-07-01-01-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#14b8a6" />
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#2563eb"/>
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#0f766e"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 18px; font-weight: 700; fill: #0f172a; }
+      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .cell { font-size: 17px; font-weight: 600; fill: #0f172a; }
+      .domain { font-size: 14px; font-weight: 700; fill: #0f172a; }
+      .warn { font-size: 15px; font-weight: 700; fill: #991b1b; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-07-01-01-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-07-01-01-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">07-01-01. 릴레이션-튜플-속성</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">릴레이션은 중복 튜플을 허용하지 않는 테이블 개념이다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#14b8a6"/></marker></defs><rect x="92" y="248" width="250" height="250" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="217" y="282" text-anchor="middle"><tspan x="217" dy="0">릴레이션-튜플-속성</tspan></text><text class="body" x="110" y="318" text-anchor="start"><tspan x="110" dy="0">릴레이션은 중복 튜플을</tspan><tspan x="110" dy="18">허용하지</tspan><tspan x="110" dy="18">튜플 순서는 의미가 없고 속성</tspan></text><rect x="420" y="222" width="360" height="302" rx="22" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/><text class="label" x="600" y="256" text-anchor="middle"><tspan x="600" dy="0">릴레이션-튜플-속성</tspan></text><text class="body" x="438" y="292" text-anchor="start"><tspan x="438" dy="0">튜플 순서는 의미가 없고 속성</tspan><tspan x="438" dy="18">도메인은 속성이 가질 수 있는</tspan></text><rect x="858" y="248" width="250" height="250" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="983" y="282" text-anchor="middle"><tspan x="983" dy="0">도메인은 속성이 가질 수</tspan><tspan x="983" dy="18">있는</tspan></text><text class="body" x="876" y="318" text-anchor="start"><tspan x="876" dy="0">릴레이션-튜플-속성</tspan><tspan x="876" dy="18">릴레이션은 중복 튜플을</tspan><tspan x="876" dy="18">허용하지</tspan></text><rect x="330" y="552" width="540" height="82" rx="22" fill="#f8fafc" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="586" text-anchor="middle"><tspan x="600" dy="0">핵심 규칙</tspan></text><text class="body" x="348" y="622" text-anchor="start"><tspan x="348" dy="0">릴레이션-튜플-속성</tspan><tspan x="348" dy="18">릴레이션은 중복 튜플을 허용하지</tspan><tspan x="348" dy="18">튜플 순서는 의미가 없고 속성</tspan></text><line x1="342" y1="372" x2="420" y2="372" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="342" y1="372" x2="420" y2="372" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="780" y1="372" x2="858" y2="372" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="780" y1="372" x2="858" y2="372" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="524" x2="600" y2="552" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="524" x2="600" y2="552" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">07-01-01-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="32" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="small" x="70" y="78">관계형 데이터베이스 기본 용어</text>
+  <text class="title" x="70" y="120">07-01-01. 릴레이션 · 튜플 · 속성</text>
+  <text class="subtitle" x="70" y="155">표 전체=릴레이션, 행=튜플, 열=속성. 시험 포인트는 중복 튜플 불허 · 튜플 순서 무의미 · 속성명 유일이다.</text>
+
+  <rect x="70" y="195" width="700" height="410" rx="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+  <text class="section" x="96" y="228">예시 릴레이션: 학생</text>
+
+  <rect x="130" y="260" width="520" height="62" rx="18" fill="url(#header)"/>
+  <rect x="130" y="322" width="520" height="72" fill="#ffffff"/>
+  <rect x="130" y="394" width="520" height="72" fill="#ccfbf1" opacity="0.65"/>
+  <rect x="130" y="466" width="520" height="72" fill="#ffffff"/>
+  <rect x="130" y="260" width="520" height="278" rx="18" fill="none" stroke="#0f172a" stroke-width="2.5"/>
+
+  <line x1="250" y1="260" x2="250" y2="538" stroke="#0f172a" stroke-width="2"/>
+  <line x1="430" y1="260" x2="430" y2="538" stroke="#0f172a" stroke-width="2"/>
+  <line x1="130" y1="322" x2="650" y2="322" stroke="#0f172a" stroke-width="2"/>
+  <line x1="130" y1="394" x2="650" y2="394" stroke="#0f172a" stroke-width="2"/>
+  <line x1="130" y1="466" x2="650" y2="466" stroke="#0f172a" stroke-width="2"/>
+
+  <text class="label" x="190" y="298" text-anchor="middle" fill="#ffffff">학번</text>
+  <text class="label" x="340" y="298" text-anchor="middle" fill="#ffffff">이름</text>
+  <text class="label" x="540" y="298" text-anchor="middle" fill="#ffffff">나이</text>
+
+  <text class="cell" x="190" y="365" text-anchor="middle">1001</text>
+  <text class="cell" x="340" y="365" text-anchor="middle">김철수</text>
+  <text class="cell" x="540" y="365" text-anchor="middle">21</text>
+
+  <text class="cell" x="190" y="437" text-anchor="middle">1002</text>
+  <text class="cell" x="340" y="437" text-anchor="middle">이영희</text>
+  <text class="cell" x="540" y="437" text-anchor="middle">22</text>
+
+  <text class="cell" x="190" y="509" text-anchor="middle">1003</text>
+  <text class="cell" x="340" y="509" text-anchor="middle">박민수</text>
+  <text class="cell" x="540" y="509" text-anchor="middle">20</text>
+
+  <rect x="116" y="246" width="548" height="306" rx="24" fill="none" stroke="#2563eb" stroke-width="4" stroke-dasharray="12 10"/>
+  <text class="label" x="390" y="578" text-anchor="middle" fill="#1d4ed8">릴레이션 = 이 표 전체</text>
+
+  <rect x="136" y="400" width="508" height="60" rx="14" fill="none" stroke="#0f766e" stroke-width="4"/>
+  <text class="label" x="674" y="435" fill="#0f766e">튜플 = 한 행의 값 묶음</text>
+  <line x1="644" y1="430" x2="702" y2="430" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="138" y="238" width="104" height="92" rx="18" fill="none" stroke="#f59e0b" stroke-width="4"/>
+  <rect x="258" y="238" width="164" height="92" rx="18" fill="none" stroke="#f59e0b" stroke-width="4"/>
+  <rect x="438" y="238" width="204" height="92" rx="18" fill="none" stroke="#f59e0b" stroke-width="4"/>
+  <text class="label" x="744" y="282" fill="#b45309">속성 = 열과 속성명</text>
+  <line x1="642" y1="282" x2="732" y2="282" stroke="#b45309" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <g transform="translate(810 210)">
+    <rect width="310" height="182" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+    <text class="section" x="24" y="34">도메인</text>
+    <text class="body" x="24" y="60">각 속성이 가질 수 있는 값의 범위</text>
+    <rect x="24" y="82" width="82" height="32" rx="16" fill="#dbeafe"/>
+    <text class="domain" x="65" y="103" text-anchor="middle">학번</text>
+    <text class="body" x="120" y="103">: 학번 형식 정수</text>
+    <rect x="24" y="122" width="82" height="32" rx="16" fill="#dcfce7"/>
+    <text class="domain" x="65" y="143" text-anchor="middle">이름</text>
+    <text class="body" x="120" y="143">: 문자 집합</text>
+    <rect x="24" y="162" width="82" height="32" rx="16" fill="#fef3c7"/>
+    <text class="domain" x="65" y="183" text-anchor="middle">나이</text>
+    <text class="body" x="120" y="183">: 0 이상 정수</text>
+  </g>
+
+  <g transform="translate(810 416)">
+    <rect width="310" height="118" rx="24" fill="#fef2f2" stroke="#fca5a5" stroke-width="2"/>
+    <text class="section" x="24" y="34">중복 튜플 불허</text>
+    <text class="body" x="24" y="60">같은 학번·이름·나이를 가진 행을</text>
+    <text class="body" x="24" y="82">다시 저장하면 릴레이션 성질 위반</text>
+    <g transform="translate(226 22)">
+      <rect x="0" y="0" width="56" height="18" rx="4" fill="#fee2e2"/>
+      <rect x="8" y="8" width="56" height="18" rx="4" fill="#fecaca"/>
+      <line x1="-4" y1="34" x2="72" y2="-4" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <text class="warn" x="24" y="104">같은 행 복제 금지</text>
+  </g>
+
+  <g transform="translate(70 626)">
+    <rect width="1050" height="40" rx="20" fill="#ecfeff" stroke="#99f6e4"/>
+    <text class="label" x="20" y="26">핵심 암기</text>
+    <text class="body" x="118" y="26">① 튜플 순서는 바뀌어도 같은 릴레이션  ② 한 릴레이션 안에서 속성명은 유일  ③ 각 속성은 자신만의 도메인을 가진다</text>
+  </g>
 </svg>

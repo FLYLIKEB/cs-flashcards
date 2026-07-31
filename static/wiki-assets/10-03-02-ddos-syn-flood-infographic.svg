@@ -1,31 +1,148 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
   <title id="title">10-03-02. DDoS-스머프-SYN-Flood SVG 인포그래픽</title>
-  <desc id="desc">DDoS-스머프-SYN-Flood</desc>
+  <desc id="desc">가용성을 노리는 DDoS, 스머프 증폭, SYN Flood의 공격 원리와 방어 지점을 비교하는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-10-03-02-ddos-syn-flood-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fee2e2" />
-      <stop offset="100%" stop-color="#fff7ed" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="55%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#fef2f2"/>
     </linearGradient>
-    <linearGradient id="line-10-03-02-ddos-syn-flood-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#b91c1c" />
-      <stop offset="100%" stop-color="#f59e0b" />
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
+    <marker id="arrow-red" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#f97316"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#2563eb"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 33px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .h2 { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .h3 { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 700 11px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      .white { fill: #ffffff; }
+      .danger { fill: #b91c1c; }
+      .ok { fill: #166534; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-10-03-02-ddos-syn-flood-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-10-03-02-ddos-syn-flood-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">10-03-02. DDoS-스머프-SYN-Flood</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">DDoS는 여러 위치의 다수 장비(봇넷 등)에서 대량 트래픽을 보내 서비스의 정상</tspan><tspan x="84" dy="24">제공을 방해하는 공격이다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/></marker></defs><rect x="90" y="322" width="180" height="120" rx="22" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/><text class="label" x="180" y="356" text-anchor="middle"><tspan x="180" dy="0">공격</tspan></text><text class="body" x="108" y="392" text-anchor="start"></text><rect x="350" y="250" width="180" height="120" rx="22" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/><text class="label" x="440" y="284" text-anchor="middle"><tspan x="440" dy="0">입력</tspan></text><text class="body" x="368" y="320" text-anchor="start"></text><rect x="620" y="322" width="180" height="120" rx="22" fill="#fff7ed" stroke="#b91c1c" stroke-width="2"/><text class="label" x="710" y="356" text-anchor="middle"><tspan x="710" dy="0">검증</tspan></text><text class="body" x="638" y="392" text-anchor="start"></text><rect x="890" y="250" width="180" height="120" rx="22" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/><text class="label" x="980" y="284" text-anchor="middle"><tspan x="980" dy="0">차단</tspan></text><text class="body" x="908" y="320" text-anchor="start"></text><rect x="455" y="510" width="250" height="92" rx="22" fill="#ffffff" stroke="#b91c1c" stroke-width="2"/><text class="label" x="580" y="544" text-anchor="middle"><tspan x="580" dy="0">모니터링</tspan></text><text class="body" x="473" y="580" text-anchor="start"></text><line x1="270" y1="382" x2="350" y2="310" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="270" y1="382" x2="350" y2="310" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="530" y1="310" x2="620" y2="382" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="530" y1="310" x2="620" y2="382" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="800" y1="382" x2="890" y2="310" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="800" y1="382" x2="890" y2="310" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="710" y1="442" x2="610" y2="510" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="440" y1="370" x2="520" y2="510" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><circle cx="595" cy="382" r="36" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/><text class="label" x="595" y="389" text-anchor="middle"><tspan x="595" dy="0">검증</tspan></text>
-  <text class="small" x="84" y="654">10-03-02-ddos-syn-flood-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="#e2e8f0"/>
+  <rect x="24" y="24" width="1152" height="672" rx="28" fill="url(#bg)"/>
+  <rect x="42" y="42" width="1116" height="636" rx="24" fill="#ffffff" opacity="0.88"/>
+
+  <text class="small" x="78" y="84">네트워크 보안 · 가용성 공격 비교</text>
+  <text class="title" x="78" y="122">DDoS · 스머프 · SYN Flood</text>
+  <text class="subtitle" x="78" y="156">다수 트래픽, ICMP 반사 증폭, TCP half-open 고갈이 각각 어디서 발생하는지 한 화면에 비교</text>
+
+  <rect x="70" y="190" width="220" height="290" rx="22" fill="url(#panel)" stroke="#cbd5e1"/>
+  <text class="h2" x="94" y="226">1. DDoS 공통 구조</text>
+  <circle cx="118" cy="278" r="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <circle cx="178" cy="258" r="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <circle cx="168" cy="318" r="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <circle cx="232" cy="286" r="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text class="tiny" x="118" y="282" text-anchor="middle">봇</text>
+  <text class="tiny" x="178" y="262" text-anchor="middle">봇</text>
+  <text class="tiny" x="168" y="322" text-anchor="middle">봇</text>
+  <text class="tiny" x="232" y="290" text-anchor="middle">봇</text>
+  <line x1="136" y1="278" x2="210" y2="378" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <line x1="196" y1="258" x2="230" y2="376" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <line x1="186" y1="318" x2="246" y2="394" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <line x1="250" y1="286" x2="252" y2="366" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <rect x="192" y="366" width="72" height="62" rx="14" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="h3" x="228" y="392" text-anchor="middle">서비스</text>
+  <text class="tiny" x="228" y="410" text-anchor="middle">대상 서버</text>
+  <text class="body" x="94" y="454">• 여러 장비가 동시에 대량 요청 전송</text>
+  <text class="body" x="94" y="476">• 정상 사용자의 대역폭·연결 기회 감소</text>
+
+  <rect x="314" y="190" width="404" height="290" rx="22" fill="url(#panel)" stroke="#fdba74"/>
+  <text class="h2" x="338" y="226">2. 스머프(Smurf): 작은 요청 → 큰 ICMP 응답 증폭</text>
+  <circle cx="378" cy="292" r="32" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"/>
+  <text class="h3" x="378" y="288" text-anchor="middle">공격자</text>
+  <text class="tiny" x="378" y="307" text-anchor="middle">출발지=희생자 위조</text>
+
+  <rect x="474" y="252" width="118" height="84" rx="16" fill="#ffedd5" stroke="#f97316" stroke-width="2"/>
+  <text class="h3" x="533" y="282" text-anchor="middle">브로드캐스트</text>
+  <text class="tiny" x="533" y="301" text-anchor="middle">ICMP Echo</text>
+  <text class="tiny" x="533" y="317" text-anchor="middle">Request</text>
+
+  <circle cx="648" cy="252" r="22" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+  <circle cx="604" cy="332" r="22" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+  <circle cx="692" cy="332" r="22" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+  <text class="tiny" x="648" y="256" text-anchor="middle">호스트</text>
+  <text class="tiny" x="604" y="336" text-anchor="middle">호스트</text>
+  <text class="tiny" x="692" y="336" text-anchor="middle">호스트</text>
+
+  <rect x="606" y="392" width="82" height="54" rx="14" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="h3" x="647" y="414" text-anchor="middle">희생자</text>
+  <text class="tiny" x="647" y="431" text-anchor="middle">대량 Reply 수신</text>
+
+  <line x1="410" y1="292" x2="474" y2="292" stroke="#f97316" stroke-width="4" marker-end="url(#arrow-orange)"/>
+  <text class="tiny" x="443" y="280" text-anchor="middle">작은 요청 1개</text>
+
+  <line x1="592" y1="292" x2="626" y2="260" stroke="#f97316" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <line x1="592" y1="292" x2="584" y2="326" stroke="#f97316" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <line x1="592" y1="292" x2="670" y2="325" stroke="#f97316" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <line x1="648" y1="274" x2="648" y2="392" stroke="#dc2626" stroke-width="3.5" marker-end="url(#arrow-red)"/>
+  <line x1="604" y1="354" x2="624" y2="392" stroke="#dc2626" stroke-width="3.5" marker-end="url(#arrow-red)"/>
+  <line x1="692" y1="354" x2="670" y2="392" stroke="#dc2626" stroke-width="3.5" marker-end="url(#arrow-red)"/>
+  <text class="tiny" x="648" y="376" text-anchor="middle">여러 Echo Reply</text>
+  <text class="body" x="338" y="454">• IP directed broadcast와 ICMP 응답 특성으로 반사·증폭</text>
+  <text class="body" x="338" y="476">• 경계 라우터에서 broadcast 차단이 핵심</text>
+
+  <rect x="742" y="190" width="386" height="290" rx="22" fill="url(#panel)" stroke="#93c5fd"/>
+  <text class="h2" x="766" y="226">3. SYN Flood: handshake 대기열을 half-open으로 채움</text>
+  <rect x="776" y="256" width="120" height="74" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text class="h3" x="836" y="285" text-anchor="middle">공격자</text>
+  <text class="tiny" x="836" y="304" text-anchor="middle">SYN만 반복</text>
+
+  <rect x="972" y="250" width="116" height="88" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="h3" x="1030" y="281" text-anchor="middle">서버</text>
+  <text class="tiny" x="1030" y="300" text-anchor="middle">SYN-ACK 후 대기</text>
+  <text class="tiny" x="1030" y="316" text-anchor="middle">ACK 없음</text>
+
+  <line x1="896" y1="274" x2="972" y2="274" stroke="#dc2626" stroke-width="4" marker-end="url(#arrow-red)"/>
+  <text class="tiny" x="934" y="262" text-anchor="middle">SYN</text>
+  <line x1="972" y1="310" x2="896" y2="310" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text class="tiny" x="934" y="330" text-anchor="middle">SYN-ACK</text>
+  <text class="tiny" x="932" y="352" text-anchor="middle">ACK 미도착 → half-open 유지</text>
+
+  <rect x="786" y="382" width="290" height="50" rx="14" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="792" y="388" width="54" height="38" rx="10" fill="#dc2626" opacity="0.82"/>
+  <rect x="850" y="388" width="54" height="38" rx="10" fill="#dc2626" opacity="0.82"/>
+  <rect x="908" y="388" width="54" height="38" rx="10" fill="#dc2626" opacity="0.82"/>
+  <rect x="966" y="388" width="54" height="38" rx="10" fill="#dc2626" opacity="0.82"/>
+  <rect x="1024" y="388" width="46" height="38" rx="10" fill="#fca5a5" opacity="0.92"/>
+  <text class="tiny white" x="819" y="412" text-anchor="middle">대기</text>
+  <text class="tiny white" x="877" y="412" text-anchor="middle">대기</text>
+  <text class="tiny white" x="935" y="412" text-anchor="middle">대기</text>
+  <text class="tiny white" x="993" y="412" text-anchor="middle">대기</text>
+  <text class="tiny" x="1047" y="412" text-anchor="middle">거의 만원</text>
+  <text class="body" x="766" y="454">• TCP backlog가 가짜 연결 상태로 점유되어 정상 연결 실패</text>
+  <text class="body" x="766" y="476">• SYN cookies, rate limiting, 방화벽/로드밸런서 차단이 핵심</text>
+
+  <rect x="70" y="506" width="1058" height="138" rx="22" fill="#0f172a"/>
+  <text class="h2 white" x="94" y="542">4. 방어 포인트와 탐지 신호</text>
+
+  <rect x="94" y="560" width="300" height="64" rx="16" fill="#111827" stroke="#334155"/>
+  <text class="h3 white" x="114" y="585">DDoS 일반</text>
+  <text class="body" x="114" y="605" fill="#cbd5e1">트래픽 급증, 다수 출발지, 분산·필터링·스케일링</text>
+
+  <rect x="416" y="560" width="332" height="64" rx="16" fill="#111827" stroke="#334155"/>
+  <text class="h3 white" x="436" y="585">스머프</text>
+  <text class="body" x="436" y="605" fill="#cbd5e1">ICMP reply 급증, directed broadcast 차단, 반사 응답 제한</text>
+
+  <rect x="770" y="560" width="334" height="64" rx="16" fill="#111827" stroke="#334155"/>
+  <text class="h3 white" x="790" y="585">SYN Flood</text>
+  <text class="body" x="790" y="605" fill="#cbd5e1">SYN 많고 ACK 적음, SYN cookie, backlog 조정, rate limit</text>
+
+  <text class="small" x="78" y="668">핵심: 스머프는 ICMP 반사 증폭, SYN Flood는 TCP 연결 대기 자원 고갈, 둘 다 결국 가용성 저하로 귀결된다.</text>
 </svg>

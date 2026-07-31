@@ -1,31 +1,119 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">16-2. 학습·검증·전처리 SVG 인포그래픽</title>
-  <desc id="desc">학습·검증·전처리</desc>
+  <title id="title">16-2. 학습·검증·전처리 인포그래픽</title>
+  <desc id="desc">전처리 후 train, validation, test를 분리하고 데이터 누수를 막는 학습 파이프라인과 시계열 검증 원칙을 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-16-2-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#eff6ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="52%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ecfeff"/>
     </linearGradient>
-    <linearGradient id="line-16-2-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#9333ea" />
-      <stop offset="100%" stop-color="#3b82f6" />
+    <linearGradient id="pipe" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#0f172a"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .eyebrow { font-size: 14px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 18px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .body { font-size: 14px; font-weight: 500; fill: #334155; }
+      .small { font-size: 12px; font-weight: 700; fill: #64748b; }
+      .danger { font-size: 14px; font-weight: 700; fill: #b91c1c; }
+      .mono { font-size: 13px; font-weight: 700; fill: #1e293b; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-16-2-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-16-2-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">16-2. 학습 검증 전처리</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">결측치 처리, 이상치 점검, 중복 제거, 범주형 인코딩, 정규화 표준화가 기본</tspan><tspan x="84" dy="24">작업이다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">수집</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">전처리</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">학습</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">검증</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">배포</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">수집</tspan><tspan x="238" dy="18">전처리</tspan><tspan x="238" dy="18">학습</tspan></text>
-  <text class="small" x="84" y="654">16-2-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="32" y="32" width="1136" height="656" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="eyebrow" x="76" y="82">ML PIPELINE · SPLIT · LEAKAGE CONTROL</text>
+  <text class="title" x="76" y="124">16-2. 학습·검증·전처리</text>
+  <text class="subtitle" x="76" y="156">전처리는 먼저 설계하고, 통계는 train에서만 학습하며, validation으로 선택하고 test는 마지막에 한 번만 확인한다.</text>
+
+  <rect x="70" y="192" width="640" height="316" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="96" y="228">1) 재현 가능한 학습 파이프라인</text>
+
+  <rect x="98" y="260" width="128" height="88" rx="18" fill="#e0f2fe" stroke="#38bdf8"/>
+  <text class="label" x="162" y="291" text-anchor="middle">원천 데이터</text>
+  <text class="body" x="162" y="315" text-anchor="middle">거래·고객·로그</text>
+  <text class="small" x="162" y="334" text-anchor="middle">업무 문맥 포함</text>
+
+  <line x1="226" y1="304" x2="286" y2="304" stroke="#0f172a" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="286" y="246" width="188" height="116" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
+  <text class="label" x="380" y="275" text-anchor="middle">전처리</text>
+  <text class="body" x="308" y="301">• 결측치·이상치·중복 제거</text>
+  <text class="body" x="308" y="323">• 범주형 인코딩</text>
+  <text class="body" x="308" y="345">• 정규화·표준화 규칙 정의</text>
+  <rect x="304" y="262" width="152" height="18" rx="9" fill="url(#pipe)" opacity="0.28"/>
+
+  <line x1="474" y1="304" x2="534" y2="304" stroke="#0f172a" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="534" y="242" width="148" height="124" rx="18" fill="#ecfeff" stroke="#06b6d4"/>
+  <text class="label" x="608" y="272" text-anchor="middle">데이터 분할</text>
+  <rect x="552" y="289" width="36" height="54" rx="8" fill="#2563eb" opacity="0.92"/>
+  <rect x="594" y="277" width="36" height="66" rx="8" fill="#7c3aed" opacity="0.92"/>
+  <rect x="636" y="301" width="28" height="42" rx="8" fill="#0f766e" opacity="0.92"/>
+  <text class="small" x="570" y="360" text-anchor="middle">Train</text>
+  <text class="small" x="612" y="360" text-anchor="middle">Val</text>
+  <text class="small" x="650" y="360" text-anchor="middle">Test</text>
+
+  <line x1="608" y1="366" x2="608" y2="426" stroke="#0f172a" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="168" y="426" width="460" height="58" rx="16" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="8 6"/>
+  <text class="mono" x="196" y="450">fit(train) → transform(train / validation / test)</text>
+  <text class="body" x="196" y="470">스케일링 통계·인코딩 기준은 train에서만 계산</text>
+
+  <rect x="730" y="192" width="398" height="316" rx="24" fill="#fff7ed" stroke="#fdba74"/>
+  <text class="section" x="756" y="228">2) 데이터 누수 차단</text>
+
+  <rect x="758" y="256" width="164" height="90" rx="18" fill="#ffffff" stroke="#f59e0b"/>
+  <text class="label" x="840" y="286" text-anchor="middle">안전한 흐름</text>
+  <text class="body" x="840" y="311" text-anchor="middle">과거 정보만으로</text>
+  <text class="body" x="840" y="331" text-anchor="middle">피처 생성</text>
+
+  <rect x="936" y="256" width="164" height="90" rx="18" fill="#fef2f2" stroke="#ef4444"/>
+  <text class="label" x="1018" y="286" text-anchor="middle">누수 위험</text>
+  <text class="body" x="1018" y="311" text-anchor="middle">미래 거래·사후 확정값</text>
+  <text class="body" x="1018" y="331" text-anchor="middle">전체 데이터 기준 통계</text>
+
+  <line x1="922" y1="301" x2="936" y2="301" stroke="#ef4444" stroke-width="3"/>
+  <line x1="908" y1="250" x2="1048" y2="352" stroke="#dc2626" stroke-width="5" stroke-linecap="round" opacity="0.85">
+    <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2.8s" repeatCount="indefinite"/>
+  </line>
+  <line x1="1048" y1="250" x2="908" y2="352" stroke="#dc2626" stroke-width="5" stroke-linecap="round" opacity="0.85">
+    <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2.8s" repeatCount="indefinite"/>
+  </line>
+
+  <text class="danger" x="758" y="384">금융 예시</text>
+  <text class="body" x="758" y="408">• 승인 이후에만 확정되는 변수 사용 금지</text>
+  <text class="body" x="758" y="430">• 미래 기간 거래 합계를 현재 예측 피처에 넣지 않기</text>
+  <text class="body" x="758" y="452">• 전체 데이터로 평균·표준편차 계산하지 않기</text>
+  <text class="body" x="758" y="474">• 시계열 데이터는 무작위 분할보다 시간 순 분할 우선</text>
+
+  <rect x="70" y="532" width="1058" height="126" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="96" y="568">3) 검증 원칙과 실무 체크포인트</text>
+
+  <rect x="98" y="588" width="230" height="46" rx="14" fill="#dbeafe" stroke="#60a5fa"/>
+  <text class="label" x="213" y="607" text-anchor="middle">Train</text>
+  <text class="body" x="213" y="624" text-anchor="middle">모델 파라미터 학습</text>
+
+  <rect x="350" y="588" width="230" height="46" rx="14" fill="#ede9fe" stroke="#a78bfa"/>
+  <text class="label" x="465" y="607" text-anchor="middle">Validation</text>
+  <text class="body" x="465" y="624" text-anchor="middle">하이퍼파라미터 선택·조정</text>
+
+  <rect x="602" y="588" width="230" height="46" rx="14" fill="#dcfce7" stroke="#4ade80"/>
+  <text class="label" x="717" y="607" text-anchor="middle">Test</text>
+  <text class="body" x="717" y="624" text-anchor="middle">마지막 일반화 성능 확인</text>
+
+  <rect x="854" y="580" width="244" height="58" rx="16" fill="#ffffff" stroke="#94a3b8"/>
+  <text class="label" x="976" y="602" text-anchor="middle">데이터가 적다면</text>
+  <text class="body" x="976" y="622" text-anchor="middle">교차검증 + fold 분포 점검</text>
+
+  <text class="body" x="854" y="652">시드 고정 · 데이터 버전 관리 · 라벨 시점 기록</text>
 </svg>

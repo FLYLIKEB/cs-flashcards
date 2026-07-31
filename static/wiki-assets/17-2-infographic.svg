@@ -1,31 +1,185 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">17-2. 컨테이너 SVG 인포그래픽</title>
-  <desc id="desc">컨테이너</desc>
+  <title id="title">17-2. 컨테이너 인포그래픽</title>
+  <desc id="desc">컨테이너가 이미지에서 실행되어 호스트 커널을 공유하고, 쿠버네티스가 Pod와 Service로 운영하며 금융권에서는 보안·배포 통제가 중요함을 설명하는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-17-2-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#d1fae5" />
-      <stop offset="100%" stop-color="#e0e7ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="55%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ecfeff"/>
     </linearGradient>
-    <linearGradient id="line-17-2-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#6366f1" />
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#0f766e"/>
     </linearGradient>
+    <linearGradient id="kernel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="host" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <linearGradient id="imgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dcfce7"/>
+      <stop offset="100%" stop-color="#bbf7d0"/>
+    </linearGradient>
+    <linearGradient id="runGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#bfdbfe"/>
+    </linearGradient>
+    <linearGradient id="controlGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fed7aa"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
       .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #7c2d12; }
+      .white { fill: #ffffff; }
+      .center { text-anchor: middle; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-17-2-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-17-2-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">17-2. 컨테이너</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">컨테이너는 애플리케이션과 의존성을 이미지로 묶고, 호스트 OS 커널을 공유해 격리</tspan><tspan x="84" dy="24">실행하는 방식이다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1"/></marker></defs><rect x="460" y="130" width="280" height="90" rx="22" fill="#ffffff" stroke="#6366f1" stroke-width="2"/><text class="label" x="600" y="164" text-anchor="middle"><tspan x="600" dy="0">Source</tspan></text><text class="body" x="478" y="200" text-anchor="start"></text><rect x="120" y="340" width="120" height="100" rx="22" fill="#d1fae5" stroke="#0f766e" stroke-width="2"/><text class="label" x="180" y="374" text-anchor="middle"><tspan x="180" dy="0">Source</tspan></text><text class="body" x="138" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="180" y2="340" stroke="#6366f1" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="330" y="340" width="120" height="100" rx="22" fill="#e0e7ff" stroke="#0f766e" stroke-width="2"/><text class="label" x="390" y="374" text-anchor="middle"><tspan x="390" dy="0">Image</tspan></text><text class="body" x="348" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="390" y2="340" stroke="#6366f1" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="540" y="340" width="120" height="100" rx="22" fill="#d1fae5" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="374" text-anchor="middle"><tspan x="600" dy="0">Container</tspan></text><text class="body" x="558" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="600" y2="340" stroke="#6366f1" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="750" y="340" width="120" height="100" rx="22" fill="#e0e7ff" stroke="#0f766e" stroke-width="2"/><text class="label" x="810" y="374" text-anchor="middle"><tspan x="810" dy="0">Pod</tspan></text><text class="body" x="768" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="810" y2="340" stroke="#6366f1" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="960" y="340" width="120" height="100" rx="22" fill="#d1fae5" stroke="#0f766e" stroke-width="2"/><text class="label" x="1020" y="374" text-anchor="middle"><tspan x="1020" dy="0">Cluster</tspan></text><text class="body" x="978" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="1020" y2="340" stroke="#6366f1" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="120" y="512" width="960" height="84" rx="24" fill="#ffffff" stroke="#0f766e" stroke-width="2"/><text class="body" x="600" y="560" text-anchor="middle"><tspan x="600" dy="0">Image Container Pod Cluster</tspan></text><line x1="120" y1="300" x2="1080" y2="300" stroke="#6366f1" stroke-width="2" stroke-dasharray="12 10" opacity="0.35"><animate attributeName="stroke-dashoffset" from="0" to="-60" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">17-2-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="34" y="28" width="1132" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="34" y="28" width="1132" height="132" rx="28" fill="url(#header)"/>
+  <rect x="34" y="118" width="1132" height="42" fill="#0f172a" opacity="0.24"/>
+
+  <text class="title" x="72" y="82">17-2. 컨테이너</text>
+  <text class="subtitle" x="72" y="116">이미지는 불변 패키지, 컨테이너는 실행 인스턴스, 쿠버네티스는 배포·복구·노출을 자동화한다.</text>
+  <text class="subtitle" x="72" y="142">핵심은 빠른 배포보다도 공유 커널 구조와 운영 통제를 이해하는 것이다.</text>
+
+  <g transform="translate(68 184)">
+    <rect width="500" height="466" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="28" y="38">1) 공유 커널 위에서 가볍게 실행</text>
+    <text class="body" x="28" y="66">VM처럼 게스트 OS를 각각 올리지 않고, 하나의 호스트 커널을 여러 컨테이너가 함께 사용한다.</text>
+
+    <rect x="44" y="104" width="412" height="42" rx="16" fill="url(#imgGrad)" stroke="#16a34a"/>
+    <text class="label center" x="250" y="130">Image = 앱 + 라이브러리 + 설정 기본값</text>
+
+    <g transform="translate(36 166)">
+      <rect x="0" y="0" width="136" height="176" rx="20" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+      <rect x="12" y="14" width="112" height="30" rx="10" fill="#cffafe"/>
+      <text class="label center" x="68" y="34">Container A</text>
+      <text class="body center" x="68" y="72">payments-api</text>
+      <text class="body center" x="68" y="96">PID / NET / FS</text>
+      <text class="body center" x="68" y="120">격리된 런타임</text>
+      <text class="tiny center" x="68" y="152">빠른 시작 · 낮은 오버헤드</text>
+    </g>
+
+    <g transform="translate(182 166)">
+      <rect x="0" y="0" width="136" height="176" rx="20" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
+      <rect x="12" y="14" width="112" height="30" rx="10" fill="#dbeafe"/>
+      <text class="label center" x="68" y="34">Container B</text>
+      <text class="body center" x="68" y="72">fraud-worker</text>
+      <text class="body center" x="68" y="96">동일 커널 공유</text>
+      <text class="body center" x="68" y="120">이미지에서 복제 실행</text>
+      <text class="tiny center" x="68" y="152">환경 재현성 확보</text>
+    </g>
+
+    <g transform="translate(328 166)">
+      <rect x="0" y="0" width="136" height="176" rx="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+      <rect x="12" y="14" width="112" height="30" rx="10" fill="#dcfce7"/>
+      <text class="label center" x="68" y="34">Container C</text>
+      <text class="body center" x="68" y="72">batch-report</text>
+      <text class="body center" x="68" y="96">의존성 포함</text>
+      <text class="body center" x="68" y="120">호스트와 분리 배포</text>
+      <text class="tiny center" x="68" y="152">롤백도 이미지 단위</text>
+    </g>
+
+    <rect x="44" y="362" width="412" height="44" rx="16" fill="url(#kernel)"/>
+    <text class="label center white" x="250" y="390">Host OS Kernel 공유</text>
+    <rect x="44" y="414" width="412" height="30" rx="14" fill="url(#host)"/>
+    <text class="small center white" x="250" y="434">Host OS / Container Runtime</text>
+
+    <path d="M250 146 L250 166" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
+    <path d="M250 342 L250 362" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+    <rect x="44" y="82" width="184" height="24" rx="12" fill="#e2e8f0"/>
+    <text class="tiny center" x="136" y="98">불변 패키지 → 실행 인스턴스 복제</text>
+    <rect x="272" y="82" width="184" height="24" rx="12" fill="#e2e8f0"/>
+    <text class="tiny center" x="364" y="98">무거운 게스트 OS 없음</text>
+  </g>
+
+  <g transform="translate(594 184)">
+    <rect width="538" height="220" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="28" y="38">2) Kubernetes가 배포 단위를 운영 단위로 바꾼다</text>
+    <text class="body" x="28" y="66">Image → Pod → Deployment → Service 흐름으로 배포, 복구, 스케일링, 외부 접근을 관리한다.</text>
+
+    <g transform="translate(26 98)">
+      <rect width="108" height="82" rx="18" fill="url(#imgGrad)" stroke="#16a34a" stroke-width="2"/>
+      <text class="label center" x="54" y="34">Image</text>
+      <text class="body center" x="54" y="56">registry</text>
+      <text class="tiny center" x="54" y="72">서명·스캔 대상</text>
+    </g>
+
+    <g transform="translate(156 98)">
+      <rect width="108" height="82" rx="18" fill="url(#runGrad)" stroke="#2563eb" stroke-width="2"/>
+      <text class="label center" x="54" y="34">Pod</text>
+      <text class="body center" x="54" y="56">1+ containers</text>
+      <text class="tiny center" x="54" y="72">최소 배포 단위</text>
+    </g>
+
+    <g transform="translate(286 98)">
+      <rect width="108" height="82" rx="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text class="label center" x="54" y="34">Deployment</text>
+      <text class="body center" x="54" y="56">replicas 3</text>
+      <text class="tiny center" x="54" y="72">rolling update</text>
+    </g>
+
+    <g transform="translate(416 98)">
+      <rect width="96" height="82" rx="18" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+      <text class="label center" x="48" y="34">Service</text>
+      <text class="body center" x="48" y="56">stable IP</text>
+      <text class="tiny center" x="48" y="72">접근 지점</text>
+    </g>
+
+    <path d="M134 139 H154" fill="none" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow)"/>
+    <path d="M264 139 H284" fill="none" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow)"/>
+    <path d="M394 139 H414" fill="none" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow)"/>
+
+    <text class="small" x="28" y="206">Self-healing: 장애 Pod 재생성 · Scaling: replica 조절 · Ingress: 외부 HTTP/S 라우팅</text>
+  </g>
+
+  <g transform="translate(594 428)">
+    <rect width="538" height="222" rx="24" fill="#fff7ed" stroke="#fdba74"/>
+    <text class="section" x="28" y="38">3) 금융권 운영 포인트: 빠른 배포보다 통제가 먼저</text>
+    <text class="body" x="28" y="66">공유 커널 구조라서 이미지 위생, 권한, 시크릿, 네트워크, 감사 로그를 함께 설계해야 한다.</text>
+
+    <g transform="translate(28 92)">
+      <rect width="146" height="44" rx="14" fill="url(#controlGrad)" stroke="#f97316"/>
+      <text class="chip center" x="73" y="28">Image Scan</text>
+    </g>
+    <g transform="translate(194 92)">
+      <rect width="146" height="44" rx="14" fill="url(#controlGrad)" stroke="#f97316"/>
+      <text class="chip center" x="73" y="28">Secret 분리</text>
+    </g>
+    <g transform="translate(360 92)">
+      <rect width="146" height="44" rx="14" fill="url(#controlGrad)" stroke="#f97316"/>
+      <text class="chip center" x="73" y="28">RBAC</text>
+    </g>
+
+    <g transform="translate(28 148)">
+      <rect width="146" height="44" rx="14" fill="url(#controlGrad)" stroke="#f97316"/>
+      <text class="chip center" x="73" y="28">Namespace</text>
+    </g>
+    <g transform="translate(194 148)">
+      <rect width="146" height="44" rx="14" fill="url(#controlGrad)" stroke="#f97316"/>
+      <text class="chip center" x="73" y="28">NetworkPolicy</text>
+    </g>
+    <g transform="translate(360 148)">
+      <rect width="146" height="44" rx="14" fill="url(#controlGrad)" stroke="#f97316"/>
+      <text class="chip center" x="73" y="28">Audit Log</text>
+    </g>
+
+    <text class="small" x="28" y="214">리스크 예시: 취약한 베이스 이미지, privileged 권한, 잘못된 시크릿 주입, east-west 통신 통제 실패</text>
+  </g>
 </svg>

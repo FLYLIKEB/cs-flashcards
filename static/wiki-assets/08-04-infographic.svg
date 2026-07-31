@@ -1,31 +1,111 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">08-04. 라우팅과 서브넷 SVG 인포그래픽</title>
-  <desc id="desc">라우팅과 서브넷</desc>
+  <title id="title">08-04. 라우팅과 서브넷 인포그래픽</title>
+  <desc id="desc">Longest Prefix Match로 라우팅 경로를 고르고, 192.168.10.66/26 주소를 서브넷으로 계산하는 과정을 함께 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-08-04-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#cffafe" />
-      <stop offset="100%" stop-color="#ecfeff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#ecfeff"/>
     </linearGradient>
-    <linearGradient id="line-08-04-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0284c7" />
-      <stop offset="100%" stop-color="#06b6d4" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
     </linearGradient>
+    <linearGradient id="routeLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 33px 'Pretendard','Noto Sans KR',sans-serif; fill: #e2e8f0; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #cbd5e1; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 15px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .monoSmall { font: 700 13px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #1e293b; }
+      .heroTag { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #93c5fd; letter-spacing: 0.08em; }
+      .whiteBody { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
     </style>
   </defs>
+
   <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-08-04-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-08-04-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">08-04. 라우팅과 서브넷</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">라우팅은 목적지까지 경로를 선택하는 과정이다. 라우터는 목적지 IP에 따라 가장</tspan><tspan x="84" dy="24">적절한 다음 홉(next hop)을 결정해 패킷을 전달한다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#06b6d4"/></marker></defs><rect x="460" y="130" width="280" height="90" rx="22" fill="#ffffff" stroke="#06b6d4" stroke-width="2"/><text class="label" x="600" y="164" text-anchor="middle"><tspan x="600" dy="0">CIDR</tspan></text><text class="body" x="478" y="200" text-anchor="start"></text><rect x="120" y="340" width="120" height="100" rx="22" fill="#cffafe" stroke="#0284c7" stroke-width="2"/><text class="label" x="180" y="374" text-anchor="middle"><tspan x="180" dy="0">CIDR</tspan></text><text class="body" x="138" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="180" y2="340" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="330" y="340" width="120" height="100" rx="22" fill="#ecfeff" stroke="#0284c7" stroke-width="2"/><text class="label" x="390" y="374" text-anchor="middle"><tspan x="390" dy="0">서브넷</tspan></text><text class="body" x="348" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="390" y2="340" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="540" y="340" width="120" height="100" rx="22" fill="#cffafe" stroke="#0284c7" stroke-width="2"/><text class="label" x="600" y="374" text-anchor="middle"><tspan x="600" dy="0">라우터</tspan></text><text class="body" x="558" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="600" y2="340" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="750" y="340" width="120" height="100" rx="22" fill="#ecfeff" stroke="#0284c7" stroke-width="2"/><text class="label" x="810" y="374" text-anchor="middle"><tspan x="810" dy="0">경로 선택</tspan></text><text class="body" x="768" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="810" y2="340" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="960" y="340" width="120" height="100" rx="22" fill="#cffafe" stroke="#0284c7" stroke-width="2"/><text class="label" x="1020" y="374" text-anchor="middle"><tspan x="1020" dy="0">패킷 전달</tspan></text><text class="body" x="978" y="410" text-anchor="start"></text><line x1="600" y1="220" x2="1020" y2="340" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="120" y="512" width="960" height="84" rx="24" fill="#ffffff" stroke="#0284c7" stroke-width="2"/><text class="body" x="600" y="560" text-anchor="middle"><tspan x="600" dy="0">서브넷 라우터 경로 선택 패킷 전달</tspan></text><line x1="120" y1="300" x2="1080" y2="300" stroke="#06b6d4" stroke-width="2" stroke-dasharray="12 10" opacity="0.35"><animate attributeName="stroke-dashoffset" from="0" to="-60" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">08-04-infographic.svg</text>
+  <rect x="24" y="24" width="1152" height="672" rx="30" fill="url(#bg)" stroke="#bfdbfe"/>
+
+  <rect x="54" y="48" width="1092" height="166" rx="28" fill="url(#hero)"/>
+  <text x="84" y="86" class="heroTag">ROUTING · SUBNETTING · CIDR · LPM</text>
+  <text x="84" y="125" class="title">08-04. 라우팅과 서브넷</text>
+  <text x="84" y="156" class="subtitle">라우터는 목적지 IP를 라우팅 테이블과 비교해 가장 긴 프리픽스를 선택하고,</text>
+  <text x="84" y="180" class="subtitle">서브넷은 CIDR 비트 수로 네트워크·브로드캐스트·사용 가능한 호스트 범위를 계산한다.</text>
+
+  <rect x="736" y="78" width="360" height="108" rx="20" fill="#0b1220" stroke="#60a5fa" stroke-opacity="0.4"/>
+  <text x="760" y="111" class="label" fill="#eff6ff">핵심 우선순위</text>
+  <text x="760" y="136" class="whiteBody">1) Longest Prefix Match</text>
+  <text x="760" y="160" class="whiteBody">2) 관리 거리(AD)</text>
+  <text x="760" y="184" class="whiteBody">3) 프로토콜 메트릭</text>
+
+  <rect x="54" y="238" width="520" height="418" rx="24" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="82" y="276" class="section">라우팅 결정: 가장 긴 프리픽스가 승리</text>
+  <text x="82" y="302" class="body">목적지 10.1.5.45가 들어오면 더 구체적인 /24 엔트리가 /16, /8, 기본 경로보다 우선한다.</text>
+
+  <rect x="82" y="328" width="180" height="64" rx="18" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="172" y="355" text-anchor="middle" class="small">입력 패킷</text>
+  <text x="172" y="377" text-anchor="middle" class="mono">DST 10.1.5.45</text>
+
+  <rect x="308" y="318" width="236" height="142" rx="22" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="330" y="348" class="label">라우팅 테이블</text>
+  <text x="330" y="373" class="monoSmall">10.0.0.0/8    → eth0</text>
+  <text x="330" y="396" class="monoSmall">10.1.0.0/16   → eth1</text>
+  <rect x="322" y="409" width="208" height="30" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="330" y="429" class="monoSmall">10.1.5.0/24   → eth2</text>
+  <text x="330" y="451" class="monoSmall">0.0.0.0/0     → default</text>
+
+  <line x1="262" y1="360" x2="308" y2="360" stroke="url(#routeLine)" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="92" y="474" width="452" height="118" rx="20" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="114" y="505" class="label">선택 과정</text>
+  <text x="114" y="531" class="body">① /24가 /16보다 더 길어서 가장 구체적</text>
+  <text x="114" y="555" class="body">② 같은 프리픽스라면 관리 거리(AD)가 낮은 경로 우선</text>
+  <text x="114" y="579" class="body">③ AD도 같으면 OSPF cost, RIP hop count 같은 메트릭 비교</text>
+
+  <rect x="362" y="607" width="182" height="34" rx="17" fill="#2563eb"/>
+  <text x="453" y="629" text-anchor="middle" class="label" fill="#ffffff">선택 결과: next hop eth2</text>
+
+  <rect x="600" y="238" width="546" height="418" rx="24" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="628" y="276" class="section">서브넷 계산: 192.168.10.66/26</text>
+  <text x="628" y="302" class="body">/26이면 네트워크 비트 26개, 호스트 비트 6개다. 블록 크기는 64, 사용 가능 호스트는 62개.</text>
+
+  <rect x="628" y="326" width="490" height="82" rx="18" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="652" y="356" class="label">CIDR 해석</text>
+  <text x="652" y="382" class="monoSmall">mask = 255.255.255.192   host bits = 32 - 26 = 6   usable = 2⁶ - 2 = 62</text>
+
+  <rect x="628" y="430" width="490" height="84" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="652" y="459" class="label">서브넷 블록</text>
+  <text x="652" y="484" class="monoSmall">... 192.168.10.0/26 | 192.168.10.64/26 | 192.168.10.128/26 ...</text>
+  <text x="652" y="505" class="body">10.66은 64~127 구간에 있으므로 192.168.10.64/26 서브넷에 속한다.</text>
+
+  <rect x="628" y="536" width="232" height="92" rx="18" fill="#dcfce7" stroke="#22c55e"/>
+  <text x="650" y="566" class="label">네트워크 주소</text>
+  <text x="650" y="593" class="mono">192.168.10.64</text>
+  <text x="650" y="614" class="small">호스트 비트를 0으로</text>
+
+  <rect x="886" y="536" width="232" height="92" rx="18" fill="#fee2e2" stroke="#ef4444"/>
+  <text x="908" y="566" class="label">브로드캐스트 주소</text>
+  <text x="908" y="593" class="mono">192.168.10.127</text>
+  <text x="908" y="614" class="small">호스트 비트를 1로</text>
+
+  <rect x="692" y="645" width="360" height="26" rx="13" fill="#dbeafe"/>
+  <rect x="698" y="649" width="348" height="18" rx="9" fill="#93c5fd" opacity="0.25"/>
+  <rect x="871" y="649" width="170" height="18" rx="9" fill="#2563eb">
+    <animate attributeName="x" values="698;871;698" dur="6s" repeatCount="indefinite"/>
+  </rect>
+  <text x="872" y="664" text-anchor="middle" class="small">usable hosts 65–126</text>
+
+  <circle cx="960" cy="367" r="8" fill="#2563eb">
+    <animate attributeName="cx" values="652;1088;652" dur="6s" repeatCount="indefinite"/>
+  </circle>
+
+  <text x="84" y="682" class="small">라우팅: Longest Prefix Match → AD → Metric · 서브넷: /26 = 64주소, 62 usable hosts</text>
 </svg>

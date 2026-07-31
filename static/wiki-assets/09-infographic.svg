@@ -1,31 +1,131 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09. 자료구조/알고리즘 SVG 인포그래픽</title>
-  <desc id="desc">자료구조/알고리즘</desc>
+  <title id="title">09. 자료구조/알고리즘 인포그래픽</title>
+  <desc id="desc">자료구조 선택과 알고리즘 패턴을 연결해 학습 순서, 핵심 시간복잡도, 대표 기법을 한 장에 요약한 페이지 전용 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-09-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e0e7ff" />
-      <stop offset="100%" stop-color="#f3e8ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
-    <linearGradient id="line-09-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4f46e5" />
-      <stop offset="100%" stop-color="#7c3aed" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#312e81" />
+      <stop offset="100%" stop-color="#1d4ed8" />
     </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#eef4ff" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 34px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
+      .subtitle { font: 500 16px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #cbd5e1; }
+      .section { font: 700 21px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #475569; }
+      .tiny { font: 700 11px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #1e3a8a; }
+      .tableHead { font: 700 13px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
+      .tableCell { font: 600 12px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .accent { fill: #dbeafe; stroke: #60a5fa; stroke-width: 1.5; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-09-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-09-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">09. 자료구조/알고리즘</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">이 장의 목표는 다음을 확실히 하는 것이다:</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker></defs><rect x="92" y="248" width="250" height="250" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="217" y="282" text-anchor="middle"><tspan x="217" dy="0">자료구조</tspan></text><text class="body" x="110" y="318" text-anchor="start"><tspan x="110" dy="0">알고리즘</tspan><tspan x="110" dy="18">학습 순서</tspan></text><rect x="420" y="222" width="360" height="302" rx="22" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="600" y="256" text-anchor="middle"><tspan x="600" dy="0">자료구조/알고리즘</tspan></text><text class="body" x="438" y="292" text-anchor="start"><tspan x="438" dy="0">학습 순서</tspan><tspan x="438" dy="18">확장 요약</tspan></text><rect x="858" y="248" width="250" height="250" rx="22" fill="#f3e8ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="983" y="282" text-anchor="middle"><tspan x="983" dy="0">확장 요약</tspan></text><text class="body" x="876" y="318" text-anchor="start"><tspan x="876" dy="0">자료구조</tspan><tspan x="876" dy="18">알고리즘</tspan></text><rect x="330" y="552" width="540" height="82" rx="22" fill="#f8fafc" stroke="#4f46e5" stroke-width="2"/><text class="label" x="600" y="586" text-anchor="middle"><tspan x="600" dy="0">핵심 규칙</tspan></text><text class="body" x="348" y="622" text-anchor="start"><tspan x="348" dy="0">자료구조</tspan><tspan x="348" dy="18">알고리즘</tspan><tspan x="348" dy="18">학습 순서</tspan></text><line x1="342" y1="372" x2="420" y2="372" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="342" y1="372" x2="420" y2="372" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="780" y1="372" x2="858" y2="372" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="780" y1="372" x2="858" y2="372" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="524" x2="600" y2="552" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="524" x2="600" y2="552" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">09-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="32" y="28" width="1136" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" />
+
+  <rect x="56" y="48" width="1088" height="138" rx="28" fill="url(#hero)" />
+  <text class="small" x="84" y="84">금융공기업 IT · 자료구조/알고리즘 전체 맵</text>
+  <text class="title" x="84" y="122">09. 자료구조/알고리즘</text>
+  <text class="subtitle" x="84" y="154">선형 자료구조 → 트리·그래프 → 정렬·탐색 → DP·재귀로 이어지는 학습 흐름과 대표 복잡도를 한 장에 연결</text>
+
+  <rect x="84" y="206" width="312" height="290" rx="24" fill="url(#panel)" stroke="#bfdbfe" />
+  <text class="section" x="108" y="242">학습 순서</text>
+  <line x1="156" y1="276" x2="156" y2="450" stroke="#93c5fd" stroke-width="6" stroke-linecap="round" />
+  <circle cx="156" cy="300" r="22" fill="#1d4ed8" />
+  <circle cx="156" cy="354" r="22" fill="#2563eb" />
+  <circle cx="156" cy="408" r="22" fill="#3b82f6" />
+  <circle cx="156" cy="462" r="22" fill="#60a5fa" />
+  <text x="156" y="306" text-anchor="middle" class="tableHead">01</text>
+  <text x="156" y="360" text-anchor="middle" class="tableHead">02</text>
+  <text x="156" y="414" text-anchor="middle" class="tableHead">03</text>
+  <text x="156" y="468" text-anchor="middle" class="tableHead">04</text>
+  <text class="label" x="194" y="294">선형 자료구조</text>
+  <text class="body" x="194" y="316">배열 · 연결리스트 · 스택 · 큐 · 해시맵</text>
+  <text class="label" x="194" y="348">트리와 그래프</text>
+  <text class="body" x="194" y="370">순회 · 힙 · 인접리스트/행렬 · BFS/DFS</text>
+  <text class="label" x="194" y="402">정렬과 탐색</text>
+  <text class="body" x="194" y="424">병합/퀵/힙 정렬 · 이분 탐색</text>
+  <text class="label" x="194" y="456">DP와 재귀</text>
+  <text class="body" x="194" y="478">상태 정의 · 점화식 · 메모이제이션</text>
+
+  <rect x="424" y="206" width="324" height="290" rx="24" fill="#ffffff" stroke="#93c5fd" />
+  <text class="section" x="448" y="242">문제 풀이 선택 기준</text>
+  <rect x="500" y="268" width="172" height="74" rx="20" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" />
+  <text class="label" x="586" y="298" text-anchor="middle">문제 요구 분석</text>
+  <text class="body" x="586" y="320" text-anchor="middle">접근 · 검색 · 삽입 · 최적화</text>
+  <line x1="586" y1="342" x2="586" y2="374" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)" />
+  <rect x="454" y="378" width="110" height="84" rx="18" class="accent" />
+  <rect x="586" y="378" width="110" height="84" rx="18" class="accent" />
+  <rect x="520" y="390" width="110" height="84" rx="18" fill="#eff6ff" stroke="#818cf8" stroke-width="1.5" />
+  <text class="tiny" x="509" y="402">구조 선택</text>
+  <text class="body" x="468" y="410">배열</text>
+  <text class="body" x="468" y="430">연결리스트</text>
+  <text class="body" x="468" y="450">해시/BST</text>
+  <text class="tiny" x="641" y="402">전략 선택</text>
+  <text class="body" x="600" y="410">BFS·DFS</text>
+  <text class="body" x="600" y="430">정렬·탐색</text>
+  <text class="body" x="600" y="450">DP·재귀</text>
+  <text class="tiny" x="575" y="414" text-anchor="middle">출력 규칙</text>
+  <text class="body" x="575" y="436" text-anchor="middle">복잡도와</text>
+  <text class="body" x="575" y="456" text-anchor="middle">근거를 함께 설명</text>
+
+  <rect x="776" y="206" width="340" height="290" rx="24" fill="url(#panel)" stroke="#bfdbfe" />
+  <text class="section" x="800" y="242">대표 알고리즘 패턴</text>
+  <path d="M 836 304 C 862 272, 912 272, 938 304" fill="none" stroke="#2563eb" stroke-width="4" />
+  <path d="M 938 304 C 964 272, 1014 272, 1040 304" fill="none" stroke="#2563eb" stroke-width="4" />
+  <line x1="886" y1="304" x2="886" y2="350" stroke="#2563eb" stroke-width="4" />
+  <line x1="988" y1="304" x2="988" y2="350" stroke="#2563eb" stroke-width="4" />
+  <circle cx="836" cy="304" r="18" fill="#1d4ed8" />
+  <circle cx="938" cy="304" r="18" fill="#3b82f6" />
+  <circle cx="1040" cy="304" r="18" fill="#60a5fa" />
+  <circle cx="886" cy="350" r="18" fill="#93c5fd" />
+  <circle cx="988" cy="350" r="18" fill="#bfdbfe" stroke="#60a5fa" stroke-width="2" />
+  <text class="tableHead" x="836" y="309" text-anchor="middle">S</text>
+  <text class="tableHead" x="938" y="309" text-anchor="middle">Q</text>
+  <text class="tableHead" x="1040" y="309" text-anchor="middle">G</text>
+  <text class="tableCell" x="836" y="336" text-anchor="middle">DFS</text>
+  <text class="tableCell" x="938" y="336" text-anchor="middle">BFS</text>
+  <text class="tableCell" x="1040" y="336" text-anchor="middle">그래프</text>
+  <text class="tableCell" x="886" y="382" text-anchor="middle">정렬</text>
+  <text class="tableCell" x="988" y="382" text-anchor="middle">탐색</text>
+  <text class="body" x="810" y="420">• BFS: 최단 간선 경로, 큐 사용</text>
+  <text class="body" x="810" y="442">• DFS: 경로 탐색, 재귀/스택</text>
+  <text class="body" x="810" y="464">• 이분 탐색: 정렬된 배열에서만 O(log n)</text>
+
+  <rect x="84" y="524" width="1032" height="132" rx="24" fill="#0f172a" />
+  <text class="section" x="108" y="560" fill="#eff6ff">핵심 시간복잡도 비교</text>
+  <rect x="108" y="578" width="984" height="28" rx="10" fill="#1e3a8a" />
+  <text class="tableHead" x="146" y="597">구조/알고리즘</text>
+  <text class="tableHead" x="454" y="597" text-anchor="middle">접근</text>
+  <text class="tableHead" x="580" y="597" text-anchor="middle">검색</text>
+  <text class="tableHead" x="706" y="597" text-anchor="middle">삽입</text>
+  <text class="tableHead" x="832" y="597" text-anchor="middle">삭제</text>
+  <text class="tableHead" x="980" y="597" text-anchor="middle">시험 포인트</text>
+
+  <rect x="108" y="606" width="984" height="34" rx="8" fill="#e0ecff" />
+  <text class="tableCell" x="146" y="628">배열 / 연결리스트</text>
+  <text class="tableCell" x="454" y="628" text-anchor="middle">O(1) / O(n)</text>
+  <text class="tableCell" x="580" y="628" text-anchor="middle">O(n)</text>
+  <text class="tableCell" x="706" y="628" text-anchor="middle">O(n) / O(1)</text>
+  <text class="tableCell" x="832" y="628" text-anchor="middle">O(n) / O(1)</text>
+  <text class="tableCell" x="980" y="628" text-anchor="middle">랜덤 액세스 vs 포인터 조작</text>
+
+  <rect x="108" y="640" width="984" height="34" rx="8" fill="#f8fbff" />
+  <text class="tableCell" x="146" y="662">해시 / BST / 이분 탐색</text>
+  <text class="tableCell" x="454" y="662" text-anchor="middle">- / O(log n) / -</text>
+  <text class="tableCell" x="580" y="662" text-anchor="middle">O(1) / O(log n) / O(log n)</text>
+  <text class="tableCell" x="706" y="662" text-anchor="middle">O(1) / O(log n) / -</text>
+  <text class="tableCell" x="832" y="662" text-anchor="middle">O(1) / O(log n) / -</text>
+  <text class="tableCell" x="980" y="662" text-anchor="middle">충돌·편향·정렬 전제 확인</text>
 </svg>

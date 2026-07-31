@@ -1,31 +1,113 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-01-01. 스택과 큐 SVG 인포그래픽</title>
-  <desc id="desc">스택과 큐</desc>
+  <title id="title">09-01-01. 스택과 큐 인포그래픽</title>
+  <desc id="desc">스택의 LIFO와 큐의 FIFO를 연산 방향, 활용 예시, 구현 포인트로 비교한 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-09-01-01-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e0e7ff" />
-      <stop offset="100%" stop-color="#f3e8ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
     </linearGradient>
-    <linearGradient id="line-09-01-01-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4f46e5" />
-      <stop offset="100%" stop-color="#7c3aed" />
+    <linearGradient id="stackGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6366f1"/>
     </linearGradient>
+    <linearGradient id="queueGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <marker id="arrowViolet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#0284c7"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 15px 'SFMono-Regular',Consolas,monospace; fill: #0f172a; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-09-01-01-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-09-01-01-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">09-01-01. 스택과 큐</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">스택(stack)은 LIFO(Last In, First Out) 구조다. 가장</tspan><tspan x="84" dy="24">나중에 들어온 요소가 먼저 나간다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">스택과 큐</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">연산 정리</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">핵심 연산과 의미</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">구현 방식 비교</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">구현 예시</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">스택과 큐</tspan><tspan x="238" dy="18">연산 정리</tspan><tspan x="238" dy="18">핵심 연산과 의미</tspan></text>
-  <text class="small" x="84" y="654">09-01-01-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="32" fill="#ffffff" stroke="#dbe4ff" stroke-width="2"/>
+
+  <text x="74" y="88" class="small">자료구조 핵심 비교 · 연산 대부분 O(1)</text>
+  <text x="74" y="132" class="title">스택과 큐</text>
+  <text x="74" y="166" class="subtitle">스택은 가장 나중에 들어온 값이 먼저 나가고, 큐는 먼저 들어온 값이 먼저 나간다.</text>
+
+  <g transform="translate(62 208)">
+    <rect x="0" y="0" width="498" height="340" rx="28" fill="#faf5ff" stroke="#d8b4fe" stroke-width="2"/>
+    <rect x="24" y="24" width="92" height="28" rx="14" fill="url(#stackGrad)"/>
+    <text x="70" y="43" text-anchor="middle" class="chip">LIFO</text>
+    <text x="24" y="84" class="section">Stack</text>
+    <text x="24" y="112" class="body">접시를 쌓듯이 top에서만 넣고 꺼낸다.</text>
+
+    <rect x="154" y="78" width="188" height="212" rx="20" fill="#ede9fe" stroke="#8b5cf6" stroke-width="3"/>
+    <rect x="184" y="230" width="128" height="38" rx="12" fill="#c4b5fd"/>
+    <rect x="184" y="184" width="128" height="38" rx="12" fill="#a78bfa"/>
+    <rect x="184" y="138" width="128" height="38" rx="12" fill="#8b5cf6"/>
+    <text x="248" y="255" text-anchor="middle" class="label">A</text>
+    <text x="248" y="209" text-anchor="middle" class="label">B</text>
+    <text x="248" y="163" text-anchor="middle" class="chip">C = top</text>
+
+    <line x1="248" y1="50" x2="248" y2="126" stroke="#7c3aed" stroke-width="5" marker-end="url(#arrowViolet)"/>
+    <text x="272" y="68" class="label">push(x)</text>
+    <text x="272" y="92" class="body">새 원소는 맨 위로</text>
+
+    <line x1="374" y1="138" x2="430" y2="138" stroke="#7c3aed" stroke-width="5" marker-end="url(#arrowViolet)"/>
+    <text x="350" y="128" text-anchor="end" class="label">pop()</text>
+    <text x="350" y="152" text-anchor="end" class="body">top 제거·반환</text>
+
+    <rect x="24" y="244" width="96" height="34" rx="12" fill="#ffffff" stroke="#c4b5fd"/>
+    <text x="72" y="266" text-anchor="middle" class="mono">peek()</text>
+    <text x="24" y="314" class="body">활용: 재귀, DFS, 괄호 검사, 후위식 계산</text>
+  </g>
+
+  <g transform="translate(640 208)">
+    <rect x="0" y="0" width="498" height="340" rx="28" fill="#f0fdfa" stroke="#99f6e4" stroke-width="2"/>
+    <rect x="24" y="24" width="92" height="28" rx="14" fill="url(#queueGrad)"/>
+    <text x="70" y="43" text-anchor="middle" class="chip">FIFO</text>
+    <text x="24" y="84" class="section">Queue</text>
+    <text x="24" y="112" class="body">줄서기처럼 rear로 넣고 front에서 꺼낸다.</text>
+
+    <rect x="66" y="168" width="348" height="84" rx="22" fill="#cffafe" stroke="#0ea5e9" stroke-width="3"/>
+    <rect x="86" y="188" width="72" height="44" rx="12" fill="#67e8f9"/>
+    <rect x="168" y="188" width="72" height="44" rx="12" fill="#5eead4"/>
+    <rect x="250" y="188" width="72" height="44" rx="12" fill="#22d3ee"/>
+    <rect x="332" y="188" width="62" height="44" rx="12" fill="#a5f3fc" stroke="#0891b2" stroke-dasharray="7 6"/>
+    <text x="122" y="214" text-anchor="middle" class="label">A</text>
+    <text x="204" y="214" text-anchor="middle" class="label">B</text>
+    <text x="286" y="214" text-anchor="middle" class="label">C</text>
+    <text x="363" y="214" text-anchor="middle" class="small">rear</text>
+
+    <line x1="16" y1="210" x2="72" y2="210" stroke="#0284c7" stroke-width="5" marker-end="url(#arrowBlue)"/>
+    <text x="18" y="184" class="label">dequeue()</text>
+    <text x="18" y="236" class="small">front</text>
+
+    <line x1="420" y1="210" x2="480" y2="210" stroke="#0284c7" stroke-width="5" marker-end="url(#arrowBlue)"/>
+    <text x="362" y="152" class="label">enqueue(x)</text>
+    <text x="362" y="176" class="body">새 원소는 뒤에 연결</text>
+
+    <rect x="24" y="264" width="150" height="48" rx="14" fill="#ffffff" stroke="#7dd3fc"/>
+    <text x="99" y="285" text-anchor="middle" class="mono">front / peek()</text>
+    <text x="200" y="298" class="body">활용: BFS, 레벨 순회, 비가중치 최단거리</text>
+  </g>
+
+  <g transform="translate(62 574)">
+    <rect x="0" y="0" width="1076" height="90" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="28" y="34" class="label">구현 포인트</text>
+    <text x="28" y="61" class="body">스택: 배열 끝을 top으로 쓰면 push/pop O(1)</text>
+    <text x="410" y="61" class="body">큐: 단순 배열 앞 제거는 O(n) → 원형 버퍼·deque로 O(1)</text>
+    <text x="846" y="61" class="body">공통: 빈 구조 pop/dequeue는 언더플로우 주의</text>
+  </g>
+
+  <g>
+    <line x1="530" y1="184" x2="530" y2="200" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round"/>
+    <line x1="670" y1="184" x2="670" y2="200" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"/>
+    <text x="600" y="196" text-anchor="middle" class="small">문제 연결: DFS ↔ 스택 / BFS ↔ 큐</text>
+  </g>
 </svg>

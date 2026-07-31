@@ -1,31 +1,143 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">13-04. 빈출 코드 출력 문제 SVG 인포그래픽</title>
-  <desc id="desc">빈출 코드 출력 문제</desc>
+  <title id="title">13-04. 빈출 코드 출력 문제 인포그래픽</title>
+  <desc id="desc">코드 출력 문제를 풀 때 스코프, 인자 전달, 반복문 변화표, 재귀 호출 순서와 출력 시점을 추적하는 방법을 정리한 SVG</desc>
   <defs>
-    <linearGradient id="grad-13-04-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#cffafe" />
-      <stop offset="100%" stop-color="#f0fdf4" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#ecfeff" />
     </linearGradient>
-    <linearGradient id="line-13-04-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2" />
-      <stop offset="100%" stop-color="#22c55e" />
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#0f766e" />
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e" />
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
+      .title { font-size: 32px; font-weight: 800; fill: #f8fafc; }
+      .subtitle { font-size: 15px; font-weight: 500; fill: #dbeafe; }
+      .section { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .body { font-size: 14px; font-weight: 500; fill: #334155; }
+      .tiny { font-size: 12px; font-weight: 600; fill: #475569; }
+      .mono { font-family: "SFMono-Regular", Consolas, monospace; font-size: 15px; font-weight: 600; fill: #e2e8f0; }
+      .mono-dark { font-family: "SFMono-Regular", Consolas, monospace; font-size: 14px; font-weight: 600; fill: #0f172a; }
+      .chip { font-size: 13px; font-weight: 700; fill: #115e59; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-13-04-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-13-04-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">13-04. 빈출 코드 출력 문제</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">추적을 체계화하면 오답 원인을 빨리 찾을 수 있다. 예를 들어 표 형태로 &quot;라인</tspan><tspan x="84" dy="24">번호/변수 상태/출력 유무/메모&quot;를 적어 가며 풀면 사람이 실수하는 부분을 줄일 수</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#cffafe" stroke="#0891b2" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">빈출 코드 출력</tspan><tspan x="177" dy="18">문제</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#f0fdf4" stroke="#0891b2" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">시험 포인트</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#cffafe" stroke="#0891b2" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">중요 빈출 유형</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#f0fdf4" stroke="#0891b2" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">실무 연결</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#cffafe" stroke="#0891b2" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">반복문 변수</tspan><tspan x="1025" dy="18">변화를 표로</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#22c55e" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">빈출 코드 출력 문제</tspan><tspan x="238" dy="18">시험 포인트</tspan><tspan x="238" dy="18">중요 빈출 유형</tspan></text>
-  <text class="small" x="84" y="654">13-04-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="34" y="30" width="1132" height="660" rx="28" fill="#ffffff" stroke="#cbd5e1" />
+  <rect x="34" y="30" width="1132" height="114" rx="28" fill="url(#header)" />
+  <rect x="34" y="116" width="1132" height="28" fill="url(#header)" />
+
+  <text class="title" x="74" y="82">13-04. 빈출 코드 출력 문제</text>
+  <text class="subtitle" x="74" y="112">정답은 감이 아니라 실행 추적에서 나온다: 변수표 + 스코프 구분 + 출력 시점 마킹</text>
+
+  <rect x="64" y="172" width="320" height="332" rx="20" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section" x="88" y="208">1. 문제를 두 개의 대표 패턴으로 해체</text>
+  <rect x="88" y="228" width="272" height="110" rx="14" fill="#0f172a" />
+  <text class="tiny" x="104" y="250" fill="#93c5fd">스코프 + 값 복사</text>
+  <text class="mono" x="104" y="276">int x = 1;</text>
+  <text class="mono" x="104" y="298">void f(int a){ a++; x += a; }</text>
+  <text class="mono" x="104" y="320">int main(){ int x = 3; f(x);</text>
+  <text class="mono" x="104" y="342">printf(&quot;%d&quot;, x); }</text>
+
+  <rect x="88" y="356" width="272" height="110" rx="14" fill="#082f49" />
+  <text class="tiny" x="104" y="378" fill="#bae6fd">재귀 + 출력 위치</text>
+  <text class="mono" x="104" y="404">def g(n):</text>
+  <text class="mono" x="120" y="426">if n == 0: return 1</text>
+  <text class="mono" x="120" y="448">print(n); return n * g(n-1)</text>
+  <text class="mono" x="104" y="470">print(g(3))</text>
+
+  <text class="body" x="88" y="534">• 같은 이름이어도 전역 x와 main의 지역 x는 다른 변수</text>
+  <text class="body" x="88" y="558">• a는 값 복사본이므로 a++을 해도 main의 x는 그대로 3</text>
+  <text class="body" x="88" y="582">• 재귀는 print가 호출 전인지 반환 후인지에 따라 출력 순서가 바뀜</text>
+
+  <rect x="408" y="172" width="366" height="332" rx="20" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section" x="432" y="208">2. 손으로 적는 실행 추적표</text>
+  <rect x="432" y="228" width="318" height="38" rx="10" fill="#ccfbf1" />
+  <text class="label" x="448" y="252">line</text>
+  <text class="label" x="500" y="252">local x / a</text>
+  <text class="label" x="626" y="252">global x</text>
+  <text class="label" x="708" y="252">output</text>
+
+  <rect x="432" y="274" width="318" height="42" fill="#ffffff" stroke="#dbe4ee" />
+  <text class="mono-dark" x="448" y="300">main</text>
+  <text class="mono-dark" x="500" y="300">x = 3</text>
+  <text class="mono-dark" x="626" y="300">1</text>
+  <text class="mono-dark" x="708" y="300">-</text>
+
+  <rect x="432" y="316" width="318" height="42" fill="#f8fafc" stroke="#dbe4ee" />
+  <text class="mono-dark" x="448" y="342">f(x)</text>
+  <text class="mono-dark" x="500" y="342">a = 3</text>
+  <text class="mono-dark" x="626" y="342">1</text>
+  <text class="mono-dark" x="708" y="342">-</text>
+
+  <rect x="432" y="358" width="318" height="42" fill="#ffffff" stroke="#dbe4ee" />
+  <text class="mono-dark" x="448" y="384">a++</text>
+  <text class="mono-dark" x="500" y="384">a = 4</text>
+  <text class="mono-dark" x="626" y="384">1</text>
+  <text class="mono-dark" x="708" y="384">-</text>
+
+  <rect x="432" y="400" width="318" height="42" fill="#f8fafc" stroke="#dbe4ee" />
+  <text class="mono-dark" x="448" y="426">x += a</text>
+  <text class="mono-dark" x="500" y="426">a = 4</text>
+  <text class="mono-dark" x="626" y="426">5</text>
+  <text class="mono-dark" x="708" y="426">-</text>
+
+  <rect x="432" y="442" width="318" height="42" fill="#ffffff" stroke="#dbe4ee" />
+  <text class="mono-dark" x="448" y="468">printf</text>
+  <text class="mono-dark" x="500" y="468">local x = 3</text>
+  <text class="mono-dark" x="626" y="468">5</text>
+  <text class="mono-dark" x="708" y="468">3</text>
+
+  <rect x="432" y="486" width="318" height="18" rx="9" fill="#ecfccb" />
+  <text class="chip" x="444" y="499">정답 포인트: 출력은 지역 x를 본다. 전역 x가 5로 바뀌어도 찍히는 값은 3.</text>
+
+  <rect x="796" y="172" width="338" height="332" rx="20" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section" x="820" y="208">3. 재귀는 호출 스택과 출력 줄을 분리</text>
+
+  <line x1="874" y1="252" x2="874" y2="432" stroke="#0f766e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" />
+  <rect x="842" y="250" width="94" height="34" rx="10" fill="#ccfbf1" stroke="#14b8a6" />
+  <text class="label" x="889" y="272" text-anchor="middle">g(3)</text>
+  <rect x="842" y="300" width="94" height="34" rx="10" fill="#dbeafe" stroke="#60a5fa" />
+  <text class="label" x="889" y="322" text-anchor="middle">g(2)</text>
+  <rect x="842" y="350" width="94" height="34" rx="10" fill="#e9d5ff" stroke="#a78bfa" />
+  <text class="label" x="889" y="372" text-anchor="middle">g(1)</text>
+  <rect x="842" y="400" width="94" height="34" rx="10" fill="#fee2e2" stroke="#fb7185" />
+  <text class="label" x="889" y="422" text-anchor="middle">g(0) → 1</text>
+
+  <text class="tiny" x="822" y="456">호출하며 먼저 출력</text>
+  <circle cx="988" cy="264" r="22" fill="#0f172a" />
+  <circle cx="1038" cy="314" r="22" fill="#0f172a" />
+  <circle cx="1088" cy="364" r="22" fill="#0f172a" />
+  <text x="988" y="270" text-anchor="middle" font-size="18" font-weight="800" fill="#f8fafc">3</text>
+  <text x="1038" y="320" text-anchor="middle" font-size="18" font-weight="800" fill="#f8fafc">2</text>
+  <text x="1088" y="370" text-anchor="middle" font-size="18" font-weight="800" fill="#f8fafc">1</text>
+  <line x1="936" y1="266" x2="964" y2="266" stroke="#0f172a" stroke-width="2.5" marker-end="url(#arrow)" />
+  <line x1="936" y1="316" x2="1014" y2="316" stroke="#0f172a" stroke-width="2.5" marker-end="url(#arrow)" />
+  <line x1="936" y1="366" x2="1064" y2="366" stroke="#0f172a" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <text class="tiny" x="822" y="486">반환하며 마지막 결과 출력</text>
+  <rect x="972" y="448" width="124" height="38" rx="19" fill="#fef3c7" stroke="#f59e0b" />
+  <text class="label" x="1034" y="472" text-anchor="middle">print(g(3)) = 6</text>
+
+  <rect x="64" y="530" width="1070" height="126" rx="20" fill="#0f172a" />
+  <text x="88" y="564" font-size="22" font-weight="800" fill="#f8fafc">시험장에서 바로 쓰는 체크 순서</text>
+  <rect x="88" y="582" width="148" height="30" rx="15" fill="#ccfbf1" />
+  <text class="chip" x="162" y="602" text-anchor="middle">① 스코프 표시</text>
+  <rect x="250" y="582" width="166" height="30" rx="15" fill="#dbeafe" />
+  <text class="chip" x="333" y="602" text-anchor="middle">② 값 복사/참조 확인</text>
+  <rect x="430" y="582" width="138" height="30" rx="15" fill="#fde68a" />
+  <text class="chip" x="499" y="602" text-anchor="middle">③ ++ 위치 체크</text>
+  <rect x="582" y="582" width="144" height="30" rx="15" fill="#fecaca" />
+  <text class="chip" x="654" y="602" text-anchor="middle">④ 반복 경계 확인</text>
+  <rect x="740" y="582" width="144" height="30" rx="15" fill="#ddd6fe" />
+  <text class="chip" x="812" y="602" text-anchor="middle">⑤ print 시점 표시</text>
+  <rect x="898" y="582" width="186" height="30" rx="15" fill="#bbf7d0" />
+  <text class="chip" x="991" y="602" text-anchor="middle">⑥ 전역 변경 부작용 체크</text>
+
+  <text class="body" x="88" y="634" fill="#cbd5e1">반복문은 “라인 번호 / 변수 상태 / 출력 유무 / 메모” 표를, 재귀는 “호출 순서 / 베이스 케이스 / 반환값” 줄을 따로 적으면 실수를 크게 줄인다.</text>
 </svg>

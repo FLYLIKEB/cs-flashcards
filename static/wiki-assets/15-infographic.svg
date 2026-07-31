@@ -1,31 +1,134 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">15. 금융 도메인 지식 SVG 인포그래픽</title>
-  <desc id="desc">금융 도메인 지식</desc>
+  <title id="title">15. 금융 도메인 지식 인포그래픽</title>
+  <desc id="desc">금융공기업 IT 관점에서 지급결제, 금융데이터, 규제·보안, CBDC, 디지털자산이 신뢰성 있는 금융 인프라로 연결되는 구조를 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-15-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#fefce8" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-15-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#ca8a04" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
     </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .centerTitle { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .centerBody { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .compareHead { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-15-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-15-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">15. 금융 도메인 지식</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">금융공기업 IT 직무는 기술 지식만으로는 부족합니다. 기관이 운영하는 금융 인프라와</tspan><tspan x="84" dy="24">규제 환경을 이해해야 시스템 설계 장애 대응 면접 답변이 설득력을 갖습니다. 이</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ca8a04"/></marker></defs><rect x="90" y="290" width="180" height="130" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="180" y="324" text-anchor="middle"><tspan x="180" dy="0">요청</tspan></text><text class="body" x="108" y="360" text-anchor="start"></text><line x1="270" y1="355" x2="300" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="270" y1="355" x2="300" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="300" y="290" width="180" height="130" rx="22" fill="#fefce8" stroke="#0f766e" stroke-width="2"/><text class="label" x="390" y="324" text-anchor="middle"><tspan x="390" dy="0">검증</tspan></text><text class="body" x="318" y="360" text-anchor="start"></text><line x1="480" y1="355" x2="510" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="480" y1="355" x2="510" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="510" y="290" width="180" height="130" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="324" text-anchor="middle"><tspan x="600" dy="0">청산</tspan></text><text class="body" x="528" y="360" text-anchor="start"></text><line x1="690" y1="355" x2="720" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="690" y1="355" x2="720" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="720" y="290" width="180" height="130" rx="22" fill="#fefce8" stroke="#0f766e" stroke-width="2"/><text class="label" x="810" y="324" text-anchor="middle"><tspan x="810" dy="0">결제</tspan></text><text class="body" x="738" y="360" text-anchor="start"></text><line x1="900" y1="355" x2="930" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="900" y1="355" x2="930" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="930" y="290" width="180" height="130" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="1020" y="324" text-anchor="middle"><tspan x="1020" dy="0">보고</tspan></text><text class="body" x="948" y="360" text-anchor="start"></text><rect x="90" y="510" width="1020" height="92" rx="26" fill="#ffffff" stroke="#0f766e" stroke-width="2"/><text class="body" x="600" y="558" text-anchor="middle"><tspan x="600" dy="0">검증 기록 감사 추적 장애 대응</tspan></text><line x1="90" y1="463" x2="1110" y2="463" stroke="#ca8a04" stroke-width="2" stroke-dasharray="10 8" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-70" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">15-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="32" y="28" width="1136" height="664" rx="30" fill="#ffffff" filter="url(#shadow)"/>
+
+  <rect x="32" y="28" width="1136" height="118" rx="30" fill="url(#hero)"/>
+  <path d="M 890 28 C 1010 80, 1090 70, 1168 38 L 1168 146 L 836 146 C 855 110, 870 72, 890 28 Z" fill="#60a5fa" opacity="0.18"/>
+  <text class="small" x="76" y="68">금융공기업 IT 관점 · 지급결제 + 데이터 + 규제 + 신기술</text>
+  <text class="title" x="76" y="104">15. 금융 도메인 지식</text>
+  <text class="subtitle" x="76" y="132">기능 구현보다 거래 확정성, 감사 가능성, 장애 복구 가능성을 먼저 만족해야 금융 인프라가 설득력을 갖는다.</text>
+
+  <rect x="68" y="170" width="1064" height="148" rx="26" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="92" y="205">지급결제 흐름: clearing → settlement → finality</text>
+  <text class="body" x="92" y="229">면접 핵심: 청산은 계산, 결제는 자금 이동, 최종성은 취소되지 않는 확정성이다.</text>
+
+  <rect x="96" y="248" width="180" height="50" rx="18" fill="#ccfbf1" stroke="#14b8a6"/>
+  <text class="label" x="186" y="278" text-anchor="middle">거래 요청·검증</text>
+  <text class="small" x="186" y="294" text-anchor="middle">인증·인가, 멱등성</text>
+
+  <line x1="276" y1="273" x2="354" y2="273" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <line x1="276" y1="273" x2="354" y2="273" stroke="#93c5fd" stroke-width="3" stroke-dasharray="10 8" opacity="0.8">
+    <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/>
+  </line>
+
+  <rect x="354" y="238" width="202" height="70" rx="18" fill="#dbeafe" stroke="#3b82f6"/>
+  <text class="label" x="455" y="267" text-anchor="middle">청산 Clearing</text>
+  <text class="small" x="455" y="286" text-anchor="middle">채권·채무 계산, 정산 금액 확정</text>
+
+  <line x1="556" y1="273" x2="634" y2="273" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <line x1="556" y1="273" x2="634" y2="273" stroke="#93c5fd" stroke-width="3" stroke-dasharray="10 8" opacity="0.8">
+    <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/>
+  </line>
+
+  <rect x="634" y="238" width="202" height="70" rx="18" fill="#e0e7ff" stroke="#6366f1"/>
+  <text class="label" x="735" y="267" text-anchor="middle">결제 Settlement</text>
+  <text class="small" x="735" y="286" text-anchor="middle">실제 자금 이동, 채무 소멸</text>
+
+  <line x1="836" y1="273" x2="914" y2="273" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <line x1="836" y1="273" x2="914" y2="273" stroke="#93c5fd" stroke-width="3" stroke-dasharray="10 8" opacity="0.8">
+    <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/>
+  </line>
+
+  <rect x="914" y="238" width="190" height="70" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
+  <text class="label" x="1009" y="267" text-anchor="middle">최종성 Finality</text>
+  <text class="small" x="1009" y="286" text-anchor="middle">취소되지 않는 확정성과 신뢰</text>
+
+  <circle cx="600" cy="470" r="106" fill="#f8fafc" stroke="#0f766e" stroke-width="3"/>
+  <circle cx="600" cy="470" r="88" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="centerTitle" x="600" y="448" text-anchor="middle">신뢰성 있는</text>
+  <text class="centerTitle" x="600" y="480" text-anchor="middle">금융 인프라</text>
+  <text class="centerBody" x="600" y="510" text-anchor="middle">거래 확정성 · 감사 가능성</text>
+  <text class="centerBody" x="600" y="532" text-anchor="middle">운영 통제 · 장애 복구</text>
+
+  <path d="M 600 364 L 600 324" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <path d="M 525 410 L 418 352" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <path d="M 675 410 L 786 352" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <path d="M 506 515 L 390 556" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <path d="M 694 515 L 810 556" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+
+  <rect x="370" y="330" width="180" height="72" rx="22" fill="#ffffff" stroke="#14b8a6"/>
+  <text class="label" x="396" y="356">금융데이터</text>
+  <text class="body" x="396" y="377">최소수집, 보존주기,</text>
+  <text class="body" x="396" y="395">마스킹, 접근기록</text>
+
+  <rect x="650" y="330" width="180" height="72" rx="22" fill="#ffffff" stroke="#3b82f6"/>
+  <text class="label" x="676" y="356">규제·보안</text>
+  <text class="body" x="676" y="377">감사 로그, 승인 이력,</text>
+  <text class="body" x="676" y="395">암호화, 키 관리</text>
+
+  <rect x="316" y="528" width="190" height="76" rx="22" fill="#ffffff" stroke="#0f766e"/>
+  <text class="label" x="342" y="555">운영 통제</text>
+  <text class="body" x="342" y="576">변경관리, 재처리 절차,</text>
+  <text class="body" x="342" y="594">RTO·RPO, 모니터링</text>
+
+  <rect x="694" y="528" width="190" height="76" rx="22" fill="#ffffff" stroke="#2563eb"/>
+  <text class="label" x="720" y="555">면접 연결 포인트</text>
+  <text class="body" x="720" y="576">API도 호출 한도·로그·</text>
+  <text class="body" x="720" y="594">장애 재처리까지 설명</text>
+
+  <rect x="68" y="350" width="250" height="140" rx="24" fill="#fff7ed" stroke="#fb923c"/>
+  <text class="section" x="92" y="384">왜 중요한가</text>
+  <text class="body" x="92" y="410">• 조회→이체→정산→보고</text>
+  <text class="body" x="92" y="431">  전체 흐름을 알아야 영향 판단</text>
+  <text class="body" x="92" y="454">• 중복 거래·정산 불일치·지연 전파는</text>
+  <text class="body" x="92" y="475">  기관 신뢰와 직접 연결</text>
+
+  <rect x="882" y="350" width="250" height="140" rx="24" fill="#fdf4ff" stroke="#d946ef"/>
+  <text class="section" x="906" y="384">답변 구조화</text>
+  <text class="body" x="906" y="410">장애 대응은</text>
+  <text class="body" x="906" y="431">탐지 → 격리 → 복구 → 사후 분석</text>
+  <text class="body" x="906" y="454">데이터 활용은</text>
+  <text class="body" x="906" y="475">동의·최소수집·보존정책까지 연결</text>
+
+  <rect x="68" y="624" width="1064" height="48" rx="20" fill="#0f172a"/>
+  <text class="small" x="92" y="653" fill="#cbd5e1">비교 포인트</text>
+  <text class="compareHead" x="240" y="654" fill="#93c5fd">CBDC</text>
+  <text class="body" x="294" y="654" fill="#e2e8f0">중앙은행 발행 · 법적 안정성 · 기존 지급결제 인프라 연계</text>
+  <text class="compareHead" x="760" y="654" fill="#f0abfc">디지털자산</text>
+  <text class="body" x="856" y="654" fill="#e2e8f0">거래·보관 구조 다양 · 규제 지위 · 키 유출·변동성 리스크 점검</text>
 </svg>

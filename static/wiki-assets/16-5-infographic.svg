@@ -1,31 +1,140 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">16-5. 금융권 적용과 모델 리스크 SVG 인포그래픽</title>
-  <desc id="desc">금융권 적용과 모델 리스크</desc>
+  <title id="title">16-5. 금융권 적용과 모델 리스크</title>
+  <desc id="desc">금융권 AI 모델이 주요 업무에 적용되더라도 설명가능성, 공정성, 드리프트 감시, 승인 통제를 충족해야 배포할 수 있음을 보여주는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-16-5-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#eff6ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef4ff"/>
+      <stop offset="55%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f5f3ff"/>
     </linearGradient>
-    <linearGradient id="line-16-5-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#9333ea" />
-      <stop offset="100%" stop-color="#3b82f6" />
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title{font:700 34px 'Pretendard','Noto Sans KR',sans-serif;fill:#0f172a}
+      .subtitle{font:500 16px 'Pretendard','Noto Sans KR',sans-serif;fill:#334155}
+      .section{font:700 18px 'Pretendard','Noto Sans KR',sans-serif;fill:#0f172a}
+      .cardTitle{font:700 17px 'Pretendard','Noto Sans KR',sans-serif;fill:#0f172a}
+      .body{font:500 14px 'Pretendard','Noto Sans KR',sans-serif;fill:#334155}
+      .mini{font:600 13px 'Pretendard','Noto Sans KR',sans-serif;fill:#475569}
+      .metric{font:700 15px 'Pretendard','Noto Sans KR',sans-serif;fill:#1e293b}
+      .chip{font:700 12px 'Pretendard','Noto Sans KR',sans-serif;fill:#4338ca}
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-16-5-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-16-5-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">16-5. 금융권 적용과 모델 리스크</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">신용평가: 대출 승인과 한도 산정에 활용되며 안정성과 설명가능성이 중요하다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/></marker></defs><rect x="450" y="130" width="300" height="80" rx="22" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/><text class="label" x="600" y="164" text-anchor="middle"><tspan x="600" dy="0">입력 데이터</tspan></text><text class="body" x="468" y="200" text-anchor="start"></text><rect x="130" y="320" width="220" height="110" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="240" y="354" text-anchor="middle"><tspan x="240" dy="0">모델</tspan></text><text class="body" x="148" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="240" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="370" y="320" width="220" height="110" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="480" y="354" text-anchor="middle"><tspan x="480" dy="0">모니터링</tspan></text><text class="body" x="388" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="480" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="610" y="320" width="220" height="110" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="720" y="354" text-anchor="middle"><tspan x="720" dy="0">드리프트</tspan></text><text class="body" x="628" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="720" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="850" y="320" width="220" height="110" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="960" y="354" text-anchor="middle"><tspan x="960" dy="0">설명가능성</tspan></text><text class="body" x="868" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="960" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="250" y="540" width="700" height="74" rx="22" fill="#ffffff" stroke="#9333ea" stroke-width="2"/><text class="label" x="600" y="574" text-anchor="middle"><tspan x="600" dy="0">운영 포인트</tspan></text><text class="body" x="268" y="610" text-anchor="start"><tspan x="268" dy="0">모델</tspan><tspan x="268" dy="18">모니터링</tspan><tspan x="268" dy="18">드리프트</tspan></text>
-  <text class="small" x="84" y="654">16-5-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#dbe4f0"/>
+
+  <text class="mini" x="70" y="78">금융권 AI 운영 답안: 성능 + 설명 + 통제</text>
+  <text class="title" x="70" y="118">16-5. 금융권 적용과 모델 리스크</text>
+  <text class="subtitle" x="70" y="148">적용 사례가 늘어도 데이터 품질, 공정성, 감독 대응, 재학습 기준이 없으면 운영 배포가 막힌다.</text>
+
+  <rect x="62" y="182" width="430" height="214" rx="24" fill="#f8fbff" stroke="#bfdbfe"/>
+  <text class="section" x="88" y="214">주요 적용 사례</text>
+
+  <rect x="88" y="234" width="180" height="64" rx="16" fill="#ffffff" stroke="#93c5fd"/>
+  <text class="cardTitle" x="106" y="259">신용평가</text>
+  <text class="body" x="106" y="281">승인·한도 산정</text>
+  <text class="body" x="106" y="299">안정성·거절사유 설명</text>
+
+  <rect x="286" y="234" width="180" height="64" rx="16" fill="#ffffff" stroke="#93c5fd"/>
+  <text class="cardTitle" x="304" y="259">FDS</text>
+  <text class="body" x="304" y="281">실시간 이상거래 탐지</text>
+  <text class="body" x="304" y="299">조사 비용 통제</text>
+
+  <rect x="88" y="314" width="180" height="64" rx="16" fill="#ffffff" stroke="#c4b5fd"/>
+  <text class="cardTitle" x="106" y="339">AML 모니터링</text>
+  <text class="body" x="106" y="361">패턴·관계 분석</text>
+  <text class="body" x="106" y="379">감독 대응 근거 필요</text>
+
+  <rect x="286" y="314" width="180" height="64" rx="16" fill="#ffffff" stroke="#c4b5fd"/>
+  <text class="cardTitle" x="304" y="339">챗봇·문서분류</text>
+  <text class="body" x="304" y="361">응대 자동화</text>
+  <text class="body" x="304" y="379">개인정보·오답 관리</text>
+
+  <rect x="516" y="182" width="310" height="470" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="542" y="214">운영 배포까지의 모델 리스크 흐름</text>
+
+  <rect x="550" y="236" width="242" height="72" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+  <text class="cardTitle" x="571" y="262">1. 입력 데이터 점검</text>
+  <text class="body" x="571" y="284">결측·오류·민감정보 최소화</text>
+  <text class="body" x="571" y="302">목적 제한·가명처리·권한 통제</text>
+
+  <line x1="671" y1="308" x2="671" y2="336" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="550" y="338" width="242" height="72" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+  <text class="cardTitle" x="571" y="364">2. 모델 판단</text>
+  <text class="body" x="571" y="386">예측 성능만으로는 부족</text>
+  <text class="body" x="571" y="404">표본 편향·데이터 누수도 점검</text>
+
+  <line x1="671" y1="410" x2="671" y2="438" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="550" y="440" width="242" height="84" rx="18" fill="#ecfeff" stroke="#22c55e"/>
+  <text class="cardTitle" x="571" y="466">3. 운영 모니터링</text>
+  <text class="body" x="571" y="488">data drift · label drift</text>
+  <text class="body" x="571" y="506">성능 저하 시 재학습 기준 발동</text>
+  <circle cx="760" cy="461" r="6" fill="#22c55e">
+    <animate attributeName="r" values="6;9;6" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <line x1="671" y1="524" x2="671" y2="552" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="550" y="554" width="242" height="72" rx="18" fill="#f5f3ff" stroke="#8b5cf6"/>
+  <text class="cardTitle" x="571" y="580">4. 승인 후 배포</text>
+  <text class="body" x="571" y="602">배포 이력·키 관리·감사 로그</text>
+  <text class="body" x="571" y="620">독립 검증 없으면 운영 불가</text>
+
+  <rect x="850" y="182" width="288" height="214" rx="24" fill="#fff7ed" stroke="#fdba74"/>
+  <text class="section" x="876" y="214">설명가능성·공정성</text>
+  <text class="chip" x="876" y="242">XAI</text>
+  <text class="body" x="876" y="264">왜 거절됐는지 설명해야 고객 응대·감사·감독 대응이 가능하다.</text>
+
+  <rect x="876" y="286" width="236" height="86" rx="16" fill="#ffffff" stroke="#fed7aa"/>
+  <text class="metric" x="896" y="312">집단별 비교 지표</text>
+  <text class="body" x="896" y="334">precision</text>
+  <rect x="980" y="322" width="96" height="10" rx="5" fill="#e2e8f0"/>
+  <rect x="980" y="322" width="70" height="10" rx="5" fill="#f97316"/>
+  <text class="body" x="896" y="353">recall</text>
+  <rect x="980" y="341" width="96" height="10" rx="5" fill="#e2e8f0"/>
+  <rect x="980" y="341" width="62" height="10" rx="5" fill="#fb923c"/>
+  <text class="body" x="896" y="372">FPR 차이</text>
+  <rect x="980" y="360" width="96" height="10" rx="5" fill="#e2e8f0"/>
+  <rect x="980" y="360" width="28" height="10" rx="5" fill="#ef4444"/>
+
+  <rect x="850" y="420" width="288" height="232" rx="24" fill="#faf5ff" stroke="#d8b4fe"/>
+  <text class="section" x="876" y="452">배포를 막는 대표 리스크</text>
+
+  <line x1="894" y1="487" x2="1094" y2="487" stroke="url(#flow)" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="914" cy="487" r="16" fill="#ffffff" stroke="#60a5fa" stroke-width="4"/>
+  <circle cx="980" cy="487" r="16" fill="#ffffff" stroke="#818cf8" stroke-width="4"/>
+  <circle cx="1046" cy="487" r="16" fill="#ffffff" stroke="#c084fc" stroke-width="4"/>
+  <text class="mini" x="890" y="522">누수·편향</text>
+  <text class="mini" x="957" y="522">설명 부족</text>
+  <text class="mini" x="1024" y="522">승인 미비</text>
+
+  <rect x="876" y="546" width="236" height="82" rx="16" fill="#ffffff" stroke="#e9d5ff"/>
+  <text class="cardTitle" x="896" y="572">배포 조건</text>
+  <text class="body" x="896" y="594">• 독립 검증과 문서화</text>
+  <text class="body" x="896" y="612">• 재학습 정책과 인간 검토 절차</text>
+
+  <path d="M 492 289 C 522 289, 522 289, 550 289" fill="none" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M 826 476 C 840 476, 840 476, 850 476" fill="none" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="62" y="420" width="430" height="232" rx="24" fill="#fefce8" stroke="#fde68a"/>
+  <text class="section" x="88" y="452">개인정보·준수 체크</text>
+
+  <rect x="88" y="478" width="378" height="52" rx="14" fill="#ffffff" stroke="#fde68a"/>
+  <text class="cardTitle" x="108" y="501">수집 단계</text>
+  <text class="body" x="196" y="501">최소 수집 · 목적 제한 · 민감정보 축소</text>
+
+  <rect x="88" y="542" width="378" height="52" rx="14" fill="#ffffff" stroke="#fde68a"/>
+  <text class="cardTitle" x="108" y="565">운영 단계</text>
+  <text class="body" x="196" y="565">접근권한 제한 · 키 관리 · 로그 보관</text>
+
+  <rect x="88" y="606" width="378" height="28" rx="14" fill="#fff7ed" stroke="#fdba74"/>
+  <text class="mini" x="108" y="625">성능이 좋아도 규제·내부통제를 못 맞추면 배포하지 못한다.</text>
 </svg>

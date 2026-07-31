@@ -1,31 +1,157 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">11-02. 테스트 SVG 인포그래픽</title>
-  <desc id="desc">테스트</desc>
+  <title id="title">11-02. 테스트 인포그래픽</title>
+  <desc id="desc">테스트의 목적, V-모델, 테스트 레벨, 블랙박스·화이트박스와 정적·동적 테스트를 설명하는 SVG 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-11-02-00-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#fdf2f8" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
-    <linearGradient id="line-11-02-00-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7c3aed" />
-      <stop offset="100%" stop-color="#ec4899" />
+    <linearGradient id="vLeft" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="vRight" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
     </linearGradient>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .panel-title { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .white { fill: #ffffff; }
+      .center { text-anchor: middle; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-11-02-00-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-11-02-00-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">11-02. 테스트</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">테스트를 수행할 때 기대하는 산출물과 목적은 다음과 같다.</tspan></text>
-  <rect x="92" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="202" y="284" text-anchor="middle"><tspan x="202" dy="0">단위</tspan></text><text class="body" x="110" y="320" text-anchor="start"></text><rect x="348" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="458" y="284" text-anchor="middle"><tspan x="458" dy="0">통합</tspan></text><text class="body" x="366" y="320" text-anchor="start"></text><rect x="604" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="714" y="284" text-anchor="middle"><tspan x="714" dy="0">시스템</tspan></text><text class="body" x="622" y="320" text-anchor="start"></text><rect x="860" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="970" y="284" text-anchor="middle"><tspan x="970" dy="0">인수</tspan></text><text class="body" x="878" y="320" text-anchor="start"></text><line x1="200" y1="572" x2="1000" y2="572" stroke="#7c3aed" stroke-width="4" opacity="0.3"/><line x1="200" y1="572" x2="760" y2="572" stroke="#ec4899" stroke-width="4"><animate attributeName="x2" values="360;1000;360" dur="7s" repeatCount="indefinite"/></line><text class="body" x="600" y="620" text-anchor="middle"><tspan x="600" dy="0">테스트</tspan></text>
-  <text class="small" x="84" y="654">11-02-00-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="24" y="24" width="1152" height="672" rx="28" fill="#ffffff" stroke="#cbd5e1" />
+
+  <text x="70" y="78" class="small">소프트웨어공학 · 테스트 핵심 구조</text>
+  <text x="70" y="118" class="title">11-02. 테스트</text>
+  <text x="70" y="148" class="subtitle">결함 발견·품질 평가·위험 감소·릴리스 의사결정을 위해, 개발 산출물과 대응 테스트를 함께 본다.</text>
+
+  <rect x="56" y="186" width="284" height="340" rx="24" fill="#f8fafc" stroke="#cbd5e1" />
+  <text x="84" y="224" class="panel-title">테스트의 목적</text>
+
+  <rect x="84" y="246" width="228" height="54" rx="14" fill="#dbeafe" />
+  <circle cx="110" cy="273" r="10" fill="#2563eb" />
+  <text x="130" y="268" class="label">결함 발견</text>
+  <text x="130" y="286" class="body">경계값·예외·동시성 문제를 조기 탐지</text>
+
+  <rect x="84" y="314" width="228" height="54" rx="14" fill="#e0f2fe" />
+  <circle cx="110" cy="341" r="10" fill="#0891b2" />
+  <text x="130" y="336" class="label">품질 평가</text>
+  <text x="130" y="354" class="body">성능·안정성·보안·사용성 확인</text>
+
+  <rect x="84" y="382" width="228" height="54" rx="14" fill="#dcfce7" />
+  <circle cx="110" cy="409" r="10" fill="#16a34a" />
+  <text x="130" y="404" class="label">위험 감소</text>
+  <text x="130" y="422" class="body">운영 전 문제를 찾아 배포 리스크 축소</text>
+
+  <rect x="84" y="450" width="228" height="54" rx="14" fill="#fef3c7" />
+  <circle cx="110" cy="477" r="10" fill="#d97706" />
+  <text x="130" y="472" class="label">의사결정 지원</text>
+  <text x="130" y="490" class="body">결함 심각도와 통과율로 릴리스 판단</text>
+
+  <text x="84" y="548" class="small">핵심 질문: “무엇을 검증했고, 그래서 배포해도 되는가?”</text>
+
+  <rect x="360" y="186" width="480" height="340" rx="24" fill="#f8fafc" stroke="#cbd5e1" />
+  <text x="388" y="224" class="panel-title">V-모델: 개발 산출물 ↔ 대응 테스트</text>
+
+  <path d="M450 270 L600 446 L750 270" fill="none" stroke="#94a3b8" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity="0.2" />
+  <path d="M450 270 L600 446" fill="none" stroke="url(#vLeft)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M600 446 L750 270" fill="none" stroke="url(#vRight)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+
+  <rect x="392" y="250" width="120" height="42" rx="12" fill="#dbeafe" stroke="#60a5fa" />
+  <text x="452" y="267" class="label center">요구사항 분석</text>
+  <text x="452" y="284" class="small center">무엇이 필요할까?</text>
+
+  <rect x="432" y="318" width="120" height="42" rx="12" fill="#dbeafe" stroke="#60a5fa" />
+  <text x="492" y="335" class="label center">시스템 설계</text>
+  <text x="492" y="352" class="small center">전체 구조 정의</text>
+
+  <rect x="480" y="386" width="120" height="42" rx="12" fill="#dbeafe" stroke="#60a5fa" />
+  <text x="540" y="403" class="label center">상세 설계</text>
+  <text x="540" y="420" class="small center">모듈·인터페이스</text>
+
+  <rect x="540" y="452" width="120" height="44" rx="12" fill="#e2e8f0" stroke="#94a3b8" />
+  <text x="600" y="470" class="label center">구현</text>
+  <text x="600" y="487" class="small center">코드 작성·단위 기준점</text>
+
+  <rect x="648" y="386" width="120" height="42" rx="12" fill="#dcfce7" stroke="#4ade80" />
+  <text x="708" y="403" class="label center">통합 테스트</text>
+  <text x="708" y="420" class="small center">모듈 연결 검증</text>
+
+  <rect x="688" y="318" width="120" height="42" rx="12" fill="#dcfce7" stroke="#4ade80" />
+  <text x="748" y="335" class="label center">시스템 테스트</text>
+  <text x="748" y="352" class="small center">기능·비기능 확인</text>
+
+  <rect x="728" y="250" width="120" height="42" rx="12" fill="#dcfce7" stroke="#4ade80" />
+  <text x="788" y="267" class="label center">인수 테스트</text>
+  <text x="788" y="284" class="small center">사용자 요구 충족?</text>
+
+  <line x1="522" y1="271" x2="726" y2="271" stroke="#94a3b8" stroke-dasharray="6 6" />
+  <line x1="562" y1="339" x2="686" y2="339" stroke="#94a3b8" stroke-dasharray="6 6" />
+  <line x1="610" y1="407" x2="646" y2="407" stroke="#94a3b8" stroke-dasharray="6 6" />
+  <text x="600" y="517" class="small center">왼쪽 산출물은 오른쪽 대응 테스트로 검증된다.</text>
+
+  <rect x="860" y="186" width="284" height="340" rx="24" fill="#f8fafc" stroke="#cbd5e1" />
+  <text x="888" y="224" class="panel-title">테스트 기법 구분</text>
+
+  <rect x="888" y="246" width="108" height="116" rx="16" fill="#eff6ff" stroke="#93c5fd" />
+  <text x="942" y="272" class="label center">블랙박스</text>
+  <text x="942" y="296" class="body center">명세 기반</text>
+  <text x="942" y="316" class="body center">입력/출력 검증</text>
+  <text x="942" y="340" class="small center">동치분할</text>
+  <text x="942" y="356" class="small center">경계값 분석</text>
+
+  <rect x="1008" y="246" width="108" height="116" rx="16" fill="#eef2ff" stroke="#a5b4fc" />
+  <text x="1062" y="272" class="label center">화이트박스</text>
+  <text x="1062" y="296" class="body center">코드 구조 기반</text>
+  <text x="1062" y="316" class="body center">분기·조건·경로</text>
+  <text x="1062" y="340" class="small center">커버리지</text>
+  <text x="1062" y="356" class="small center">루프 테스트</text>
+
+  <rect x="888" y="384" width="108" height="116" rx="16" fill="#fefce8" stroke="#facc15" />
+  <text x="942" y="410" class="label center">정적 테스트</text>
+  <text x="942" y="434" class="body center">실행 없이</text>
+  <text x="942" y="454" class="body center">리뷰·정적분석</text>
+  <text x="942" y="478" class="small center">조기 결함 발견</text>
+
+  <rect x="1008" y="384" width="108" height="116" rx="16" fill="#ecfeff" stroke="#67e8f9" />
+  <text x="1062" y="410" class="label center">동적 테스트</text>
+  <text x="1062" y="434" class="body center">실행 기반</text>
+  <text x="1062" y="454" class="body center">동작·출력 관찰</text>
+  <text x="1062" y="478" class="small center">모든 테스트 레벨 포함</text>
+
+  <rect x="56" y="546" width="1088" height="124" rx="24" fill="#0f172a" />
+  <text x="84" y="584" class="panel-title white">테스트 레벨 흐름</text>
+
+  <rect x="84" y="604" width="220" height="42" rx="14" fill="#1d4ed8" />
+  <text x="194" y="621" class="label white center">단위 테스트</text>
+  <text x="194" y="638" class="small white center">함수·클래스의 논리와 예외 확인</text>
+
+  <path d="M314 625 H360" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+  <polygon points="360,625 348,618 348,632" fill="#94a3b8" />
+
+  <rect x="370" y="604" width="220" height="42" rx="14" fill="#0f766e" />
+  <text x="480" y="621" class="label white center">통합 테스트</text>
+  <text x="480" y="638" class="small white center">모듈 간 인터페이스·데이터 흐름 검증</text>
+
+  <path d="M600 625 H646" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+  <polygon points="646,625 634,618 634,632" fill="#94a3b8" />
+
+  <rect x="656" y="604" width="220" height="42" rx="14" fill="#0369a1" />
+  <text x="766" y="621" class="label white center">시스템 테스트</text>
+  <text x="766" y="638" class="small white center">전체 시나리오와 성능·보안 점검</text>
+
+  <path d="M886 625 H932" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+  <polygon points="932,625 920,618 920,632" fill="#94a3b8" />
+
+  <rect x="942" y="604" width="174" height="42" rx="14" fill="#15803d" />
+  <text x="1029" y="621" class="label white center">인수 테스트</text>
+  <text x="1029" y="638" class="small white center">사용자 관점 수용 기준 충족 확인</text>
 </svg>

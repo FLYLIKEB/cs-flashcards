@@ -1,31 +1,131 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">15-1. 핀테크·오픈뱅킹·마이데이터 SVG 인포그래픽</title>
-  <desc id="desc">핀테크·오픈뱅킹·마이데이터</desc>
+  <title id="title">15-1. 핀테크·오픈뱅킹·마이데이터 인포그래픽</title>
+  <desc id="desc">사용자 동의에서 토큰 발급, 오픈뱅킹 API 호출, 마이데이터 통합, 감사 로그까지의 금융 데이터 흐름을 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-15-1-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#fefce8" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="55%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#ecfeff" />
     </linearGradient>
-    <linearGradient id="line-15-1-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#ca8a04" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#0f766e" />
     </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#0891b2" />
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #f8fafc; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
       .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .inverse { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #ecfeff; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-15-1-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-15-1-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">15-1. 핀테크 오픈뱅킹 마이데이터</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">오픈뱅킹은 은행별로 분산된 계좌 조회 이체 기능을 표준 API로 제공해 핀테크와</tspan><tspan x="84" dy="24">금융기관이 연결되도록 하는 인프라입니다. 사용자는 하나의 서비스에서 여러 금융기관</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ca8a04"/></marker></defs><rect x="90" y="290" width="180" height="130" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="180" y="324" text-anchor="middle"><tspan x="180" dy="0">고객 동의</tspan></text><text class="body" x="108" y="360" text-anchor="start"></text><line x1="270" y1="355" x2="300" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="270" y1="355" x2="300" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="300" y="290" width="180" height="130" rx="22" fill="#fefce8" stroke="#0f766e" stroke-width="2"/><text class="label" x="390" y="324" text-anchor="middle"><tspan x="390" dy="0">API 호출</tspan></text><text class="body" x="318" y="360" text-anchor="start"></text><line x1="480" y1="355" x2="510" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="480" y1="355" x2="510" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="510" y="290" width="180" height="130" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="324" text-anchor="middle"><tspan x="600" dy="0">계좌 조회</tspan></text><text class="body" x="528" y="360" text-anchor="start"></text><line x1="690" y1="355" x2="720" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="690" y1="355" x2="720" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="720" y="290" width="180" height="130" rx="22" fill="#fefce8" stroke="#0f766e" stroke-width="2"/><text class="label" x="810" y="324" text-anchor="middle"><tspan x="810" dy="0">데이터 결합</tspan></text><text class="body" x="738" y="360" text-anchor="start"></text><line x1="900" y1="355" x2="930" y2="355" stroke="#ca8a04" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="900" y1="355" x2="930" y2="355" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="930" y="290" width="180" height="130" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="1020" y="324" text-anchor="middle"><tspan x="1020" dy="0">서비스</tspan></text><text class="body" x="948" y="360" text-anchor="start"></text><rect x="90" y="510" width="1020" height="92" rx="26" fill="#ffffff" stroke="#0f766e" stroke-width="2"/><text class="body" x="600" y="558" text-anchor="middle"><tspan x="600" dy="0">검증 기록 감사 추적 장애 대응</tspan></text><line x1="90" y1="463" x2="1110" y2="463" stroke="#ca8a04" stroke-width="2" stroke-dasharray="10 8" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-70" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">15-1-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="32" y="28" width="1136" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <rect x="56" y="48" width="1088" height="126" rx="28" fill="url(#hero)" />
+  <text class="small" x="84" y="84">금융공기업 IT · 15-1 페이지 전용 개념도</text>
+  <text class="title" x="84" y="122">핀테크 · 오픈뱅킹 · 마이데이터</text>
+  <text class="subtitle" x="84" y="154">하나의 서비스가 여러 금융기관과 안전하게 연결되려면 사용자 동의, OAuth2 토큰, 표준 API,</text>
+  <text class="subtitle" x="84" y="178">데이터 표준화, 최소권한, 감사 로그가 함께 돌아가야 한다.</text>
+
+  <rect x="72" y="202" width="1056" height="248" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <text class="section" x="92" y="236">1. 사용자 동의에서 API 호출까지</text>
+
+  <rect x="92" y="266" width="170" height="150" rx="22" fill="#ecfeff" stroke="#14b8a6" stroke-width="2" />
+  <circle cx="177" cy="312" r="26" fill="#99f6e4" />
+  <circle cx="177" cy="301" r="10" fill="#0f766e" opacity="0.85" />
+  <path d="M152 344 C158 325,196 325,202 344" fill="#0f766e" opacity="0.85" />
+  <text class="label" x="177" y="372" text-anchor="middle">사용자</text>
+  <text class="body" x="177" y="392" text-anchor="middle">조회·이체·전송 범위</text>
+
+  <rect x="292" y="266" width="190" height="150" rx="22" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" />
+  <rect x="336" y="292" width="102" height="46" rx="10" fill="#dcfce7" stroke="#16a34a" />
+  <text class="chip" x="387" y="321" text-anchor="middle">동의 관리</text>
+  <text class="label" x="387" y="370" text-anchor="middle">인증 · 인가 서버</text>
+  <text class="body" x="387" y="392" text-anchor="middle">OAuth2 code → access token</text>
+
+  <rect x="512" y="266" width="190" height="150" rx="22" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />
+  <rect x="553" y="290" width="108" height="54" rx="12" fill="#dbeafe" stroke="#2563eb" />
+  <path d="M571 307 H643 M571 319 H643 M571 331 H626" stroke="#2563eb" stroke-width="4" stroke-linecap="round" />
+  <text class="label" x="607" y="370" text-anchor="middle">API Gateway</text>
+  <text class="body" x="607" y="392" text-anchor="middle">인증 · 라우팅 · rate limit</text>
+
+  <rect x="732" y="266" width="180" height="150" rx="22" fill="#fefce8" stroke="#eab308" stroke-width="2" />
+  <rect x="765" y="294" width="114" height="36" rx="9" fill="#fef3c7" stroke="#d97706" />
+  <text class="chip" x="822" y="317" text-anchor="middle">/accounts</text>
+  <rect x="765" y="338" width="114" height="36" rx="9" fill="#fef3c7" stroke="#d97706" />
+  <text class="chip" x="822" y="361" text-anchor="middle">/transfers</text>
+  <text class="label" x="822" y="392" text-anchor="middle">은행 · 금융기관 API</text>
+
+  <rect x="942" y="266" width="166" height="150" rx="22" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2" />
+  <rect x="976" y="294" width="98" height="70" rx="12" fill="#ede9fe" stroke="#7c3aed" />
+  <path d="M996 317 H1054 M996 331 H1054 M996 345 H1032" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" />
+  <text class="label" x="1025" y="392" text-anchor="middle">핀테크 서비스</text>
+
+  <line x1="262" y1="341" x2="292" y2="341" stroke="url(#flow)" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="482" y1="341" x2="512" y2="341" stroke="url(#flow)" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="702" y1="341" x2="732" y2="341" stroke="url(#flow)" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="912" y1="341" x2="942" y2="341" stroke="url(#flow)" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)" />
+  <text class="inverse" x="273" y="330">동의</text>
+  <text class="inverse" x="492" y="330">토큰</text>
+  <text class="inverse" x="713" y="330">표준 호출</text>
+  <text class="inverse" x="924" y="330">응답</text>
+
+  <rect x="72" y="470" width="500" height="182" rx="26" fill="#ecfeff" stroke="#14b8a6" stroke-width="1.5" />
+  <text class="section" x="92" y="506">2. 마이데이터가 추가하는 것</text>
+  <rect x="98" y="528" width="140" height="92" rx="18" fill="#ffffff" stroke="#67e8f9" />
+  <text class="label" x="168" y="558" text-anchor="middle">전송요구권</text>
+  <text class="body" x="168" y="582" text-anchor="middle">내 데이터 전송</text>
+  <text class="body" x="168" y="602" text-anchor="middle">권한은 사용자에게</text>
+
+  <rect x="252" y="528" width="140" height="92" rx="18" fill="#ffffff" stroke="#67e8f9" />
+  <text class="label" x="322" y="558" text-anchor="middle">데이터 표준화</text>
+  <text class="body" x="322" y="582" text-anchor="middle">계좌·카드·대출을</text>
+  <text class="body" x="322" y="602" text-anchor="middle">공통 스키마로 정리</text>
+
+  <rect x="406" y="528" width="140" height="92" rx="18" fill="#ffffff" stroke="#67e8f9" />
+  <text class="label" x="476" y="558" text-anchor="middle">동의 철회</text>
+  <text class="body" x="476" y="582" text-anchor="middle">목적 변경 시 재동의</text>
+  <text class="body" x="476" y="602" text-anchor="middle">보유기간도 추적</text>
+
+  <line x1="238" y1="574" x2="252" y2="574" stroke="#0891b2" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="392" y1="574" x2="406" y2="574" stroke="#0891b2" stroke-width="4" marker-end="url(#arrow)" />
+
+  <rect x="592" y="470" width="536" height="182" rx="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+  <text class="section" x="612" y="506">3. 금융권 운영 통제</text>
+
+  <rect x="618" y="530" width="156" height="96" rx="18" fill="#ffffff" stroke="#cbd5e1" />
+  <text class="label" x="696" y="560" text-anchor="middle">최소 권한</text>
+  <text class="body" x="696" y="584" text-anchor="middle">필요한 데이터만 요청</text>
+  <text class="body" x="696" y="604" text-anchor="middle">scope와 목적 일치</text>
+
+  <rect x="782" y="530" width="156" height="96" rx="18" fill="#ffffff" stroke="#cbd5e1" />
+  <text class="label" x="860" y="560" text-anchor="middle">감사 로그</text>
+  <text class="body" x="860" y="584" text-anchor="middle">누가 어떤 권한으로</text>
+  <text class="body" x="860" y="604" text-anchor="middle">무엇을 호출했는지 추적</text>
+
+  <rect x="946" y="530" width="156" height="96" rx="18" fill="#ffffff" stroke="#cbd5e1" />
+  <text class="label" x="1024" y="560" text-anchor="middle">보안·탐지</text>
+  <text class="body" x="1024" y="584" text-anchor="middle">TLS·암호화·이상 호출</text>
+  <text class="body" x="1024" y="604" text-anchor="middle">rate limit·장애 대응</text>
+
+  <line x1="696" y1="418" x2="696" y2="530" stroke="#0f766e" stroke-width="3" stroke-dasharray="7 8" />
+  <line x1="860" y1="418" x2="860" y2="530" stroke="#334155" stroke-width="3" stroke-dasharray="7 8" />
+  <line x1="1024" y1="418" x2="1024" y2="530" stroke="#7c3aed" stroke-width="3" stroke-dasharray="7 8" />
+
+  <rect x="786" y="74" width="318" height="74" rx="18" fill="#0b253f" opacity="0.92" />
+  <text class="inverse" x="810" y="102">면접 한 줄 정리</text>
+  <text class="subtitle" x="810" y="126">오픈뱅킹 = 표준 API 개방</text>
+  <text class="subtitle" x="810" y="146">마이데이터 = 동의 기반 데이터 통제</text>
 </svg>

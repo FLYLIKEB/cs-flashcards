@@ -1,31 +1,113 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">13-01-02. JOIN-서브쿼리 SVG 인포그래픽</title>
-  <desc id="desc">JOIN-서브쿼리</desc>
+  <title id="title">13-01-02. JOIN-서브쿼리 인포그래픽</title>
+  <desc id="desc">INNER JOIN과 OUTER JOIN의 차이, 비상관·상관 서브쿼리의 실행 흐름, 실행 계획 체크 포인트를 함께 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-13-01-02-join-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#cffafe" />
-      <stop offset="100%" stop-color="#f0fdf4" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-13-01-02-join-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2" />
-      <stop offset="100%" stop-color="#22c55e" />
+    <linearGradient id="joinGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
     </linearGradient>
+    <linearGradient id="subGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#0f766e"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
+      .title { font-size: 33px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 20px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .mono { font-size: 13px; font-weight: 700; fill: #1e293b; }
+      .chip { font-size: 12px; font-weight: 800; fill: #ffffff; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-13-01-02-join-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-13-01-02-join-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">13-01-02. JOIN-서브쿼리</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">INNER JOIN은 매칭되는 행만 반환한다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e"/></marker></defs><rect x="92" y="248" width="250" height="250" rx="22" fill="#cffafe" stroke="#0891b2" stroke-width="2"/><text class="label" x="217" y="282" text-anchor="middle"><tspan x="217" dy="0">기준 테이블</tspan></text><text class="body" x="110" y="318" text-anchor="start"><tspan x="110" dy="0">JOIN</tspan><tspan x="110" dy="18">조건 필터</tspan></text><rect x="420" y="222" width="360" height="302" rx="22" fill="#ffffff" stroke="#22c55e" stroke-width="2"/><text class="label" x="600" y="256" text-anchor="middle"><tspan x="600" dy="0">JOIN-서브쿼리</tspan></text><text class="body" x="438" y="292" text-anchor="start"><tspan x="438" dy="0">조건 필터</tspan><tspan x="438" dy="18">서브쿼리</tspan><tspan x="438" dy="18">집계</tspan></text><rect x="858" y="248" width="250" height="250" rx="22" fill="#f0fdf4" stroke="#0891b2" stroke-width="2"/><text class="label" x="983" y="282" text-anchor="middle"><tspan x="983" dy="0">결과</tspan></text><text class="body" x="876" y="318" text-anchor="start"><tspan x="876" dy="0">기준 테이블</tspan><tspan x="876" dy="18">JOIN</tspan></text><rect x="330" y="552" width="540" height="82" rx="22" fill="#f8fafc" stroke="#0891b2" stroke-width="2"/><text class="label" x="600" y="586" text-anchor="middle"><tspan x="600" dy="0">핵심 규칙</tspan></text><text class="body" x="348" y="622" text-anchor="start"><tspan x="348" dy="0">기준 테이블</tspan><tspan x="348" dy="18">JOIN</tspan><tspan x="348" dy="18">조건 필터</tspan></text><line x1="342" y1="372" x2="420" y2="372" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="342" y1="372" x2="420" y2="372" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="780" y1="372" x2="858" y2="372" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="780" y1="372" x2="858" y2="372" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="524" x2="600" y2="552" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="524" x2="600" y2="552" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">13-01-02-join-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="32" y="28" width="1136" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="84" class="small">데이터베이스 · JOIN / SUBQUERY</text>
+  <text x="72" y="124" class="title">13-01-02. JOIN-서브쿼리</text>
+  <text x="72" y="156" class="subtitle">JOIN은 표를 옆으로 결합하고, 서브쿼리는 안쪽 결과를 바깥 조건으로 공급한다.</text>
+
+  <rect x="64" y="188" width="514" height="356" rx="24" fill="#f8fbff" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="622" y="188" width="514" height="356" rx="24" fill="#f7fef9" stroke="#86efac" stroke-width="2"/>
+
+  <text x="88" y="226" class="section">1) JOIN: 공통 키로 두 표를 결합</text>
+  <text x="646" y="226" class="section">2) 서브쿼리: 안쪽 결과를 바깥 쿼리가 사용</text>
+
+  <rect x="94" y="252" width="132" height="188" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <rect x="242" y="252" width="132" height="188" rx="18" fill="#ffffff" stroke="#06b6d4" stroke-width="2"/>
+  <text x="160" y="284" text-anchor="middle" class="label">customers</text>
+  <text x="308" y="284" text-anchor="middle" class="label">orders</text>
+  <text x="110" y="318" class="mono">id | name</text>
+  <text x="110" y="343" class="body">1  | Kim</text>
+  <text x="110" y="366" class="body">2  | Lee</text>
+  <text x="110" y="389" class="body">3  | Park</text>
+  <text x="258" y="318" class="mono">cid | amt</text>
+  <text x="258" y="343" class="body">1   | 80</text>
+  <text x="258" y="366" class="body">1   | 120</text>
+  <text x="258" y="389" class="body">2   | 60</text>
+
+  <line x1="226" y1="346" x2="242" y2="346" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <line x1="226" y1="369" x2="242" y2="369" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <line x1="226" y1="392" x2="242" y2="392" stroke="#94a3b8" stroke-width="3" stroke-dasharray="5 5"/>
+
+  <rect x="396" y="252" width="156" height="84" rx="18" fill="url(#joinGrad)"/>
+  <text x="474" y="281" text-anchor="middle" class="chip">INNER JOIN</text>
+  <text x="474" y="304" text-anchor="middle" class="body" fill="#eff6ff">매칭되는 행만 반환</text>
+  <text x="474" y="323" text-anchor="middle" class="small" fill="#dbeafe">Kim·Lee만 결과에 남음</text>
+
+  <rect x="396" y="348" width="156" height="84" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="474" y="377" text-anchor="middle" class="label">LEFT OUTER JOIN</text>
+  <text x="474" y="400" text-anchor="middle" class="body">왼쪽 행 보존 +</text>
+  <text x="474" y="419" text-anchor="middle" class="body">미매칭은 NULL</text>
+
+  <path d="M374 294 C388 294, 388 294, 396 294" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <path d="M374 390 C388 390, 388 390, 396 390" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+
+  <rect x="94" y="456" width="458" height="66" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="114" y="483" class="label">시험 함정</text>
+  <text x="114" y="506" class="body">JOIN으로 바꾸면 1:N 관계에서 행이 늘 수 있다 → DISTINCT 또는 GROUP BY 필요</text>
+
+  <rect x="650" y="252" width="204" height="106" rx="18" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="904" y="252" width="204" height="106" rx="18" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+  <text x="752" y="282" text-anchor="middle" class="label">비상관 서브쿼리</text>
+  <text x="752" y="305" text-anchor="middle" class="body">한 번 실행</text>
+  <text x="752" y="326" text-anchor="middle" class="mono">IN (SELECT customer_id</text>
+  <text x="752" y="344" text-anchor="middle" class="mono">FROM orders WHERE amt &gt; 100)</text>
+  <text x="1006" y="282" text-anchor="middle" class="label">상관 서브쿼리</text>
+  <text x="1006" y="305" text-anchor="middle" class="body">바깥 행마다 평가 가능</text>
+  <text x="1006" y="326" text-anchor="middle" class="mono">WHERE EXISTS (SELECT 1</text>
+  <text x="1006" y="344" text-anchor="middle" class="mono">... o.customer_id = c.customer_id)</text>
+
+  <rect x="690" y="392" width="124" height="72" rx="18" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="752" y="420" text-anchor="middle" class="label">중간 결과</text>
+  <text x="752" y="444" text-anchor="middle" class="body">{1}</text>
+  <rect x="944" y="392" width="124" height="72" rx="18" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="1006" y="420" text-anchor="middle" class="label">반복 판정</text>
+  <text x="1006" y="444" text-anchor="middle" class="body">Kim ✓ Lee ✗ Park ✗</text>
+
+  <line x1="752" y1="358" x2="752" y2="392" stroke="#0f766e" stroke-width="3" marker-end="url(#arrowGreen)"/>
+  <line x1="1006" y1="358" x2="1006" y2="392" stroke="#0f766e" stroke-width="3" marker-end="url(#arrowGreen)"/>
+
+  <rect x="650" y="480" width="458" height="42" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="670" y="507" class="body">IN vs EXISTS는 결과가 같아도 실행 계획이 다를 수 있고, NULL 처리에서는 특히 NOT IN을 조심한다.</text>
+
+  <rect x="64" y="568" width="1072" height="94" rx="22" fill="#0f172a"/>
+  <text x="92" y="602" class="section" fill="#f8fafc">3) 실행 계획에서 확인할 것</text>
+  <text x="92" y="628" class="body" fill="#cbd5e1">• join type: Nested Loop / Hash Join / Sort-Merge</text>
+  <text x="442" y="628" class="body" fill="#cbd5e1">• index seek/scan과 조인 순서</text>
+  <text x="760" y="628" class="body" fill="#cbd5e1">• estimated rows vs actual rows 차이</text>
+  <text x="92" y="650" class="body" fill="#cbd5e1">• Hash spill, 정렬, 반복 실행이 보이면 비용 증가 신호 → 인덱스·재작성·통계 점검</text>
 </svg>

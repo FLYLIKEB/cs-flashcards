@@ -1,31 +1,151 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">11-02-02. 단위-통합-인수테스트 SVG 인포그래픽</title>
-  <desc id="desc">단위-통합-인수테스트</desc>
+  <title id="title">11-02-02 단위·통합·시스템·인수 테스트 인포그래픽</title>
+  <desc id="desc">테스트 레벨이 단위에서 인수로 갈수록 범위와 관점이 확장되는 구조와 회귀 테스트, 스모크 테스트의 차이를 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-11-02-02-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#fdf2f8" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-11-02-02-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7c3aed" />
-      <stop offset="100%" stop-color="#ec4899" />
+    <linearGradient id="scope" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
     </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .level { font-size: 26px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 13px; font-weight: 700; fill: #475569; }
+      .body { font-size: 15px; font-weight: 500; fill: #1e293b; }
+      .small { font-size: 13px; font-weight: 500; fill: #334155; }
+      .mini { font-size: 12px; font-weight: 600; fill: #475569; }
+      .chip { font-size: 13px; font-weight: 700; fill: #1e293b; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-11-02-02-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-11-02-02-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">11-02-02. 단위-통합-인수테스트</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">단위 테스트는 가장 작은 개발 단위가 의도대로 동작하는지 검증한다. 금융공기업</tspan><tspan x="84" dy="24">환경에서는 회계 거래 로직의 정확성이 특히 중요하다.</tspan></text>
-  <rect x="92" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="202" y="284" text-anchor="middle"><tspan x="202" dy="0">단위</tspan></text><text class="body" x="110" y="320" text-anchor="start"></text><rect x="348" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="458" y="284" text-anchor="middle"><tspan x="458" dy="0">통합</tspan></text><text class="body" x="366" y="320" text-anchor="start"></text><rect x="604" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="714" y="284" text-anchor="middle"><tspan x="714" dy="0">시스템</tspan></text><text class="body" x="622" y="320" text-anchor="start"></text><rect x="860" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="970" y="284" text-anchor="middle"><tspan x="970" dy="0">인수</tspan></text><text class="body" x="878" y="320" text-anchor="start"></text><line x1="200" y1="572" x2="1000" y2="572" stroke="#7c3aed" stroke-width="4" opacity="0.3"/><line x1="200" y1="572" x2="760" y2="572" stroke="#ec4899" stroke-width="4"><animate attributeName="x2" values="360;1000;360" dur="7s" repeatCount="indefinite"/></line><text class="body" x="600" y="620" text-anchor="middle"><tspan x="600" dy="0">단위-통합-인수테스트</tspan></text>
-  <text class="small" x="84" y="654">11-02-02-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="88" class="section">TEST LEVEL MAP</text>
+  <text x="72" y="126" class="title">단위 → 통합 → 시스템 → 인수 테스트</text>
+  <text x="72" y="160" class="subtitle">검증 범위는 넓어지고, 관점은 개발자에서 사용자·운영·규제로 이동한다.</text>
+
+  <g transform="translate(70 205)">
+    <rect x="0" y="0" width="620" height="300" rx="28" fill="#f8fafc" stroke="#dbeafe"/>
+    <text x="24" y="34" class="section">범위 확장 구조</text>
+
+    <path d="M40 248 L580 248" stroke="url(#scope)" stroke-width="12" stroke-linecap="round" opacity="0.15"/>
+    <path d="M100 248 L540 248" stroke="url(#scope)" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)"/>
+    <text x="284" y="280" class="small">테스트 범위·이해관계자·비용 증가</text>
+
+    <g>
+      <rect x="32" y="182" width="118" height="56" rx="18" fill="#dbeafe" stroke="#60a5fa"/>
+      <text x="91" y="216" text-anchor="middle" class="level">단위</text>
+      <rect x="166" y="150" width="140" height="88" rx="22" fill="#e0e7ff" stroke="#818cf8"/>
+      <text x="236" y="184" text-anchor="middle" class="level">통합</text>
+      <rect x="326" y="108" width="162" height="130" rx="24" fill="#ede9fe" stroke="#a78bfa"/>
+      <text x="407" y="145" text-anchor="middle" class="level">시스템</text>
+      <rect x="510" y="58" width="84" height="180" rx="26" fill="#fae8ff" stroke="#e879f9"/>
+      <text x="552" y="122" text-anchor="middle" class="level" transform="rotate(90 552 122)">인수</text>
+    </g>
+
+    <g>
+      <line x1="91" y1="176" x2="91" y2="72" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+      <rect x="42" y="18" width="98" height="48" rx="14" fill="#ffffff" stroke="#bfdbfe"/>
+      <text x="91" y="38" text-anchor="middle" class="label">대상</text>
+      <text x="91" y="56" text-anchor="middle" class="mini">함수·클래스</text>
+
+      <line x1="236" y1="144" x2="236" y2="72" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+      <rect x="187" y="18" width="98" height="48" rx="14" fill="#ffffff" stroke="#c7d2fe"/>
+      <text x="236" y="38" text-anchor="middle" class="label">대상</text>
+      <text x="236" y="56" text-anchor="middle" class="mini">인터페이스·흐름</text>
+
+      <line x1="407" y1="102" x2="407" y2="72" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+      <rect x="358" y="18" width="98" height="48" rx="14" fill="#ffffff" stroke="#ddd6fe"/>
+      <text x="407" y="38" text-anchor="middle" class="label">대상</text>
+      <text x="407" y="56" text-anchor="middle" class="mini">전체 기능·성능·보안</text>
+
+      <line x1="552" y1="52" x2="552" y2="18" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+      <rect x="503" y="-36" width="98" height="48" rx="14" fill="#ffffff" stroke="#f5d0fe"/>
+      <text x="552" y="-16" text-anchor="middle" class="label">기준</text>
+      <text x="552" y="2" text-anchor="middle" class="mini">SLA·규제·업무절차</text>
+    </g>
+  </g>
+
+  <g transform="translate(720 205)">
+    <rect x="0" y="0" width="410" height="300" rx="28" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="24" y="34" class="section">레벨별 핵심 포인트</text>
+
+    <g transform="translate(24 56)">
+      <rect width="362" height="50" rx="16" fill="#dbeafe"/>
+      <text x="16" y="22" class="label">단위 TEST</text>
+      <text x="16" y="40" class="body">경계값·예외·수수료 계산 같은 로직 정확성</text>
+      <rect x="276" y="12" width="70" height="26" rx="13" fill="#ffffff"/>
+      <text x="311" y="30" text-anchor="middle" class="chip">Mock/Stub</text>
+    </g>
+
+    <g transform="translate(24 116)">
+      <rect width="362" height="50" rx="16" fill="#e0e7ff"/>
+      <text x="16" y="22" class="label">통합 TEST</text>
+      <text x="16" y="40" class="body">서비스↔DB↔외부연동 간 트랜잭션·데이터 흐름</text>
+      <rect x="254" y="12" width="92" height="26" rx="13" fill="#ffffff"/>
+      <text x="300" y="30" text-anchor="middle" class="chip">Driver/Stub</text>
+    </g>
+
+    <g transform="translate(24 176)">
+      <rect width="362" height="50" rx="16" fill="#ede9fe"/>
+      <text x="16" y="22" class="label">시스템 TEST</text>
+      <text x="16" y="40" class="body">성능·보안·가용성·배치 복구까지 종단 검증</text>
+      <rect x="269" y="12" width="77" height="26" rx="13" fill="#ffffff"/>
+      <text x="307.5" y="30" text-anchor="middle" class="chip">RTO/RPO</text>
+    </g>
+
+    <g transform="translate(24 236)">
+      <rect width="362" height="50" rx="16" fill="#fae8ff"/>
+      <text x="16" y="22" class="label">인수 TEST</text>
+      <text x="16" y="40" class="body">업무 담당자 승인, 운영 절차, 규제 준수 여부 판단</text>
+      <rect x="286" y="12" width="60" height="26" rx="13" fill="#ffffff"/>
+      <text x="316" y="30" text-anchor="middle" class="chip">UAT</text>
+    </g>
+  </g>
+
+  <g transform="translate(70 528)">
+    <rect x="0" y="0" width="620" height="124" rx="24" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="24" y="32" class="section">통합 테스트 방식</text>
+    <g transform="translate(24 52)">
+      <rect x="0" y="0" width="122" height="42" rx="14" fill="#ffffff" stroke="#fdba74"/>
+      <text x="61" y="19" text-anchor="middle" class="label">빅뱅</text>
+      <text x="61" y="34" text-anchor="middle" class="mini">한 번에 결합</text>
+
+      <rect x="152" y="0" width="122" height="42" rx="14" fill="#ffffff" stroke="#fdba74"/>
+      <text x="213" y="19" text-anchor="middle" class="label">상향식</text>
+      <text x="213" y="34" text-anchor="middle" class="mini">Driver 필요</text>
+
+      <rect x="304" y="0" width="122" height="42" rx="14" fill="#ffffff" stroke="#fdba74"/>
+      <text x="365" y="19" text-anchor="middle" class="label">하향식</text>
+      <text x="365" y="34" text-anchor="middle" class="mini">Stub 필요</text>
+
+      <rect x="456" y="0" width="122" height="42" rx="14" fill="#ffffff" stroke="#fdba74"/>
+      <text x="517" y="19" text-anchor="middle" class="label">샌드위치</text>
+      <text x="517" y="34" text-anchor="middle" class="mini">병행 결합</text>
+    </g>
+  </g>
+
+  <g transform="translate(720 528)">
+    <rect x="0" y="0" width="410" height="124" rx="24" fill="#f0fdf4" stroke="#86efac"/>
+    <text x="24" y="32" class="section">회귀 vs 스모크</text>
+    <line x1="205" y1="18" x2="205" y2="104" stroke="#bbf7d0" stroke-width="2"/>
+    <text x="102" y="56" text-anchor="middle" class="label">회귀 테스트</text>
+    <text x="102" y="76" text-anchor="middle" class="body">변경 후 기존 기능이</text>
+    <text x="102" y="96" text-anchor="middle" class="body">깨지지 않았는지 심층 확인</text>
+    <text x="308" y="56" text-anchor="middle" class="label">스모크 테스트</text>
+    <text x="308" y="76" text-anchor="middle" class="body">배포 직후 핵심 기능만</text>
+    <text x="308" y="96" text-anchor="middle" class="body">빠르게 통과 여부 점검</text>
+  </g>
+
+  <text x="72" y="680" class="small">핵심 흐름: 작은 로직 검증(단위) → 모듈 연결 검증(통합) → 전체 요구사항 검증(시스템) → 사용자/규제 인수 판단(인수)</text>
 </svg>

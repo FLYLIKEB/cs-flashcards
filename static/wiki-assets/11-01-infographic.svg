@@ -1,31 +1,154 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">11-01. 개발방법론 SVG 인포그래픽</title>
-  <desc id="desc">개발방법론</desc>
+  <title id="title">11-01. 개발방법론 인포그래픽</title>
+  <desc id="desc">폭포수, 애자일, 나선형, UP·RAD·XP를 요구사항 안정성, 피드백, 위험관리 관점에서 비교하는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-11-01-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#fdf2f8" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-11-01-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7c3aed" />
-      <stop offset="100%" stop-color="#ec4899" />
+    <linearGradient id="titleBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
+      .title { font-size: 34px; font-weight: 800; fill: #f8fafc; }
+      .subtitle { font-size: 16px; font-weight: 500; fill: #dbeafe; }
+      .section { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .body { font-size: 14px; font-weight: 500; fill: #334155; }
+      .small { font-size: 12px; font-weight: 600; fill: #475569; }
+      .chip { font-size: 13px; font-weight: 700; fill: #1e3a8a; }
+      .mono { font-size: 13px; font-weight: 700; fill: #0f172a; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-11-01-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-11-01-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">11-01. 개발방법론</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">개발방법론은 요구사항 분석부터 설계, 구현, 테스트, 배포, 유지보수까지의 작업</tspan><tspan x="84" dy="24">절차와 관리 방식을 정한 체계다.</tspan></text>
-  <rect x="92" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="202" y="284" text-anchor="middle"><tspan x="202" dy="0">폭포수</tspan></text><text class="body" x="110" y="320" text-anchor="start"></text><rect x="348" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="458" y="284" text-anchor="middle"><tspan x="458" dy="0">애자일</tspan></text><text class="body" x="366" y="320" text-anchor="start"></text><rect x="604" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="714" y="284" text-anchor="middle"><tspan x="714" dy="0">나선형</tspan></text><text class="body" x="622" y="320" text-anchor="start"></text><rect x="860" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="970" y="284" text-anchor="middle"><tspan x="970" dy="0">스크럼</tspan></text><text class="body" x="878" y="320" text-anchor="start"></text><line x1="200" y1="572" x2="1000" y2="572" stroke="#7c3aed" stroke-width="4" opacity="0.3"/><line x1="200" y1="572" x2="760" y2="572" stroke="#ec4899" stroke-width="4"><animate attributeName="x2" values="360;1000;360" dur="7s" repeatCount="indefinite"/></line><text class="body" x="600" y="620" text-anchor="middle"><tspan x="600" dy="0">개발방법론</tspan></text>
-  <text class="small" x="84" y="654">11-01-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="36" y="28" width="1128" height="110" rx="28" fill="url(#titleBar)"/>
+  <text class="title" x="72" y="74">11-01. 개발방법론</text>
+  <text class="subtitle" x="72" y="104">요구사항 안정성, 피드백 속도, 위험관리 방식에 따라 폭포수·애자일·나선형·UP/RAD/XP를 구분한다.</text>
+
+  <rect x="760" y="48" width="118" height="34" rx="17" fill="#dbeafe"/>
+  <text class="chip" x="819" y="70" text-anchor="middle">안정 요구</text>
+  <rect x="888" y="48" width="118" height="34" rx="17" fill="#bfdbfe"/>
+  <text class="chip" x="947" y="70" text-anchor="middle">반복·증분</text>
+  <rect x="1016" y="48" width="118" height="34" rx="17" fill="#93c5fd"/>
+  <text class="chip" x="1075" y="70" text-anchor="middle">위험 중심</text>
+  <rect x="760" y="92" width="374" height="26" rx="13" fill="#1e40af" opacity="0.24"/>
+  <text class="small" x="947" y="109" text-anchor="middle">선택 기준: 요구 변경 가능성 · 조직 성숙도 · 규제/감사 · 프로젝트 위험</text>
+
+  <rect x="44" y="154" width="272" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="70" y="192">폭포수</text>
+  <text class="body" x="70" y="216">요구 → 설계 → 구현 → 테스트 → 운영을 순차 진행</text>
+  <rect x="72" y="240" width="170" height="34" rx="10" fill="#dbeafe"/>
+  <text class="label" x="157" y="262" text-anchor="middle">요구사항 분석</text>
+  <rect x="102" y="286" width="170" height="34" rx="10" fill="#bfdbfe"/>
+  <text class="label" x="187" y="308" text-anchor="middle">설계</text>
+  <rect x="132" y="332" width="170" height="34" rx="10" fill="#93c5fd"/>
+  <text class="label" x="217" y="354" text-anchor="middle">구현</text>
+  <rect x="162" y="378" width="170" height="34" rx="10" fill="#60a5fa"/>
+  <text class="label" x="247" y="400" text-anchor="middle">테스트</text>
+  <rect x="192" y="424" width="96" height="34" rx="10" fill="#2563eb"/>
+  <text x="240" y="446" text-anchor="middle" font-size="15" font-weight="800" fill="#eff6ff">운영</text>
+  <text class="mono" x="70" y="480">장점</text>
+  <text class="body" x="70" y="502">• 일정·문서·산출물 관리가 명확</text>
+  <text class="body" x="70" y="524">• 규제·감사 환경에서 추적성 확보 유리</text>
+  <text class="mono" x="70" y="548">주의</text>
+  <text class="body" x="70" y="570">• 후반 변경 비용 큼</text>
+  <text class="body" x="70" y="592">• 사용자 피드백 반영이 늦음</text>
+
+  <rect x="332" y="154" width="272" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="358" y="192">애자일 · 스크럼 · 칸반</text>
+  <text class="body" x="358" y="216">짧은 반복과 사용자 피드백으로 요구 변화를 흡수</text>
+  <circle cx="430" cy="320" r="58" fill="#ecfeff" stroke="#0891b2" stroke-width="3"/>
+  <path d="M430 254 A66 66 0 0 1 490 320" fill="none" stroke="#0891b2" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="486,306 503,319 482,325" fill="#0891b2"/>
+  <path d="M490 320 A66 66 0 0 1 430 386" fill="none" stroke="#06b6d4" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="439,380 422,394 444,398" fill="#06b6d4"/>
+  <path d="M430 386 A66 66 0 0 1 370 320" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="374,334 357,321 378,315" fill="#22c55e"/>
+  <path d="M370 320 A66 66 0 0 1 430 254" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="421,261 439,247 418,243" fill="#f59e0b"/>
+  <text class="small" x="430" y="302" text-anchor="middle">계획</text>
+  <text class="small" x="474" y="324" text-anchor="middle">개발</text>
+  <text class="small" x="430" y="350" text-anchor="middle">검토</text>
+  <text class="small" x="386" y="324" text-anchor="middle">회고</text>
+  <rect x="507" y="254" width="74" height="170" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="515" y="286" width="58" height="34" rx="8" fill="#dbeafe"/>
+  <rect x="515" y="330" width="58" height="34" rx="8" fill="#bae6fd"/>
+  <rect x="515" y="374" width="58" height="34" rx="8" fill="#bbf7d0"/>
+  <text class="small" x="544" y="276" text-anchor="middle">칸반 보드</text>
+  <text class="small" x="544" y="308" text-anchor="middle">To Do</text>
+  <text class="small" x="544" y="352" text-anchor="middle">Doing</text>
+  <text class="small" x="544" y="396" text-anchor="middle">Done</text>
+  <text class="mono" x="358" y="480">핵심</text>
+  <text class="body" x="358" y="502">• 반복·증분, 빠른 배포, 고객 참여</text>
+  <text class="body" x="358" y="524">• 스크럼: 스프린트·백로그·리뷰·회고</text>
+  <text class="body" x="358" y="546">• 칸반: 흐름 시각화, WIP 제한</text>
+  <text class="mono" x="358" y="570">주의</text>
+  <text class="body" x="358" y="592">• 범위 통제와 추적성 보완 필요</text>
+
+  <rect x="620" y="154" width="272" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="646" y="192">나선형</text>
+  <text class="body" x="646" y="216">반복마다 위험을 식별·분석·완화하며 전진</text>
+  <path d="M756 284 C794 284 814 312 814 334 C814 372 780 400 744 400 C694 400 664 356 664 324 C664 270 716 242 772 242" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="772" cy="242" r="7" fill="#8b5cf6"/>
+  <circle cx="814" cy="334" r="7" fill="#ef4444"/>
+  <circle cx="744" cy="400" r="7" fill="#22c55e"/>
+  <circle cx="664" cy="324" r="7" fill="#f59e0b"/>
+  <text class="small" x="774" y="226" text-anchor="middle">계획</text>
+  <text class="small" x="844" y="338">위험 분석</text>
+  <text class="small" x="744" y="424" text-anchor="middle">개발·검증</text>
+  <text class="small" x="602" y="328">고객 평가</text>
+  <rect x="650" y="438" width="210" height="34" rx="17" fill="#f3e8ff"/>
+  <text class="label" x="755" y="460" text-anchor="middle">프로토타입으로 불확실성 축소</text>
+  <text class="mono" x="646" y="490">적합</text>
+  <text class="body" x="646" y="512">• 고위험·대규모·외부연동 많은 프로젝트</text>
+  <text class="body" x="646" y="534">• 성능/보안/사업성 검증을 선행해야 할 때</text>
+  <text class="mono" x="646" y="558">주의</text>
+  <text class="body" x="646" y="580">• 관리 복잡도와 비용 부담 증가</text>
+
+  <rect x="908" y="154" width="248" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="934" y="192">UP · RAD · XP</text>
+  <text class="body" x="934" y="216">반복 개발을 세분화한 대표 프로세스·실천 묶음</text>
+  <rect x="934" y="244" width="196" height="28" rx="8" fill="#dbeafe"/>
+  <text class="small" x="1032" y="263" text-anchor="middle">UP: Inception → Elaboration → Construction → Transition</text>
+  <rect x="934" y="286" width="92" height="70" rx="14" fill="#ecfccb" stroke="#84cc16"/>
+  <text class="label" x="980" y="314" text-anchor="middle">RAD</text>
+  <text class="small" x="980" y="336" text-anchor="middle">빠른</text>
+  <text class="small" x="980" y="352" text-anchor="middle">프로토타입</text>
+  <rect x="1038" y="286" width="92" height="70" rx="14" fill="#fee2e2" stroke="#ef4444"/>
+  <text class="label" x="1084" y="314" text-anchor="middle">XP</text>
+  <text class="small" x="1084" y="336" text-anchor="middle">TDD·CI</text>
+  <text class="small" x="1084" y="352" text-anchor="middle">Pair·Refactor</text>
+  <rect x="934" y="376" width="196" height="28" rx="14" fill="#e0f2fe"/>
+  <text class="small" x="1032" y="395" text-anchor="middle">UP = 유스케이스·아키텍처·위험 중심</text>
+  <rect x="934" y="412" width="196" height="28" rx="14" fill="#fef3c7"/>
+  <text class="small" x="1032" y="431" text-anchor="middle">RAD = 사용자 참여로 개발기간 단축</text>
+  <rect x="934" y="448" width="196" height="28" rx="14" fill="#fee2e2"/>
+  <text class="small" x="1032" y="467" text-anchor="middle">XP = 코드 품질과 변경 대응성 강화</text>
+  <text class="mono" x="934" y="500">시험 연결</text>
+  <text class="body" x="934" y="522">• UP 단계 목표 구분</text>
+  <text class="body" x="934" y="544">• RAD 장단점과 적용 상황</text>
+  <text class="body" x="934" y="566">• XP 실천: TDD, CI, 짝 프로그래밍</text>
+
+  <rect x="44" y="522" width="1112" height="158" rx="26" fill="#0f172a"/>
+  <text x="72" y="558" font-size="22" font-weight="800" fill="#f8fafc">상황별 선택 힌트</text>
+  <line x1="84" y1="592" x2="1118" y2="592" stroke="#334155" stroke-width="2"/>
+  <text class="small" x="140" y="615" text-anchor="middle" fill="#93c5fd">요구사항 안정</text>
+  <text class="small" x="344" y="615" text-anchor="middle" fill="#93c5fd">규제·감사 강함</text>
+  <text class="small" x="564" y="615" text-anchor="middle" fill="#93c5fd">변화·피드백 빈번</text>
+  <text class="small" x="786" y="615" text-anchor="middle" fill="#93c5fd">고위험·대규모</text>
+  <text class="small" x="1008" y="615" text-anchor="middle" fill="#93c5fd">운영 흐름 개선</text>
+  <rect x="96" y="632" width="126" height="26" rx="13" fill="#dbeafe"/>
+  <text class="small" x="159" y="649" text-anchor="middle" fill="#0f172a">폭포수</text>
+  <rect x="272" y="632" width="180" height="26" rx="13" fill="#bfdbfe"/>
+  <text class="small" x="362" y="649" text-anchor="middle" fill="#0f172a">폭포수 + 추적성 통제</text>
+  <rect x="502" y="632" width="162" height="26" rx="13" fill="#86efac"/>
+  <text class="small" x="583" y="649" text-anchor="middle" fill="#0f172a">애자일 / 스크럼</text>
+  <rect x="726" y="632" width="146" height="26" rx="13" fill="#c4b5fd"/>
+  <text class="small" x="799" y="649" text-anchor="middle" fill="#0f172a">나선형 / UP</text>
+  <rect x="932" y="632" width="132" height="26" rx="13" fill="#67e8f9"/>
+  <text class="small" x="998" y="649" text-anchor="middle" fill="#0f172a">칸반</text>
+  <text class="small" x="1078" y="648" text-anchor="end" fill="#cbd5e1">현업에서는 혼합형 적용이 흔함</text>
 </svg>

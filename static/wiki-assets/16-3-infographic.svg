@@ -1,31 +1,158 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">16-3. 평가 지표와 혼동행렬 SVG 인포그래픽</title>
-  <desc id="desc">평가 지표와 혼동행렬</desc>
+  <title id="title">16-3. 평가 지표와 혼동행렬</title>
+  <desc id="desc">혼동행렬의 TP, FP, FN, TN과 accuracy, precision, recall, F1, ROC-AUC, PR-AUC, 임계값 조정의 관계를 설명하는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-16-3-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#eff6ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
     </linearGradient>
-    <linearGradient id="line-16-3-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#9333ea" />
-      <stop offset="100%" stop-color="#3b82f6" />
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="tp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dcfce7"/>
+      <stop offset="100%" stop-color="#86efac"/>
+    </linearGradient>
+    <linearGradient id="warn" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="risk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fee2e2"/>
+      <stop offset="100%" stop-color="#fca5a5"/>
+    </linearGradient>
+    <linearGradient id="safe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#93c5fd"/>
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .title { font-size: 34px; font-weight: 800; fill: #f8fafc; }
+      .subtitle { font-size: 16px; font-weight: 500; fill: #dbeafe; }
+      .section { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 15px; font-weight: 700; fill: #334155; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .metric { font-size: 21px; font-weight: 800; fill: #0f172a; }
+      .formula { font-size: 15px; font-weight: 700; fill: #1e293b; }
+      .tiny { font-size: 13px; font-weight: 600; fill: #475569; }
+      .cellTitle { font-size: 26px; font-weight: 800; fill: #0f172a; }
+      .cellNote { font-size: 15px; font-weight: 600; fill: #1e293b; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-16-3-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-16-3-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">16-3. 평가 지표와 혼동행렬</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">혼동행렬은 분류 결과를 TP, FP, FN, TN으로 나눠 어떤 오류가 발생했는지</tspan><tspan x="84" dy="24">보여 준다.</tspan></text>
-  <rect x="92" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="202" y="284" text-anchor="middle"><tspan x="202" dy="0">TP</tspan></text><text class="body" x="110" y="320" text-anchor="start"></text><rect x="348" y="250" width="220" height="280" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="458" y="284" text-anchor="middle"><tspan x="458" dy="0">FP</tspan></text><text class="body" x="366" y="320" text-anchor="start"></text><rect x="604" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="714" y="284" text-anchor="middle"><tspan x="714" dy="0">FN</tspan></text><text class="body" x="622" y="320" text-anchor="start"></text><rect x="860" y="250" width="220" height="280" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="970" y="284" text-anchor="middle"><tspan x="970" dy="0">TN</tspan></text><text class="body" x="878" y="320" text-anchor="start"></text><line x1="200" y1="572" x2="1000" y2="572" stroke="#9333ea" stroke-width="4" opacity="0.3"/><line x1="200" y1="572" x2="760" y2="572" stroke="#3b82f6" stroke-width="4"><animate attributeName="x2" values="360;1000;360" dur="7s" repeatCount="indefinite"/></line><text class="body" x="600" y="620" text-anchor="middle"><tspan x="600" dy="0">평가 지표와 혼동행렬</tspan></text>
-  <text class="small" x="84" y="654">16-3-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="36" y="34" width="1128" height="652" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="36" y="34" width="1128" height="118" rx="30" fill="url(#header)"/>
+  <rect x="36" y="122" width="1128" height="30" fill="url(#header)"/>
+
+  <text class="title" x="78" y="85">16-3. 평가 지표와 혼동행렬</text>
+  <text class="subtitle" x="78" y="114">분류 결과를 TP·FP·FN·TN으로 나누고, 지표·임계값·업무 비용까지 함께 해석해야 모델 평가가 완성된다.</text>
+
+  <g transform="translate(72 182)">
+    <text class="section" x="0" y="0">혼동행렬 기본</text>
+    <text class="tiny" x="0" y="26">행 = 실제값, 열 = 모델 예측값</text>
+
+    <g transform="translate(0 46)">
+      <rect x="108" y="0" width="170" height="42" rx="14" fill="#e0e7ff"/>
+      <rect x="286" y="0" width="170" height="42" rx="14" fill="#e0e7ff"/>
+      <text class="label" x="193" y="26" text-anchor="middle">예측 Positive</text>
+      <text class="label" x="371" y="26" text-anchor="middle">예측 Negative</text>
+
+      <rect x="0" y="52" width="100" height="128" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+      <rect x="0" y="188" width="100" height="128" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="label" x="50" y="108" text-anchor="middle">실제</text>
+      <text class="label" x="50" y="128" text-anchor="middle">Positive</text>
+      <text class="label" x="50" y="244" text-anchor="middle">실제</text>
+      <text class="label" x="50" y="264" text-anchor="middle">Negative</text>
+
+      <rect x="108" y="52" width="170" height="128" rx="22" fill="url(#tp)" stroke="#22c55e" stroke-width="2"/>
+      <rect x="286" y="52" width="170" height="128" rx="22" fill="url(#warn)" stroke="#f59e0b" stroke-width="2"/>
+      <rect x="108" y="188" width="170" height="128" rx="22" fill="url(#risk)" stroke="#ef4444" stroke-width="2"/>
+      <rect x="286" y="188" width="170" height="128" rx="22" fill="url(#safe)" stroke="#3b82f6" stroke-width="2"/>
+
+      <text class="cellTitle" x="193" y="104" text-anchor="middle">TP</text>
+      <text class="cellNote" x="193" y="132" text-anchor="middle">실제 양성을 맞춤</text>
+      <text class="tiny" x="193" y="154" text-anchor="middle">사기 거래 탐지 성공</text>
+
+      <text class="cellTitle" x="371" y="104" text-anchor="middle">FN</text>
+      <text class="cellNote" x="371" y="132" text-anchor="middle">양성을 놓침</text>
+      <text class="tiny" x="371" y="154" text-anchor="middle">사기인데 정상으로 통과</text>
+
+      <text class="cellTitle" x="193" y="240" text-anchor="middle">FP</text>
+      <text class="cellNote" x="193" y="268" text-anchor="middle">정상을 양성으로 오탐</text>
+      <text class="tiny" x="193" y="290" text-anchor="middle">정상 고객 추가 조사</text>
+
+      <text class="cellTitle" x="371" y="240" text-anchor="middle">TN</text>
+      <text class="cellNote" x="371" y="268" text-anchor="middle">실제 음성을 맞춤</text>
+      <text class="tiny" x="371" y="290" text-anchor="middle">정상 거래를 정상 처리</text>
+    </g>
+  </g>
+
+  <g transform="translate(582 182)">
+    <text class="section" x="0" y="0">대표 지표</text>
+    <text class="tiny" x="0" y="26">혼동행렬에서 계산되지만, 어떤 비용을 줄일지에 따라 해석이 달라진다.</text>
+
+    <g transform="translate(0 48)">
+      <rect x="0" y="0" width="250" height="98" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="metric" x="24" y="34">Accuracy</text>
+      <text class="formula" x="24" y="60">(TP + TN) / 전체</text>
+      <text class="body" x="24" y="82">클래스가 균형적일 때 유용</text>
+
+      <rect x="270" y="0" width="250" height="98" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="metric" x="294" y="34">Precision</text>
+      <text class="formula" x="294" y="60">TP / (TP + FP)</text>
+      <text class="body" x="294" y="82">오탐 비용이 클 때 중요</text>
+
+      <rect x="0" y="116" width="250" height="98" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="metric" x="24" y="150">Recall</text>
+      <text class="formula" x="24" y="176">TP / (TP + FN)</text>
+      <text class="body" x="24" y="198">미탐 비용이 클 때 중요</text>
+
+      <rect x="270" y="116" width="250" height="98" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text class="metric" x="294" y="150">F1</text>
+      <text class="formula" x="294" y="176">2PR / (P + R)</text>
+      <text class="body" x="294" y="198">정밀도·재현율 균형 지표</text>
+
+      <rect x="0" y="232" width="250" height="98" rx="22" fill="#eff6ff" stroke="#93c5fd"/>
+      <text class="metric" x="24" y="266">ROC-AUC</text>
+      <text class="body" x="24" y="290">임계값 전체에서 순위 성능 비교</text>
+      <text class="tiny" x="24" y="312">모델 전반 비교에 적합</text>
+
+      <rect x="270" y="232" width="250" height="98" rx="22" fill="#ecfccb" stroke="#84cc16"/>
+      <text class="metric" x="294" y="266">PR-AUC</text>
+      <text class="body" x="294" y="290">희소한 양성 클래스 중심 성능</text>
+      <text class="tiny" x="294" y="312">불균형 데이터에서 더 민감</text>
+    </g>
+  </g>
+
+  <g transform="translate(72 568)">
+    <rect x="0" y="0" width="510" height="88" rx="24" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+    <text class="section" x="24" y="34">불균형 데이터 주의</text>
+    <text class="body" x="24" y="58">TN이 압도적으로 많으면 accuracy가 높아도 실제 양성 탐지 성능은 낮을 수 있다.</text>
+  </g>
+
+  <g transform="translate(606 560)">
+    <rect x="0" y="0" width="520" height="96" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text class="section" x="24" y="32">임계값과 운영 기준</text>
+    <line x1="38" y1="60" x2="482" y2="60" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="190" cy="60" r="16" fill="#2563eb">
+      <animate attributeName="cx" values="170;330;170" dur="6s" repeatCount="indefinite"/>
+    </circle>
+    <text class="tiny" x="38" y="84">임계값↓ → recall↑, FP↑</text>
+    <text class="tiny" x="342" y="84">임계값↑ → precision↑, FN↑</text>
+  </g>
+
+  <g transform="translate(910 182)">
+    <rect x="0" y="0" width="216" height="308" rx="24" fill="#0f172a"/>
+    <text x="24" y="34" fill="#f8fafc" font-size="21" font-weight="800">금융권 해석 포인트</text>
+    <text class="body" x="24" y="68" fill="#cbd5e1">• 이상거래탐지: recall이 낮으면</text>
+    <text class="body" x="24" y="90" fill="#cbd5e1">  사기를 놓쳐 손실이 커진다.</text>
+    <text class="body" x="24" y="124" fill="#cbd5e1">• precision이 낮으면 정상 고객</text>
+    <text class="body" x="24" y="146" fill="#cbd5e1">  조사 비용과 불편이 커진다.</text>
+    <text class="body" x="24" y="180" fill="#cbd5e1">• 신용평가에서는 성능 수치만</text>
+    <text class="body" x="24" y="202" fill="#cbd5e1">  아니라 임계값 정책 설명이 필요하다.</text>
+    <text class="body" x="24" y="236" fill="#cbd5e1">• FP/FN 비용 행렬을 함께 제시하면</text>
+    <text class="body" x="24" y="258" fill="#cbd5e1">  업무 설득력이 높아진다.</text>
+  </g>
 </svg>

@@ -1,31 +1,146 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">10-04. IDS-IPS-로그-감사 SVG 인포그래픽</title>
-  <desc id="desc">IDS-IPS-로그-감사</desc>
+  <title id="title">10-04. IDS·IPS·로그 감사 인포그래픽</title>
+  <desc id="desc">인터넷에서 내부망으로 들어오는 트래픽 경로에서 IPS는 인라인으로 차단하고, IDS는 미러 트래픽을 패시브 탐지하며, 로그 감사와 SIEM은 기록 보존·상관분석·사후 증빙을 담당하는 구조를 설명한다.</desc>
   <defs>
-    <linearGradient id="grad-10-04-ids-ips-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fee2e2" />
-      <stop offset="100%" stop-color="#fff7ed" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="55%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#fefce8" />
     </linearGradient>
-    <linearGradient id="line-10-04-ids-ips-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#b91c1c" />
+    <linearGradient id="traffic" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fca5a5" />
+      <stop offset="100%" stop-color="#ef4444" />
+    </linearGradient>
+    <linearGradient id="sensor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c4b5fd" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <linearGradient id="logs" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fde68a" />
       <stop offset="100%" stop-color="#f59e0b" />
     </linearGradient>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e" />
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7c3aed" />
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d97706" />
+    </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 600 12px 'SFMono-Regular',Consolas,monospace; fill: #374151; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-10-04-ids-ips-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-10-04-ids-ips-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">10-04. IDS-IPS-로그-감사</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">IDS는 침입을 탐지한다(알림/로그 생성, 수동 대응).</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/></marker></defs><rect x="90" y="322" width="180" height="120" rx="22" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/><text class="label" x="180" y="356" text-anchor="middle"><tspan x="180" dy="0">수집</tspan></text><text class="body" x="108" y="392" text-anchor="start"></text><rect x="350" y="250" width="180" height="120" rx="22" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/><text class="label" x="440" y="284" text-anchor="middle"><tspan x="440" dy="0">탐지</tspan></text><text class="body" x="368" y="320" text-anchor="start"></text><rect x="620" y="322" width="180" height="120" rx="22" fill="#fff7ed" stroke="#b91c1c" stroke-width="2"/><text class="label" x="710" y="356" text-anchor="middle"><tspan x="710" dy="0">차단</tspan></text><text class="body" x="638" y="392" text-anchor="start"></text><rect x="890" y="250" width="180" height="120" rx="22" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/><text class="label" x="980" y="284" text-anchor="middle"><tspan x="980" dy="0">로그</tspan></text><text class="body" x="908" y="320" text-anchor="start"></text><rect x="455" y="510" width="250" height="92" rx="22" fill="#ffffff" stroke="#b91c1c" stroke-width="2"/><text class="label" x="580" y="544" text-anchor="middle"><tspan x="580" dy="0">감사</tspan></text><text class="body" x="473" y="580" text-anchor="start"></text><line x1="270" y1="382" x2="350" y2="310" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="270" y1="382" x2="350" y2="310" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="530" y1="310" x2="620" y2="382" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="530" y1="310" x2="620" y2="382" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="800" y1="382" x2="890" y2="310" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="800" y1="382" x2="890" y2="310" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="710" y1="442" x2="610" y2="510" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="440" y1="370" x2="520" y2="510" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><circle cx="595" cy="382" r="36" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/><text class="label" x="595" y="389" text-anchor="middle"><tspan x="595" dy="0">검증</tspan></text>
-  <text class="small" x="84" y="654">10-04-ids-ips-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="#e2e8f0" />
+  <rect x="24" y="24" width="1152" height="672" rx="30" fill="url(#bg)" stroke="#cbd5e1" />
+
+  <text x="70" y="82" class="small">보안 운영 핵심: 탐지 / 차단 / 기록 보존</text>
+  <text x="70" y="120" class="title">10-04. IDS · IPS · 로그 감사</text>
+  <text x="70" y="154" class="subtitle">같은 보안 이벤트라도 배치 위치와 역할이 다르다: IDS는 본다, IPS는 막는다, 로그 감사는 남기고 연결한다.</text>
+
+  <rect x="58" y="184" width="1084" height="252" rx="24" fill="#ffffff" stroke="#bfdbfe" />
+  <text x="84" y="220" class="section">1) 트래픽 경로에서의 역할 차이</text>
+
+  <circle cx="148" cy="312" r="48" fill="#dbeafe" stroke="#3b82f6" stroke-width="3" />
+  <path d="M118 308 C130 286, 166 286, 178 308 C194 308, 202 320, 202 333 C202 351, 186 362, 167 362 H126 C107 362, 92 350, 92 332 C92 317, 102 307, 118 308 Z" fill="#60a5fa" opacity="0.85" />
+  <text x="148" y="384" text-anchor="middle" class="label">외부 공격 트래픽</text>
+  <text x="148" y="404" text-anchor="middle" class="body">인터넷 구간</text>
+
+  <line x1="196" y1="312" x2="420" y2="312" stroke="url(#traffic)" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  <text x="252" y="290" class="small">인라인 경로</text>
+  <rect x="432" y="238" width="184" height="146" rx="24" fill="#fff1f2" stroke="#ef4444" stroke-width="3" />
+  <path d="M524 258 L568 276 L562 322 C560 347, 545 363, 524 374 C503 363, 488 347, 486 322 L480 276 Z" fill="url(#shield)" stroke="#b91c1c" stroke-width="2" />
+  <path d="M524 286 L524 334" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
+  <path d="M505 314 L524 334 L546 301" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="524" y="220" text-anchor="middle" class="section">IPS</text>
+  <text x="524" y="404" text-anchor="middle" class="body">탐지 + 실시간 차단</text>
+  <text x="524" y="424" text-anchor="middle" class="small">인라인 배치 · 가용성 영향 고려</text>
+
+  <line x1="616" y1="312" x2="858" y2="312" stroke="url(#traffic)" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  <text x="676" y="290" class="small">허용된 트래픽만 내부망 통과</text>
+
+  <rect x="872" y="248" width="182" height="128" rx="24" fill="#ecfeff" stroke="#0f766e" stroke-width="3" />
+  <rect x="900" y="274" width="126" height="20" rx="10" fill="#99f6e4" />
+  <rect x="900" y="304" width="96" height="20" rx="10" fill="#5eead4" />
+  <rect x="900" y="334" width="72" height="20" rx="10" fill="#2dd4bf" />
+  <text x="963" y="224" text-anchor="middle" class="section">내부 서비스</text>
+  <text x="963" y="402" text-anchor="middle" class="body">서버 존 · DB 존 · 업무 시스템</text>
+
+  <line x1="308" y1="312" x2="308" y2="192" stroke="#7c3aed" stroke-width="5" stroke-dasharray="10 8" marker-end="url(#arrow-purple)" />
+  <text x="320" y="205" class="small">미러/SPAN 복제</text>
+  <rect x="224" y="72" width="170" height="104" rx="22" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="3" />
+  <circle cx="266" cy="123" r="20" fill="url(#sensor)" />
+  <circle cx="266" cy="123" r="8" fill="#ede9fe" />
+  <path d="M286 123 Q308 96 330 123" fill="none" stroke="#8b5cf6" stroke-width="3" />
+  <path d="M286 137 Q308 160 330 137" fill="none" stroke="#8b5cf6" stroke-width="3" />
+  <text x="344" y="115" text-anchor="middle" class="section">IDS</text>
+  <text x="344" y="136" text-anchor="middle" class="body">패시브 탐지</text>
+  <text x="344" y="156" text-anchor="middle" class="small">알림 · 로그 생성</text>
+
+  <path d="M394 124 C450 124, 480 124, 532 144" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrow-purple)" />
+  <text x="448" y="108" class="small">서명 기반 / 이상 기반</text>
+
+  <rect x="58" y="456" width="694" height="218" rx="24" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="84" y="492" class="section">2) 로그 감사와 SIEM: 사건 전·중·후를 연결</text>
+
+  <rect x="84" y="518" width="198" height="124" rx="18" fill="#fffbeb" stroke="#f59e0b" stroke-width="2.5" />
+  <rect x="110" y="544" width="146" height="18" rx="6" fill="#fde68a" />
+  <rect x="110" y="572" width="146" height="18" rx="6" fill="#fcd34d" />
+  <rect x="110" y="600" width="110" height="18" rx="6" fill="#fbbf24" />
+  <text x="183" y="534" text-anchor="middle" class="label">로그 수집기</text>
+  <text x="183" y="661" text-anchor="middle" class="small">방화벽 · 서버 · DB · 앱 · 인증 로그</text>
+
+  <line x1="282" y1="580" x2="412" y2="580" stroke="#d97706" stroke-width="5" marker-end="url(#arrow-amber)" />
+  <text x="314" y="560" class="small">정규화</text>
+
+  <rect x="424" y="510" width="302" height="140" rx="18" fill="#f8fafc" stroke="#64748b" stroke-width="2.5" />
+  <text x="575" y="536" text-anchor="middle" class="label">SIEM 상관분석</text>
+  <text x="448" y="566" class="body">• 실패 로그인 → 성공 로그인 → 대량 조회</text>
+  <text x="448" y="590" class="body">• IDS/IPS 경보와 계정 활동을 결합</text>
+  <text x="448" y="614" class="body">• 우선순위 분류 후 대응 워크플로우 연결</text>
+  <text x="448" y="638" class="small">NTP 동기화가 있어야 타임라인 비교 가능</text>
+
+  <rect x="774" y="184" width="368" height="490" rx="24" fill="#0f172a" />
+  <text x="802" y="220" class="section" fill="#f8fafc">3) 로그 감사 필수 요소</text>
+
+  <rect x="800" y="246" width="316" height="84" rx="18" fill="#111827" stroke="#38bdf8" />
+  <circle cx="836" cy="288" r="20" fill="#0ea5e9" />
+  <path d="M836 276 V289 L846 295" fill="none" stroke="#e0f2fe" stroke-width="4" stroke-linecap="round" />
+  <text x="868" y="281" class="label" fill="#f8fafc">시간 동기화</text>
+  <text x="868" y="304" class="body" fill="#cbd5e1">NTP 기준으로 여러 장비 로그의 순서를 맞춤</text>
+
+  <rect x="800" y="346" width="316" height="84" rx="18" fill="#111827" stroke="#fb7185" />
+  <path d="M836 375 h32 a8 8 0 0 1 8 8 v18 a8 8 0 0 1 -8 8 h-32 a8 8 0 0 1 -8 -8 v-18 a8 8 0 0 1 8 -8 z" fill="#ef4444" />
+  <path d="M842 375 v-12 a10 10 0 0 1 20 0 v12" fill="none" stroke="#fecdd3" stroke-width="4" />
+  <text x="888" y="381" class="label" fill="#f8fafc">무결성 보장</text>
+  <text x="888" y="404" class="body" fill="#cbd5e1">append-only, 해시, 서명으로 위변조 방지</text>
+
+  <rect x="800" y="446" width="316" height="84" rx="18" fill="#111827" stroke="#f59e0b" />
+  <path d="M826 470 h50 v36 h-50 z" fill="#f59e0b" />
+  <path d="M836 470 v-10 h30 v10" fill="none" stroke="#fde68a" stroke-width="4" />
+  <text x="888" y="481" class="label" fill="#f8fafc">보존 정책</text>
+  <text x="888" y="504" class="body" fill="#cbd5e1">보존기간·자동삭제·포렌식 보관 절차 문서화</text>
+
+  <rect x="800" y="546" width="316" height="102" rx="18" fill="#111827" stroke="#34d399" />
+  <path d="M834 575 h42 v34 h-42 z" fill="#10b981" />
+  <circle cx="855" cy="591" r="8" fill="#d1fae5" />
+  <path d="M848 604 q7 -6 14 0" fill="none" stroke="#d1fae5" stroke-width="3" />
+  <text x="888" y="581" class="label" fill="#f8fafc">접근통제·마스킹</text>
+  <text x="888" y="604" class="body" fill="#cbd5e1">개인정보 최소화, 조사 시 승인된 접근만 허용</text>
+  <text x="888" y="626" class="small" fill="#94a3b8">사후 분석 · 책임 추적 · 내부통제 증빙</text>
+
+  <rect x="70" y="654" width="652" height="26" rx="13" fill="#e2e8f0" />
+  <text x="396" y="672" text-anchor="middle" class="mono">기억법: IDS = CCTV, IPS = 경비원, 로그 감사 = 출입기록부</text>
 </svg>

@@ -1,31 +1,131 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">13-01. SQL 기본 SVG 인포그래픽</title>
-  <desc id="desc">SQL 기본</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">13-01. SQL 기본 인포그래픽</title>
+  <desc id="desc">SELECT 문의 작성 순서와 SQL의 논리적 실행 순서, WHERE와 HAVING의 차이를 예시와 함께 설명하는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-13-01-00-sql-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#cffafe" />
-      <stop offset="100%" stop-color="#f0fdf4" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-13-01-00-sql-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2" />
-      <stop offset="100%" stop-color="#22c55e" />
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#2563eb"/>
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .mono { font: 600 19px 'SFMono-Regular','Consolas','Menlo',monospace; }
+      .mono-sm { font: 600 15px 'SFMono-Regular','Consolas','Menlo',monospace; }
+      .small { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .step { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .step-name { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .step-desc { font: 500 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-13-01-00-sql-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-13-01-00-sql-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">13-01. SQL 기본</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">일반적으로 SQL 문은 작성된 순서와는 다른 논리적 평가 순서를 가진다. 이해하면</tspan><tspan x="84" dy="24">디버깅과 시험 문제 풀이에 도움이 된다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e"/></marker></defs><rect x="92" y="248" width="250" height="250" rx="22" fill="#cffafe" stroke="#0891b2" stroke-width="2"/><text class="label" x="217" y="282" text-anchor="middle"><tspan x="217" dy="0">SELECT</tspan></text><text class="body" x="110" y="318" text-anchor="start"><tspan x="110" dy="0">FROM</tspan><tspan x="110" dy="18">WHERE</tspan></text><rect x="420" y="222" width="360" height="302" rx="22" fill="#ffffff" stroke="#22c55e" stroke-width="2"/><text class="label" x="600" y="256" text-anchor="middle"><tspan x="600" dy="0">SQL 기본</tspan></text><text class="body" x="438" y="292" text-anchor="start"><tspan x="438" dy="0">WHERE</tspan><tspan x="438" dy="18">GROUP</tspan><tspan x="438" dy="18">HAVING</tspan></text><rect x="858" y="248" width="250" height="250" rx="22" fill="#f0fdf4" stroke="#0891b2" stroke-width="2"/><text class="label" x="983" y="282" text-anchor="middle"><tspan x="983" dy="0">ORDER</tspan></text><text class="body" x="876" y="318" text-anchor="start"><tspan x="876" dy="0">SELECT</tspan><tspan x="876" dy="18">FROM</tspan></text><rect x="330" y="552" width="540" height="82" rx="22" fill="#f8fafc" stroke="#0891b2" stroke-width="2"/><text class="label" x="600" y="586" text-anchor="middle"><tspan x="600" dy="0">핵심 규칙</tspan></text><text class="body" x="348" y="622" text-anchor="start"><tspan x="348" dy="0">SELECT</tspan><tspan x="348" dy="18">FROM</tspan><tspan x="348" dy="18">WHERE</tspan></text><line x1="342" y1="372" x2="420" y2="372" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="342" y1="372" x2="420" y2="372" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="780" y1="372" x2="858" y2="372" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="780" y1="372" x2="858" y2="372" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="524" x2="600" y2="552" stroke="#22c55e" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="524" x2="600" y2="552" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">13-01-00-sql-infographic.svg</text>
+
+  <rect width="1200" height="780" fill="url(#bg)"/>
+  <rect x="30" y="28" width="1140" height="724" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="small" x="72" y="78">데이터베이스 · SELECT 기본 절 · 시험 빈출</text>
+  <text class="title" x="72" y="118">13-01. SQL 기본</text>
+  <text class="subtitle" x="72" y="152">핵심은 “작성 순서”와 “논리적 평가 순서”를 구분하는 것이다.</text>
+
+  <rect x="72" y="186" width="404" height="260" rx="22" fill="#0f172a"/>
+  <text class="section" x="100" y="222" fill="#f8fafc">예시 질의문</text>
+  <text class="mono" x="100" y="262" fill="#93c5fd">SELECT <tspan fill="#f8fafc">customer_id,</tspan></text>
+  <text class="mono" x="100" y="292" fill="#f8fafc">       COUNT(*) AS orders_cnt,</text>
+  <text class="mono" x="100" y="322" fill="#f8fafc">       SUM(amount) AS total</text>
+  <text class="mono" x="100" y="352" fill="#86efac">FROM <tspan fill="#f8fafc">orders</tspan></text>
+  <text class="mono" x="100" y="382" fill="#fca5a5">WHERE <tspan fill="#f8fafc">order_date &gt;= '2023-01-01'</tspan></text>
+  <text class="mono" x="100" y="412" fill="#fde68a">GROUP BY <tspan fill="#f8fafc">customer_id</tspan></text>
+  <text class="mono" x="100" y="442" fill="#fdba74">HAVING <tspan fill="#f8fafc">SUM(amount) &gt; 1000</tspan></text>
+  <text class="mono" x="100" y="472" fill="#c4b5fd">ORDER BY <tspan fill="#f8fafc">total DESC</tspan></text>
+  <text class="mono" x="100" y="502" fill="#67e8f9">LIMIT <tspan fill="#f8fafc">10</tspan></text>
+
+  <rect x="496" y="186" width="628" height="92" rx="22" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+  <text class="section" x="524" y="222">겉으로 보이는 작성 순서</text>
+  <text class="mono-sm" x="524" y="255" fill="#1d4ed8">SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT</text>
+  <text class="body" x="524" y="273">시험에서는 이 순서가 아니라 아래의 논리적 평가 순서를 자주 묻는다.</text>
+
+  <rect x="496" y="298" width="628" height="242" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="524" y="332">논리적 실행 순서</text>
+
+  <line x1="556" y1="410" x2="1064" y2="410" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <line x1="556" y1="410" x2="1064" y2="410" stroke="#ffffff" stroke-width="2" stroke-dasharray="10 8" opacity="0.75">
+    <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/>
+  </line>
+
+  <g transform="translate(548 410)">
+    <circle r="30" fill="#0f766e"/>
+    <text class="step" text-anchor="middle" y="6">1</text>
+    <text class="step-name" text-anchor="middle" x="0" y="58">FROM</text>
+    <text class="step-desc" text-anchor="middle" x="0" y="76">테이블 접근·조인</text>
+  </g>
+  <g transform="translate(632 410)">
+    <circle r="30" fill="#0d9488"/>
+    <text class="step" text-anchor="middle" y="6">2</text>
+    <text class="step-name" text-anchor="middle" x="0" y="58">WHERE</text>
+    <text class="step-desc" text-anchor="middle" x="0" y="76">행 조건 필터</text>
+  </g>
+  <g transform="translate(716 410)">
+    <circle r="30" fill="#0891b2"/>
+    <text class="step" text-anchor="middle" y="6">3</text>
+    <text class="step-name" text-anchor="middle" x="0" y="58">GROUP BY</text>
+    <text class="step-desc" text-anchor="middle" x="0" y="76">그룹 생성</text>
+  </g>
+  <g transform="translate(800 410)">
+    <circle r="30" fill="#0284c7"/>
+    <text class="step" text-anchor="middle" y="6">4</text>
+    <text class="step-name" text-anchor="middle" x="0" y="58">HAVING</text>
+    <text class="step-desc" text-anchor="middle" x="0" y="76">그룹 조건 필터</text>
+  </g>
+  <g transform="translate(884 410)">
+    <circle r="30" fill="#2563eb"/>
+    <text class="step" text-anchor="middle" y="6">5</text>
+    <text class="step-name" text-anchor="middle" x="0" y="58">SELECT</text>
+    <text class="step-desc" text-anchor="middle" x="0" y="76">컬럼·집계 계산</text>
+  </g>
+  <g transform="translate(968 410)">
+    <circle r="30" fill="#4f46e5"/>
+    <text class="step" text-anchor="middle" y="6">6</text>
+    <text class="step-name" text-anchor="middle" x="0" y="58">ORDER BY</text>
+    <text class="step-desc" text-anchor="middle" x="0" y="76">정렬</text>
+  </g>
+  <g transform="translate(1052 410)">
+    <circle r="30" fill="#7c3aed"/>
+    <text class="step" text-anchor="middle" y="6">7</text>
+    <text class="step-name" text-anchor="middle" x="0" y="58">LIMIT</text>
+    <text class="step-desc" text-anchor="middle" x="0" y="76">상위 N개 반환</text>
+  </g>
+
+  <rect x="72" y="476" width="516" height="236" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="100" y="512">WHERE vs HAVING</text>
+  <text class="label" x="100" y="546">WHERE = 행을 먼저 줄인다</text>
+  <g transform="translate(100 564)">
+    <rect x="0" y="0" width="116" height="28" rx="8" fill="#fee2e2"/><text class="chip" x="58" y="19" text-anchor="middle">2022 / 450</text>
+    <rect x="124" y="0" width="116" height="28" rx="8" fill="#dcfce7"/><text class="chip" x="182" y="19" text-anchor="middle">2023 / 700</text>
+    <rect x="248" y="0" width="116" height="28" rx="8" fill="#dcfce7"/><text class="chip" x="306" y="19" text-anchor="middle">2023 / 600</text>
+    <rect x="372" y="0" width="116" height="28" rx="8" fill="#dcfce7"/><text class="chip" x="430" y="19" text-anchor="middle">2024 / 900</text>
+  </g>
+  <text class="body" x="100" y="620">order_date ≥ 2023-01-01 조건으로 2022 주문 행은 집계 전에 제거된다.</text>
+  <text class="label" x="100" y="658">HAVING = 그룹을 만든 뒤 걸러낸다</text>
+  <g transform="translate(100 674)">
+    <rect x="0" y="0" width="132" height="28" rx="8" fill="#e0f2fe"/><text class="chip" x="66" y="19" text-anchor="middle">A고객 합계 1300</text>
+    <rect x="144" y="0" width="132" height="28" rx="8" fill="#fee2e2"/><text class="chip" x="210" y="19" text-anchor="middle">B고객 합계 800</text>
+    <rect x="288" y="0" width="132" height="28" rx="8" fill="#e0f2fe"/><text class="chip" x="354" y="19" text-anchor="middle">C고객 합계 1500</text>
+  </g>
+
+  <rect x="612" y="560" width="512" height="152" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="640" y="596">시험 포인트 압축</text>
+  <text class="body" x="640" y="628">• GROUP BY 이전에는 집계 결과를 알 수 없으므로 WHERE에 SUM(amount) 조건을 쓰지 않는다.</text>
+  <text class="body" x="640" y="654">• NULL 비교는 = NULL이 아니라 IS NULL / IS NOT NULL을 사용한다.</text>
+  <text class="body" x="640" y="680">• 실제 물리적 실행은 옵티마이저가 정하지만, 문제에서는 논리적 순서를 답한다.</text>
+
+  <text class="small" x="72" y="736">13-01-00-sql-infographic.svg · SQL logical order: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT</text>
 </svg>

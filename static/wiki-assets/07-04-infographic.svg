@@ -1,31 +1,139 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-04. 트랜잭션과 회복 SVG 인포그래픽</title>
-  <desc id="desc">트랜잭션과 회복</desc>
+  <title id="title">07-04. 트랜잭션과 회복 인포그래픽</title>
+  <desc id="desc">은행 이체 예시를 중심으로 ACID, 격리 수준, WAL 기반 undo/redo와 체크포인트를 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-07-04-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#ecfeff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#e0f2fe" />
     </linearGradient>
-    <linearGradient id="line-07-04-infographic.svg" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0369a1" />
+    </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .mono { font: 600 13px 'SFMono-Regular','Consolas',monospace; fill: #0f172a; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-07-04-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-07-04-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">07-04. 트랜잭션과 회복</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">트랜잭션은 논리적 작업 단위다. (예: 은행 이체: A에서 출금하고 B에 입금하는</tspan><tspan x="84" dy="24">두 작업을 하나의 단위로 묶음)</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#14b8a6"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">트랜잭션과 회복</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">트랜잭션은 논리적</tspan><tspan x="389" dy="18">작업 단위다</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">은행 이체</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">A에서 출금하고</tspan><tspan x="813" dy="18">B에 입금하는 두</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">ACID는 원자성</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">트랜잭션과 회복</tspan><tspan x="238" dy="18">트랜잭션은 논리적 작업 단위다</tspan><tspan x="238" dy="18">은행 이체</tspan></text>
-  <text class="small" x="84" y="654">07-04-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="24" y="24" width="1152" height="672" rx="30" fill="#ffffff" stroke="#cbd5e1" />
+
+  <text class="tiny" x="56" y="66">금융공기업 IT · 데이터베이스</text>
+  <text class="title" x="56" y="108">07-04. 트랜잭션과 회복</text>
+  <text class="subtitle" x="56" y="140">은행 이체를 안전하게 끝내기 위해 ACID로 실행하고, 장애 시 WAL 로그로 undo/redo 복구한다.</text>
+
+  <rect x="48" y="170" width="1104" height="235" rx="26" fill="url(#panel)" stroke="#bae6fd" />
+  <text class="section" x="72" y="204">1. 트랜잭션 = 끊기면 안 되는 하나의 작업</text>
+
+  <rect x="78" y="236" width="150" height="120" rx="20" fill="#ecfeff" stroke="#0f766e" stroke-width="2" />
+  <text class="label" x="153" y="270" text-anchor="middle">BEGIN</text>
+  <text class="body" x="153" y="296" text-anchor="middle">이체 T1 시작</text>
+  <text class="body" x="153" y="316" text-anchor="middle">A: 1000원</text>
+  <text class="body" x="153" y="336" text-anchor="middle">B: 500원</text>
+
+  <rect x="276" y="236" width="188" height="120" rx="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="2" />
+  <text class="label" x="370" y="270" text-anchor="middle">1) 출금</text>
+  <text class="body" x="370" y="296" text-anchor="middle">A 계좌 -100</text>
+  <text class="body" x="370" y="316" text-anchor="middle">부분 반영 상태</text>
+  <text class="body" x="370" y="336" text-anchor="middle">단독 확정 금지</text>
+
+  <rect x="512" y="236" width="188" height="120" rx="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+  <text class="label" x="606" y="270" text-anchor="middle">2) 입금</text>
+  <text class="body" x="606" y="296" text-anchor="middle">B 계좌 +100</text>
+  <text class="body" x="606" y="316" text-anchor="middle">A: 900원</text>
+  <text class="body" x="606" y="336" text-anchor="middle">B: 600원</text>
+
+  <rect x="748" y="236" width="180" height="120" rx="20" fill="#fefce8" stroke="#ca8a04" stroke-width="2" />
+  <text class="label" x="838" y="270" text-anchor="middle">COMMIT / ROLLBACK</text>
+  <text class="body" x="838" y="296" text-anchor="middle">둘 다 성공 → COMMIT</text>
+  <text class="body" x="838" y="316" text-anchor="middle">중간 장애 → ROLLBACK</text>
+  <text class="body" x="838" y="336" text-anchor="middle">전부 성공 or 전부 취소</text>
+
+  <line x1="228" y1="296" x2="276" y2="296" stroke="url(#flow)" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="464" y1="296" x2="512" y2="296" stroke="url(#flow)" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="700" y1="296" x2="748" y2="296" stroke="url(#flow)" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)" />
+
+  <rect x="956" y="224" width="170" height="145" rx="22" fill="#0f172a" />
+  <text class="section" x="1041" y="258" text-anchor="middle" fill="#f8fafc">ACID</text>
+  <text class="chip" x="980" y="286" fill="#5eead4">A</text>
+  <text class="body" x="1000" y="286" fill="#e2e8f0">원자성: 전부 성공/취소</text>
+  <text class="chip" x="980" y="312" fill="#93c5fd">C</text>
+  <text class="body" x="1000" y="312" fill="#e2e8f0">일관성: 규칙 유지</text>
+  <text class="chip" x="980" y="338" fill="#fde68a">I</text>
+  <text class="body" x="1000" y="338" fill="#e2e8f0">격리성: 중간 결과 차단</text>
+  <text class="chip" x="980" y="364" fill="#fca5a5">D</text>
+  <text class="body" x="1000" y="364" fill="#e2e8f0">지속성: 커밋 후 유지</text>
+
+  <rect x="48" y="425" width="532" height="247" rx="26" fill="url(#panel)" stroke="#bfdbfe" />
+  <text class="section" x="72" y="459">2. 격리 수준과 읽기 이상</text>
+  <text class="tiny" x="72" y="483">동시성은 위로 갈수록 높고, 일관성은 아래로 갈수록 강하다.</text>
+
+  <line x1="124" y1="518" x2="124" y2="632" stroke="#94a3b8" stroke-width="3" />
+  <polygon points="124,506 117,520 131,520" fill="#94a3b8" />
+  <polygon points="124,644 117,630 131,630" fill="#94a3b8" />
+  <text class="tiny" x="92" y="514" text-anchor="end">동시성↑</text>
+  <text class="tiny" x="92" y="646" text-anchor="end">일관성↑</text>
+
+  <rect x="160" y="506" width="380" height="28" rx="14" fill="#fee2e2" />
+  <text class="label" x="178" y="525">Read Uncommitted</text>
+  <text class="body" x="364" y="525">Dirty / Non-repeatable / Phantom 허용</text>
+
+  <rect x="160" y="545" width="380" height="28" rx="14" fill="#ffedd5" />
+  <text class="label" x="178" y="564">Read Committed</text>
+  <text class="body" x="364" y="564">Dirty read 방지, 나머지 가능</text>
+
+  <rect x="160" y="584" width="380" height="28" rx="14" fill="#dbeafe" />
+  <text class="label" x="178" y="603">Repeatable Read</text>
+  <text class="body" x="364" y="603">Phantom read 가능</text>
+
+  <rect x="160" y="623" width="380" height="28" rx="14" fill="#dcfce7" />
+  <text class="label" x="178" y="642">Serializable</text>
+  <text class="body" x="364" y="642">모든 이상 방지, 동시성 최저</text>
+
+  <rect x="600" y="425" width="552" height="247" rx="26" fill="url(#panel)" stroke="#a7f3d0" />
+  <text class="section" x="624" y="459">3. 회복: WAL → 장애 판정 → undo / redo</text>
+  <text class="tiny" x="624" y="483">Write-Ahead Logging: 데이터 페이지보다 로그를 먼저 디스크에 기록한다.</text>
+
+  <rect x="628" y="510" width="136" height="108" rx="20" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
+  <text class="label" x="696" y="544" text-anchor="middle">로그 선기록</text>
+  <text class="mono" x="696" y="570" text-anchor="middle">L1: A -100</text>
+  <text class="mono" x="696" y="590" text-anchor="middle">L2: B +100</text>
+  <text class="body" x="696" y="610" text-anchor="middle">WAL</text>
+
+  <rect x="810" y="510" width="136" height="108" rx="20" fill="#fef3c7" stroke="#d97706" stroke-width="2" />
+  <text class="label" x="878" y="544" text-anchor="middle">장애 발생</text>
+  <text class="body" x="878" y="570" text-anchor="middle">커밋 로그 있음?</text>
+  <text class="body" x="878" y="590" text-anchor="middle">체크포인트 이후만</text>
+  <text class="body" x="878" y="610" text-anchor="middle">집중 확인</text>
+
+  <rect x="992" y="496" width="128" height="54" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="2" />
+  <text class="label" x="1056" y="529" text-anchor="middle">YES → REDO</text>
+  <rect x="992" y="564" width="128" height="54" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="2" />
+  <text class="label" x="1056" y="597" text-anchor="middle">NO → UNDO</text>
+
+  <line x1="764" y1="564" x2="810" y2="564" stroke="url(#flow)" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="946" y1="550" x2="992" y2="523" stroke="#16a34a" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="946" y1="578" x2="992" y2="591" stroke="#dc2626" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" />
+
+  <rect x="644" y="629" width="202" height="24" rx="12" fill="#e2e8f0" />
+  <rect x="644" y="629" width="122" height="24" rx="12" fill="#38bdf8">
+    <animate attributeName="width" values="32;122;32" dur="5s" repeatCount="indefinite" />
+  </rect>
+  <text class="tiny" x="745" y="645" text-anchor="middle">Checkpoint가 복구 범위를 줄인다</text>
+
+  <text class="tiny" x="56" y="690">자산: 07-04-infographic.svg · 핵심: 은행 이체, ACID, 격리 수준, WAL, 체크포인트, undo/redo</text>
 </svg>

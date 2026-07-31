@@ -1,31 +1,147 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-02-01. 이진트리-힙-B트리 SVG 인포그래픽</title>
-  <desc id="desc">이진트리-힙-B트리</desc>
+  <title id="title">09-02-01. 이진트리-힙-B트리 인포그래픽</title>
+  <desc id="desc">BST는 정렬된 탐색, 힙은 우선순위 큐, B트리는 디스크 친화 인덱스라는 차이를 비교하는 페이지 전용 SVG</desc>
   <defs>
-    <linearGradient id="grad-09-02-01-b-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e0e7ff" />
-      <stop offset="100%" stop-color="#f3e8ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
-    <linearGradient id="line-09-02-01-b-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4f46e5" />
-      <stop offset="100%" stop-color="#7c3aed" />
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1d4ed8" />
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 33px 'Pretendard','Noto Sans KR',sans-serif; fill: #f8fafc; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .panelTitle { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .panelBody { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 11px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      .metric { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .nodeText { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: white; }
+      .arrayText { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .pageKey { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-09-02-01-b-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-09-02-01-b-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">09-02-01. 이진트리-힙-B트리</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">이진트리(Binary tree)</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker></defs><line x1="220" y1="360" x2="420" y2="250" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="220" y1="360" x2="420" y2="470" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="420" y1="250" x2="660" y2="250" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="420" y1="470" x2="660" y2="470" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="660" y1="250" x2="900" y2="360" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="660" y1="470" x2="900" y2="360" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="420" y1="250" x2="420" y2="470" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="660" y1="250" x2="660" y2="470" stroke="#7c3aed" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><circle cx="220" cy="360" r="56" fill="white" stroke="#4f46e5" stroke-width="3"/><circle cx="220" cy="360" r="46" fill="#e0e7ff" opacity="0.95"/><text class="label" x="220" y="354" text-anchor="middle"><tspan x="220" dy="0">이진트리-힙-B트리</tspan></text><circle cx="420" cy="250" r="56" fill="white" stroke="#4f46e5" stroke-width="3"/><circle cx="420" cy="250" r="46" fill="#f3e8ff" opacity="0.95"/><text class="label" x="420" y="244" text-anchor="middle"><tspan x="420" dy="0">핵심 포인트 요약</tspan></text><circle cx="420" cy="470" r="56" fill="white" stroke="#4f46e5" stroke-width="3"/><circle cx="420" cy="470" r="46" fill="#e0e7ff" opacity="0.95"/><text class="label" x="420" y="464" text-anchor="middle"><tspan x="420" dy="0">세부 개념 및 연산</tspan></text><circle cx="660" cy="250" r="56" fill="white" stroke="#4f46e5" stroke-width="3"/><circle cx="660" cy="250" r="46" fill="#f3e8ff" opacity="0.95"/><text class="label" x="660" y="244" text-anchor="middle"><tspan x="660" dy="0">시험 실무에 자주</tspan><tspan x="660" dy="18">나오는 포인트</tspan></text><circle cx="660" cy="470" r="56" fill="white" stroke="#4f46e5" stroke-width="3"/><circle cx="660" cy="470" r="46" fill="#e0e7ff" opacity="0.95"/><text class="label" x="660" y="464" text-anchor="middle"><tspan x="660" dy="0">비교 정리</tspan></text><circle cx="900" cy="360" r="56" fill="white" stroke="#4f46e5" stroke-width="3"/><circle cx="900" cy="360" r="46" fill="#f3e8ff" opacity="0.95"/><text class="label" x="900" y="354" text-anchor="middle"><tspan x="900" dy="0">노드</tspan></text><rect x="360" y="578" width="480" height="66" rx="22" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="600" y="612" text-anchor="middle"><tspan x="600" dy="0">탐색 포인트</tspan></text><text class="body" x="378" y="648" text-anchor="start"><tspan x="378" dy="0">이진트리-힙-B트리</tspan><tspan x="378" dy="18">핵심 포인트 요약</tspan><tspan x="378" dy="18">세부 개념 및 연산</tspan></text>
-  <text class="small" x="84" y="654">09-02-01-b-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="36" y="28" width="1128" height="664" rx="28" fill="white" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="36" y="28" width="1128" height="116" rx="28" fill="url(#header)" />
+  <rect x="36" y="110" width="1128" height="34" fill="url(#header)" />
+
+  <text class="subtitle" x="72" y="66">자료구조 비교 · 구조 / 핵심 연산 / 실무 사용처</text>
+  <text class="title" x="72" y="104">이진 탐색 트리(BST) · 힙(Heap) · B트리(B-tree)</text>
+  <text class="subtitle" x="72" y="128">정렬 탐색은 BST, 최댓값·최솟값 우선순위는 힙, 디스크 기반 인덱스는 B트리</text>
+
+  <rect x="62" y="168" width="340" height="420" rx="24" fill="#f8fafc" stroke="#bfdbfe" stroke-width="2" />
+  <rect x="430" y="168" width="340" height="420" rx="24" fill="#f8fafc" stroke="#c7d2fe" stroke-width="2" />
+  <rect x="798" y="168" width="340" height="420" rx="24" fill="#f8fafc" stroke="#bae6fd" stroke-width="2" />
+
+  <text class="panelTitle" x="86" y="206">1. BST: 정렬된 탐색</text>
+  <text class="panelBody" x="86" y="230">왼쪽 &lt; 부모 &lt; 오른쪽 → inorder 순회 결과가 정렬</text>
+
+  <line x1="206" y1="260" x2="146" y2="318" stroke="#2563eb" stroke-width="3" />
+  <line x1="206" y1="260" x2="266" y2="318" stroke="#2563eb" stroke-width="3" />
+  <line x1="146" y1="318" x2="108" y2="376" stroke="#2563eb" stroke-width="3" />
+  <line x1="146" y1="318" x2="184" y2="376" stroke="#2563eb" stroke-width="3" />
+  <line x1="266" y1="318" x2="308" y2="376" stroke="#2563eb" stroke-width="3" />
+  <line x1="184" y1="376" x2="164" y2="430" stroke="#2563eb" stroke-width="3" />
+  <line x1="308" y1="376" x2="330" y2="430" stroke="#2563eb" stroke-width="3" />
+
+  <circle cx="206" cy="260" r="23" fill="#2563eb" /><text class="nodeText" x="206" y="265" text-anchor="middle">8</text>
+  <circle cx="146" cy="318" r="21" fill="#3b82f6" /><text class="nodeText" x="146" y="323" text-anchor="middle">3</text>
+  <circle cx="266" cy="318" r="21" fill="#3b82f6" /><text class="nodeText" x="266" y="323" text-anchor="middle">10</text>
+  <circle cx="108" cy="376" r="19" fill="#60a5fa" /><text class="nodeText" x="108" y="381" text-anchor="middle">1</text>
+  <circle cx="184" cy="376" r="19" fill="#60a5fa" /><text class="nodeText" x="184" y="381" text-anchor="middle">6</text>
+  <circle cx="308" cy="376" r="19" fill="#60a5fa" /><text class="nodeText" x="308" y="381" text-anchor="middle">14</text>
+  <circle cx="164" cy="430" r="17" fill="#93c5fd" /><text class="nodeText" x="164" y="435" text-anchor="middle">4</text>
+  <circle cx="330" cy="430" r="17" fill="#93c5fd" /><text class="nodeText" x="330" y="435" text-anchor="middle">7</text>
+
+  <text class="small" x="86" y="468">inorder → Left → Node → Right</text>
+  <g transform="translate(86 484)">
+    <rect x="0" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="14" y="19" text-anchor="middle">1</text>
+    <rect x="34" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="48" y="19" text-anchor="middle">3</text>
+    <rect x="68" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="82" y="19" text-anchor="middle">4</text>
+    <rect x="102" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="116" y="19" text-anchor="middle">6</text>
+    <rect x="136" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="150" y="19" text-anchor="middle">7</text>
+    <rect x="170" y="0" width="28" height="28" rx="8" fill="#bfdbfe" /><text class="chip" x="184" y="19" text-anchor="middle">8</text>
+    <rect x="204" y="0" width="34" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="221" y="19" text-anchor="middle">10</text>
+    <rect x="244" y="0" width="34" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="261" y="19" text-anchor="middle">14</text>
+  </g>
+  <rect x="86" y="530" width="292" height="42" rx="14" fill="#eff6ff" stroke="#93c5fd" />
+  <text class="metric" x="102" y="556">탐색·삽입·삭제 평균 O(log n), 편향되면 최악 O(n)</text>
+
+  <text class="panelTitle" x="454" y="206">2. 힙: 루트 우선순위</text>
+  <text class="panelBody" x="454" y="230">완전이진트리 + 배열 표현 → 최댓값/최솟값 즉시 확인</text>
+
+  <line x1="600" y1="260" x2="540" y2="318" stroke="#7c3aed" stroke-width="3" />
+  <line x1="600" y1="260" x2="660" y2="318" stroke="#7c3aed" stroke-width="3" />
+  <line x1="540" y1="318" x2="504" y2="374" stroke="#7c3aed" stroke-width="3" />
+  <line x1="540" y1="318" x2="576" y2="374" stroke="#7c3aed" stroke-width="3" />
+  <line x1="660" y1="318" x2="624" y2="374" stroke="#7c3aed" stroke-width="3" />
+  <line x1="660" y1="318" x2="696" y2="374" stroke="#7c3aed" stroke-width="3" />
+
+  <circle cx="600" cy="260" r="23" fill="#7c3aed" /><text class="nodeText" x="600" y="265" text-anchor="middle">90</text>
+  <circle cx="540" cy="318" r="21" fill="#8b5cf6" /><text class="nodeText" x="540" y="323" text-anchor="middle">70</text>
+  <circle cx="660" cy="318" r="21" fill="#8b5cf6" /><text class="nodeText" x="660" y="323" text-anchor="middle">65</text>
+  <circle cx="504" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="504" y="379" text-anchor="middle">30</text>
+  <circle cx="576" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="576" y="379" text-anchor="middle">50</text>
+  <circle cx="624" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="624" y="379" text-anchor="middle">40</text>
+  <circle cx="696" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="696" y="379" text-anchor="middle">20</text>
+
+  <text class="small" x="454" y="415">배열 인덱스(0-based): parent(i)=(i-1)//2, child=2i+1 / 2i+2</text>
+  <g transform="translate(454 430)">
+    <rect x="0" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="18" y="21" text-anchor="middle">90</text>
+    <rect x="38" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="56" y="21" text-anchor="middle">70</text>
+    <rect x="76" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="94" y="21" text-anchor="middle">65</text>
+    <rect x="114" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="132" y="21" text-anchor="middle">30</text>
+    <rect x="152" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="170" y="21" text-anchor="middle">50</text>
+    <rect x="190" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="208" y="21" text-anchor="middle">40</text>
+    <rect x="228" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="246" y="21" text-anchor="middle">20</text>
+    <text class="tiny" x="18" y="50" text-anchor="middle">0</text>
+    <text class="tiny" x="56" y="50" text-anchor="middle">1</text>
+    <text class="tiny" x="94" y="50" text-anchor="middle">2</text>
+    <text class="tiny" x="132" y="50" text-anchor="middle">3</text>
+    <text class="tiny" x="170" y="50" text-anchor="middle">4</text>
+    <text class="tiny" x="208" y="50" text-anchor="middle">5</text>
+    <text class="tiny" x="246" y="50" text-anchor="middle">6</text>
+  </g>
+  <rect x="454" y="500" width="292" height="72" rx="14" fill="#faf5ff" stroke="#c4b5fd" />
+  <text class="metric" x="470" y="524">peek O(1) · insert/extract O(log n)</text>
+  <text class="small" x="470" y="546">build-heap은 바닥에서 siftdown → O(n)</text>
+  <text class="small" x="470" y="564">임의 원소 탐색은 정렬 보장이 없어 O(n)</text>
+
+  <text class="panelTitle" x="822" y="206">3. B트리: 높이를 낮춰 I/O 절감</text>
+  <text class="panelBody" x="822" y="230">한 노드에 여러 키와 자식 포인터를 담아 디스크 접근 횟수를 줄인다</text>
+
+  <rect x="920" y="254" width="104" height="48" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
+  <text class="pageKey" x="972" y="284" text-anchor="middle">20 | 40</text>
+  <line x1="944" y1="302" x2="888" y2="346" stroke="#0284c7" stroke-width="3" />
+  <line x1="972" y1="302" x2="972" y2="346" stroke="#0284c7" stroke-width="3" />
+  <line x1="1000" y1="302" x2="1056" y2="346" stroke="#0284c7" stroke-width="3" />
+
+  <rect x="838" y="346" width="100" height="54" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="888" y="378" text-anchor="middle">5 | 12</text>
+  <rect x="922" y="346" width="100" height="54" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="972" y="378" text-anchor="middle">24 | 31</text>
+  <rect x="1006" y="346" width="100" height="54" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="1056" y="378" text-anchor="middle">52 | 68</text>
+
+  <g transform="translate(824 430)">
+    <ellipse cx="26" cy="10" rx="24" ry="8" fill="#0f766e" opacity="0.18" />
+    <rect x="2" y="10" width="48" height="44" rx="8" fill="#14b8a6" opacity="0.18" stroke="#0f766e" />
+    <ellipse cx="26" cy="54" rx="24" ry="8" fill="#14b8a6" opacity="0.18" stroke="#0f766e" />
+    <text class="small" x="76" y="26">DB / 파일시스템 페이지</text>
+    <text class="metric" x="76" y="48">노드당 키↑ → 트리 높이↓ → 블록 I/O↓</text>
+    <text class="small" x="76" y="68">삽입 시 split, 삭제 시 merge/재분배</text>
+  </g>
+
+  <rect x="822" y="520" width="292" height="52" rx="14" fill="#ecfeff" stroke="#67e8f9" />
+  <text class="metric" x="838" y="542">전체 탐색 O(log n), 범위 조회·인덱스에 강함</text>
+  <text class="small" x="838" y="560">모든 리프가 같은 깊이여서 균형 유지</text>
+
+  <rect x="62" y="610" width="1076" height="58" rx="20" fill="#0f172a" />
+  <text class="subtitle" x="88" y="635">언제 어떤 구조를 쓰나</text>
+  <text class="small" x="88" y="654" fill="#cbd5e1">BST/Balanced BST: 메모리 내 정렬 집합 · 힙: 우선순위 큐/스케줄러 · B트리: DB 인덱스/대용량 범위 검색</text>
 </svg>

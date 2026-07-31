@@ -1,31 +1,123 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
   <title id="title">07-01. 관계형 데이터베이스 기본 SVG 인포그래픽</title>
-  <desc id="desc">관계형 데이터베이스 기본</desc>
+  <desc id="desc">릴레이션, 튜플, 속성, 스키마와 인스턴스, 기본키와 외래키, 무결성 제약을 고객과 계좌 테이블 예시로 설명하는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-07-01-00-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
       <stop offset="100%" stop-color="#ecfeff" />
     </linearGradient>
-    <linearGradient id="line-07-01-00-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#14b8a6" />
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#0f766e" />
+    </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .key { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f766e; }
+      .warn { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #b45309; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-07-01-00-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-07-01-00-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">07-01. 관계형 데이터베이스 기본</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">릴레이션은 테이블, 튜플은 행, 속성은 열이다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#14b8a6"/></marker></defs><rect x="92" y="248" width="250" height="250" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="217" y="282" text-anchor="middle"><tspan x="217" dy="0">관계형 데이터베이스 기본</tspan></text><text class="body" x="110" y="318" text-anchor="start"><tspan x="110" dy="0">릴레이션은 테이블</tspan><tspan x="110" dy="18">튜플은 행</tspan></text><rect x="420" y="222" width="360" height="302" rx="22" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/><text class="label" x="600" y="256" text-anchor="middle"><tspan x="600" dy="0">관계형 데이터베이스 기본</tspan></text><text class="body" x="438" y="292" text-anchor="start"><tspan x="438" dy="0">튜플은 행</tspan><tspan x="438" dy="18">속성은 열이다</tspan></text><rect x="858" y="248" width="250" height="250" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="983" y="282" text-anchor="middle"><tspan x="983" dy="0">속성은 열이다</tspan></text><text class="body" x="876" y="318" text-anchor="start"><tspan x="876" dy="0">관계형 데이터베이스 기본</tspan><tspan x="876" dy="18">릴레이션은 테이블</tspan></text><rect x="330" y="552" width="540" height="82" rx="22" fill="#f8fafc" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="586" text-anchor="middle"><tspan x="600" dy="0">핵심 규칙</tspan></text><text class="body" x="348" y="622" text-anchor="start"><tspan x="348" dy="0">관계형 데이터베이스 기본</tspan><tspan x="348" dy="18">릴레이션은 테이블</tspan><tspan x="348" dy="18">튜플은 행</tspan></text><line x1="342" y1="372" x2="420" y2="372" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="342" y1="372" x2="420" y2="372" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="780" y1="372" x2="858" y2="372" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="780" y1="372" x2="858" y2="372" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="524" x2="600" y2="552" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="524" x2="600" y2="552" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">07-01-00-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="#e2e8f0" />
+  <rect x="24" y="24" width="1152" height="672" rx="32" fill="url(#bg)" />
+  <rect x="48" y="48" width="1104" height="624" rx="28" fill="#ffffff" />
+
+  <text class="small" x="84" y="92">데이터를 표로 나누고, 키와 제약으로 정확하게 연결한다</text>
+  <text class="title" x="84" y="130">07-01. 관계형 데이터베이스 기본</text>
+  <text class="subtitle" x="84" y="166">릴레이션=테이블, 튜플=행, 속성=열 / 스키마는 설계도, 인스턴스는 현재 데이터</text>
+
+  <rect x="76" y="206" width="466" height="414" rx="24" fill="url(#panel)" stroke="#bae6fd" stroke-width="2" />
+  <rect x="562" y="206" width="270" height="414" rx="24" fill="url(#panel)" stroke="#99f6e4" stroke-width="2" />
+  <rect x="852" y="206" width="272" height="414" rx="24" fill="url(#panel)" stroke="#bfdbfe" stroke-width="2" />
+
+  <text class="section" x="104" y="244">1. 릴레이션의 구성요소</text>
+  <text class="body" x="104" y="270">하나의 표가 릴레이션이고, 행과 열 이름을 기준으로 데이터를 읽는다.</text>
+
+  <rect x="104" y="292" width="410" height="248" rx="18" fill="#ffffff" stroke="#0f766e" stroke-width="2.5" />
+  <rect x="104" y="292" width="410" height="42" rx="18" fill="#ccfbf1" />
+  <rect x="104" y="316" width="410" height="18" fill="#ccfbf1" />
+  <line x1="214" y1="292" x2="214" y2="540" stroke="#94a3b8" stroke-width="1.5" />
+  <line x1="354" y1="292" x2="354" y2="540" stroke="#94a3b8" stroke-width="1.5" />
+  <line x1="104" y1="334" x2="514" y2="334" stroke="#94a3b8" stroke-width="1.5" />
+  <line x1="104" y1="386" x2="514" y2="386" stroke="#cbd5e1" stroke-width="1.5" />
+  <line x1="104" y1="438" x2="514" y2="438" stroke="#cbd5e1" stroke-width="1.5" />
+  <line x1="104" y1="490" x2="514" y2="490" stroke="#cbd5e1" stroke-width="1.5" />
+
+  <text class="label" x="159" y="320" text-anchor="middle">고객번호</text>
+  <text class="label" x="284" y="320" text-anchor="middle">고객명</text>
+  <text class="label" x="434" y="320" text-anchor="middle">등급</text>
+
+  <text class="body" x="159" y="367" text-anchor="middle">C001</text>
+  <text class="body" x="284" y="367" text-anchor="middle">김민수</text>
+  <text class="body" x="434" y="367" text-anchor="middle">VIP</text>
+  <text class="body" x="159" y="419" text-anchor="middle">C002</text>
+  <text class="body" x="284" y="419" text-anchor="middle">이서연</text>
+  <text class="body" x="434" y="419" text-anchor="middle">일반</text>
+  <text class="body" x="159" y="471" text-anchor="middle">C003</text>
+  <text class="body" x="284" y="471" text-anchor="middle">박준호</text>
+  <text class="body" x="434" y="471" text-anchor="middle">우수</text>
+
+  <rect x="130" y="345" width="358" height="34" rx="10" fill="#14b8a6" opacity="0.16" />
+  <text class="key" x="96" y="364">튜플</text>
+  <line x1="108" y1="360" x2="126" y2="360" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <rect x="132" y="300" width="94" height="28" rx="10" fill="#0ea5e9" opacity="0.16" />
+  <text class="key" x="176" y="285" text-anchor="middle">속성</text>
+  <line x1="176" y1="289" x2="176" y2="298" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <text class="key" x="420" y="284">릴레이션 = 고객 테이블</text>
+  <line x1="420" y1="288" x2="474" y2="288" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <text class="small" x="104" y="574">시험 포인트: 테이블·행·열 용어를 서로 바꿔 물어본다.</text>
+
+  <text class="section" x="590" y="244">2. 스키마 vs 인스턴스</text>
+  <text class="body" x="590" y="270">구조를 정의한 설계도와, 특정 시점의 실제 저장값을 구분한다.</text>
+
+  <rect x="590" y="292" width="214" height="112" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+  <text class="label" x="607" y="322">스키마</text>
+  <text class="body" x="607" y="348">고객(고객번호 PK, 고객명, 등급)</text>
+  <text class="body" x="607" y="370">계좌(계좌번호 PK, 고객번호 FK, 잔액)</text>
+  <text class="small" x="607" y="392">이름·자료형·제약조건까지 포함</text>
+
+  <line x1="697" y1="412" x2="697" y2="448" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)" />
+
+  <rect x="590" y="458" width="214" height="128" rx="16" fill="#ecfeff" stroke="#14b8a6" stroke-width="2" />
+  <text class="label" x="607" y="488">인스턴스</text>
+  <text class="body" x="607" y="514">지금 저장된 행들</text>
+  <text class="body" x="607" y="536">C001, 김민수, VIP</text>
+  <text class="body" x="607" y="558">A101, C001, 5,000,000</text>
+  <text class="small" x="607" y="580">시간이 지나면 값은 바뀌지만 스키마는 유지</text>
+
+  <text class="section" x="880" y="244">3. 키와 무결성</text>
+  <text class="body" x="880" y="270">중복을 줄이기 위해 고객과 계좌를 분리하고, 키와 제약으로 연결한다.</text>
+
+  <rect x="880" y="296" width="216" height="114" rx="16" fill="#ffffff" stroke="#0f766e" stroke-width="2" />
+  <rect x="880" y="296" width="216" height="34" rx="16" fill="#dcfce7" />
+  <text class="label" x="898" y="319">고객</text>
+  <text class="body" x="898" y="348">PK 고객번호 = C001</text>
+  <text class="body" x="898" y="370">고객명 = 김민수</text>
+  <text class="body" x="898" y="392">등급 = VIP</text>
+
+  <rect x="880" y="444" width="216" height="126" rx="16" fill="#ffffff" stroke="#0f766e" stroke-width="2" />
+  <rect x="880" y="444" width="216" height="34" rx="16" fill="#fde68a" />
+  <text class="label" x="898" y="467">계좌</text>
+  <text class="body" x="898" y="496">PK 계좌번호 = A101</text>
+  <text class="body" x="898" y="518">FK 고객번호 = C001</text>
+  <text class="body" x="898" y="540">잔액 = 5,000,000</text>
+
+  <line x1="988" y1="410" x2="988" y2="444" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)" />
+  <text class="key" x="1002" y="430">참조</text>
+
+  <rect x="76" y="636" width="1048" height="24" rx="12" fill="#0f172a" opacity="0.92" />
+  <text class="small" x="96" y="652" fill="#e2e8f0">무결성 요약: 엔터티 무결성 = 기본키는 NULL 불가 / 참조 무결성 = 외래키는 존재하는 기본키만 참조 / 도메인 무결성 = 속성값은 정해진 범위 준수</text>
+
+  <rect x="908" y="582" width="160" height="24" rx="12" fill="#fff7ed" />
+  <text class="warn" x="988" y="599" text-anchor="middle">중복 대신 연결이 핵심</text>
 </svg>

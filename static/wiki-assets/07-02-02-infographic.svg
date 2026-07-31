@@ -1,31 +1,181 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-02-02. 이상현상과 함수종속 SVG 인포그래픽</title>
-  <desc id="desc">이상현상과 함수종속</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">07-02-02. 이상현상과 함수종속 인포그래픽</title>
+  <desc id="desc">주문 테이블에 고객과 상품 정보가 함께 섞일 때 발생하는 갱신 이상, 삽입 이상, 삭제 이상을 함수 종속과 정규화로 연결한 도식</desc>
   <defs>
-    <linearGradient id="grad-07-02-02-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#ecfeff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-07-02-02-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#14b8a6" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0f766e"/>
     </linearGradient>
+    <linearGradient id="tableGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="danger" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </linearGradient>
+    <linearGradient id="safe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ecfeff"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="softArrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#0f766e"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title{font:700 34px sans-serif;fill:#f8fafc}
+      .subtitle{font:500 16px sans-serif;fill:#dbeafe}
+      .section{font:700 24px sans-serif;fill:#0f172a}
+      .label{font:700 17px sans-serif;fill:#0f172a}
+      .body{font:500 14px sans-serif;fill:#334155}
+      .small{font:600 12px sans-serif;fill:#475569}
+      .mini{font:500 11px sans-serif;fill:#64748b}
+      .whiteLabel{font:700 16px sans-serif;fill:#f8fafc}
+      .whiteBody{font:500 13px sans-serif;fill:#e2e8f0}
+      .mono{font:600 13px monospace;fill:#0f172a}
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-07-02-02-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-07-02-02-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">07-02-02. 이상현상과 함수종속</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">이상현상은 한 테이블에 서로 다른 주제의 정보가 섞여 있을 때 발생한다. 같은 고객</tspan><tspan x="84" dy="24">정보, 상품 정보, 교수 정보가 여러 행에 반복되면 삽입 삭제 수정 과정에서</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#14b8a6"/></marker></defs><rect x="420" y="170" width="360" height="90" rx="22" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/><text class="label" x="600" y="204" text-anchor="middle"><tspan x="600" dy="0">이상현상과 함수종속</tspan></text><text class="body" x="438" y="240" text-anchor="start"></text><rect x="210" y="350" width="120" height="82" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="270" y="384" text-anchor="middle"><tspan x="270" dy="0">이상현상 예시</tspan></text><text class="body" x="228" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="270" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="430" y="350" width="120" height="82" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="490" y="384" text-anchor="middle"><tspan x="490" dy="0">함수 종속으로</tspan><tspan x="490" dy="18">원인 찾기</tspan></text><text class="body" x="448" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="490" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="650" y="350" width="120" height="82" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="710" y="384" text-anchor="middle"><tspan x="710" dy="0">종속의 종류</tspan></text><text class="body" x="668" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="710" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="870" y="350" width="120" height="82" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="930" y="384" text-anchor="middle"><tspan x="930" dy="0">무손실 조인</tspan><tspan x="930" dy="18">예시</tspan></text><text class="body" x="888" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="930" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="516" x2="600" y2="612" stroke="#14b8a6" stroke-width="3" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="390" y="612" width="420" height="60" rx="22" fill="#f8fafc" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="646" text-anchor="middle"><tspan x="600" dy="0">분해 기준</tspan></text><text class="body" x="408" y="682" text-anchor="start"><tspan x="408" dy="0">이상현상 예시</tspan><tspan x="408" dy="18">함수 종속으로 원인 찾기</tspan><tspan x="408" dy="18">종속의 종류</tspan></text>
-  <text class="small" x="84" y="654">07-02-02-infographic.svg</text>
+
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <rect x="28" y="24" width="1144" height="712" rx="32" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <rect x="52" y="44" width="1096" height="118" rx="26" fill="url(#hero)"/>
+  <text class="small" x="84" y="78">Database Normalization · 07-02-02</text>
+  <text class="title" x="84" y="116">이상현상과 함수종속</text>
+  <text class="subtitle" x="84" y="146">한 주문 테이블에 상품·고객·주문상세가 함께 섞이면 반복 저장이 생기고, 그 반복의 원인은 함수 종속으로 추적한다.</text>
+
+  <rect x="74" y="192" width="484" height="250" rx="24" fill="url(#tableGlow)" stroke="#93c5fd" stroke-width="2"/>
+  <text class="section" x="98" y="228">1. 원본 주문 테이블: 여러 주제가 한곳에 혼합</text>
+  <text class="body" x="98" y="253">후보키 = (주문ID, 상품ID) 이지만 상품명·단가·고객명은 키 전체가 아니라 일부 속성에 의해 결정된다.</text>
+
+  <rect x="98" y="276" width="436" height="132" rx="16" fill="#ffffff" stroke="#bfdbfe"/>
+  <g class="mini" text-anchor="middle">
+    <text x="140" y="300">주문ID</text>
+    <text x="202" y="300">상품ID</text>
+    <text x="278" y="300">상품명</text>
+    <text x="344" y="300">단가</text>
+    <text x="408" y="300">고객ID</text>
+    <text x="482" y="300">고객명</text>
+  </g>
+  <line x1="118" y1="310" x2="514" y2="310" stroke="#cbd5e1"/>
+  <line x1="171" y1="286" x2="171" y2="392" stroke="#e2e8f0"/>
+  <line x1="233" y1="286" x2="233" y2="392" stroke="#e2e8f0"/>
+  <line x1="323" y1="286" x2="323" y2="392" stroke="#e2e8f0"/>
+  <line x1="365" y1="286" x2="365" y2="392" stroke="#e2e8f0"/>
+  <line x1="445" y1="286" x2="445" y2="392" stroke="#e2e8f0"/>
+  <line x1="118" y1="338" x2="514" y2="338" stroke="#e2e8f0"/>
+  <line x1="118" y1="364" x2="514" y2="364" stroke="#e2e8f0"/>
+  <g class="body" text-anchor="middle">
+    <text x="140" y="330">O1001</text>
+    <text x="202" y="330">P10</text>
+    <text x="278" y="330">노트북</text>
+    <text x="344" y="330">150만</text>
+    <text x="408" y="330">C01</text>
+    <text x="482" y="330">김하나</text>
+
+    <text x="140" y="356">O1001</text>
+    <text x="202" y="356">P20</text>
+    <text x="278" y="356">마우스</text>
+    <text x="344" y="356">3만</text>
+    <text x="408" y="356">C01</text>
+    <text x="482" y="356">김하나</text>
+
+    <text x="140" y="382">O1002</text>
+    <text x="202" y="382">P20</text>
+    <text x="278" y="382">마우스</text>
+    <text x="344" y="382">3만</text>
+    <text x="408" y="382">C02</text>
+    <text x="482" y="382">이두리</text>
+  </g>
+  <rect x="238" y="284" width="132" height="100" rx="12" fill="#fef3c7" opacity="0.7"/>
+  <rect x="388" y="284" width="120" height="100" rx="12" fill="#ddd6fe" opacity="0.7"/>
+  <text class="small" x="247" y="422">반복 저장: 상품 정보·고객 정보가 여러 행에서 중복</text>
+
+  <rect x="584" y="192" width="538" height="250" rx="24" fill="url(#danger)" stroke="#f59e0b" stroke-width="2"/>
+  <text class="section" x="608" y="228">2. 반복 저장이 만드는 3대 이상현상</text>
+
+  <rect x="608" y="250" width="154" height="164" rx="18" fill="#ffffff" stroke="#fb923c"/>
+  <text class="label" x="685" y="278" text-anchor="middle">갱신 이상</text>
+  <text class="body" x="624" y="304">• P20 단가 변경 시</text>
+  <text class="body" x="624" y="326">  여러 행을 함께 수정</text>
+  <text class="body" x="624" y="348">• 일부만 바꾸면</text>
+  <text class="body" x="624" y="370">  같은 상품 가격 불일치</text>
+  <text class="mono" x="624" y="398">상품ID → 상품명, 단가</text>
+
+  <rect x="776" y="250" width="154" height="164" rx="18" fill="#ffffff" stroke="#ef4444"/>
+  <text class="label" x="853" y="278" text-anchor="middle">삽입 이상</text>
+  <text class="body" x="792" y="304">• 주문 없는 신상품 P30</text>
+  <text class="body" x="792" y="326">  등록이 어려움</text>
+  <text class="body" x="792" y="348">• 주문ID를 억지로 넣거나</text>
+  <text class="body" x="792" y="370">  허위 행이 필요</text>
+  <text class="mono" x="792" y="398">상품ID → 상품명, 단가</text>
+
+  <rect x="944" y="250" width="154" height="164" rx="18" fill="#ffffff" stroke="#dc2626"/>
+  <text class="label" x="1021" y="278" text-anchor="middle">삭제 이상</text>
+  <text class="body" x="960" y="304">• 특정 주문 행 삭제 시</text>
+  <text class="body" x="960" y="326">  고객/상품 정보도</text>
+  <text class="body" x="960" y="348">  함께 사라질 수 있음</text>
+  <text class="body" x="960" y="370">• 마스터 데이터 손실</text>
+  <text class="mono" x="960" y="398">고객ID → 고객명</text>
+
+  <line x1="558" y1="316" x2="608" y2="316" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="558" y1="352" x2="776" y2="332" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="558" y1="388" x2="944" y2="348" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="74" y="468" width="500" height="236" rx="24" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text class="section" x="98" y="504">3. 함수 종속으로 원인을 분해</text>
+  <rect x="98" y="526" width="196" height="64" rx="16" fill="#1e3a8a"/>
+  <text class="whiteLabel" x="196" y="552" text-anchor="middle">완전 함수 종속</text>
+  <text class="whiteBody" x="114" y="574">(주문ID, 상품ID) → 수량</text>
+
+  <rect x="314" y="526" width="236" height="64" rx="16" fill="#0f766e"/>
+  <text class="whiteLabel" x="432" y="552" text-anchor="middle">부분 함수 종속 → 2NF 위반</text>
+  <text class="whiteBody" x="330" y="574">상품ID → 상품명, 단가</text>
+
+  <rect x="98" y="610" width="452" height="64" rx="16" fill="#7c3aed"/>
+  <text class="whiteLabel" x="324" y="636" text-anchor="middle">이행 함수 종속 → 3NF 위반</text>
+  <text class="whiteBody" x="116" y="658">주문ID → 고객ID → 고객명</text>
+
+  <line x1="294" y1="558" x2="314" y2="558" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="432" y1="590" x2="432" y2="610" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <text class="small" x="98" y="694">결정자(determinant)를 찾으면 어떤 속성이 분리 대상인지 명확해진다.</text>
+
+  <rect x="598" y="468" width="524" height="236" rx="24" fill="url(#safe)" stroke="#34d399" stroke-width="2"/>
+  <text class="section" x="622" y="504">4. 정규화 결과: 무손실 조인으로 복원 가능</text>
+
+  <rect x="622" y="528" width="112" height="72" rx="16" fill="#ffffff" stroke="#0f766e"/>
+  <text class="label" x="678" y="554" text-anchor="middle">상품</text>
+  <text class="mini" x="638" y="576">상품ID</text>
+  <text class="mini" x="638" y="592">상품명, 단가</text>
+
+  <rect x="754" y="528" width="112" height="72" rx="16" fill="#ffffff" stroke="#0f766e"/>
+  <text class="label" x="810" y="554" text-anchor="middle">고객</text>
+  <text class="mini" x="770" y="576">고객ID</text>
+  <text class="mini" x="770" y="592">고객명</text>
+
+  <rect x="886" y="528" width="112" height="72" rx="16" fill="#ffffff" stroke="#0f766e"/>
+  <text class="label" x="942" y="554" text-anchor="middle">주문</text>
+  <text class="mini" x="902" y="576">주문ID</text>
+  <text class="mini" x="902" y="592">고객ID</text>
+
+  <rect x="1010" y="528" width="88" height="72" rx="16" fill="#ffffff" stroke="#0f766e"/>
+  <text class="label" x="1054" y="554" text-anchor="middle">주문상세</text>
+  <text class="mini" x="1021" y="576">주문ID</text>
+  <text class="mini" x="1021" y="592">상품ID, 수량</text>
+
+  <line x1="942" y1="600" x2="1054" y2="630" stroke="#0f766e" stroke-width="4" marker-end="url(#softArrow)"/>
+  <line x1="678" y1="600" x2="1032" y2="630" stroke="#0f766e" stroke-width="4" marker-end="url(#softArrow)"/>
+  <line x1="810" y1="600" x2="964" y2="630" stroke="#0f766e" stroke-width="4" marker-end="url(#softArrow)"/>
+
+  <rect x="642" y="624" width="438" height="56" rx="18" fill="#ffffff" stroke="#6ee7b7"/>
+  <text class="label" x="861" y="648" text-anchor="middle">효과</text>
+  <text class="body" x="662" y="668">상품은 독립 삽입 가능 · 단가 수정은 1행만 변경 · 주문 삭제가 고객/상품 마스터를 지우지 않음</text>
+
+  <text class="small" x="84" y="728">핵심 연결: 이상현상 = 반복 저장의 부작용, 함수 종속 = 반복의 원인, 정규화 = 그 원인을 분리해 무손실 조인으로 복원하는 과정</text>
 </svg>

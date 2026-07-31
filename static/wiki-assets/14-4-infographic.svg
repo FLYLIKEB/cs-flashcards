@@ -1,31 +1,139 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">14-4. 입출력 시스템 SVG 인포그래픽</title>
-  <desc id="desc">입출력 시스템</desc>
+  <title id="title">14-4. 입출력 시스템 인포그래픽</title>
+  <desc id="desc">I/O 병목, 폴링, 인터럽트, DMA의 차이와 적합한 사용 상황을 비교하는 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-14-4-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e5e7eb" />
-      <stop offset="100%" stop-color="#dbeafe" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="55%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ecfeff"/>
     </linearGradient>
-    <linearGradient id="line-14-4-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1f2937" />
-      <stop offset="100%" stop-color="#2563eb" />
+    <linearGradient id="cpuGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0f172a"/>
     </linearGradient>
+    <linearGradient id="ioGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#334155"/>
+    </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
       .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      .chip { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-14-4-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-14-4-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">14-4. 입출력 시스템</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">CPU가 아무리 빨라도 디스크, 네트워크, 외부 장치가 느리면 전체 시스템 성능은</tspan><tspan x="84" dy="24">입출력에서 제한됩니다. 금융 시스템에서는 파일 전문 처리, 네트워크 패킷, DB</tspan></text>
-  <rect x="280" y="240" width="640" height="56" rx="18" fill="#e5e7eb" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="274" text-anchor="middle"><tspan x="600" dy="0">입출력 시스템</tspan></text><line x1="600" y1="296" x2="600" y2="314" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="314" width="640" height="56" rx="18" fill="#dbeafe" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="348" text-anchor="middle"><tspan x="600" dy="0">입출력의 역할</tspan></text><line x1="600" y1="370" x2="600" y2="388" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="388" width="640" height="56" rx="18" fill="#e5e7eb" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="422" text-anchor="middle"><tspan x="600" dy="0">폴링</tspan></text><line x1="600" y1="444" x2="600" y2="462" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="462" width="640" height="56" rx="18" fill="#dbeafe" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="496" text-anchor="middle"><tspan x="600" dy="0">인터럽트</tspan></text><line x1="600" y1="518" x2="600" y2="536" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="536" width="640" height="56" rx="18" fill="#e5e7eb" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="570" text-anchor="middle"><tspan x="600" dy="0">DMA</tspan></text><rect x="96" y="296" width="150" height="160" rx="22" fill="#ffffff" stroke="#2563eb" stroke-width="2"/><text class="label" x="171" y="330" text-anchor="middle"><tspan x="171" dy="0">입력</tspan></text><text class="body" x="114" y="366" text-anchor="start"><tspan x="114" dy="0">입출력 시스템</tspan></text><rect x="954" y="296" width="150" height="160" rx="22" fill="#ffffff" stroke="#2563eb" stroke-width="2"/><text class="label" x="1029" y="330" text-anchor="middle"><tspan x="1029" dy="0">출력</tspan></text><text class="body" x="972" y="366" text-anchor="start"><tspan x="972" dy="0">DMA</tspan></text><line x1="246" y1="376" x2="280" y2="376" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="920" y1="376" x2="954" y2="376" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <text class="small" x="84" y="654">14-4-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="small" x="72" y="78">금융공기업 IT · 운영체제 핵심 비교</text>
+  <text class="title" x="72" y="120">14-4. 입출력 시스템</text>
+  <text class="subtitle" x="72" y="156">느린 장치 때문에 생기는 병목을 줄이기 위해 CPU는 폴링, 인터럽트, DMA 중 상황에 맞는 I/O 경로를 선택한다.</text>
+
+  <g transform="translate(72 190)">
+    <text class="section" x="0" y="0">1) 왜 I/O가 병목이 되는가</text>
+    <rect x="0" y="22" width="1056" height="120" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+
+    <rect x="36" y="50" width="170" height="64" rx="18" fill="url(#cpuGrad)"/>
+    <text x="121" y="90" text-anchor="middle" style="font:700 24px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">CPU</text>
+    <text class="tiny" x="121" y="110" text-anchor="middle" fill="#dbeafe">계산은 빠름</text>
+
+    <path d="M206 82 C250 82, 250 82, 292 82" fill="none" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="260" cy="82" r="14" fill="#f97316">
+      <animate attributeName="r" values="12;16;12" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <text class="chip" x="260" y="86" text-anchor="middle" fill="#ffffff">병목</text>
+
+    <rect x="292" y="44" width="208" height="78" rx="22" fill="url(#ioGrad)"/>
+    <text x="396" y="74" text-anchor="middle" style="font:700 24px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">I/O 장치</text>
+    <text class="tiny" x="396" y="96" text-anchor="middle" fill="#ffedd5">디스크 · 네트워크 · 외부 장치</text>
+
+    <rect x="546" y="42" width="148" height="82" rx="20" fill="#eef2ff" stroke="#a5b4fc"/>
+    <text class="label" x="620" y="72" text-anchor="middle">CPU 유휴</text>
+    <text class="body" x="620" y="95" text-anchor="middle">대기 증가</text>
+
+    <rect x="710" y="42" width="148" height="82" rx="20" fill="#fef3c7" stroke="#f59e0b"/>
+    <text class="label" x="784" y="72" text-anchor="middle">큐 적체</text>
+    <text class="body" x="784" y="95" text-anchor="middle">I/O wait 상승</text>
+
+    <rect x="874" y="42" width="148" height="82" rx="20" fill="#fee2e2" stroke="#ef4444"/>
+    <text class="label" x="948" y="72" text-anchor="middle">응답 변동</text>
+    <text class="body" x="948" y="95" text-anchor="middle">지연시간 흔들림</text>
+  </g>
+
+  <g transform="translate(72 350)">
+    <text class="section" x="0" y="0">2) CPU가 장치를 다루는 세 가지 방식</text>
+
+    <g transform="translate(0 24)">
+      <rect x="0" y="0" width="320" height="220" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <rect x="24" y="20" width="80" height="30" rx="15" fill="#dbeafe"/>
+      <text class="chip" x="64" y="40" text-anchor="middle">폴링</text>
+      <text class="label" x="24" y="78">CPU가 계속 묻는다</text>
+      <rect x="26" y="96" width="92" height="46" rx="14" fill="#1d4ed8"/>
+      <text x="72" y="124" text-anchor="middle" style="font:700 18px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">CPU</text>
+      <rect x="202" y="96" width="92" height="46" rx="14" fill="#f97316"/>
+      <text x="248" y="124" text-anchor="middle" style="font:700 18px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">장치</text>
+      <line x1="118" y1="108" x2="202" y2="108" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)"/>
+      <line x1="202" y1="132" x2="118" y2="132" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+      <line x1="118" y1="94" x2="202" y2="94" stroke="#334155" stroke-width="2" stroke-dasharray="5 6"/>
+      <text class="tiny" x="160" y="88" text-anchor="middle">준비됐나?</text>
+      <text class="body" x="24" y="172">• 구현 단순, 상태를 예측하기 쉬움</text>
+      <text class="body" x="24" y="196">• 이벤트가 드물면 busy waiting으로 CPU 낭비</text>
+    </g>
+
+    <g transform="translate(368 24)">
+      <rect x="0" y="0" width="320" height="220" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <rect x="24" y="20" width="92" height="30" rx="15" fill="#dcfce7"/>
+      <text class="chip" x="70" y="40" text-anchor="middle">인터럽트</text>
+      <text class="label" x="24" y="78">장치가 필요할 때만 깨운다</text>
+      <rect x="26" y="96" width="92" height="46" rx="14" fill="#1d4ed8"/>
+      <text x="72" y="124" text-anchor="middle" style="font:700 18px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">CPU</text>
+      <rect x="202" y="96" width="92" height="46" rx="14" fill="#16a34a"/>
+      <text x="248" y="124" text-anchor="middle" style="font:700 18px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">장치</text>
+      <line x1="202" y1="118" x2="118" y2="118" stroke="#16a34a" stroke-width="4" marker-end="url(#arrow)"/>
+      <circle cx="182" cy="118" r="6" fill="#22c55e">
+        <animate attributeName="cx" values="182;126;182" dur="1.6s" repeatCount="indefinite"/>
+      </circle>
+      <text class="tiny" x="160" y="88" text-anchor="middle">이벤트 발생 → ISR 호출</text>
+      <text class="body" x="24" y="172">• 이벤트 기반이라 CPU 자원 효율이 높음</text>
+      <text class="body" x="24" y="196">• 너무 잦으면 ISR/컨텍스트 전환 오버헤드</text>
+    </g>
+
+    <g transform="translate(736 24)">
+      <rect x="0" y="0" width="320" height="220" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <rect x="24" y="20" width="64" height="30" rx="15" fill="#fde68a"/>
+      <text class="chip" x="56" y="40" text-anchor="middle">DMA</text>
+      <text class="label" x="24" y="78">큰 데이터는 메모리로 직접 이동</text>
+      <rect x="20" y="96" width="72" height="46" rx="14" fill="#1d4ed8"/>
+      <text x="56" y="124" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">CPU</text>
+      <rect x="124" y="96" width="72" height="46" rx="14" fill="#facc15"/>
+      <text x="160" y="124" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#111827;">DMA</text>
+      <rect x="228" y="96" width="72" height="46" rx="14" fill="#f97316"/>
+      <text x="264" y="124" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">장치</text>
+      <rect x="124" y="154" width="72" height="34" rx="12" fill="#e2e8f0"/>
+      <text class="tiny" x="160" y="176" text-anchor="middle">메모리</text>
+      <line x1="92" y1="108" x2="124" y2="108" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)"/>
+      <line x1="228" y1="130" x2="196" y2="130" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)"/>
+      <line x1="160" y1="142" x2="160" y2="154" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)"/>
+      <text class="tiny" x="160" y="88" text-anchor="middle">CPU는 조건만 설정, 전송은 DMA가 담당</text>
+      <text class="body" x="24" y="204">• 대용량 파일·디스크 블록·고속 패킷에 유리</text>
+    </g>
+  </g>
+
+  <g transform="translate(72 632)">
+    <rect x="0" y="0" width="1056" height="36" rx="18" fill="#e2e8f0"/>
+    <rect x="0" y="0" width="242" height="36" rx="18" fill="#dbeafe"/>
+    <rect x="254" y="0" width="352" height="36" rx="18" fill="#dcfce7"/>
+    <rect x="618" y="0" width="438" height="36" rx="18" fill="#fde68a"/>
+    <text class="small" x="121" y="23" text-anchor="middle">폴링: 작고 짧은 확인</text>
+    <text class="small" x="430" y="23" text-anchor="middle">인터럽트: 일반적인 이벤트 처리</text>
+    <text class="small" x="837" y="23" text-anchor="middle">DMA: 크고 연속적인 전송</text>
+  </g>
 </svg>

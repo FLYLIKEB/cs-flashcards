@@ -1,31 +1,126 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">06-01. 프로세스와 스레드 SVG 인포그래픽</title>
-  <desc id="desc">프로세스와 스레드</desc>
+  <title id="title">06-01 프로세스와 스레드 인포그래픽</title>
+  <desc id="desc">프로세스는 자원과 주소 공간의 단위이고, 스레드는 그 안에서 실행 흐름을 나누어 공유 자원을 사용한다는 점을 비교하고 PCB, 시스템 콜, IPC를 함께 요약한 SVG 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-06-01-00-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe" />
-      <stop offset="100%" stop-color="#eef2ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
-    <linearGradient id="line-06-01-00-infographic.svg" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="procGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#2563eb" />
-      <stop offset="100%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
     </linearGradient>
+    <linearGradient id="threadGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    <linearGradient id="signalGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb" />
+    </marker>
+    <marker id="arrowTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e" />
+    </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
       .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      .light { fill: #ffffff; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-06-01-00-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-06-01-00-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">06-01. 프로세스와 스레드</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">프로세스: 실행 중인 프로그램과 그 프로그램이 사용하는 자원의 묶음(실행 단위).</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8b5cf6"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">프로세스</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#eef2ff" stroke="#2563eb" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">독립 메모리</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">스레드</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#eef2ff" stroke="#2563eb" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">공유 자원</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">단계</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">프로세스</tspan><tspan x="238" dy="18">독립 메모리</tspan><tspan x="238" dy="18">스레드</tspan></text>
-  <text class="small" x="84" y="654">06-01-00-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="28" y="28" width="1144" height="664" rx="30" fill="#ffffff" stroke="#dbeafe" stroke-width="2" />
+
+  <text class="small" x="72" y="78">운영체제 핵심 비교 · process vs thread</text>
+  <text class="title" x="72" y="118">06-01. 프로세스와 스레드</text>
+  <text class="subtitle" x="72" y="150">프로세스는 실행 중인 프로그램과 자원의 묶음, 스레드는 그 프로세스 안에서 실제 명령을 수행하는 흐름 단위다.</text>
+
+  <rect x="60" y="186" width="500" height="344" rx="28" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2" />
+  <rect x="640" y="186" width="500" height="344" rx="28" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="2" />
+
+  <rect x="84" y="210" width="158" height="42" rx="21" fill="url(#procGrad)" />
+  <text class="label light" x="163" y="237" text-anchor="middle">프로세스 = 자원 단위</text>
+  <text class="section" x="84" y="286">독립 주소 공간 + PCB</text>
+  <text class="body" x="84" y="314">프로세스마다 메모리와 파일, 상태 정보가 따로 관리되어 서로 격리된다.</text>
+
+  <rect x="84" y="340" width="286" height="156" rx="22" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <text class="label" x="106" y="366">주소 공간</text>
+  <rect x="108" y="386" width="238" height="28" rx="12" fill="#dbeafe" />
+  <text class="body" x="227" y="405" text-anchor="middle">Code</text>
+  <rect x="108" y="422" width="238" height="28" rx="12" fill="#bfdbfe" />
+  <text class="body" x="227" y="441" text-anchor="middle">Data</text>
+  <rect x="108" y="458" width="238" height="28" rx="12" fill="#93c5fd" />
+  <text class="body" x="227" y="477" text-anchor="middle">Heap / Stack</text>
+
+  <rect x="392" y="340" width="144" height="156" rx="22" fill="#ffffff" stroke="#60a5fa" stroke-width="2" />
+  <text class="label" x="464" y="366" text-anchor="middle">PCB</text>
+  <text class="small" x="464" y="396" text-anchor="middle">상태</text>
+  <text class="small" x="464" y="422" text-anchor="middle">PID</text>
+  <text class="small" x="464" y="448" text-anchor="middle">PC / 레지스터</text>
+  <text class="small" x="464" y="474" text-anchor="middle">스케줄링 정보</text>
+  <line x1="370" y1="418" x2="392" y2="418" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)" />
+  <text class="tiny" x="381" y="405" text-anchor="middle">문맥 기록</text>
+
+  <rect x="84" y="500" width="452" height="20" rx="10" fill="#dbeafe" />
+  <text class="small" x="310" y="515" text-anchor="middle">프로세스 간 메모리 기본 공유 없음 → 통신이 필요하면 IPC 사용</text>
+
+  <rect x="664" y="210" width="190" height="42" rx="21" fill="url(#threadGrad)" />
+  <text class="label light" x="759" y="237" text-anchor="middle">스레드 = 실행 흐름 단위</text>
+  <text class="section" x="664" y="286">한 프로세스 내부에서 분업</text>
+  <text class="body" x="664" y="314">여러 스레드는 코드·데이터·힙을 공유하고, 각자 스택·PC·레지스터를 가진다.</text>
+
+  <rect x="664" y="340" width="452" height="156" rx="22" fill="#ffffff" stroke="#c4b5fd" stroke-width="2" />
+  <text class="label" x="690" y="366">공유하는 프로세스 자원</text>
+  <rect x="690" y="384" width="400" height="30" rx="14" fill="#ede9fe" />
+  <text class="body" x="890" y="404" text-anchor="middle">Code</text>
+  <rect x="690" y="422" width="400" height="30" rx="14" fill="#ddd6fe" />
+  <text class="body" x="890" y="442" text-anchor="middle">Data / Heap</text>
+  <rect x="690" y="460" width="400" height="22" rx="11" fill="#c4b5fd" />
+  <text class="small" x="890" y="475" text-anchor="middle">열린 파일 · 소켓 · 기타 프로세스 자원</text>
+
+  <rect x="698" y="520" width="126" height="76" rx="18" fill="#ffffff" stroke="#8b5cf6" stroke-width="2" />
+  <text class="label" x="761" y="545" text-anchor="middle">Thread A</text>
+  <text class="small" x="761" y="567" text-anchor="middle">Stack</text>
+  <text class="small" x="761" y="586" text-anchor="middle">PC / Register</text>
+
+  <rect x="839" y="520" width="126" height="76" rx="18" fill="#ffffff" stroke="#8b5cf6" stroke-width="2" />
+  <text class="label" x="902" y="545" text-anchor="middle">Thread B</text>
+  <text class="small" x="902" y="567" text-anchor="middle">Stack</text>
+  <text class="small" x="902" y="586" text-anchor="middle">PC / Register</text>
+
+  <rect x="980" y="520" width="126" height="76" rx="18" fill="#ffffff" stroke="#8b5cf6" stroke-width="2" />
+  <text class="label" x="1043" y="545" text-anchor="middle">Thread C</text>
+  <text class="small" x="1043" y="567" text-anchor="middle">Stack</text>
+  <text class="small" x="1043" y="586" text-anchor="middle">PC / Register</text>
+
+  <line x1="761" y1="520" x2="761" y2="486" stroke="#8b5cf6" stroke-width="3" />
+  <line x1="902" y1="520" x2="902" y2="486" stroke="#8b5cf6" stroke-width="3" />
+  <line x1="1043" y1="520" x2="1043" y2="486" stroke="#8b5cf6" stroke-width="3" />
+
+  <rect x="60" y="554" width="540" height="112" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <text class="label" x="84" y="586">커널 진입 신호</text>
+  <text class="small" x="84" y="610">시스템 콜 = 의도적 요청 / 인터럽트 = 외부 장치 / 예외 = 실행 중 오류·특수 상황</text>
+  <rect x="84" y="624" width="150" height="22" rx="11" fill="#ccfbf1" />
+  <text class="tiny" x="159" y="639" text-anchor="middle">User mode</text>
+  <line x1="236" y1="635" x2="308" y2="635" stroke="url(#signalGrad)" stroke-width="4" marker-end="url(#arrowTeal)" />
+  <rect x="314" y="624" width="150" height="22" rx="11" fill="#99f6e4" />
+  <text class="tiny" x="389" y="639" text-anchor="middle">Kernel mode</text>
+  <line x1="466" y1="635" x2="538" y2="635" stroke="url(#signalGrad)" stroke-width="4" marker-end="url(#arrowTeal)" />
+  <text class="tiny" x="514" y="620" text-anchor="middle">처리 후 복귀</text>
+
+  <rect x="624" y="554" width="516" height="112" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <text class="label" x="648" y="586">프로세스 간 통신 IPC</text>
+  <text class="small" x="648" y="610">주소 공간이 분리되어 있어 Pipe, Message Queue, Shared Memory, Socket 같은 통신 수단을 사용한다.</text>
+  <rect x="648" y="624" width="94" height="24" rx="12" fill="#dbeafe" /><text class="tiny" x="695" y="640" text-anchor="middle">Pipe</text>
+  <rect x="754" y="624" width="126" height="24" rx="12" fill="#e9d5ff" /><text class="tiny" x="817" y="640" text-anchor="middle">Message Queue</text>
+  <rect x="892" y="624" width="130" height="24" rx="12" fill="#ccfbf1" /><text class="tiny" x="957" y="640" text-anchor="middle">Shared Memory</text>
+  <rect x="1034" y="624" width="82" height="24" rx="12" fill="#fde68a" /><text class="tiny" x="1075" y="640" text-anchor="middle">Socket</text>
 </svg>

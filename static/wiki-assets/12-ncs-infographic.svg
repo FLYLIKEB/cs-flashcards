@@ -1,31 +1,132 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">12. NCS SVG 인포그래픽</title>
-  <desc id="desc">NCS</desc>
+  <title id="title">12. NCS 인포그래픽</title>
+  <desc id="desc">NCS 학습 구조를 4대 역량, 시험 전략, 오답관리 루틴으로 정리한 페이지 전용 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-12-ncs-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe" />
-      <stop offset="100%" stop-color="#f0f9ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-12-ncs-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1d4ed8" />
-      <stop offset="100%" stop-color="#0ea5e9" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .kicker { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #2563eb; letter-spacing: 0.08em; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .heroTitle { font: 700 30px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .heroBody { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .white { fill: #ffffff; }
+      .muted { fill: #cbd5e1; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-12-ncs-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-12-ncs-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">12. NCS</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">(각 세부 페이지에서 문제유형, 기출 예제, 풀이 템플릿을 확인하여 연습하세요.)</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9"/></marker></defs><rect x="440" y="290" width="320" height="150" rx="22" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/><text class="label" x="600" y="324" text-anchor="middle"><tspan x="600" dy="0">NCS</tspan></text><text class="body" x="458" y="360" text-anchor="start"><tspan x="458" dy="0">NCS</tspan></text><rect x="170" y="260" width="320" height="110" rx="22" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/><text class="label" x="330" y="294" text-anchor="middle"><tspan x="330" dy="0">NCS SVG 인포그래픽</tspan></text><text class="body" x="188" y="330" text-anchor="start"></text><rect x="690" y="260" width="320" height="110" rx="22" fill="#f0f9ff" stroke="#1d4ed8" stroke-width="2"/><text class="label" x="850" y="294" text-anchor="middle"><tspan x="850" dy="0">의사소통</tspan></text><text class="body" x="708" y="330" text-anchor="start"></text><rect x="170" y="470" width="320" height="110" rx="22" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/><text class="label" x="330" y="504" text-anchor="middle"><tspan x="330" dy="0">수리</tspan></text><text class="body" x="188" y="540" text-anchor="start"></text><rect x="690" y="470" width="320" height="110" rx="22" fill="#f0f9ff" stroke="#1d4ed8" stroke-width="2"/><text class="label" x="850" y="504" text-anchor="middle"><tspan x="850" dy="0">문제해결</tspan></text><text class="body" x="708" y="540" text-anchor="start"></text><line x1="600" y1="360" x2="490" y2="315" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="360" x2="490" y2="315" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="360" x2="710" y2="315" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="360" x2="710" y2="315" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="360" x2="490" y2="525" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="360" x2="490" y2="525" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="600" y1="360" x2="710" y2="525" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="360" x2="710" y2="525" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line>
-  <text class="small" x="84" y="654">12-ncs-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="24" y="24" width="1152" height="672" rx="30" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+
+  <text class="kicker" x="72" y="74">NCS LEARNING MAP</text>
+  <text class="title" x="72" y="116">12. NCS</text>
+  <text class="subtitle" x="72" y="146">의사소통·수리·문제해결을 시험 전략과 오답관리 루틴으로 묶는 국가직무능력표준 학습 구조</text>
+
+  <rect x="72" y="180" width="1056" height="142" rx="28" fill="url(#hero)"/>
+  <text class="heroTitle" x="104" y="228">핵심: 정답 찾기보다 정보 해석 + 논리적 사고 + 실수 관리</text>
+  <text class="heroBody" x="104" y="264">단기: 유형 분류와 풀이 순서 고정</text>
+  <text class="heroBody" x="104" y="290">중기: 오답 원인 분류와 재학습 루틴 완성</text>
+  <text class="heroBody" x="104" y="316">장기: 문서화·자료해석·문제해결 역량을 실제 직무 성과로 연결</text>
+
+  <g transform="translate(820 196)">
+    <circle cx="118" cy="56" r="40" fill="#1e3a8a" opacity="0.9"/>
+    <circle cx="58" cy="98" r="30" fill="#2563eb" opacity="0.85"/>
+    <circle cx="176" cy="102" r="30" fill="#06b6d4" opacity="0.85"/>
+    <circle cx="118" cy="126" r="30" fill="#0ea5e9" opacity="0.85"/>
+    <text class="small white" x="118" y="60" text-anchor="middle">NCS</text>
+    <text class="small white" x="58" y="102" text-anchor="middle">의사</text>
+    <text class="small white" x="176" y="106" text-anchor="middle">수리</text>
+    <text class="small white" x="118" y="130" text-anchor="middle">해결</text>
+  </g>
+
+  <text class="section" x="72" y="366">4대 학습 축</text>
+
+  <g transform="translate(72 388)">
+    <rect width="246" height="158" rx="22" fill="#eff6ff" stroke="#93c5fd"/>
+    <rect x="18" y="18" width="54" height="54" rx="16" fill="#2563eb"/>
+    <path d="M35 58h21M35 46h32M35 34h32" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+    <text class="label" x="88" y="40">의사소통</text>
+    <text class="body" x="88" y="62">주제 한 문장 요약</text>
+    <text class="body" x="24" y="104">• 선택지의 강조·부정 표현 판별</text>
+    <text class="body" x="24" y="128">• 보고서·이메일 핵심 전달과 직결</text>
+    <text class="body" x="24" y="152">• 빠른 읽기보다 정확한 의미 압축</text>
+  </g>
+
+  <g transform="translate(336 388)">
+    <rect width="246" height="158" rx="22" fill="#f0fdf4" stroke="#86efac"/>
+    <rect x="18" y="18" width="54" height="54" rx="16" fill="#16a34a"/>
+    <path d="M34 58l11-20 9 14 11-24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="label" x="88" y="40">수리</text>
+    <text class="body" x="88" y="62">단위·비율·근사값</text>
+    <text class="body" x="24" y="104">• 계산 전 조건과 단위를 먼저 확인</text>
+    <text class="body" x="24" y="128">• 예산·비용 검토 같은 수치 검증 훈련</text>
+    <text class="body" x="24" y="152">• 오래 걸리면 근사값으로 후보 축소</text>
+  </g>
+
+  <g transform="translate(600 388)">
+    <rect width="246" height="158" rx="22" fill="#fff7ed" stroke="#fdba74"/>
+    <rect x="18" y="18" width="54" height="54" rx="16" fill="#ea580c"/>
+    <path d="M34 56l11-11 9 9 18-21" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="label" x="88" y="40">문제해결</text>
+    <text class="body" x="88" y="62">분해 → 우선순위 → 가설 검증</text>
+    <text class="body" x="24" y="104">• 주어지지 않은 정보는 유효 가정 처리</text>
+    <text class="body" x="24" y="128">• 복합 문제를 작은 단위로 쪼개 접근</text>
+    <text class="body" x="24" y="152">• 실무의 RCA·프로세스 개선과 연결</text>
+  </g>
+
+  <g transform="translate(864 388)">
+    <rect width="264" height="158" rx="22" fill="#fdf2f8" stroke="#f9a8d4"/>
+    <rect x="18" y="18" width="54" height="54" rx="16" fill="#db2777"/>
+    <path d="M36 34h18v24H36zM63 42h10M63 52h10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="label" x="88" y="40">실전 오답 관리</text>
+    <text class="body" x="88" y="62">유형화 + 재학습 일정화</text>
+    <text class="body" x="24" y="104">• 표현 착오·계산 실수·개념 오류 분리</text>
+    <text class="body" x="24" y="128">• 재풀이 일자와 유사문제 링크 기록</text>
+    <text class="body" x="24" y="152">• 실수 보고서처럼 재발 방지 체크리스트화</text>
+  </g>
+
+  <text class="section" x="72" y="590">시험 당일 루틴</text>
+
+  <g transform="translate(74 610)">
+    <rect x="0" y="0" width="168" height="58" rx="20" fill="#dbeafe"/>
+    <text class="label" x="84" y="25" text-anchor="middle">1. 전체 훑기</text>
+    <text class="small" x="84" y="43" text-anchor="middle">난이도·유형 파악</text>
+    <text class="small" x="84" y="57" text-anchor="middle">쉬운 문제 우선</text>
+
+    <rect x="214" y="0" width="168" height="58" rx="20" fill="#dcfce7"/>
+    <text class="label" x="298" y="25" text-anchor="middle">2. 시간 배분</text>
+    <text class="small" x="298" y="43" text-anchor="middle">1문제당 목표 시간</text>
+    <text class="small" x="298" y="57" text-anchor="middle">1/3 지점 진도 체크</text>
+
+    <rect x="428" y="0" width="168" height="58" rx="20" fill="#ffedd5"/>
+    <text class="label" x="512" y="25" text-anchor="middle">3. 오답 배제</text>
+    <text class="small" x="512" y="43" text-anchor="middle">선택지 비교로 제거</text>
+    <text class="small" x="512" y="57" text-anchor="middle">계산은 근사값 활용</text>
+
+    <rect x="642" y="0" width="168" height="58" rx="20" fill="#fce7f3"/>
+    <text class="label" x="726" y="25" text-anchor="middle">4. 재검토</text>
+    <text class="small" x="726" y="43" text-anchor="middle">표시 문제 우선 복기</text>
+    <text class="small" x="726" y="57" text-anchor="middle">자리수·오타 최종 확인</text>
+
+    <path d="M170 29H202M384 29H416M598 29H630" fill="none" stroke="url(#flow)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M170 29H202M384 29H416M598 29H630" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 8">
+      <animate attributeName="stroke-dashoffset" from="0" to="-36" dur="3s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <text class="small" x="72" y="690">오답노트 권장 항목: 문제번호 · 유형 · 오답원인 · 정답 풀이 요약 · 재풀이 일자 · 비고</text>
 </svg>

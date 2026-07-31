@@ -1,31 +1,147 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-02. 정규화 SVG 인포그래픽</title>
-  <desc id="desc">정규화</desc>
+  <title id="title">07-02. 정규화 인포그래픽</title>
+  <desc id="desc">주문상세원본 테이블이 함수 종속을 기준으로 주문, 고객, 상품, 주문상세로 분해되며 2NF와 3NF, 무손실 조인과 종속성 보존을 설명하는 다이어그램</desc>
   <defs>
-    <linearGradient id="grad-07-02-00-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#ecfeff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="55%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ecfeff"/>
     </linearGradient>
-    <linearGradient id="line-07-02-00-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#14b8a6" />
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 11px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      .mono { font: 700 13px 'SFMono-Regular','Menlo',monospace; fill: #0f766e; }
+      .table-head { fill: #dbeafe; }
+      .badge { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f766e; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-07-02-00-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-07-02-00-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">07-02. 정규화</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">정규화는 중복 데이터를 줄이고 삽입 삭제 갱신 이상을 막기 위해 릴레이션을 더 작은</tspan><tspan x="84" dy="24">릴레이션으로 분해하는 과정이다. 핵심 기준은 함수 종속이다. 어떤 속성 X를 알면</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#14b8a6"/></marker></defs><rect x="420" y="170" width="360" height="90" rx="22" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/><text class="label" x="600" y="204" text-anchor="middle"><tspan x="600" dy="0">비정규형</tspan></text><text class="body" x="438" y="240" text-anchor="start"></text><rect x="210" y="350" width="120" height="82" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="270" y="384" text-anchor="middle"><tspan x="270" dy="0">1NF</tspan></text><text class="body" x="228" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="270" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="430" y="350" width="120" height="82" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="490" y="384" text-anchor="middle"><tspan x="490" dy="0">2NF</tspan></text><text class="body" x="448" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="490" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="650" y="350" width="120" height="82" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="710" y="384" text-anchor="middle"><tspan x="710" dy="0">3NF</tspan></text><text class="body" x="668" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="710" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="870" y="350" width="120" height="82" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="930" y="384" text-anchor="middle"><tspan x="930" dy="0">BCNF</tspan></text><text class="body" x="888" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="930" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="516" x2="600" y2="612" stroke="#14b8a6" stroke-width="3" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="390" y="612" width="420" height="60" rx="22" fill="#f8fafc" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="646" text-anchor="middle"><tspan x="600" dy="0">분해 기준</tspan></text><text class="body" x="408" y="682" text-anchor="start"><tspan x="408" dy="0">1NF</tspan><tspan x="408" dy="18">2NF</tspan><tspan x="408" dy="18">3NF</tspan></text>
-  <text class="small" x="84" y="654">07-02-00-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="small" x="66" y="74">데이터베이스 · 정규화 핵심 흐름</text>
+  <text class="title" x="66" y="116">07-02. 정규화</text>
+  <text class="subtitle" x="66" y="146">함수 종속을 보고 중복과 이상현상을 찾은 뒤, 부분 종속과 이행 종속을 제거해 무손실 분해와 종속성 보존을 확인한다.</text>
+
+  <rect x="56" y="182" width="330" height="426" rx="24" fill="url(#panel)" stroke="#bfdbfe"/>
+  <text class="section" x="80" y="220">1) 원본 릴레이션과 이상현상</text>
+  <rect x="80" y="238" width="282" height="38" rx="10" fill="#e0f2fe"/>
+  <text class="label" x="94" y="262">주문상세원본</text>
+  <text class="tiny" x="235" y="262">후보키 = (주문ID, 상품ID)</text>
+
+  <rect x="80" y="290" width="282" height="28" class="table-head" rx="8"/>
+  <text class="tiny" x="92" y="308">주문ID</text>
+  <text class="tiny" x="146" y="308">고객ID</text>
+  <text class="tiny" x="196" y="308">고객명</text>
+  <text class="tiny" x="246" y="308">등급</text>
+  <text class="tiny" x="288" y="308">상품</text>
+  <text class="tiny" x="328" y="308">수량</text>
+
+  <rect x="80" y="320" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text class="tiny" x="92" y="341">O1001</text><text class="tiny" x="146" y="341">C01</text><text class="tiny" x="196" y="341">김하나</text><text class="tiny" x="246" y="341">GOLD</text><text class="tiny" x="288" y="341">P10</text><text class="tiny" x="328" y="341">1</text>
+  <rect x="80" y="358" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text class="tiny" x="92" y="379">O1001</text><text class="tiny" x="146" y="379">C01</text><text class="tiny" x="196" y="379">김하나</text><text class="tiny" x="246" y="379">GOLD</text><text class="tiny" x="288" y="379">P20</text><text class="tiny" x="328" y="379">2</text>
+  <rect x="80" y="396" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text class="tiny" x="92" y="417">O1002</text><text class="tiny" x="146" y="417">C02</text><text class="tiny" x="196" y="417">이두리</text><text class="tiny" x="246" y="417">SILVER</text><text class="tiny" x="288" y="417">P20</text><text class="tiny" x="328" y="417">1</text>
+  <rect x="80" y="434" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text class="tiny" x="92" y="455">O1003</text><text class="tiny" x="146" y="455">C01</text><text class="tiny" x="196" y="455">김하나</text><text class="tiny" x="246" y="455">GOLD</text><text class="tiny" x="288" y="455">P30</text><text class="tiny" x="328" y="455">1</text>
+
+  <rect x="80" y="490" width="282" height="42" rx="12" fill="#fee2e2"/>
+  <text class="label" x="95" y="516">갱신 이상</text>
+  <text class="body" x="162" y="516">김하나 등급 변경 시 여러 행을 동시에 수정</text>
+  <rect x="80" y="540" width="282" height="48" rx="12" fill="#fef3c7"/>
+  <text class="label" x="95" y="568">중복 원인</text>
+  <text class="body" x="162" y="560">고객명·고객등급, 상품명·단가가</text>
+  <text class="body" x="162" y="578">주문 행마다 반복 저장</text>
+
+  <rect x="408" y="182" width="340" height="426" rx="24" fill="url(#panel)" stroke="#99f6e4"/>
+  <text class="section" x="432" y="220">2) 함수 종속으로 문제 위치 찾기</text>
+
+  <rect x="432" y="246" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="mono" x="452" y="269">주문ID → 고객ID</text>
+  <text class="body" x="452" y="287">주문 하나는 한 고객에 대응</text>
+
+  <rect x="432" y="316" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="mono" x="452" y="339">고객ID → 고객명, 고객등급</text>
+  <text class="body" x="452" y="357">고객 정보는 주문이 아니라 고객에 종속</text>
+
+  <rect x="432" y="386" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="mono" x="452" y="409">상품ID → 상품명, 단가</text>
+  <text class="body" x="452" y="427">상품 정보도 주문과 분리 가능</text>
+
+  <rect x="432" y="456" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="mono" x="452" y="479">주문ID, 상품ID → 수량</text>
+  <text class="body" x="452" y="497">수량만 복합키 전체에 직접 의존</text>
+
+  <path d="M 578 300 C 580 308, 580 308, 578 316" fill="none" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M 578 370 C 580 378, 580 378, 578 386" fill="none" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M 578 440 C 580 448, 580 448, 578 456" fill="none" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="432" y="530" width="292" height="54" rx="14" fill="#dcfce7" stroke="#86efac"/>
+  <text class="badge" x="450" y="554">판단</text>
+  <text class="body" x="500" y="554">복합키 일부만으로 정해지는 속성은 2NF 대상</text>
+  <text class="body" x="500" y="574">비키 속성이 다른 비키 속성을 정하면 3NF 대상</text>
+
+  <rect x="770" y="182" width="374" height="426" rx="24" fill="url(#panel)" stroke="#c7d2fe"/>
+  <text class="section" x="794" y="220">3) 정규화 분해 결과</text>
+
+  <rect x="794" y="246" width="324" height="84" rx="18" fill="#ede9fe" stroke="#c4b5fd"/>
+  <text class="label" x="814" y="272">2NF: 부분 함수 종속 제거</text>
+  <text class="body" x="814" y="296">주문ID → 고객ID, 상품ID → 상품명·단가를 떼어내</text>
+  <text class="body" x="814" y="316">주문 / 상품 / 주문상세로 1차 분해</text>
+
+  <rect x="794" y="346" width="98" height="116" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="label" x="843" y="372" text-anchor="middle">주문</text>
+  <text class="tiny" x="810" y="396">PK 주문ID</text>
+  <text class="body" x="810" y="416">주문ID</text>
+  <text class="body" x="810" y="436">고객ID</text>
+
+  <rect x="907" y="346" width="98" height="116" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="label" x="956" y="372" text-anchor="middle">상품</text>
+  <text class="tiny" x="923" y="396">PK 상품ID</text>
+  <text class="body" x="923" y="416">상품ID</text>
+  <text class="body" x="923" y="436">상품명</text>
+  <text class="body" x="923" y="456">단가</text>
+
+  <rect x="1020" y="346" width="98" height="116" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="label" x="1069" y="372" text-anchor="middle">주문상세</text>
+  <text class="tiny" x="1031" y="396">PK 주문ID+상품ID</text>
+  <text class="body" x="1036" y="416">주문ID</text>
+  <text class="body" x="1036" y="436">상품ID</text>
+  <text class="body" x="1036" y="456">수량</text>
+
+  <path d="M 843 468 L 843 494 L 956 494 L 956 468" fill="none" stroke="#94a3b8" stroke-width="2"/>
+  <path d="M 1069 468 L 1069 494 L 956 494 L 956 468" fill="none" stroke="#94a3b8" stroke-width="2"/>
+  <text class="tiny" x="956" y="510" text-anchor="middle">주문상세가 주문·상품 키를 참조</text>
+
+  <rect x="794" y="528" width="324" height="56" rx="18" fill="#dbeafe" stroke="#93c5fd"/>
+  <text class="label" x="814" y="552">3NF: 이행 함수 종속 제거</text>
+  <text class="body" x="814" y="572">주문ID → 고객ID → 고객명·고객등급 이므로 고객 테이블 분리</text>
+
+  <path d="M 842 462 C 824 492, 810 506, 794 542" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="930" y="518" width="188" height="74" rx="16" fill="#ffffff" stroke="#93c5fd"/>
+  <text class="label" x="950" y="544">고객</text>
+  <text class="tiny" x="950" y="564">PK 고객ID</text>
+  <text class="body" x="1014" y="544">고객ID, 고객명, 고객등급</text>
+  <text class="body" x="950" y="582">고객등급 변경은 여기 한 행만 수정</text>
+
+  <rect x="56" y="624" width="1088" height="44" rx="18" fill="#0f172a"/>
+  <text class="small" x="80" y="651" fill="#e2e8f0">최종 체크:</text>
+  <text class="body" x="160" y="651" fill="#e2e8f0">무손실 조인</text>
+  <circle cx="243" cy="645" r="4" fill="#5eead4"/>
+  <text class="body" x="260" y="651" fill="#e2e8f0">공통 속성(고객ID, 상품ID 등)이 분해 릴레이션의 키와 연결</text>
+  <circle cx="597" cy="645" r="4" fill="#5eead4"/>
+  <text class="body" x="614" y="651" fill="#e2e8f0">종속성 보존: 원래 FD를 각 테이블에서 조인 없이 검사 가능</text>
 </svg>

@@ -1,31 +1,171 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">06-02. CPU 스케줄링 SVG 인포그래픽</title>
-  <desc id="desc">CPU 스케줄링</desc>
+  <title id="title">06-02. CPU 스케줄링 인포그래픽</title>
+  <desc id="desc">Ready Queue에서 스케줄러가 실행 대상을 고르고 디스패처가 문맥 전환을 수행하는 CPU 스케줄링의 흐름, 발생 시점, 평가 지표, 정책 분류를 한 장에 정리한 인포그래픽.</desc>
   <defs>
-    <linearGradient id="grad-06-02-00-cpu-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe" />
-      <stop offset="100%" stop-color="#eef2ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-06-02-00-cpu-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb" />
-      <stop offset="100%" stop-color="#8b5cf6" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 11px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      .mono { font: 700 12px 'SFMono-Regular',Consolas,monospace; fill: #1e293b; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-06-02-00-cpu-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-06-02-00-cpu-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">06-02. CPU 스케줄링</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">CPU 스케줄링은 Ready Queue에 있는 프로세스 중 하나를 골라 CPU를</tspan><tspan x="84" dy="24">배정하는 운영체제의 정책이다. 프로세스는 생성 직후부터 항상 CPU를 바로 사용하지</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8b5cf6"/></marker></defs><line x1="110" y1="390" x2="1060" y2="390" stroke="#2563eb" stroke-width="8" stroke-linecap="round" opacity="0.25"/><line x1="110" y1="390" x2="760" y2="390" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round"><animate attributeName="x2" values="240;1060;240" dur="7s" repeatCount="indefinite"/></line><circle cx="110" cy="390" r="22" fill="white" stroke="#8b5cf6" stroke-width="4"/><text class="label" x="110" y="342" text-anchor="middle"><tspan x="110" dy="0">CPU 스케줄링</tspan></text><circle cx="110" cy="390" r="8" fill="#2563eb"><animate attributeName="opacity" values="1;.4;1" dur="2.5s" repeatCount="indefinite"/></circle><line x1="134" y1="390" x2="276" y2="390" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="134" y1="390" x2="276" y2="390" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="55" y="430" width="110" height="52" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text class="body" x="110" y="462" text-anchor="middle"><tspan x="110" dy="0">CPU 스케줄링</tspan></text><circle cx="300" cy="390" r="22" fill="white" stroke="#8b5cf6" stroke-width="4"/><text class="label" x="300" y="342" text-anchor="middle"><tspan x="300" dy="0">스케줄링이 일어나는</tspan><tspan x="300" dy="18">시점</tspan></text><circle cx="300" cy="390" r="8" fill="#2563eb"><animate attributeName="opacity" values="1;.4;1" dur="2.9s" repeatCount="indefinite"/></circle><line x1="324" y1="390" x2="466" y2="390" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="324" y1="390" x2="466" y2="390" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="245" y="430" width="110" height="52" rx="18" fill="#eef2ff" stroke="#2563eb" stroke-width="1.5"/><text class="body" x="300" y="462" text-anchor="middle"><tspan x="300" dy="0">스케줄링이 일어나는</tspan><tspan x="300" dy="18">시점</tspan></text><circle cx="490" cy="390" r="22" fill="white" stroke="#8b5cf6" stroke-width="4"/><text class="label" x="490" y="342" text-anchor="middle"><tspan x="490" dy="0">평가 지표</tspan></text><circle cx="490" cy="390" r="8" fill="#2563eb"><animate attributeName="opacity" values="1;.4;1" dur="3.3s" repeatCount="indefinite"/></circle><line x1="514" y1="390" x2="656" y2="390" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="514" y1="390" x2="656" y2="390" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="435" y="430" width="110" height="52" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text class="body" x="490" y="462" text-anchor="middle"><tspan x="490" dy="0">평가 지표</tspan></text><circle cx="680" cy="390" r="22" fill="white" stroke="#8b5cf6" stroke-width="4"/><text class="label" x="680" y="342" text-anchor="middle"><tspan x="680" dy="0">스케줄링 정책의 큰</tspan><tspan x="680" dy="18">분류</tspan></text><circle cx="680" cy="390" r="8" fill="#2563eb"><animate attributeName="opacity" values="1;.4;1" dur="3.7s" repeatCount="indefinite"/></circle><line x1="704" y1="390" x2="846" y2="390" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="704" y1="390" x2="846" y2="390" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="625" y="430" width="110" height="52" rx="18" fill="#eef2ff" stroke="#2563eb" stroke-width="1.5"/><text class="body" x="680" y="462" text-anchor="middle"><tspan x="680" dy="0">스케줄링 정책의 큰</tspan><tspan x="680" dy="18">분류</tspan></text><circle cx="870" cy="390" r="22" fill="white" stroke="#8b5cf6" stroke-width="4"/><text class="label" x="870" y="342" text-anchor="middle"><tspan x="870" dy="0">계산 문제 접근</tspan><tspan x="870" dy="18">순서</tspan></text><circle cx="870" cy="390" r="8" fill="#2563eb"><animate attributeName="opacity" values="1;.4;1" dur="4.1s" repeatCount="indefinite"/></circle><rect x="815" y="430" width="110" height="52" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text class="body" x="870" y="462" text-anchor="middle"><tspan x="870" dy="0">계산 문제 접근</tspan><tspan x="870" dy="18">순서</tspan></text>
-  <text class="small" x="84" y="654">06-02-00-cpu-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+
+  <rect x="52" y="52" width="1096" height="108" rx="24" fill="url(#hero)"/>
+  <text class="small" x="82" y="86">운영체제 · Ready Queue → Scheduler → Dispatcher → CPU</text>
+  <text class="title" x="82" y="122">06-02. CPU 스케줄링</text>
+  <text class="subtitle" x="82" y="150">언제 CPU를 다시 고르는지, 무엇을 최적화하는지, 어떤 정책이 어떤 비용을 만드는지 한눈에 정리</text>
+
+  <g transform="translate(64 186)">
+    <rect width="500" height="244" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="24" y="32">1. 상태 흐름 속에서 스케줄링이 끼어드는 위치</text>
+    <text class="body" x="24" y="56">Ready Queue의 후보 중 하나를 고르면 Running으로 올라가고, 그 결정 직후 디스패처가 문맥 전환을 수행한다.</text>
+
+    <rect x="32" y="88" width="116" height="56" rx="16" fill="#dbeafe" stroke="#60a5fa"/>
+    <text class="label" x="90" y="121" text-anchor="middle">Ready</text>
+    <text class="tiny" x="90" y="138" text-anchor="middle">대기 중</text>
+
+    <rect x="192" y="88" width="116" height="56" rx="16" fill="#dcfce7" stroke="#4ade80"/>
+    <text class="label" x="250" y="121" text-anchor="middle">Running</text>
+    <text class="tiny" x="250" y="138" text-anchor="middle">CPU 사용 중</text>
+
+    <rect x="352" y="88" width="116" height="56" rx="16" fill="#fee2e2" stroke="#f87171"/>
+    <text class="label" x="410" y="121" text-anchor="middle">Waiting</text>
+    <text class="tiny" x="410" y="138" text-anchor="middle">I/O 대기</text>
+
+    <line x1="148" y1="116" x2="192" y2="116" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+    <text class="tiny" x="171" y="104" text-anchor="middle">선택</text>
+    <line x1="308" y1="116" x2="352" y2="116" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+    <text class="tiny" x="330" y="104" text-anchor="middle">I/O 요청</text>
+    <path d="M 410 144 C 410 188, 230 188, 90 144" fill="none" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+    <text class="tiny" x="250" y="208" text-anchor="middle">I/O 완료 후 Waiting → Ready</text>
+
+    <rect x="198" y="24" width="104" height="36" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
+    <text class="label" x="250" y="47" text-anchor="middle">Scheduler</text>
+    <line x1="250" y1="60" x2="250" y2="88" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="336" y="24" width="132" height="36" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
+    <text class="label" x="402" y="47" text-anchor="middle">Dispatcher</text>
+    <text class="tiny" x="402" y="68" text-anchor="middle">context switch 수행</text>
+
+    <line x1="302" y1="42" x2="336" y2="42" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="32" y="170" width="436" height="50" rx="16" fill="#0f172a"/>
+    <text class="body" x="250" y="191" text-anchor="middle" fill="#e2e8f0">핵심 질문</text>
+    <text class="small" x="250" y="211" text-anchor="middle" fill="#f8fafc">“실행 중인 프로세스가 끝나지 않았는데 CPU가 바뀌었는가?” → 그렇다면 선점형 상황이다.</text>
+  </g>
+
+  <g transform="translate(584 186)">
+    <rect width="552" height="244" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="24" y="32">2. 실제 선택 흐름: Ready Queue에서 CPU까지</text>
+    <text class="body" x="24" y="56">도착 시간·실행 시간·우선순위·time quantum을 보고 선택 규칙을 적용한 뒤 간트 차트로 계산한다.</text>
+
+    <rect x="24" y="84" width="170" height="124" rx="18" fill="#eff6ff" stroke="#93c5fd"/>
+    <text class="label" x="42" y="108">Ready Queue</text>
+    <rect x="42" y="122" width="118" height="18" rx="9" fill="#60a5fa"/>
+    <text class="tiny" x="170" y="135" text-anchor="end">P1 · 도착 0 · 실행 7</text>
+    <rect x="42" y="148" width="92" height="18" rx="9" fill="#818cf8"/>
+    <text class="tiny" x="170" y="161" text-anchor="end">P2 · 도착 2 · 실행 3</text>
+    <rect x="42" y="174" width="64" height="18" rx="9" fill="#34d399"/>
+    <text class="tiny" x="170" y="187" text-anchor="end">P3 · 도착 4 · 실행 2</text>
+
+    <rect x="222" y="96" width="136" height="52" rx="16" fill="#ede9fe" stroke="#a78bfa"/>
+    <text class="label" x="290" y="118" text-anchor="middle">스케줄러</text>
+    <text class="tiny" x="290" y="137" text-anchor="middle">선택 규칙 적용</text>
+
+    <rect x="222" y="160" width="136" height="48" rx="16" fill="#f5f3ff" stroke="#c4b5fd"/>
+    <text class="mono" x="290" y="188" text-anchor="middle">FCFS / SJF / RR</text>
+
+    <rect x="392" y="96" width="132" height="112" rx="18" fill="#ecfeff" stroke="#67e8f9"/>
+    <text class="label" x="458" y="118" text-anchor="middle">Dispatcher</text>
+    <text class="tiny" x="458" y="139" text-anchor="middle">문맥 저장</text>
+    <text class="tiny" x="458" y="158" text-anchor="middle">레지스터 복원</text>
+    <text class="tiny" x="458" y="177" text-anchor="middle">CPU 제어권 전달</text>
+
+    <rect x="24" y="214" width="500" height="18" rx="9" fill="#e2e8f0"/>
+    <rect x="24" y="214" width="120" height="18" rx="9" fill="#60a5fa"/>
+    <rect x="144" y="214" width="84" height="18" rx="0" fill="#818cf8"/>
+    <rect x="228" y="214" width="56" height="18" rx="0" fill="#34d399"/>
+    <rect x="284" y="214" width="128" height="18" rx="0" fill="#60a5fa"/>
+    <text class="tiny" x="24" y="208">간트 차트 예시</text>
+    <text class="tiny" x="84" y="227" text-anchor="middle">P1</text>
+    <text class="tiny" x="186" y="227" text-anchor="middle">P2</text>
+    <text class="tiny" x="256" y="227" text-anchor="middle">P3</text>
+    <text class="tiny" x="348" y="227" text-anchor="middle">P1</text>
+
+    <line x1="194" y1="146" x2="222" y2="122" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+    <line x1="358" y1="122" x2="392" y2="122" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+    <line x1="524" y1="152" x2="510" y2="152" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="522" y="92" width="12" height="120" rx="6" fill="#cbd5e1"/>
+    <rect x="510" y="108" width="36" height="88" rx="14" fill="#0f172a"/>
+    <rect x="516" y="116" width="24" height="54" rx="10" fill="#22c55e"/>
+    <text class="tiny" x="528" y="189" text-anchor="middle">CPU</text>
+  </g>
+
+  <g transform="translate(64 450)">
+    <rect width="500" height="210" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="24" y="32">3. 스케줄링이 다시 일어나는 네 가지 시점</text>
+
+    <rect x="24" y="56" width="212" height="56" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+    <text class="label" x="40" y="79">Running → Waiting</text>
+    <text class="body" x="40" y="100">I/O 요청으로 CPU를 스스로 내려놓음</text>
+
+    <rect x="264" y="56" width="212" height="56" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+    <text class="label" x="280" y="79">Running → Terminated</text>
+    <text class="body" x="280" y="100">실행 종료, 다음 후보를 고름</text>
+
+    <rect x="24" y="126" width="212" height="56" rx="16" fill="#fef3c7" stroke="#f59e0b"/>
+    <text class="label" x="40" y="149">Running → Ready</text>
+    <text class="body" x="40" y="170">타임 슬라이스 만료·더 높은 우선순위 도착</text>
+
+    <rect x="264" y="126" width="212" height="56" rx="16" fill="#ecfccb" stroke="#84cc16"/>
+    <text class="label" x="280" y="149">Waiting → Ready</text>
+    <text class="body" x="280" y="170">I/O 완료 후 Ready Queue 복귀</text>
+
+    <text class="small" x="24" y="198">비선점형은 보통 종료/자발적 대기 시점에만 교체되고, 선점형은 Running → Ready 상황을 추가로 본다.</text>
+  </g>
+
+  <g transform="translate(584 450)">
+    <rect width="552" height="210" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="24" y="32">4. 무엇을 최적화하고 어떤 정책을 고르는가</text>
+
+    <g transform="translate(24 56)">
+      <text class="label" x="0" y="0">평가 지표</text>
+      <rect x="0" y="14" width="208" height="128" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+      <text class="body" x="16" y="40">CPU 이용률 · 처리량 ↑</text>
+      <text class="body" x="16" y="64">반환시간 · 대기시간 ↓</text>
+      <text class="body" x="16" y="88">응답시간 ↓</text>
+      <text class="tiny" x="16" y="114">배치: 처리량·반환시간 중시</text>
+      <text class="tiny" x="16" y="132">대화형: 응답시간 중시</text>
+    </g>
+
+    <g transform="translate(252 56)">
+      <text class="label" x="0" y="0">정책 분류와 대표 위험</text>
+      <rect x="0" y="14" width="276" height="128" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+      <text class="body" x="16" y="38">FCFS: 단순하지만 convoy effect</text>
+      <text class="body" x="16" y="60">SJF/SRTF: 평균 대기시간 감소, 기아 위험</text>
+      <text class="body" x="16" y="82">HRN: 오래 기다린 작업을 보정</text>
+      <text class="body" x="16" y="104">RR: 응답성↑, 문맥교환 오버헤드↑</text>
+      <text class="body" x="16" y="126">Priority: aging으로 starvation 완화</text>
+    </g>
+  </g>
+
+  <text class="small" x="82" y="681">06-02-00-cpu-infographic.svg · page-specific asset for 06-02-00-CPU-스케줄링.md</text>
 </svg>

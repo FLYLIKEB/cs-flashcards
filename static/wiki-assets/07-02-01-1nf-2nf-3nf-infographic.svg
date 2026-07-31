@@ -1,31 +1,175 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-02-01. 1NF-2NF-3NF SVG 인포그래픽</title>
-  <desc id="desc">1NF-2NF-3NF</desc>
+  <title id="title">07-02-01 1NF 2NF 3NF 정규화 단계 인포그래픽</title>
+  <desc id="desc">수강신청 원본 테이블이 1NF, 2NF, 3NF를 거치며 반복 그룹, 부분 함수 종속, 이행 함수 종속을 제거하는 과정을 보여주는 SVG 인포그래픽.</desc>
   <defs>
-    <linearGradient id="grad-07-02-01-1nf-2nf-3nf-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ccfbf1" />
-      <stop offset="100%" stop-color="#ecfeff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-07-02-01-1nf-2nf-3nf-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
-      <stop offset="100%" stop-color="#14b8a6" />
+    <linearGradient id="panel1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#bfdbfe"/>
     </linearGradient>
+    <linearGradient id="panel2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dcfce7"/>
+      <stop offset="100%" stop-color="#bbf7d0"/>
+    </linearGradient>
+    <linearGradient id="panel3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ede9fe"/>
+      <stop offset="100%" stop-color="#ddd6fe"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 14px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 33px; font-weight: 800; }
+      .subtitle { font-size: 16px; font-weight: 500; fill: #334155; }
+      .stage-title { font-size: 23px; font-weight: 800; }
+      .stage-sub { font-size: 14px; font-weight: 700; fill: #1e3a8a; }
+      .box-title { font-size: 15px; font-weight: 800; }
+      .cell-h { font-size: 13px; font-weight: 700; fill: #334155; }
+      .cell { font-size: 12px; font-weight: 600; }
+      .pill { font-size: 12px; font-weight: 800; fill: #ffffff; }
+      .note { font-size: 13px; font-weight: 700; fill: #0f172a; }
+      .foot { font-size: 12px; font-weight: 700; fill: #475569; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-07-02-01-1nf-2nf-3nf-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-07-02-01-1nf-2nf-3nf-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">07-02-01. 1NF-2NF-3NF</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">아래 테이블은 학생, 과목, 교수, 학과 정보가 한곳에 섞여 있다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#14b8a6"/></marker></defs><rect x="420" y="170" width="360" height="90" rx="22" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/><text class="label" x="600" y="204" text-anchor="middle"><tspan x="600" dy="0">비정규형</tspan></text><text class="body" x="438" y="240" text-anchor="start"></text><rect x="210" y="350" width="120" height="82" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="270" y="384" text-anchor="middle"><tspan x="270" dy="0">1NF</tspan></text><text class="body" x="228" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="270" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="430" y="350" width="120" height="82" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="490" y="384" text-anchor="middle"><tspan x="490" dy="0">2NF</tspan></text><text class="body" x="448" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="490" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="650" y="350" width="120" height="82" rx="22" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/><text class="label" x="710" y="384" text-anchor="middle"><tspan x="710" dy="0">3NF</tspan></text><text class="body" x="668" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="710" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="870" y="350" width="120" height="82" rx="22" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/><text class="label" x="930" y="384" text-anchor="middle"><tspan x="930" dy="0">BCNF</tspan></text><text class="body" x="888" y="420" text-anchor="start"></text><line x1="600" y1="260" x2="930" y2="350" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="600" y1="516" x2="600" y2="612" stroke="#14b8a6" stroke-width="3" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="390" y="612" width="420" height="60" rx="22" fill="#f8fafc" stroke="#0f766e" stroke-width="2"/><text class="label" x="600" y="646" text-anchor="middle"><tspan x="600" dy="0">분해 기준</tspan></text><text class="body" x="408" y="682" text-anchor="start"><tspan x="408" dy="0">1NF</tspan><tspan x="408" dy="18">2NF</tspan><tspan x="408" dy="18">3NF</tspan></text>
-  <text class="small" x="84" y="654">07-02-01-1nf-2nf-3nf-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="24" y="24" width="1152" height="672" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="eyebrow" x="72" y="78">DATABASE NORMALIZATION</text>
+  <text class="title" x="72" y="118">1NF → 2NF → 3NF: 수강신청 테이블을 단계별로 분해하기</text>
+  <text class="subtitle" x="72" y="150">페이지 예시 그대로 반복 그룹 → 부분 함수 종속 → 이행 함수 종속을 제거하는 흐름을 한 장에 요약했다.</text>
+
+  <rect x="60" y="188" width="310" height="452" rx="24" fill="url(#panel1)" stroke="#93c5fd"/>
+  <rect x="395" y="188" width="390" height="452" rx="24" fill="url(#panel2)" stroke="#86efac"/>
+  <rect x="810" y="188" width="330" height="452" rx="24" fill="url(#panel3)" stroke="#c4b5fd"/>
+
+  <text class="stage-title" x="84" y="230">1NF</text>
+  <text class="stage-sub" x="84" y="252">"한 칸에 여러 값이 들어 있는가?" → 원자값으로 분리</text>
+
+  <rect x="84" y="274" width="262" height="128" rx="16" fill="#ffffff" stroke="#60a5fa"/>
+  <line x1="84" y1="306" x2="346" y2="306" stroke="#bfdbfe"/>
+  <line x1="144" y1="274" x2="144" y2="402" stroke="#bfdbfe"/>
+  <line x1="238" y1="274" x2="238" y2="402" stroke="#bfdbfe"/>
+  <line x1="84" y1="338" x2="346" y2="338" stroke="#e2e8f0"/>
+  <line x1="84" y1="370" x2="346" y2="370" stroke="#e2e8f0"/>
+  <text class="cell-h" x="99" y="295">학번</text>
+  <text class="cell-h" x="161" y="295">학생명</text>
+  <text class="cell-h" x="255" y="295">수강과목 / 성적</text>
+  <text class="cell" x="99" y="327">S01</text>
+  <text class="cell" x="161" y="327">김하나</text>
+  <text class="cell" x="255" y="327">운영체제, DB / A, B+</text>
+  <text class="cell" x="99" y="359">S02</text>
+  <text class="cell" x="161" y="359">이두리</text>
+  <text class="cell" x="255" y="359">운영체제 / B</text>
+  <rect x="250" y="316" width="80" height="18" rx="9" fill="#ef4444"/>
+  <text class="pill" x="290" y="329" text-anchor="middle">반복 그룹</text>
+
+  <line x1="215" y1="414" x2="215" y2="452" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="84" y="468" width="262" height="132" rx="16" fill="#ffffff" stroke="#60a5fa"/>
+  <line x1="84" y1="500" x2="346" y2="500" stroke="#bfdbfe"/>
+  <line x1="144" y1="468" x2="144" y2="600" stroke="#bfdbfe"/>
+  <line x1="214" y1="468" x2="214" y2="600" stroke="#bfdbfe"/>
+  <line x1="84" y1="532" x2="346" y2="532" stroke="#e2e8f0"/>
+  <line x1="84" y1="564" x2="346" y2="564" stroke="#e2e8f0"/>
+  <text class="cell-h" x="99" y="489">학번</text>
+  <text class="cell-h" x="159" y="489">학생명</text>
+  <text class="cell-h" x="229" y="489">과목코드 / 성적</text>
+  <text class="cell" x="99" y="521">S01</text>
+  <text class="cell" x="159" y="521">김하나</text>
+  <text class="cell" x="229" y="521">C101 / A</text>
+  <text class="cell" x="99" y="553">S01</text>
+  <text class="cell" x="159" y="553">김하나</text>
+  <text class="cell" x="229" y="553">C102 / B+</text>
+  <text class="cell" x="99" y="585">S02</text>
+  <text class="cell" x="159" y="585">이두리</text>
+  <text class="cell" x="229" y="585">C101 / B</text>
+
+  <text class="note" x="84" y="624">결과: 각 수강 기록이 한 행이 되어 1NF 만족</text>
+
+  <text class="stage-title" x="419" y="230">2NF</text>
+  <text class="stage-sub" x="419" y="252">복합키 (학번, 과목코드)의 일부만으로 결정되는 속성을 분리</text>
+
+  <rect x="419" y="274" width="342" height="104" rx="16" fill="#ffffff" stroke="#4ade80"/>
+  <text class="box-title" x="440" y="299">부분 함수 종속 탐지</text>
+  <text class="cell" x="440" y="325">학번 → 학생명, 학과코드, 학과명</text>
+  <text class="cell" x="440" y="349">과목코드 → 과목명, 담당교수, 교수연구실</text>
+  <rect x="640" y="308" width="92" height="18" rx="9" fill="#f59e0b"/>
+  <text class="pill" x="686" y="321" text-anchor="middle">부분 종속</text>
+
+  <line x1="590" y1="388" x2="490" y2="436" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="590" y1="388" x2="590" y2="436" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="590" y1="388" x2="690" y2="436" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="419" y="448" width="142" height="134" rx="16" fill="#f0fdf4" stroke="#4ade80"/>
+  <text class="box-title" x="438" y="472">학생</text>
+  <text class="cell" x="438" y="500">PK 학번</text>
+  <text class="cell" x="438" y="526">학생명</text>
+  <text class="cell" x="438" y="552">학과코드</text>
+  <text class="cell" x="438" y="578">학과명</text>
+
+  <rect x="574" y="448" width="112" height="134" rx="16" fill="#f0fdf4" stroke="#4ade80"/>
+  <text class="box-title" x="593" y="472">수강</text>
+  <text class="cell" x="593" y="500">PK 학번</text>
+  <text class="cell" x="593" y="526">PK 과목코드</text>
+  <text class="cell" x="593" y="552">성적</text>
+
+  <rect x="699" y="448" width="142" height="134" rx="16" fill="#f0fdf4" stroke="#4ade80" transform="translate(-55 0)"/>
+  <text class="box-title" x="663" y="472">과목</text>
+  <text class="cell" x="663" y="500">PK 과목코드</text>
+  <text class="cell" x="663" y="526">과목명</text>
+  <text class="cell" x="663" y="552">담당교수</text>
+  <text class="cell" x="663" y="578">교수연구실</text>
+
+  <text class="note" x="419" y="624">결과: 학생 · 과목 · 수강으로 쪼개 부분 종속 제거</text>
+
+  <text class="stage-title" x="834" y="230">3NF</text>
+  <text class="stage-sub" x="834" y="252">비키 속성이 다른 비키 속성을 결정하면 별도 테이블로 분리</text>
+
+  <rect x="834" y="274" width="282" height="104" rx="16" fill="#ffffff" stroke="#a78bfa"/>
+  <text class="box-title" x="854" y="299">이행 함수 종속 탐지</text>
+  <text class="cell" x="854" y="325">학번 → 학과코드 → 학과명</text>
+  <text class="cell" x="854" y="349">과목코드 → 담당교수 → 교수연구실</text>
+  <rect x="1025" y="308" width="78" height="18" rx="9" fill="#8b5cf6"/>
+  <text class="pill" x="1064" y="321" text-anchor="middle">이행 종속</text>
+
+  <line x1="975" y1="388" x2="892" y2="430" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="975" y1="388" x2="975" y2="430" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="975" y1="388" x2="1058" y2="430" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="834" y="444" width="96" height="142" rx="16" fill="#faf5ff" stroke="#a78bfa"/>
+  <text class="box-title" x="852" y="468">학생</text>
+  <text class="cell" x="852" y="496">학번</text>
+  <text class="cell" x="852" y="522">학생명</text>
+  <text class="cell" x="852" y="548">학과코드</text>
+
+  <rect x="942" y="444" width="96" height="142" rx="16" fill="#faf5ff" stroke="#a78bfa"/>
+  <text class="box-title" x="960" y="468">학과</text>
+  <text class="cell" x="960" y="496">학과코드</text>
+  <text class="cell" x="960" y="522">학과명</text>
+
+  <rect x="1050" y="444" width="96" height="142" rx="16" fill="#faf5ff" stroke="#a78bfa"/>
+  <text class="box-title" x="1068" y="468">과목</text>
+  <text class="cell" x="1068" y="496">과목코드</text>
+  <text class="cell" x="1068" y="522">과목명</text>
+  <text class="cell" x="1068" y="548">교수ID</text>
+
+  <rect x="1158" y="444" width="96" height="142" rx="16" fill="#faf5ff" stroke="#a78bfa" transform="translate(-34 0)"/>
+  <text class="box-title" x="1142" y="468">교수</text>
+  <text class="cell" x="1142" y="496">교수ID</text>
+  <text class="cell" x="1142" y="522">담당교수</text>
+  <text class="cell" x="1142" y="548">연구실</text>
+
+  <text class="note" x="834" y="624">결과: 학과 · 교수 테이블을 추가해 갱신 이상 감소</text>
+
+  <line x1="370" y1="414" x2="395" y2="414" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="785" y1="414" x2="810" y2="414" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="70" y="652" width="1060" height="24" rx="12" fill="#e2e8f0"/>
+  <text class="foot" x="88" y="668">검사 순서: 1NF 원자성 확인 → 2NF 복합키의 부분 종속 확인 → 3NF 비키 속성 사이의 이행 종속 확인 → 분해 후 무손실 조인·종속성 보존 점검</text>
 </svg>

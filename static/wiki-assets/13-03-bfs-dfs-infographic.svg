@@ -1,31 +1,166 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">13-03. BFS-DFS SVG 인포그래픽</title>
-  <desc id="desc">BFS-DFS</desc>
+  <title id="title">13-03. BFS-DFS 인포그래픽</title>
+  <desc id="desc">같은 그래프에서 BFS는 큐와 레벨 순서로, DFS는 재귀 또는 스택으로 깊게 탐색하며 두 방식 모두 방문 처리를 빠르게 해야 중복 삽입을 막는다는 내용을 비교한 SVG</desc>
   <defs>
-    <linearGradient id="grad-13-03-bfs-dfs-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#cffafe" />
-      <stop offset="100%" stop-color="#f0fdf4" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-13-03-bfs-dfs-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2" />
-      <stop offset="100%" stop-color="#22c55e" />
+    <linearGradient id="bfsGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="dfsGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#f97316"/>
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .eyebrow { font-size: 14px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .panelTitle { font-size: 24px; font-weight: 800; }
+      .panelBody { font-size: 15px; font-weight: 500; fill: #334155; }
+      .panelStrong { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .tiny { font-size: 12px; font-weight: 700; fill: #64748b; }
+      .nodeText { font-size: 19px; font-weight: 800; fill: #0f172a; }
+      .chipText { font-size: 13px; font-weight: 700; fill: #0f172a; }
     </style>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" viewBox="0 0 10 10">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" viewBox="0 0 10 10">
+      <path d="M0,0 L10,5 L0,10 z" fill="#f97316"/>
+    </marker>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-13-03-bfs-dfs-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-13-03-bfs-dfs-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">13-03. BFS-DFS</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">BFS는 큐를 사용한다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e"/></marker></defs><line x1="220" y1="360" x2="420" y2="250" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="220" y1="360" x2="420" y2="470" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="420" y1="250" x2="660" y2="250" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="420" y1="470" x2="660" y2="470" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="660" y1="250" x2="900" y2="360" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="660" y1="470" x2="900" y2="360" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="420" y1="250" x2="420" y2="470" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><line x1="660" y1="250" x2="660" y2="470" stroke="#22c55e" stroke-width="3" stroke-dasharray="10 8" opacity="0.55"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="5s" repeatCount="indefinite"/></line><circle cx="220" cy="360" r="56" fill="white" stroke="#0891b2" stroke-width="3"/><circle cx="220" cy="360" r="46" fill="#cffafe" opacity="0.95"/><text class="label" x="220" y="354" text-anchor="middle"><tspan x="220" dy="0">시작</tspan></text><circle cx="420" cy="250" r="56" fill="white" stroke="#0891b2" stroke-width="3"/><circle cx="420" cy="250" r="46" fill="#f0fdf4" opacity="0.95"/><text class="label" x="420" y="244" text-anchor="middle"><tspan x="420" dy="0">방문</tspan></text><circle cx="420" cy="470" r="56" fill="white" stroke="#0891b2" stroke-width="3"/><circle cx="420" cy="470" r="46" fill="#cffafe" opacity="0.95"/><text class="label" x="420" y="464" text-anchor="middle"><tspan x="420" dy="0">큐/스택</tspan></text><circle cx="660" cy="250" r="56" fill="white" stroke="#0891b2" stroke-width="3"/><circle cx="660" cy="250" r="46" fill="#f0fdf4" opacity="0.95"/><text class="label" x="660" y="244" text-anchor="middle"><tspan x="660" dy="0">거리 갱신</tspan></text><circle cx="660" cy="470" r="56" fill="white" stroke="#0891b2" stroke-width="3"/><circle cx="660" cy="470" r="46" fill="#cffafe" opacity="0.95"/><text class="label" x="660" y="464" text-anchor="middle"><tspan x="660" dy="0">도착</tspan></text><circle cx="900" cy="360" r="56" fill="white" stroke="#0891b2" stroke-width="3"/><circle cx="900" cy="360" r="46" fill="#f0fdf4" opacity="0.95"/><text class="label" x="900" y="354" text-anchor="middle"><tspan x="900" dy="0">노드</tspan></text><rect x="360" y="578" width="480" height="66" rx="22" fill="#ffffff" stroke="#22c55e" stroke-width="2"/><text class="label" x="600" y="612" text-anchor="middle"><tspan x="600" dy="0">탐색 포인트</tspan></text><text class="body" x="378" y="648" text-anchor="start"><tspan x="378" dy="0">시작</tspan><tspan x="378" dy="18">방문</tspan><tspan x="378" dy="18">큐/스택</tspan></text>
-  <text class="small" x="84" y="654">13-03-bfs-dfs-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="76" class="eyebrow">GRAPH TRAVERSAL</text>
+  <text x="72" y="118" class="title">13-03. BFS · DFS</text>
+  <text x="72" y="150" class="subtitle">핵심은 탐색 순서보다도 방문 처리를 언제 하느냐이다: BFS는 enqueue 시, DFS는 진입(push/호출) 시가 기본.</text>
+
+  <rect x="64" y="184" width="520" height="378" rx="28" fill="#f8fdff" stroke="#bae6fd" stroke-width="2"/>
+  <rect x="616" y="184" width="520" height="378" rx="28" fill="#fffaf5" stroke="#fed7aa" stroke-width="2"/>
+
+  <text x="96" y="224" class="panelTitle" fill="#0369a1">BFS = Queue + Level Order</text>
+  <text x="648" y="224" class="panelTitle" fill="#9a3412">DFS = Recursion/Stack + Depth First</text>
+
+  <text x="96" y="252" class="panelBody">같은 거리의 정점을 먼저 훑는다. 비가중치 최단경로와 최소 간선 수 문제에 적합.</text>
+  <text x="648" y="252" class="panelBody">한 방향으로 끝까지 내려간 뒤 되돌아온다. 경로 탐색·사이클·위상 정렬에 자주 사용.</text>
+
+  <line x1="168" y1="368" x2="258" y2="292" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="168" y1="368" x2="258" y2="442" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="258" y1="292" x2="378" y2="256" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="258" y1="292" x2="378" y2="368" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="258" y1="442" x2="378" y2="368" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="258" y1="442" x2="378" y2="478" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="378" y1="256" x2="492" y2="368" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="378" y1="368" x2="492" y2="368" stroke="#cbd5e1" stroke-width="4"/>
+  <line x1="378" y1="478" x2="492" y2="368" stroke="#cbd5e1" stroke-width="4"/>
+
+  <line x1="720" y1="368" x2="810" y2="292" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="720" y1="368" x2="810" y2="442" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="810" y1="292" x2="930" y2="256" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="810" y1="292" x2="930" y2="368" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="810" y1="442" x2="930" y2="368" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="810" y1="442" x2="930" y2="478" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="930" y1="256" x2="1044" y2="368" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="930" y1="368" x2="1044" y2="368" stroke="#d6d3d1" stroke-width="4"/>
+  <line x1="930" y1="478" x2="1044" y2="368" stroke="#d6d3d1" stroke-width="4"/>
+
+  <path d="M168 368 L258 292 L378 256 L492 368" fill="none" stroke="#0ea5e9" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowBlue)"/>
+  <path d="M168 368 L258 442 L378 478" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" marker-end="url(#arrowBlue)"/>
+  <path d="M720 368 L810 292 L930 256 L1044 368 L930 478" fill="none" stroke="#f97316" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowOrange)"/>
+
+  <g>
+    <circle cx="168" cy="368" r="34" fill="#ffffff" stroke="#0284c7" stroke-width="4"/>
+    <circle cx="258" cy="292" r="34" fill="#ffffff" stroke="#0284c7" stroke-width="4"/>
+    <circle cx="258" cy="442" r="34" fill="#ffffff" stroke="#0284c7" stroke-width="4"/>
+    <circle cx="378" cy="256" r="34" fill="#ffffff" stroke="#0284c7" stroke-width="4"/>
+    <circle cx="378" cy="368" r="34" fill="#ffffff" stroke="#0284c7" stroke-width="4"/>
+    <circle cx="378" cy="478" r="34" fill="#ffffff" stroke="#0284c7" stroke-width="4"/>
+    <circle cx="492" cy="368" r="34" fill="#ffffff" stroke="#0284c7" stroke-width="4"/>
+    <text x="168" y="375" text-anchor="middle" class="nodeText">A</text>
+    <text x="258" y="299" text-anchor="middle" class="nodeText">B</text>
+    <text x="258" y="449" text-anchor="middle" class="nodeText">C</text>
+    <text x="378" y="263" text-anchor="middle" class="nodeText">D</text>
+    <text x="378" y="375" text-anchor="middle" class="nodeText">E</text>
+    <text x="378" y="485" text-anchor="middle" class="nodeText">F</text>
+    <text x="492" y="375" text-anchor="middle" class="nodeText">G</text>
+  </g>
+
+  <g>
+    <circle cx="720" cy="368" r="34" fill="#ffffff" stroke="#c2410c" stroke-width="4"/>
+    <circle cx="810" cy="292" r="34" fill="#ffffff" stroke="#c2410c" stroke-width="4"/>
+    <circle cx="810" cy="442" r="34" fill="#ffffff" stroke="#c2410c" stroke-width="4"/>
+    <circle cx="930" cy="256" r="34" fill="#ffffff" stroke="#c2410c" stroke-width="4"/>
+    <circle cx="930" cy="368" r="34" fill="#ffffff" stroke="#c2410c" stroke-width="4"/>
+    <circle cx="930" cy="478" r="34" fill="#ffffff" stroke="#c2410c" stroke-width="4"/>
+    <circle cx="1044" cy="368" r="34" fill="#ffffff" stroke="#c2410c" stroke-width="4"/>
+    <text x="720" y="375" text-anchor="middle" class="nodeText">A</text>
+    <text x="810" y="299" text-anchor="middle" class="nodeText">B</text>
+    <text x="810" y="449" text-anchor="middle" class="nodeText">C</text>
+    <text x="930" y="263" text-anchor="middle" class="nodeText">D</text>
+    <text x="930" y="375" text-anchor="middle" class="nodeText">E</text>
+    <text x="930" y="485" text-anchor="middle" class="nodeText">F</text>
+    <text x="1044" y="375" text-anchor="middle" class="nodeText">G</text>
+  </g>
+
+  <rect x="112" y="278" width="82" height="26" rx="13" fill="#e0f2fe"/>
+  <text x="153" y="296" text-anchor="middle" class="tiny">Level 0</text>
+  <rect x="224" y="208" width="82" height="26" rx="13" fill="#dcfce7"/>
+  <text x="265" y="226" text-anchor="middle" class="tiny">Level 1</text>
+  <rect x="344" y="174" width="82" height="26" rx="13" fill="#dbeafe"/>
+  <text x="385" y="192" text-anchor="middle" class="tiny">Level 2</text>
+  <rect x="452" y="322" width="82" height="26" rx="13" fill="#fef3c7"/>
+  <text x="493" y="340" text-anchor="middle" class="tiny">Level 3</text>
+
+  <rect x="94" y="505" width="458" height="40" rx="20" fill="#e0f2fe" stroke="#7dd3fc"/>
+  <text x="112" y="530" class="panelStrong">Queue:</text>
+  <rect x="178" y="514" width="48" height="22" rx="11" fill="#ffffff" stroke="#0284c7"/>
+  <rect x="234" y="514" width="48" height="22" rx="11" fill="#ffffff" stroke="#0284c7"/>
+  <rect x="290" y="514" width="48" height="22" rx="11" fill="#ffffff" stroke="#0284c7"/>
+  <text x="202" y="529" text-anchor="middle" class="chipText">B</text>
+  <text x="258" y="529" text-anchor="middle" class="chipText">C</text>
+  <text x="314" y="529" text-anchor="middle" class="chipText">D</text>
+  <text x="362" y="529" class="small">front → 같은 거리부터 처리</text>
+
+  <rect x="648" y="505" width="456" height="40" rx="20" fill="#ffedd5" stroke="#fdba74"/>
+  <text x="666" y="530" class="panelStrong">Call stack:</text>
+  <rect x="762" y="514" width="48" height="22" rx="11" fill="#ffffff" stroke="#c2410c"/>
+  <rect x="818" y="514" width="48" height="22" rx="11" fill="#ffffff" stroke="#c2410c"/>
+  <rect x="874" y="514" width="48" height="22" rx="11" fill="#ffffff" stroke="#c2410c"/>
+  <text x="786" y="529" text-anchor="middle" class="chipText">A</text>
+  <text x="842" y="529" text-anchor="middle" class="chipText">B</text>
+  <text x="898" y="529" text-anchor="middle" class="chipText">D</text>
+  <text x="946" y="529" class="small">top → 더 깊게 진입</text>
+
+  <rect x="84" y="580" width="1032" height="86" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="108" y="600" width="202" height="46" rx="18" fill="url(#bfsGrad)" opacity="0.16"/>
+  <rect x="328" y="600" width="202" height="46" rx="18" fill="#dbeafe"/>
+  <rect x="548" y="600" width="202" height="46" rx="18" fill="url(#dfsGrad)" opacity="0.14"/>
+  <rect x="768" y="600" width="324" height="46" rx="18" fill="#ffedd5"/>
+
+  <text x="124" y="620" class="panelStrong">BFS 방문 처리</text>
+  <text x="124" y="638" class="small">enqueue 시 visited = true</text>
+
+  <text x="344" y="620" class="panelStrong">효과</text>
+  <text x="344" y="638" class="small">큐 중복 삽입 방지 · O(V+E)</text>
+
+  <text x="564" y="620" class="panelStrong">DFS 방문 처리</text>
+  <text x="564" y="638" class="small">진입(push/호출) 시 visited = true</text>
+
+  <text x="784" y="620" class="panelStrong">예외 메모</text>
+  <text x="784" y="638" class="small">모든 경로 탐색은 backtracking으로 visited 해제 가능</text>
+
+  <rect x="416" y="298" width="122" height="54" rx="16" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+  <text x="477" y="320" text-anchor="middle" class="panelStrong">중복 방지</text>
+  <text x="477" y="340" text-anchor="middle" class="small">E를 큐에 한 번만</text>
+
+  <rect x="954" y="286" width="136" height="54" rx="16" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+  <text x="1022" y="308" text-anchor="middle" class="panelStrong">되돌아오기</text>
+  <text x="1022" y="328" text-anchor="middle" class="small">막히면 pop/return</text>
 </svg>

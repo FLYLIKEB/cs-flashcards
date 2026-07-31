@@ -1,31 +1,156 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">08-02-02. 혼잡제어와 흐름제어 SVG 인포그래픽</title>
-  <desc id="desc">혼잡제어와 흐름제어</desc>
+  <title id="title">08-02-02. 혼잡제어와 흐름제어 인포그래픽</title>
+  <desc id="desc">흐름제어의 rwnd와 혼잡제어의 cwnd를 비교하고 실제 송신량이 min(rwnd, cwnd)로 결정되는 과정을 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-08-02-02-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#cffafe" />
-      <stop offset="100%" stop-color="#ecfeff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-08-02-02-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0284c7" />
-      <stop offset="100%" stop-color="#06b6d4" />
+    <linearGradient id="flowPanel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
     </linearGradient>
+    <linearGradient id="congPanel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fee2e2"/>
+      <stop offset="100%" stop-color="#fff7ed"/>
+    </linearGradient>
+    <linearGradient id="formula" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ea580c"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .kicker { font-size: 15px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .panelTitle { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .panelBody { font-size: 15px; font-weight: 500; fill: #334155; }
+      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .tiny { font-size: 12px; font-weight: 600; fill: #64748b; }
+      .metric { font-size: 28px; font-weight: 800; fill: #ffffff; }
+      .metricSub { font-size: 14px; font-weight: 600; fill: #dbeafe; }
+      .axis { stroke: #64748b; stroke-width: 2; }
+      .grid { stroke: #cbd5e1; stroke-width: 1; stroke-dasharray: 5 7; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-08-02-02-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-08-02-02-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">08-02-02. 혼잡제어와 흐름제어</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">흐름제어는 송신자와 수신자 속도 차이를 조절한다(end-to-end). 수신자는</tspan><tspan x="84" dy="24">자신이 처리 가능한 버퍼 크기를 광고하고 송신자는 이를 넘지 않도록 데이터를</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#06b6d4"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#cffafe" stroke="#0284c7" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">혼잡제어와</tspan><tspan x="177" dy="18">흐름제어</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#ecfeff" stroke="#0284c7" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">서술형 확장 개념</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#cffafe" stroke="#0284c7" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">면접용 비유</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#ecfeff" stroke="#0284c7" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">면접 대비 실전</tspan><tspan x="813" dy="18">포인트</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#06b6d4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#cffafe" stroke="#0284c7" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">예제 계산</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#06b6d4" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">혼잡제어와 흐름제어</tspan><tspan x="238" dy="18">서술형 확장 개념</tspan><tspan x="238" dy="18">면접용 비유</tspan></text>
-  <text class="small" x="84" y="654">08-02-02-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="24" y="24" width="1152" height="672" rx="32" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+
+  <text class="kicker" x="72" y="76">NETWORK CONTROL · END-TO-END VS NETWORK-WIDE</text>
+  <text class="title" x="72" y="118">혼잡제어와 흐름제어</text>
+  <text class="subtitle" x="72" y="152">흐름제어는 수신 버퍼를 보호하고, 혼잡제어는 네트워크 전체를 보호한다.</text>
+  <text class="subtitle" x="72" y="176">TCP 송신자는 광고 윈도우 rwnd와 혼잡 윈도우 cwnd 중 더 작은 값만큼만 전송한다.</text>
+
+  <rect x="60" y="210" width="510" height="220" rx="26" fill="url(#flowPanel)" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="630" y="210" width="510" height="220" rx="26" fill="url(#congPanel)" stroke="#fdba74" stroke-width="2"/>
+
+  <text class="panelTitle" x="92" y="250">흐름제어 Flow Control</text>
+  <text class="panelBody" x="92" y="278">수신자가 처리 가능한 버퍼 한계(rwnd)를 광고해 송신 속도를 맞춘다.</text>
+  <text class="tiny" x="92" y="302">핵심: end-to-end · 수신자 보호 · 슬라이딩 윈도우</text>
+
+  <rect x="96" y="326" width="118" height="64" rx="16" fill="#2563eb" opacity="0.12" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="155" y="364" text-anchor="middle">송신자</text>
+  <text class="small" x="155" y="384" text-anchor="middle">보낼 데이터 보유</text>
+
+  <rect x="420" y="322" width="114" height="72" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="477" y="349" text-anchor="middle">수신자</text>
+  <text class="small" x="477" y="369" text-anchor="middle">버퍼 여유 광고</text>
+  <rect x="448" y="380" width="58" height="8" rx="4" fill="#cbd5e1"/>
+  <rect x="448" y="380" width="34" height="8" rx="4" fill="#22c55e"/>
+  <text class="tiny" x="477" y="405" text-anchor="middle">남은 버퍼 ≈ rwnd</text>
+
+  <line x1="214" y1="356" x2="420" y2="356" stroke="#2563eb" stroke-width="6" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
+  <rect x="260" y="342" width="18" height="18" rx="4" fill="#60a5fa">
+    <animate attributeName="x" values="260;332;260" dur="4s" repeatCount="indefinite"/>
+  </rect>
+  <text class="small" x="316" y="336" text-anchor="middle">데이터 전송</text>
+
+  <line x1="420" y1="386" x2="214" y2="386" stroke="#0f766e" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8" marker-end="url(#arrowBlue)"/>
+  <text class="small" x="317" y="408" text-anchor="middle">ACK + rwnd 광고</text>
+
+  <rect x="228" y="322" width="160" height="98" rx="18" fill="#ffffff" opacity="0.82" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text class="label" x="308" y="350" text-anchor="middle">흐름제어 규칙</text>
+  <text class="panelBody" x="246" y="373">• rwnd를 넘기면 안 됨</text>
+  <text class="panelBody" x="246" y="394">• 상대 버퍼가 작은 경우</text>
+  <text class="panelBody" x="260" y="413">네트워크가 여유여도 대기</text>
+
+  <text class="panelTitle" x="662" y="250">혼잡제어 Congestion Control</text>
+  <text class="panelBody" x="662" y="278">송신자가 네트워크 혼잡을 추정해 cwnd를 늘리거나 줄인다.</text>
+  <text class="tiny" x="662" y="302">핵심: 네트워크 보호 · AIMD · Slow Start / CA / Fast Recovery</text>
+
+  <rect x="666" y="326" width="116" height="64" rx="16" fill="#ea580c" opacity="0.12" stroke="#ea580c" stroke-width="2"/>
+  <text class="label" x="724" y="364" text-anchor="middle">송신자</text>
+  <text class="small" x="724" y="384" text-anchor="middle">cwnd 자체 유지</text>
+
+  <line x1="782" y1="356" x2="856" y2="356" stroke="#ea580c" stroke-width="6" stroke-linecap="round" marker-end="url(#arrowOrange)"/>
+  <line x1="924" y1="356" x2="1000" y2="356" stroke="#ea580c" stroke-width="6" stroke-linecap="round" marker-end="url(#arrowOrange)"/>
+
+  <rect x="856" y="324" width="68" height="74" rx="16" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+  <text class="label" x="890" y="350" text-anchor="middle">라우터</text>
+  <rect x="870" y="360" width="12" height="24" rx="3" fill="#fdba74"/>
+  <rect x="886" y="350" width="12" height="34" rx="3" fill="#fb923c"/>
+  <rect x="902" y="340" width="12" height="44" rx="3" fill="#f97316"/>
+  <text class="tiny" x="890" y="410" text-anchor="middle">큐 증가</text>
+
+  <rect x="1000" y="326" width="112" height="64" rx="16" fill="#ffffff" stroke="#ea580c" stroke-width="2"/>
+  <text class="label" x="1056" y="364" text-anchor="middle">수신자</text>
+  <text class="small" x="1056" y="384" text-anchor="middle">ACK 반환</text>
+
+  <rect x="776" y="320" width="66" height="72" rx="16" fill="#7c2d12"/>
+  <text class="metric" x="809" y="352" text-anchor="middle">cwnd</text>
+  <text class="metricSub" x="809" y="374" text-anchor="middle">네트워크 상태 기반</text>
+
+  <rect x="774" y="400" width="314" height="18" rx="9" fill="#fed7aa"/>
+  <rect x="774" y="400" width="188" height="18" rx="9" fill="#f97316"/>
+  <text class="tiny" x="774" y="394">혼잡 없으면 증가</text>
+  <text class="tiny" x="972" y="394">손실·ECN·RTT 증가 시 감소</text>
+
+  <circle cx="948" cy="334" r="13" fill="#dc2626"/>
+  <text class="small" x="948" y="339" text-anchor="middle" fill="#ffffff">!</text>
+  <text class="small" x="948" y="418" text-anchor="middle">혼잡 신호</text>
+
+  <rect x="272" y="448" width="656" height="82" rx="22" fill="url(#formula)"/>
+  <text class="label" x="600" y="480" text-anchor="middle" fill="#dbeafe">실제 송신 허용량</text>
+  <text x="600" y="517" text-anchor="middle" style="font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:34px;font-weight:800;fill:#ffffff;">send window = min(rwnd, cwnd)</text>
+  <text class="small" x="600" y="544" text-anchor="middle" fill="#dbeafe">수신 버퍼가 작아도 제한되고, 네트워크가 막혀도 제한된다.</text>
+
+  <rect x="60" y="552" width="540" height="132" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="panelTitle" x="92" y="588">TCP 혼잡 윈도우 변화</text>
+
+  <line class="axis" x1="108" y1="650" x2="560" y2="650"/>
+  <line class="axis" x1="108" y1="650" x2="108" y2="602"/>
+  <line class="grid" x1="240" y1="602" x2="240" y2="650"/>
+  <line class="grid" x1="368" y1="602" x2="368" y2="650"/>
+  <line class="grid" x1="472" y1="602" x2="472" y2="650"/>
+  <polyline fill="none" stroke="#2563eb" stroke-width="5" points="108,646 152,638 196,622 240,590 284,590 328,584 368,578 404,616 440,612 472,646 528,646"/>
+  <line x1="238" y1="580" x2="238" y2="650" stroke="#0f766e" stroke-width="2" stroke-dasharray="6 6"/>
+  <text class="tiny" x="238" y="574" text-anchor="middle">ssthresh</text>
+  <text class="tiny" x="174" y="666" text-anchor="middle">Slow Start</text>
+  <text class="tiny" x="328" y="666" text-anchor="middle">Congestion Avoidance</text>
+  <text class="tiny" x="404" y="666" text-anchor="middle">dup ACK → 절반</text>
+  <text class="tiny" x="500" y="666" text-anchor="middle">timeout → 1 MSS</text>
+  <text class="tiny" x="92" y="608">cwnd</text>
+  <text class="tiny" x="540" y="666">RTT</text>
+
+  <rect x="624" y="552" width="516" height="132" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="panelTitle" x="656" y="588">면접용 압축 정리</text>
+  <text class="panelBody" x="656" y="614">• 흐름제어 = 수신자 보호, rwnd 광고, end-to-end</text>
+  <text class="panelBody" x="656" y="636">• 혼잡제어 = 네트워크 보호, cwnd 조절, 손실/ECN/RTT 증가 반영</text>
+  <text class="panelBody" x="656" y="658">• 처리량 근사: throughput ≈ cwnd / RTT</text>
+
+  <rect x="924" y="566" width="188" height="88" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text class="label" x="1018" y="592" text-anchor="middle">예시 계산</text>
+  <text class="small" x="1018" y="615" text-anchor="middle">cwnd=20KB, RTT=50ms</text>
+  <text class="small" x="1018" y="637" text-anchor="middle">≈ 20KB / 0.05s</text>
+  <text class="label" x="1018" y="660" text-anchor="middle">≈ 400KB/s ≈ 3.2Mbps</text>
+
+  <text class="tiny" x="72" y="702">08-02-02-infographic.svg</text>
 </svg>

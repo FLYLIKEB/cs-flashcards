@@ -1,31 +1,129 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">11-02-01. 블랙박스와 화이트박스 SVG 인포그래픽</title>
-  <desc id="desc">블랙박스와 화이트박스</desc>
+  <title id="title">11-02-01. 블랙박스와 화이트박스 인포그래픽</title>
+  <desc id="desc">요구사항과 입출력을 검증하는 블랙박스 테스트와 코드 구조와 커버리지를 확인하는 화이트박스 테스트를 대비한 인포그래픽</desc>
   <defs>
-    <linearGradient id="grad-11-02-01-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#fdf2f8" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-11-02-01-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7c3aed" />
-      <stop offset="100%" stop-color="#ec4899" />
+    <linearGradient id="blackPanel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#334155"/>
     </linearGradient>
+    <linearGradient id="whitePanel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="bridge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#475569"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .eyebrow { font-size: 14px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .panelTitleDark { font-size: 28px; font-weight: 800; fill: #f8fafc; }
+      .panelTitleLight { font-size: 28px; font-weight: 800; fill: #0f172a; }
+      .panelTextDark { font-size: 16px; font-weight: 500; fill: #e2e8f0; }
+      .panelTextLight { font-size: 16px; font-weight: 500; fill: #334155; }
+      .chipDark { font-size: 14px; font-weight: 700; fill: #0f172a; }
+      .chipLight { font-size: 14px; font-weight: 700; fill: #f8fafc; }
+      .label { font-size: 15px; font-weight: 700; fill: #0f172a; }
+      .small { font-size: 13px; font-weight: 600; fill: #64748b; }
+      .mono { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 14px; font-weight: 700; fill: #e2e8f0; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-11-02-01-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-11-02-01-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">11-02-01. 블랙박스와 화이트박스</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">블랙박스 테스트는 내부 구조(코드, 설계)를 보지 않고 요구사항 명세 입출력에</tspan><tspan x="84" dy="24">기반해 테스트한다. 사용자 관점에서 기능의 완전성(명세 대비 동작)을 검증하는 데</tspan></text>
-  <rect x="92" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="202" y="284" text-anchor="middle"><tspan x="202" dy="0">블랙박스</tspan></text><text class="body" x="110" y="320" text-anchor="start"></text><rect x="348" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="458" y="284" text-anchor="middle"><tspan x="458" dy="0">입출력 중심</tspan></text><text class="body" x="366" y="320" text-anchor="start"></text><rect x="604" y="250" width="220" height="280" rx="22" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="714" y="284" text-anchor="middle"><tspan x="714" dy="0">화이트박스</tspan></text><text class="body" x="622" y="320" text-anchor="start"></text><rect x="860" y="250" width="220" height="280" rx="22" fill="#fdf2f8" stroke="#7c3aed" stroke-width="2"/><text class="label" x="970" y="284" text-anchor="middle"><tspan x="970" dy="0">코드 경로 중심</tspan></text><text class="body" x="878" y="320" text-anchor="start"></text><line x1="200" y1="572" x2="1000" y2="572" stroke="#7c3aed" stroke-width="4" opacity="0.3"/><line x1="200" y1="572" x2="760" y2="572" stroke="#ec4899" stroke-width="4"><animate attributeName="x2" values="360;1000;360" dur="7s" repeatCount="indefinite"/></line><text class="body" x="600" y="620" text-anchor="middle"><tspan x="600" dy="0">블랙박스와 화이트박스</tspan></text>
-  <text class="small" x="84" y="654">11-02-01-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="24" y="24" width="1152" height="672" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="eyebrow" x="72" y="78">TEST DESIGN VIEWPOINT</text>
+  <text class="title" x="72" y="120">11-02-01. 블랙박스와 화이트박스</text>
+  <text class="subtitle" x="72" y="156">블랙박스는 “무엇을 검증할까”, 화이트박스는 “어떻게 실행되는가”에 초점을 둔다.</text>
+
+  <rect x="60" y="190" width="500" height="400" rx="28" fill="url(#blackPanel)"/>
+  <rect x="640" y="190" width="500" height="400" rx="28" fill="url(#whitePanel)" stroke="#cbd5e1"/>
+
+  <text class="panelTitleDark" x="92" y="238">블랙박스 테스트</text>
+  <text class="panelTextDark" x="92" y="266">요구사항·명세·입출력을 보고 기능이 맞는지 검증</text>
+
+  <rect x="92" y="298" width="116" height="40" rx="20" fill="#fde68a"/>
+  <text class="chipDark" x="150" y="323" text-anchor="middle">사용자 관점</text>
+  <rect x="220" y="298" width="126" height="40" rx="20" fill="#bfdbfe"/>
+  <text class="chipDark" x="283" y="323" text-anchor="middle">내부 코드 미확인</text>
+
+  <rect x="110" y="372" width="110" height="76" rx="18" fill="#e2e8f0"/>
+  <text class="label" x="165" y="404" text-anchor="middle">입력</text>
+  <text class="small" x="165" y="428" text-anchor="middle">경계값·대표값</text>
+
+  <rect x="255" y="352" width="110" height="116" rx="18" fill="#111827" stroke="#94a3b8" stroke-dasharray="8 7"/>
+  <text class="panelTitleDark" x="310" y="400" text-anchor="middle" font-size="22">?</text>
+  <text class="panelTextDark" x="310" y="430" text-anchor="middle">내부 로직</text>
+
+  <rect x="400" y="372" width="110" height="76" rx="18" fill="#e2e8f0"/>
+  <text class="label" x="455" y="404" text-anchor="middle">출력</text>
+  <text class="small" x="455" y="428" text-anchor="middle">명세 일치 확인</text>
+
+  <line x1="220" y1="410" x2="255" y2="410" stroke="#f8fafc" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="365" y1="410" x2="400" y2="410" stroke="#f8fafc" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="92" y="494" width="436" height="72" rx="20" fill="#1e293b" stroke="#475569"/>
+  <text class="chipLight" x="120" y="521">대표 기법</text>
+  <text class="panelTextDark" x="120" y="547">동치분할 · 경계값 분석 · 결정 테이블 · 상태 전이 · 유스케이스</text>
+
+  <text class="panelTitleLight" x="672" y="238">화이트박스 테스트</text>
+  <text class="panelTextLight" x="672" y="266">코드의 분기·조건·반복·경로를 분석해 구조적 결함을 찾음</text>
+
+  <rect x="672" y="298" width="108" height="40" rx="20" fill="#dbeafe"/>
+  <text class="chipDark" x="726" y="323" text-anchor="middle">개발자 관점</text>
+  <rect x="792" y="298" width="144" height="40" rx="20" fill="#e9d5ff"/>
+  <text class="chipDark" x="864" y="323" text-anchor="middle">코드 구조 직접 확인</text>
+
+  <rect x="672" y="360" width="220" height="162" rx="20" fill="#0f172a"/>
+  <text class="mono" x="692" y="392">if (amount &gt; limit) {</text>
+  <text class="mono" x="712" y="418">alert();</text>
+  <text class="mono" x="692" y="444">} else if (vip &amp;&amp; ok) {</text>
+  <text class="mono" x="712" y="470">approve();</text>
+  <text class="mono" x="692" y="496">}</text>
+  <circle cx="862" cy="392" r="9" fill="#22c55e"/>
+  <circle cx="846" cy="444" r="9" fill="#f59e0b"/>
+  <circle cx="878" cy="444" r="9" fill="#38bdf8"/>
+  <text class="small" x="782" y="544">조건과 분기 참·거짓을 모두 설계</text>
+
+  <g transform="translate(924 360)">
+    <rect width="180" height="34" rx="17" fill="#e2e8f0"/>
+    <rect x="0" y="0" width="72" height="34" rx="17" fill="#bfdbfe"/>
+    <text class="label" x="14" y="22">문장</text>
+    <text class="small" x="92" y="22">모든 문장 1회 실행</text>
+
+    <rect y="42" width="180" height="34" rx="17" fill="#e2e8f0"/>
+    <rect y="42" width="108" height="34" rx="17" fill="#93c5fd"/>
+    <text class="label" x="14" y="64">분기</text>
+    <text class="small" x="92" y="64">참/거짓 모두 통과</text>
+
+    <rect y="84" width="180" height="34" rx="17" fill="#e2e8f0"/>
+    <rect y="84" width="136" height="34" rx="17" fill="#c4b5fd"/>
+    <text class="label" x="14" y="106">조건</text>
+    <text class="small" x="92" y="106">원자 조건 진리값 확인</text>
+
+    <rect y="126" width="180" height="34" rx="17" fill="#e2e8f0"/>
+    <rect y="126" width="168" height="34" rx="17" fill="#a5f3fc"/>
+    <text class="label" x="14" y="148">경로</text>
+    <text class="small" x="92" y="148">가능 경로 폭발로 비용 큼</text>
+  </g>
+
+  <path d="M560 390C600 390 600 390 640 390" fill="none" stroke="url(#bridge)" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="600" cy="390" r="42" fill="#ffffff" stroke="#cbd5e1" stroke-width="6"/>
+  <text class="label" x="600" y="384" text-anchor="middle">프로그램</text>
+  <text class="small" x="600" y="406" text-anchor="middle">동일 대상</text>
+
+  <rect x="60" y="612" width="1080" height="56" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="label" x="88" y="646">핵심 비교</text>
+  <text class="small" x="196" y="646">블랙박스 = 기능·명세 검증</text>
+  <text class="small" x="458" y="646">화이트박스 = 로직·커버리지 검증</text>
+  <text class="small" x="756" y="646">실무에서는 두 방식을 함께 사용해야 누락 기능과 구조 결함을 모두 잡을 수 있다.</text>
 </svg>

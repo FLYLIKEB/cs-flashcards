@@ -1,31 +1,149 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">16-4. 주요 모델과 딥러닝 SVG 인포그래픽</title>
-  <desc id="desc">주요 모델과 딥러닝</desc>
+  <title id="title">16-4. 주요 모델과 딥러닝 인포그래픽</title>
+  <desc id="desc">전통적 머신러닝, 비지도 학습, 딥러닝 구조와 모델 선택 기준을 비교하는 페이지 전용 SVG</desc>
   <defs>
-    <linearGradient id="grad-16-4-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f3e8ff" />
-      <stop offset="100%" stop-color="#eff6ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef4ff"/>
+      <stop offset="55%" stop-color="#f8faff"/>
+      <stop offset="100%" stop-color="#f4f1ff"/>
     </linearGradient>
-    <linearGradient id="line-16-4-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#9333ea" />
-      <stop offset="100%" stop-color="#3b82f6" />
+    <linearGradient id="deep" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="classic" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="unsup" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ea580c"/>
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tableHead { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .tableCell { font: 500 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
     </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
   </defs>
+
   <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-16-4-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-16-4-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">16-4. 주요 모델과 딥러닝</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">Linear regression: 연속값 예측의 기본 모델로 해석이 쉽다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/></marker></defs><rect x="450" y="130" width="300" height="80" rx="22" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/><text class="label" x="600" y="164" text-anchor="middle"><tspan x="600" dy="0">선형모델</tspan></text><text class="body" x="468" y="200" text-anchor="start"></text><rect x="130" y="320" width="220" height="110" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="240" y="354" text-anchor="middle"><tspan x="240" dy="0">트리</tspan></text><text class="body" x="148" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="240" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="370" y="320" width="220" height="110" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="480" y="354" text-anchor="middle"><tspan x="480" dy="0">SVM</tspan></text><text class="body" x="388" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="480" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="610" y="320" width="220" height="110" rx="22" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="720" y="354" text-anchor="middle"><tspan x="720" dy="0">CNN</tspan></text><text class="body" x="628" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="720" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="850" y="320" width="220" height="110" rx="22" fill="#eff6ff" stroke="#9333ea" stroke-width="2"/><text class="label" x="960" y="354" text-anchor="middle"><tspan x="960" dy="0">Transformer</tspan></text><text class="body" x="868" y="390" text-anchor="start"></text><line x1="600" y1="210" x2="960" y2="320" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><rect x="250" y="540" width="700" height="74" rx="22" fill="#ffffff" stroke="#9333ea" stroke-width="2"/><text class="label" x="600" y="574" text-anchor="middle"><tspan x="600" dy="0">운영 포인트</tspan></text><text class="body" x="268" y="610" text-anchor="start"><tspan x="268" dy="0">트리</tspan><tspan x="268" dy="18">SVM</tspan><tspan x="268" dy="18">CNN</tspan></text>
-  <text class="small" x="84" y="654">16-4-infographic.svg</text>
+  <rect x="24" y="24" width="1152" height="672" rx="28" fill="url(#bg)" stroke="#dbe4f0"/>
+
+  <text x="64" y="78" class="tiny">금융공기업 IT · 16-4 페이지 전용 요약</text>
+  <text x="64" y="118" class="title">주요 모델과 딥러닝: 데이터 성격에 맞춰 복잡도를 올린다</text>
+  <text x="64" y="148" class="subtitle">베이스라인은 단순 모델에서 시작하고, 군집·차원축소·신경망은 데이터 구조와 설명가능성 요구에 따라 선택한다.</text>
+
+  <rect x="56" y="184" width="344" height="258" rx="24" fill="#ffffff" stroke="#bfe7e2"/>
+  <rect x="80" y="204" width="112" height="30" rx="15" fill="url(#classic)"/>
+  <text x="136" y="224" text-anchor="middle" class="chip">전통적 ML</text>
+  <text x="80" y="264" class="section">구조화 데이터의 기본 출발점</text>
+
+  <rect x="80" y="286" width="140" height="52" rx="16" fill="#ecfeff" stroke="#5eead4"/>
+  <text x="150" y="308" text-anchor="middle" class="label">Linear / Logistic</text>
+  <text x="94" y="327" class="body">해석 쉬움 · 베이스라인</text>
+
+  <rect x="236" y="286" width="140" height="52" rx="16" fill="#ecfeff" stroke="#5eead4"/>
+  <text x="306" y="308" text-anchor="middle" class="label">Decision Tree</text>
+  <text x="251" y="327" class="body">규칙 직관적 · 과적합 주의</text>
+
+  <rect x="80" y="352" width="140" height="52" rx="16" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="150" y="374" text-anchor="middle" class="label">Random Forest</text>
+  <text x="94" y="393" class="body">여러 트리로 분산 감소</text>
+
+  <rect x="236" y="352" width="140" height="52" rx="16" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="306" y="374" text-anchor="middle" class="label">Gradient Boosting</text>
+  <text x="252" y="393" class="body">금융 데이터에서 강한 경우</text>
+
+  <rect x="80" y="418" width="296" height="52" rx="16" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="228" y="440" text-anchor="middle" class="label">SVM</text>
+  <text x="98" y="459" class="body">마진 최대화 · 고차원 대응 가능 · 대규모 학습 비용 큼</text>
+
+  <rect x="428" y="184" width="344" height="258" rx="24" fill="#ffffff" stroke="#f5d29a"/>
+  <rect x="452" y="204" width="118" height="30" rx="15" fill="url(#unsup)"/>
+  <text x="511" y="224" text-anchor="middle" class="chip">비지도 학습</text>
+  <text x="452" y="264" class="section">라벨 없이 구조를 찾고 줄인다</text>
+
+  <circle cx="518" cy="336" r="56" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <circle cx="498" cy="324" r="13" fill="#fb923c" opacity="0.88"/>
+  <circle cx="538" cy="318" r="13" fill="#facc15" opacity="0.88"/>
+  <circle cx="526" cy="352" r="13" fill="#60a5fa" opacity="0.88"/>
+  <text x="518" y="400" text-anchor="middle" class="label">K-means</text>
+  <text x="518" y="418" text-anchor="middle" class="body">군집 중심점 기반</text>
+
+  <rect x="610" y="290" width="118" height="90" rx="18" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <line x1="630" y1="358" x2="708" y2="312" stroke="#f97316" stroke-width="3"/>
+  <line x1="630" y1="330" x2="708" y2="330" stroke="#fb923c" stroke-width="3" opacity="0.65"/>
+  <line x1="630" y1="302" x2="708" y2="348" stroke="#fdba74" stroke-width="3" opacity="0.6"/>
+  <text x="669" y="400" text-anchor="middle" class="label">PCA</text>
+  <text x="669" y="418" text-anchor="middle" class="body">분산 큰 축으로 축소</text>
+
+  <rect x="452" y="392" width="276" height="52" rx="16" fill="#fffaf0" stroke="#fcd34d"/>
+  <text x="590" y="414" text-anchor="middle" class="label">이상치 탐지</text>
+  <text x="470" y="433" class="body">Isolation Forest · LOF로 초기 필터링과 모니터링</text>
+
+  <rect x="800" y="184" width="344" height="258" rx="24" fill="#ffffff" stroke="#c7d2fe"/>
+  <rect x="824" y="204" width="112" height="30" rx="15" fill="url(#deep)"/>
+  <text x="880" y="224" text-anchor="middle" class="chip">딥러닝</text>
+  <text x="824" y="264" class="section">표현 학습이 필요한 비선형 문제</text>
+
+  <rect x="826" y="292" width="64" height="112" rx="18" fill="#eef2ff" stroke="#818cf8"/>
+  <rect x="904" y="278" width="64" height="140" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
+  <rect x="982" y="278" width="64" height="140" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
+  <rect x="1060" y="306" width="56" height="84" rx="18" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="858" y="426" text-anchor="middle" class="tiny">입력층</text>
+  <text x="936" y="426" text-anchor="middle" class="tiny">은닉층</text>
+  <text x="1014" y="426" text-anchor="middle" class="tiny">은닉층</text>
+  <text x="1088" y="426" text-anchor="middle" class="tiny">출력층</text>
+
+  <line x1="890" y1="348" x2="904" y2="348" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="968" y1="348" x2="982" y2="348" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="1046" y1="348" x2="1060" y2="348" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <text x="824" y="462" class="body">손실 함수 → 역전파 → 경사하강법</text>
+  <text x="824" y="484" class="body">CNN: 이미지 / RNN·LSTM: 순차 / Transformer: 긴 문맥</text>
+
+  <line x1="400" y1="313" x2="428" y2="313" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="772" y1="313" x2="800" y2="313" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="586" y="298" text-anchor="middle" class="tiny">데이터·문제 복잡도 증가</text>
+  <text x="586" y="332" text-anchor="middle" class="tiny">설명가능성은 좌측이 유리, 표현 학습은 우측이 유리</text>
+
+  <rect x="56" y="468" width="1088" height="196" rx="24" fill="#ffffff" stroke="#d7deea"/>
+  <text x="80" y="506" class="section">모델 선택 기준: 언제 단순 모델에서 복잡 모델로 넘어갈까?</text>
+
+  <rect x="80" y="528" width="200" height="40" rx="12" fill="#e2e8f0"/>
+  <rect x="294" y="528" width="354" height="40" rx="12" fill="#dcfce7"/>
+  <rect x="662" y="528" width="458" height="40" rx="12" fill="#dbeafe"/>
+  <text x="180" y="553" text-anchor="middle" class="tableHead">기준</text>
+  <text x="471" y="553" text-anchor="middle" class="tableHead">단순 모델 선호</text>
+  <text x="891" y="553" text-anchor="middle" class="tableHead">복잡 모델 선호</text>
+
+  <rect x="80" y="580" width="200" height="24" rx="8" fill="#f8fafc"/>
+  <rect x="294" y="580" width="354" height="24" rx="8" fill="#f8fafc"/>
+  <rect x="662" y="580" width="458" height="24" rx="8" fill="#f8fafc"/>
+  <text x="98" y="596" class="tableCell">데이터 크기</text>
+  <text x="312" y="596" class="tableCell">작고 구조화 중심</text>
+  <text x="680" y="596" class="tableCell">매우 크거나 비정형 포함</text>
+
+  <rect x="80" y="612" width="200" height="24" rx="8" fill="#f8fafc"/>
+  <rect x="294" y="612" width="354" height="24" rx="8" fill="#f8fafc"/>
+  <rect x="662" y="612" width="458" height="24" rx="8" fill="#f8fafc"/>
+  <text x="98" y="628" class="tableCell">설명가능성</text>
+  <text x="312" y="628" class="tableCell">규제 대응이 핵심</text>
+  <text x="680" y="628" class="tableCell">성능 우선 과업</text>
+
+  <rect x="80" y="644" width="200" height="24" rx="8" fill="#f8fafc"/>
+  <rect x="294" y="644" width="354" height="24" rx="8" fill="#f8fafc"/>
+  <rect x="662" y="644" width="458" height="24" rx="8" fill="#f8fafc"/>
+  <text x="98" y="660" class="tableCell">속도·피처 구조</text>
+  <text x="312" y="660" class="tableCell">실시간 추론 · 사람이 만든 피처 강함</text>
+  <text x="680" y="660" class="tableCell">배치 허용 · 표현 학습 필요</text>
 </svg>

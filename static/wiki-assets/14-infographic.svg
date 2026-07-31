@@ -1,31 +1,135 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">14. 컴퓨터구조 심화 SVG 인포그래픽</title>
-  <desc id="desc">컴퓨터구조 심화</desc>
+  <title id="title">14. 컴퓨터구조 심화 인포그래픽</title>
+  <desc id="desc">CPU time과 AMAT 공식을 중심으로 CPU, 메모리 계층, 명령어 세트, 입출력 병목을 한 흐름으로 정리한 컴퓨터구조 심화 개념도</desc>
   <defs>
-    <linearGradient id="grad-14-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e5e7eb" />
-      <stop offset="100%" stop-color="#dbeafe" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="55%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
     </linearGradient>
-    <linearGradient id="line-14-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1f2937" />
-      <stop offset="100%" stop-color="#2563eb" />
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
     </linearGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="cool" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: "Pretendard", "Noto Sans KR", sans-serif; }
+      .eyebrow { font-size: 16px; font-weight: 700; fill: #475569; letter-spacing: 0.04em; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 14px; font-weight: 800; fill: #1e293b; letter-spacing: 0.04em; }
+      .label { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 600; fill: #475569; }
+      .formula { font-size: 21px; font-weight: 800; fill: #0f172a; }
+      .metric { font-size: 15px; font-weight: 700; fill: #0f172a; }
+      .white { fill: #ffffff; }
     </style>
   </defs>
+
   <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-14-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-14-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">14. 컴퓨터구조 심화</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">금융공기업 IT 필기에서 컴퓨터구조는 운영체제 네트워크와 함께 시스템 전반의 성능과</tspan><tspan x="84" dy="24">안정성을 설명하는 핵심 과목입니다. 특히 금융결제원 산업은행 전산 직무에서는 CPU</tspan></text>
-  <rect x="280" y="240" width="640" height="56" rx="18" fill="#e5e7eb" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="274" text-anchor="middle"><tspan x="600" dy="0">명령어</tspan></text><line x1="600" y1="296" x2="600" y2="314" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="314" width="640" height="56" rx="18" fill="#dbeafe" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="348" text-anchor="middle"><tspan x="600" dy="0">CPU</tspan></text><line x1="600" y1="370" x2="600" y2="388" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="388" width="640" height="56" rx="18" fill="#e5e7eb" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="422" text-anchor="middle"><tspan x="600" dy="0">캐시</tspan></text><line x1="600" y1="444" x2="600" y2="462" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="462" width="640" height="56" rx="18" fill="#dbeafe" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="496" text-anchor="middle"><tspan x="600" dy="0">메모리</tspan></text><line x1="600" y1="518" x2="600" y2="536" stroke="#2563eb" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="536" width="640" height="56" rx="18" fill="#e5e7eb" stroke="#1f2937" stroke-width="2"/><text class="label" x="600" y="570" text-anchor="middle"><tspan x="600" dy="0">I/O</tspan></text><rect x="96" y="296" width="150" height="160" rx="22" fill="#ffffff" stroke="#2563eb" stroke-width="2"/><text class="label" x="171" y="330" text-anchor="middle"><tspan x="171" dy="0">입력</tspan></text><text class="body" x="114" y="366" text-anchor="start"><tspan x="114" dy="0">명령어</tspan></text><rect x="954" y="296" width="150" height="160" rx="22" fill="#ffffff" stroke="#2563eb" stroke-width="2"/><text class="label" x="1029" y="330" text-anchor="middle"><tspan x="1029" dy="0">출력</tspan></text><text class="body" x="972" y="366" text-anchor="start"><tspan x="972" dy="0">I/O</tspan></text><line x1="246" y1="376" x2="280" y2="376" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="920" y1="376" x2="954" y2="376" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <text class="small" x="84" y="654">14-infographic.svg</text>
+  <rect x="24" y="24" width="1152" height="672" rx="32" fill="url(#bg)" stroke="#cbd5e1"/>
+
+  <text x="72" y="82" class="eyebrow">FINANCE IT · COMPUTER ARCHITECTURE</text>
+  <text x="72" y="124" class="title">14. 컴퓨터구조 심화</text>
+  <text x="72" y="154" class="subtitle">CPU 실행 구조에서 메모리 계층, ISA, I/O까지 이어지는 병목을 두 공식으로 묶어 보는 페이지</text>
+
+  <rect x="60" y="188" width="300" height="470" rx="28" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="88" y="224" class="section">학습 흐름</text>
+
+  <rect x="88" y="246" width="244" height="74" rx="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="122" cy="283" r="18" fill="#2563eb"/>
+  <text x="122" y="289" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">1</text>
+  <text x="154" y="277" class="metric">CPU 설계</text>
+  <text x="154" y="299" class="small">파이프라인 5단계 · CPI 감소</text>
+
+  <line x1="210" y1="320" x2="210" y2="343" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow-slate)"/>
+
+  <rect x="88" y="346" width="244" height="74" rx="20" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+  <circle cx="122" cy="383" r="18" fill="#0891b2"/>
+  <text x="122" y="389" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">2</text>
+  <text x="154" y="377" class="metric">캐시 · 메모리 계층</text>
+  <text x="154" y="399" class="small">L1/L2/TLB · AMAT 감소</text>
+
+  <line x1="210" y1="420" x2="210" y2="443" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow-slate)"/>
+
+  <rect x="88" y="446" width="244" height="74" rx="20" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <circle cx="122" cy="483" r="18" fill="#7c3aed"/>
+  <text x="122" y="489" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">3</text>
+  <text x="154" y="477" class="metric">명령어 세트</text>
+  <text x="154" y="499" class="small">RISC/CISC · 주소 지정 방식</text>
+
+  <line x1="210" y1="520" x2="210" y2="543" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow-slate)"/>
+
+  <rect x="88" y="546" width="244" height="74" rx="20" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  <circle cx="122" cy="583" r="18" fill="#f97316"/>
+  <text x="122" y="589" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">4</text>
+  <text x="154" y="577" class="metric">입출력 시스템</text>
+  <text x="154" y="599" class="small">인터럽트 · DMA · 저장장치</text>
+
+  <rect x="390" y="188" width="750" height="220" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="422" y="224" class="section">성능을 설명하는 두 공식</text>
+
+  <rect x="424" y="250" width="320" height="128" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="454" y="287" class="label">CPU 내부 병목</text>
+  <text x="454" y="327" class="formula">CPU time = IC × CPI × Clock</text>
+  <text x="454" y="355" class="body">명령어 수, 명령어당 사이클, 클럭 주기 중</text>
+  <text x="454" y="377" class="body">어느 항을 줄였는지 구분해 설명</text>
+
+  <rect x="786" y="250" width="320" height="128" rx="24" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="816" y="287" class="label">메모리 계층 병목</text>
+  <text x="816" y="327" class="formula">AMAT = Hit + Miss × Penalty</text>
+  <text x="816" y="355" class="body">캐시 적중시간, 미스율, 미스 패널티가</text>
+  <text x="816" y="377" class="body">체감 지연을 어떻게 바꾸는지 해석</text>
+
+  <line x1="744" y1="314" x2="786" y2="314" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="764" y="302" text-anchor="middle" class="small">메모리 접근</text>
+
+  <rect x="390" y="434" width="750" height="224" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="422" y="470" class="section">병목 지도: 실행 → 메모리 → I/O</text>
+
+  <rect x="432" y="505" width="180" height="108" rx="24" fill="url(#core)"/>
+  <text x="522" y="550" text-anchor="middle" class="white" style="font-size:28px;font-weight:800;">CPU</text>
+  <text x="522" y="578" text-anchor="middle" class="white" style="font-size:15px;font-weight:600;">파이프라인 · 분기 예측</text>
+
+  <rect x="676" y="505" width="180" height="108" rx="24" fill="url(#cool)"/>
+  <text x="766" y="550" text-anchor="middle" class="white" style="font-size:28px;font-weight:800;">Memory</text>
+  <text x="766" y="578" text-anchor="middle" class="white" style="font-size:15px;font-weight:600;">Cache · TLB · DRAM</text>
+
+  <rect x="920" y="505" width="180" height="108" rx="24" fill="url(#warm)"/>
+  <text x="1010" y="550" text-anchor="middle" class="white" style="font-size:28px;font-weight:800;">I/O</text>
+  <text x="1010" y="578" text-anchor="middle" class="white" style="font-size:15px;font-weight:600;">Interrupt · DMA · Storage</text>
+
+  <line x1="612" y1="559" x2="676" y2="559" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow-blue)"/>
+  <line x1="856" y1="559" x2="920" y2="559" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="430" y="454" width="190" height="38" rx="19" fill="#dbeafe"/>
+  <text x="525" y="478" text-anchor="middle" class="small">CPI ↓ 파이프라인 개선</text>
+
+  <rect x="671" y="454" width="190" height="38" rx="19" fill="#cffafe"/>
+  <text x="766" y="478" text-anchor="middle" class="small">AMAT ↓ 캐시/TLB 개선</text>
+
+  <rect x="913" y="454" width="194" height="38" rx="19" fill="#fed7aa"/>
+  <text x="1010" y="478" text-anchor="middle" class="small">CPU 점유율 ↓ DMA 활용</text>
+
+  <rect x="90" y="638" width="1010" height="18" rx="9" fill="#e2e8f0"/>
+  <rect x="90" y="638" width="280" height="18" rx="9" fill="#2563eb"/>
+  <rect x="370" y="638" width="250" height="18" rx="0" fill="#06b6d4"/>
+  <rect x="620" y="638" width="240" height="18" rx="0" fill="#7c3aed"/>
+  <rect x="860" y="638" width="240" height="18" rx="9" fill="#f97316"/>
+
+  <text x="90" y="684" class="small">금융공기업 필기 포인트: 분기 예측 실패, 캐시 미스, 인터럽트 폭주를 각각 다른 병목으로 구분하고 CPU→메모리→I/O 흐름으로 연결해 답안화</text>
 </svg>

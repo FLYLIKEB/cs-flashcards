@@ -1,31 +1,134 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">10-03. 웹-네트워크 공격 SVG 인포그래픽</title>
-  <desc id="desc">웹-네트워크 공격</desc>
+  <title id="title">10-03. 웹-네트워크 공격 인포그래픽</title>
+  <desc id="desc">웹 공격 벡터가 기밀성, 무결성, 가용성을 침해하고 코드 방어와 네트워크 방어가 이를 차단하는 구조를 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-10-03-00-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fee2e2" />
-      <stop offset="100%" stop-color="#fff7ed" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff7ed" />
+      <stop offset="55%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#eff6ff" />
     </linearGradient>
-    <linearGradient id="line-10-03-00-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#b91c1c" />
-      <stop offset="100%" stop-color="#f59e0b" />
+    <linearGradient id="threat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#f97316" />
     </linearGradient>
+    <linearGradient id="defense" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef3c7" />
+      <stop offset="100%" stop-color="#fde68a" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.12" />
+    </filter>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ea580c" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 800 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .micro { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; letter-spacing: 0.08em; }
+      .center { text-anchor: middle; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-10-03-00-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-10-03-00-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">10-03. 웹-네트워크 공격</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">웹 공격은 입력값 검증 실패와 세션/권한 관리 취약점에서 자주 발생한다. 방어는</tspan><tspan x="84" dy="24">주로 입력값 검증, 출력 인코딩, 세션/권한 관리 강화로 접근한다.</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/></marker></defs><rect x="90" y="322" width="180" height="120" rx="22" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/><text class="label" x="180" y="356" text-anchor="middle"><tspan x="180" dy="0">공격</tspan></text><text class="body" x="108" y="392" text-anchor="start"></text><rect x="350" y="250" width="180" height="120" rx="22" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/><text class="label" x="440" y="284" text-anchor="middle"><tspan x="440" dy="0">입력</tspan></text><text class="body" x="368" y="320" text-anchor="start"></text><rect x="620" y="322" width="180" height="120" rx="22" fill="#fff7ed" stroke="#b91c1c" stroke-width="2"/><text class="label" x="710" y="356" text-anchor="middle"><tspan x="710" dy="0">검증</tspan></text><text class="body" x="638" y="392" text-anchor="start"></text><rect x="890" y="250" width="180" height="120" rx="22" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/><text class="label" x="980" y="284" text-anchor="middle"><tspan x="980" dy="0">차단</tspan></text><text class="body" x="908" y="320" text-anchor="start"></text><rect x="455" y="510" width="250" height="92" rx="22" fill="#ffffff" stroke="#b91c1c" stroke-width="2"/><text class="label" x="580" y="544" text-anchor="middle"><tspan x="580" dy="0">모니터링</tspan></text><text class="body" x="473" y="580" text-anchor="start"></text><line x1="270" y1="382" x2="350" y2="310" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="270" y1="382" x2="350" y2="310" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="530" y1="310" x2="620" y2="382" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="530" y1="310" x2="620" y2="382" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="800" y1="382" x2="890" y2="310" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="800" y1="382" x2="890" y2="310" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><line x1="710" y1="442" x2="610" y2="510" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="440" y1="370" x2="520" y2="510" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><circle cx="595" cy="382" r="36" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/><text class="label" x="595" y="389" text-anchor="middle"><tspan x="595" dy="0">검증</tspan></text>
-  <text class="small" x="84" y="654">10-03-00-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="#f8fafc" />
+  <rect x="28" y="28" width="1144" height="664" rx="30" fill="url(#bg)" stroke="#e2e8f0" />
+
+  <text class="micro" x="74" y="76">SECURITY MAP · VECTOR → CIA → DEFENSE</text>
+  <text class="title" x="74" y="116">10-03. 웹·네트워크 공격</text>
+  <text class="subtitle" x="74" y="150">입력·세션·URL 호출 같은 공격 벡터가 기밀성·무결성·가용성을 침해한다. 대응은 코드 수준 방어와 네트워크 계층 방어를 함께 설계해야 한다.</text>
+
+  <rect x="60" y="186" width="300" height="468" rx="24" fill="#fff1f2" stroke="#fecdd3" filter="url(#shadow)" />
+  <text class="section" x="88" y="224">주요 웹 공격 벡터</text>
+
+  <rect x="86" y="248" width="248" height="58" rx="16" fill="#ffffff" stroke="#fda4af" />
+  <circle cx="116" cy="277" r="12" fill="url(#threat)" />
+  <text class="label" x="140" y="271">XSS</text>
+  <text class="body" x="140" y="290">출력 지점 스크립트 주입 → 세션 탈취·화면 변조</text>
+
+  <rect x="86" y="320" width="248" height="58" rx="16" fill="#ffffff" stroke="#fdba74" />
+  <circle cx="116" cy="349" r="12" fill="url(#threat)" />
+  <text class="label" x="140" y="343">SQL Injection</text>
+  <text class="body" x="140" y="362">쿼리 구조 변조 → 인증 우회·데이터 유출</text>
+
+  <rect x="86" y="392" width="248" height="58" rx="16" fill="#ffffff" stroke="#fdba74" />
+  <circle cx="116" cy="421" r="12" fill="url(#threat)" />
+  <text class="label" x="140" y="415">CSRF</text>
+  <text class="body" x="140" y="434">인증된 사용자의 상태 변경 요청을 강제</text>
+
+  <rect x="86" y="464" width="248" height="58" rx="16" fill="#ffffff" stroke="#fdba74" />
+  <circle cx="116" cy="493" r="12" fill="url(#threat)" />
+  <text class="label" x="140" y="487">SSRF</text>
+  <text class="body" x="140" y="506">서버가 내부망·메타데이터 URL을 대신 호출</text>
+
+  <rect x="86" y="536" width="248" height="82" rx="16" fill="#ffffff" stroke="#fda4af" />
+  <circle cx="116" cy="566" r="12" fill="url(#threat)" />
+  <text class="label" x="140" y="560">파일 업로드 취약점</text>
+  <text class="body" x="140" y="579">웹쉘 업로드, MIME/경로 조작, 실행 권한 악용</text>
+  <text class="body" x="140" y="598">→ 원격 코드 실행·서비스 변조</text>
+
+  <rect x="412" y="202" width="378" height="242" rx="28" fill="#ffffff" stroke="#fde68a" filter="url(#shadow)" />
+  <text class="section center" x="601" y="238">침해되는 핵심 자산: CIA</text>
+
+  <path d="M601 262 L688 300 L672 398 L601 430 L530 398 L514 300 Z" fill="url(#shield)" stroke="#f59e0b" stroke-width="3">
+    <animate attributeName="opacity" values="0.95;1;0.95" dur="3.6s" repeatCount="indefinite" />
+  </path>
+  <text class="label center" x="601" y="312">기밀성</text>
+  <text class="body center" x="601" y="331">토큰·패킷·자격증명 유출</text>
+  <text class="label center" x="601" y="360">무결성</text>
+  <text class="body center" x="601" y="379">쿼리·요청·콘텐츠 변조</text>
+  <text class="label center" x="601" y="408">가용성</text>
+  <text class="body center" x="601" y="427">DoS/DDoS·자원 고갈·서비스 중단</text>
+
+  <line x1="360" y1="278" x2="512" y2="302" stroke="#ea580c" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  <line x1="360" y1="349" x2="512" y2="324" stroke="#ea580c" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  <line x1="360" y1="421" x2="512" y2="347" stroke="#ea580c" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  <line x1="360" y1="493" x2="512" y2="371" stroke="#ea580c" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  <line x1="360" y1="577" x2="512" y2="395" stroke="#ea580c" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-red)" />
+
+  <rect x="412" y="472" width="378" height="182" rx="28" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section center" x="601" y="506">코드 수준 1차 방어</text>
+  <text class="label" x="444" y="542">입력·출력</text>
+  <text class="body" x="444" y="564">화이트리스트 검증, 컨텍스트별 인코딩, 에러 메시지 숨김</text>
+  <text class="label" x="444" y="595">세션·상태 변경</text>
+  <text class="body" x="444" y="617">CSRF 토큰, SameSite·HTTPOnly·Secure 쿠키, 재인증</text>
+  <text class="label" x="444" y="648">DB·업로드·URL 호출</text>
+  <text class="body" x="444" y="670">Prepared statement, 웹루트 외 저장, 내부 IP 차단·타임아웃</text>
+
+  <rect x="840" y="186" width="300" height="468" rx="24" fill="#eff6ff" stroke="#bfdbfe" filter="url(#shadow)" />
+  <text class="section" x="868" y="224">네트워크 방어 계층</text>
+
+  <rect x="866" y="248" width="248" height="64" rx="18" fill="#ffffff" stroke="#93c5fd" />
+  <text class="label" x="892" y="274">Firewall</text>
+  <text class="body" x="892" y="294">IP·포트·프로토콜 필터링으로 불필요한 노출 최소화</text>
+
+  <rect x="866" y="328" width="248" height="64" rx="18" fill="#ffffff" stroke="#93c5fd" />
+  <text class="label" x="892" y="354">WAF</text>
+  <text class="body" x="892" y="374">HTTP/HTTPS에서 XSS·SQLi 패턴 탐지·차단</text>
+
+  <rect x="866" y="408" width="248" height="64" rx="18" fill="#ffffff" stroke="#93c5fd" />
+  <text class="label" x="892" y="434">IDS / IPS</text>
+  <text class="body" x="892" y="454">이상 트래픽 탐지, 자동 차단, 로그 기반 대응</text>
+
+  <rect x="866" y="488" width="248" height="64" rx="18" fill="#ffffff" stroke="#93c5fd" />
+  <text class="label" x="892" y="514">VPN</text>
+  <text class="body" x="892" y="534">원격 접속 암호화·접속 주체 통제로 내부 자원 보호</text>
+
+  <rect x="866" y="572" width="248" height="46" rx="16" fill="url(#defense)" opacity="0.12" stroke="#60a5fa" />
+  <text class="body" x="892" y="600">로그 모니터링과 정책 튜닝이 최종 대응 품질을 결정</text>
+
+  <line x1="690" y1="300" x2="840" y2="280" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  <line x1="690" y1="332" x2="840" y2="360" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  <line x1="690" y1="364" x2="840" y2="440" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  <line x1="690" y1="396" x2="840" y2="520" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+
+  <text class="micro" x="74" y="682">시험 암기축: 공격 벡터 → 침해 자산(CIA) → 구체적 방어책</text>
 </svg>

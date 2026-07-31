@@ -1,31 +1,143 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">06-04. 메모리와 가상메모리 SVG 인포그래픽</title>
-  <desc id="desc">메모리와 가상메모리</desc>
+  <title id="title">06-04. 메모리와 가상메모리 인포그래픽</title>
+  <desc id="desc">내부·외부 단편화, 페이징과 세그먼트, TLB 기반 주소 변환, 페이지 교체와 스래싱을 함께 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-06-04-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe" />
-      <stop offset="100%" stop-color="#eef2ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
-    <linearGradient id="line-06-04-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb" />
-      <stop offset="100%" stop-color="#8b5cf6" />
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#7c3aed" />
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569" />
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-06-04-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-06-04-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">06-04. 메모리와 가상메모리</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">내부 단편화는 할당 블록 내부 낭비다.</tspan></text>
-  <rect x="280" y="240" width="640" height="56" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text class="label" x="600" y="274" text-anchor="middle"><tspan x="600" dy="0">레지스터</tspan></text><line x1="600" y1="296" x2="600" y2="314" stroke="#8b5cf6" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="314" width="640" height="56" rx="18" fill="#eef2ff" stroke="#2563eb" stroke-width="2"/><text class="label" x="600" y="348" text-anchor="middle"><tspan x="600" dy="0">캐시</tspan></text><line x1="600" y1="370" x2="600" y2="388" stroke="#8b5cf6" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="388" width="640" height="56" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text class="label" x="600" y="422" text-anchor="middle"><tspan x="600" dy="0">메인 메모리</tspan></text><line x1="600" y1="444" x2="600" y2="462" stroke="#8b5cf6" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="462" width="640" height="56" rx="18" fill="#eef2ff" stroke="#2563eb" stroke-width="2"/><text class="label" x="600" y="496" text-anchor="middle"><tspan x="600" dy="0">가상 메모리</tspan></text><line x1="600" y1="518" x2="600" y2="536" stroke="#8b5cf6" stroke-width="4" stroke-dasharray="8 8"><animate attributeName="stroke-dashoffset" from="0" to="-40" dur="4s" repeatCount="indefinite"/></line><rect x="280" y="536" width="640" height="56" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text class="label" x="600" y="570" text-anchor="middle"><tspan x="600" dy="0">디스크</tspan></text><rect x="96" y="296" width="150" height="160" rx="22" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/><text class="label" x="171" y="330" text-anchor="middle"><tspan x="171" dy="0">입력</tspan></text><text class="body" x="114" y="366" text-anchor="start"><tspan x="114" dy="0">레지스터</tspan></text><rect x="954" y="296" width="150" height="160" rx="22" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/><text class="label" x="1029" y="330" text-anchor="middle"><tspan x="1029" dy="0">출력</tspan></text><text class="body" x="972" y="366" text-anchor="start"><tspan x="972" dy="0">디스크</tspan></text><line x1="246" y1="376" x2="280" y2="376" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="920" y1="376" x2="954" y2="376" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <text class="small" x="84" y="654">06-04-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)" />
+  <rect x="32" y="28" width="1136" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <rect x="64" y="52" width="1072" height="84" rx="22" fill="url(#header)" />
+  <text class="small" x="88" y="84">운영체제 · 메모리 관리 핵심 구조</text>
+  <text class="title" x="88" y="116">06-04. 메모리와 가상메모리</text>
+  <text class="subtitle" x="740" y="103">단편화 비교 → 주소 변환 → 페이지 교체 → 스래싱 대응</text>
+
+  <rect x="64" y="164" width="328" height="286" rx="22" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section" x="88" y="198">1) 단편화와 할당 방식</text>
+
+  <rect x="88" y="218" width="132" height="94" rx="18" fill="#dbeafe" stroke="#60a5fa" />
+  <text class="label" x="154" y="244" text-anchor="middle">내부 단편화</text>
+  <rect x="104" y="258" width="96" height="30" rx="8" fill="#93c5fd" />
+  <rect x="168" y="258" width="32" height="30" rx="8" fill="#fbbf24" opacity="0.9" />
+  <text class="small" x="154" y="305" text-anchor="middle">고정 블록 안 남는 공간</text>
+
+  <rect x="236" y="218" width="132" height="94" rx="18" fill="#ede9fe" stroke="#a78bfa" />
+  <text class="label" x="302" y="244" text-anchor="middle">외부 단편화</text>
+  <rect x="250" y="258" width="24" height="30" rx="6" fill="#c4b5fd" />
+  <rect x="282" y="258" width="42" height="30" rx="6" fill="#8b5cf6" />
+  <rect x="332" y="258" width="18" height="30" rx="6" fill="#c4b5fd" />
+  <text class="small" x="302" y="305" text-anchor="middle">빈 공간이 흩어져 연속 할당 곤란</text>
+
+  <rect x="88" y="334" width="128" height="96" rx="18" fill="#eff6ff" stroke="#60a5fa" />
+  <text class="label" x="152" y="360" text-anchor="middle">페이징</text>
+  <rect x="106" y="372" width="92" height="12" rx="4" fill="#60a5fa" />
+  <rect x="106" y="390" width="92" height="12" rx="4" fill="#93c5fd" />
+  <rect x="106" y="408" width="92" height="12" rx="4" fill="#bfdbfe" />
+  <text class="small" x="152" y="425" text-anchor="middle">고정 크기 페이지</text>
+
+  <rect x="228" y="334" width="140" height="96" rx="18" fill="#faf5ff" stroke="#c084fc" />
+  <text class="label" x="298" y="360" text-anchor="middle">세그먼트</text>
+  <rect x="246" y="372" width="46" height="12" rx="4" fill="#d8b4fe" />
+  <rect x="246" y="390" width="88" height="12" rx="4" fill="#a78bfa" />
+  <rect x="246" y="408" width="62" height="12" rx="4" fill="#c084fc" />
+  <text class="small" x="298" y="425" text-anchor="middle">가변 크기 논리 단위</text>
+
+  <text class="body" x="88" y="466">• 페이징: 단순한 고정 크기 관리, 내부 단편화 가능</text>
+  <text class="body" x="88" y="489">• 세그먼트: 코드·데이터·스택처럼 논리적 분할</text>
+  <text class="body" x="88" y="512">• 세그먼트는 외부 단편화 가능성이 더 큼</text>
+
+  <rect x="416" y="164" width="472" height="406" rx="22" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section" x="440" y="198">2) 가상주소 → 물리주소 변환</text>
+  <text class="body" x="440" y="224">가상메모리는 큰 연속 주소 공간처럼 보이게 하고, MMU·TLB·페이지 테이블이 실제 위치를 찾는다.</text>
+
+  <rect x="442" y="252" width="134" height="86" rx="18" fill="#dbeafe" stroke="#60a5fa" />
+  <text class="label" x="509" y="282" text-anchor="middle">가상주소</text>
+  <text class="body" x="509" y="306" text-anchor="middle">페이지 번호</text>
+  <text class="body" x="509" y="325" text-anchor="middle">+ 오프셋</text>
+
+  <rect x="622" y="252" width="110" height="86" rx="18" fill="#dcfce7" stroke="#4ade80" />
+  <text class="label" x="677" y="282" text-anchor="middle">TLB</text>
+  <text class="body" x="677" y="306" text-anchor="middle">최근 변환</text>
+  <text class="small" x="677" y="325" text-anchor="middle">hit면 즉시 통과</text>
+
+  <rect x="760" y="236" width="102" height="54" rx="14" fill="#ecfccb" stroke="#84cc16" />
+  <text class="chip" x="811" y="268" text-anchor="middle">TLB hit</text>
+  <rect x="760" y="300" width="102" height="54" rx="14" fill="#fee2e2" stroke="#f87171" />
+  <text class="chip" x="811" y="332" text-anchor="middle">TLB miss</text>
+
+  <rect x="622" y="380" width="156" height="104" rx="18" fill="#ede9fe" stroke="#a78bfa" />
+  <text class="label" x="700" y="410" text-anchor="middle">페이지 테이블</text>
+  <text class="body" x="700" y="433" text-anchor="middle">페이지 → 프레임</text>
+  <text class="body" x="700" y="452" text-anchor="middle">present bit 검사</text>
+  <text class="small" x="700" y="472" text-anchor="middle">다단계면 필요한 하위 테이블만 생성</text>
+
+  <rect x="456" y="388" width="126" height="146" rx="18" fill="#eff6ff" stroke="#60a5fa" />
+  <text class="label" x="519" y="418" text-anchor="middle">EAT</text>
+  <text class="small" x="519" y="442" text-anchor="middle">hit: TLB + M</text>
+  <text class="small" x="519" y="463" text-anchor="middle">miss: TLB + 2M</text>
+  <text class="small" x="519" y="494" text-anchor="middle">h·(TLB+M)</text>
+  <text class="small" x="519" y="511" text-anchor="middle">+ (1-h)·(TLB+2M)</text>
+
+  <rect x="800" y="388" width="64" height="146" rx="18" fill="#bfdbfe" stroke="#60a5fa" />
+  <rect x="814" y="408" width="36" height="22" rx="6" fill="#1d4ed8" />
+  <rect x="814" y="438" width="36" height="22" rx="6" fill="#60a5fa" />
+  <rect x="814" y="468" width="36" height="22" rx="6" fill="#93c5fd" />
+  <text class="small" x="832" y="517" text-anchor="middle">프레임</text>
+
+  <line x1="576" y1="295" x2="622" y2="295" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="677" y1="338" x2="677" y2="380" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="732" y1="295" x2="760" y2="263" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="732" y1="295" x2="760" y2="327" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="862" y1="263" x2="800" y2="263" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="778" y1="327" x2="760" y2="380" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="778" y1="432" x2="800" y2="432" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+
+  <rect x="910" y="164" width="226" height="406" rx="22" fill="#fff7ed" stroke="#fdba74" />
+  <text class="section" x="934" y="198">3) 페이지 폴트 이후</text>
+
+  <rect x="934" y="226" width="178" height="68" rx="16" fill="#fee2e2" stroke="#f87171" />
+  <text class="label" x="1023" y="252" text-anchor="middle">demand paging</text>
+  <text class="body" x="1023" y="274" text-anchor="middle">없는 페이지면</text>
+  <text class="body" x="1023" y="291" text-anchor="middle">디스크에서 적재</text>
+
+  <rect x="934" y="314" width="178" height="84" rx="16" fill="#fef3c7" stroke="#f59e0b" />
+  <text class="label" x="1023" y="340" text-anchor="middle">페이지 교체</text>
+  <text class="small" x="1023" y="362" text-anchor="middle">FIFO: 단순, Belady anomaly 가능</text>
+  <text class="small" x="1023" y="380" text-anchor="middle">LRU/Clock: 최근성 반영</text>
+
+  <rect x="934" y="418" width="178" height="126" rx="16" fill="#ecfccb" stroke="#84cc16" />
+  <text class="label" x="1023" y="444" text-anchor="middle">Thrashing 완화</text>
+  <text class="body" x="1023" y="467" text-anchor="middle">페이지 폴트가 과도하면</text>
+  <text class="body" x="1023" y="486" text-anchor="middle">CPU보다 교체 비용이 커진다</text>
+  <text class="small" x="1023" y="510" text-anchor="middle">Working Set 유지</text>
+  <text class="small" x="1023" y="528" text-anchor="middle">프레임 재분배로 완화</text>
+
+  <line x1="864" y1="462" x2="934" y2="462" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="1023" y1="294" x2="1023" y2="314" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="1023" y1="398" x2="1023" y2="418" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+
+  <rect x="64" y="590" width="1072" height="72" rx="20" fill="#0f172a" />
+  <text class="section" x="88" y="621" fill="#f8fafc">시험 직전 체크</text>
+  <text class="body" x="248" y="621" fill="#e2e8f0">내부 vs 외부 단편화, 페이징 vs 세그먼트, TLB hit/miss, page fault·교체·thrashing 흐름을 한 장으로 정리</text>
+  <text class="small" x="88" y="645" fill="#94a3b8">06-04-infographic.svg</text>
 </svg>

@@ -1,31 +1,130 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-01-02. 연결리스트 SVG 인포그래픽</title>
-  <desc id="desc">연결리스트</desc>
+  <title id="title">09-01-02. 연결리스트 인포그래픽</title>
+  <desc id="desc">연결리스트의 노드 구조, 순차 접근, 삽입·삭제의 포인터 변경, 배열과의 차이를 설명하는 SVG</desc>
   <defs>
-    <linearGradient id="grad-09-01-02-infographic.svg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e0e7ff" />
-      <stop offset="100%" stop-color="#f3e8ff" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="line-09-01-02-infographic.svg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#4f46e5" />
-      <stop offset="100%" stop-color="#7c3aed" />
+    <linearGradient id="nodeFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
     </linearGradient>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="redArrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#dc2626"/>
+    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 18px; font-weight: 700; fill: #0f172a; }
+      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
+      .body { font-size: 14px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .mono { font-size: 13px; font-weight: 700; fill: #1e293b; }
+      .chip { font-size: 12px; font-weight: 700; fill: #1d4ed8; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-09-01-02-infographic.svg)" opacity="0.9"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
-  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-09-01-02-infographic.svg)" opacity="0.14"/>
-  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
-  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">09-01-02. 연결리스트</tspan></text>
-  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">노드는 데이터와 다음 노드 주소(포인터)를 가진다. 일반적으로 하나의 노드 구조체는</tspan><tspan x="84" dy="24">다음과 같은 필드로 구성된다: 데이터 필드, 다음 포인터(또는 이전 포인터 포함).</tspan></text>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">연결리스트</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">구현 관점</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">자주 묻는 연산과</tspan><tspan x="601" dy="18">의사코드</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">시간 복잡도 표</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">단일 연결 리스트</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">연결리스트</tspan><tspan x="238" dy="18">구현 관점</tspan><tspan x="238" dy="18">자주 묻는 연산과 의사코드</tspan></text>
-  <text class="small" x="84" y="654">09-01-02-infographic.svg</text>
+
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="small" x="72" y="78">선형 자료구조 · singly linked list 핵심 구조</text>
+  <text class="title" x="72" y="118">09-01-02. 연결리스트</text>
+  <text class="subtitle" x="72" y="152">노드는 데이터 + next 포인터를 갖고, 접근은 순차 O(n), 삽입·삭제는 연결만 바꿔 처리한다.</text>
+
+  <rect x="64" y="186" width="1072" height="178" rx="24" fill="#f8fafc" stroke="#dbeafe" stroke-width="2"/>
+  <text class="section" x="92" y="220">1. 노드 anatomy와 head → tail → null</text>
+
+  <rect x="118" y="248" width="54" height="54" rx="14" fill="#dbeafe" stroke="#60a5fa"/>
+  <text class="label" x="145" y="282" text-anchor="middle">head</text>
+
+  <rect x="220" y="236" width="150" height="80" rx="18" fill="url(#nodeFill)" stroke="#2563eb" stroke-width="2"/>
+  <line x1="300" y1="236" x2="300" y2="316" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="260" y="268" text-anchor="middle">data</text>
+  <text class="body" x="260" y="292" text-anchor="middle">A</text>
+  <text class="label" x="335" y="268" text-anchor="middle">next</text>
+  <text class="body" x="335" y="292" text-anchor="middle">주소</text>
+
+  <rect x="450" y="236" width="150" height="80" rx="18" fill="url(#nodeFill)" stroke="#2563eb" stroke-width="2"/>
+  <line x1="530" y1="236" x2="530" y2="316" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="490" y="268" text-anchor="middle">data</text>
+  <text class="body" x="490" y="292" text-anchor="middle">B</text>
+  <text class="label" x="565" y="268" text-anchor="middle">next</text>
+  <text class="body" x="565" y="292" text-anchor="middle">주소</text>
+
+  <rect x="680" y="236" width="150" height="80" rx="18" fill="url(#nodeFill)" stroke="#2563eb" stroke-width="2"/>
+  <line x1="760" y1="236" x2="760" y2="316" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="720" y="268" text-anchor="middle">data</text>
+  <text class="body" x="720" y="292" text-anchor="middle">C</text>
+  <text class="label" x="795" y="268" text-anchor="middle">next</text>
+  <text class="body" x="795" y="292" text-anchor="middle">null</text>
+
+  <rect x="874" y="248" width="54" height="54" rx="14" fill="#ede9fe" stroke="#8b5cf6"/>
+  <text class="label" x="901" y="282" text-anchor="middle">tail</text>
+
+  <line x1="172" y1="275" x2="220" y2="275" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="370" y1="275" x2="450" y2="275" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="600" y1="275" x2="680" y2="275" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="830" y1="275" x2="874" y2="275" stroke="#8b5cf6" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <text class="small" x="219" y="340">각 노드는 데이터와 다음 노드 주소를 함께 저장한다.</text>
+  <text class="small" x="643" y="340">마지막 노드의 next는 null이다.</text>
+
+  <rect x="64" y="386" width="514" height="266" rx="24" fill="#fefefe" stroke="#bfdbfe" stroke-width="2"/>
+  <text class="section" x="92" y="420">2. 왜 접근은 느리고, 삽입·삭제는 빠를까?</text>
+
+  <text class="chip" x="96" y="454">순차 접근</text>
+  <rect x="100" y="472" width="86" height="52" rx="16" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="220" y="472" width="86" height="52" rx="16" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="340" y="472" width="86" height="52" rx="16" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="460" y="472" width="86" height="52" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="143" y="503" text-anchor="middle">1번째</text>
+  <text class="label" x="263" y="503" text-anchor="middle">2번째</text>
+  <text class="label" x="383" y="503" text-anchor="middle">3번째</text>
+  <text class="label" x="503" y="503" text-anchor="middle">4번째</text>
+  <line x1="186" y1="498" x2="220" y2="498" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="306" y1="498" x2="340" y2="498" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="426" y1="498" x2="460" y2="498" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <text class="body" x="100" y="555">4번째 원소도 head부터 1 → 2 → 3 → 4 순서로 따라가야 하므로 접근 O(n)</text>
+
+  <text class="chip" x="96" y="596">포인터만 바꾸는 삽입/삭제</text>
+  <text class="mono" x="100" y="622">삽입: new.next = curr.next   /   curr.next = new</text>
+  <text class="mono" x="100" y="644">삭제: prev.next = curr.next   (삭제 노드를 건너뜀)</text>
+
+  <rect x="606" y="386" width="530" height="266" rx="24" fill="#fefefe" stroke="#c7d2fe" stroke-width="2"/>
+  <text class="section" x="634" y="420">3. 시험 포인트: 삽입·삭제와 배열 비교</text>
+
+  <text class="chip" x="638" y="454">중간 삽입</text>
+  <rect x="644" y="474" width="72" height="46" rx="14" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="762" y="474" width="72" height="46" rx="14" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="880" y="474" width="72" height="46" rx="14" fill="#e0f2fe" stroke="#38bdf8"/>
+  <text class="label" x="680" y="503" text-anchor="middle">A</text>
+  <text class="label" x="798" y="503" text-anchor="middle">NEW</text>
+  <text class="label" x="916" y="503" text-anchor="middle">B</text>
+  <line x1="716" y1="497" x2="762" y2="497" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="834" y1="497" x2="880" y2="497" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <text class="body" x="644" y="545">중간 삽입은 원소 이동이 아니라 연결 방향만 재지정한다.</text>
+
+  <text class="chip" x="638" y="579">중간 삭제</text>
+  <rect x="644" y="596" width="72" height="46" rx="14" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="762" y="596" width="72" height="46" rx="14" fill="#fee2e2" stroke="#ef4444" stroke-dasharray="7 5"/>
+  <rect x="880" y="596" width="72" height="46" rx="14" fill="#e0f2fe" stroke="#38bdf8"/>
+  <text class="label" x="680" y="625" text-anchor="middle">prev</text>
+  <text class="label" x="798" y="625" text-anchor="middle">curr</text>
+  <text class="label" x="916" y="625" text-anchor="middle">next</text>
+  <line x1="716" y1="619" x2="880" y2="619" stroke="#dc2626" stroke-width="4" marker-end="url(#redArrow)"/>
+  <text class="body" x="644" y="668">prev를 알아야 curr을 건너뛰는 연결로 바꿀 수 있다.</text>
+
+  <rect x="918" y="462" width="188" height="102" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="label" x="1012" y="488" text-anchor="middle">배열 vs 연결리스트</text>
+  <text class="body" x="934" y="516">배열: 인덱스 접근 O(1)</text>
+  <text class="body" x="934" y="538">연결리스트: 접근 O(n)</text>
+  <text class="body" x="934" y="560">대신 앞/중간 삽입·삭제에 강점</text>
+
+  <rect x="64" y="670" width="1072" height="18" rx="9" fill="#eff6ff"/>
+  <text class="small" x="78" y="683">핵심 문장: 연결리스트는 랜덤 접근이 느리지만, 포인터를 알고 있으면 삽입·삭제를 O(1)에 가깝게 처리할 수 있다.</text>
 </svg>
