@@ -321,6 +321,11 @@ class StaticFrontendTests(unittest.TestCase):
 
         self.assertIn('문제 풀이 · 문제은행', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageHeaderSummary"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageOverviewCards"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageResetFiltersBtn"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageSelectionSummary"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPagePracticeStatus"', QUESTION_BANK_HTML)
         self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
@@ -331,6 +336,12 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('available_categories', QUESTION_BANK_JS)
         self.assertIn('question-keyword-link', QUESTION_BANK_JS)
         self.assertIn('card_query=', QUESTION_BANK_JS)
+        self.assertIn('function renderHeader()', QUESTION_BANK_JS)
+        self.assertIn('function renderOverviewCards()', QUESTION_BANK_JS)
+        self.assertIn('function renderActiveFilters()', QUESTION_BANK_JS)
+        self.assertIn('function renderSelectionSummary()', QUESTION_BANK_JS)
+        self.assertIn('function resetFilters()', QUESTION_BANK_JS)
+        self.assertIn('function scheduleLoad()', QUESTION_BANK_JS)
 
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
@@ -693,6 +704,12 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('body.question-bank-embed {', STYLE_CSS)
         self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-overview-grid', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-selection-summary', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-practice-status', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-header-chip', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-filter-chip', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-shell-header-chips', TABLE_SHELL_CSS)
 
 
 if __name__ == '__main__':
