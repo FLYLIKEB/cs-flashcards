@@ -1,0 +1,459 @@
+{
+  "slug": "db",
+  "topic": "데이터베이스",
+  "category": "데이터베이스",
+  "target_count": 14,
+  "requirements": [
+    "계산/판단형 최소 4개: SQL 결과, 정규화 판단, 트랜잭션 격리수준 사례, 인덱스 선택 포함"
+  ],
+  "entries": [
+    {
+      "question_bank_id": "qb-bokplus-db-001",
+      "card_id": "CS-180",
+      "question_type": "multiple_choice",
+      "prompt": "다음 수강 테이블 설명에 대한 판단으로 가장 적절한 것은?",
+      "body": "수강(학번, 과목코드, 학생명, 과목명, 성적)에서 후보키는 (학번, 과목코드)이다. 학생명은 학번에만 함수 종속되고, 과목명은 과목코드에만 함수 종속된다.",
+      "answer": "부분 함수 종속이 있으므로 제2정규형을 만족하지 않는다.",
+      "explanation": "후보키가 복합키인데 비키 속성인 학생명은 학번에만, 과목명은 과목코드에만 의존하므로 부분 함수 종속이 존재한다. 따라서 제1정규형은 만족하더라도 제2정규형은 만족하지 못하며, 학생과 과목 정보를 분리해 중복과 갱신 이상을 줄여야 한다.",
+      "rubric": [
+        "복합키의 일부에만 종속되는 비키 속성을 식별한다.",
+        "제2정규형 위반 원인을 부분 함수 종속으로 설명한다."
+      ],
+      "choices": [
+        "모든 비키 속성이 후보키 전체에 종속되므로 제3정규형이다.",
+        "부분 함수 종속이 있으므로 제2정규형을 만족하지 않는다.",
+        "이행 함수 종속만 있으므로 BCNF만 위반한다.",
+        "반복 속성이 없으므로 정규화가 전혀 필요 없다."
+      ],
+      "answer_index": 1,
+      "topic": "정규화",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["정규화", "제2정규형", "부분 함수 종속", "갱신 이상"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 120,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-002",
+      "card_id": "CS-412",
+      "question_type": "multiple_choice",
+      "prompt": "다음 분해에 대한 설명으로 가장 적절한 것은?",
+      "body": "계좌지점(계좌번호, 지점코드, 지점명)에서 함수 종속은 계좌번호 → 지점코드, 지점코드 → 지점명이다. 이를 R1(계좌번호, 지점코드), R2(지점코드, 지점명)으로 분해했다.",
+      "answer": "공통 속성인 지점코드가 R2의 키이므로 무손실 분해로 볼 수 있다.",
+      "explanation": "R1과 R2의 공통 속성은 지점코드이며, 지점코드는 R2에서 지점명을 결정하는 키 역할을 한다. 따라서 두 릴레이션을 자연 조인하면 원래 정보를 복원할 수 있어 무손실 분해에 해당한다.",
+      "rubric": [
+        "무손실 분해의 판단 기준을 설명한다.",
+        "공통 속성이 한쪽 릴레이션의 키가 되는지 확인한다."
+      ],
+      "choices": [
+        "공통 속성이 기본키가 아니므로 손실 분해이다.",
+        "지점명이 중복될 수 있으므로 항상 허위 튜플이 발생한다.",
+        "공통 속성인 지점코드가 R2의 키이므로 무손실 분해로 볼 수 있다.",
+        "분해 후 조인을 사용할 수 없으므로 정규화 자체가 실패한다."
+      ],
+      "answer_index": 2,
+      "topic": "정규화",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["무손실 분해", "정규화", "자연 조인", "함수 종속"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 120,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-003",
+      "card_id": "CS-039",
+      "question_type": "multiple_choice",
+      "prompt": "다음 주문상세 릴레이션의 후보키로 가장 적절한 것은?",
+      "body": "주문상세(주문번호, 상품번호, 주문일, 상품명, 수량)에서 주문번호 → 주문일, 상품번호 → 상품명, (주문번호, 상품번호) → 수량이 성립한다.",
+      "answer": "(주문번호, 상품번호)",
+      "explanation": "주문일은 주문번호만으로, 상품명은 상품번호만으로 결정되지만 각 행을 유일하게 식별하려면 주문번호와 상품번호의 조합이 필요하다. 둘 중 하나만 제거하면 같은 주문의 여러 상품 또는 같은 상품의 여러 주문을 구분할 수 없으므로 최소성과 유일성을 만족하는 후보키는 (주문번호, 상품번호)이다.",
+      "rubric": [
+        "유일성과 최소성을 함께 확인한다.",
+        "함수 종속으로 결정되는 속성과 식별 속성을 구분한다."
+      ],
+      "choices": [
+        "주문번호",
+        "상품번호",
+        "(주문번호, 상품번호)",
+        "(주문번호, 주문일)"
+      ],
+      "answer_index": 2,
+      "topic": "키",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["후보키", "유일성", "최소성", "함수 종속"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 120,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-004",
+      "card_id": "CS-113",
+      "question_type": "multiple_choice",
+      "prompt": "다음 상황에서 위배되는 무결성으로 가장 적절한 것은?",
+      "body": "고객(customer_id)가 부모 테이블에 존재하지 않는데 주문 테이블에 customer_id = 9001인 행이 삽입되었다. 주문.customer_id는 고객.customer_id를 참조하는 외래키이다.",
+      "answer": "참조 무결성 위반이다.",
+      "explanation": "외래키는 자식 테이블의 값이 부모 테이블의 기본키나 후보키에 실제로 존재하도록 강제한다. 부모에 없는 customer_id를 주문에 삽입하면 외래키 제약이 깨지므로 참조 무결성 위반이다.",
+      "rubric": [
+        "외래키의 역할을 설명한다.",
+        "개체 무결성과 참조 무결성을 구분한다."
+      ],
+      "choices": [
+        "개체 무결성 위반이다.",
+        "도메인 무결성 위반이다.",
+        "참조 무결성 위반이다.",
+        "트랜잭션의 지속성 위반이다."
+      ],
+      "answer_index": 2,
+      "topic": "키와 무결성",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["외래키", "참조 무결성", "무결성", "제약조건"],
+      "difficulty": "하",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 3,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-005",
+      "card_id": "CS-119",
+      "question_type": "multiple_choice",
+      "prompt": "다음 SQL의 실행 결과로 가장 적절한 것은?",
+      "body": "orders(branch, amount) 테이블의 행은 (A,120), (A,80), (B,70), (B,50), (C,200) 이다.\n\nSELECT branch, COUNT(*) AS cnt, SUM(amount) AS total\nFROM orders\nWHERE amount >= 70\nGROUP BY branch\nHAVING SUM(amount) >= 150\nORDER BY branch;",
+      "answer": "(A, 2, 200), (C, 1, 200) 두 행이 반환된다.",
+      "explanation": "WHERE 절에서 amount >= 70인 행만 남기면 A는 120,80 / B는 70 / C는 200이다. GROUP BY 후 합계를 구하면 A는 count 2, sum 200 / B는 count 1, sum 70 / C는 count 1, sum 200이다. HAVING SUM(amount) >= 150을 만족하는 그룹은 A와 C뿐이다.",
+      "rubric": [
+        "WHERE와 HAVING의 적용 순서를 구분한다.",
+        "그룹별 COUNT와 SUM을 정확히 계산한다."
+      ],
+      "choices": [
+        "(A, 2, 200), (B, 2, 120), (C, 1, 200) 세 행이 반환된다.",
+        "(A, 2, 200), (C, 1, 200) 두 행이 반환된다.",
+        "(A, 2, 200) 한 행만 반환된다.",
+        "(B, 1, 70), (C, 1, 200) 두 행이 반환된다."
+      ],
+      "answer_index": 1,
+      "topic": "SQL 결과 해석",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["GROUP BY", "HAVING", "SQL 결과", "집계"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 150,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-006",
+      "card_id": "CS-148",
+      "question_type": "multiple_choice",
+      "prompt": "다음 LEFT JOIN 질의의 결과로 가장 적절한 것은?",
+      "body": "customers(id) 테이블의 행은 1, 2, 3이고, orders(customer_id, status) 테이블의 행은 (1,'paid'), (1,'cancel'), (2,'paid') 이다.\n\nSELECT c.id, COUNT(o.customer_id) AS paid_cnt\nFROM customers c\nLEFT JOIN orders o\n  ON c.id = o.customer_id AND o.status = 'paid'\nGROUP BY c.id\nORDER BY c.id;",
+      "answer": "(1,1), (2,1), (3,0)",
+      "explanation": "LEFT JOIN이므로 고객 1, 2, 3은 모두 결과에 남는다. 조인 조건에서 paid만 연결되므로 고객 1은 paid 주문 1건, 고객 2도 1건, 고객 3은 매칭 행이 없어 COUNT(o.customer_id)가 0이 된다. cancel 주문은 ON 조건에서 제외된다.",
+      "rubric": [
+        "LEFT JOIN에서 보존되는 쪽을 식별한다.",
+        "ON 조건과 COUNT(컬럼)의 동작을 설명한다."
+      ],
+      "choices": [
+        "(1,2), (2,1), (3,0)",
+        "(1,1), (2,1), (3,0)",
+        "(1,1), (2,1) 두 행만 반환된다.",
+        "(1,1), (2,0), (3,0)"
+      ],
+      "answer_index": 1,
+      "topic": "JOIN",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["JOIN", "LEFT JOIN", "COUNT", "SQL 결과"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 150,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-007",
+      "card_id": "CS-122",
+      "question_type": "multiple_choice",
+      "prompt": "다음 SQL에 대한 설명으로 가장 적절한 것은?",
+      "body": "SELECT dept, COUNT(*)\nFROM emp\nWHERE COUNT(*) >= 2\nGROUP BY dept;",
+      "answer": "집계 함수 조건은 WHERE가 아니라 HAVING에 써야 하므로 문장을 수정해야 한다.",
+      "explanation": "WHERE는 그룹화 이전의 개별 행을 거르는 절이므로 COUNT(*) 같은 집계 결과를 직접 사용할 수 없다. 부서별 인원수가 2명 이상인 그룹만 남기려면 GROUP BY dept HAVING COUNT(*) >= 2로 작성해야 한다.",
+      "rubric": [
+        "WHERE와 HAVING의 역할 차이를 설명한다.",
+        "집계 조건을 올바른 절로 옮긴다."
+      ],
+      "choices": [
+        "COUNT(*)는 WHERE에서만 사용할 수 있으므로 올바른 문장이다.",
+        "집계 함수 조건은 WHERE가 아니라 HAVING에 써야 하므로 문장을 수정해야 한다.",
+        "GROUP BY 없이도 같은 결과가 나온다.",
+        "ORDER BY가 없어서 오류가 발생한다."
+      ],
+      "answer_index": 1,
+      "topic": "GROUP BY와 HAVING",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["HAVING", "WHERE", "GROUP BY", "집계"],
+      "difficulty": "하",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 3,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-008",
+      "card_id": "CS-134",
+      "question_type": "multiple_choice",
+      "prompt": "다음 조회 패턴에 가장 적절한 인덱스는 무엇인가?",
+      "body": "주문 테이블에서 다음 질의가 매우 자주 수행된다.\nSELECT *\nFROM orders\nWHERE customer_id = ? AND order_date BETWEEN ? AND ?\nORDER BY order_date;",
+      "answer": "(customer_id, order_date) 복합 인덱스",
+      "explanation": "동등 조건인 customer_id를 앞에 두고 그 뒤에 범위 조건 및 정렬에 사용되는 order_date를 배치한 복합 인덱스가 가장 적합하다. 이렇게 하면 특정 고객 범위를 빠르게 좁힌 뒤 날짜 구간과 정렬까지 연속적으로 처리할 수 있다.",
+      "rubric": [
+        "동등 조건과 범위 조건의 인덱스 배치 원칙을 설명한다.",
+        "정렬까지 고려한 복합 인덱스를 선택한다."
+      ],
+      "choices": [
+        "(order_date, customer_id) 복합 인덱스",
+        "(customer_id, order_date) 복합 인덱스",
+        "status 단일 인덱스",
+        "인덱스를 만들지 않고 항상 전체 테이블 스캔을 한다."
+      ],
+      "answer_index": 1,
+      "topic": "인덱스",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["인덱스", "복합 인덱스", "정렬", "범위 검색"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 120,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-009",
+      "card_id": "CS-024",
+      "question_type": "multiple_choice",
+      "prompt": "B+트리 인덱스가 범위 검색에 특히 유리한 이유로 가장 적절한 것은?",
+      "body": "다음 보기 중 B+트리 인덱스의 구조적 특성을 기준으로 판단하시오.",
+      "answer": "모든 실제 데이터 포인터가 리프에 있고 리프 노드들이 순차 연결되어 있기 때문이다.",
+      "explanation": "B+트리는 내부 노드가 탐색 경로만 담당하고 실제 데이터 포인터는 리프 노드에 모아 둔다. 또한 리프 노드가 정렬 순서대로 연결되어 있어 시작 지점을 찾은 뒤 범위 끝까지 순차적으로 읽기 쉽기 때문에 BETWEEN, ORDER BY 같은 범위 검색에 강하다.",
+      "rubric": [
+        "B+트리의 내부 노드와 리프 노드 역할을 구분한다.",
+        "범위 검색 성능이 리프 연결 구조와 관련 있음을 설명한다."
+      ],
+      "choices": [
+        "해시 충돌이 전혀 발생하지 않기 때문이다.",
+        "모든 실제 데이터 포인터가 리프에 있고 리프 노드들이 순차 연결되어 있기 때문이다.",
+        "항상 메모리에만 존재해 디스크 접근이 필요 없기 때문이다.",
+        "삽입과 삭제 시 재구성이 전혀 일어나지 않기 때문이다."
+      ],
+      "answer_index": 1,
+      "topic": "인덱스 구조",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["B+트리", "인덱스", "범위 검색", "리프 노드"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 3,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-010",
+      "card_id": "CS-361",
+      "question_type": "multiple_choice",
+      "prompt": "다음 동시성 상황에 대한 판단으로 가장 적절한 것은?",
+      "body": "T1이 계좌 잔액을 100에서 0으로 UPDATE한 뒤 아직 COMMIT하지 않았다. 그 사이 T2가 잔액 0을 읽었다. 이후 T1이 ROLLBACK되었다.",
+      "answer": "더티 리드가 발생했으며, 이를 막는 최소 격리수준은 READ COMMITTED이다.",
+      "explanation": "T2가 T1의 미커밋 값을 읽었으므로 더티 리드가 발생했다. 더티 리드를 막으려면 다른 트랜잭션의 커밋된 데이터만 읽도록 해야 하며, 일반적으로 READ COMMITTED 이상에서 이를 방지한다.",
+      "rubric": [
+        "이상 현상 유형을 정확히 식별한다.",
+        "이를 방지하는 최소 격리수준을 연결한다."
+      ],
+      "choices": [
+        "팬텀 리드가 발생했으며 SERIALIZABLE이 최소 수준이다.",
+        "반복 불가능 읽기가 발생했으며 REPEATABLE READ가 최소 수준이다.",
+        "더티 리드가 발생했으며, 이를 막는 최소 격리수준은 READ COMMITTED이다.",
+        "손실 갱신이 발생했으며 READ UNCOMMITTED면 충분하다."
+      ],
+      "answer_index": 2,
+      "topic": "트랜잭션과 격리수준",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["격리수준", "고립성", "더티 리드", "READ COMMITTED"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 120,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-011",
+      "card_id": "CS-176",
+      "question_type": "multiple_choice",
+      "prompt": "다음 MVCC 기반 스냅샷 읽기 상황의 결과로 가장 적절한 것은?",
+      "body": "MVCC 기반 REPEATABLE READ 환경에서 T1이 10시에 시작해 고객 수를 조회한 결과 100건이었다. T2가 10시 1분에 새 고객 1건을 INSERT하고 COMMIT했다. T1이 같은 트랜잭션 안에서 10시 2분에 다시 고객 수를 조회했다.",
+      "answer": "T1은 같은 스냅샷을 유지하므로 다시 100건을 본다.",
+      "explanation": "문제에서 MVCC 기반 REPEATABLE READ라고 했으므로 T1은 트랜잭션 시작 시점의 일관된 스냅샷을 계속 본다. 따라서 T2가 중간에 커밋한 새 행은 T1이 끝날 때까지 보이지 않아 두 번째 조회 결과도 100건이다.",
+      "rubric": [
+        "MVCC의 스냅샷 읽기 특성을 설명한다.",
+        "격리수준에 따라 같은 트랜잭션 내 재조회 결과를 판단한다."
+      ],
+      "choices": [
+        "T1은 즉시 최신 버전을 보므로 101건을 본다.",
+        "T1은 같은 스냅샷을 유지하므로 다시 100건을 본다.",
+        "T1은 더티 리드를 막지 못하므로 결과를 예측할 수 없다.",
+        "T1은 항상 테이블 전체를 잠그므로 T2의 INSERT가 불가능하다."
+      ],
+      "answer_index": 1,
+      "topic": "트랜잭션과 격리수준",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["MVCC", "스냅샷", "REPEATABLE READ", "동시성"],
+      "difficulty": "상",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 150,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-012",
+      "card_id": "CS-306",
+      "question_type": "multiple_choice",
+      "prompt": "다음 TCL 실행 후 최종 상태로 가장 적절한 것은?",
+      "body": "초기 잔액은 1000원이다.\nBEGIN;\nUPDATE account SET balance = balance - 100;\nSAVEPOINT s1;\nUPDATE account SET balance = balance - 50;\nROLLBACK TO s1;\nCOMMIT;",
+      "answer": "최종 잔액은 900원이다.",
+      "explanation": "첫 UPDATE 후 잔액은 900원이 된다. SAVEPOINT s1 이후 두 번째 UPDATE로 850원이 되지만, ROLLBACK TO s1을 수행하면 s1 이후 작업만 취소되어 다시 900원이 된다. 이후 COMMIT하므로 최종 반영 값은 900원이다.",
+      "rubric": [
+        "SAVEPOINT와 ROLLBACK TO의 범위를 설명한다.",
+        "트랜잭션 내 각 단계의 잔액 변화를 계산한다."
+      ],
+      "choices": [
+        "최종 잔액은 850원이다.",
+        "최종 잔액은 900원이다.",
+        "최종 잔액은 950원이다.",
+        "전체 트랜잭션이 취소되어 1000원이다."
+      ],
+      "answer_index": 1,
+      "topic": "트랜잭션 제어",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["TCL", "SAVEPOINT", "ROLLBACK", "COMMIT"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 120,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-013",
+      "card_id": "CS-368",
+      "question_type": "multiple_choice",
+      "prompt": "다음 락 획득 상황에 대한 판단으로 가장 적절한 것은?",
+      "body": "T1은 자원 A를 잠근 뒤 자원 B를 기다리고, T2는 자원 B를 잠근 뒤 자원 A를 기다린다.",
+      "answer": "교착상태이며, 한 트랜잭션을 희생시켜 롤백시키는 방식으로 해결할 수 있다.",
+      "explanation": "두 트랜잭션이 서로가 가진 자원을 기다리며 순환 대기하고 있으므로 전형적인 교착상태다. DBMS는 이를 탐지한 뒤 한 트랜잭션을 희생시켜 롤백하고 다른 트랜잭션이 진행하도록 만들어 문제를 해소할 수 있다.",
+      "rubric": [
+        "순환 대기를 교착상태로 식별한다.",
+        "DBMS의 일반적 해결 방식인 희생 트랜잭션 롤백을 설명한다."
+      ],
+      "choices": [
+        "기아 상태이며 우선순위만 높이면 해결된다.",
+        "교착상태이며, 한 트랜잭션을 희생시켜 롤백시키는 방식으로 해결할 수 있다.",
+        "더티 리드이며 COMMIT만 하면 즉시 해결된다.",
+        "팬텀 리드이며 인덱스를 추가하면 해결된다."
+      ],
+      "answer_index": 1,
+      "topic": "동시성 제어",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["교착상태", "락", "동시성 제어", "롤백"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 3,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-db-014",
+      "card_id": "CS-004",
+      "question_type": "multiple_choice",
+      "prompt": "다음 상황에서 핵심적으로 보장되어야 하는 ACID 속성은 무엇인가?",
+      "body": "DBMS가 COMMIT 완료를 사용자에게 알린 직후 전원이 꺼졌다. 아직 일부 데이터 페이지는 디스크에 늦게 반영될 수 있지만, 재기동 후 로그를 이용해 커밋된 변경을 복구해야 한다.",
+      "answer": "지속성(Durability)",
+      "explanation": "COMMIT이 완료된 뒤에는 시스템 장애가 나더라도 그 결과가 보존되어야 한다. 이는 ACID 중 지속성에 해당하며, 실제 구현에서는 로그와 REDO 복구를 통해 커밋된 변경을 재반영한다.",
+      "rubric": [
+        "ACID 각 속성의 역할을 구분한다.",
+        "장애 복구 상황을 지속성과 연결한다."
+      ],
+      "choices": [
+        "원자성(Atomicity)",
+        "일관성(Consistency)",
+        "고립성(Isolation)",
+        "지속성(Durability)"
+      ],
+      "answer_index": 3,
+      "topic": "트랜잭션",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "데이터베이스",
+      "keywords": ["ACID", "지속성", "로그", "복구"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/db.json",
+      "section": "전공필기",
+      "points": 3,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    }
+  ]
+}

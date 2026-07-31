@@ -1,0 +1,443 @@
+{
+  "slug": "sec",
+  "topic": "보안",
+  "category": "보안",
+  "target_count": 12,
+  "requirements": [
+    "판단형 최소 4개: 공격-대응 매칭, 인증/인가/전자서명 사례, 로그 해석, 취약점 구분 포함"
+  ],
+  "entries": [
+    {
+      "question_bank_id": "qb-bokplus-sec-001",
+      "card_id": "",
+      "question_type": "multiple_choice",
+      "prompt": "다음 상황에 가장 적절한 암호 적용 방식은 무엇인가?",
+      "body": "본점과 데이터센터가 매일 대용량 거래 원장을 전송한다. 통신 시작 시에는 상대 서버의 신원을 확인하고 세션키를 안전하게 교환해야 하며, 실제 원장 데이터 구간은 빠르게 암호화해야 한다.",
+      "answer": "공개키 방식으로 세션키를 교환하고, 이후 대칭키로 원장 데이터를 암호화한다.",
+      "explanation": "대용량 데이터 암호화는 연산 효율이 높은 대칭키가 적합하고, 초기 키 교환과 상대 신원 확인에는 공개키 기반 절차가 적합하다. 실제 TLS도 이런 구조를 사용한다.",
+      "rubric": [
+        "대칭키와 공개키의 역할 차이를 구분해야 한다.",
+        "성능과 키 배포 문제를 함께 판단해야 한다."
+      ],
+      "choices": [
+        "원장 데이터와 세션키를 모두 공개키로만 처리한다.",
+        "공개키 방식으로 세션키를 교환하고, 이후 대칭키로 원장 데이터를 암호화한다.",
+        "원장 데이터와 세션키를 모두 해시로 처리한다.",
+        "원장 데이터는 평문으로 보내고 세션 종료 후 전자서명만 추가한다."
+      ],
+      "answer_index": 1,
+      "topic": "대칭키·공개키 암호",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "대칭키",
+        "공개키",
+        "세션키",
+        "TLS"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-002",
+      "card_id": "CS-088",
+      "question_type": "multiple_choice",
+      "prompt": "다음 요구사항을 만족하는 기술로 가장 적절한 것은 무엇인가?",
+      "body": "고객이 전자문서로 대출 약정서를 제출했다. 은행은 문서가 제출 후 바뀌지 않았음을 확인하고, 나중에 고객이 제출 사실을 부인하지 못하게 해야 한다. 문서 내용 자체를 숨기는 것은 핵심 요구가 아니다.",
+      "answer": "전자서명",
+      "explanation": "전자서명은 문서 무결성, 서명자 인증, 부인 방지를 제공한다. 암호화는 기밀성 확보가 주목적이므로 문제의 핵심 요구와 다르다.",
+      "rubric": [
+        "전자서명과 암호화의 목적 차이를 구분해야 한다."
+      ],
+      "choices": [
+        "전자서명",
+        "단순 대칭키 암호화",
+        "방화벽 정책",
+        "압축 알고리즘"
+      ],
+      "answer_index": 0,
+      "topic": "전자서명",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "전자서명",
+        "무결성",
+        "부인방지",
+        "인증"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 75,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-003",
+      "card_id": "CS-221",
+      "question_type": "multiple_choice",
+      "prompt": "다음 인증서 검증 실패 상황에 대한 설명으로 가장 적절한 것은 무엇인가?",
+      "body": "사내 VPN 접속 시 서버 주소는 맞고 통신도 가능하지만, 클라이언트가 '인증서 만료' 경고를 내며 연결을 거부한다. 서버 개인키는 유출되지 않았고 DNS 변조도 없었다.",
+      "answer": "인증서의 유효기간이 끝나 신뢰 체인 검증에 실패한 것이다.",
+      "explanation": "인증서는 공개키와 신원을 일정 기간 동안 신뢰하도록 보증하는 문서다. 유효기간이 끝나면 공개키 자체가 같아도 인증서 검증은 실패한다. VPN 같은 원격 접속에서도 PKI와 인증서 검증이 중요하다.",
+      "rubric": [
+        "인증서와 공개키 자체를 구분해야 한다.",
+        "PKI의 유효기간 검증 의미를 이해해야 한다."
+      ],
+      "choices": [
+        "대칭키 길이가 짧아져 자동으로 연결이 차단된 것이다.",
+        "인증서의 유효기간이 끝나 신뢰 체인 검증에 실패한 것이다.",
+        "해시 함수는 만료 개념이 없으므로 경고는 오탐이다.",
+        "사용자 인가 정책이 부족하면 항상 인증서 만료 경고가 발생한다."
+      ],
+      "answer_index": 1,
+      "topic": "인증서·PKI",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "인증서",
+        "PKI",
+        "유효기간",
+        "VPN"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-004",
+      "card_id": "",
+      "question_type": "multiple_choice",
+      "prompt": "다음 API 보호 요구사항에 가장 적절한 방식은 무엇인가?",
+      "body": "지점 단말과 본점 서버가 공유 비밀값을 이미 가지고 있다. 요청 본문이 전송 중 바뀌지 않았는지 확인해야 하며, 검증 과정에서 비밀값이 외부로 드러나면 안 된다. 본문 복호화 자체는 요구되지 않는다.",
+      "answer": "HMAC을 사용해 메시지와 공유 비밀값으로 인증 코드를 계산한다.",
+      "explanation": "일반 해시는 누구나 계산할 수 있어 공유 비밀을 이용한 송신자 검증이 되지 않는다. HMAC은 해시 함수에 비밀키를 결합해 무결성과 송신자 검증을 함께 제공한다.",
+      "rubric": [
+        "해시와 HMAC의 차이를 설명할 수 있어야 한다."
+      ],
+      "choices": [
+        "평문 뒤에 단순 SHA-256 해시만 붙인다.",
+        "HMAC을 사용해 메시지와 공유 비밀값으로 인증 코드를 계산한다.",
+        "메시지를 ZIP으로 압축해 크기를 줄인다.",
+        "방화벽에서 포트만 제한하면 본문 변조를 검증할 수 있다."
+      ],
+      "answer_index": 1,
+      "topic": "해시·HMAC",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "해시",
+        "HMAC",
+        "무결성",
+        "API 인증"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-005",
+      "card_id": "CS-020",
+      "question_type": "multiple_choice",
+      "prompt": "다음 상황에서 실패한 보안 단계는 무엇인가?",
+      "body": "직원이 사내 포털에 ID, 비밀번호, OTP까지 모두 정상 입력해 로그인에는 성공했다. 그러나 '결재 승인' 메뉴를 누르자 권한이 없다는 메시지가 나타났다.",
+      "answer": "인가",
+      "explanation": "로그인에 성공했으므로 신원 확인인 인증은 통과했다. 특정 메뉴 사용 가능 여부를 판단하는 것은 인가이므로, 실패한 단계는 인가다.",
+      "rubric": [
+        "인증과 인가의 차이를 사례에 적용해야 한다."
+      ],
+      "choices": [
+        "암호화",
+        "해시",
+        "인증",
+        "인가"
+      ],
+      "answer_index": 3,
+      "topic": "인증과 인가",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "인증",
+        "인가",
+        "권한",
+        "OTP"
+      ],
+      "difficulty": "하",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 60,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-006",
+      "card_id": "",
+      "question_type": "multiple_choice",
+      "prompt": "다음 취약점 분류로 옳은 것은 무엇인가?",
+      "body": "ㄱ. 게시판에 저장된 악성 스크립트가 다른 사용자의 브라우저에서 실행되었다. ㄴ. 사용자가 로그인한 상태에서 악성 사이트를 열자 본인 의도와 무관한 이체 요청이 전송되었다. ㄷ. 검색어 입력값을 SQL 문자열에 이어 붙였더니 조건 우회로 관리자 정보가 조회되었다.",
+      "answer": "ㄱ XSS, ㄴ CSRF, ㄷ SQL Injection",
+      "explanation": "저장된 스크립트 실행은 XSS, 로그인 세션을 악용한 요청 위조는 CSRF, 입력값이 SQL 명령으로 해석되는 것은 SQL Injection이다.",
+      "rubric": [
+        "세 가지 대표 웹 취약점을 사례와 연결해야 한다."
+      ],
+      "choices": [
+        "ㄱ XSS, ㄴ CSRF, ㄷ SQL Injection",
+        "ㄱ CSRF, ㄴ XSS, ㄷ SQL Injection",
+        "ㄱ SQL Injection, ㄴ XSS, ㄷ CSRF",
+        "ㄱ XSS, ㄴ SQL Injection, ㄷ CSRF"
+      ],
+      "answer_index": 0,
+      "topic": "웹 취약점 분류",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "XSS",
+        "CSRF",
+        "SQL Injection",
+        "취약점 분류"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 6,
+      "expected_time_seconds": 100,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-007",
+      "card_id": "CS-347",
+      "question_type": "multiple_choice",
+      "prompt": "다음 상황에서 가장 우선적인 대응으로 적절한 것은 무엇인가?",
+      "body": "고객 문의 내용을 HTML에 그대로 삽입해 보여주는 페이지가 있다. 공격자가 <script> 태그가 포함된 값을 남기자, 다른 사용자가 해당 페이지를 열 때 스크립트가 실행되었다.",
+      "answer": "출력 위치에 맞는 인코딩을 적용하고, 입력값 검증을 함께 수행한다.",
+      "explanation": "XSS의 핵심 대응은 브라우저가 데이터를 코드로 해석하지 못하게 하는 문맥별 출력 인코딩이다. 입력 검증을 병행하면 악성 페이로드 유입 가능성을 더 줄일 수 있다.",
+      "rubric": [
+        "XSS의 원인과 방어 원리를 함께 이해해야 한다."
+      ],
+      "choices": [
+        "출력 위치에 맞는 인코딩을 적용하고, 입력값 검증을 함께 수행한다.",
+        "DB 인덱스를 추가해 조회 속도를 높인다.",
+        "서버 포트를 비표준 포트로 바꾼다.",
+        "CSRF 토큰만 추가한다."
+      ],
+      "answer_index": 0,
+      "topic": "XSS",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "XSS",
+        "출력 인코딩",
+        "입력 검증"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 80,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-008",
+      "card_id": "CS-070",
+      "question_type": "multiple_choice",
+      "prompt": "다음 공격을 막기 위한 대책으로 가장 적절한 것은 무엇인가?",
+      "body": "사용자가 인터넷뱅킹에 로그인한 상태에서 공격자가 만든 페이지를 열었다. 페이지 안의 숨겨진 폼이 자동 제출되면서 송금 요청이 정상 세션 쿠키와 함께 은행 서버로 전송되었다.",
+      "answer": "서버가 요청마다 CSRF 토큰을 검증하고, 세션 쿠키에 SameSite 속성을 적용한다.",
+      "explanation": "CSRF는 사용자의 인증 상태를 악용한 요청 위조다. 위조 페이지가 예측할 수 없는 CSRF 토큰을 검증하고, 쿠키 자동 전송을 제한하는 SameSite를 사용하면 방어 효과가 크다.",
+      "rubric": [
+        "CSRF의 공격 원리와 대표 대응책을 연결해야 한다."
+      ],
+      "choices": [
+        "서버가 요청마다 CSRF 토큰을 검증하고, 세션 쿠키에 SameSite 속성을 적용한다.",
+        "게시글 출력 시 HTML 이스케이프만 수행한다.",
+        "데이터베이스 정규화를 수행한다.",
+        "비밀번호를 SHA-256 한 번만 해시한다."
+      ],
+      "answer_index": 0,
+      "topic": "CSRF",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "CSRF",
+        "SameSite",
+        "세션 쿠키",
+        "토큰"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 80,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-009",
+      "card_id": "CS-288",
+      "question_type": "multiple_choice",
+      "prompt": "다음 로그인 우회 취약점의 근본 대응책으로 가장 적절한 것은 무엇인가?",
+      "body": "애플리케이션이 로그인 쿼리를 문자열 결합으로 만들고 있다. 공격자가 아이디 입력칸에 ' OR '1'='1 을 넣자 WHERE 절이 항상 참이 되어 인증 우회가 발생했다.",
+      "answer": "사용자 입력을 SQL 구조와 분리하는 파라미터 바인딩을 적용한다.",
+      "explanation": "SQL Injection의 핵심 원인은 사용자 입력이 SQL 명령 일부로 해석되는 것이다. Prepared Statement와 파라미터 바인딩은 입력을 데이터로만 처리해 구조 변조를 막는다.",
+      "rubric": [
+        "SQL Injection의 원인과 대응을 정확히 연결해야 한다."
+      ],
+      "choices": [
+        "사용자 입력을 SQL 구조와 분리하는 파라미터 바인딩을 적용한다.",
+        "로그인 화면의 배경색을 변경한다.",
+        "세션 타임아웃을 10분으로 줄인다.",
+        "방화벽에서 443 포트만 허용한다."
+      ],
+      "answer_index": 0,
+      "topic": "SQL Injection",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "SQL Injection",
+        "Prepared Statement",
+        "파라미터 바인딩"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 75,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-010",
+      "card_id": "CS-079",
+      "question_type": "multiple_choice",
+      "prompt": "다음 상황에 대한 판단으로 가장 적절한 것은 무엇인가?",
+      "body": "대외 서비스가 갑자기 초당 수십만 건의 비정상 요청을 받아 CPU와 네트워크 대역폭이 동시에 포화되었다. 정상 사용자도 접속이 거의 불가능해졌으며, 요청 출발지는 여러 지역의 감염 단말로 분산되어 있었다.",
+      "answer": "분산된 다수의 장비가 자원을 소진시켜 서비스 가용성을 떨어뜨리는 DDoS 공격이다.",
+      "explanation": "요청 출발지가 여러 지역에 분산되고 서비스 가용성이 저하된 점이 DDoS의 특징이다. 목적은 기밀성 침해보다 서비스 자원 고갈과 가용성 저하다.",
+      "rubric": [
+        "가용성 공격의 특징을 파악해야 한다."
+      ],
+      "choices": [
+        "분산된 다수의 장비가 자원을 소진시켜 서비스 가용성을 떨어뜨리는 DDoS 공격이다.",
+        "인증된 사용자의 권한 상승만을 노리는 인가 문제다.",
+        "전자서명 검증 실패로 인한 무결성 오류다.",
+        "단순 압축 해제 지연으로 인한 성능 저하다."
+      ],
+      "answer_index": 0,
+      "topic": "DDoS",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "DDoS",
+        "가용성",
+        "봇넷",
+        "자원 고갈"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 5,
+      "expected_time_seconds": 75,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-011",
+      "card_id": "",
+      "question_type": "multiple_choice",
+      "prompt": "다음 장비 역할 비교로 옳은 것은 무엇인가?",
+      "body": "은행이 인터넷 구간 앞단에 정책 기반 허용·차단 장비를 두고, 내부로 들어오는 트래픽 중 악성 패턴은 실시간으로 차단하며, 별도 미러링 구간에서는 침입 징후를 탐지해 관제센터에 경보를 보낸다.",
+      "answer": "앞단 정책 기반 허용·차단은 방화벽, 실시간 차단은 IPS, 미러링 탐지는 IDS에 해당한다.",
+      "explanation": "방화벽은 정책에 따른 허용·차단, IPS는 인라인 차단, IDS는 탐지와 경보에 초점을 둔다. 문제의 세 역할을 각각 구분해야 한다.",
+      "rubric": [
+        "방화벽, IDS, IPS의 기능 차이를 구분해야 한다."
+      ],
+      "choices": [
+        "앞단 정책 기반 허용·차단은 방화벽, 실시간 차단은 IPS, 미러링 탐지는 IDS에 해당한다.",
+        "앞단 정책 기반 허용·차단은 IDS, 실시간 차단은 방화벽, 미러링 탐지는 IPS에 해당한다.",
+        "세 장비는 모두 동일하며 배치 위치만 다르다.",
+        "미러링 탐지는 VPN의 핵심 기능이다."
+      ],
+      "answer_index": 0,
+      "topic": "방화벽·IDS·IPS",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "방화벽",
+        "IDS",
+        "IPS",
+        "침입탐지"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 6,
+      "expected_time_seconds": 90,
+      "answer_guide": "",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-sec-012",
+      "card_id": "CS-337",
+      "question_type": "multiple_choice",
+      "prompt": "다음 원격 접속 요구사항에 가장 적절한 기술은 무엇인가?",
+      "body": "재택 근무 중인 내부 직원이 공용 인터넷을 통해 본점 내부 시스템에 접속해야 한다. 회사는 전송 구간 암호화, 사용자 인증, 내부망과 유사한 안전한 통신 경로를 함께 원한다.",
+      "answer": "VPN",
+      "explanation": "VPN은 공용망 위에 암호화된 터널을 만들고 인증된 사용자만 내부 자원에 접근하게 한다. 재택근무나 지점 연결에 적합한 대표 기술이다.",
+      "rubric": [
+        "VPN의 목적과 활용 상황을 사례로 판단해야 한다."
+      ],
+      "choices": [
+        "VPN",
+        "단순 NAT",
+        "로드 밸런서",
+        "SQL 파서"
+      ],
+      "answer_index": 0,
+      "topic": "VPN",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "보안",
+      "keywords": [
+        "VPN",
+        "원격접속",
+        "암호화 터널",
+        "사용자 인증"
+      ],
+      "difficulty": "하",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/sec.json",
+      "section": "전공필기",
+      "points": 4,
+      "expected_time_seconds": 60,
+      "answer_guide": "",
+      "session_mode": "practice"
+    }
+  ]
+}

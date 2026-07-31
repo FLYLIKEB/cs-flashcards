@@ -1,0 +1,267 @@
+{
+  "slug": "fin",
+  "topic": "금융IT·신기술",
+  "category": "금융IT·신기술",
+  "target_count": 7,
+  "requirements": [
+    "응용형 최소 3개: 지급결제, CBDC, 블록체인, FDS, BCP/DR 포함"
+  ],
+  "entries": [
+    {
+      "question_bank_id": "qb-bokplus-fin-001",
+      "card_id": "CS-199",
+      "question_type": "multiple_choice",
+      "prompt": "온라인 쇼핑 결제에서 지급결제의 결제 단계에 해당하는 것으로 가장 적절한 것은?",
+      "body": "한 소비자가 카드로 10만 원을 결제했다. 승인 직후에는 가맹점이 대금을 아직 받지 못했고, 매입사와 발급사 사이에 채권·채무를 정리한 뒤 한국은행 계좌를 통해 최종 자금 이전이 이루어진다.",
+      "answer": "한국은행 계좌에서 은행 간 최종 자금 이전이 이루어져 채무가 소멸하는 단계",
+      "explanation": "지급결제는 지급 지시, 승인, 청산, 결제를 포괄한다. 이 중 결제는 청산 결과 확정된 채권·채무를 실제 자금 이전으로 이행해 법적으로 최종성을 확보하는 단계다. 승인이나 거래정보 교환만으로는 최종 자금 이전이 끝난 것이 아니다.",
+      "rubric": [
+        "지급결제 전체 흐름 이해",
+        "청산과 결제 구분",
+        "최종결제의 법적 의미 파악"
+      ],
+      "choices": [
+        "카드 승인 메시지가 가맹점 단말기에 표시되는 단계",
+        "매입사와 발급사 사이의 상계 금액을 계산하는 청산 단계",
+        "한국은행 계좌에서 은행 간 최종 자금 이전이 이루어져 채무가 소멸하는 단계",
+        "가맹점이 하루 매출 전표를 카드사에 전송하는 단계"
+      ],
+      "answer_index": 2,
+      "topic": "지급결제",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "금융IT·신기술",
+      "keywords": [
+        "지급결제",
+        "청산",
+        "결제",
+        "결제완결성"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/fin.json",
+      "section": "전공필기",
+      "points": 10,
+      "expected_time_seconds": 90,
+      "answer_guide": "지급결제 흐름에서 청산과 결제를 구분하고 최종 자금 이전 여부를 기준으로 판단한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-fin-002",
+      "card_id": "CS-259",
+      "question_type": "multiple_choice",
+      "prompt": "다음 상황에서 DNS보다 RTGS를 우선 고려해야 하는 이유로 가장 적절한 것은?",
+      "body": "세 은행 간 대금이동이 건별로 즉시 확정되어야 하는 고액자금이체 시스템을 설계한다. 참가기관 중 한 곳이 업무시간 중 유동성 위기에 빠질 가능성이 있으며, 결제 지연이 다른 기관으로 빠르게 전염될 수 있다.",
+      "answer": "건별 실시간 총액결제로 결제 전 신용위험과 전염위험을 크게 줄일 수 있기 때문이다.",
+      "explanation": "RTGS는 지급지시를 건별 총액으로 즉시 결제하므로 미결제 잔액이 오래 쌓이지 않아 결제 전 신용위험과 전염위험을 줄인다. DNS는 유동성 효율은 높지만 지정 시점 전까지 순액 계산을 기다리므로 참가자 부실이 발생하면 결제불이행 위험이 남을 수 있다.",
+      "rubric": [
+        "RTGS와 DNS 비교",
+        "고액결제의 위험요인 판단",
+        "유동성과 결제위험의 상충 이해"
+      ],
+      "choices": [
+        "건별 실시간 총액결제로 결제 전 신용위험과 전염위험을 크게 줄일 수 있기 때문이다.",
+        "거래를 모아 순액만 결제하므로 중앙은행 결제계좌가 전혀 필요 없기 때문이다.",
+        "참가기관의 유동성 소요가 항상 DNS보다 더 작기 때문이다.",
+        "청산 절차가 없어져 거래검증과 기록보존이 불필요해지기 때문이다."
+      ],
+      "answer_index": 0,
+      "topic": "RTGS vs DNS",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "금융IT·신기술",
+      "keywords": [
+        "RTGS",
+        "DNS",
+        "고액결제",
+        "전염위험"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/fin.json",
+      "section": "전공필기",
+      "points": 10,
+      "expected_time_seconds": 100,
+      "answer_guide": "RTGS는 결제위험 축소, DNS는 유동성 절감에 강점이 있음을 비교해 상황 적합성을 판단한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-fin-003",
+      "card_id": "CS-043",
+      "question_type": "multiple_choice",
+      "prompt": "다음 요구사항에 가장 부합하는 CBDC 유형은 무엇인가?",
+      "body": "중앙은행이 일반 국민의 디지털 지급수단 접근성을 높이면서도, 오프라인 소액결제와 재난 시 기초 결제수단 유지 가능성을 함께 검토하고 있다. 반면 증권대금 동시결제 같은 기관 간 대규모 청산 효율화는 이번 사업의 1차 목표가 아니다.",
+      "answer": "소매형 CBDC",
+      "explanation": "소매형 CBDC는 일반 국민이 사용하는 디지털 법정화폐를 대상으로 하므로 지급수단 접근성, 소액결제 편의, 현금 보완, 재난 시 공공결제수단 확보와 연결된다. 도매형 CBDC는 주로 금융기관 간 대규모 결제 효율화와 토큰화 자산 결제 인프라 개선에 초점이 있다.",
+      "rubric": [
+        "CBDC 유형 구분",
+        "정책목표와 기술유형 연결",
+        "소매형·도매형 비교"
+      ],
+      "choices": [
+        "도매형 CBDC",
+        "소매형 CBDC",
+        "스테이블코인",
+        "전자지급수단 선불충전금"
+      ],
+      "answer_index": 1,
+      "topic": "CBDC",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "금융IT·신기술",
+      "keywords": [
+        "CBDC",
+        "소매형",
+        "도매형",
+        "오프라인 결제"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/fin.json",
+      "section": "전공필기",
+      "points": 10,
+      "expected_time_seconds": 90,
+      "answer_guide": "일반 국민 대상 지급수단인지, 금융기관 간 결제 인프라인지에 따라 CBDC 유형을 구분한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-fin-004",
+      "card_id": "CS-212",
+      "question_type": "multiple_choice",
+      "prompt": "은행 컨소시엄 공동원장에 가장 적합한 선택은 무엇인가?",
+      "body": "여러 은행이 무역금융 서류 진행상태를 공동으로 조회하려고 한다. 참여기관은 사전에 실명 확인된 금융회사로 한정하고, 거래 열람권한을 세분화해야 하며, 초당 처리량도 퍼블릭 체인보다 높아야 한다.",
+      "answer": "프라이빗 블록체인",
+      "explanation": "프라이빗 블록체인은 허가된 참여자만 검증과 열람에 참여하게 하므로 실명 기반 거버넌스, 권한 통제, 높은 처리성능 요구에 잘 맞는다. 퍼블릭 블록체인은 개방성과 검열저항성은 높지만 금융기관 컨소시엄의 접근통제·개인정보·성능 요구를 충족시키기 어렵다.",
+      "rubric": [
+        "퍼블릭 vs 프라이빗 비교",
+        "권한통제 요구 해석",
+        "금융 컨소시엄 적용 판단"
+      ],
+      "choices": [
+        "퍼블릭 블록체인",
+        "프라이빗 블록체인",
+        "작업증명 기반 공개 메인넷",
+        "누구나 검증 가능한 무허가 원장"
+      ],
+      "answer_index": 1,
+      "topic": "블록체인 퍼블릭 vs 프라이빗",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "금융IT·신기술",
+      "keywords": [
+        "프라이빗 블록체인",
+        "퍼블릭 블록체인",
+        "권한통제",
+        "컨소시엄"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/fin.json",
+      "section": "전공필기",
+      "points": 10,
+      "expected_time_seconds": 90,
+      "answer_guide": "참여자 제한, 성능, 개인정보, 거버넌스 요구를 기준으로 퍼블릭과 프라이빗을 비교한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-fin-005",
+      "card_id": "CS-114",
+      "question_type": "multiple_choice",
+      "prompt": "모바일뱅킹 FDS 운영에서 가장 우선해야 할 조치로 적절한 것은?",
+      "body": "평소 서울에서 소액이체만 하던 고객 계정에서 새벽 3시에 해외 IP와 신규 단말로 접속해 1천만 원을 처음 보는 수취인에게 즉시이체하려 한다. 비밀번호 입력은 맞았지만 직전 10분 동안 로그인 실패가 여러 번 있었다.",
+      "answer": "거래를 즉시 보류하고 추가 본인확인을 요구한다.",
+      "explanation": "FDS는 정상 패턴에서 크게 벗어난 거래를 실시간으로 탐지해 부정거래 피해를 줄이는 것이 핵심이다. 이 사례는 시간, 위치, 단말, 금액, 수취인, 로그인 실패 이력 모두 이상징후가 강하므로 단순 기록만 남기기보다 보류 후 추가 인증이나 상담원 확인이 우선이다.",
+      "rubric": [
+        "이상거래 징후 식별",
+        "FDS의 실시간 통제 목적 이해",
+        "오탐보다 미탐 비용이 큰 상황 판단"
+      ],
+      "choices": [
+        "정상 비밀번호가 입력됐으므로 그대로 이체를 승인한다.",
+        "거래를 즉시 보류하고 추가 본인확인을 요구한다.",
+        "이체는 승인하되 다음 영업일에만 로그를 점검한다.",
+        "유사거래 학습을 위해 아무 조치 없이 데이터만 수집한다."
+      ],
+      "answer_index": 1,
+      "topic": "FDS",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "금융IT·신기술",
+      "keywords": [
+        "FDS",
+        "이상거래탐지",
+        "추가인증",
+        "계정탈취"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/fin.json",
+      "section": "전공필기",
+      "points": 10,
+      "expected_time_seconds": 85,
+      "answer_guide": "정상 인증 여부만 보지 말고 시간·위치·단말·금액·수취인 패턴 이상 여부를 함께 판단한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-fin-006",
+      "card_id": "",
+      "question_type": "subjective",
+      "prompt": "주전산센터 화재로 결제시스템이 중단된 상황에서 BCP와 DR을 구분하여 설명하시오.",
+      "body": "상황: 인터넷뱅킹과 대외계 결제연계가 동시에 중단되었다. 은행은 2시간 내 핵심 지급서비스를 재개해야 하며, 고객 안내·대체업무·백업센터 전환이 모두 필요하다.",
+      "answer": "BCP는 핵심 업무를 계속 수행하기 위한 전사적 연속성 계획이고, DR은 IT 시스템과 데이터를 복구해 대체센터에서 서비스를 재가동하는 기술적 복구 계획이다. 위 상황에서는 고객 공지·수기 절차·업무 우선순위 조정은 BCP에, 백업센터 전환·데이터 복구·네트워크 재구성은 DR에 해당한다.",
+      "explanation": "BCP는 사람·조직·대체절차까지 포함해 업무가 완전히 멈추지 않도록 설계하는 상위 개념이다. DR은 그중 IT 자원 복구에 초점을 둔다. 따라서 재해 상황에서는 DR만 준비돼 있어도 고객 응대, 대체 승인 절차, 우선 복구 서비스 선정이 없으면 실제 업무 연속성은 확보되지 않는다.",
+      "rubric": [
+        "BCP와 DR의 범위 구분",
+        "재해 상황 적용 설명",
+        "업무 연속성과 IT 복구의 관계 제시"
+      ],
+      "choices": [],
+      "answer_index": null,
+      "topic": "BCP/DR",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "금융IT·신기술",
+      "keywords": [
+        "BCP",
+        "DR",
+        "재해복구",
+        "업무연속성"
+      ],
+      "difficulty": "상",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/fin.json",
+      "section": "전공필기",
+      "points": 15,
+      "expected_time_seconds": 210,
+      "answer_guide": "상위 개념인 BCP와 하위 기술 복구 영역인 DR을 구분하고, 사례에 맞춰 각각의 조치를 분리해 서술한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-fin-007",
+      "card_id": "",
+      "question_type": "short",
+      "prompt": "퍼블릭 블록체인보다 프라이빗 블록체인이 은행 내부 공동업무에 더 자주 채택되는 핵심 이유를 두 가지 쓰시오.",
+      "body": "힌트: 금융기관 내부 업무는 참여자 신원확인, 거래정보 접근통제, 처리성능 요구가 함께 존재한다.",
+      "answer": "참여자 권한통제가 가능하고 처리성능·거버넌스를 운영 목적에 맞게 조정하기 쉽기 때문이다.",
+      "explanation": "은행 내부 공동업무는 누구나 참여하는 개방성보다 신원 확인된 참여자 관리, 개인정보 보호, 감독 대응, 빠른 확정성이 더 중요하다. 그래서 퍼블릭 블록체인의 개방성보다 프라이빗 블록체인의 권한통제와 성능 최적화가 실무 적합성이 높다.",
+      "rubric": [
+        "퍼블릭과 프라이빗 비교",
+        "금융업무 요구사항 반영",
+        "핵심 이유 2가지 제시"
+      ],
+      "choices": [],
+      "answer_index": null,
+      "topic": "블록체인 퍼블릭 vs 프라이빗",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "금융IT·신기술",
+      "keywords": [
+        "퍼블릭 블록체인",
+        "프라이빗 블록체인",
+        "권한통제",
+        "처리성능"
+      ],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/fin.json",
+      "section": "전공필기",
+      "points": 10,
+      "expected_time_seconds": 120,
+      "answer_guide": "개방성보다 권한통제와 성능·거버넌스 측면이 중요하다는 점을 두 가지 이상으로 압축해 제시한다.",
+      "session_mode": "practice"
+    }
+  ]
+}

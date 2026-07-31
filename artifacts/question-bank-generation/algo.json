@@ -1,0 +1,459 @@
+{
+  "slug": "algo",
+  "topic": "자료구조·알고리즘",
+  "category": "자료구조·알고리즘",
+  "target_count": 14,
+  "requirements": [
+    "계산형 최소 5개: DFS/BFS 추적, 정렬/복잡도, 최단경로, MST, DP 점화식 포함"
+  ],
+  "entries": [
+    {
+      "question_bank_id": "qb-bokplus-algo-001",
+      "card_id": "",
+      "question_type": "multiple_choice",
+      "prompt": "다음 중 배열과 연결 리스트의 특성을 가장 올바르게 비교한 것은?",
+      "body": "금융 거래 로그를 저장하는 구조를 검토 중이다. 거래 ID로 k번째 원소를 즉시 조회하는 요구가 자주 있고, 중간 삽입은 상대적으로 드물다.",
+      "answer": "배열은 임의 접근이 O(1)이고, 연결 리스트는 삽입 위치 노드를 이미 알고 있으면 포인터 변경만으로 중간 삽입이 가능하다.",
+      "explanation": "배열은 연속 메모리를 사용하므로 인덱스로 바로 접근할 수 있어 임의 접근이 O(1)이다. 연결 리스트는 k번째 원소 접근이 O(n)이지만, 삽입 위치의 이전/현재 노드를 이미 알고 있다면 포인터만 바꿔 중간 삽입을 처리할 수 있다. 반대로 배열의 중간 삽입은 뒤 원소들을 밀어야 하므로 O(n)이다.",
+      "rubric": [
+        "배열의 임의 접근 특성을 구분한다.",
+        "연결 리스트의 삽입 조건과 비용을 설명할 수 있다."
+      ],
+      "choices": [
+        "배열은 임의 접근이 O(1)이고, 연결 리스트는 삽입 위치 노드를 이미 알고 있으면 포인터 변경만으로 중간 삽입이 가능하다.",
+        "배열과 연결 리스트는 모두 k번째 원소 접근이 O(1)이다.",
+        "연결 리스트는 항상 캐시 지역성이 좋아 배열보다 순차 탐색이 빠르다.",
+        "배열은 중간 삽입 시 원소 이동이 필요 없으므로 O(1)이다."
+      ],
+      "answer_index": 0,
+      "topic": "배열·리스트",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["배열", "연결 리스트", "임의 접근", "중간 삽입"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 90,
+      "answer_guide": "자료구조별 접근·삽입 복잡도를 비교해 판단한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-002",
+      "card_id": "CS-293",
+      "question_type": "multiple_choice",
+      "prompt": "후위 표기식 `7 2 3 * - 4 +`를 스택으로 계산한 결과는 무엇인가?",
+      "body": "피연산자를 만나면 push하고, 연산자를 만나면 스택에서 두 값을 pop하여 앞에서 꺼낸 값을 오른쪽 피연산자로 사용한다.",
+      "answer": "5",
+      "explanation": "2와 3을 push한 뒤 `*`를 만나면 2×3=6이 된다. 이후 7과 6으로 `-`를 수행하면 7-6=1이다. 마지막으로 4를 더하면 1+4=5가 된다.",
+      "rubric": [
+        "후위 표기식의 스택 계산 순서를 따른다.",
+        "pop 순서가 연산 결과에 미치는 영향을 이해한다."
+      ],
+      "choices": [
+        "1",
+        "5",
+        "9",
+        "15"
+      ],
+      "answer_index": 1,
+      "topic": "스택",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["스택", "후위 표기식", "수식 계산", "추적"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 120,
+      "answer_guide": "연산자마다 두 값을 꺼내는 순서를 따라 계산한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-003",
+      "card_id": "CS-494",
+      "question_type": "multiple_choice",
+      "prompt": "다음 원형 큐 연산을 수행한 뒤 큐의 논리적 순서로 옳은 것은 무엇인가?",
+      "body": "크기 5 배열로 구현한 원형 큐이며, 공백과 포화를 구분하기 위해 항상 한 칸을 비워 둔다. 초기 상태는 공백이다.\n연산 순서: enqueue(10), enqueue(20), enqueue(30), dequeue(), enqueue(40), enqueue(50), dequeue(), enqueue(60)",
+      "answer": "30, 40, 50, 60",
+      "explanation": "처음 세 번의 enqueue 후 큐는 10,20,30이다. 첫 dequeue로 10이 제거된다. 이어 40,50을 넣으면 20,30,40,50이 되고, 다시 dequeue로 20이 제거된다. 마지막으로 60을 넣으면 최종 논리 순서는 30,40,50,60이다.",
+      "rubric": [
+        "원형 큐의 wrap-around 동작을 추적한다.",
+        "dequeue 이후 남는 원소 순서를 정확히 구분한다."
+      ],
+      "choices": [
+        "20, 30, 40, 50",
+        "30, 40, 50, 60",
+        "40, 50, 60",
+        "10, 30, 40, 60"
+      ],
+      "answer_index": 1,
+      "topic": "큐",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["원형 큐", "enqueue", "dequeue", "추적"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 120,
+      "answer_guide": "삭제되는 값과 front·rear의 순환 이동을 함께 추적한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-004",
+      "card_id": "CS-505",
+      "question_type": "multiple_choice",
+      "prompt": "다음 이진 트리의 후위 순회(postorder) 결과는 무엇인가?",
+      "body": "트리 구조는 다음과 같다.\n루트 A\nA의 왼쪽 자식 B, 오른쪽 자식 C\nB의 왼쪽 자식 D, 오른쪽 자식 E\nC의 오른쪽 자식 F",
+      "answer": "D, E, B, F, C, A",
+      "explanation": "후위 순회는 왼쪽 서브트리 → 오른쪽 서브트리 → 루트 순서다. B 서브트리에서 D, E, B를 방문하고, C 서브트리에서 F, C를 방문한 뒤 마지막에 루트 A를 방문하므로 결과는 D, E, B, F, C, A이다.",
+      "rubric": [
+        "후위 순회의 방문 규칙을 적용한다.",
+        "좌·우 서브트리 방문 후 루트를 처리한다."
+      ],
+      "choices": [
+        "A, B, D, E, C, F",
+        "D, B, E, A, C, F",
+        "D, E, B, F, C, A",
+        "D, E, B, C, F, A"
+      ],
+      "answer_index": 2,
+      "topic": "트리",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["이진 트리", "후위 순회", "트리 순회", "추적"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 120,
+      "answer_guide": "왼쪽-오른쪽-루트 순서를 각 서브트리에 재귀적으로 적용한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-005",
+      "card_id": "CS-357",
+      "question_type": "multiple_choice",
+      "prompt": "선형 조사(linear probing)를 쓰는 해시 테이블에서 키 31이 저장되는 인덱스는 무엇인가?",
+      "body": "테이블 크기는 7, 해시 함수는 h(k)=k mod 7이다. 삽입 순서는 10, 17, 24, 31이며 충돌 시 오른쪽으로 한 칸씩 이동한다.",
+      "answer": "6",
+      "explanation": "10 mod 7=3이므로 10은 3번 칸에 저장된다. 17, 24, 31도 모두 3으로 해시되지만 충돌이 발생하므로 차례로 4, 5, 6번 칸에 들어간다. 따라서 31의 저장 위치는 6이다.",
+      "rubric": [
+        "해시값 계산과 충돌 발생을 구분한다.",
+        "선형 조사의 이동 순서를 끝까지 추적한다."
+      ],
+      "choices": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "answer_index": 3,
+      "topic": "해시",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["해시", "개방 주소법", "선형 조사", "충돌"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 120,
+      "answer_guide": "각 키의 해시값과 충돌 시 다음 슬롯 이동을 순서대로 계산한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-006",
+      "card_id": "CS-086",
+      "question_type": "multiple_choice",
+      "prompt": "다음 그래프에서 재귀 DFS를 수행할 때 방문 순서로 옳은 것은 무엇인가?",
+      "body": "시작 정점은 A이고, 인접 정점은 알파벳 순으로 방문한다.\n인접 리스트:\nA: B, C\nB: D, E\nC: F\nD: 없음\nE: F\nF: 없음",
+      "answer": "A, B, D, E, F, C",
+      "explanation": "A에서 B를 먼저 방문하고, B에서 D를 방문한 뒤 되돌아와 E를 방문한다. E의 인접 정점 F를 방문하고 다시 A로 돌아와 C를 보지만 F는 이미 방문한 상태다. 따라서 순서는 A, B, D, E, F, C이다.",
+      "rubric": [
+        "DFS의 깊이 우선 방문 원리를 적용한다.",
+        "이미 방문한 정점을 다시 방문하지 않는다."
+      ],
+      "choices": [
+        "A, B, D, E, F, C",
+        "A, B, C, D, E, F",
+        "A, C, F, B, D, E",
+        "A, B, E, F, D, C"
+      ],
+      "answer_index": 0,
+      "topic": "DFS",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["DFS", "그래프 탐색", "재귀", "추적"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 120,
+      "answer_guide": "인접 정점 우선순위와 백트래킹 시점을 따라간다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-007",
+      "card_id": "CS-029",
+      "question_type": "multiple_choice",
+      "prompt": "다음 무가중치 그래프에서 BFS를 수행할 때 정점 E의 시작점 A로부터 최단 거리는 얼마인가?",
+      "body": "간선은 다음과 같다.\nA-B, A-C, B-D, C-D, D-E\n모든 간선의 가중치는 1이며 그래프는 무방향 그래프이다.",
+      "answer": "3",
+      "explanation": "BFS는 간선 수 기준 최단 거리를 보장한다. A에서 한 번에 갈 수 있는 정점은 B, C로 거리 1이고, 그다음 D가 거리 2, 마지막으로 E가 거리 3이 된다. 따라서 A에서 E까지의 최단 거리는 3이다.",
+      "rubric": [
+        "BFS가 무가중치 최단 거리를 보장함을 이해한다.",
+        "레벨별 거리 계산을 정확히 수행한다."
+      ],
+      "choices": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "answer_index": 1,
+      "topic": "BFS",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["BFS", "최단 거리", "무가중치 그래프", "레벨 탐색"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 120,
+      "answer_guide": "시작점에서 레벨별로 확장하며 거리 값을 센다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-008",
+      "card_id": "CS-284",
+      "question_type": "multiple_choice",
+      "prompt": "다음 요구사항에 가장 적합한 정렬 알고리즘은 무엇인가?",
+      "body": "동일한 거래 시각을 가진 레코드의 기존 입력 순서를 유지해야 하며, 최악의 경우에도 O(n log n) 시간복잡도를 보장받고 싶다.",
+      "answer": "병합 정렬",
+      "explanation": "병합 정렬은 안정 정렬이며 최선·평균·최악 모두 O(n log n)이다. 퀵 정렬은 평균적으로 빠르지만 최악 O(n²)이고 기본 구현은 안정적이지 않다. 힙 정렬은 최악 O(n log n)이지만 일반적으로 안정 정렬이 아니다.",
+      "rubric": [
+        "정렬의 안정성과 최악 시간복잡도를 함께 고려한다.",
+        "요구사항에 맞지 않는 정렬을 배제할 수 있다."
+      ],
+      "choices": [
+        "퀵 정렬",
+        "선택 정렬",
+        "병합 정렬",
+        "힙 정렬"
+      ],
+      "answer_index": 2,
+      "topic": "정렬",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["정렬", "안정 정렬", "병합 정렬", "복잡도"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 90,
+      "answer_guide": "안정성 여부와 최악 시간복잡도를 동시에 확인한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-009",
+      "card_id": "CS-468",
+      "question_type": "multiple_choice",
+      "prompt": "다음 코드의 시간 복잡도로 가장 적절한 것은 무엇인가?",
+      "body": "for i in range(n):\n    j = 1\n    while j < n:\n        j *= 2",
+      "answer": "O(n log n)",
+      "explanation": "바깥 for문은 n번 반복된다. 안쪽 while문은 j가 1에서 시작해 2배씩 증가하므로 약 log₂n번 반복된다. 따라서 전체 반복 횟수는 n×log n이므로 시간 복잡도는 O(n log n)이다.",
+      "rubric": [
+        "반복문의 중첩 구조를 분리해 계산한다.",
+        "지수 증가 반복의 횟수를 log n으로 해석한다."
+      ],
+      "choices": [
+        "O(log n)",
+        "O(n)",
+        "O(n log n)",
+        "O(n²)"
+      ],
+      "answer_index": 2,
+      "topic": "복잡도",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["시간 복잡도", "반복문", "빅오", "로그"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 90,
+      "answer_guide": "바깥 반복 횟수와 안쪽 로그 반복 횟수를 곱한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-010",
+      "card_id": "CS-379",
+      "question_type": "multiple_choice",
+      "prompt": "다음 그래프에서 다익스트라 알고리즘으로 구한 A에서 E까지의 최단 거리는 얼마인가?",
+      "body": "간선 가중치는 모두 음수가 아니다.\nA-B:2, A-C:5, B-C:1, B-D:2, C-D:3, C-E:5, D-E:1",
+      "answer": "5",
+      "explanation": "A에서 B까지 2, B에서 D까지 2를 더하면 D까지 4다. D에서 E까지 1이므로 A→B→D→E 경로 비용은 5다. A→C→E는 10, A→B→C→D→E는 7이므로 최단 거리는 5다.",
+      "rubric": [
+        "비음수 가중치 그래프에서 최단 경로를 누적 계산한다.",
+        "대안 경로와 비교해 최소 비용을 확인한다."
+      ],
+      "choices": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "answer_index": 1,
+      "topic": "최단 경로",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["다익스트라", "최단 경로", "가중 그래프", "추적"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 150,
+      "answer_guide": "누적 거리 갱신과 대체 경로 비교를 통해 최솟값을 찾는다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-011",
+      "card_id": "CS-422",
+      "question_type": "multiple_choice",
+      "prompt": "다음 그래프에 대한 설명으로 가장 옳은 것은 무엇인가?",
+      "body": "방향 그래프의 간선은 다음과 같다.\nA→B:4, A→C:5, B→C:-6, C→B:2\n시작 정점은 A이다.",
+      "answer": "벨만-포드는 도달 가능한 음수 사이클을 검출할 수 있으므로 B와 C에 대한 최단 거리가 확정되지 않음을 판별할 수 있다.",
+      "explanation": "B→C→B의 사이클 가중치 합은 -6+2=-4로 음수이며 A에서 B로 갈 수 있으므로 시작점 A에서 도달 가능한 음수 사이클이다. 이런 경우 B와 C로 가는 최단 거리는 계속 감소시킬 수 있어 정의되지 않는다. 다익스트라는 음수 간선이 있는 상황에 적합하지 않다.",
+      "rubric": [
+        "음수 사이클의 존재와 의미를 판별한다.",
+        "다익스트라와 벨만-포드의 적용 조건을 구분한다."
+      ],
+      "choices": [
+        "다익스트라는 음수 간선이 하나만 있어도 항상 정확하다.",
+        "벨만-포드는 도달 가능한 음수 사이클을 검출할 수 있으므로 B와 C에 대한 최단 거리가 확정되지 않음을 판별할 수 있다.",
+        "B와 C 사이클의 총 가중치는 0이므로 최단 거리는 잘 정의된다.",
+        "음수 간선이 있으면 BFS로 최단 경로를 구하는 것이 가장 안전하다."
+      ],
+      "answer_index": 1,
+      "topic": "벨만-포드",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["벨만-포드", "음수 사이클", "최단 경로", "판단형"],
+      "difficulty": "상",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 150,
+      "answer_guide": "사이클 가중치 합과 알고리즘 적용 조건을 함께 본다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-012",
+      "card_id": "CS-575",
+      "question_type": "multiple_choice",
+      "prompt": "다음 무방향 가중 그래프에 크루스칼 알고리즘을 적용할 때 최소 신장 트리의 총 가중치는 얼마인가?",
+      "body": "정점은 A, B, C, D이고 간선은 다음과 같다.\nA-B:1, B-C:2, C-D:3, A-C:4, B-D:5, A-D:6",
+      "answer": "6",
+      "explanation": "가중치가 작은 간선부터 보면 A-B(1), B-C(2), C-D(3)을 선택해도 사이클이 생기지 않는다. 이때 이미 정점 4개가 모두 연결되어 간선 3개(V-1개)를 채웠으므로 종료한다. 총합은 1+2+3=6이다.",
+      "rubric": [
+        "크루스칼의 간선 선택 순서를 따른다.",
+        "사이클 발생 여부와 종료 조건을 판별한다."
+      ],
+      "choices": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "answer_index": 1,
+      "topic": "최소 신장 트리",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["최소 신장 트리", "크루스칼", "가중 그래프", "계산형"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 150,
+      "answer_guide": "간선 오름차순 선택과 사이클 배제를 반복해 총합을 계산한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-013",
+      "card_id": "CS-101",
+      "question_type": "multiple_choice",
+      "prompt": "한 번에 1계단 또는 2계단씩 오를 수 있을 때 5계단에 도달하는 방법 수는 몇 개인가?",
+      "body": "동적 계획법으로 dp[n]=dp[n-1]+dp[n-2], dp[1]=1, dp[2]=2를 사용한다.",
+      "answer": "8",
+      "explanation": "점화식에 따라 dp[3]=3, dp[4]=5, dp[5]=8이 된다. 이는 마지막 이동이 1계단이냐 2계단이냐로 경우를 나눈 전형적인 DP 문제다.",
+      "rubric": [
+        "기저값과 점화식을 정확히 적용한다.",
+        "이전 상태 두 개를 이용한 DP 계산을 수행한다."
+      ],
+      "choices": [
+        "5",
+        "8",
+        "13",
+        "16"
+      ],
+      "answer_index": 1,
+      "topic": "DP",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["동적 계획법", "점화식", "계단 오르기", "계산형"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 120,
+      "answer_guide": "기저값부터 표를 채우며 dp[5]를 계산한다.",
+      "session_mode": "practice"
+    },
+    {
+      "question_bank_id": "qb-bokplus-algo-014",
+      "card_id": "CS-557",
+      "question_type": "multiple_choice",
+      "prompt": "삭제가 잦고 적재율(load factor)이 1을 넘을 수 있는 해시 테이블에서 가장 적절한 충돌 처리 방식은 무엇인가?",
+      "body": "금융 감사 로그 캐시를 해시 테이블로 관리한다. 특정 시간대에 키가 몰릴 수 있고, 삭제 연산도 자주 발생한다.",
+      "answer": "체이닝",
+      "explanation": "체이닝은 같은 버킷에 여러 원소를 연결 리스트 등으로 저장하므로 적재율이 1을 넘어도 동작하며 삭제도 비교적 단순하다. 반면 개방 주소법은 적재율이 높아질수록 군집화가 심해지고 삭제 처리도 더 까다롭다.",
+      "rubric": [
+        "충돌 처리 방식의 운영 특성을 비교한다.",
+        "삭제 빈도와 적재율 조건에 맞는 방식을 고른다."
+      ],
+      "choices": [
+        "선형 조사",
+        "체이닝",
+        "계수 정렬",
+        "이진 탐색"
+      ],
+      "answer_index": 1,
+      "topic": "해시",
+      "field_name": "한국은행 필기 보강 100제",
+      "category": "자료구조·알고리즘",
+      "keywords": ["해시", "체이닝", "충돌 해결", "비교형"],
+      "difficulty": "중",
+      "issuer": "한국은행 대비 제작",
+      "source_location": "artifacts/question-bank-generation/algo.json",
+      "section": "전공필기",
+      "points": 2,
+      "expected_time_seconds": 90,
+      "answer_guide": "적재율과 삭제 비용을 기준으로 충돌 해결 방식을 비교한다.",
+      "session_mode": "practice"
+    }
+  ]
+}
