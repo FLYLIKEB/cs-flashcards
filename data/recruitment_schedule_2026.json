@@ -1,0 +1,484 @@
+{
+  "schema_version": 1,
+  "title": "2026 금융공기업 IT 채용 캘린더",
+  "timezone": "Asia/Seoul",
+  "last_updated": "2026-07-31",
+  "description": "2026년 금융공기업 IT 채용 일정의 공식 공고·예비공고·연간 채용계획 기준 데이터입니다.",
+  "calendar_intro": "앱 내부 캘린더와 위키 일정 페이지는 이 데이터 파일을 기준으로 렌더링됩니다.",
+  "calendar_notes": [
+    "접수 종료된 상반기 공고는 달력에서 제외했습니다.",
+    "월 단위·전후 표현만 공개된 일정은 예정 이벤트로 표시합니다.",
+    "Google Calendar 전체 동기화는 ICS 피드를 URL로 추가하는 방식이 가장 안정적입니다."
+  ],
+  "institutions": [
+    {
+      "id": "bok",
+      "name": "한국은행",
+      "short_name": "한은",
+      "color": "#1d4ed8"
+    },
+    {
+      "id": "hf",
+      "name": "한국주택금융공사",
+      "short_name": "주금공",
+      "color": "#0f766e"
+    },
+    {
+      "id": "kodit",
+      "name": "신용보증기금",
+      "short_name": "신보",
+      "color": "#7c3aed"
+    },
+    {
+      "id": "kexim",
+      "name": "한국수출입은행",
+      "short_name": "수은",
+      "color": "#b45309"
+    },
+    {
+      "id": "kdic",
+      "name": "예금보험공사",
+      "short_name": "예보",
+      "color": "#be123c"
+    },
+    {
+      "id": "ksd",
+      "name": "한국예탁결제원",
+      "short_name": "예탁원",
+      "color": "#0369a1"
+    },
+    {
+      "id": "kftc",
+      "name": "금융결제원",
+      "short_name": "금결원",
+      "color": "#2563eb"
+    },
+    {
+      "id": "koscom",
+      "name": "코스콤",
+      "short_name": "코스콤",
+      "color": "#4f46e5"
+    },
+    {
+      "id": "kdb",
+      "name": "한국산업은행",
+      "short_name": "산은",
+      "color": "#dc2626"
+    }
+  ],
+  "timeline": [
+    {
+      "id": "phase-open",
+      "period": "7.23 ~ 8.20",
+      "headline": "한국은행 G5, 주택금융공사 신입 공고 접수 진행 중",
+      "focus": "자소서 제출을 끝내고 바로 필기 모드로 전환"
+    },
+    {
+      "id": "phase-august",
+      "period": "8월",
+      "headline": "신보 하반기 신입 공고 예정(연간 채용계획 기준), 미공고 기관 채용페이지 점검 구간",
+      "focus": "링크 확인은 짧게, 공부 시간은 한국은행 필기 중심으로 유지"
+    },
+    {
+      "id": "phase-sep12",
+      "period": "9.12",
+      "headline": "한국은행 필기 확정 / 주택금융공사 IT 코딩시험",
+      "focus": "한국은행 기출 회차별 실전 풀이, 주금공은 코딩·전산 객관식 감 유지"
+    },
+    {
+      "id": "phase-sep19",
+      "period": "9.19",
+      "headline": "주택금융공사 필기전형",
+      "focus": "한은 직후 곧바로 주금공 전형까지 이어서 대응"
+    },
+    {
+      "id": "phase-octnov",
+      "period": "10 ~ 11월",
+      "headline": "한국은행 면접 예정, 주택금융공사 면접 예정, 수출입은행은 연간 계획상 하반기 신입 진행 구간",
+      "focus": "한은 면접 최우선, 병행 기관은 공고가 뜰 때만 즉시 대응"
+    },
+    {
+      "id": "phase-dec",
+      "period": "12월",
+      "headline": "신용보증기금 하반기 채용시기 예정(연간 채용계획 기준)",
+      "focus": "복기, 추가 면접, 예비합격 대응"
+    }
+  ],
+  "dashboard_open": [
+    {
+      "institution_id": "bok",
+      "status": "원서접수 진행 중",
+      "schedule_summary": "접수 07.23 10:00 ~ 08.05 17:00 / 서류 08.26 전후 / 필기 09.12 / 면접 10~11월 / 잠정합격 11월 중순경",
+      "links": [
+        {
+          "label": "공고",
+          "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037"
+        },
+        {
+          "label": "채용홈",
+          "url": "https://apply.bok.or.kr"
+        }
+      ],
+      "note": "최우선. 2027년도 G5 공고 기준"
+    },
+    {
+      "institution_id": "hf",
+      "status": "신입 공고 접수 중",
+      "schedule_summary": "접수 07.31 15:00 ~ 08.20 17:00 / 서류 09.08 / IT 코딩 09.12 / 필기 09.19 / 1차면접 10.19 ~ 10.23 / 2차면접 11.10 ~ 11.13 / 합격 11.20 / 임용 11.30 예정",
+      "links": [
+        {
+          "label": "채용홈",
+          "url": "https://hf.recruitlab.co.kr"
+        },
+        {
+          "label": "예비공고",
+          "url": "https://www.hf.go.kr/ko/sub05/sub05_07_03.do?articleNo=600253&mode=view"
+        },
+        {
+          "label": "채용공고 게시판",
+          "url": "https://www.hf.go.kr/ko/sub05/sub05_07_03.do"
+        }
+      ],
+      "note": "대졸수준 5급 IT 직렬 포함"
+    },
+    {
+      "institution_id": "kodit",
+      "status": "연간 채용계획 공개",
+      "schedule_summary": "하반기 신입 공고 8월 예정 / 채용시기 12월 예정",
+      "links": [
+        {
+          "label": "채용계획",
+          "url": "https://www.kodit.or.kr/kodit/cm/cntnts/cntntsView.do?cntntsId=11182&mi=2515"
+        },
+        {
+          "label": "채용공고 게시판",
+          "url": "https://www.kodit.co.kr/kodit/na/ntt/selectNttList.do?bbsId=407&mi=2518"
+        }
+      ],
+      "note": "아직 본공고 전. 이공계·ICT 포함 여부는 공고문 확인 필요"
+    },
+    {
+      "institution_id": "kexim",
+      "status": "하반기 채용계획만 공개",
+      "schedule_summary": "연간 채용계획안 기준 8 ~ 11월 전문직행원(신입) 예정 / 07.31 현재 진행 공고 0건",
+      "links": [
+        {
+          "label": "채용공고 목록",
+          "url": "https://koreaexim.incruit.com/hire/hirelist.asp"
+        },
+        {
+          "label": "연간채용 용역 계획 자료",
+          "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01256486&bidPbancOrd=000&fileSeq=4&fileType=&prcmBsneSeCd=03"
+        }
+      ],
+      "note": "IT 포함 여부·인원은 본공고 확인 필요"
+    }
+  ],
+  "dashboard_watch": [
+    {
+      "institution_id": "kdic",
+      "status": "하반기 신입/디지털 공고 미확인",
+      "links": [
+        {
+          "label": "채용공고",
+          "url": "https://www.kdic.or.kr/di/empm/selectPbcrEmpmPbancList.do"
+        }
+      ],
+      "note": "현재 목록에는 청년인턴·업무지원직만 확인"
+    },
+    {
+      "institution_id": "ksd",
+      "status": "하반기 신입/전산 공고 미확인",
+      "links": [
+        {
+          "label": "채용홈",
+          "url": "https://ksd.recruit-zone.co.kr/recruits"
+        },
+        {
+          "label": "공식홈",
+          "url": "https://www.ksd.or.kr"
+        }
+      ],
+      "note": "현재 채용홈에는 경력·기간제 마감 공고만 확인"
+    },
+    {
+      "institution_id": "kftc",
+      "status": "하반기 신입/전산 공고 미확인",
+      "links": [
+        {
+          "label": "채용홈",
+          "url": "https://jrs.jobkorea.co.kr/kftc"
+        },
+        {
+          "label": "공식홈",
+          "url": "https://www.kftc.or.kr/"
+        }
+      ],
+      "note": "공식 채용페이지에는 2026 상반기 공고만 확인"
+    },
+    {
+      "institution_id": "koscom",
+      "status": "하반기 신입 IT 공고 미확인",
+      "links": [
+        {
+          "label": "채용안내",
+          "url": "https://koscom.co.kr/mobile/bbs/B0000015/list.do?menuNo=400073"
+        },
+        {
+          "label": "입사지원",
+          "url": "https://koscom.applyin.co.kr"
+        }
+      ],
+      "note": "공식 목록에는 2026 상반기 신입/경력 및 기간제만 확인"
+    },
+    {
+      "institution_id": "kdb",
+      "status": "2026 하반기 신입 IT·AI 공고 미확인",
+      "links": [
+        {
+          "label": "채용포털",
+          "url": "https://recruit.kdb.co.kr/RCBIBI00N00.act"
+        }
+      ],
+      "note": "현재 확인되는 공개 공고는 상반기 채용 건"
+    }
+  ],
+  "priorities": [
+    {
+      "rank": 1,
+      "institution_id": "bok",
+      "reason": "접수와 필기 일정이 확정돼 있어 지금 바로 대응해야 한다"
+    },
+    {
+      "rank": 2,
+      "institution_id": "hf",
+      "reason": "실제 공고가 떴고 9월 전형 일정까지 확정됐다"
+    },
+    {
+      "rank": 3,
+      "institution_group": "신보·수은",
+      "reason": "공식 채용계획이 공개돼 있어 8월 공고 가능성이 높다"
+    },
+    {
+      "rank": 4,
+      "institution_group": "예보·예탁원·금결원·코스콤·산은",
+      "reason": "아직 하반기 신입공고가 없어 링크만 짧게 확인하면 된다"
+    }
+  ],
+  "events": [
+    {
+      "id": "bok-2027-apply",
+      "institution_id": "bok",
+      "title": "2027년도 G5 원서 접수",
+      "summary": "한국은행 신입 종합기획직원(G5)",
+      "event_type": "apply",
+      "status": "open",
+      "date_precision": "range",
+      "start_date": "2026-07-23",
+      "end_date": "2026-08-05",
+      "start_time": "10:00",
+      "end_time": "17:00",
+      "display_label": "원서 접수",
+      "description": "한국시각 기준. 컴퓨터공학 포함.",
+      "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037",
+      "source_label": "공고"
+    },
+    {
+      "id": "bok-2027-doc",
+      "institution_id": "bok",
+      "title": "2027년도 G5 서류전형 합격 발표 전후",
+      "summary": "한국은행 신입 종합기획직원(G5)",
+      "event_type": "result",
+      "status": "scheduled",
+      "date_precision": "approximate_day",
+      "start_date": "2026-08-26",
+      "end_date": "2026-08-26",
+      "display_label": "서류발표 전후",
+      "description": "공고문 기준 2026.08.26 전후.",
+      "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037",
+      "source_label": "공고"
+    },
+    {
+      "id": "bok-2027-written",
+      "institution_id": "bok",
+      "title": "2027년도 G5 필기시험",
+      "summary": "한국은행 신입 종합기획직원(G5)",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-12",
+      "display_label": "필기시험",
+      "description": "A매치 핵심 일정.",
+      "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037",
+      "source_label": "공고"
+    },
+    {
+      "id": "hf-2026-apply",
+      "institution_id": "hf",
+      "title": "2026 신입직원 원서 접수",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "apply",
+      "status": "open",
+      "date_precision": "range",
+      "start_date": "2026-07-31",
+      "end_date": "2026-08-20",
+      "start_time": "15:00",
+      "end_time": "17:00",
+      "display_label": "원서 접수",
+      "description": "채용홈페이지 기준.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "hf-2026-doc",
+      "institution_id": "hf",
+      "title": "2026 신입직원 서류전형 합격 발표",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "result",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-09-08",
+      "end_date": "2026-09-08",
+      "display_label": "서류발표",
+      "description": "채용홈페이지 공고 기준.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "hf-2026-coding",
+      "institution_id": "hf",
+      "title": "2026 신입직원 IT 코딩시험",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "coding",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-12",
+      "display_label": "IT 코딩시험",
+      "description": "IT 직렬 온라인 코딩시험.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "hf-2026-written",
+      "institution_id": "hf",
+      "title": "2026 신입직원 필기전형",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-09-19",
+      "end_date": "2026-09-19",
+      "display_label": "필기전형",
+      "description": "서울/부산 동시 실시 예정.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "hf-2026-interview-1",
+      "institution_id": "hf",
+      "title": "2026 신입직원 1차면접",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "interview",
+      "status": "scheduled",
+      "date_precision": "range",
+      "start_date": "2026-10-19",
+      "end_date": "2026-10-23",
+      "display_label": "1차면접",
+      "description": "PT·심층·집단과제 면접.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "hf-2026-interview-2",
+      "institution_id": "hf",
+      "title": "2026 신입직원 2차면접",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "interview",
+      "status": "scheduled",
+      "date_precision": "range",
+      "start_date": "2026-11-10",
+      "end_date": "2026-11-13",
+      "display_label": "2차면접",
+      "description": "인성면접.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "hf-2026-final",
+      "institution_id": "hf",
+      "title": "2026 신입직원 최종합격 발표",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "announcement",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-11-20",
+      "end_date": "2026-11-20",
+      "display_label": "최종합격 발표",
+      "description": "채용홈페이지 공고 기준.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "hf-2026-onboarding",
+      "institution_id": "hf",
+      "title": "2026 신입직원 임용 예정일",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "onboarding",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-11-30",
+      "end_date": "2026-11-30",
+      "display_label": "임용 예정",
+      "description": "공고문 기준 11.30 예정.",
+      "url": "https://hf.recruitlab.co.kr/app/recruitment-announcement/view/986",
+      "source_label": "채용홈"
+    },
+    {
+      "id": "kodit-2026-h2-announcement",
+      "institution_id": "kodit",
+      "title": "2026 하반기 신입 공고 예정",
+      "summary": "신용보증기금 연간 채용계획",
+      "event_type": "plan",
+      "status": "planned",
+      "date_precision": "month",
+      "start_date": "2026-08-01",
+      "end_date": "2026-08-31",
+      "display_label": "8월 공고 예정",
+      "description": "연간 채용계획 기준. 세부 전형은 본공고 확인 필요.",
+      "url": "https://www.kodit.or.kr/kodit/cm/cntnts/cntntsView.do?cntntsId=11182&mi=2515",
+      "source_label": "연간 채용계획"
+    },
+    {
+      "id": "kodit-2026-h2-hiring",
+      "institution_id": "kodit",
+      "title": "2026 하반기 신입 채용시기 예정",
+      "summary": "신용보증기금 연간 채용계획",
+      "event_type": "plan",
+      "status": "planned",
+      "date_precision": "month",
+      "start_date": "2026-12-01",
+      "end_date": "2026-12-31",
+      "display_label": "12월 채용 예정",
+      "description": "연간 채용계획 기준.",
+      "url": "https://www.kodit.or.kr/kodit/cm/cntnts/cntntsView.do?cntntsId=11182&mi=2515",
+      "source_label": "연간 채용계획"
+    },
+    {
+      "id": "kexim-2026-h2-window",
+      "institution_id": "kexim",
+      "title": "2026 하반기 전문직행원(신입) 진행 구간",
+      "summary": "한국수출입은행 연간 채용계획안",
+      "event_type": "plan",
+      "status": "planned",
+      "date_precision": "window",
+      "start_date": "2026-08-01",
+      "end_date": "2026-11-30",
+      "display_label": "8~11월 예정",
+      "description": "연간 채용계획안 기준. IT 포함 여부·인원은 본공고 확인 필요.",
+      "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01256486&bidPbancOrd=000&fileSeq=4&fileType=&prcmBsneSeCd=03",
+      "source_label": "연간채용 용역 계획 자료"
+    }
+  ]
+}

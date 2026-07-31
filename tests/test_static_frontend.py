@@ -11,6 +11,9 @@ QUESTION_BANK_JS = (ROOT / 'static' / 'question-bank.js').read_text(encoding='ut
 STYLE_CSS = (ROOT / 'static' / 'style.css').read_text(encoding='utf-8')
 TABLE_SHELL_CSS = (ROOT / 'static' / 'table-shell.css').read_text(encoding='utf-8')
 AI_TOOLS_JS = (ROOT / 'static' / 'ai-tools.js').read_text(encoding='utf-8')
+CALENDAR_HTML = (ROOT / 'static' / 'calendar.html').read_text(encoding='utf-8')
+CALENDAR_JS = (ROOT / 'static' / 'calendar.js').read_text(encoding='utf-8')
+CALENDAR_CSS = (ROOT / 'static' / 'calendar.css').read_text(encoding='utf-8')
 
 
 class StaticFrontendTests(unittest.TestCase):
@@ -22,6 +25,17 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="contentDbPath"', INDEX_HTML)
         self.assertIn("$('contentDbPath').textContent = data.summary.content_db_path;", APP_JS)
 
+    def test_calendar_page_and_menu_links_are_present(self):
+        self.assertIn('id="calendarPageLink"', INDEX_HTML)
+        self.assertIn('href="/calendar"', INDEX_HTML)
+        self.assertIn('fullcalendar@6.1.18', CALENDAR_HTML)
+        self.assertIn('id="icsFeedLink"', CALENDAR_HTML)
+        self.assertIn('id="hideApproximateToggle"', CALENDAR_HTML)
+        self.assertIn("const CALENDAR_API_PATH = '/api/calendar/recruitment';", CALENDAR_JS)
+        self.assertIn('Google Calendar에 추가', CALENDAR_JS)
+        self.assertIn("bindFilterGroup('institutionFilters'", CALENDAR_JS)
+        self.assertIn('.calendar-layout', CALENDAR_CSS)
+        self.assertIn('.filter-chip.active', CALENDAR_CSS)
     def test_frontend_normalizes_legacy_ai_image_urls(self):
         self.assertIn('function normalizedConceptMediaUrl(value)', APP_JS)
         self.assertIn("/api/concept-images/", APP_JS)
