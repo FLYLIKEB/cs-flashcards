@@ -12,7 +12,10 @@ const calendarState = {
   hideApproximate: false,
   selectedEventId: '',
   sidebarOpen: true,
+  sidebarMenuOpen: false,
+  activeSidebarPanel: 'overview',
 };
+
 
 
 const $ = (id) => document.getElementById(id);
@@ -64,11 +67,8 @@ function saveCalendarSidebarState() {
 function applyCalendarSidebarState({persist = true} = {}) {
   document.body.classList.toggle('calendar-sidebar-collapsed', !calendarState.sidebarOpen);
   $('calendarSidebar')?.setAttribute('aria-hidden', String(!calendarState.sidebarOpen));
-  const toggleBtn = $('calendarSidebarToggleBtn');
-  if (toggleBtn) {
-    toggleBtn.setAttribute('aria-expanded', String(calendarState.sidebarOpen));
-    toggleBtn.setAttribute('aria-label', calendarState.sidebarOpen ? '사이드바 숨기기' : '사이드바 보기');
-    toggleBtn.setAttribute('title', calendarState.sidebarOpen ? '사이드바 숨기기' : '사이드바 보기');
+  if (!calendarState.sidebarOpen) {
+    toggleCalendarSidebarMenu(false);
   }
   if (persist) saveCalendarSidebarState();
 }
@@ -76,6 +76,62 @@ function applyCalendarSidebarState({persist = true} = {}) {
 function toggleCalendarSidebar(force = !calendarState.sidebarOpen) {
   calendarState.sidebarOpen = Boolean(force);
   applyCalendarSidebarState();
+}
+
+
+function applyCalendarSidebarMenuState() {
+  const menu = $('calendarSidebarMenu');
+  const toggleBtn = $('calendarSidebarToggleBtn');
+  if (menu) {
+    menu.hidden = !calendarState.sidebarMenuOpen;
+  }
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-expanded', String(calendarState.sidebarMenuOpen));
+    toggleBtn.setAttribute('aria-label', calendarState.sidebarMenuOpen ? '기능 목록 닫기' : '기능 목록 열기');
+    toggleBtn.setAttribute('title', calendarState.sidebarMenuOpen ? '기능 목록 닫기' : '기능 목록 열기');
+  }
+}
+
+function toggleCalendarSidebarMenu(force = !calendarState.sidebarMenuOpen) {
+  calendarState.sidebarMenuOpen = Boolean(force);
+  applyCalendarSidebarMenuState();
+}
+
+function applyActiveSidebarPanel() {
+  document.querySelectorAll('[data-sidebar-panel]').forEach((element) => {
+    const active = element.dataset.sidebarPanel === calendarState.activeSidebarPanel;
+    element.classList.toggle('is-active', active);
+    element.hidden = !active;
+  });
+  document.querySelectorAll('[data-sidebar-panel-target]').forEach((button) => {
+    button.classList.toggle('active', button.dataset.sidebarPanelTarget === calendarState.activeSidebarPanel);
+  });
+}
+
+function setActiveSidebarPanel(panelId, {openSidebar = true, closeMenu = true, scroll = true} = {}) {
+  if (!panelId) return;
+  calendarState.activeSidebarPanel = panelId;
+  if (openSidebar && !calendarState.sidebarOpen) {
+    calendarState.sidebarOpen = true;
+    applyCalendarSidebarState();
+  }
+  applyActiveSidebarPanel();
+  if (closeMenu) {
+    toggleCalendarSidebarMenu(false);
+  }
+  if (scroll) {
+    const panel = document.querySelector(`[data-sidebar-panel="${panelId}"]`);
+    panel?.scrollIntoView({block: 'nearest'});
+  }
+}
+
+function openSidebarPanelFromMenu(panelId) {
+  if (panelId === 'close') {
+    toggleCalendarSidebarMenu(false);
+    toggleCalendarSidebar(false);
+    return;
+  }
+  setActiveSidebarPanel(panelId, {openSidebar: true, closeMenu: true, scroll: true});
 }
 
 function eventTimestamp(event, field = 'start') {
@@ -335,8 +391,9 @@ function renderEventList(events = filteredEvents()) {
   `).join('');
 
   container.querySelectorAll('[data-event-id]').forEach((element) => {
-    element.addEventListener('click', () => selectEvent(element.dataset.eventId || '', {revealSidebar: true}));
+    element.addEventListener('click', () => selectEvent(element.dataset.eventId || '', {revealSidebar: true, panelId: 'detail'}));
   });
+
 
 }
 
@@ -389,15 +446,20 @@ function renderSelectedEvent(event) {
   `;
 }
 
-function selectEvent(eventId, {revealSidebar = false} = {}) {
+function selectEvent(eventId, {revealSidebar = false, panelId = ''} = {}) {
   calendarState.selectedEventId = eventId;
   const event = filteredEvents().find((item) => item.id === eventId) || null;
-  if (event && revealSidebar && !calendarState.sidebarOpen) {
-    toggleCalendarSidebar(true);
+  if (event && revealSidebar) {
+    if (panelId) {
+      setActiveSidebarPanel(panelId, {openSidebar: true, closeMenu: true, scroll: true});
+    } else if (!calendarState.sidebarOpen) {
+      toggleCalendarSidebar(true);
+    }
   }
   renderSelectedEvent(event);
   syncSelectedEventCard();
 }
+
 
 
 function rerenderCalendar() {
@@ -470,11 +532,12 @@ function initializeCalendar() {
     events: filteredEvents(),
     eventClick(info) {
       info.jsEvent.preventDefault();
-      selectEvent(info.event.id, {revealSidebar: true});
+      selectEvent(info.event.id, {revealSidebar: true, panelId: 'detail'});
     },
     eventDidMount(info) {
       applyCalendarEventTone(info);
     },
+
 
   });
   calendarState.calendar.render();
@@ -525,14 +588,26 @@ async function loadCalendar() {
 
 calendarState.sidebarOpen = readSavedCalendarSidebarState();
 applyCalendarSidebarState({persist: false});
+applyCalendarSidebarMenuState();
+applyActiveSidebarPanel();
 
-$('calendarSidebarToggleBtn')?.addEventListener('click', () => toggleCalendarSidebar());
+$('calendarSidebarToggleBtn')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  toggleCalendarSidebarMenu();
+});
+document.querySelectorAll('[data-sidebar-panel-target]').forEach((button) => {
+  button.addEventListener('click', () => openSidebarPanelFromMenu(button.dataset.sidebarPanelTarget || ''));
+});
 $('copyIcsLinkBtn')?.addEventListener('click', copyIcsLink);
 $('hideApproximateToggle')?.addEventListener('change', (event) => {
   calendarState.hideApproximate = Boolean(event.target.checked);
   rerenderCalendar();
 });
 window.matchMedia?.(COMPACT_CALENDAR_MEDIA).addEventListener?.('change', () => applyResponsiveCalendarView());
+document.addEventListener('click', (event) => {
+  if (calendarState.sidebarMenuOpen && !event.target.closest('.calendar-sidebar-menu-wrap')) toggleCalendarSidebarMenu(false);
+});
 bindFilterGroup('institutionFilters', calendarState.selectedInstitutions, () => (calendarState.payload?.institutions || []).map((item) => item.id));
 bindFilterGroup('eventTypeFilters', calendarState.selectedEventTypes, () => uniqueValues(calendarState.payload?.events || [], 'event_type'));
 bindFilterGroup('statusFilters', calendarState.selectedStatuses, () => uniqueValues(calendarState.payload?.events || [], 'status'));

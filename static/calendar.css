@@ -171,6 +171,10 @@ body.calendar-sidebar-collapsed .calendar-layout {
   justify-content: center;
 }
 
+.calendar-sidebar-menu-wrap {
+  position: relative;
+}
+
 .calendar-sidebar-toggle {
   width: 2.3rem;
   min-height: 2.3rem;
@@ -185,6 +189,40 @@ body.calendar-sidebar-collapsed .calendar-layout {
 .calendar-sidebar-toggle:focus-visible {
   background: #ffffff;
   border-color: var(--line-strong);
+  outline: none;
+}
+
+.calendar-sidebar-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: 180px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  display: grid;
+  gap: 2px;
+  z-index: 20;
+}
+
+.calendar-sidebar-menu[hidden] {
+  display: none !important;
+}
+
+.calendar-sidebar-menu button {
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+}
+
+.calendar-sidebar-menu button:hover,
+.calendar-sidebar-menu button:focus-visible,
+.calendar-sidebar-menu button.active {
+  background: #ffffff;
   outline: none;
 }
 

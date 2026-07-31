@@ -42,11 +42,25 @@
       </section>
 
       <div class="calendar-sidebar-dock">
-        <button id="calendarSidebarToggleBtn" class="calendar-sidebar-toggle" type="button" aria-controls="calendarSidebar" aria-expanded="true" aria-label="사이드바 숨기기" title="사이드바 숨기기">☰</button>
+        <div class="calendar-sidebar-menu-wrap">
+          <button id="calendarSidebarToggleBtn" class="calendar-sidebar-toggle" type="button" aria-controls="calendarSidebarMenu" aria-expanded="false" aria-label="기능 목록 열기" title="기능 목록 열기">☰</button>
+          <div id="calendarSidebarMenu" class="calendar-sidebar-menu" hidden>
+            <button type="button" data-sidebar-panel-target="overview">포커스</button>
+            <button type="button" data-sidebar-panel-target="summary">요약</button>
+            <button type="button" data-sidebar-panel-target="timeline">타임라인</button>
+            <button type="button" data-sidebar-panel-target="detail">선택 일정</button>
+            <button type="button" data-sidebar-panel-target="events">일정 목록</button>
+            <button type="button" data-sidebar-panel-target="subscribe">캘린더 구독</button>
+            <button type="button" data-sidebar-panel-target="priorities">우선순위</button>
+            <button type="button" data-sidebar-panel-target="filters">필터</button>
+            <button type="button" data-sidebar-panel-target="watch">기관 현황</button>
+            <button type="button" data-sidebar-panel-target="close">사이드바 숨기기</button>
+          </div>
+        </div>
       </div>
 
       <aside id="calendarSidebar" class="calendar-sidebar" aria-hidden="false">
-        <article class="calendar-panel calendar-hero">
+        <article class="calendar-panel calendar-hero" data-sidebar-panel="overview">
           <div class="calendar-hero__copy">
             <p class="hero-kicker">이번 시즌 포커스</p>
             <h2 id="overviewHeadline">핵심 일정 불러오는 중...</h2>
@@ -55,7 +69,7 @@
           <div id="overviewHighlights" class="overview-highlights" aria-live="polite"></div>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="summary" hidden>
           <div class="panel-heading">
             <div>
               <p class="section-label">숫자 기준</p>
@@ -66,7 +80,7 @@
           <dl id="calendarCounts" class="calendar-counts"></dl>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="timeline" hidden>
           <div class="panel-heading">
             <div>
               <p class="section-label">지원 → 필기 → 면접</p>
@@ -76,7 +90,7 @@
           <div id="timelineHighlights" class="timeline-strip"></div>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="detail" hidden>
           <div class="event-list-header">
             <div>
               <p class="section-label">선택한 일정</p>
@@ -87,7 +101,7 @@
           <div id="selectedEventDetail" class="event-detail-empty">달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.</div>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="events" hidden>
           <div class="event-list-header">
             <div>
               <p class="section-label">선택 가능한 일정</p>
@@ -98,7 +112,7 @@
           <div id="eventList" class="event-list"></div>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="subscribe" hidden>
           <div class="panel-heading panel-heading--stacked">
             <div>
               <p class="section-label">캘린더 구독</p>
@@ -113,7 +127,7 @@
           <ol id="calendarNotes" class="calendar-notes"></ol>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="priorities" hidden>
           <div class="panel-heading">
             <div>
               <p class="section-label">지금 볼 것만</p>
@@ -123,7 +137,7 @@
           <div id="priorityList" class="priority-list"></div>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="filters" hidden>
           <div class="panel-heading">
             <div>
               <p class="section-label">필터</p>
@@ -148,7 +162,7 @@
           </label>
         </article>
 
-        <article class="calendar-panel">
+        <article class="calendar-panel" data-sidebar-panel="watch" hidden>
           <div class="panel-heading">
             <div>
               <p class="section-label">기관 모니터링</p>
