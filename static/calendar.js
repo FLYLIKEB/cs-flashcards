@@ -837,7 +837,14 @@ $('resetFiltersBtn')?.addEventListener('click', resetFilters);
 $('quickFilterBtn')?.addEventListener('click', () => setActiveSidebarPanel('filters', { openSidebar: true, closeMenu: true, scroll: false }));
 $('quickListBtn')?.addEventListener('click', () => setActiveSidebarPanel('events', { openSidebar: true, closeMenu: true, scroll: false }));
 document.querySelectorAll('[data-quick-panel]').forEach((button) => {
-  button.addEventListener('click', () => setActiveSidebarPanel(button.dataset.quickPanel || 'overview', { openSidebar: true, closeMenu: true, scroll: false }));
+  button.addEventListener('click', () => {
+    const panelId = button.dataset.quickPanel || 'overview';
+    if (calendarState.sidebarOpen && calendarState.activeSidebarPanel === panelId) {
+      toggleCalendarSidebar(false);
+      return;
+    }
+    setActiveSidebarPanel(panelId, { openSidebar: true, closeMenu: true, scroll: false });
+  });
 });
 $('quickNextEventBtn')?.addEventListener('click', () => {
   const nextExactEvent = nextUpcomingEvent(filteredEvents(), { exactOnly: true });
