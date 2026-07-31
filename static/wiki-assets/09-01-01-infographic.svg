@@ -1,71 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-01-01. 스택과 큐 인포그래픽</title>
-  <desc id="desc">스택과 큐 / 학습 목적 / LIFO와 FIFO를 문제 상황에 적용한다 / 관련 기출</desc>
+  <title id="title">09-01-01. 스택과 큐 SVG 인포그래픽</title>
+  <desc id="desc">스택과 큐</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="grad-09-01-01-infographic.svg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#e0e7ff" />
       <stop offset="100%" stop-color="#f3e8ff" />
     </linearGradient>
-    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="line-09-01-01-infographic.svg" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#4f46e5" />
       <stop offset="100%" stop-color="#7c3aed" />
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.12" />
-    </filter>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .node { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .focus { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
       .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .float1 { animation: float1 7s ease-in-out infinite; }
-      .float2 { animation: float2 8s ease-in-out infinite; }
-      .float3 { animation: float3 9s ease-in-out infinite; }
-      .pulse { animation: pulse 2.4s ease-in-out infinite; transform-origin: center; }
-      @keyframes float1 { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-      @keyframes float2 { 0%,100% { transform: translateY(-2px); } 50% { transform: translateY(7px); } }
-      @keyframes float3 { 0%,100% { transform: translateY(2px); } 50% { transform: translateY(-6px); } }
-      @keyframes pulse { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.35); } }
+      .cap { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
     </style>
   </defs>
-  <rect width="1200" height="720" fill="#f8fafc" />
-  <rect x="32" y="30" width="1136" height="660" rx="34" fill="url(#bg)" opacity="0.55" />
-  <rect x="48" y="46" width="1104" height="628" rx="30" fill="white" filter="url(#shadow)" />
-  <rect x="48" y="46" width="1104" height="628" rx="30" fill="url(#bg)" opacity="0.16" />
-  <text class="small" x="88" y="92">금융공기업 IT · SVG 인포그래픽</text>
-  <text class="title" x="88" y="116"><tspan x="88" dy="0">09-01-01. 스택과 큐</tspan></text>
-  <text class="subtitle" x="88" y="198"><tspan x="88" dy="0">스택(stack)은 LIFO(Last In, First Out) 구조다.</tspan><tspan x="88" dy="24">가장 나중에 들어온 요소가 먼저 나간다.</tspan></text>
-  <g class="float1"><rect x="90" y="126" width="170" height="42" rx="21" fill="#e0e7ff" stroke="#4f46e5" stroke-opacity="0.18"/><text class="chip" x="175" y="152" text-anchor="middle">스택과 큐</text></g><g class="float2"><rect x="300" y="126" width="170" height="42" rx="21" fill="#f3e8ff" stroke="#4f46e5" stroke-opacity="0.18"/><text class="chip" x="385" y="152" text-anchor="middle">학습 목적</text></g><g class="float3"><rect x="510" y="126" width="170" height="42" rx="21" fill="#e0e7ff" stroke="#4f46e5" stroke-opacity="0.18"/><text class="chip" x="595" y="152" text-anchor="middle">LIFO와 FIFO를 문제 상황에 적용한다</text></g><g class="float1"><rect x="720" y="126" width="170" height="42" rx="21" fill="#f3e8ff" stroke="#4f46e5" stroke-opacity="0.18"/><text class="chip" x="805" y="152" text-anchor="middle">관련 기출</text></g>
-  <rect x="82" y="244" width="1036" height="2" rx="1" fill="url(#line)" opacity="0.35" />
-  <rect x="86" y="278" width="300" height="370" rx="28" fill="#e0e7ff" opacity="0.42" />
-  <rect x="450" y="258" width="300" height="190" rx="28" fill="#f3e8ff" opacity="0.38" />
-  <rect x="782" y="278" width="300" height="370" rx="28" fill="#f3e8ff" opacity="0.42" />
-  <text class="section" x="108" y="314">핵심 키워드</text>
-  <text class="section" x="474" y="296">개념 연결 흐름</text>
-  <text class="section" x="804" y="314">실전 포인트</text>
-  <path d="M 180 410 C 260 480, 390 480, 470 410 S 680 340, 760 410" fill="none" stroke="url(#line)" stroke-width="6" stroke-linecap="round" opacity="0.85" stroke-dasharray="10 12">
-    <animate attributeName="stroke-dashoffset" from="0" to="-220" dur="8s" repeatCount="indefinite" />
-  </path>
-  <circle cx="182" cy="408" r="10" fill="#4f46e5">
-    <animateMotion dur="8s" repeatCount="indefinite" rotate="auto">
-      <mpath href="#route" />
-    </animateMotion>
-  </circle>
-  <path id="route" d="M 180 410 C 260 480, 390 480, 470 410 S 680 340, 760 410" fill="none" />
-  <g><circle cx="180" cy="345" r="58" fill="white" stroke="#4f46e5" stroke-width="3" opacity="0.96"/><circle cx="180" cy="345" r="66" fill="none" stroke="#7c3aed" stroke-opacity="0.35" stroke-width="2.5" stroke-dasharray="10 8"><animate attributeName="stroke-dashoffset" from="0" to="-180" dur="7s" begin="0.0s" repeatCount="indefinite" /></circle><text class="node" x="180" text-anchor="middle" y="337"><tspan x="180" text-anchor="middle" dy="0">연산 정리 (핵심 연산과</tspan><tspan x="180" text-anchor="middle" dy="18">의미)</tspan></text></g><g><circle cx="470" cy="345" r="58" fill="white" stroke="#4f46e5" stroke-width="3" opacity="0.96"/><circle cx="470" cy="345" r="66" fill="none" stroke="#7c3aed" stroke-opacity="0.35" stroke-width="2.5" stroke-dasharray="10 8"><animate attributeName="stroke-dashoffset" from="0" to="-180" dur="7s" begin="0.7s" repeatCount="indefinite" /></circle><text class="node" x="470" text-anchor="middle" y="337"><tspan x="470" text-anchor="middle" dy="0">구현 방식 비교</tspan></text></g><g><circle cx="760" cy="345" r="58" fill="white" stroke="#4f46e5" stroke-width="3" opacity="0.96"/><circle cx="760" cy="345" r="66" fill="none" stroke="#7c3aed" stroke-opacity="0.35" stroke-width="2.5" stroke-dasharray="10 8"><animate attributeName="stroke-dashoffset" from="0" to="-180" dur="7s" begin="1.4s" repeatCount="indefinite" /></circle><text class="node" x="760" text-anchor="middle" y="337"><tspan x="760" text-anchor="middle" dy="0">구현 예시 (의사코드 /</tspan><tspan x="760" text-anchor="middle" dy="18">Python 스타일)</tspan></text></g>
-  <text class="body" x="108" y="362"><tspan x="108" dy="0">스택과 큐</tspan></text>
-  <text class="body" x="108" y="454"><tspan x="108" dy="0">학습 목적</tspan></text>
-  <text class="body" x="108" y="546"><tspan x="108" dy="0">LIFO와 FIFO를 문제 상황에</tspan><tspan x="108" dy="20">적용한다</tspan></text>
-  <circle cx="832" cy="545" r="6" fill="#7c3aed" class="pulse" style="animation-delay:0.0s"/><text class="focus" x="850" y="553"><tspan x="850" dy="0">스택(stack)은 LIFO(Last In,</tspan><tspan x="850" dy="18">First Out) 구조다. 가장 나중에</tspan></text><circle cx="832" cy="603" r="6" fill="#7c3aed" class="pulse" style="animation-delay:0.45s"/><text class="focus" x="850" y="611"><tspan x="850" dy="0">큐(queue)는 FIFO(First In,</tspan><tspan x="850" dy="18">First Out) 구조다. 먼저 들어온</tspan></text><circle cx="832" cy="661" r="6" fill="#7c3aed" class="pulse" style="animation-delay:0.9s"/><text class="focus" x="850" y="669"><tspan x="850" dy="0">DFS(Depth-First Search)는</tspan><tspan x="850" dy="18">논리적으로 스택과 연결해서 이해하고,</tspan></text>
-  <rect x="86" y="618" width="1028" height="16" rx="8" fill="#e2e8f0" />
-  <rect x="86" y="618" width="640" height="16" rx="8" fill="url(#line)" opacity="0.82">
-    <animate attributeName="width" values="420;860;420" dur="10s" repeatCount="indefinite" />
-  </rect>
-  <circle cx="726" cy="626" r="12" fill="#7c3aed" class="pulse" />
-  <text class="small" x="88" y="666">asset: 09-01-01-infographic.svg</text>
-  <text class="small" x="1116" y="666" text-anchor="end">스택과 큐</text>
+  <rect width="1200" height="720" fill="#f8fafc"/>
+  <rect x="32" y="30" width="1136" height="660" rx="30" fill="url(#grad-09-01-01-infographic.svg)" opacity="0.9"/>
+  <rect x="48" y="46" width="1104" height="628" rx="28" fill="white"/>
+  <rect x="48" y="46" width="1104" height="628" rx="28" fill="url(#grad-09-01-01-infographic.svg)" opacity="0.14"/>
+  <text class="small" x="84" y="86">금융공기업 IT · 페이지 맞춤 SVG</text>
+  <text class="title" x="84" y="118" text-anchor="start"><tspan x="84" dy="0">09-01-01. 스택과 큐</tspan></text>
+  <text class="subtitle" x="84" y="180" text-anchor="start"><tspan x="84" dy="0">스택(stack)은 LIFO(Last In, First Out) 구조다. 가장</tspan><tspan x="84" dy="24">나중에 들어온 요소가 먼저 나간다.</tspan></text>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker></defs><rect x="92" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="177" y="342" text-anchor="middle"><tspan x="177" dy="0">스택과 큐</tspan></text><text class="body" x="110" y="378" text-anchor="start"></text><line x1="262" y1="363" x2="304" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="262" y1="363" x2="304" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="304" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="389" y="342" text-anchor="middle"><tspan x="389" dy="0">연산 정리</tspan></text><text class="body" x="322" y="378" text-anchor="start"></text><line x1="474" y1="363" x2="516" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="474" y1="363" x2="516" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="516" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="601" y="342" text-anchor="middle"><tspan x="601" dy="0">핵심 연산과 의미</tspan></text><text class="body" x="534" y="378" text-anchor="start"></text><line x1="686" y1="363" x2="728" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="686" y1="363" x2="728" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="728" y="308" width="170" height="110" rx="22" fill="#f3e8ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="813" y="342" text-anchor="middle"><tspan x="813" dy="0">구현 방식 비교</tspan></text><text class="body" x="746" y="378" text-anchor="start"></text><line x1="898" y1="363" x2="940" y2="363" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/><line x1="898" y1="363" x2="940" y2="363" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.5"><animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/></line><rect x="940" y="308" width="170" height="110" rx="22" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text class="label" x="1025" y="342" text-anchor="middle"><tspan x="1025" dy="0">구현 예시</tspan></text><text class="body" x="958" y="378" text-anchor="start"></text><rect x="220" y="516" width="760" height="92" rx="22" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/><text class="label" x="600" y="550" text-anchor="middle"><tspan x="600" dy="0">핵심 체크</tspan></text><text class="body" x="238" y="586" text-anchor="start"><tspan x="238" dy="0">스택과 큐</tspan><tspan x="238" dy="18">연산 정리</tspan><tspan x="238" dy="18">핵심 연산과 의미</tspan></text>
+  <text class="small" x="84" y="654">09-01-01-infographic.svg</text>
 </svg>
