@@ -289,11 +289,17 @@ if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then
   .venv/bin/python - <<'PY'
 import json
 import app
-result = app.sync_bok_question_bank_entries(app.wiki_book_dir(), app.CSV_PATH, app.PROGRESS_DB_PATH)
+fin_corp = app.sync_fin_corp_question_bank_entries(app.wiki_book_dir(), app.CSV_PATH, app.PROGRESS_DB_PATH)
+print("239 question-bank sync:", json.dumps({
+    "pages": fin_corp.get("pages", 0),
+    "cleared": fin_corp.get("cleared", 0),
+    "count": fin_corp.get("count", 0),
+}, ensure_ascii=False))
+bok = app.sync_bok_question_bank_entries(app.wiki_book_dir(), app.CSV_PATH, app.PROGRESS_DB_PATH)
 print("BOK question-bank sync:", json.dumps({
-    "pages": result.get("pages", 0),
-    "cleared": result.get("cleared", 0),
-    "count": result.get("count", 0),
+    "pages": bok.get("pages", 0),
+    "cleared": bok.get("cleared", 0),
+    "count": bok.get("count", 0),
 }, ensure_ascii=False))
 PY
 fi

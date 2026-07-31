@@ -2150,6 +2150,462 @@ def attach_generated_question_bank_ids(
     payload["question_bank_saved"] = len(saved.get("items") or [])
     return payload
 
+FIN_CORP_QUESTION_BANK_PAGE_GLOB = "05-0[1-8]-*.md"
+FIN_CORP_QUESTION_HEADING_RE = re.compile(r"^###\s+(\d+)\.\s+(.+?)\s*$", re.MULTILINE)
+FIN_CORP_TITLE_PREFIX_RE = re.compile(r"^\d{2}-\d{2}\.\s*")
+FIN_CORP_CHOICE_LINE_RE = re.compile(r"^\s*(\d+|[A-Ea-e])\.\s+(.+?)\s*$")
+FIN_CORP_INLINE_CHOICE_RE = re.compile(r"(\d+)\.\s*(.+?)(?=(?:\s+\d+\.)|$)")
+FIN_CORP_ANSWER_LINE_RE = re.compile(r"^(?P<prefix>.*?)(?P<marker>(?:정)?\*{0,2}답(?:\(AI답변\))?:?\*{0,2}\s*:?\s*)(?P<answer>.+?)\s*$")
+FIN_CORP_FIELD_NAME = "금융공기업 IT 필기 239제"
+FIN_CORP_SECTION = "전공필기"
+FIN_CORP_SESSION_MODE = "practice"
+FIN_CORP_MULTIPLE_CHOICE_POINTS = 4
+FIN_CORP_SHORT_POINTS = 6
+FIN_CORP_SUBJECTIVE_POINTS = 10
+FIN_CORP_ESSAY_POINTS = 20
+FIN_CORP_MULTIPLE_CHOICE_EXPECTED_SECONDS = 90
+FIN_CORP_SHORT_EXPECTED_SECONDS = 4 * 60
+FIN_CORP_SUBJECTIVE_EXPECTED_SECONDS = 8 * 60
+FIN_CORP_ESSAY_EXPECTED_SECONDS = 20 * 60
+FIN_CORP_MULTIPLE_CHOICE_ANSWER_GUIDE = "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장"
+FIN_CORP_SHORT_ANSWER_GUIDE = "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장"
+FIN_CORP_SUBJECTIVE_ANSWER_GUIDE = "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장"
+FIN_CORP_ESSAY_ANSWER_GUIDE = "문제 배경 → 핵심 원리 → 비교/원인 분석 → 개선안/적용 순으로 8~12문장"
+FIN_CORP_SHORT_HINTS = (
+    "뜻",
+    "무엇",
+    "단어",
+    "용어",
+    "크기는",
+    "의미",
+    "약어",
+)
+FIN_CORP_FALLBACK_CATEGORY_HINTS: dict[str, tuple[str, ...]] = {
+    "금융IT·신기술": ("오픈마켓", "ott", "메타버스", "디지털트윈", "크라우드 펀딩", "프롭테크", "알트코인", "핀테크", "블록체인", "약인공지능"),
+    "네트워크": ("http", "ssl", "tls", "vpn", "ssh", "x.25", "nic", "tcp", "udp", "라우팅", "lan", "wan", "dns"),
+    "데이터베이스": ("dba", "procedure", "dense rank", "grant", "revoke", "2pl", "schema", "트랜잭션", "정규화"),
+    "보안": ("xss", "sql injection", "공인인증서", "다크웹", "랜섬웨어", "ddos", "중간자 공격", "rsa", "전자서명", "syn flood", "daisy chain", "권한"),
+    "소프트웨어공학": ("man month", "cocomo", "형상관리", "애자일", "스크럼", "인수테스트", "베타테스트", "결합도", "응집도", "fp기능점수", "cpm"),
+    "운영체제": ("hrn", "페이지 폴트", "redo", "undo", "tlb", "페이징", "세그먼트", "동기화", "프로세서", "시분할시스템"),
+    "인공지능·데이터": ("빅데이터", "튜링테스트", "드릴다운", "정형데이터", "gpu", "머신러닝", "하둡"),
+    "자료구조·알고리즘": ("quick sort", "정렬", "하노이탑", "bst", "heap", "b-tree", "b+tree", "dfs", "bfs", "피보나치", "연결리스트", "인접행렬", "동적 계획법", "플립플롭"),
+    "컴퓨터구조": ("petabyte", "raid", "rom", "ram", "gpu", "flip-flop", "daisy chain", "alu", "캐시", "가상화", "server virtualization"),
+    "클라우드·분산시스템": ("분산처리 시스템", "서버 가상화", "하이브리드 클라우드", "커뮤니티 클라우드", "클라우드", "virtualization"),
+    "프로그래밍 언어": ("python", "java", "jvm", "바인딩", "오버로딩", "재귀함수", "c언어", "instance of"),
+}
+FIN_CORP_HIGH_DIFFICULTY_HINTS = (
+    "계산",
+    "코드",
+    "sql",
+    "tlb",
+    "서브넷",
+    "트랜잭션",
+    "정규화",
+    "동시성",
+    "b-tree",
+    "b+tree",
+    "dfs",
+    "bfs",
+    "행렬",
+    "역행렬",
+    "rsa",
+    "dynamic programming",
+    "동적 계획법",
+)
+FIN_CORP_MID_DIFFICULTY_HINTS = (
+    "특징",
+    "비교",
+    "장단점",
+    "설명",
+    "권한",
+    "라우팅",
+    "raid",
+    "테스트",
+    "클라우드",
+    "보안",
+)
+
+
+def clean_fin_corp_question_bank_title(value: str) -> str:
+    return FIN_CORP_TITLE_PREFIX_RE.sub("", str(value or "").strip())
+
+
+
+def fin_corp_question_bank_issuer(page_title: str) -> str:
+    title = clean_fin_corp_question_bank_title(page_title)
+    title = re.sub(r"\s+IT\s+기출$", "", title)
+    title = re.sub(r"\s+기출$", "", title)
+    return title.strip()
+
+
+
+def fin_corp_question_bank_source_pages(repo_dir: Path | None = None) -> list[Path]:
+    repo = wiki_book_dir(repo_dir)
+    pages = wiki_pages_dir(repo)
+    return sorted(path for path in pages.glob(FIN_CORP_QUESTION_BANK_PAGE_GLOB) if path.is_file())
+
+
+
+def normalize_question_bank_match_text(value: Any) -> str:
+    normalized = normalized_lookup_text(value).replace("c++", "cplusplus").replace("c#", "csharp")
+    return re.sub(r"[^0-9a-z가-힣]+", "", normalized)
+
+
+
+def fin_corp_question_bank_choices(markdown_text: str) -> list[str]:
+    choices: list[str] = []
+    for line in str(markdown_text or "").splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if match := FIN_CORP_CHOICE_LINE_RE.match(stripped):
+            choices.append(match.group(2).strip())
+            continue
+        inline = [item[1].strip() for item in FIN_CORP_INLINE_CHOICE_RE.findall(stripped)]
+        if len(inline) >= 2:
+            choices.extend(inline)
+    return normalize_question_bank_list(choices, item_limit=2000)
+
+
+
+def fin_corp_question_bank_answer_parts(markdown_text: str) -> tuple[str, str, str]:
+    body_lines: list[str] = []
+    trailing_lines: list[str] = []
+    direct_answers: list[str] = []
+    ai_answers: list[str] = []
+    seen_answer = False
+    for raw_line in str(markdown_text or "").splitlines():
+        stripped = raw_line.strip()
+        answer_match = FIN_CORP_ANSWER_LINE_RE.match(stripped)
+        if answer_match:
+            seen_answer = True
+            prefix = answer_match.group("prefix").strip()
+            if prefix and prefix not in {"-", "*"}:
+                body_lines.append(prefix)
+            answer_text = normalize_question_bank_markdown(answer_match.group("answer"), limit=20000)
+            if "AI답변" in answer_match.group("marker"):
+                ai_answers.append(answer_text)
+            else:
+                direct_answers.append(answer_text)
+            continue
+        if seen_answer:
+            trailing_lines.append(raw_line.rstrip())
+        else:
+            body_lines.append(raw_line.rstrip())
+    body = "\n".join(body_lines).strip()
+    answer = direct_answers[0] if direct_answers else (ai_answers[0] if ai_answers else "")
+    explanation_parts: list[str] = []
+    if ai_answers:
+        explanation_parts.append("\n".join(ai_answers).strip())
+    trailing = "\n".join(trailing_lines).strip()
+    if trailing:
+        explanation_parts.append(trailing)
+    explanation = "\n\n".join(part for part in explanation_parts if part)
+    if not explanation and answer:
+        explanation = answer
+    return body, answer, explanation
+
+
+
+def fin_corp_question_bank_topic(title: str) -> str:
+    topic = re.sub(r"\s*\((?:약술|서술|논술|주관식)\)\s*$", "", str(title or "").strip(), flags=re.IGNORECASE)
+    return re.sub(r"\s+", " ", topic).strip()
+
+
+
+def fin_corp_question_bank_type(title: str, body: str, answer: str, explanation: str, choices: list[str]) -> str:
+    combined = "\n".join(part for part in (title, body, answer, explanation) if part)
+    if "논술" in combined:
+        return "essay"
+    if choices:
+        return "multiple_choice"
+    if any(token in combined for token in ("약술", "서술", "설명하시오", "기술하시오", "비교", "장단점", "코드", "SQL", "작성하시오", "구하시오", "원인", "개선방안", "출력결과")):
+        return "subjective"
+    if any(token in title for token in FIN_CORP_SHORT_HINTS):
+        return "short"
+    return "subjective"
+
+
+
+def fin_corp_question_bank_points(question_type: str) -> int:
+    if question_type == "multiple_choice":
+        return FIN_CORP_MULTIPLE_CHOICE_POINTS
+    if question_type == "short":
+        return FIN_CORP_SHORT_POINTS
+    if question_type == "essay":
+        return FIN_CORP_ESSAY_POINTS
+    return FIN_CORP_SUBJECTIVE_POINTS
+
+
+
+def fin_corp_question_bank_expected_seconds(question_type: str) -> int:
+    if question_type == "multiple_choice":
+        return FIN_CORP_MULTIPLE_CHOICE_EXPECTED_SECONDS
+    if question_type == "short":
+        return FIN_CORP_SHORT_EXPECTED_SECONDS
+    if question_type == "essay":
+        return FIN_CORP_ESSAY_EXPECTED_SECONDS
+    return FIN_CORP_SUBJECTIVE_EXPECTED_SECONDS
+
+
+
+def fin_corp_question_bank_answer_guide(question_type: str) -> str:
+    if question_type == "multiple_choice":
+        return FIN_CORP_MULTIPLE_CHOICE_ANSWER_GUIDE
+    if question_type == "short":
+        return FIN_CORP_SHORT_ANSWER_GUIDE
+    if question_type == "essay":
+        return FIN_CORP_ESSAY_ANSWER_GUIDE
+    return FIN_CORP_SUBJECTIVE_ANSWER_GUIDE
+
+
+
+def fin_corp_question_bank_category(
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    card_category: str = "",
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = None,
+) -> str:
+    combined_body = "\n\n".join(part for part in (body, answer, explanation) if part)
+    category = infer_question_bank_category(
+        card_category,
+        card_category=card_category,
+        topic=fin_corp_question_bank_topic(title),
+        prompt=f"### {title}",
+        body=combined_body,
+        csv_path=csv_path,
+        progress_db_path=progress_db_path,
+    )
+    if category:
+        return category
+    combined = "\n".join(part for part in (title, body, answer, explanation) if part).casefold()
+    for fallback_category, hints in FIN_CORP_FALLBACK_CATEGORY_HINTS.items():
+        if any(hint.casefold() in combined for hint in hints):
+            return fallback_category
+    return card_category or "금융IT·신기술"
+
+
+
+def fin_corp_question_bank_keywords(
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    card: dict[str, Any] | None = None,
+) -> list[str]:
+    candidates: list[str] = []
+    if isinstance(card, dict) and card:
+        candidates.extend(question_bank_keywords_for_card(card))
+    topic = fin_corp_question_bank_topic(title)
+    candidates.extend(bok_topic_keyword_candidates(topic))
+    candidates.extend(bok_detect_keyword_matches(topic, body, answer, explanation))
+    if answer and len(answer) <= 80:
+        candidates.extend(bok_topic_keyword_candidates(answer))
+    if not candidates and topic:
+        candidates.append(topic)
+    return normalize_question_bank_list(candidates, item_limit=255)[:6]
+
+
+
+def fin_corp_question_bank_card(
+    rows: list[dict[str, Any]],
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    category: str = "",
+) -> dict[str, Any]:
+    combined = "\n".join(part for part in (title, body, answer, explanation) if part)
+    match_text = normalize_question_bank_match_text(combined)
+    if not match_text:
+        return {}
+    candidate_terms = normalize_question_bank_list([
+        fin_corp_question_bank_topic(title),
+        answer if len(answer) <= 120 else "",
+        *bok_detect_keyword_matches(title, body, answer, explanation),
+    ], item_limit=255)
+    candidate_keys = {normalize_question_bank_match_text(item) for item in candidate_terms if normalize_question_bank_match_text(item)}
+    best_score = 0
+    best_card: dict[str, Any] = {}
+    for row in rows:
+        row_score = 0
+        term_key = normalize_question_bank_match_text(row.get("term"))
+        english_key = normalize_question_bank_match_text(row.get("english"))
+        for keyword in question_bank_keywords_for_card(row):
+            keyword_key = normalize_question_bank_match_text(keyword)
+            if len(keyword_key) < 2:
+                continue
+            if keyword_key in candidate_keys:
+                row_score = max(row_score, 520 + len(keyword_key))
+            elif keyword_key in match_text:
+                row_score = max(row_score, 320 + len(keyword_key))
+        if not row_score:
+            continue
+        if category and row.get("category") == category:
+            row_score += 40
+        if term_key and term_key == normalize_question_bank_match_text(fin_corp_question_bank_topic(title)):
+            row_score += 80
+        if answer and term_key and term_key == normalize_question_bank_match_text(answer):
+            row_score += 120
+        if answer and english_key and english_key == normalize_question_bank_match_text(answer):
+            row_score += 120
+        if row_score > best_score:
+            best_score = row_score
+            best_card = row
+    return best_card
+
+
+
+def fin_corp_question_bank_difficulty(
+    question_type: str,
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    card: dict[str, Any] | None = None,
+) -> str:
+    if isinstance(card, dict) and card.get("difficulty") in {"상", "중", "하"}:
+        if question_type == "essay":
+            return "상"
+        return str(card.get("difficulty"))
+    combined = "\n".join(part for part in (title, body, answer, explanation) if part).casefold()
+    if question_type == "essay":
+        return "상"
+    if question_type in {"multiple_choice", "short"}:
+        if any(hint.casefold() in combined for hint in FIN_CORP_HIGH_DIFFICULTY_HINTS):
+            return "중"
+        return "하"
+    if "```" in body or any(hint.casefold() in combined for hint in FIN_CORP_HIGH_DIFFICULTY_HINTS):
+        return "상"
+    if any(hint.casefold() in combined for hint in FIN_CORP_MID_DIFFICULTY_HINTS):
+        return "중"
+    return "중"
+
+
+
+def parse_fin_corp_question_bank_entries(
+    repo_dir: Path | None = None,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> list[dict[str, Any]]:
+    rows, _ = read_cards(csv_path, progress_db_path)
+    entries: list[dict[str, Any]] = []
+    for source_path in fin_corp_question_bank_source_pages(repo_dir):
+        text = source_path.read_text(encoding="utf-8")
+        page_title = clean_fin_corp_question_bank_title(extract_markdown_title(text, source_path.stem))
+        issuer = fin_corp_question_bank_issuer(page_title)
+        matches = list(FIN_CORP_QUESTION_HEADING_RE.finditer(text))
+        page_code = "-".join(source_path.stem.split("-")[:2]) or source_path.stem
+        for offset, match in enumerate(matches, start=1):
+            question_number = int(match.group(1))
+            title = match.group(2).strip()
+            start = match.end()
+            end = matches[offset].start() if offset < len(matches) else len(text)
+            content = text[start:end].strip()
+            body, answer, explanation = fin_corp_question_bank_answer_parts(content)
+            choices = fin_corp_question_bank_choices(body)
+            question_type = fin_corp_question_bank_type(title, body, answer, explanation, choices)
+            provisional_category = fin_corp_question_bank_category(
+                title,
+                body,
+                answer,
+                explanation,
+                csv_path=csv_path,
+                progress_db_path=progress_db_path,
+            )
+            card = fin_corp_question_bank_card(rows, title, body, answer, explanation, category=provisional_category)
+            category = fin_corp_question_bank_category(
+                title,
+                body,
+                answer,
+                explanation,
+                card_category=str(card.get("category") or provisional_category),
+                csv_path=csv_path,
+                progress_db_path=progress_db_path,
+            )
+            answer_index = None
+            if question_type == "multiple_choice":
+                answer_key = normalize_question_bank_match_text(answer)
+                number_match = re.search(r"(?<!\d)(\d+)\s*번", answer)
+                if number_match:
+                    numeric_index = int(number_match.group(1)) - 1
+                    if 0 <= numeric_index < len(choices):
+                        answer_index = numeric_index
+                elif answer_key:
+                    for index, choice in enumerate(choices):
+                        choice_key = normalize_question_bank_match_text(choice)
+                        if choice_key and (choice_key == answer_key or choice_key in answer_key or answer_key in choice_key):
+                            answer_index = index
+                            break
+            entries.append({
+                "question_bank_id": f"qb-fin239-{page_code}-{offset:02d}",
+                "card_id": str(card.get("id") or ""),
+                "question_type": question_type,
+                "prompt": f"### {question_number}. {title}",
+                "body": body,
+                "answer": answer,
+                "explanation": explanation,
+                "rubric": [],
+                "choices": choices,
+                "answer_index": answer_index,
+                "topic": fin_corp_question_bank_topic(title),
+                "field_name": FIN_CORP_FIELD_NAME,
+                "category": category,
+                "keywords": fin_corp_question_bank_keywords(title, body, answer, explanation, card=card),
+                "difficulty": fin_corp_question_bank_difficulty(question_type, title, body, answer, explanation, card=card),
+                "issuer": issuer,
+                "source_location": f"{page_title} · {question_number}. {title}",
+                "section": FIN_CORP_SECTION,
+                "points": fin_corp_question_bank_points(question_type),
+                "expected_time_seconds": fin_corp_question_bank_expected_seconds(question_type),
+                "answer_guide": fin_corp_question_bank_answer_guide(question_type),
+                "session_mode": FIN_CORP_SESSION_MODE,
+            })
+    return entries
+
+
+
+def clear_fin_corp_question_bank_entries(
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> int:
+    db_path = progress_db_for(csv_path, progress_db_path)
+    ensure_progress_db(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        count = int(conn.execute(
+            "SELECT COUNT(*) FROM question_bank WHERE id LIKE ?",
+            ("qb-fin239-%",),
+        ).fetchone()[0] or 0)
+        conn.execute(
+            "DELETE FROM question_bank WHERE id LIKE ?",
+            ("qb-fin239-%",),
+        )
+        conn.commit()
+    return count
+
+
+
+def sync_fin_corp_question_bank_entries(
+    repo_dir: Path | None = None,
+    csv_path: Path = CSV_PATH,
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> dict[str, Any]:
+    entries = parse_fin_corp_question_bank_entries(repo_dir, csv_path=csv_path, progress_db_path=progress_db_path)
+    cleared = clear_fin_corp_question_bank_entries(csv_path, progress_db_path)
+    saved = upsert_question_bank_entries(entries, csv_path, progress_db_path)
+    return {
+        "pages": len(fin_corp_question_bank_source_pages(repo_dir)),
+        "cleared": cleared,
+        "count": saved.get("count", 0),
+        "items": saved.get("items", []),
+    }
 BOK_QUESTION_BANK_PAGE_GLOB = "05-14-[0-9][0-9]-*.md"
 BOK_ANY_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 BOK_NUMBERED_HEADING_RE = re.compile(r"^(#{2,6})\s+(\d+)\.\s+(.+?)\s*$")

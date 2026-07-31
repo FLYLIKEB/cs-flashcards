@@ -1113,6 +1113,174 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed_item['answer'], answer)
             self.assertEqual(listed_item['explanation'], explanation)
             self.assertEqual(listed_item['answer_guide'], answer_guide)
+    def test_parse_fin_corp_question_bank_entries_extracts_answers_and_metadata(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+
+            with csv_path.open('w', encoding='utf-8-sig', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=BASE_FIELDS)
+                writer.writeheader()
+                for row in [
+                    {
+                        'id': 'CS-001',
+                        'term': '프라이빗 블록체인',
+                        'english': 'Private Blockchain',
+                        'category': '금융IT·신기술',
+                        'definition': '허가형 참여자로 제한하는 블록체인이다.',
+                        'detailed_explanation': '운영 주체가 명확하고 접근 권한을 통제한다.',
+                        'related_concepts': '[[블록체인]], [[퍼블릭 블록체인]]',
+                        'source_files': 'pages/05-01-우리은행-기출.md',
+                        'exam_note': '퍼블릭과 비교',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '중',
+                    },
+                    {
+                        'id': 'CS-002',
+                        'term': '형상관리',
+                        'english': 'Configuration Management',
+                        'category': '소프트웨어공학',
+                        'definition': '버전과 변경 이력을 통제한다.',
+                        'detailed_explanation': '기준선, 변경 통제, 릴리스 구성을 관리한다.',
+                        'related_concepts': '[[버전관리]], [[변경관리]]',
+                        'source_files': 'pages/05-04-금융결제원-기출.md',
+                        'exam_note': '형상관리자 역할',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '하',
+                    },
+                ]:
+                    writer.writerow(row)
+            bootstrap_runtime_db(csv_path, db_path)
+
+            (pages / '05-01-우리은행-기출.md').write_text(
+                '# 05-01. 우리은행 기출\n\n'
+                '### 1. 프라이빗 블록체인의 특징으로 옳지 않은 것은?\n'
+                '1. 분산형으로 네트워크 운영과 관리가 각각 이루어진다.\n'
+                '2. 퍼블릭보다 합의 알고리즘이 경량화될 수 있다.\n'
+                '3. 허가된 참여자만 접근할 수 있다.\n\n'
+                '  **답:** 1번\n'
+                '- 프라이빗 블록체인은 운영 주체가 명확하고 접근을 통제한다.\n\n'
+                '### 2. 1 Petabyte의 크기는?\n\n'
+                '  **답:** 1,024 TB\n',
+                encoding='utf-8',
+            )
+            (pages / '05-04-금융결제원-기출.md').write_text(
+                '# 05-04. 금융결제원 기출\n\n'
+                '### 147. 형상관리자 역할은?\n'
+                '**답(AI답변):** 형상관리자는 변경 이력, 버전, 기준선과 릴리스 구성을 관리한다.\n',
+                encoding='utf-8',
+            )
+
+            entries = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            self.assertEqual(len(entries), 3)
+
+            multiple_choice = entries[0]
+            self.assertEqual(multiple_choice['question_bank_id'], 'qb-fin239-05-01-01')
+            self.assertEqual(multiple_choice['card_id'], 'CS-001')
+            self.assertEqual(multiple_choice['question_type'], 'multiple_choice')
+            self.assertEqual(multiple_choice['choices'], [
+                '분산형으로 네트워크 운영과 관리가 각각 이루어진다.',
+                '퍼블릭보다 합의 알고리즘이 경량화될 수 있다.',
+                '허가된 참여자만 접근할 수 있다.',
+            ])
+            self.assertEqual(multiple_choice['answer'], '1번')
+            self.assertEqual(multiple_choice['answer_index'], 0)
+            self.assertIn('운영 주체가 명확', multiple_choice['explanation'])
+            self.assertEqual(multiple_choice['field_name'], flashcard_app.FIN_CORP_FIELD_NAME)
+            self.assertEqual(multiple_choice['section'], '전공필기')
+            self.assertEqual(multiple_choice['session_mode'], 'practice')
+            self.assertEqual(multiple_choice['difficulty'], '중')
+            self.assertEqual(multiple_choice['points'], flashcard_app.FIN_CORP_MULTIPLE_CHOICE_POINTS)
+            self.assertEqual(multiple_choice['expected_time_seconds'], flashcard_app.FIN_CORP_MULTIPLE_CHOICE_EXPECTED_SECONDS)
+            self.assertTrue(multiple_choice['answer_guide'])
+            self.assertEqual(multiple_choice['issuer'], '우리은행')
+            self.assertIn('프라이빗 블록체인', multiple_choice['keywords'])
+
+            short = entries[1]
+            self.assertEqual(short['question_type'], 'short')
+            self.assertEqual(short['answer'], '1,024 TB')
+            self.assertEqual(short['category'], '컴퓨터구조')
+            self.assertEqual(short['difficulty'], '하')
+            self.assertEqual(short['points'], flashcard_app.FIN_CORP_SHORT_POINTS)
+            self.assertEqual(short['expected_time_seconds'], flashcard_app.FIN_CORP_SHORT_EXPECTED_SECONDS)
+
+            subjective = entries[2]
+            self.assertEqual(subjective['card_id'], 'CS-002')
+            self.assertEqual(subjective['issuer'], '금융결제원')
+            self.assertEqual(subjective['question_type'], 'subjective')
+            self.assertTrue(subjective['answer'])
+            self.assertTrue(subjective['explanation'])
+            self.assertEqual(subjective['difficulty'], '하')
+            self.assertEqual(subjective['source_location'], '금융결제원 기출 · 147. 형상관리자 역할은?')
+
+    def test_sync_fin_corp_question_bank_entries_upserts_parsed_pages(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+
+            with csv_path.open('w', encoding='utf-8-sig', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=BASE_FIELDS)
+                writer.writeheader()
+                writer.writerow({
+                    'id': 'CS-001',
+                    'term': '프라이빗 블록체인',
+                    'english': 'Private Blockchain',
+                    'category': '금융IT·신기술',
+                    'definition': '허가형 참여자로 제한하는 블록체인이다.',
+                    'detailed_explanation': '운영 주체가 명확하고 접근 권한을 통제한다.',
+                    'related_concepts': '[[블록체인]]',
+                    'source_files': 'pages/05-01-우리은행-기출.md',
+                    'exam_note': '퍼블릭과 비교',
+                    'bok_appeared': '',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+            bootstrap_runtime_db(csv_path, db_path)
+
+            (pages / '05-01-우리은행-기출.md').write_text(
+                '# 05-01. 우리은행 기출\n\n'
+                '### 1. 프라이빗 블록체인의 특징으로 옳지 않은 것은?\n'
+                '1. 분산형으로 네트워크 운영과 관리가 각각 이루어진다.\n'
+                '2. 퍼블릭보다 합의 알고리즘이 경량화될 수 있다.\n\n'
+                '  **답:** 1번\n'
+                '- 프라이빗 블록체인은 운영 주체가 명확하고 접근을 통제한다.\n\n'
+                '### 2. 1 Petabyte의 크기는?\n\n'
+                '  **답:** 1,024 TB\n',
+                encoding='utf-8',
+            )
+            (pages / '05-04-금융결제원-기출.md').write_text(
+                '# 05-04. 금융결제원 기출\n\n'
+                '### 147. 형상관리자 역할은?\n'
+                '**답(AI답변):** 형상관리자는 변경 이력, 버전, 기준선과 릴리스 구성을 관리한다.\n',
+                encoding='utf-8',
+            )
+
+            saved = flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            self.assertEqual(saved['pages'], 2)
+            self.assertEqual(saved['count'], 3)
+
+            saved_again = flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            self.assertEqual(saved_again['count'], 3)
+
+            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, field_name=flashcard_app.FIN_CORP_FIELD_NAME, limit=10)
+            self.assertEqual(listed['summary']['total'], 3)
+            self.assertEqual({item['issuer'] for item in listed['items']}, {'우리은행', '금융결제원'})
+            self.assertTrue(all(item['question_bank_id'].startswith('qb-fin239-') for item in listed['items']))
+            self.assertTrue(all(item['answer'] for item in listed['items']))
+            self.assertTrue(all(item['difficulty'] in {'상', '중', '하'} for item in listed['items']))
+            self.assertTrue(all(item['source_location'] for item in listed['items']))
+            self.assertTrue(all(item['answer_guide'] for item in listed['items']))
+
     def test_parse_bok_question_bank_entries_splits_and_preserves_markdown(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
