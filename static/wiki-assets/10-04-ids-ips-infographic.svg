@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">10-04. IDS-IPS-로그-감사 인포그래픽</title>
+  <desc id="desc">IDS-IPS-로그-감사 / 학습 목적 / 탐지 / 차단</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fee2e2" />
+      <stop offset="100%" stop-color="#fff7ed" />
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#b91c1c" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.12" />
+    </filter>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .node { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .focus { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .float1 { animation: float1 7s ease-in-out infinite; }
+      .float2 { animation: float2 8s ease-in-out infinite; }
+      .float3 { animation: float3 9s ease-in-out infinite; }
+      .pulse { animation: pulse 2.4s ease-in-out infinite; transform-origin: center; }
+      @keyframes float1 { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+      @keyframes float2 { 0%,100% { transform: translateY(-2px); } 50% { transform: translateY(7px); } }
+      @keyframes float3 { 0%,100% { transform: translateY(2px); } 50% { transform: translateY(-6px); } }
+      @keyframes pulse { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.35); } }
+    </style>
+  </defs>
+  <rect width="1200" height="720" fill="#f8fafc" />
+  <rect x="32" y="30" width="1136" height="660" rx="34" fill="url(#bg)" opacity="0.55" />
+  <rect x="48" y="46" width="1104" height="628" rx="30" fill="white" filter="url(#shadow)" />
+  <rect x="48" y="46" width="1104" height="628" rx="30" fill="url(#bg)" opacity="0.16" />
+  <text class="small" x="88" y="92">금융공기업 IT · SVG 인포그래픽</text>
+  <text class="title" x="88" y="116"><tspan x="88" dy="0">10-04. IDS-IPS-로그-감사</tspan></text>
+  <text class="subtitle" x="88" y="198"><tspan x="88" dy="0">IDS는 침입을 탐지한다(알림/로그 생성, 수동 대응).</tspan></text>
+  <g class="float1"><rect x="90" y="126" width="170" height="42" rx="21" fill="#fee2e2" stroke="#b91c1c" stroke-opacity="0.18"/><text class="chip" x="175" y="152" text-anchor="middle">IDS-IPS-로그-감사</text></g><g class="float2"><rect x="300" y="126" width="170" height="42" rx="21" fill="#fff7ed" stroke="#b91c1c" stroke-opacity="0.18"/><text class="chip" x="385" y="152" text-anchor="middle">학습 목적</text></g><g class="float3"><rect x="510" y="126" width="170" height="42" rx="21" fill="#fee2e2" stroke="#b91c1c" stroke-opacity="0.18"/><text class="chip" x="595" y="152" text-anchor="middle">탐지</text></g><g class="float1"><rect x="720" y="126" width="170" height="42" rx="21" fill="#fff7ed" stroke="#b91c1c" stroke-opacity="0.18"/><text class="chip" x="805" y="152" text-anchor="middle">차단</text></g>
+  <rect x="82" y="244" width="1036" height="2" rx="1" fill="url(#line)" opacity="0.35" />
+  <rect x="86" y="278" width="300" height="370" rx="28" fill="#fee2e2" opacity="0.42" />
+  <rect x="450" y="258" width="300" height="190" rx="28" fill="#fff7ed" opacity="0.38" />
+  <rect x="782" y="278" width="300" height="370" rx="28" fill="#fff7ed" opacity="0.42" />
+  <text class="section" x="108" y="314">핵심 키워드</text>
+  <text class="section" x="474" y="296">개념 연결 흐름</text>
+  <text class="section" x="804" y="314">실전 포인트</text>
+  <path d="M 180 410 C 260 480, 390 480, 470 410 S 680 340, 760 410" fill="none" stroke="url(#line)" stroke-width="6" stroke-linecap="round" opacity="0.85" stroke-dasharray="10 12">
+    <animate attributeName="stroke-dashoffset" from="0" to="-220" dur="8s" repeatCount="indefinite" />
+  </path>
+  <circle cx="182" cy="408" r="10" fill="#b91c1c">
+    <animateMotion dur="8s" repeatCount="indefinite" rotate="auto">
+      <mpath href="#route" />
+    </animateMotion>
+  </circle>
+  <path id="route" d="M 180 410 C 260 480, 390 480, 470 410 S 680 340, 760 410" fill="none" />
+  <g><circle cx="180" cy="345" r="58" fill="white" stroke="#b91c1c" stroke-width="3" opacity="0.96"/><circle cx="180" cy="345" r="66" fill="none" stroke="#f59e0b" stroke-opacity="0.35" stroke-width="2.5" stroke-dasharray="10 8"><animate attributeName="stroke-dashoffset" from="0" to="-180" dur="7s" begin="0.0s" repeatCount="indefinite" /></circle><text class="node" x="180" text-anchor="middle" y="337"><tspan x="180" text-anchor="middle" dy="0">시험 포인트(핵심 암기사항)</tspan></text></g><g><circle cx="470" cy="345" r="58" fill="white" stroke="#b91c1c" stroke-width="3" opacity="0.96"/><circle cx="470" cy="345" r="66" fill="none" stroke="#f59e0b" stroke-opacity="0.35" stroke-width="2.5" stroke-dasharray="10 8"><animate attributeName="stroke-dashoffset" from="0" to="-180" dur="7s" begin="0.7s" repeatCount="indefinite" /></circle><text class="node" x="470" text-anchor="middle" y="337"><tspan x="470" text-anchor="middle" dy="0">실무 적용 체크리스트</tspan></text></g><g><circle cx="760" cy="345" r="58" fill="white" stroke="#b91c1c" stroke-width="3" opacity="0.96"/><circle cx="760" cy="345" r="66" fill="none" stroke="#f59e0b" stroke-opacity="0.35" stroke-width="2.5" stroke-dasharray="10 8"><animate attributeName="stroke-dashoffset" from="0" to="-180" dur="7s" begin="1.4s" repeatCount="indefinite" /></circle><text class="node" x="760" text-anchor="middle" y="337"><tspan x="760" text-anchor="middle" dy="0">로그 감사 상세 가이드</tspan></text></g>
+  <text class="body" x="108" y="362"><tspan x="108" dy="0">IDS-IPS-로그-감사</tspan></text>
+  <text class="body" x="108" y="454"><tspan x="108" dy="0">학습 목적</tspan></text>
+  <text class="body" x="108" y="546"><tspan x="108" dy="0">탐지</tspan></text>
+  <circle cx="832" cy="545" r="6" fill="#f59e0b" class="pulse" style="animation-delay:0.0s"/><text class="focus" x="850" y="553"><tspan x="850" dy="0">IDS는 침입을 탐지한다(알림/로그 생성,</tspan><tspan x="850" dy="18">수동 대응).</tspan></text><circle cx="832" cy="603" r="6" fill="#f59e0b" class="pulse" style="animation-delay:0.45s"/><text class="focus" x="850" y="611"><tspan x="850" dy="0">IPS는 탐지 후 네트워크/호스트 수준에서</tspan><tspan x="850" dy="18">실시간 차단까지 수행한다(능동 대응).</tspan></text><circle cx="832" cy="661" r="6" fill="#f59e0b" class="pulse" style="animation-delay:0.9s"/><text class="focus" x="850" y="669"><tspan x="850" dy="0">로그 감사는 사건 발생 전 중 후의 기록을</tspan><tspan x="850" dy="18">보존하고, 사후 분석 책임 추적 내부통제</tspan></text>
+  <rect x="86" y="618" width="1028" height="16" rx="8" fill="#e2e8f0" />
+  <rect x="86" y="618" width="640" height="16" rx="8" fill="url(#line)" opacity="0.82">
+    <animate attributeName="width" values="420;860;420" dur="10s" repeatCount="indefinite" />
+  </rect>
+  <circle cx="726" cy="626" r="12" fill="#f59e0b" class="pulse" />
+  <text class="small" x="88" y="666">asset: 10-04-ids-ips-infographic.svg</text>
+  <text class="small" x="1116" y="666" text-anchor="end">IDS-IPS-로그-감사</text>
+</svg>
