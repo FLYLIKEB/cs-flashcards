@@ -708,6 +708,19 @@ button {
   padding-left: 18px;
 }
 
+#selectedEventDetail,
+#selectedEventDetail p,
+#selectedEventDetail li,
+#selectedEventDetail dd,
+#selectedEventDetail a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.calendar-drawer .detail-grid {
+  grid-template-columns: 1fr;
+}
+
 .calendar-drawer-backdrop {
   position: fixed;
   inset: 0;
@@ -743,6 +756,7 @@ button {
   overflow-y: auto;
   padding: 12px;
   display: grid;
+  align-content: start;
   gap: 12px;
 }
 
