@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-38e16a69b4cb6e160f950d84",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-38e16a69b4cb6e160f950d84",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 15. 인공지능",
+    "body": "인공지능과 관련하여 다음 물음에 답하시오.\n\n1. 대규모 언어모형과 관련하여 **사전학습(Pre-training)** 및 **미세조정(Fine-tuning)**에 대하여 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "인공지능",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "인공지능"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 15. 인공지능 · 15. 인공지능",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-38e16a69b4cb6e160f950d84",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "대규모 언어모형의 사전학습(Pre-training)과 미세조정(Fine-tuning)을 설명하시오.",
+    "body": "대규모 언어모형(LLM)의 학습 과정에서 사전학습과 미세조정의 목적, 방법, 차이점을 중심으로 설명하시오.",
+    "answer": "사전학습은 대규모 범용 텍스트 데이터로 언어 패턴과 일반 지식을 학습해 기본 언어능력을 형성하는 단계이고, 미세조정은 사전학습된 모델을 특정 업무나 도메인 데이터로 추가 학습시켜 목적에 맞게 성능을 높이는 단계이다.",
+    "explanation": "사전학습은 막대한 비라벨 또는 자기지도 학습 데이터를 사용해 다음 토큰 예측 등으로 문법, 문맥, 세계지식을 폭넓게 익히는 과정이다. 이 단계는 비용이 크지만 범용성이 높다. 미세조정은 상대적으로 적은 양의 라벨 데이터나 지시 데이터로 모델을 특정 과제, 조직, 산업 도메인에 맞추는 과정이다. 따라서 사전학습은 범용 기반모델을 만드는 단계이고, 미세조정은 그 기반모델을 분류, 질의응답, 금융 상담 등 실제 업무에 맞게 조정하는 단계라는 차이가 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "인공지능",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "대규모 언어모형",
+      "사전학습",
+      "미세조정",
+      "LLM"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 15. 인공지능 · 15. 인공지능",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt가 제목 마크다운만 담고 있어 실제 질문이 body에 섞여 있었음",
+      "answer와 explanation이 비어 있어 채점 가능한 정답 정보가 없었음",
+      "keywords가 지나치게 포괄적이어서 핵심 개념을 반영하지 못했음"
+    ],
+    "changes": [
+      "prompt를 사전학습과 미세조정을 직접 묻는 질문형 문장으로 정리함",
+      "body를 풀이에 필요한 설명 범위만 남기도록 정제함",
+      "answer와 explanation에 두 개념의 정의·목적·차이를 채워 넣음",
+      "keywords를 LLM, 사전학습, 미세조정 중심으로 구체화함"
+    ]
+  }
+}

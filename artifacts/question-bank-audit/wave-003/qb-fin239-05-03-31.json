@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-31",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-31",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 118. IT 기술 용어의 의미를 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 보기와 연관지을 수 있는 IT기술 용어는 무엇인가?",
+    "answer": "트레이딩",
+    "explanation": "트레이딩",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "IT 기술 용어의 의미를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "트레이딩"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 118. IT 기술 용어의 의미를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-31",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "보기의 설명과 연관지을 수 있는 IT 기술 용어는 무엇인가?",
+    "body": "금융시장에서 주식, 채권 또는 파생상품을 매매하려면 매매 의사결정을 위한 정확한 정보 제공과 신속한 매매 주문 처리가 가능해야 한다.",
+    "answer": "트레이딩",
+    "explanation": "트레이딩은 금융시장에서 주식·채권·파생상품 등을 매매하는 활동과 이를 지원하는 업무를 뜻한다. 제시문은 정확한 정보 제공과 신속한 주문 처리 등 매매 수행 요건을 설명하므로 해당 용어는 트레이딩이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "IT 기술 용어의 의미를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "트레이딩",
+      "매매 주문 처리",
+      "금융시장"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 118. IT 기술 용어의 의미를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 118. 보기와 연관지을 수 있는 IT기술 용어는 무엇인가?\n\n  보기 : 금융시장에서 주식, 채권 또는 파생상품을 매매하기 위해서는 매매의사 결정을 위한 정확한 정보의\n제공과 신속한 매매 주문 처리가 가능해야 한다.\n\n  **답:** 트레이딩",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "source excerpt에 정답과 풀이 단서가 충분한데도 불필요하게 개념문제로 변환되어 있었다.",
+      "prompt에 markdown heading이 남아 있었고 body에 변환 메모가 들어가 있어 문제 맥락이 훼손되어 있었다.",
+      "question_type이 실제 답형과 맞지 않았고 explanation이 정답 단어만 반복하고 있었다."
+    ],
+    "changes": [
+      "source excerpt를 기준으로 원래의 용어 식별 문제로 복원하고 prompt/body를 정리했다.",
+      "question_type을 short로 수정하고 choices/answer_index 없는 단답형 구조를 유지했다.",
+      "answer는 트레이딩으로 유지하면서 explanation과 keywords를 문제 맥락에 맞게 보강했다."
+    ]
+  }
+}

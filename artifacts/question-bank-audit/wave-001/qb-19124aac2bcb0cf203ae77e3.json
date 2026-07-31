@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-19124aac2bcb0cf203ae77e3",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-19124aac2bcb0cf203ae77e3",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 2. 프로그래밍 언어",
+    "body": "프로그래밍 언어와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n객체지향언어가 지니는 장점에 대해 간략히 설명하시오.\n\n#### 2.\n\n객체지향언어 중 Java는 다중 상속이 불가하고 C++는 다중 상속이 가능하다. 상속(inheritance)에 있어서 단일 상속(single inheritance)과 다중 상속(multiple inheritance)의 차이를 설명하고, 다중 상속이 가지는 문제점을 서술하시오.\n\n#### 3.\n\n객체지향언어의 특성인 오버로딩(overloading)과 오버라이딩(overriding)에 대해 간략히 설명하시오.\n\n#### 4.\n\n##### 1. 다음 Java 코드의 실행 결과를 작성하시오.\n\n```java\nclass Parent{\n    Parent( ){\n        System.out.println(\"Parent 1\");\n    }\n    Parent(String str){\n        System.out.println(\"Parent 2\");\n    }\n}\n\nclass Child extends Parent{\n    Child( ){\n        System.out.println(\"Child 1\");\n    }\n    Child(String str){\n        System.out.println(\"Child 2\");\n    }\n}\n\nclass FamilyTest{\n    public static void main(String args[]){\n        Child c1 = new Child( );\n        Child c2 = new Child(\"a\");\n    }\n}\n```\n\n```text\n<실행결과>\n\n```\n\n##### 2. 다음 Java 코드에서 문제가 있는 부분 두 곳을 지적하고 그 이유를 설명하시오.\n\n```java\nclass Parent{\n    Parent( ){ }\n}\n\nclass Child extends Parent{\n    Child( ){ }\n    public void init( ){ }\n}\n\nclass FamilyTest{\n    public static void main(String args[]){\n        Parent p = null;\n        Child c1 = new Child( );\n        Child c2 = null;\n        p = c1;\n        p.init( );\n        c2 = p;\n    }\n}\n```\n\n```text\n<문제점>\n\n```\n\n##### 3. 재귀호출(recursive call) 방식을 이용하여 `x^n`을 구하는 함수를 Java 코드로 작성하시오.\n\n```java\nstatic long power(int x, int n){\n}\n```",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로그래밍 언어",
+    "field_name": "컴퓨터공학 학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "프로그래밍 언어",
+      "객체지향",
+      "Java"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2019 컴퓨터공학 학술 파트 II · 2. 프로그래밍 언어",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-19124aac2bcb0cf203ae77e3",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "객체지향언어의 장점과 상속·메서드 재정의 개념, Java 코드 분석, 재귀 거듭제곱 함수를 설명하시오.",
+    "body": "다음 항목에 답하시오.\n\n1. 객체지향언어가 지니는 장점을 간략히 설명하시오.\n\n2. 상속(inheritance)에서 단일 상속(single inheritance)과 다중 상속(multiple inheritance)의 차이를 설명하고, 다중 상속이 가지는 문제점을 서술하시오.\n\n3. 객체지향언어의 특성인 오버로딩(overloading)과 오버라이딩(overriding)을 간략히 설명하시오.\n\n4-1. 다음 Java 코드의 실행 결과를 작성하시오.\n\n```java\nclass Parent{\n    Parent( ){\n        System.out.println(\"Parent 1\");\n    }\n    Parent(String str){\n        System.out.println(\"Parent 2\");\n    }\n}\n\nclass Child extends Parent{\n    Child( ){\n        System.out.println(\"Child 1\");\n    }\n    Child(String str){\n        System.out.println(\"Child 2\");\n    }\n}\n\nclass FamilyTest{\n    public static void main(String args[]){\n        Child c1 = new Child( );\n        Child c2 = new Child(\"a\");\n    }\n}\n```\n\n4-2. 다음 Java 코드에서 문제가 있는 부분 두 곳을 지적하고 그 이유를 설명하시오.\n\n```java\nclass Parent{\n    Parent( ){ }\n}\n\nclass Child extends Parent{\n    Child( ){ }\n    public void init( ){ }\n}\n\nclass FamilyTest{\n    public static void main(String args[]){\n        Parent p = null;\n        Child c1 = new Child( );\n        Child c2 = null;\n        p = c1;\n        p.init( );\n        c2 = p;\n    }\n}\n```\n\n4-3. 재귀호출(recursive call) 방식을 이용하여 x^n을 구하는 Java 함수를 작성하시오.\n\n```java\nstatic long power(int x, int n){\n}\n```",
+    "answer": "1. 객체지향언어의 장점은 캡슐화·상속·다형성을 통해 코드 재사용성과 유지보수성을 높이고, 현실 세계의 객체를 자연스럽게 모델링할 수 있다는 점이다.\n2. 단일 상속은 한 클래스가 하나의 부모 클래스만 상속받는 방식이고, 다중 상속은 여러 부모 클래스를 동시에 상속받는 방식이다. 다중 상속은 동일한 이름의 메서드나 필드가 여러 부모에 있을 때 충돌과 모호성이 생기는 다이아몬드 문제를 유발할 수 있다.\n3. 오버로딩은 같은 이름의 메서드를 매개변수 목록을 다르게 하여 여러 개 정의하는 것이고, 오버라이딩은 자식 클래스가 부모 클래스의 메서드를 같은 시그니처로 재정의하는 것이다.\n4-1. 실행 결과는 `Parent 1`, `Child 1`, `Parent 1`, `Child 2` 순서이다.\n4-2. `p.init();`는 참조 변수 `p`의 타입이 `Parent`이므로 `Parent`에 선언되지 않은 `init()`을 호출할 수 없어 컴파일 오류가 난다. `c2 = p;`는 부모 타입 참조를 자식 타입 변수에 명시적 형변환 없이 대입한 것이므로 컴파일 오류가 난다.\n4-3. `static long power(int x, int n){ if (n == 0) return 1; return x * power(x, n - 1); }`",
+    "explanation": "기본 생성자에서 `super()`가 생략되면 부모의 무인자 생성자가 먼저 호출된다. 따라서 `new Child()`는 `Parent 1` 후 `Child 1`을 출력하고, `new Child(\"a\")`도 자식 생성자에 `super(str)`가 없으므로 부모의 무인자 생성자인 `Parent 1`이 먼저 실행된 뒤 `Child 2`가 출력된다. 오버로딩은 컴파일 시점에 매개변수 시그니처로 구분되고, 오버라이딩은 상속 관계에서 동적 바인딩과 관련된다. 다중 상속의 대표적 문제는 동일 멤버 상속에 따른 충돌과 모호성이다. 재귀 거듭제곱 함수는 종료 조건으로 `n == 0`일 때 1을 반환하고, 그 외에는 `x * power(x, n - 1)`로 문제를 축소한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로그래밍 언어",
+    "field_name": "컴퓨터공학 학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "객체지향",
+      "상속",
+      "오버로딩",
+      "오버라이딩",
+      "Java",
+      "재귀호출"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2019 컴퓨터공학 학술 파트 II · 2. 프로그래밍 언어",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt가 제목 마크다운만 담고 있어 질문으로 바로 사용할 수 없었음",
+      "answer와 explanation이 비어 있어 채점 가능한 정답 정보가 없었음",
+      "body가 복합 서술형 문항임에도 불필요한 마크다운 헤딩과 빈 결과 표식을 포함했음"
+    ],
+    "changes": [
+      "prompt를 실제 서술형 문제 요지로 정리함",
+      "body에서 헤딩 노이즈와 빈 실행결과/문제점 표식을 제거하고 하위 문항 구조를 정돈함",
+      "모든 하위 문항의 모범 답안과 근거 설명을 추가하고 keywords를 구체화함"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-20",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-20",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 225. 하노이탑에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 하노이탑 손코딩 문제",
+    "answer": "n개 원반의 최소 이동 횟수는 2^n - 1이며 재귀적으로 n-1개 이동, 큰 원반 이동, n-1개 이동 순서다.",
+    "explanation": "n개 원반의 최소 이동 횟수는 2^n - 1이며 재귀적으로 n-1개 이동, 큰 원반 이동, n-1개 이동 순서다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "하노이탑에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "하노이탑"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 225. 하노이탑에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-20",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "하노이탑의 핵심 원리와 최소 이동 횟수 계산 방법을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 225. 하노이탑 손코딩 문제",
+    "answer": "하노이탑은 작은 원반을 큰 원반 위에 놓을 수 없다는 제약 아래 원반을 다른 기둥으로 옮기는 재귀 문제이며, n개 원반의 최소 이동 횟수는 2^n - 1이다.",
+    "explanation": "가장 큰 원반을 옮기려면 먼저 위의 n-1개를 보조 기둥으로 옮기고, 큰 원반을 목적 기둥으로 이동한 뒤, 다시 n-1개를 목적 기둥으로 옮겨야 한다. 따라서 점화식은 T(n)=2T(n-1)+1이고 이를 풀면 최소 이동 횟수는 2^n-1이 된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "하노이탑에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "하노이탑",
+      "재귀",
+      "최소 이동 횟수"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 225. 하노이탑에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 225. 하노이탑 손코딩 문제\n**답(AI답변):** n개 원반의 최소 이동 횟수는 2^n - 1이며 재귀적으로 n-1개 이동, 큰 원반 이동, n-1개 이동 순서다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row.prompt에 마크다운 헤딩과 번호가 남아 있어 질문문만 분리되지 않았음",
+      "불완전 원문 변환 body가 공통 규칙의 고정 문구와 원문 제목 형식을 정확히 따르지 않았음",
+      "answer와 explanation이 동일해 개념 설명과 근거가 분리되지 않았고 keywords가 지나치게 좁았음"
+    ],
+    "changes": [
+      "프롬프트를 명시적 개념형 주관식 질문으로 정리하고 마크다운 표시를 제거함",
+      "body를 규칙상 두 줄 고정 형식으로 수정하고 원문 제목을 source_excerpt 기준으로 보존함",
+      "정답을 핵심 정의와 공식 중심으로 다듬고 explanation에 재귀 점화식 근거를 추가했으며 keywords를 보강함"
+    ]
+  }
+}

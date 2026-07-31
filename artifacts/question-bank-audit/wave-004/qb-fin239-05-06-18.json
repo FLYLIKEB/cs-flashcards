@@ -1,0 +1,111 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-06-18",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-504",
+    "term": "이진 탐색 트리",
+    "english": "Binary Search Tree",
+    "category": "자료구조·알고리즘",
+    "alphabet_index": "#",
+    "korean_initial": "ㅇ",
+    "definition": "이진 탐색 트리는 각 노드에 대해 왼쪽 서브트리는 해당 노드보다 작은 값만, 오른쪽 서브트리는 큰 값만 갖도록 구성된 이진 트리로, 이 구조를 이용해 탐색·삽입·삭제를 효율적으로 수행합니다.",
+    "detailed_explanation": "의미: 이진 탐색 트리는 중위 순회 시 노드 값이 오름차순으로 나오는 구조입니다. 평균적으로 탐색·삽입·삭제 연산은 트리 높이에 비례하여 O(log n)이지만, 입력이 이미 정렬되어 한쪽으로 치우이면 높이가 n이 되어 최악에는 O(n)이 됩니다. 삭제는 세 가지 경우로 나뉩니다: 리프 노드면 단순 제거, 한 자식만 있으면 그 자식으로 대체, 두 자식이 있으면 보통 오른쪽 서브트리의 최솟값(후계자)이나 왼쪽 서브트리의 최댓값(전임자)으로 교체한 뒤 그 노드를 제거합니다. 학습할 때는 작은 예제를 손으로 직접 따라가 초기 상태·반복 과정·종료 조건을 확인하고, 입력 크기가 커질수록 시간·공간 복잡도가 어떻게 변하는지 비교해 보는 것이 도움이 됩니다.\n활용: 정렬된 맵(키-값 저장), 범위 검색(range search), 순위 조회(order-statistics) 등에 자주 쓰입니다. 최악의 성능 보장이 필요하면 AVL·레드블랙 같은 균형 트리를 사용하고, 단순 키 조회가 주된 경우에는 해시 테이블과 비교해 선택합니다. 실전에서는 가중치 여부, 음수 값, 정렬 안정성, 중복 허용 여부 등 문제의 전제를 먼저 확인해야 하며, 면접에서는 이 구조를 선택한 이유와 언제 부적절한지 함께 설명하는 것이 안전합니다.",
+    "related_concepts": "[[트리]], [[이진 트리]], [[AVL 트리]], [[레드블랙 트리]], [[시간 복잡도]]",
+    "source_files": "05-13-알고리즘-기출-모음.md; 05-06-예탁결제원-기출.md",
+    "exam_note": "정의만 쓰지 말고 AVL·레드블랙(균형 트리), 해시 테이블 등과 성능(높이·탐색 복잡도)·특성(범위 검색 가능 여부, 최악 성능 보장)을 간단히 비교해 서술하세요.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-504-20260719-174048-15074cdf.png",
+    "concept_image_alt": "이진 탐색 트리(자료구조·알고리즘) 개념 참고 이미지",
+    "sort_order": 503,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-504-20260719-174048-15074cdf.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-06-18",
+    "card_id": "CS-504",
+    "question_type": "multiple_choice",
+    "prompt": "### 182. 이진 탐색 트리(BST)의 특징으로 옳은 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "3번",
+    "rubric": [],
+    "choices": [
+      "왼쪽 > 루트 > 오른쪽",
+      "항상 균형 유지",
+      "중위순회 시 정렬 결과",
+      "삽입이 O(1)"
+    ],
+    "answer_index": 2,
+    "topic": "이진 탐색 트리(BST)의 특징으로 옳은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "이진 탐색 트리",
+      "Binary Search Tree",
+      "이진 탐색 트리 의",
+      "BST",
+      "이진 탐색 트리(BST)의",
+      "중위순회 시 정렬 결과"
+    ],
+    "difficulty": "중",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 182. 이진 탐색 트리(BST)의 특징으로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-06-18",
+    "card_id": "CS-504",
+    "question_type": "multiple_choice",
+    "prompt": "이진 탐색 트리(BST)의 특징으로 옳은 것은?",
+    "body": "",
+    "answer": "중위순회 시 정렬 결과",
+    "explanation": "이진 탐색 트리는 왼쪽 서브트리에 더 작은 값, 오른쪽 서브트리에 더 큰 값이 저장되므로 중위순회를 하면 값이 오름차순으로 방문된다. BST는 항상 균형을 유지하지 않으며, 삽입 시간도 트리 높이에 따라 평균 O(log n), 최악 O(n)이다.",
+    "rubric": [],
+    "choices": [
+      "왼쪽 > 루트 > 오른쪽",
+      "항상 균형 유지",
+      "중위순회 시 정렬 결과",
+      "삽입이 O(1)"
+    ],
+    "answer_index": 2,
+    "topic": "이진 탐색 트리(BST)",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "이진 탐색 트리",
+      "Binary Search Tree",
+      "BST",
+      "중위순회"
+    ],
+    "difficulty": "중",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 182. 이진 탐색 트리(BST)의 특징으로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 182. 이진 탐색 트리(BST)의 특징으로 옳은 것은?\n1. 왼쪽 > 루트 > 오른쪽\n2. 항상 균형 유지\n3. 중위순회 시 정렬 결과\n4. 삽입이 O(1)\n\n**답:** 3번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었다.",
+      "answer와 explanation이 모두 '3번'만 있어 정답 내용과 근거가 부족했다.",
+      "topic과 keywords에 질문 문장 조각 및 중복·불완전 키워드가 섞여 있었다."
+    ],
+    "changes": [
+      "prompt를 순수 질문 문장으로 정리했다.",
+      "answer를 정답 선지 텍스트로 바꾸고 BST의 중위순회 특성과 오답 근거를 설명에 보강했다.",
+      "topic을 핵심 개념으로 정리하고 keywords를 카드 용어 중심의 간결한 키워드로 정제했다."
+    ]
+  }
+}

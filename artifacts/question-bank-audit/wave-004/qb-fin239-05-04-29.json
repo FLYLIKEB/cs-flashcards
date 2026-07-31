@@ -1,0 +1,80 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-29",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-29",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 157. REVOKE와 GRANT의 역할을 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: (주관식)SQL 문제 약술 - REVOKE, GRANT",
+    "answer": "GRANT는 권한 부여, REVOKE는 권한 회수 명령이다.",
+    "explanation": "GRANT는 권한 부여, REVOKE는 권한 회수 명령이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "REVOKE와 GRANT의 역할을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL",
+      "REVOKE와 GRANT",
+      "REVOKE",
+      "GRANT"
+    ],
+    "difficulty": "상",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 157. REVOKE와 GRANT의 역할을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-29",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "REVOKE와 GRANT의 역할을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 157. (주관식)SQL 문제 약술 - REVOKE, GRANT",
+    "answer": "GRANT는 데이터베이스 객체에 대한 권한을 사용자나 역할에 부여하는 명령이고, REVOKE는 이미 부여된 권한을 회수하는 명령이다.",
+    "explanation": "GRANT는 테이블·뷰 등 객체에 대해 SELECT, INSERT 같은 권한을 주는 데 사용한다. REVOKE는 이렇게 부여된 권한을 취소해 접근을 제한한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "REVOKE와 GRANT의 역할",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL",
+      "권한 부여",
+      "권한 회수",
+      "GRANT",
+      "REVOKE"
+    ],
+    "difficulty": "상",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 157. REVOKE와 GRANT의 역할을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 헤더와 번호가 남아 있었음",
+      "변환 문구가 공통 규칙의 고정 문구와 일치하지 않았음",
+      "source_excerpt에 원문 정보가 부족해 실전형 문제가 아닌 개념문제로 다듬을 필요가 있었음",
+      "keywords와 topic이 장문/중복 표현 중심이었음"
+    ],
+    "changes": [
+      "prompt를 순수 질문 문장으로 정리함",
+      "body를 규칙에 맞는 2줄 변환 메모와 원문 제목만 남기도록 수정함",
+      "answer와 explanation을 SQL 권한 부여/회수 개념이 드러나게 보강함",
+      "topic과 keywords를 간결한 데이터베이스 용어 중심으로 정리함"
+    ]
+  }
+}

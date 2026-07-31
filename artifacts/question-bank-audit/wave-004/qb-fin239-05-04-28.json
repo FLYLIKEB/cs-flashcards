@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-28",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-28",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 156. 그래프 전위순회 경로를 적으세요에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: (주관식)그래프 전위순회 경로를 적으세요",
+    "answer": "전위순회는 루트(시작 정점)를 먼저 방문한 뒤 왼쪽/인접 하위 노드를 재귀적으로 방문하는 순서다.",
+    "explanation": "전위순회는 루트(시작 정점)를 먼저 방문한 뒤 왼쪽/인접 하위 노드를 재귀적으로 방문하는 순서다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "그래프 전위순회 경로를 적으세요에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "그래프 전위순회 경로를 적으세요"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 156. 그래프 전위순회 경로를 적으세요에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-28",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "전위순회(preorder traversal)란 무엇인가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 156. (주관식)그래프 전위순회 경로를 적으세요",
+    "answer": "전위순회는 현재 노드를 먼저 방문한 뒤 왼쪽 서브트리와 오른쪽 서브트리를 순서대로 방문하는 트리 순회 방식이다.",
+    "explanation": "원문에는 실제 그래프/트리 구조와 정답 경로가 없어 경로를 산출할 수 없으므로 개념문제로 변환했다. 전위순회는 루트 방문을 먼저 수행한 뒤 각 하위 서브트리를 재귀적으로 방문하며, 방문 순서는 보통 루트-왼쪽-오른쪽이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "트리 순회",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "전위순회",
+      "preorder traversal",
+      "트리 순회"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 156. 그래프 전위순회 경로를 적으세요",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 156. (주관식)그래프 전위순회 경로를 적으세요\n**답(AI답변):** 전위순회는 루트(시작 정점)를 먼저 방문한 뒤 왼쪽/인접 하위 노드를 재귀적으로 방문하는 순서다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 헤더와 불필요한 설명형 문구가 남아 있었다.",
+      "원문에 실제 그래프/트리 정보가 없어 경로를 답할 수 없는 불완전한 문제였다.",
+      "body의 변환 메모 문구가 공통 규칙의 지정 형식과 달랐고 keywords가 긴 문장형 잡음이었다."
+    ],
+    "changes": [
+      "문제를 전위순회 개념을 묻는 주관식으로 변환하고 prompt를 정리했다.",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 수정했다.",
+      "answer/explanation을 전위순회 정의와 방문 순서 중심으로 다시 쓰고 topic, source_location, keywords를 정리했다."
+    ]
+  }
+}

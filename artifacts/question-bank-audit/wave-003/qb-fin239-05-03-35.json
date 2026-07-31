@@ -1,0 +1,87 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-35",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-35",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 122. GAN에 대해 옳지 않은 것은?",
+    "body": "",
+    "answer": "2번 (2개의 신경망으로 구성되어있음)",
+    "explanation": "- GAN(Generative Adversarial Network)은 두 개의 신경망, 즉 생성자(Generator)와 판별자(Discriminator)로\n       구성됩니다. 생성자는 가짜 데이터를 생성하고, 판별자는 그 데이터가 진짜인지 가짜인지 구별하는\n       역할을 합니다. 따라서 GAN이 3개의 신경망으로 구성되어 있다는 설명은 옳지 않습니다",
+    "rubric": [],
+    "choices": [
+      "생성적 적대 신경망이다",
+      "3개의 신경망으로 구성되어있다",
+      "컴퓨터 게임, 패션, 광고에 활용된다",
+      "학습패턴을 통해 트워영상,음성 생성 및 복원이 가능하다",
+      "가짜의 이미지, 영상 생성이 가능하다"
+    ],
+    "answer_index": 1,
+    "topic": "GAN에 대해 옳지 않은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "GAN",
+      "3개의 신경망으로 구성되어있다"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 122. GAN에 대해 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-35",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "GAN에 대해 옳지 않은 것은?",
+    "body": "",
+    "answer": "3개의 신경망으로 구성되어 있다.",
+    "explanation": "GAN은 생성자와 판별자의 두 신경망으로 구성되는 생성적 적대 신경망이다. 따라서 '3개의 신경망으로 구성되어 있다'는 진술이 옳지 않다.",
+    "rubric": [],
+    "choices": [
+      "생성적 적대 신경망이다",
+      "3개의 신경망으로 구성되어있다",
+      "컴퓨터 게임, 패션, 광고에 활용된다",
+      "학습 패턴을 통해 이미지·영상·음성 생성 및 복원이 가능하다",
+      "가짜의 이미지, 영상 생성이 가능하다"
+    ],
+    "answer_index": 1,
+    "topic": "GAN",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "GAN",
+      "생성자",
+      "판별자"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 122. GAN에 대해 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 122. GAN에 대해 옳지 않은 것은?\n1. 생성적 적대 신경망이다\n2. 3개의 신경망으로 구성되어있다\n3. 컴퓨터 게임, 패션, 광고에 활용된다\n4. 학습패턴을 통해 트워영상,음성 생성 및 복원이 가능하다\n5. 가짜의 이미지, 영상 생성이 가능하다\n\n  **답:** 2번 (2개의 신경망으로 구성되어있음)\n- GAN(Generative Adversarial Network)은 두 개의 신경망, 즉 생성자(Generator)와 판별자(Discriminator)로\n       구성됩니다. 생성자는 가짜 데이터를 생성하고, 판별자는 그 데이터가 진짜인지 가짜인지 구별하는\n       역할을 합니다. 따라서 GAN이 3개의 신경망으로 구성되어 있다는 설명은 옳지 않습니다",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 번호가 남아 있었음",
+      "answer가 정답 표현 대신 번호와 부가 설명을 함께 포함했음",
+      "explanation과 keywords에 장문·오답 진술이 그대로 들어 있었고 선지 문구에 오타가 있었음"
+    ],
+    "changes": [
+      "prompt를 깨끗한 질문 문장으로 정리함",
+      "answer를 오답 선지의 정확한 내용만 남기도록 수정하고 explanation을 간결하게 재작성함",
+      "선지의 오타를 바로잡고 topic·keywords를 GAN 개념 중심으로 정리함"
+    ]
+  }
+}

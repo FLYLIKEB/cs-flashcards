@@ -1,0 +1,80 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-1bb7af032b4ae1303011597d",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-1bb7af032b4ae1303011597d",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 9. 컴퓨터구조: 캐시 메모리",
+    "body": "컴퓨터구조의 캐시 메모리(cache memory)와 관련하여 다음 물음에 답하시오.\n\n1. **1-1 write-through**\n\n   ![1-1 write-through](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202025%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0008.bmp)\n\n   **1-2 write-back**\n\n   ![1-2 write-back](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202025%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0009.bmp)\n\n   캐시 메모리를 사용하면서 캐시의 내용이 변경되었을 때, 그 내용을 주기억장치에 갱신하는 시기와 방법을 결정하는 것을 쓰기 정책(write policy)이라고 한다. 다음 그림의 쓰기 정책에 대해 각각 정의와 장·단점을 서술하시오.\n\n   | write-through | write-back |\n   |---|---|\n   | CPU가 캐시와 주기억장치에 동시에 기록하는 방식 | CPU가 우선 캐시에 기록하고, 이후 필요한 시점에 주기억장치에 반영하는 방식 |\n\n2. 주기억장치 접근 시간이 100ns, 캐시 접근 시간이 10ns인 시스템이 있다. 전체 접근 요구 중에서 80%는 읽기 동작이고, 20%는 쓰기 동작이었으며, 캐시 히트율은 90%였다. 캐시 쓰기 정책이 **write-through**일 때 읽기 동작 시간, 쓰기 동작 시간, 평균 접근 시간을 각각 구하시오. 읽기와 쓰기 동작에 별도의 오버헤드는 없다고 가정한다.\n\n   ```text\n   · 읽기 동작 시간:\n   · 쓰기 동작 시간:\n   · 평균 접근 시간:\n   ```",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터구조: 캐시 메모리",
+    "field_name": "컴퓨터공학 학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "컴퓨터구조",
+      "캐시 메모리"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 9. 컴퓨터구조: 캐시 메모리 · 9. 컴퓨터구조: 캐시 메모리",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-1bb7af032b4ae1303011597d",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "캐시 메모리의 write-through와 write-back을 각각 정의하고 장단점을 서술한 뒤, 주기억장치 접근 시간이 100ns, 캐시 접근 시간이 10ns, 읽기 비중이 80%, 쓰기 비중이 20%, 캐시 히트율이 90%인 시스템에서 write-through 정책의 읽기 동작 시간·쓰기 동작 시간·평균 접근 시간을 구하시오.",
+    "body": "쓰기 정책 정의:\n- write-through: CPU가 캐시와 주기억장치에 동시에 기록하는 방식\n- write-back: CPU가 우선 캐시에 기록하고, 이후 필요한 시점에 주기억장치에 반영하는 방식\n\n수치 조건:\n- 주기억장치 접근 시간: 100ns\n- 캐시 접근 시간: 10ns\n- 읽기 동작 비중: 80%\n- 쓰기 동작 비중: 20%\n- 캐시 히트율: 90%\n- write-through 정책, 읽기와 쓰기에 별도 오버헤드 없음",
+    "answer": "write-through: 캐시와 주기억장치에 동시에 기록하는 방식이다. 장점은 주기억장치와의 일관성이 높고 구현이 단순하다는 점이며, 단점은 모든 쓰기마다 주기억장치까지 기록해야 하므로 쓰기 시간이 길고 메모리 버스 트래픽이 증가한다.\n\nwrite-back: 먼저 캐시에 기록하고 블록 교체 등 필요한 시점에만 주기억장치에 반영하는 방식이다. 장점은 쓰기 성능이 좋고 메모리 트래픽이 줄어든다는 점이며, 단점은 더티 비트 관리 등 구현이 복잡하고 캐시와 주기억장치의 데이터 불일치 가능성이 있다는 점이다.\n\n읽기 동작 시간: 20ns\n쓰기 동작 시간: 100ns\n평균 접근 시간: 36ns",
+    "explanation": "읽기 동작의 평균 시간은 캐시 히트 시 10ns, 미스 시 10ns + 100ns = 110ns이므로 0.9×10 + 0.1×110 = 20ns이다. write-through는 캐시와 주기억장치에 동시에 기록하므로 별도 오버헤드가 없다는 조건에서 쓰기 시간은 느린 쪽인 주기억장치 접근 시간 100ns로 본다. 따라서 평균 접근 시간은 읽기와 쓰기 비중을 반영하여 0.8×20 + 0.2×100 = 36ns이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터구조: 캐시 메모리",
+    "field_name": "컴퓨터공학 학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "컴퓨터구조",
+      "캐시 메모리",
+      "write-through",
+      "write-back",
+      "쓰기 정책",
+      "캐시 히트율"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 9. 컴퓨터구조: 캐시 메모리 · 9. 컴퓨터구조: 캐시 메모리",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt가 마크다운 제목만 담고 있어 문제 진술이 불완전했음",
+      "body에 불필요한 이미지 마크다운과 원문 서식 노이즈가 포함되어 있었음",
+      "answer와 explanation이 비어 있어 정답 데이터가 누락되어 있었음",
+      "keywords가 핵심 개념을 충분히 반영하지 못했음"
+    ],
+    "changes": [
+      "prompt를 완전한 서술형 문제 문장으로 정리함",
+      "body를 정의와 수치 조건만 남기도록 정리함",
+      "write-through/write-back의 정의·장단점과 접근 시간 계산 결과를 answer/explanation에 보강함",
+      "keywords에 write-through, write-back, 쓰기 정책, 캐시 히트율을 추가함"
+    ]
+  }
+}

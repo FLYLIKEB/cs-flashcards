@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-ed6f745047d590b94f81a8c1",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-ed6f745047d590b94f81a8c1",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 6. 네트워크",
+    "body": "네트워크와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**6-1-1 ARP 동작 방식**\n\n![6-1-1 ARP 동작 방식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0003.bmp)\n\n**6-1-2 RARP 동작 방식**\n\n![6-1-2 RARP 동작 방식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0004.bmp)\n\n아래 그림을 보고 ARP와 RARP 프로토콜의 정의와 필요성을 각각 설명하시오.\n\n#### 2.\n\nARP 프로토콜에서 발생할 수 있는 ARP 스푸핑(Spoofing)의 공격 방식을 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "네트워크"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 6. 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-ed6f745047d590b94f81a8c1",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "ARP와 RARP 프로토콜의 정의와 필요성을 설명하고, ARP 스푸핑의 공격 방식을 설명하시오.",
+    "body": "1) ARP와 RARP의 역할을 각각 정의하고 왜 필요한지 설명하시오.\n2) ARP 스푸핑이 ARP 캐시를 어떻게 오염시켜 통신을 가로채거나 방해하는지 설명하시오.",
+    "answer": "ARP는 동일 네트워크에서 IP 주소에 대응하는 MAC 주소를 알아내기 위한 프로토콜이고, RARP는 이미 알고 있는 MAC 주소를 바탕으로 자신의 IP 주소를 알아내기 위한 프로토콜이다. ARP는 IP 패킷을 이더넷 프레임으로 전달하기 위해 목적지 MAC 주소를 알아내는 데 필요하며, RARP는 디스크리스크 워크스테이션 등에서 초기 부팅 시 IP 주소를 할당받기 위해 필요했다. ARP 스푸핑은 공격자가 위조된 ARP 응답을 보내 피해자의 ARP 캐시에 게이트웨이 IP나 다른 호스트 IP가 공격자 MAC 주소에 대응되는 것처럼 등록시키는 공격으로, 이를 통해 트래픽을 중간자 방식으로 가로채거나 통신을 방해할 수 있다.",
+    "explanation": "ARP는 논리 주소(IP)를 물리 주소(MAC)로 해석하는 주소 결정 프로토콜이고, 브로드캐스트 ARP Request와 유니캐스트 ARP Reply를 통해 같은 LAN 내 대상의 MAC 주소를 알아낸다. RARP는 그 반대로 물리 주소를 기반으로 논리 주소를 질의하는 방식으로, 과거 부팅 시 자신의 IP를 모르는 장치가 서버에 요청할 때 사용되었다. ARP 스푸핑은 ARP에 인증 절차가 없다는 점을 악용해 허위 ARP Reply를 반복 전송함으로써 ARP 테이블을 변조하는 공격이다. 그 결과 피해자는 공격자를 기본 게이트웨이나 상대 호스트로 오인해 패킷을 공격자에게 보내게 되며, 공격자는 패킷을 전달하면서 도청·변조하거나 아예 폐기해 서비스 거부를 유발할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "ARP",
+      "RARP",
+      "ARP 스푸핑",
+      "주소 결정 프로토콜"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 6. 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 6. 네트워크\n\n네트워크와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**6-1-1 ARP 동작 방식**\n\n![6-1-1 ARP 동작 방식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0003.bmp)\n\n**6-1-2 RARP 동작 방식**\n\n![6-1-2 RARP 동작 방식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0004.bmp)\n\n아래 그림을 보고 ARP와 RARP 프로토콜의 정의와 필요성을 각각 설명하시오.\n\n#### 2.\n\nARP 프로토콜에서 발생할 수 있는 ARP 스푸핑(Spoofing)의 공격 방식을 설명하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트가 섹션 제목만 남아 있어 실제 질문이 드러나지 않음",
+      "본문에 마크다운 제목·이미지 링크가 그대로 남아 문제 풀이와 무관한 노이즈가 많음",
+      "정답과 해설이 비어 있고 키워드가 지나치게 포괄적임"
+    ],
+    "changes": [
+      "프롬프트를 ARP·RARP·ARP 스푸핑을 묻는 서술형 질문으로 정리함",
+      "본문에서 불필요한 마크다운과 이미지 링크를 제거하고 요구사항만 남김",
+      "정답·해설을 보강하고 키워드를 ARP, RARP, ARP 스푸핑 중심으로 정제함"
+    ]
+  }
+}

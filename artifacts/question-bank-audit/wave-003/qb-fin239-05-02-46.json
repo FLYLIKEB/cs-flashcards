@@ -1,0 +1,85 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-46",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-46",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 76. SQL RANK 함수",
+    "body": "name                                                 score\n A                                                    100\n B                                                    90\n C                                                    90\n\n SELECT name, RANK() OVER (ORDER BY score DESC) FROM table;",
+    "answer": "2번",
+    "explanation": "2번",
+    "rubric": [],
+    "choices": [
+      "A1 B2 C3",
+      "A1 B2 C2"
+    ],
+    "answer_index": 1,
+    "topic": "SQL RANK 함수",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "ORDER BY",
+      "SELECT",
+      "SQL",
+      "SQL RANK 함수",
+      "A1 B2 C2"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 76. SQL RANK 함수",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-46",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "주어진 데이터에 대해 `RANK() OVER (ORDER BY score DESC)`를 적용했을 때 각 name의 순위를 쓰시오.",
+    "body": "name                                                 score\nA                                                    100\nB                                                    90\nC                                                    90\n\nSELECT name, RANK() OVER (ORDER BY score DESC) FROM table;",
+    "answer": "A는 1위, B는 2위, C는 2위이다.",
+    "explanation": "RANK 함수는 동일한 정렬값에 같은 순위를 부여한다. score가 100인 A가 1위이고, score가 90으로 같은 B와 C는 모두 2위를 받는다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SQL RANK 함수",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL",
+      "RANK",
+      "윈도우 함수",
+      "ORDER BY",
+      "동순위"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 76. SQL RANK 함수",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "각 행의 순위를 정확히 쓰고, 동점일 때 RANK가 같은 순위를 부여함을 설명한다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 76. SQL RANK 함수\n\n name                                                 score\n A                                                    100\n B                                                    90\n C                                                    90\n\n SELECT name, RANK() OVER (ORDER BY score DESC) FROM table;\n1. A1 B2 C3\n2. A1 B2 C2\n3. A1 B2 C2\n4. A1 B2 C3\n\n**답:** 2번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목만 있어 질문 의도가 드러나지 않았다.",
+      "multiple_choice인데 choices가 중복·누락되어 4지선다 구조가 깨져 있었다.",
+      "answer와 explanation이 모두 '2번'만 적혀 있어 학습용 정보가 없었다.",
+      "keywords에 정답 문구가 섞여 있었다."
+    ],
+    "changes": [
+      "문제를 실제 계산 결과를 쓰는 short형으로 바꾸고 prompt를 명확한 질문문으로 수정했다.",
+      "body는 표와 SQL문만 남기고 정답은 answer에 'A 1위, B 2위, C 2위'로 정리했다.",
+      "explanation에 RANK의 동점 처리 규칙을 설명하고 choices/answer_index를 short형에 맞게 비웠다.",
+      "keywords를 SQL, RANK, 윈도우 함수, ORDER BY, 동순위로 정리했다."
+    ]
+  }
+}

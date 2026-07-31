@@ -1,0 +1,79 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-e459a81c921ee69596d518e8",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-e459a81c921ee69596d518e8",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 8. 머신 러닝",
+    "body": "### 1.\n\n**그림 8-1. K-means 군집 그림**\n\n![그림 8-1. K-means 군집 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202026%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C.html/bindata/BIN0004.png)\n\n비지도 학습(Unsupervised Learning)의 대표적인 알고리즘 중 하나인 K-means 알고리즘은 주어진 n개의 관측값을 k개의 클러스터로 분할하는 알고리즘으로, 관측값들은 거리가 최소인 클러스터로 분류된다. K-means 알고리즘은 데이터에 대한 사전 정보 없이도 데이터를 군집화할 수 있다는 장점이 있지만, 몇 가지 한계를 가진다. K-means 알고리즘의 한계를 세 가지 서술하시오.\n\n### 2.\n\n다음의 스팸메일 분류 모델 결과에 대해 정확도(Accuracy), 정밀도(Precision), 재현율(Recall)을 각각 계산하시오. 단, 모든 결과는 백분율로 환산한 퍼센티지(%)로 표현.\n\n| 예측 결과 \\ 실제 결과 | 스팸(Positive) | 스팸 아님(Negative) |\n|---|---:|---:|\n| 스팸(Positive) | 30 | 10 |\n| 스팸 아님(Negative) | 20 | 40 |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신 러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "머신 러닝",
+      "머신러닝"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 8. 머신 러닝 · 8. 머신 러닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-e459a81c921ee69596d518e8",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "K-means 알고리즘의 한계 세 가지를 서술하고, 주어진 스팸메일 분류 결과의 정확도·정밀도·재현율을 각각 계산하시오.",
+    "body": "비지도 학습(Unsupervised Learning)의 대표적인 알고리즘 중 하나인 K-means 알고리즘은 주어진 n개의 관측값을 k개의 클러스터로 분할하는 알고리즘으로, 관측값들은 거리가 최소인 클러스터로 분류된다. K-means 알고리즘은 데이터에 대한 사전 정보 없이도 데이터를 군집화할 수 있다는 장점이 있지만, 몇 가지 한계를 가진다. K-means 알고리즘의 한계를 세 가지 서술하시오.\n\n다음의 스팸메일 분류 모델 결과에 대해 정확도(Accuracy), 정밀도(Precision), 재현율(Recall)을 각각 계산하시오. 단, 모든 결과는 백분율(%)로 표현하시오.\n\n| 예측 결과 \\ 실제 결과 | 스팸(Positive) | 스팸 아님(Negative) |\n|---|---:|---:|\n| 스팸(Positive) | 30 | 10 |\n| 스팸 아님(Negative) | 20 | 40 |",
+    "answer": "K-means의 한계: 초기 중심값 설정에 민감하여 결과가 달라질 수 있고, 클러스터 수 k를 사전에 정해야 하며, 이상치와 비구형·비선형 군집에 취약하다. 정확도는 70%, 정밀도는 75%, 재현율은 60%이다.",
+    "explanation": "혼동행렬에서 TP=30, FP=10, FN=20, TN=40이므로 전체 표본은 100개이다. 정확도는 (TP+TN)/100=(30+40)/100=70%이다. 정밀도는 TP/(TP+FP)=30/40=75%이고, 재현율은 TP/(TP+FN)=30/50=60%이다. K-means는 초기값과 k 선택에 민감하고, 평균 기반 거리 계산 특성상 이상치나 복잡한 형태의 군집을 잘 처리하지 못한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신 러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "머신 러닝",
+      "K-means",
+      "군집화",
+      "정확도",
+      "정밀도",
+      "재현율"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 8. 머신 러닝 · 8. 머신 러닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "섹션 제목과 두 개의 하위 문항이 한 행에 섞여 있어 문제 형식이 불명확했음",
+      "정답과 해설이 비어 있었음",
+      "본문에 마크다운 헤딩·이미지 등 불필요한 노이즈가 포함되어 있었음"
+    ],
+    "changes": [
+      "두 하위 문항을 모두 반영한 단일 서술형 prompt로 정리함",
+      "불필요한 헤딩과 이미지 링크를 제거하고 풀이에 필요한 본문만 남김",
+      "K-means 한계와 정확도·정밀도·재현율 계산 결과를 answer/explanation에 보강함",
+      "keywords를 핵심 개념 중심으로 정리함"
+    ]
+  }
+}

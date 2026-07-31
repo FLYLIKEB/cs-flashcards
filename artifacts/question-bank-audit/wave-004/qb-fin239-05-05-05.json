@@ -1,0 +1,91 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-05-05",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-05-05",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 162. 입력되는 데이터를 컴퓨터의 프로세서가 처리하기 전에 미리 처리하여 프로세서가 처리하는 시간을 줄여주는 프로그램이나 하드웨어를 말하는 것은 무엇인가?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "- EAI (Enterprise Application Integration): 서로 다른 응용 프로그램 간의 통합을 통해 데이터와\n       프로세스를 연결하는 기술입니다.\n- GPL (General Public License): 소프트웨어의 자유로운 사용, 수정, 배포를 허용하는 라이선스입니다.\n- Duplexing: 데이터 통신에서 양방향으로 동시에 데이터 전송을 가능하게 하는 기술입니다.",
+    "rubric": [],
+    "choices": [
+      "EAI (Enterprise Application Integration)",
+      "FEP (Front-End Processor)",
+      "GPL (General Public License)",
+      "Duplexing"
+    ],
+    "answer_index": 1,
+    "topic": "입력되는 데이터를 컴퓨터의 프로세서가 처리하기 전에 미리 처리하여 프로세서가 처리하는 시간을 줄여주는 프로그램이나 하드웨어를 말하는 것은 무엇인가?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스",
+      "FEP",
+      "Front-End Processor",
+      "FEP (Front-End Processor)",
+      "데이터 통신"
+    ],
+    "difficulty": "하",
+    "issuer": "SGI서울보증",
+    "source_location": "SGI서울보증 기출 · 162. 입력되는 데이터를 컴퓨터의 프로세서가 처리하기 전에 미리 처리하여 프로세서가 처리하는 시간을 줄여주는 프로그램이나 하드웨어를 말하는 것은 무엇인가?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-05-05",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "입력 데이터를 프로세서가 처리하기 전에 미리 처리하여 프로세서의 부담을 줄여 주는 프로그램이나 하드웨어는 무엇인가?",
+    "body": "",
+    "answer": "FEP (Front-End Processor)",
+    "explanation": "FEP는 메인 프로세서에 들어가기 전 입력 데이터를 선처리하거나 통신·입출력 작업을 담당해 중앙 프로세서의 처리 부담을 줄여 주는 전처리 장치이다. EAI는 이기종 애플리케이션 통합 기술이고, GPL은 소프트웨어 라이선스이며, Duplexing은 양방향 통신 방식이므로 해당 개념과 다르다.",
+    "rubric": [],
+    "choices": [
+      "EAI (Enterprise Application Integration)",
+      "FEP (Front-End Processor)",
+      "GPL (General Public License)",
+      "Duplexing"
+    ],
+    "answer_index": 1,
+    "topic": "Front-End Processor",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "FEP",
+      "Front-End Processor",
+      "전처리",
+      "입출력 처리"
+    ],
+    "difficulty": "하",
+    "issuer": "SGI서울보증",
+    "source_location": "SGI서울보증 기출 · 162. 입력되는 데이터를 컴퓨터의 프로세서가 처리하기 전에 미리 처리하여 프로세서가 처리하는 시간을 줄여주는 프로그램이나 하드웨어를 말하는 것은 무엇인가?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 162. 입력되는 데이터를 컴퓨터의 프로세서가 처리하기 전에 미리 처리하여 프로세서가 처리하는 시간을\n줄여주는 프로그램이나 하드웨어를 말하는 것은 무엇인가?\n1. EAI (Enterprise Application Integration)\n2. FEP (Front-End Processor)\n3. GPL (General Public License)\n4. Duplexing\n\n  **답:** 2번\n- EAI (Enterprise Application Integration): 서로 다른 응용 프로그램 간의 통합을 통해 데이터와\n       프로세스를 연결하는 기술입니다.\n- GPL (General Public License): 소프트웨어의 자유로운 사용, 수정, 배포를 허용하는 라이선스입니다.\n- Duplexing: 데이터 통신에서 양방향으로 동시에 데이터 전송을 가능하게 하는 기술입니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "answer가 선지 번호만 적혀 있어 정답 값이 불완전했음",
+      "explanation이 정답 근거 없이 일부 오답 설명만 포함하고 있었음",
+      "topic과 keywords가 장문 문장·중복 표현 위주라 정제 필요"
+    ],
+    "changes": [
+      "prompt를 순수 질문 문장으로 정리함",
+      "answer를 정답 선지 텍스트로 교체하고 answer_index/choices와 일치시킴",
+      "FEP의 의미와 오답 구분을 포함한 explanation으로 보강함",
+      "topic을 핵심 개념명으로 축약하고 keywords를 간결한 용어로 재정리함"
+    ]
+  }
+}

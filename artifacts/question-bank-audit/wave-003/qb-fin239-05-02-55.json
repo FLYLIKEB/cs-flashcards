@@ -1,0 +1,85 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-55",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-55",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 85. 다음 중 올바르게 연결된 것은?",
+    "body": "정",
+    "answer": "3번",
+    "explanation": "3번",
+    "rubric": [],
+    "choices": [
+      "Physical – Frame",
+      "Data Link – Packet",
+      "Network – Packet",
+      "Transport – Frame"
+    ],
+    "answer_index": 2,
+    "topic": "다음 중 올바르게 연결된 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "OSI 7계층 PDU",
+      "Network – Packet"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 85. 다음 중 올바르게 연결된 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-55",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "OSI 7계층의 PDU 연결로 올바른 것은?",
+    "body": "",
+    "answer": "Network – Packet",
+    "explanation": "OSI 계층별 PDU는 Physical=bit, Data Link=frame, Network=packet, Transport=segment이다. 따라서 Network 계층과 Packet의 연결만 올바르다.",
+    "rubric": [],
+    "choices": [
+      "Physical – Frame",
+      "Data Link – Packet",
+      "Network – Packet",
+      "Transport – Frame"
+    ],
+    "answer_index": 2,
+    "topic": "OSI 7계층 PDU",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "OSI 7계층",
+      "PDU",
+      "Packet"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 85. 다음 중 올바르게 연결된 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 85. 다음 중 올바르게 연결된 것은?\n1. Physical – Frame\n2. Data Link – Packet\n3. Network – Packet\n4. Transport – Frame\n\n정**답:** 3번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었고 topic이 지나치게 일반적이었다.",
+      "body에 의미 없는 잔여 텍스트가 있었고 answer/explanation이 정답 번호만 담고 있었다.",
+      "keywords가 카드 비연계 상태 대비 다소 장황해 핵심 개념 중심 정리가 필요했다."
+    ],
+    "changes": [
+      "prompt를 OSI 7계층 PDU를 묻는 명확한 문장으로 정리하고 body를 빈 문자열로 정리했다.",
+      "answer를 실제 정답 선지 텍스트로, explanation을 계층별 PDU 근거 설명으로 수정했다.",
+      "topic과 keywords를 OSI 7계층/PDU/Packet 중심으로 정리했다."
+    ]
+  }
+}

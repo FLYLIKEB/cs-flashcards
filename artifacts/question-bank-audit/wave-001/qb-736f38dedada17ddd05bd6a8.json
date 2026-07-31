@@ -1,0 +1,116 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-736f38dedada17ddd05bd6a8",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-297",
+    "term": "서브넷",
+    "english": "Subnet",
+    "category": "네트워크",
+    "alphabet_index": "S",
+    "korean_initial": "ㅅ",
+    "definition": "서브넷은 하나의 IP 네트워크를 논리적으로 분할한 주소 구역으로, 주소 관리·라우팅·보안 경계를 세분화해 운영과 장애 대응, 정책 적용을 용이하게 하는 단위입니다.",
+    "detailed_explanation": "의미: 서브넷은 IP 주소를 네트워크 프리픽스(네트워크 부분)와 호스트 부분으로 나누어 만든 논리적 주소 구역입니다. 같은 서브넷에 속한 호스트들은 일반적으로 라우터 없이 직접 통신할 수 있고, 다른 서브넷으로 가려면 기본 게이트웨이를 통해 라우팅됩니다.\n활용: 서브넷은 부서별·업무별·서버망·관리망·DMZ 등으로 네트워크를 분리해 브로드캐스트 범위를 줄이고 장애 영향을 격리하며 방화벽 같은 보안 정책을 적용하기 쉽게 합니다. IPv4에서는 서브넷 마스크나 CIDR 표기로 범위를 나타내며, 프리픽스 길이가 길수록 사용할 수 있는 호스트 수는 줄어듭니다. 금융권에서는 개인정보 처리망, 인터넷 공개망, 대외기관 연계망을 분리하는 것이 중요합니다. 학습 시에는 서브넷이 네트워크의 어느 계층에서 동작하는지, 어떤 상태를 만들거나 변경하는지, 장애 발생 시 어떤 로그나 패킷 증거로 확인할지를 순서대로 떠올리면 이해가 쉬워집니다. 운영에서는 성능과 안정성도 함께 고려해 주소 범위·포트·타임아웃·캐시·재전송 기준 등을 서비스 특성에 맞게 검토하세요.",
+    "related_concepts": "[[IPv4]], [[IPv6]], [[서브넷 마스크]], [[CIDR]], [[TCP]]",
+    "source_files": "05-08-산업은행-기출.md; 08-04-라우팅과-서브넷.md; 05-14-01-한국은행-2019-컴퓨터공학-학술-파트-I.md",
+    "exam_note": "정의뿐 아니라 IPv4 vs IPv6 차이와 서브넷 마스크 vs CIDR(프리픽스 길이)에 따른 호스트 수·라우팅 영향도 간단히 비교해서 쓰세요.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-297-20260719-114543-0182f062.png",
+    "concept_image_alt": "서브넷(네트워크) 개념 참고 이미지",
+    "sort_order": 296,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-297-20260719-114543-0182f062.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-736f38dedada17ddd05bd6a8",
+    "card_id": "CS-297",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]은 하나의 IP 네트워크를 논리적으로 분할한 주소 구역으로, 주소 관리·라우팅·보안 경계를 세분화해 운영과 장애 대응, 정책 적용을 용이하게 하는 단위입니다.",
+    "answer": "서브넷",
+    "explanation": "서브넷은 하나의 IP 네트워크를 논리적으로 분할한 주소 구역으로, 주소 관리·라우팅·보안 경계를 세분화해 운영과 장애 대응, 정책 적용을 용이하게 하는 단위입니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "서브넷 마스크",
+      "TCP",
+      "IPv4",
+      "서브넷"
+    ],
+    "answer_index": 3,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "서브넷",
+      "Subnet",
+      "IPv4",
+      "IPv6",
+      "서브넷 마스크",
+      "CIDR",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-08-산업은행-기출.md; 08-04-라우팅과-서브넷.md; 05-14-01-한국은행-2019-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-736f38dedada17ddd05bd6a8",
+    "card_id": "CS-297",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "하나의 IP 네트워크를 논리적으로 분할한 주소 구역으로, 주소 관리·라우팅·보안 경계를 세분화해 운영과 장애 대응, 정책 적용을 용이하게 하는 단위이다.",
+    "answer": "서브넷",
+    "explanation": "서브넷은 하나의 IP 네트워크를 논리적으로 분할해 주소 관리, 라우팅, 보안 경계를 세분화하는 단위이다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "서브넷 마스크",
+      "TCP",
+      "IPv4",
+      "서브넷"
+    ],
+    "answer_index": 3,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "서브넷",
+      "Subnet",
+      "서브넷 마스크",
+      "CIDR"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-08-산업은행-기출.md; 08-04-라우팅과-서브넷.md; 05-14-01-한국은행-2019-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row.body에 literal [?] placeholder가 남아 있어 문제 풀이에 방해가 되었음",
+      "category가 비어 있어 topic 및 카드 분류와 일치하지 않았음",
+      "keywords에 문제 핵심과 직접 관련 없는 상위/주변 개념이 포함되어 있었음"
+    ],
+    "changes": [
+      "proposed_row.body의 placeholder를 제거하고 서술형 정의 문장으로 다듬어 객관식 풀이가 가능하도록 정리함",
+      "category를 linked_card 기준으로 네트워크로 보정함",
+      "keywords를 서브넷 중심의 간결한 용어로 정리함"
+    ]
+  }
+}

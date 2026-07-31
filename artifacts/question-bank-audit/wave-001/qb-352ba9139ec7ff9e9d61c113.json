@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-352ba9139ec7ff9e9d61c113",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-352ba9139ec7ff9e9d61c113",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 3. 신흥 기술(emerging technologies)의 성숙도를 그래프로 표현한 아래의 하이프 사이클(hype cycle)을 보고 물음에 답하시오.",
+    "body": "![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202013%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%EC%B5%9C%EC%A2%85%29.html/bindata/BIN0003.bmp)\n\n#### 1.\n\nBig Data의 의미와 Big Data가 갖고 있는 주요 속성(3V)에 대해 간략하게 기술하시오.\n\n#### 2.\n\nBig Data의 처리(분석) 과정에서 발생할 수 있는 성능 저하 문제를 해결하는 데 사용될 수 있는 기술을 위의 그림에서 한 가지만 선택하고, 이 기술이 어떻게 성능향상에 기여할 수 있는지를 간략하게 기술하시오.\n\n#### 3.\n\nHTML5의 정의와 의의에 대하여 간략하게 기술하시오.\n\n## Ⅱ. 다음 물음에 답하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "신흥 기술(emerging technologies)의 성숙도를 그래프로 표현한 아래의 하이프 사이클(hype cycle)을 보고 물음에 답하시오.",
+    "field_name": "전산학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "자료구조·알고리즘"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2013 전산학술 발췌 · 3. 신흥 기술(emerging technologies)의 성숙도를 그래프로 표현한 아래의 하이프 사이클(hype cycle)을 보고 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-352ba9139ec7ff9e9d61c113",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "빅데이터의 의미와 주요 속성인 3V를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 3. 신흥 기술(emerging technologies)의 성숙도를 그래프로 표현한 아래의 하이프 사이클(hype cycle)을 보고 물음에 답하시오.",
+    "answer": "빅데이터는 기존 데이터 처리 도구로 다루기 어려울 만큼 대규모·고속·다양한 형태로 생성되는 데이터를 말한다. 주요 속성 3V는 데이터의 양을 뜻하는 Volume, 생성·처리 속도를 뜻하는 Velocity, 정형·비정형을 포함한 데이터 형태의 다양성을 뜻하는 Variety이다.",
+    "explanation": "원문은 하이프 사이클 그림을 전제로 여러 소문항을 함께 묻고 있어 단일 문항으로는 불완전하다. 그중 그림 없이도 독립적으로 성립하는 Big Data와 3V 정의를 개념문제로 재구성했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "빅데이터",
+    "field_name": "전산학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "Big Data",
+      "3V",
+      "Volume",
+      "Velocity",
+      "Variety"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2013 전산학술 발췌 · 3. 신흥 기술(emerging technologies)의 성숙도를 그래프로 표현한 아래의 하이프 사이클(hype cycle)을 보고 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "빅데이터의 정의를 먼저 쓰고 3V(Volume, Velocity, Variety)를 각각 한 문장씩 설명한다.",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 3. 신흥 기술(emerging technologies)의 성숙도를 그래프로 표현한 아래의 하이프 사이클(hype cycle)을 보고 물음에 답하시오.\n\n![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202013%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%EC%B5%9C%EC%A2%85%29.html/bindata/BIN0003.bmp)\n\n#### 1.\n\nBig Data의 의미와 Big Data가 갖고 있는 주요 속성(3V)에 대해 간략하게 기술하시오.\n\n#### 2.\n\nBig Data의 처리(분석) 과정에서 발생할 수 있는 성능 저하 문제를 해결하는 데 사용될 수 있는 기술을 위의 그림에서 한 가지만 선택하고, 이 기술이 어떻게 성능향상에 기여할 수 있는지를 간략하게 기술하시오.\n\n#### 3.\n\nHTML5의 정의와 의의에 대하여 간략하게 기술하시오.\n\n## Ⅱ. 다음 물음에 답하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문이 하이프 사이클 그림 의존형이며 소문항 3개가 한 행에 합쳐져 있음",
+      "정답과 해설이 비어 있어 현재 형태로는 단일 문제로 사용 불가"
+    ],
+    "changes": [
+      "그림 없이도 성립하는 Big Data와 3V 개념문제로 변환",
+      "prompt·body·answer·explanation·topic·keywords·answer_guide를 정리"
+    ]
+  }
+}

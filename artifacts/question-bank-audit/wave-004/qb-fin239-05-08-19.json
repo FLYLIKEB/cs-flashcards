@@ -1,0 +1,101 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-19",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-238",
+    "term": "REDO",
+    "english": "REDO",
+    "category": "데이터베이스",
+    "alphabet_index": "R",
+    "korean_initial": "R",
+    "definition": "REDO는 장애 복구 과정에서 커밋된 트랜잭션의 변경을 로그를 근거로 데이터 파일에 재적용하여 데이터의 지속성을 보장하는 작업입니다.",
+    "detailed_explanation": "의미: REDO는 트랜잭션이 커밋되어야 할 변경이 로그에는 기록되었지만 장애 시점에 실제 데이터 파일에 반영되지 않았을 가능성이 있을 때, 로그를 따라 그 변경을 다시 적용하여 데이터 일관성과 지속성을 복원하는 절차입니다. WAL(Write-Ahead Logging) 구조에서는 먼저 로그를 안전하게 기록해 두고, 이 로그를 근거로 커밋된 변경을 재실행(REDO)할 수 있도록 합니다. 예를 들어 계좌이체처럼 출금과 입금이 함께 성공해야 하는 연산에서 한쪽만 반영되는 것을 방지하는 데 중요합니다. 내부적으로는 잠금, 로그, 버전 관리, 체크포인트 등이 각기 다른 실패 시나리오와 동시성 문제를 분담해 복구를 돕습니다.\n\n활용: 실무에서는 서버가 커밋 응답 후 중단되더라도 REDO를 통해 입금이나 이체 결과를 잃지 않도록 보장합니다. UNDO가 커밋되지 않은 작업을 되돌리는 데 집중한다면 REDO는 이미 커밋된 작업을 보존하는 역할을 합니다. 체크포인트는 로그 중 REDO로 처리해야 할 범위를 줄여 복구 시간을 단축합니다. 시험·면접에서는 ACID 원칙, 고립성 수준, 회복 기법, 교착상태 등과 연관 지어 원인과 해결책을 비교 설명하면 좋고, 실무에서는 정합성이 중요한 금융·공공 시스템에서 성능을 위해 보호 수준을 낮추기 전에 실패 시나리오를 먼저 검토해야 한다는 점을 기억하세요.",
+    "related_concepts": "[[로그]], [[UNDO]], [[체크포인트]], [[인덱스]], [[SQL]]",
+    "source_files": "05-08-산업은행-기출.md; 07-04-트랜잭션과-회복.md; 05-10-데이터베이스-기출-모음.md",
+    "exam_note": "정의만 쓰지 말고 로그·UNDO·체크포인트와 비교해 쓰세요. 핵심: REDO는 커밋된 변경 보존, UNDO는 미커밋 되돌림, 체크포인트로 REDO 범위 단축.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-238-20260719-124215-8576f042.png",
+    "concept_image_alt": "REDO(데이터베이스) 개념 참고 이미지",
+    "sort_order": 237,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-238-20260719-124215-8576f042.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-19",
+    "card_id": "CS-238",
+    "question_type": "subjective",
+    "prompt": "### 224. Redo와 Undo의 역할과 차이를 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: Redo, undo 관련 트랜잭션문제",
+    "answer": "REDO는 커밋된 트랜잭션의 결과를 재반영하고, UNDO는 미완료 트랜잭션의 변경을 취소해 원자성과 지속성을 보장한다.",
+    "explanation": "REDO는 커밋된 트랜잭션의 결과를 재반영하고, UNDO는 미완료 트랜잭션의 변경을 취소해 원자성과 지속성을 보장한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Redo와 Undo의 역할과 차이를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "REDO",
+      "트랜잭션",
+      "UNDO",
+      "Redo와 Undo"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 224. Redo와 Undo의 역할과 차이를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-19",
+    "card_id": "CS-238",
+    "question_type": "subjective",
+    "prompt": "REDO와 UNDO의 역할과 차이를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 224. Redo, undo 관련 트랜잭션문제",
+    "answer": "REDO는 로그를 바탕으로 커밋된 트랜잭션의 변경을 다시 적용해 지속성을 보장하고, UNDO는 커밋되지 않은 트랜잭션의 변경을 취소해 원자성을 보장한다.",
+    "explanation": "장애 복구에서 REDO는 로그에 기록됐지만 데이터 파일에 완전히 반영되지 않았을 수 있는 커밋 완료 변경을 재적용한다. 반면 UNDO는 장애 시점까지 완료되지 않은 트랜잭션의 변경을 되돌려 일관성과 원자성을 회복한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "트랜잭션 회복",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "REDO",
+      "UNDO",
+      "트랜잭션 회복",
+      "로그"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 224. Redo와 Undo의 역할과 차이를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 224. Redo, undo 관련 트랜잭션문제\n**답(AI답변):** REDO는 커밋된 트랜잭션의 결과를 재반영하고, UNDO는 미완료 트랜잭션의 변경을 취소해 원자성과 지속성을 보장한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호/헤딩 표시가 남아 있어 질문문만 분리되지 않았음.",
+      "불완전한 원문을 개념문제로 변환했지만 body 문구가 공통 규칙의 고정 문구와 일치하지 않았음.",
+      "keywords에 중복성 있는 긴 표현이 포함되어 카드 및 개념 정렬이 약했음.",
+      "explanation이 answer와 동일해 보조 해설 역할이 부족했음."
+    ],
+    "changes": [
+      "prompt를 마크다운 없이 명시적 개념 질문으로 정리함.",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 교체하고 원문 제목을 명시함.",
+      "answer와 explanation을 REDO/UNDO의 복구 역할 차이가 드러나도록 정리함.",
+      "keywords를 REDO, UNDO, 트랜잭션 회복, 로그로 정리해 linked_card 및 출제 개념과 맞춤."
+    ]
+  }
+}

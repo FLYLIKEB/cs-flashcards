@@ -1,0 +1,71 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-15",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-15",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "### 15. 크라우드 펀딩 뜻",
+    "body": "- 크라우드 펀딩: 인터넷을 통해 다수의 소액 투자자들로부터 자금을 모으는 방식",
+    "answer": "다수의 개인에게서 소액 자금을 모아 프로젝트·기업·상품을 후원하거나 투자하는 방식이다.",
+    "explanation": "다수의 개인에게서 소액 자금을 모아 프로젝트·기업·상품을 후원하거나 투자하는 방식이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "크라우드 펀딩 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "크라우드 펀딩"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 15. 크라우드 펀딩 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-15",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "크라우드 펀딩의 뜻을 쓰시오.",
+    "body": "",
+    "answer": "인터넷 등을 통해 다수의 개인으로부터 소액 자금을 모아 프로젝트나 기업에 후원하거나 투자하는 방식이다.",
+    "explanation": "크라우드 펀딩은 온라인 플랫폼을 통해 여러 사람이 소액을 모아 자금을 조달하는 방식을 뜻한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "크라우드 펀딩 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "크라우드 펀딩"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 15. 크라우드 펀딩 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 15. 크라우드 펀딩 뜻\n- 크라우드 펀딩: 인터넷을 통해 다수의 소액 투자자들로부터 자금을 모으는 방식\n**답(AI답변):** 다수의 개인에게서 소액 자금을 모아 프로젝트·기업·상품을 후원하거나 투자하는 방식이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 헤딩과 번호가 남아 있었음",
+      "body에 정답성 정의가 그대로 들어가 있었음"
+    ],
+    "changes": [
+      "프롬프트를 서술형 질문으로 정리함",
+      "body의 답안 누출성 정의를 제거함",
+      "정답과 해설을 개념형 서술에 맞게 다듬음"
+    ]
+  }
+}

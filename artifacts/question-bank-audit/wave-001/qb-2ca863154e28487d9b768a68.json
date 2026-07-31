@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-2ca863154e28487d9b768a68",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-2ca863154e28487d9b768a68",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 1. 여러 개의 비동기 프로세스(Asynchronous processes)가 공유 변수 X를 조작하는 아래 코드를 수행하려고 한다. 이때 발생할 수 있는 문제를 예를 들어 설명하고 세마포어(Semaphore)가 이 문제를 해결하는데 어떻게 활용될 수 있는지 기술하시오.",
+    "body": "```text\nRead (X)\nX = X+1\nWrite (X)\n```",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "여러 개의 비동기 프로세스(Asynchronous processes)가 공유 변수 X를 조작하는 아래 코드를 수행하려고 한다. 이때 발생할 수 있는 문제를 예를 들어 설명하고 세마포어(Semaphore)가 이 문제를 해결하는데 어떻게 활용될 수 있는지 기술하시오.",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스",
+      "세마포어"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2011 전산학술 발췌 · 1. 여러 개의 비동기 프로세스(Asynchronous processes)가 공유 변수 X를 조작하는 아래 코드를 수행하려고 한다. 이때 발생할 수 있는 문제를 예를 들어 설명하고 세마포어(Semaphore)가 이 문제를 해결하는데 어떻게 활용될 수 있는지 기술하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-2ca863154e28487d9b768a68",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "여러 개의 비동기 프로세스가 공유 변수 X를 조작할 때 발생할 수 있는 문제를 예를 들어 설명하고, 세마포어가 이 문제를 어떻게 해결하는지 기술하시오.",
+    "body": "Read (X)\nX = X+1\nWrite (X)",
+    "answer": "여러 프로세스가 공유 변수 X를 동시에 읽고 수정하면 상호 배제가 보장되지 않아 race condition이 발생할 수 있다. 예를 들어 X가 5일 때 두 프로세스가 동시에 Read(X)를 수행하면 둘 다 5를 읽고 각각 6으로 계산한 뒤 Write(X)를 하면 최종값이 7이 아니라 6이 되어 갱신이 유실된다. 세마포어는 공유 변수에 접근하는 임계구역 앞에서 wait(P) 연산으로 진입을 제어하고, 작업이 끝난 뒤 signal(V) 연산으로 해제하여 한 번에 하나의 프로세스만 Read-Modify-Write를 수행하게 함으로써 이 문제를 해결한다.",
+    "explanation": "제시된 코드는 읽기-수정-쓰기 연산이 분리되어 있어 실행이 교차되면 lost update가 발생한다. 이는 공유 자원에 대한 동시 접근을 제어하지 못한 전형적인 임계구역 문제다. 초기값 1의 이진 세마포어나 mutex 성격의 세마포어를 사용하면 프로세스는 임계구역 진입 전에 wait를 호출해 잠금을 획득하고, 종료 후 signal을 호출해 다른 프로세스의 진입을 허용한다. 그 결과 공유 변수 X의 변경이 직렬화되어 데이터 일관성이 유지된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로세스 동기화와 세마포어",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스 동기화",
+      "임계구역",
+      "race condition",
+      "세마포어"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2011 전산학술 발췌 · 1. 여러 개의 비동기 프로세스(Asynchronous processes)가 공유 변수 X를 조작하는 아래 코드를 수행하려고 한다. 이때 발생할 수 있는 문제를 예를 들어 설명하고 세마포어(Semaphore)가 이 문제를 해결하는데 어떻게 활용될 수 있는지 기술하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 1. 여러 개의 비동기 프로세스(Asynchronous processes)가 공유 변수 X를 조작하는 아래 코드를 수행하려고 한다. 이때 발생할 수 있는 문제를 예를 들어 설명하고 세마포어(Semaphore)가 이 문제를 해결하는데 어떻게 활용될 수 있는지 기술하시오.\n\n```text\nRead (X)\nX = X+1\nWrite (X)\n```",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 번호가 남아 있었음",
+      "정답과 해설이 비어 있었음",
+      "topic과 keywords가 지나치게 포괄적이었음",
+      "body에 불필요한 코드펜스가 포함되어 있었음"
+    ],
+    "changes": [
+      "프롬프트를 순수 질문문으로 정리함",
+      "body를 실행 코드만 남기도록 정리함",
+      "race condition과 세마포어 활용에 대한 정답·해설을 작성함",
+      "topic과 keywords를 프로세스 동기화 맥락에 맞게 보정함"
+    ]
+  }
+}

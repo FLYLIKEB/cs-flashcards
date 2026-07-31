@@ -1,0 +1,79 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-7b4229a7e7a103fc458d936f",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-7b4229a7e7a103fc458d936f",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 4. 컴퓨터구조",
+    "body": "컴퓨터구조와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n다음은 동일한 소스 코드를 작성한 뒤 명령어 집합(Instruction Set)이 다른 컴퓨터에서 어셈블리어로 컴파일한 결과이다. `A`와 `B`에 대하여 각각 RISC/CISC 중 어떤 것인지 쓰고, 장단점을 설명하시오.\n\n```text\nA (x86-64)                              B (ARM)\nmain:                                   main:\npush rbp                                push {r7}\nmov rbp, rsp                            sub sp, sp, #20\nmov DWORD PTR [rbp-4], 1                add r7, sp, #0\nmov DWORD PTR [rbp-8], 2                movs r3, #1\nmov edx, DWORD PTR [rbp-4]              str r3, [r7, #12]\nmov eax, DWORD PTR [rbp-8]              movs r3, #2\nadd eax, edx                            str r2, [r7, #8]\nmov DWORD PTR [rbp-12], eax             ldr r2, [r7, #12]\nmov eax, 0                              ldr r3, [r7, #8]\npop rbp                                 add r3, r3, r2\nret                                     str r3, [r7, #4]\n                                        movs r3, #0\n                                        mov r0, r3\n                                        adds r7, r7, #20\n                                        mov sp, r7\n                                        ldr r7, [sp], #4\n                                        bx lr\n```\n\n#### 2.\n\n**4-2-1 CPU 구조**\n\n![4-2-1 CPU 구조](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0001.bmp)\n\n**4-2-2 GPU 구조**\n\n![4-2-2 GPU 구조](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0002.bmp)\n\n아래는 CPU와 GPU의 구조를 간략화한 것이다. 딥러닝 알고리즘 연산에는 어떤 것을 사용하면 유리할지와 그 이유를 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터구조",
+    "field_name": "컴퓨터공학 학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "컴퓨터구조"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 4. 컴퓨터구조",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-7b4229a7e7a103fc458d936f",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "다음 두 가지 컴퓨터구조 관련 물음에 답하시오.",
+    "body": "1. 동일한 소스 코드를 서로 다른 명령어 집합 구조에서 컴파일한 결과가 아래와 같다. A(x86-64)와 B(ARM)를 각각 CISC와 RISC로 구분하고, 각 구조의 장단점을 설명하시오.\n\n```text\nA (x86-64)                              B (ARM)\nmain:                                   main:\npush rbp                                push {r7}\nmov rbp, rsp                            sub sp, sp, #20\nmov DWORD PTR [rbp-4], 1                add r7, sp, #0\nmov DWORD PTR [rbp-8], 2                movs r3, #1\nmov edx, DWORD PTR [rbp-4]              str r3, [r7, #12]\nmov eax, DWORD PTR [rbp-8]              movs r3, #2\nadd eax, edx                            str r2, [r7, #8]\nmov DWORD PTR [rbp-12], eax             ldr r2, [r7, #12]\nmov eax, 0                              ldr r3, [r7, #8]\npop rbp                                 add r3, r3, r2\nret                                     str r3, [r7, #4]\n                                        movs r3, #0\n                                        mov r0, r3\n                                        adds r7, r7, #20\n                                        mov sp, r7\n                                        ldr r7, [sp], #4\n                                        bx lr\n```\n\n2. CPU와 GPU의 구조를 비교할 때, 딥러닝 알고리즘 연산에는 어느 쪽이 더 유리한지와 그 이유를 설명하시오.",
+    "answer": "1. A(x86-64)는 CISC, B(ARM)는 RISC이다. CISC는 복잡한 명령을 한 번에 수행해 코드 밀도가 높고 하위 호환성이 좋지만, 명령 해석이 복잡해 하드웨어 설계와 전력 효율 측면에서 불리할 수 있다. RISC는 단순한 명령을 빠르게 실행해 파이프라이닝과 전력 효율에 유리하지만, 같은 작업에 더 많은 명령어가 필요할 수 있다.\n\n2. 딥러닝 연산에는 GPU가 더 유리하다. 행렬·벡터 연산처럼 동일한 계산을 대량의 데이터에 병렬로 적용하는 작업이 많아, 다수의 코어로 높은 병렬 처리량을 제공하는 GPU가 CPU보다 효율적이기 때문이다.",
+    "explanation": "x86 계열은 전통적으로 복잡한 명령어를 지원하는 CISC, ARM 계열은 단순한 명령어를 빠르게 처리하도록 설계된 RISC로 분류한다. 따라서 비교 포인트는 명령어 복잡도, 파이프라이닝 용이성, 전력 효율, 코드 밀도이다. 또 CPU는 소수의 강력한 코어로 범용 제어에 강하고, GPU는 많은 연산 유닛으로 동일 연산의 대규모 병렬 처리에 강하므로 딥러닝의 핵심인 행렬 곱셈·합성곱 같은 연산에서 GPU가 유리하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터구조",
+    "field_name": "컴퓨터공학 학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "RISC",
+      "CISC",
+      "CPU",
+      "GPU",
+      "병렬 처리",
+      "딥러닝"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 4. 컴퓨터구조",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 4. 컴퓨터구조\n\n컴퓨터구조와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n다음은 동일한 소스 코드를 작성한 뒤 명령어 집합(Instruction Set)이 다른 컴퓨터에서 어셈블리어로 컴파일한 결과이다. `A`와 `B`에 대하여 각각 RISC/CISC 중 어떤 것인지 쓰고, 장단점을 설명하시오.\n\n```text\nA (x86-64)                              B (ARM)\nmain:                                   main:\npush rbp                                push {r7}\nmov rbp, rsp                            sub sp, sp, #20\nmov DWORD PTR [rbp-4], 1                add r7, sp, #0\nmov DWORD PTR [rbp-8], 2                movs r3, #1\nmov edx, DWORD PTR [rbp-4]              str r3, [r7, #12]\nmov eax, DWORD PTR [rbp-8]              movs r3, #2\nadd eax, edx                            str r2, [r7, #8]\nmov DWORD PTR [rbp-12], eax             ldr r2, [r7, #12]\nmov eax, 0                              ldr r3, [r7, #8]\npop rbp                                 add r3, r3, r2\nret                                     str r3, [r7, #4]\n                                        movs r3, #0\n                                        mov r0, r3\n                                        adds r7, r7, #20\n                                        mov sp, r7\n                                        ldr r7, [sp], #4\n                                        bx lr\n```\n\n#### 2.\n\n**4-2-1 CPU 구조**\n\n![4-2-1 CPU 구조](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0001.bmp)\n\n**4-2-2 GPU 구조**\n\n![4-2-2 GPU 구조](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0002.bmp)\n\n아래는 CPU와 GPU의 구조를 간략화한 것이다. 딥러닝 알고리즘 연산에는 어떤 것을 사용하면 유리할지와 그 이유를 설명하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt가 섹션 제목만 담고 있어 질문 역할을 하지 않음",
+      "answer와 explanation이 비어 있음",
+      "body가 원문 마크다운 헤딩과 이미지 링크를 포함한 채 정리되지 않음",
+      "keywords가 지나치게 포괄적임"
+    ],
+    "changes": [
+      "prompt를 실제 서술형 질문으로 수정함",
+      "body를 두 개의 하위 문항이 드러나도록 정리하고 불필요한 마크다운 제목·이미지 링크를 제거함",
+      "RISC/CISC 비교와 GPU 선택 이유에 대한 정답 및 해설을 작성함",
+      "keywords를 핵심 개념어 중심으로 보정함"
+    ]
+  }
+}

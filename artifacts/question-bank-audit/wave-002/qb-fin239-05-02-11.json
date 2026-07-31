@@ -1,0 +1,72 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-11",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-11",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 41. GPU특징",
+    "body": "",
+    "answer": "GPU는 많은 코어로 병렬 연산에 특화되어 그래픽 처리, AI 학습, 행렬 연산 등에 강하다.",
+    "explanation": "GPU는 많은 코어로 병렬 연산에 특화되어 그래픽 처리, AI 학습, 행렬 연산 등에 강하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "GPU특징",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "GPU"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 41. GPU특징",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-11",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "GPU의 주요 특징을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 41. GPU특징",
+    "answer": "GPU는 다수의 코어를 이용해 동일한 연산을 대량으로 병렬 처리하도록 설계된 프로세서로, 그래픽 렌더링과 벡터·행렬 기반 연산에 강하다.",
+    "explanation": "GPU는 CPU보다 제어 흐름이 단순한 연산을 동시에 많이 처리하는 데 최적화되어 있어 그래픽 처리, 딥러닝 학습, 과학기술 계산처럼 병렬성이 큰 작업에서 성능 이점이 크다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "GPU특징",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "GPU",
+      "병렬 처리",
+      "행렬 연산"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 41. GPU특징",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트가 마크다운 제목 형태라 질문문이 아님",
+      "원문에 문제 맥락이 없어 실전형 서술 문제로 풀기 어려움"
+    ],
+    "changes": [
+      "GPU 특징 설명 개념문제로 프롬프트 정리",
+      "변환 메모 2줄 추가 및 답안·해설을 개념형으로 보강",
+      "키워드를 병렬 처리 중심으로 정리"
+    ]
+  }
+}

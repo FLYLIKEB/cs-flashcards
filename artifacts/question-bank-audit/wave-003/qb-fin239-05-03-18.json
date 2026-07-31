@@ -1,0 +1,107 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-18",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-053",
+    "term": "클라우드 컴퓨팅",
+    "english": "Cloud Computing",
+    "category": "클라우드·분산시스템",
+    "alphabet_index": "C",
+    "korean_initial": "ㅋ",
+    "definition": "클라우드 컴퓨팅은 네트워크를 통해 공유 IT 자원을 온디맨드로 빠르게 할당·확장하고 사용량 기반으로 관리하는 컴퓨팅 모델이며, 여러 서버와 네트워크가 함께 동작하는 환경에서 확장성, 장애 대응, 일관성, 운영 자동화를 균형 있게 설계할 때 중요합니다.",
+    "detailed_explanation": "의미: 클라우드 컴퓨팅은 서버, 스토리지, 네트워크, 플랫폼, 애플리케이션을 공동 자원 풀에서 제공하며 온디맨드 셀프서비스, 광범위한 네트워크 접근, 자원 풀링, 빠른 탄력성, 측정 가능한 서비스가 핵심 특성입니다. 서비스 모델은 사용자가 관리하는 범위에 따라 IaaS, PaaS, SaaS로 구분됩니다. 컴퓨팅 자원을 필요한 만큼 빌려 쓰는 운영 모델입니다. 학습할 때는 여러 노드와 네트워크가 함께 움직일 때 어떤 위험을 줄이는지 보면 쉽습니다. 식당의 주문, 조리, 배달을 나누면 빠르지만 전달 지연이나 일부 담당자 장애가 전체 경험에 영향을 주는 것과 비슷합니다. 핵심은 요청 흐름, 상태 위치, 장애 전파 범위, 복구 방법을 분리해 보는 것이며, 확장성만큼 복잡도와 비용도 늘어납니다. 가상화, 하이퍼바이저와 비교하면 경계가 더 분명합니다. 활용: 금융권에서는 개발·분석 환경을 빠르게 만들고 피크 트래픽에 맞춰 확장할 수 있지만, 계정 권한, 데이터 위치, 암호화, 비용 한도, 벤더 종속을 통제해야 합니다. 단순 외부 서버 임대와 달리 자동화·탄력성·계량 과금이 함께 있어야 클라우드답다고 설명할 수 있습니다. 시험이나 면접에서는 성능 향상과 함께 장애, 네트워크 지연, 데이터 일관성, 운영 비용의 trade-off를 같이 말하면 좋습니다. 실무에서는 모니터링, 자동 복구, 우회 경로를 전제로 설계해야 합니다.",
+    "related_concepts": "[[가상화]], [[하이퍼바이저]], [[분산 시스템]], [[컨테이너]], [[관측성]]",
+    "source_files": "07-01-02-키와-무결성.md; 04-IT-필기-핵심정리.md; 04-02-프로그래밍-SQL-분산-클라우드.md",
+    "exam_note": "클라우드·분산시스템 문제에서는 클라우드 컴퓨팅의 정의만 쓰지 말고 관련 개념(가상화, 하이퍼바이저, 분산 시스템)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "하",
+    "concept_image_url": "/api/ai-images/CS-053-20260720-055808-895db9d2.png",
+    "concept_image_alt": "클라우드 컴퓨팅(클라우드·분산시스템) 개념 참고 이미지",
+    "sort_order": 52,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-053-20260720-055808-895db9d2.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-18",
+    "card_id": "CS-053",
+    "question_type": "multiple_choice",
+    "prompt": "### 105. 클라우드 컴퓨팅에 대해 적절하지 않은 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "- 클라우드 컴퓨팅은 서비스 모델에 따라 PaaS(Platform as a Service), IaaS(Infrastructure as a Service),\n           SaaS(Software as a Service)로 분류됩니다. 운용 모델에 따라 퍼블릭, 프라이빗, 하이브리드로\n           분류됩니다.",
+    "rubric": [],
+    "choices": [
+      "PaaS는 자원 제공",
+      "운용 모델에 따라 퍼블릭, 프라이빗, 하이브리드로 분류",
+      "운용 모델에 따라 PaaS, IaaS, SaaS로 분류",
+      "웹 메일은 클라우드 컴퓨터의 가장 기본적인 모델이다."
+    ],
+    "answer_index": 2,
+    "topic": "클라우드 컴퓨팅에 대해 적절하지 않은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "클라우드 컴퓨팅",
+      "Cloud Computing"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 105. 클라우드 컴퓨팅에 대해 적절하지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-18",
+    "card_id": "CS-053",
+    "question_type": "multiple_choice",
+    "prompt": "클라우드 컴퓨팅에 대해 적절하지 않은 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "클라우드 컴퓨팅은 서비스 모델에 따라 IaaS, PaaS, SaaS로 분류되고, 운용 모델에 따라 퍼블릭, 프라이빗, 하이브리드로 분류된다. 따라서 3번은 서비스 모델을 운용 모델로 잘못 설명한 선지이므로 부적절하다.",
+    "rubric": [],
+    "choices": [
+      "PaaS는 자원 제공 모델이다.",
+      "운용 모델에 따라 퍼블릭, 프라이빗, 하이브리드로 분류된다.",
+      "운용 모델에 따라 PaaS, IaaS, SaaS로 분류된다.",
+      "웹 메일은 클라우드 컴퓨팅의 대표적인 SaaS 사례이다."
+    ],
+    "answer_index": 2,
+    "topic": "클라우드 컴퓨팅에 대해 적절하지 않은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "클라우드 컴퓨팅",
+      "Cloud Computing",
+      "서비스 모델",
+      "운용 모델"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 105. 클라우드 컴퓨팅에 대해 적절하지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 105. 클라우드 컴퓨팅에 대해 적절하지 않은 것은?\n1. PaaS는 자원 제공\n2. 운용 모델에 따라 퍼블릭, 프라이빗, 하이브리드로 분류\n3. 운용 모델에 따라 PaaS, IaaS, SaaS로 분류\n4. 웹 메일은 클라우드 컴퓨터의 가장 기본적인 모델이다.\n\n  **답:** 3번\n- 클라우드 컴퓨팅은 서비스 모델에 따라 PaaS(Platform as a Service), IaaS(Infrastructure as a Service),\n           SaaS(Software as a Service)로 분류됩니다. 운용 모델에 따라 퍼블릭, 프라이빗, 하이브리드로\n           분류됩니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 번호가 남아 있었고 explanation이 답안 표기 형식의 불완전한 발췌문이었다.",
+      "choices에 비문과 오타(클라우드 컴퓨터)가 있었고 4번 선지가 대표적 SaaS 사례라는 의미로만 이해되어 문장 정리가 필요했다.",
+      "keywords가 문제 핵심인 서비스 모델·운용 모델 구분을 반영하지 못했다."
+    ],
+    "changes": [
+      "prompt를 순수 질문 문장으로 정리하고 explanation을 정답 근거가 드러나는 완전한 문장으로 수정했다.",
+      "choices를 뜻은 유지한 채 문장형으로 다듬고 4번의 오타를 클라우드 컴퓨팅으로 바로잡아 사용 가능하게 정리했다.",
+      "keywords에 서비스 모델과 운용 모델을 추가해 linked_card와 문제 핵심 개념 정렬을 보완했다."
+    ]
+  }
+}

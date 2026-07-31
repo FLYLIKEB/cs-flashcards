@@ -1,0 +1,84 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-03",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-03",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 90. 어떤 값보다 큰 가장 작은 정수를 구하는 C언어 함수는?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "- floor: 이 함수는 주어진 값보다 작거나 같은 가장 큰 정수를 반환합니다. 예를 들어, floor(3.7)은 3을\n       반환합니다.\n- round: 이 함수는 주어진 값을 가장 가까운 정수로 반올림합니다. 예를 들어, round(3.5)는 4를,\n\n       round(3.2)는 3을 반환합니다.\n- trunc: 이 함수는 주어진 값의 소수 부분을 버리고 정수 부분만 반환합니다. 예를 들어, trunc(3.7)은 3을\n       반환합니다.",
+    "rubric": [],
+    "choices": [
+      "floor",
+      "ceil",
+      "round",
+      "trunc"
+    ],
+    "answer_index": 1,
+    "topic": "어떤 값보다 큰 가장 작은 정수를 구하는 C언어 함수는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "ceil 함수",
+      "ceil"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 90. 어떤 값보다 큰 가장 작은 정수를 구하는 C언어 함수는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-03",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "C 언어에서 어떤 값보다 큰 가장 작은 정수를 구하는 함수는?",
+    "body": "",
+    "answer": "ceil",
+    "explanation": "ceil은 주어진 값보다 크거나 같은 최소 정수를 반환한다. floor는 작거나 같은 최대 정수, round는 가장 가까운 정수로 반올림, trunc는 소수부를 버린다.",
+    "rubric": [],
+    "choices": [
+      "floor",
+      "ceil",
+      "round",
+      "trunc"
+    ],
+    "answer_index": 1,
+    "topic": "어떤 값보다 큰 가장 작은 정수를 구하는 C언어 함수는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "ceil 함수",
+      "ceil"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 90. 어떤 값보다 큰 가장 작은 정수를 구하는 C언어 함수는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 90. 어떤 값보다 큰 가장 작은 정수를 구하는 C언어 함수는?\n1. floor\n2. ceil\n3. round\n4. trunc\n\n  **답:** 2번\n- floor: 이 함수는 주어진 값보다 작거나 같은 가장 큰 정수를 반환합니다. 예를 들어, floor(3.7)은 3을\n       반환합니다.\n- round: 이 함수는 주어진 값을 가장 가까운 정수로 반올림합니다. 예를 들어, round(3.5)는 4를,\n\n       round(3.2)는 3을 반환합니다.\n- trunc: 이 함수는 주어진 값의 소수 부분을 버리고 정수 부분만 반환합니다. 예를 들어, trunc(3.7)은 3을\n       반환합니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row.prompt에 마크다운 제목 표시와 문항 번호가 남아 있었다.",
+      "proposed_row.answer가 정답 내용 대신 '2번'으로 되어 있었다.",
+      "proposed_row.explanation이 장황하고 정답 근거가 간결하게 정리되지 않았다."
+    ],
+    "changes": [
+      "prompt를 풀이용 질문 문장만 남기도록 정리했다.",
+      "answer를 정답 함수명인 'ceil'로 수정했다.",
+      "explanation을 ceil의 의미와 다른 함수와의 차이만 남기도록 간결하게 정리했다."
+    ]
+  }
+}

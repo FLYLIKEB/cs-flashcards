@@ -1,0 +1,105 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-48",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-610",
+    "term": "해시 함수",
+    "english": "Hash Function",
+    "category": "자료구조·알고리즘",
+    "alphabet_index": "#",
+    "korean_initial": "ㅎ",
+    "definition": "해시 함수는 임의 길이의 입력(키)을 고정 범위의 해시값으로 변환하는 함수입니다. 이 해시값은 해시 테이블의 인덱스 결정, 중복 탐지 또는 무결성 검증 같은 연산에 사용됩니다.",
+    "detailed_explanation": "의미: 해시 함수는 같은 입력에 대해 항상 같은 해시값을 반환해야 하고, 가능한 한 결과를 균등하게 분산시켜 충돌(서로 다른 입력이 같은 해시값을 갖는 경우)을 최소화해야 합니다. 자료구조에서 쓰이는 해시는 주로 계산 속도와 분포(균등성)가 중요하며, 암호학적 해시는 여기에 더해 역상 저항성(주어진 해시값으로 원래 입력을 찾기 어려움), 충돌 저항성(서로 다른 입력이 같은 해시값을 만들기 어려움) 같은 보안 특성이 필요합니다. 같은 데이터를 저장하는 방식에 따라 조회·삽입·삭제·순회 비용이 크게 달라지므로 평균 성능뿐 아니라 최악 경우 성능과 메모리 사용을 함께 고려해야 합니다.\n활용: 해시 함수는 해시 테이블의 인덱스 계산, 캐시 샤딩, 중복 탐지, 비밀번호 저장 전처리 등에서 쓰입니다. 간단한 나머지 연산 방식은 특정 패턴의 키에 취약할 수 있고, 보안 목적에는 SHA 계열 같은 강한 해시와 salt를 함께 써야 합니다. 실무에서는 데이터 크기, 조회 대 갱신 비율, 순서 보장 필요성, 캐시 효율성, 동시성 제어 등을 기준으로 해시 방법을 선택하며, 이름만 익숙하다고 바로 적용하지 말고 병목 지점을 먼저 파악한 뒤 경계 조건과 최악 입력에 대한 테스트를 반드시 수행해야 합니다.",
+    "related_concepts": "[[최소 힙]], [[해시 테이블]], [[충돌]], [[체이닝]], [[시간 복잡도]]",
+    "source_files": "04-04-네트워크-프로토콜-보안.md; 05-12-보안-기출-모음.md; 05-14-20-한국은행-2025-컴퓨터공학-학술-10-자료구조-해시.md",
+    "exam_note": "정의만 쓰지 말고 해시 테이블·충돌(체이닝·오픈 어드레싱)·최소 힙 등과의 차이(성능·용도)를 간단히 비교해 설명하라.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-610-20260719-175814-42ef33c7.png",
+    "concept_image_alt": "해시 함수(자료구조·알고리즘) 개념 참고 이미지",
+    "sort_order": 609,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-610-20260719-175814-42ef33c7.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-48",
+    "card_id": "CS-610",
+    "question_type": "multiple_choice",
+    "prompt": "### 78. 다음 중 해시 함수의 특징으로 옳은 것은?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "2번",
+    "rubric": [],
+    "choices": [
+      "복호화가 가능하다",
+      "동일 입력은 항상 동일 출력이다",
+      "키를 사용한다",
+      "양방향 변환이 가능하다"
+    ],
+    "answer_index": 1,
+    "topic": "다음 중 해시 함수의 특징으로 옳은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "해시 함수",
+      "Hash Function"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 78. 다음 중 해시 함수의 특징으로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-48",
+    "card_id": "CS-610",
+    "question_type": "multiple_choice",
+    "prompt": "다음 중 해시 함수의 특징으로 옳은 것은?",
+    "body": "",
+    "answer": "동일 입력은 항상 동일 출력이다",
+    "explanation": "해시 함수는 같은 입력값에 대해 항상 같은 해시값을 반환하는 결정성을 가져야 하므로 2번이 옳다. 복호화나 양방향 변환은 해시의 성질이 아니며, 키 사용은 일반 해시 함수의 필수 조건이 아니다.",
+    "rubric": [],
+    "choices": [
+      "복호화가 가능하다",
+      "동일 입력은 항상 동일 출력이다",
+      "키를 사용한다",
+      "양방향 변환이 가능하다"
+    ],
+    "answer_index": 1,
+    "topic": "해시 함수",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "해시 함수",
+      "Hash Function"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 78. 다음 중 해시 함수의 특징으로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 78. 다음 중 해시 함수의 특징으로 옳은 것은?\n1. 복호화가 가능하다\n2. 동일 입력은 항상 동일 출력이다\n3. 키를 사용한다\n4. 양방향 변환이 가능하다\n\n**답:** 2번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "answer와 explanation이 모두 '2번'으로만 되어 있어 정답 내용과 해설이 비어 있었음",
+      "topic이 질문 문장 전체여서 주제어로 정리되지 않았음"
+    ],
+    "changes": [
+      "prompt를 질문 문장만 남기도록 정리함",
+      "answer를 정답 선지의 실제 내용으로 바꾸고 explanation에 근거와 오답 구분을 보강함",
+      "topic을 카드와 일치하는 핵심 주제어인 '해시 함수'로 정리함"
+    ]
+  }
+}

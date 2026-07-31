@@ -1,0 +1,85 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-363d9dc99ea8a0c9c3283394",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-363d9dc99ea8a0c9c3283394",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 1. 아래 코드가 실행되면 시작 프로세스를 포함하여 총 몇 개의 프로세스가 생성되는가?",
+    "body": "```c\nint main() {\n    if (fork() > 0) fork();\n}\n```\n\n> 주) 프로세스 생성이 실패하는 경우는 없다고 가정한다.\n\nA. 1\n\nB. 2\n\nC. 3\n\nD. 4\n\nE. ∞ (운영체제에서 허용하는 프로세스의 개수 만큼 생성)",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "∞ (운영체제에서 허용하는 프로세스의 개수 만큼 생성)"
+    ],
+    "answer_index": null,
+    "topic": "아래 코드가 실행되면 시작 프로세스를 포함하여 총 몇 개의 프로세스가 생성되는가?",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 1. 아래 코드가 실행되면 시작 프로세스를 포함하여 총 몇 개의 프로세스가 생성되는가?",
+    "section": "전공필기",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-363d9dc99ea8a0c9c3283394",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "아래 코드가 실행되면 시작 프로세스를 포함하여 총 몇 개의 프로세스가 생성되는가?",
+    "body": "```c\nint main() {\n    if (fork() > 0) fork();\n}\n```\n\n주) 프로세스 생성이 실패하는 경우는 없다고 가정한다.",
+    "answer": "3",
+    "explanation": "첫 번째 fork() 호출로 부모와 자식, 총 2개의 프로세스가 된다. 부모 프로세스에서는 fork()의 반환값이 0보다 크므로 조건이 참이어서 두 번째 fork()를 한 번 더 수행해 프로세스가 1개 추가된다. 자식 프로세스에서는 첫 번째 fork()의 반환값이 0이므로 조건이 거짓이어서 두 번째 fork()를 수행하지 않는다.",
+    "rubric": [],
+    "choices": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "∞ (운영체제에서 허용하는 프로세스의 개수 만큼 생성)"
+    ],
+    "answer_index": 2,
+    "topic": "아래 코드가 실행되면 시작 프로세스를 포함하여 총 몇 개의 프로세스가 생성되는가?",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스",
+      "fork"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 1. 아래 코드가 실행되면 시작 프로세스를 포함하여 총 몇 개의 프로세스가 생성되는가?",
+    "section": "전공필기",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 1. 아래 코드가 실행되면 시작 프로세스를 포함하여 총 몇 개의 프로세스가 생성되는가?\n\n```c\nint main() {\n    if (fork() > 0) fork();\n}\n```\n\n> 주) 프로세스 생성이 실패하는 경우는 없다고 가정한다.\n\nA. 1\n\nB. 2\n\nC. 3\n\nD. 4\n\nE. ∞ (운영체제에서 허용하는 프로세스의 개수 만큼 생성)",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 번호가 포함되어 있었음",
+      "body에 선택지가 중복 포함되어 있었음",
+      "정답과 해설, answer_index가 비어 있었음"
+    ],
+    "changes": [
+      "prompt를 질문 문장만 남기도록 정리함",
+      "body에서 선택지 중복을 제거하고 코드와 조건만 유지함",
+      "정답을 3으로 확정하고 해설, answer_index, keywords를 보완함"
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-47",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-302",
+    "term": "대칭키 암호화",
+    "english": "Symmetric Encryption",
+    "category": "보안",
+    "alphabet_index": "S",
+    "korean_initial": "ㄷ",
+    "definition": "대칭키 암호화는 하나의 비밀키로 암호화와 복호화를 모두 수행해 빠르지만 키 공유와 보관이 보안의 핵심이 되는 방식이며, 최소 권한·검증·감사 관점에서 보호 대상과 실패 영향을 함께 판단해야 합니다.",
+    "detailed_explanation": "의미: 대칭키 암호화는 송신자와 수신자가 같은 키를 알고 있어야 평문을 암호문으로 만들고 다시 복호화할 수 있는 방식입니다. AES가 대표적이며 비대칭키 암호보다 훨씬 빠르기 때문에 대용량 데이터 보호에 적합합니다. 활용: TLS 세션 데이터, DB 암호화, 파일·백업 암호화, VPN 터널 암호화에 사용됩니다. 문제는 키를 어떻게 안전하게 생성, 배포, 저장, 회전, 폐기하느냐입니다. 그래서 실제 통신에서는 비대칭키나 Diffie-Hellman으로 세션키를 안전하게 합의한 뒤 대칭키로 본문을 암호화합니다. 면접에서는 대칭키는 성능, 비대칭키는 키 배포와 인증 측면에서 강점이 있다고 비교하면 좋습니다. 처음 학습할 때는 대칭키 암호화을 단일 제품이 아니라 자산 식별, 정책 설정, 기술 통제, 로그 확인, 사고 대응이 이어지는 흐름으로 보면 이해가 쉽습니다. 실제 운영에서는 보안을 강화할수록 사용자 편의와 처리 속도가 영향을 받을 수 있으므로, 민감도와 업무 필요성을 기준으로 예외를 최소화하고 남긴 예외는 만료일과 책임자를 정해 점검해야 합니다.",
+    "related_concepts": "[[PKI]], [[공개키 기반구조]], [[비대칭키 암호화]], [[AES]], [[인증]]",
+    "source_files": "04-04-네트워크-프로토콜-보안.md; 05-12-보안-기출-모음.md; 05-02-기업은행-기출.md",
+    "exam_note": "보안 문제에서는 대칭키 암호화의 정의만 쓰지 말고 관련 개념(PKI, 공개키 기반구조, 비대칭키 암호화)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-302-20260720-053140-c998088b.png",
+    "concept_image_alt": "대칭키 암호화(보안) 개념 참고 이미지",
+    "sort_order": 301,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-302-20260720-053140-c998088b.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-47",
+    "card_id": "CS-302",
+    "question_type": "multiple_choice",
+    "prompt": "### 77. 다음 중 대칭키 암호화 알고리즘에 해당하는 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "3번",
+    "rubric": [],
+    "choices": [
+      "RSA",
+      "ECC",
+      "AES",
+      "SHA-256"
+    ],
+    "answer_index": 2,
+    "topic": "다음 중 대칭키 암호화 알고리즘에 해당하는 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "대칭키 암호화",
+      "Symmetric Encryption",
+      "AES"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 77. 다음 중 대칭키 암호화 알고리즘에 해당하는 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-47",
+    "card_id": "CS-302",
+    "question_type": "multiple_choice",
+    "prompt": "다음 중 대칭키 암호화 알고리즘에 해당하는 것은?",
+    "body": "",
+    "answer": "AES",
+    "explanation": "AES는 대표적인 대칭키 암호화 알고리즘이다. RSA와 ECC는 비대칭키 암호화에 사용되고, SHA-256은 암호화 알고리즘이 아니라 해시 함수다.",
+    "rubric": [],
+    "choices": [
+      "RSA",
+      "ECC",
+      "AES",
+      "SHA-256"
+    ],
+    "answer_index": 2,
+    "topic": "대칭키 암호화",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "대칭키 암호화",
+      "Symmetric Encryption",
+      "AES"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 77. 다음 중 대칭키 암호화 알고리즘에 해당하는 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 77. 다음 중 대칭키 암호화 알고리즘에 해당하는 것은?\n1. RSA\n2. ECC\n3. AES\n4. SHA-256\n\n**답:** 3번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "answer와 explanation이 모두 '3번'으로만 되어 있어 정답 내용과 해설이 부족했음",
+      "topic이 질문 문장 전체로 들어가 있어 카드 주제와 맞춘 정리가 필요했음"
+    ],
+    "changes": [
+      "prompt를 문항 번호와 마크다운 없이 순수 질문 문장으로 정리함",
+      "answer를 실제 정답인 'AES'로 수정하고 answer_index 및 choices와 일치시킴",
+      "explanation에 AES가 대칭키 알고리즘이며 나머지 선택지는 비대칭키 또는 해시 함수라는 구분 근거를 추가함",
+      "topic을 '대칭키 암호화'로 정리해 카드 및 카테고리와 정렬함"
+    ]
+  }
+}

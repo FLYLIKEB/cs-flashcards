@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-27",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-27",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 232. 피보나치수열에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 피보나치수열 문제",
+    "answer": "피보나치 수열은 F(n)=F(n-1)+F(n-2), F(0)=0, F(1)=1이며 재귀보다 DP가 효율적이다.",
+    "explanation": "피보나치 수열은 F(n)=F(n-1)+F(n-2), F(0)=0, F(1)=1이며 재귀보다 DP가 효율적이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "피보나치수열에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "피보나치수열"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 232. 피보나치수열에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-27",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "피보나치 수열의 정의와 점화식을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 232. 피보나치수열 문제",
+    "answer": "피보나치 수열은 각 항이 바로 앞의 두 항의 합으로 정의되는 수열로, F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2)(n≥2)를 만족한다.",
+    "explanation": "피보나치 수열의 핵심은 초기값 두 개와 점화식으로 이후 항이 결정된다는 점이다. 단순 재귀는 같은 부분 문제를 반복 계산하므로 비효율적이어서 실제 구현에서는 동적 계획법이나 반복문으로 계산하는 방법을 많이 사용한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "피보나치 수열",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "피보나치 수열",
+      "점화식",
+      "동적 계획법"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 232. 피보나치수열에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 232. 피보나치수열 문제\n**답(AI답변):** 피보나치 수열은 F(n)=F(n-1)+F(n-2), F(0)=0, F(1)=1이며 재귀보다 DP가 효율적이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 제목과 번호가 남아 있어 질문 문장만 남기지 못했다.",
+      "body의 변환 메모 문구가 공통 규칙의 지정 형식과 다르고 원문 제목도 축약돼 있었다.",
+      "answer와 explanation이 동일한 한 줄이라 정의·점화식과 구현상 설명이 충분히 분리되지 않았다.",
+      "topic과 keywords가 문제 문장 복사 수준이어서 개념 중심 용어 정리가 필요했다."
+    ],
+    "changes": [
+      "불완전한 원문을 규칙에 따라 피보나치 수열의 정의와 점화식을 묻는 개념형 subjective 문항으로 정리했다.",
+      "body를 지정된 두 줄 형식으로 교체하고 원문 제목을 그대로 명시했다.",
+      "answer는 최종 정의와 점화식만 남기고 explanation은 재귀 대비 동적 계획법 활용 이유를 설명하도록 분리했다.",
+      "topic을 개념명으로 정리하고 keywords를 피보나치 수열·점화식·동적 계획법으로 정제했다."
+    ]
+  }
+}

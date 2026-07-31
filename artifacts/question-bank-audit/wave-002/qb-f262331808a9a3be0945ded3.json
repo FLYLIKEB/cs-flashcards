@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-f262331808a9a3be0945ded3",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-f262331808a9a3be0945ded3",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 2. 자료구조",
+    "body": "자료구조와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n깊이우선탐색(DFS, Depth First Search)과 너비우선탐색(BFS, Breadth First Search)의 개념을 각각 설명하고, 각 탐색 방법의 구현에 가장 적합한 자료구조 형식을 제시하시오.\n\n#### 2.\n\n**2-2 BFS 그래프**\n\n![2-2 BFS 그래프](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0002.bmp)\n\n다음과 같은 그래프가 있다. 시작점 `0`에서부터 너비우선탐색(BFS)으로 모든 노드를 방문했을 때의 탐색 결과(방문 순서)를 답하시오. (단, 동일한 조건의 노드는 낮은 숫자의 노드를 우선으로 방문한다.)\n\n#### 3.\n\n**2-3 B-Tree 그림**\n\n![2-3 B-Tree 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0003.bmp)\n\n다음 B-Tree에 `7`을 삽입할 경우 완성될 B-Tree를 그리시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "자료구조",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "자료구조"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 2. 자료구조",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-f262331808a9a3be0945ded3",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "깊이우선탐색(DFS)과 너비우선탐색(BFS)의 개념을 설명하고, 각 탐색에 적합한 자료구조를 쓰시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 2. 자료구조",
+    "answer": "DFS는 한 경로를 가능한 깊게 탐색한 뒤 되돌아가며 방문하는 방식으로 주로 스택(또는 재귀 호출 스택)을 사용하고, BFS는 시작 정점에서 가까운 정점부터 같은 레벨별로 넓게 탐색하는 방식으로 큐를 사용한다.",
+    "explanation": "원문에는 DFS/BFS 서술형 문항과 함께 BFS 그래프, B-Tree 삽입 그림 문제가 한 행에 섞여 있었고 그림 정보가 빠져 있어 원문 그대로는 단일 문제로 풀 수 없다. 따라서 제공된 텍스트만으로 답할 수 있는 DFS/BFS 개념 문제로 변환했다. DFS는 후입선출 구조가 깊이 우선 진행에 맞고, BFS는 선입선출 구조가 가까운 노드부터 순차 방문하는 데 적합하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "자료구조",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "DFS",
+      "BFS",
+      "스택",
+      "큐",
+      "그래프 탐색"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 2. 자료구조",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 2. 자료구조\n\n자료구조와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n깊이우선탐색(DFS, Depth First Search)과 너비우선탐색(BFS, Breadth First Search)의 개념을 각각 설명하고, 각 탐색 방법의 구현에 가장 적합한 자료구조 형식을 제시하시오.\n\n#### 2.\n\n**2-2 BFS 그래프**\n\n![2-2 BFS 그래프](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0002.bmp)\n\n다음과 같은 그래프가 있다. 시작점 `0`에서부터 너비우선탐색(BFS)으로 모든 노드를 방문했을 때의 탐색 결과(방문 순서)를 답하시오. (단, 동일한 조건의 노드는 낮은 숫자의 노드를 우선으로 방문한다.)\n\n#### 3.\n\n**2-3 B-Tree 그림**\n\n![2-3 B-Tree 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0003.bmp)\n\n다음 B-Tree에 `7`을 삽입할 경우 완성될 B-Tree를 그리시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "한 행에 서로 다른 3개 문항이 섞여 있음",
+      "BFS 그래프와 B-Tree 그림 정보가 없어 원문형으로는 풀이 불가",
+      "prompt와 body에 마크다운 제목/복합 문제 서술이 그대로 남아 있음"
+    ],
+    "changes": [
+      "DFS/BFS 개념과 적합한 자료구조를 묻는 단일 서술형 문제로 변환",
+      "body를 변환 메모 2줄 형식으로 정리",
+      "정답·해설·키워드를 개념형 문항에 맞게 보강"
+    ]
+  }
+}

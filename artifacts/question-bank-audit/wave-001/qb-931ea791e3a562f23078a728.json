@@ -1,0 +1,90 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-931ea791e3a562f23078a728",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-931ea791e3a562f23078a728",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 3. 다음과 같은 작업이 수행 될 때 SJF(Shortest Job First) 스케줄링 기법의 평균 반환시간(Turnaround time)은 얼마인가 ?",
+    "body": "| 프로세스 | 도착 시각 | 수행 시간(예상) |\n| --- | --- | --- |\n| P1 | 0 | 3 |\n| P2 | 2 | 6 |\n| P3 | 4 | 4 |\n| P4 | 6 | 5 |\n| P5 | 8 | 2 |\n\nA. 7.2\n\nB. 7.6\n\nC. 8.6\n\nD. 8.9\n\nE. 9.4",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [
+      "7.2",
+      "7.6",
+      "8.6",
+      "8.9",
+      "9.4"
+    ],
+    "answer_index": null,
+    "topic": "다음과 같은 작업이 수행 될 때 SJF(Shortest Job First) 스케줄링 기법의 평균 반환시간(Turnaround time)은 얼마인가 ?",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스",
+      "스케줄링",
+      "SJF"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 3. 다음과 같은 작업이 수행 될 때 SJF(Shortest Job First) 스케줄링 기법의 평균 반환시간(Turnaround time)은 얼마인가 ?",
+    "section": "전공필기",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-931ea791e3a562f23078a728",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "다음 작업들이 수행될 때 SJF(Shortest Job First) 스케줄링의 평균 반환시간(Turnaround time)은 얼마인가?",
+    "body": "| 프로세스 | 도착 시각 | 수행 시간(예상) |\n| --- | --- | --- |\n| P1 | 0 | 3 |\n| P2 | 2 | 6 |\n| P3 | 4 | 4 |\n| P4 | 6 | 5 |\n| P5 | 8 | 2 |",
+    "answer": "7.6",
+    "explanation": "비선점형 SJF로 계산하면 P1(0~3) → P2(3~9) → P5(9~11) → P3(11~15) → P4(15~20) 순서로 실행된다. 각 반환시간은 P1=3, P2=7, P5=3, P3=11, P4=14이므로 평균은 (3+7+3+11+14)/5 = 7.6이다.",
+    "rubric": [],
+    "choices": [
+      "7.2",
+      "7.6",
+      "8.6",
+      "8.9",
+      "9.4"
+    ],
+    "answer_index": 1,
+    "topic": "SJF 스케줄링",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스 스케줄링",
+      "SJF",
+      "반환시간"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 3. 다음과 같은 작업이 수행 될 때 SJF(Shortest Job First) 스케줄링 기법의 평균 반환시간(Turnaround time)은 얼마인가 ?",
+    "section": "전공필기",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 3. 다음과 같은 작업이 수행 될 때 SJF(Shortest Job First) 스케줄링 기법의 평균 반환시간(Turnaround time)은 얼마인가 ?\n\n| 프로세스 | 도착 시각 | 수행 시간(예상) |\n| --- | --- | --- |\n| P1 | 0 | 3 |\n| P2 | 2 | 6 |\n| P3 | 4 | 4 |\n| P4 | 6 | 5 |\n| P5 | 8 | 2 |\n\nA. 7.2\n\nB. 7.6\n\nC. 8.6\n\nD. 8.9\n\nE. 9.4",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 헤딩과 문항 번호가 포함됨",
+      "body에 선택지가 중복 기재됨",
+      "정답, 해설, answer_index가 비어 있음",
+      "topic과 keywords가 비정형적임"
+    ],
+    "changes": [
+      "prompt를 질문 문장만 남기도록 정리함",
+      "body에서 선택지 중복을 제거하고 표만 유지함",
+      "정답 7.6과 해설 및 answer_index=1을 채움",
+      "topic과 keywords를 SJF 스케줄링 중심으로 정리함"
+    ]
+  }
+}

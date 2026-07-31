@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-08",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-08",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "### 8. OTT에 대한 뜻",
+    "body": "- OTT(Over The Top): 인터넷을 통해 다양한 플랫폼으로 사용자가 원할 때 방송을 보여주는 VOD 서비스",
+    "answer": "인터넷망을 통해 방송·영상 콘텐츠를 제공하는 서비스로 Netflix, YouTube 등이 예시다.",
+    "explanation": "인터넷망을 통해 방송·영상 콘텐츠를 제공하는 서비스로 Netflix, YouTube 등이 예시다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "OTT에 대한 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "OTT"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 8. OTT에 대한 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-08",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "OTT란 무엇인가?",
+    "body": "",
+    "answer": "인터넷망을 통해 방송·영상 콘텐츠를 제공하는 서비스이다.",
+    "explanation": "OTT는 Over The Top의 약자로, 전통적인 방송망이나 셋톱박스를 거치지 않고 인터넷을 통해 사용자가 원하는 시점에 영상 콘텐츠를 제공하는 서비스를 뜻한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "OTT에 대한 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "OTT",
+      "Over The Top",
+      "VOD"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 8. OTT에 대한 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 8. OTT에 대한 뜻\n- OTT(Over The Top): 인터넷을 통해 다양한 플랫폼으로 사용자가 원할 때 방송을 보여주는 VOD 서비스\n**답(AI답변):** 인터넷망을 통해 방송·영상 콘텐츠를 제공하는 서비스로 Netflix, YouTube 등이 예시다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 번호가 남아 있었다.",
+      "body에 정답 정의가 그대로 노출되어 있었다.",
+      "explanation이 정답을 중복할 뿐 근거 설명이 부족했다."
+    ],
+    "changes": [
+      "프롬프트를 깔끔한 개념 질문으로 정리했다.",
+      "body를 비우고 OTT 정의를 정답과 해설로 재작성했다.",
+      "키워드에 영문 약어와 관련 용어를 보강했다."
+    ]
+  }
+}

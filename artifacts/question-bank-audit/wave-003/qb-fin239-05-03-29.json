@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-29",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-29",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 116. 애자일 방법론 중 설명이 틀린 것은?",
+    "body": "",
+    "answer": "애자일은 짧은 반복, 고객 피드백, 변화 수용을 중시한다. 폭포수처럼 모든 단계를 순차 고정하지 않는다.",
+    "explanation": "애자일은 짧은 반복, 고객 피드백, 변화 수용을 중시한다. 폭포수처럼 모든 단계를 순차 고정하지 않는다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "애자일 방법론 중 설명이 틀린 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "애자일"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 116. 애자일 방법론 중 설명이 틀린 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-29",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "애자일 방법론의 핵심 특징을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 116. 애자일 방법론 중 설명이 틀린 것은?",
+    "answer": "애자일 방법론은 짧은 반복 주기로 개발을 진행하면서 고객 피드백을 지속적으로 반영하고 변화하는 요구사항에 유연하게 대응하는 개발 방식이다.",
+    "explanation": "원문은 '틀린 것'을 고르는 문제였지만 선택지가 없어 실제 정오판단이 불가능했다. 따라서 애자일의 핵심 원리인 반복적 개발, 고객 협업, 변화 대응을 묻는 개념문제로 변환했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "애자일 방법론",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "애자일 방법론",
+      "반복 개발",
+      "고객 피드백",
+      "요구사항 변화 대응"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 116. 애자일 방법론 중 설명이 틀린 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 116. 애자일 방법론 중 설명이 틀린 것은?\n**답(AI답변):** 애자일은 짧은 반복, 고객 피드백, 변화 수용을 중시한다. 폭포수처럼 모든 단계를 순차 고정하지 않는다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문은 '틀린 것'을 묻는 객관식 형태인데 선택지가 없어 실제로 풀 수 없었다.",
+      "prompt에 마크다운 heading이 남아 있었고 topic도 질문 문장 그대로였다.",
+      "AI답변 문구를 그대로 answer/explanation에 넣어 문제 형식과 맞지 않았다."
+    ],
+    "changes": [
+      "불완전한 실전형 문항을 애자일 방법론의 핵심 특징을 묻는 개념형 subjective 문항으로 변환했다.",
+      "prompt를 정리하고 body를 변환 메모 2줄 형식으로 채웠다.",
+      "answer, explanation, topic, keywords를 애자일의 핵심 원리에 맞게 정리했다."
+    ]
+  }
+}

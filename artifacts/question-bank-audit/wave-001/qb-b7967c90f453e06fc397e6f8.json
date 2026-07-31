@@ -1,0 +1,116 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-b7967c90f453e06fc397e6f8",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-618",
+    "term": "패킷 지연",
+    "english": "Packet Delay",
+    "category": "네트워크",
+    "alphabet_index": "P",
+    "korean_initial": "ㅍ",
+    "definition": "패킷 지연은 출발지에서 목적지까지 패킷이 도달하는 데 걸리는 총 시간으로, 처리 지연·큐잉 지연·전송 지연·전파 지연 네 가지 요소의 합으로 발생합니다. 각 요소를 분리해 보면 네트워크 계층별 책임과 실제 장애 지점을 식별하기 쉽습니다.",
+    "detailed_explanation": "의미: 패킷 지연은 네 가지로 나뉩니다. 처리 지연은 라우터가 패킷 헤더를 검사하고 결정하는 데 걸리는 시간, 큐잉 지연은 전송을 기다리며 버퍼에 머무는 시간, 전송 지연은 패킷의 모든 비트를 링크에 올려보내는 데 필요한 시간(패킷 길이와 대역폭에 영향), 전파 지연은 신호가 매체를 따라 이동하는 데 필요한 시간(거리와 전파 속도에 영향)입니다. 각 항목은 발생 위치와 원인이 달라 장애 원인 분석에 유용합니다.\n활용: 지연에 민감한 서비스(예: 금융망의 실시간 주문·지급결제, 외부 연계 API)는 평균 지연뿐 아니라 피크 시간의 큐잉 지연과 지터까지 점검해야 합니다. 시험에서는 전송 지연은 패킷 길이·대역폭, 전파 지연은 거리·전파 속도로 구분해 설명하세요. 학습할 때는 ‘어떤 계층에서 동작하는지 → 어떤 상태값을 바꾸는지 → 장애 시 어떤 로그나 패킷 증거가 남는지’ 순서로 떠올리면 이해가 빠릅니다. 운영에서는 성능 개선과 안정성 확보를 위해 주소 범위, 포트, 타임아웃, 캐시 정책, 재전송 기준 등을 서비스 특성에 맞춰 검토·조정해야 합니다.",
+    "related_concepts": "[[QoS]], [[혼잡 제어]], [[라우팅]], [[TCP]], [[UDP]]",
+    "source_files": "2026년도 한국은행 신입직원(G5) 채용 안내(PDF): 데이터통신 범위; 한국은행 컴퓨터공학 2023 기출 풀이(비공식)",
+    "exam_note": "네 가지 지연(처리·큐잉·전송·전파)을 원인·계산 변수로 구분하고, 혼잡 시 큐잉 지연이 급증한다는 점을 비교해 설명하세요.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-618-20260719-115049-5f627f21.png",
+    "concept_image_alt": "패킷 지연(네트워크) 개념 참고 이미지",
+    "sort_order": 617,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-618-20260719-115049-5f627f21.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-b7967c90f453e06fc397e6f8",
+    "card_id": "CS-618",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]은 출발지에서 목적지까지 패킷이 도달하는 데 걸리는 총 시간으로, 처리 지연·큐잉 지연·전송 지연·전파 지연 네 가지 요소의 합으로 발생합니다.",
+    "answer": "패킷 지연",
+    "explanation": "패킷 지연은 출발지에서 목적지까지 패킷이 도달하는 데 걸리는 총 시간으로, 처리 지연·큐잉 지연·전송 지연·전파 지연 네 가지 요소의 합으로 발생합니다. 각 요소를 분리해 보면 네트워크 계층별 책임과 실제 장애 지점을 식별하기 쉽습니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "라우팅",
+      "패킷 지연",
+      "UDP",
+      "QoS"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "패킷 지연",
+      "Packet Delay",
+      "QoS",
+      "혼잡 제어",
+      "라우팅",
+      "TCP",
+      "UDP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "2026년도 한국은행 신입직원(G5) 채용 안내(PDF): 데이터통신 범위; 한국은행 컴퓨터공학 2023 기출 풀이(비공식)",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-b7967c90f453e06fc397e6f8",
+    "card_id": "CS-618",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것은?",
+    "body": "출발지에서 목적지까지 패킷이 도달하는 데 걸리는 총 시간으로, 처리 지연·큐잉 지연·전송 지연·전파 지연 네 가지 요소의 합으로 발생합니다.",
+    "answer": "패킷 지연",
+    "explanation": "패킷 지연은 출발지에서 목적지까지 패킷이 도달하는 데 걸리는 총 시간으로, 처리 지연·큐잉 지연·전송 지연·전파 지연 네 가지 요소의 합입니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "라우팅",
+      "패킷 지연",
+      "UDP",
+      "QoS"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "패킷 지연",
+      "Packet Delay",
+      "처리 지연",
+      "큐잉 지연",
+      "전송 지연",
+      "전파 지연"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "2026년도 한국은행 신입직원(G5) 채용 안내(PDF): 데이터통신 범위; 한국은행 컴퓨터공학 2023 기출 풀이(비공식)",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 placeholder 표기([?])가 남아 있었습니다.",
+      "category가 비어 있었고 keywords에 범위가 넓은 관련 개념이 섞여 있었습니다."
+    ],
+    "changes": [
+      "prompt/body를 정리해 placeholder를 제거하고 정의 문장만 남겼습니다.",
+      "category를 네트워크로 보정하고 keywords를 패킷 지연 핵심 용어로 정리했습니다."
+    ]
+  }
+}

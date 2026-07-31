@@ -1,0 +1,82 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-19",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-19",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 205. 클라우드 시스템 분류 및 특징 약술",
+    "body": "- IaaS(인프라형 서비스): 물리적 자원을 가상화하여 인프라를 제공함. 예: 서버, 스토리지, 네트워크 등.\n- PaaS(플랫폼형    서비스):   개발자가   애플리케이션을      개발하고 배포할   수   있도록   플랫폼을   제공함.   예:\n    애플리케이션 개발 환경, 데이터베이스 등.\n- SaaS(소프트웨어형 서비스): 최종 사용자가 이용할 수 있는 소프트웨어 애플리케이션을 제공함. 예: 이메일,\n    CRM, 협업 도구 등.",
+    "answer": "IaaS는 인프라 제공, PaaS는 개발 플랫폼 제공, SaaS는 완성 소프트웨어 제공이다.",
+    "explanation": "IaaS는 인프라 제공, PaaS는 개발 플랫폼 제공, SaaS는 완성 소프트웨어 제공이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "클라우드 시스템 분류 및 특징 약술",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "데이터베이스",
+      "IaaS",
+      "PaaS",
+      "SaaS",
+      "클라우드 시스템",
+      "클라우드"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 205. 클라우드 시스템 분류 및 특징 약술",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-19",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "클라우드 서비스 모델인 IaaS, PaaS, SaaS의 특징을 각각 설명하시오.",
+    "body": "",
+    "answer": "IaaS는 서버·스토리지·네트워크 같은 인프라 자원을 가상화해 제공하는 모델이고, PaaS는 애플리케이션 개발·배포에 필요한 플랫폼과 실행 환경을 제공하는 모델이며, SaaS는 사용자가 완성된 소프트웨어를 인터넷을 통해 바로 이용하는 모델이다.",
+    "explanation": "IaaS는 인프라 계층을 서비스로 제공하고, PaaS는 개발자가 애플리케이션을 만들고 배포할 수 있는 플랫폼을 제공하며, SaaS는 최종 사용자가 설치 부담 없이 완성된 소프트웨어를 이용하게 한다. 세 모델은 제공 범위가 인프라 → 개발 플랫폼 → 완성 소프트웨어로 확장된다는 점에서 구분된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "클라우드 서비스 모델",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "클라우드 컴퓨팅",
+      "클라우드 서비스 모델",
+      "IaaS",
+      "PaaS",
+      "SaaS"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 205. 클라우드 시스템 분류 및 특징 약술",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 205. 클라우드 시스템 분류 및 특징 약술\n- IaaS(인프라형 서비스): 물리적 자원을 가상화하여 인프라를 제공함. 예: 서버, 스토리지, 네트워크 등.\n- PaaS(플랫폼형    서비스):   개발자가   애플리케이션을      개발하고 배포할   수   있도록   플랫폼을   제공함.   예:\n    애플리케이션 개발 환경, 데이터베이스 등.\n- SaaS(소프트웨어형 서비스): 최종 사용자가 이용할 수 있는 소프트웨어 애플리케이션을 제공함. 예: 이메일,\n    CRM, 협업 도구 등.\n**답(AI답변):** IaaS는 인프라 제공, PaaS는 개발 플랫폼 제공, SaaS는 완성 소프트웨어 제공이다.\n\n## 약어 풀이\n\n- IT: Information Technology, 정보기술\n- LRU: Least Recently Used, 최근 최소 사용",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row.prompt에 마크다운 번호/헤딩 잔여물이 남아 있었다.",
+      "proposed_row.body가 정답 내용을 그대로 담고 있어 답안 누출과 공백 이상이 있었다.",
+      "answer와 explanation이 지나치게 축약돼 있어 IaaS·PaaS·SaaS의 구분이 충분히 드러나지 않았다.",
+      "keywords에 데이터베이스처럼 핵심 범주와 직접 맞지 않는 항목이 포함돼 있었다."
+    ],
+    "changes": [
+      "prompt를 명시적인 개념형 서술 문제로 정리하고 body는 빈 문자열로 정리했다.",
+      "answer와 explanation을 각 서비스 모델의 제공 범위와 차이가 드러나도록 구체화했다.",
+      "topic을 간결하게 정리하고 keywords를 클라우드 서비스 모델 중심으로 재구성했다."
+    ]
+  }
+}

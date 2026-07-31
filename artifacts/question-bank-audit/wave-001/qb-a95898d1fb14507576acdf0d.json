@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-a95898d1fb14507576acdf0d",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-a95898d1fb14507576acdf0d",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 1. 소프트웨어 공학",
+    "body": "소프트웨어 공학과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**1-1 작업 네트워크**\n\n![1-1 작업 네트워크](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0001.bmp)\n\n다음 작업 네트워크의 임계경로(critical path)를 구하시오.\n\n#### 2.\n\n문제 `1.`의 작업 네트워크에서 작업 `E`를 가장 늦게 시작할 수 있는 날은 프로젝트를 시작한 지 며칠 후인가? (단, 전체 일정에 지연이 발생해서는 안 됨)\n\n#### 3.\n\n신규 소프트웨어 개발 프로젝트의 계획단계에서 기능점수(function points) 분석법 중 간이법을 적용하여 개발규모를 산정하려고 한다. 아래 표와 같이 기능이 식별되었을 때 최종 기능점수를 산출하시오. (단, 평균 복잡도 가중치는 ILF 7.5, EIF 5.4, EI 4.0, EO 5.2, EQ 3.9를 적용)\n\n| 단위 업무 | ILF | EIF | EI 입력 | EI 수정 | EI 삭제 | EO | EQ |\n|---|---:|---:|---:|---:|---:|---:|---:|\n| P1 | 1 | 0 | 1 | 1 | 1 | 0 | 1 |\n| P2 | 2 | 0 | 2 | 1 | 1 | 1 | 2 |\n| P3 | 0 | 1 | 1 | 1 | 0 | 1 | 2 |\n| P4 | 1 | 0 | 2 | 1 | 1 | 0 | 2 |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "소프트웨어 공학",
+    "field_name": "컴퓨터공학 학술",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "소프트웨어 공학"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 1. 소프트웨어 공학",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-a95898d1fb14507576acdf0d",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "기능점수(function points) 분석법 중 간이법을 적용할 때 아래 표의 기능 식별 결과를 바탕으로 최종 기능점수를 산출하시오.",
+    "body": "평균 복잡도 가중치는 ILF 7.5, EIF 5.4, EI 4.0, EO 5.2, EQ 3.9를 적용한다.\n\n| 단위 업무 | ILF | EIF | EI 입력 | EI 수정 | EI 삭제 | EO | EQ |\n|---|---:|---:|---:|---:|---:|---:|---:|\n| P1 | 1 | 0 | 1 | 1 | 1 | 0 | 1 |\n| P2 | 2 | 0 | 2 | 1 | 1 | 1 | 2 |\n| P3 | 0 | 1 | 1 | 1 | 0 | 1 | 2 |\n| P4 | 1 | 0 | 2 | 1 | 1 | 0 | 2 |",
+    "answer": "125.1 FP",
+    "explanation": "간이 기능점수는 식별된 기능 수에 평균 복잡도 가중치를 곱해 합산한다. ILF는 4개로 30.0점, EIF는 1개로 5.4점, EI는 입력·수정·삭제를 합쳐 13개로 52.0점, EO는 2개로 10.4점, EQ는 7개로 27.3점이다. 따라서 총 기능점수는 30.0 + 5.4 + 52.0 + 10.4 + 27.3 = 125.1 FP이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "소프트웨어 공학",
+    "field_name": "컴퓨터공학 학술",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "기능점수",
+      "Function Point",
+      "ILF",
+      "EIF",
+      "EI",
+      "EO",
+      "EQ"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 1. 소프트웨어 공학",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "항목별 개수를 집계하고 가중치를 곱한 뒤 총합을 제시",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 1. 소프트웨어 공학\n\n소프트웨어 공학과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**1-1 작업 네트워크**\n\n![1-1 작업 네트워크](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0001.bmp)\n\n다음 작업 네트워크의 임계경로(critical path)를 구하시오.\n\n#### 2.\n\n문제 `1.`의 작업 네트워크에서 작업 `E`를 가장 늦게 시작할 수 있는 날은 프로젝트를 시작한 지 며칠 후인가? (단, 전체 일정에 지연이 발생해서는 안 됨)\n\n#### 3.\n\n신규 소프트웨어 개발 프로젝트의 계획단계에서 기능점수(function points) 분석법 중 간이법을 적용하여 개발규모를 산정하려고 한다. 아래 표와 같이 기능이 식별되었을 때 최종 기능점수를 산출하시오. (단, 평균 복잡도 가중치는 ILF 7.5, EIF 5.4, EI 4.0, EO 5.2, EQ 3.9를 적용)\n\n| 단위 업무 | ILF | EIF | EI 입력 | EI 수정 | EI 삭제 | EO | EQ |\n|---|---:|---:|---:|---:|---:|---:|---:|\n| P1 | 1 | 0 | 1 | 1 | 1 | 0 | 1 |\n| P2 | 2 | 0 | 2 | 1 | 1 | 1 | 2 |\n| P3 | 0 | 1 | 1 | 1 | 0 | 1 | 2 |\n| P4 | 1 | 0 | 2 | 1 | 1 | 0 | 2 |",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "여러 하위 문항이 한 행에 합쳐져 있어 단일 문제로 풀 수 없었음",
+      "작업 네트워크 그림이 누락돼 앞선 문항들은 풀이 불가능했음",
+      "정답, 해설, 검색용 키워드가 비어 있었음"
+    ],
+    "changes": [
+      "완전한 정보가 있는 기능점수 산정 문항만 남기도록 prompt와 body를 정리함",
+      "최종 기능점수 125.1 FP와 계산 근거 해설을 추가함",
+      "키워드와 answer_guide를 기능점수 문제에 맞게 정리함"
+    ]
+  }
+}

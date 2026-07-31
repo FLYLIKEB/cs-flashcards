@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-12",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-12",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "### 12. 1 Petabyte의 크기는?",
+    "body": "",
+    "answer": "1,024 TB",
+    "explanation": "1,024 TB",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "1 Petabyte의 크기는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "Petabyte"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 12. 1 Petabyte의 크기는?",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-12",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "1 Petabyte의 크기는?",
+    "body": "",
+    "answer": "1,024 TB",
+    "explanation": "저장 용량 단위에서 1 PB는 1,024 TB이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "1 Petabyte의 크기는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "Petabyte",
+      "PB",
+      "TB"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 12. 1 Petabyte의 크기는?",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 12. 1 Petabyte의 크기는?\n\n   **답:** 1,024 TB",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 markdown heading과 문항 번호가 남아 있었음",
+      "explanation이 정답만 반복해 근거가 부족했음",
+      "keywords가 핵심 용량 단위를 충분히 담지 못했음"
+    ],
+    "changes": [
+      "prompt를 순수 질문 문장으로 정리함",
+      "explanation에 PB-TB 환산 근거를 보강함",
+      "keywords에 PB와 TB를 추가함"
+    ]
+  }
+}

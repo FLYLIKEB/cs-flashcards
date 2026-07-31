@@ -1,0 +1,96 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-23",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-337",
+    "term": "VPN",
+    "english": "VPN",
+    "category": "네트워크",
+    "alphabet_index": "V",
+    "korean_initial": "V",
+    "definition": "VPN은 공용 네트워크 위에 암호화된 터널과 인증을 통해 원격 사용자나 지점을 사설망처럼 안전하게 연결하는 기술입니다. 또한 네트워크의 계층별 책임과 실제 장애 지점을 구분하는 기준으로 사용됩니다.",
+    "detailed_explanation": "의미: VPN은 Virtual Private Network로, 인터넷처럼 신뢰할 수 없는 공용망 위에 암호화된 '터널'을 만들어 인증된 사용자나 장비만 내부 자원에 접근하도록 하는 기술입니다. 대표적인 구현 방식으로는 IPsec, SSL/TLS 기반 VPN, WireGuard 등이 있습니다.\n활용: 재택근무 접속, 지점 간 네트워크 연결, 운영자 원격 접속, 클라우드와 사내망 연계 등에 사용됩니다. 다만 VPN이 접속 후 내부망 전체를 과도하게 열어주면 계정 탈취 시 피해가 커지므로 MFA, 단말 보안 상태 확인(단말 검사), 최소 권한 적용, 분할 터널링 정책, 접속 로그 감사 등을 함께 적용해야 합니다. 면접에서는 '터널링은 캡슐화 기술이고 VPN은 보안 접속을 제공하는 서비스'라고 비교하면 이해하기 쉽습니다. 처음 학습할 땐 VPN이 어느 계층에서 동작하는지, 어떤 상태값을 만들거나 바꾸는지, 장애 발생 시 어떤 로그와 패킷 증거를 확인할지 순서대로 떠올리면 이해가 빠릅니다. 운영에서는 성능과 안정성 확보를 위해 기본값에만 의존하지 말고 주소 범위, 포트, 타임아웃, 캐시·재전송 정책 등을 서비스 특성에 맞게 검토해야 합니다.",
+    "related_concepts": "[[캐시 서버]], [[CDN]], [[터널링]], [[QoS]], [[TCP]]",
+    "source_files": "05-08-산업은행-기출.md; 05-14-17-한국은행-2025-컴퓨터공학-학술-7-네트워크-보안.md; 05-01-우리은행-기출.md",
+    "exam_note": "정의뿐 아니라 캐시 서버·CDN·터널링과의 차이를 간단히 비교해 쓰세요.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "상",
+    "concept_image_url": "/api/ai-images/CS-337-20260719-115532-7a1c5dc4.png",
+    "concept_image_alt": "VPN(네트워크) 개념 참고 이미지",
+    "sort_order": 336,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-337-20260719-115532-7a1c5dc4.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-23",
+    "card_id": "CS-337",
+    "question_type": "subjective",
+    "prompt": "### 23. VPN 뜻",
+    "body": "- VPN(Virtual Private Network): 공용 네트워크를 통해 사설 네트워크를 안전하게 연결하는 기술",
+    "answer": "VPN은 공용 네트워크 위에 암호화된 터널과 인증을 통해 원격 사용자나 지점을 사설망처럼 안전하게 연결하는 기술입니다. 또한 네트워크의 계층별 책임과 실제 장애 지점을 구분하는 기준으로 사용됩니다.",
+    "explanation": "VPN은 공용 네트워크 위에 암호화된 터널과 인증을 통해 원격 사용자나 지점을 사설망처럼 안전하게 연결하는 기술입니다. 또한 네트워크의 계층별 책임과 실제 장애 지점을 구분하는 기준으로 사용됩니다.\n\n의미: VPN은 Virtual Private Network로, 인터넷처럼 신뢰할 수 없는 공용망 위에 암호화된 '터널'을 만들어 인증된 사용자나 장비만 내부 자원에 접근하도록 하는 기술입니다. 대표적인 구현 방식으로는 IPsec, SSL/TLS 기반 VPN, WireGuard 등이 있습니다.\n활용: 재택근무 접속, 지점 간 네트워크 연결, 운영자 원격 접속, 클라우드와 사내망 연계 등에 사용됩니다. 다만 VPN이 접속 후 내부망 전체를 과도하게 열어주면 계정 탈취 시 피해가 커지므로 MFA, 단말 보안 상태 확인(단말 검사), 최소 권한 적용, 분할 터널링 정책, 접속 로그 감사 등을 함께 적용해야 합니다. 면접에서는 '터널링은 캡슐화 기술이고 VPN은 보안 접속을 제공하는 서비스'라고 비교하면 이해하기 쉽습니다. 처음 학습할 땐 VPN이 어느 계층에서 동작하는지, 어떤 상태값을 만들거나 바꾸는지, 장애 발생 시 어떤 로그와 패킷 증거를 확인할지 순서대로 떠올리면 이해가 빠릅니다. 운영에서는 성능과 안정성 확보를 위해 기본값에만 의존하지 말고 주소 범위, 포트, 타임아웃, 캐시·재전송 정책 등을 서비스 특성에 맞게 검토해야 합니다.\n\n정의뿐 아니라 캐시 서버·CDN·터널링과의 차이를 간단히 비교해 쓰세요.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "VPN 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "VPN"
+    ],
+    "difficulty": "상",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 23. VPN 뜻",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-23",
+    "card_id": "CS-337",
+    "question_type": "subjective",
+    "prompt": "VPN의 의미를 설명하시오.",
+    "body": "VPN은 Virtual Private Network의 약자이다.",
+    "answer": "VPN은 공용 네트워크 위에 암호화된 터널과 인증을 사용해 원격 사용자나 지점을 사설망처럼 안전하게 연결하는 기술이다.",
+    "explanation": "VPN은 인터넷 같은 공용망 위에 암호화된 터널을 만들어 안전한 통신 경로를 제공한다. 재택근무 접속이나 지점 간 연결처럼 외부 네트워크를 통해 내부 자원에 안전하게 접근해야 할 때 사용된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "VPN 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "VPN",
+      "Virtual Private Network",
+      "터널링"
+    ],
+    "difficulty": "상",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 23. VPN 뜻",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 23. VPN 뜻\n- VPN(Virtual Private Network): 공용 네트워크를 통해 사설 네트워크를 안전하게 연결하는 기술\n**답(AI답변):** 공용망 위에 암호화된 가상 사설 터널을 만들어 안전하게 통신하는 기술이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 번호가 남아 있었음",
+      "본문과 해설에 불필요한 서술과 안내 문구가 섞여 있었음",
+      "정답 문장이 핵심 정의 외 내용을 포함하고 있었음"
+    ],
+    "changes": [
+      "프롬프트를 자연스러운 서술형 질문으로 정리함",
+      "본문을 약자 설명만 남기고 간결화함",
+      "정답과 해설을 VPN의 핵심 정의와 용도로 재작성함",
+      "키워드를 카드 용어에 맞춰 보강함"
+    ]
+  }
+}

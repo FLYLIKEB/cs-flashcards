@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-12",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-12",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 198. 충돌직렬성에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 충돌직렬성 문제",
+    "answer": "충돌 직렬 가능성은 충돌 연산 순서를 보존하면서 어떤 직렬 스케줄과 동등한지 판단한다. 우선순위 그래프에 사이클이 없으면 충돌 직렬 가능하다.",
+    "explanation": "충돌 직렬 가능성은 충돌 연산 순서를 보존하면서 어떤 직렬 스케줄과 동등한지 판단한다. 우선순위 그래프에 사이클이 없으면 충돌 직렬 가능하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "충돌직렬성에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "충돌직렬성"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 198. 충돌직렬성에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-12",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "충돌 직렬 가능성의 개념과 판별 방법을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 198. 충돌직렬성 문제",
+    "answer": "충돌 직렬 가능성은 스케줄에서 서로 충돌하는 연산들의 상대적 순서를 유지한 채 어떤 직렬 스케줄과 동등하게 만들 수 있는 성질이다. 일반적으로 선행 그래프(우선순위 그래프)를 그렸을 때 사이클이 없으면 충돌 직렬 가능하다.",
+    "explanation": "충돌 직렬 가능성은 동시 수행된 트랜잭션 결과를 직렬 실행 결과처럼 해석할 수 있는지를 보는 기준이다. 서로 다른 트랜잭션의 읽기·쓰기 또는 쓰기·쓰기처럼 충돌하는 연산 순서만 보존하면 되며, 이를 그래프로 표현했을 때 순환 의존성이 없으면 직렬 순서를 정할 수 있으므로 충돌 직렬 가능하다고 판단한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "트랜잭션 동시성 제어",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "충돌 직렬 가능성",
+      "동시성 제어",
+      "선행 그래프",
+      "우선순위 그래프"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 198. 충돌직렬성 문제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 198. 충돌직렬성 문제\n**답(AI답변):** 충돌 직렬 가능성은 충돌 연산 순서를 보존하면서 어떤 직렬 스케줄과 동등한지 판단한다. 우선순위 그래프에 사이클이 없으면 충돌 직렬 가능하다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "불완전 원문인데 body의 변환 메모 문구가 공통 규칙과 다르고 원문 제목에서 문항 번호가 빠져 있었음",
+      "category가 데이터베이스 개념인 충돌 직렬 가능성과 맞지 않게 자료구조·알고리즘으로 분류되어 있었음",
+      "topic, keywords, source_location이 문제 문장을 반복하거나 지나치게 축약되어 있었고 answer와 explanation도 동일 문장으로만 작성되어 있었음"
+    ],
+    "changes": [
+      "불완전 출처 규칙에 맞춰 개념형 prompt와 body 2줄을 정리함",
+      "충돌 직렬 가능성의 정의와 선행 그래프 기준을 반영해 answer와 explanation을 보강함",
+      "topic을 트랜잭션 동시성 제어로 정리하고 keywords를 충돌 직렬 가능성 관련 핵심 용어로 보정함",
+      "category와 source_location을 source_excerpt와 실제 개념 범주에 맞게 데이터베이스 기준으로 수정함"
+    ]
+  }
+}

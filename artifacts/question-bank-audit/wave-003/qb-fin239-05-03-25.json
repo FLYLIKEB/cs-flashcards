@@ -1,0 +1,96 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-25",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-031",
+    "term": "빅데이터",
+    "english": "Big Data",
+    "category": "인공지능·데이터",
+    "alphabet_index": "B",
+    "korean_initial": "ㅂ",
+    "definition": "빅데이터는 Volume(규모), Velocity(속도), Variety(다양성) 등 3V(또는 Veracity·Value를 포함한 5V) 특성으로 기존 도구만으로는 수집·저장·분석하기 어려운 대규모이자 다양한 형태의 데이터 집합을 말합니다.",
+    "detailed_explanation": "의미: 빅데이터는 단순히 데이터가 많다는 뜻이 아니라 Volume(규모), Velocity(속도), Variety(다양성) 등 3V(여기에 Veracity·Value를 더해 5V로 설명하기도 함) 특성이 커서 저장·처리·품질관리·분석 방식이 달라지는 환경을 말합니다. 구조화된 테이블뿐 아니라 로그, 클릭스트림, 문서, 이미지, 센서 등 서로 다른 형태의 데이터가 함께 다뤄지며, 이로 인해 기존 도구와 절차만으로는 처리하기 어렵습니다. 개념적으로는 데이터가 입력되어 모델이 판단을 내리는 그 과정의 어느 지점에서 처리·관리 방식이 달라지는지를 보면 이해하기 쉽습니다. 예를 들어 금융권의 민원 분류나 이상거래 탐지에서는 라벨 품질, 데이터 분포, 평가지표가 결과에 큰 영향을 주어 같은 모델도 상황에 따라 다른 성능을 보일 수 있습니다.\n활용: 빅데이터는 이상거래 탐지, 신용평가 보조, 고객 행동 분석 등에 활용되지만 결측치·이상치·편향을 관리하지 않으면 대규모 데이터가 오히려 잘못된 결론을 강화할 수 있습니다. 하둡·스파크 같은 분산처리 기술은 처리 수단일 뿐이며, 데이터 거버넌스와 개인정보 보호를 함께 고려해야 합니다. 실무에서는 훈련·검증·테스트 데이터를 분리하고(시간 기반 분할 포함), 운영 중 데이터 분포 변화가 발생하면 성능 기준을 다시 확인하고 필요하면 모델을 재학습해야 합니다.",
+    "related_concepts": "[[이상치]], [[결측치]], [[3V]], [[데이터 마이닝]], [[머신러닝]]",
+    "source_files": "04-IT-필기-핵심정리.md; 05-01-우리은행-기출.md; 05-03-대구은행-기출.md",
+    "exam_note": "정의만 적지 말고 3V(규모·속도·다양성)와 이상치·결측치의 차이·영향을 비교해 설명하라.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "하",
+    "concept_image_url": "/api/ai-images/CS-031-20260719-162827-f6d8003a.png",
+    "concept_image_alt": "빅데이터(인공지능·데이터) 개념 참고 이미지",
+    "sort_order": 30,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-031-20260719-162827-f6d8003a.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-25",
+    "card_id": "CS-031",
+    "question_type": "subjective",
+    "prompt": "### 112. 다음 중 빅데이터의 5V가 아닌 것은?",
+    "body": "- 5V : Volume(크기), Velocity(속도), Variety(다양성), Value(가치), Veracity(진실성)",
+    "answer": "빅데이터 5V는 Volume, Velocity, Variety, Veracity, Value이다.",
+    "explanation": "빅데이터 5V는 Volume, Velocity, Variety, Veracity, Value이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "다음 중 빅데이터의 5V가 아닌 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "빅데이터",
+      "Big Data"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 112. 다음 중 빅데이터의 5V가 아닌 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-25",
+    "card_id": "CS-031",
+    "question_type": "subjective",
+    "prompt": "빅데이터의 5V를 쓰시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 112. 다음 중 빅데이터의 5V가 아닌 것은?",
+    "answer": "빅데이터의 5V는 Volume(규모), Velocity(속도), Variety(다양성), Veracity(정확성·신뢰성), Value(가치)이다.",
+    "explanation": "원문은 '5V가 아닌 것'을 묻지만 선택지가 없어 실전형 객관식으로는 정답을 확정할 수 없다. 제공된 source_excerpt와 linked_card 정의에 근거해 빅데이터의 핵심 특성인 5V를 서술하는 개념문제로 변환했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "빅데이터",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "빅데이터",
+      "Big Data",
+      "5V"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 112. 다음 중 빅데이터의 5V가 아닌 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "빅데이터의 5V 다섯 요소를 정확히 열거한다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 112. 다음 중 빅데이터의 5V가 아닌 것은?\n- 5V : Volume(크기), Velocity(속도), Variety(다양성), Value(가치), Veracity(진실성)\n**답(AI답변):** 빅데이터 5V는 Volume, Velocity, Variety, Veracity, Value이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문 prompt가 마크다운 헤딩과 객관식 문구를 포함하고 있었고, 선택지가 없어 실제로는 정답을 판별할 수 없었다.",
+      "body와 answer/explanation이 원문 문제를 푸는 데 필요한 구조가 아니라 5V 목록만 반복하고 있었다.",
+      "topic과 keywords가 문제 형태를 반영하지 못해 개념 축이 약했다."
+    ],
+    "changes": [
+      "불완전한 객관식을 규칙에 따라 '빅데이터의 5V를 쓰시오.'라는 개념형 subjective 문항으로 변환했다.",
+      "body를 변환 메모 2줄 형식으로 정리하고, answer와 explanation을 5V 개념에 맞게 다시 작성했다.",
+      "topic을 '빅데이터'로 정리하고 keywords에 '5V'를 추가했으며 answer_guide를 서술형 답안 기준에 맞게 정리했다."
+    ]
+  }
+}

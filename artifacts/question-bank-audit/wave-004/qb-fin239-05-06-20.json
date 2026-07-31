@@ -1,0 +1,84 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-06-20",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-06-20",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 184. 다음 중 Dense Rank 특징은?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "2번",
+    "rubric": [],
+    "choices": [
+      "순위 건너뜀",
+      "동일 값 동일 순위 + 다음 순위 연속",
+      "항상 1부터 시작 안함",
+      "NULL 포함"
+    ],
+    "answer_index": 1,
+    "topic": "다음 중 Dense Rank 특징은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "Dense Rank"
+    ],
+    "difficulty": "하",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 184. 다음 중 Dense Rank 특징은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-06-20",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "Dense Rank의 특징으로 가장 적절한 것은?",
+    "body": "",
+    "answer": "동일 값 동일 순위 + 다음 순위 연속",
+    "explanation": "DENSE_RANK는 동일한 값에 같은 순위를 부여하고, 그 다음 순위를 건너뛰지 않고 연속해서 매긴다. 반면 RANK는 동순위 뒤의 순위를 건너뛸 수 있다.",
+    "rubric": [],
+    "choices": [
+      "순위 건너뜀",
+      "동일 값 동일 순위 + 다음 순위 연속",
+      "항상 1부터 시작 안함",
+      "NULL 포함"
+    ],
+    "answer_index": 1,
+    "topic": "Dense Rank",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "Dense Rank",
+      "윈도우 함수",
+      "순위 함수"
+    ],
+    "difficulty": "하",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 184. 다음 중 Dense Rank 특징은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 184. 다음 중 Dense Rank 특징은?\n1. 순위 건너뜀\n2. 동일 값 동일 순위 + 다음 순위 연속\n3. 항상 1부터 시작 안함\n4. NULL 포함\n\n**답:** 2번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문제 번호가 포함되어 있었다.",
+      "answer와 explanation이 모두 '2번'만 남아 있어 정답 내용과 해설이 불완전했다.",
+      "topic과 keywords가 질문 문장 중심이라 학습용 메타데이터로 다소 거칠었다."
+    ],
+    "changes": [
+      "prompt를 마크다운과 번호를 제거한 자연스러운 객관식 질문으로 정리했다.",
+      "answer를 정답 선지의 실제 내용으로 바꾸고 DENSE_RANK와 RANK의 차이를 설명하는 해설을 추가했다.",
+      "topic을 Dense Rank로 정리하고 keywords를 윈도우 함수·순위 함수 중심으로 보강했다."
+    ]
+  }
+}

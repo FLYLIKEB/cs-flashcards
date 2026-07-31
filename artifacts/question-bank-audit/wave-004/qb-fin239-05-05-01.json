@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-05-01",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-05-01",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 158. SSH Handshake에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: SSH Handshake 전송순서",
+    "answer": "일반 흐름은 버전 교환 → 알고리즘 협상 → 키 교환 → 서버 인증 → 세션키 생성 → 사용자 인증이다.",
+    "explanation": "일반 흐름은 버전 교환 → 알고리즘 협상 → 키 교환 → 서버 인증 → 세션키 생성 → 사용자 인증이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SSH Handshake에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "SSH",
+      "SSH Handshake"
+    ],
+    "difficulty": "중",
+    "issuer": "SGI서울보증",
+    "source_location": "SGI서울보증 기출 · 158. SSH Handshake에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-05-01",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "SSH 핸드셰이크의 일반적인 전송 순서를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 158. SSH Handshake 전송순서",
+    "answer": "SSH 핸드셰이크는 일반적으로 버전 교환, 알고리즘 협상, 키 교환, 서버 인증, 세션 키 생성, 사용자 인증 순서로 진행된다.",
+    "explanation": "먼저 클라이언트와 서버가 프로토콜 버전을 교환하고 사용할 암호·MAC·압축 알고리즘을 협상한다. 이후 Diffie-Hellman 등으로 키를 교환하면서 서버의 호스트 키를 검증해 서버를 인증하고, 공유 비밀로 세션 키를 만든 뒤 비밀번호·공개키 등의 방식으로 사용자를 인증해 안전한 세션을 연다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SSH 핸드셰이크",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "SSH",
+      "SSH 핸드셰이크",
+      "키 교환",
+      "서버 인증",
+      "사용자 인증"
+    ],
+    "difficulty": "중",
+    "issuer": "SGI서울보증",
+    "source_location": "SGI서울보증 기출 · 158. SSH Handshake 전송순서",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 158. SSH Handshake 전송순서\n**답(AI답변):** 일반 흐름은 버전 교환 → 알고리즘 협상 → 키 교환 → 서버 인증 → 세션키 생성 → 사용자 인증이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 번호/헤더가 남아 있어 질문문으로 바로 쓰기 어려웠다.",
+      "변환 body 문구가 공통 규칙의 2줄 형식과 다르고 원문 제목에 번호가 빠져 있었다.",
+      "category가 SSH 주제와 맞지 않는 자료구조·알고리즘으로 잘못 분류되어 있었고 explanation이 answer를 그대로 반복했다."
+    ],
+    "changes": [
+      "prompt를 마크다운 없는 개념형 서술 질문으로 정리하고 topic을 SSH 핸드셰이크로 맞췄다.",
+      "body를 공통 규칙의 정확한 2줄 변환 메모 형식으로 수정하고 source_location을 원문 제목과 일치시켰다.",
+      "category를 보안으로 바로잡고 answer·explanation을 SSH 핸드셰이크의 단계와 의미가 드러나도록 보강했으며 keywords를 핵심 용어 중심으로 정제했다."
+    ]
+  }
+}

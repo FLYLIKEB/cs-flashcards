@@ -1,0 +1,95 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-09",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-161",
+    "term": "LRU",
+    "english": "LRU",
+    "category": "운영체제",
+    "alphabet_index": "L",
+    "korean_initial": "L",
+    "definition": "LRU는 가장 오랫동안 참조되지 않은 페이지나 캐시 항목을 우선 교체하는 정책으로, 최근에 사용된 항목일수록 앞으로 재사용될 가능성이 높다고 가정합니다. 정확한 참조 이력 추적은 비용이 커서 운영체제에서는 흔히 참조 비트나 클록 같은 LRU 근사 기법을 사용합니다.",
+    "detailed_explanation": "의미: LRU는 Least Recently Used의 약자로, 참조된 지 가장 오래된 항목을 제거합니다. 시간 지역성을 활용하므로 FIFO보다 실제 접근 패턴을 잘 반영하지만 모든 참조 순서를 정확히 추적하려면 하드웨어나 운영체제 비용이 큽니다. 작은 책상 위에 필요한 책만 올리고 나머지는 책장에 두는 상황을 떠올리면 메모리 관리의 목적이 보입니다. 주소 변환, 페이지 교체, 지역성 판단이 맞물려 프로그램은 큰 메모리를 쓰는 듯 보이지만 실제 물리 자원은 제한됩니다. 활용: 운영체제는 참조 비트, 클록 알고리즘처럼 LRU를 근사하는 방식을 자주 사용합니다. 순차 스캔처럼 한 번만 읽는 데이터는 LRU 캐시를 오염시킬 수 있습니다. 금융 데이터베이스에서는 버퍼 캐시가 핵심 인덱스 페이지를 유지하는지, 대량 조회가 온라인 거래 캐시를 밀어내지 않는지 확인해야 합니다. 시험에서는 논리 주소와 물리 주소, 페이지와 프레임, 지역성과 교체 정책을 연결해 설명하면 좋습니다. 실무에서는 메모리 부족이 단순 용량 문제가 아니라 스래싱, 캐시 효율, 작업 집합 크기 문제로 나타날 수 있음을 모니터링해야 합니다.",
+    "related_concepts": "[[페이지 교체]], [[FIFO 페이지 교체]], [[Optimal 페이지 교체]], [[스래싱]], [[프로세스]]",
+    "source_files": "05-09-운영체제-기출-모음.md; 06-04-메모리와-가상메모리.md; 05-14-08-한국은행-2023-컴퓨터공학-학술-파트-I.md",
+    "exam_note": "운영체제 문제에서는 LRU의 정의만 쓰지 말고 관련 개념(페이지 교체, FIFO 페이지 교체, Optimal 페이지 교체)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-161-20260719-102147-c85f2cbf.png",
+    "concept_image_alt": "LRU(운영체제) 개념 참고 이미지",
+    "sort_order": 160,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-161-20260719-102147-c85f2cbf.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-09",
+    "card_id": "CS-161",
+    "question_type": "subjective",
+    "prompt": "### 195. LRU에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: LRU 계산문제 문제",
+    "answer": "LRU는 가장 오랫동안 사용되지 않은 페이지를 교체한다.",
+    "explanation": "LRU는 가장 오랫동안 사용되지 않은 페이지를 교체한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "LRU에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "LRU"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 195. LRU에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-09",
+    "card_id": "CS-161",
+    "question_type": "subjective",
+    "prompt": "LRU 페이지 교체 정책의 핵심 원리를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 195. LRU 계산문제 문제",
+    "answer": "LRU는 가장 최근에 사용된 항목이 아니라 가장 오랫동안 참조되지 않은 페이지나 캐시 항목을 우선 교체하는 정책이다.",
+    "explanation": "LRU는 최근에 사용된 항목일수록 다시 사용될 가능성이 높다는 시간 지역성 가정에 기반한다. 따라서 교체 시점에는 마지막 참조 시점이 가장 오래된 항목을 제거하며, FIFO보다 실제 접근 패턴을 더 잘 반영하지만 정확한 참조 순서를 추적하는 비용이 커서 실제 운영체제에서는 클록 같은 근사 기법이 함께 쓰인다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "LRU",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "LRU",
+      "페이지 교체",
+      "시간 지역성"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 195. LRU에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 195. LRU 계산문제 문제\n**답(AI답변):** LRU는 가장 오랫동안 사용되지 않은 페이지를 교체한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row.prompt에 마크다운 헤더와 번호가 남아 있어 질문 문장만 남지 않았음",
+      "body의 변환 메모 문구가 공통 규칙의 지정 형식과 달랐고 원문이 불완전한 계산형 문항이었음",
+      "answer와 explanation이 동일한 한 줄이라 LRU의 핵심 원리와 풀이 기준 설명이 부족했음"
+    ],
+    "changes": [
+      "prompt를 깨끗한 개념형 질문으로 바꾸고 body를 공통 규칙의 정확한 2줄 형식으로 수정함",
+      "answer와 explanation을 LRU의 정의, 시간 지역성, 근사 구현까지 드러나도록 보강함",
+      "topic을 LRU로 정리하고 keywords를 linked_card와 개념에 맞게 페이지 교체·시간 지역성으로 정제함"
+    ]
+  }
+}

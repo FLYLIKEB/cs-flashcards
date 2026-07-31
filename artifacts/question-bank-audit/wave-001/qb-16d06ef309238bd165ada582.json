@@ -1,0 +1,115 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-16d06ef309238bd165ada582",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-042",
+    "term": "CDN",
+    "english": "CDN",
+    "category": "네트워크",
+    "alphabet_index": "C",
+    "korean_initial": "C",
+    "definition": "CDN은 정적·자주 요청되는 콘텐츠를 사용자와 가까운 엣지 서버에 캐시해 지연을 줄이고 원본 서버 부하와 트래픽 폭주를 완화하는 분산 전달망입니다. 운영·장애 대응 시 계층별 책임과 실제 장애 지점을 구분하는 기준으로 활용됩니다.",
+    "detailed_explanation": "의미: CDN은 이미지, 동영상, 정적 파일과 일부 API 응답처럼 반복 조회되는 자원을 여러 지역의 엣지 서버에 복제·캐시하여 사용자에게 지리적으로 가까운 지점에서 전달하는 네트워크 서비스입니다. 단순 캐시보다 글로벌 라우팅, TLS 종료, 압축, 보안 필터링 등 추가 기능을 함께 제공하는 경우가 많습니다.\n활용: 공개 홈페이지, 앱 배포 파일, 공지 이미지 등 대량 조회되는 자원에 유용하나 개인정보나 거래 데이터 등은 캐시를 엄격히 제한해야 합니다. 운영에서는 캐시 무효화 지연, 원본 장애 시 stale 응답 발생 가능성, 국가별 경로 차이 등을 고려해야 하며 DDoS 완화와 WAF 연계 여부도 검토합니다. 면접 대비로는 프록시와 CDN의 공통점(중계·캐싱)과 차이(글로벌 규모·엣지 위치 최적화)를 정리하면 좋고, 학습할 때는 CDN이 통신 흐름의 어느 계층에서 동작하는지, 어떤 상태값을 만들거나 바꾸는지, 장애 시 어떤 로그·패킷 증거로 확인할지 순서대로 떠올리면 이해가 쉬워집니다. 실제 운영에서는 기본값에만 의존하지 말고 주소 범위, 포트, 타임아웃, 캐시 정책, 재전송 기준 등을 서비스 특성에 맞게 검토해야 합니다.",
+    "related_concepts": "[[프록시]], [[캐시 서버]], [[VPN]], [[터널링]], [[TCP]]",
+    "source_files": "보강 개념(페이지 직접 언급 없음)",
+    "exam_note": "CDN 정의뿐 아니라 프록시·캐시 서버·VPN과의 공통점(중계·캐싱)과 차이(글로벌 엣지·캐시 범위·라우팅)를 간단히 비교해 쓰세요.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-042-20260719-114228-54e17add.png",
+    "concept_image_alt": "CDN(네트워크) 개념 참고 이미지",
+    "sort_order": 41,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-042-20260719-114228-54e17add.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-16d06ef309238bd165ada582",
+    "card_id": "CS-042",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]은 정적·자주 요청되는 콘텐츠를 사용자와 가까운 엣지 서버에 캐시해 지연을 줄이고 원본 서버 부하와 트래픽 폭주를 완화하는 분산 전달망입니다.",
+    "answer": "CDN",
+    "explanation": "CDN은 정적·자주 요청되는 콘텐츠를 사용자와 가까운 엣지 서버에 캐시해 지연을 줄이고 원본 서버 부하와 트래픽 폭주를 완화하는 분산 전달망입니다. 운영·장애 대응 시 계층별 책임과 실제 장애 지점을 구분하는 기준으로 활용됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "VPN",
+      "터널링",
+      "TCP",
+      "CDN"
+    ],
+    "answer_index": 3,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "CDN",
+      "프록시",
+      "캐시 서버",
+      "VPN",
+      "터널링",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "보강 개념(페이지 직접 언급 없음)",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-16d06ef309238bd165ada582",
+    "card_id": "CS-042",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "정적·자주 요청되는 콘텐츠를 사용자와 가까운 엣지 서버에 캐시해 지연을 줄이고 원본 서버 부하와 트래픽 폭주를 완화하는 분산 전달망.",
+    "answer": "CDN",
+    "explanation": "CDN은 정적·자주 요청되는 콘텐츠를 사용자와 가까운 엣지 서버에 캐시해 지연을 줄이고 원본 서버 부하와 트래픽 폭주를 완화하는 분산 전달망입니다. 운영 시에는 지리적으로 가까운 엣지 서버에서 콘텐츠를 전달해 지연을 줄이고 원본 서버 부하를 완화합니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "VPN",
+      "터널링",
+      "TCP",
+      "CDN"
+    ],
+    "answer_index": 3,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "CDN",
+      "엣지 서버",
+      "캐시 서버",
+      "콘텐츠 전송"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "보강 개념(페이지 직접 언급 없음)",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 placeholder 기호가 남아 있었음",
+      "category가 비어 있었음",
+      "keywords에 오답 보기 위주 잡음이 포함되어 있었음"
+    ],
+    "changes": [
+      "body에서 placeholder를 제거하고 설명형 문장으로 정리함",
+      "category를 topic과 linked_card에 맞춰 네트워크로 보정함",
+      "keywords를 CDN 중심 핵심 용어로 정리함"
+    ]
+  }
+}

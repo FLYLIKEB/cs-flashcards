@@ -1,0 +1,85 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-06",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-06",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 93. 다음 중 파이썬에서 없는 함수는?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "2번",
+    "rubric": [],
+    "choices": [
+      "sum()",
+      "average()",
+      "max()",
+      "len()"
+    ],
+    "answer_index": 1,
+    "topic": "다음 중 파이썬에서 없는 함수는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "파이썬",
+      "average"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 93. 다음 중 파이썬에서 없는 함수는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-06",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "다음 중 파이썬에 없는 함수는?",
+    "body": "",
+    "answer": "average()",
+    "explanation": "`sum()`, `max()`, `len()`은 모두 파이썬의 내장 함수이지만 `average()`는 기본 내장 함수가 아니다. 평균은 보통 `sum()`과 `len()`을 조합하거나 `statistics.mean()` 등을 사용해 구한다.",
+    "rubric": [],
+    "choices": [
+      "sum()",
+      "average()",
+      "max()",
+      "len()"
+    ],
+    "answer_index": 1,
+    "topic": "파이썬 내장 함수",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "파이썬",
+      "내장 함수",
+      "평균"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 93. 다음 중 파이썬에서 없는 함수는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 93. 다음 중 파이썬에서 없는 함수는?\n1. sum()\n2. average()\n3. max()\n4. len()\n\n  **답:** 2번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "answer와 explanation이 모두 '2번'으로만 저장되어 정답 내용과 해설이 부실했음",
+      "topic과 keywords가 문제 의도를 충분히 반영하지 못했음"
+    ],
+    "changes": [
+      "prompt를 질문 문장만 남도록 정리함",
+      "answer를 실제 정답 함수명인 average()로 수정하고 해설에 내장 함수 여부를 설명함",
+      "topic을 '파이썬 내장 함수'로 정리하고 keywords를 관련 용어 중심으로 보정함"
+    ]
+  }
+}

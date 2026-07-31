@@ -1,0 +1,84 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-06-22",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-06-22",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 186. TCP 혼잡 제어 방식이 아닌 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "3번",
+    "rubric": [],
+    "choices": [
+      "Slow Start",
+      "AIMD",
+      "Stop-and-Wait",
+      "Congestion Avoidance"
+    ],
+    "answer_index": 2,
+    "topic": "TCP 혼잡 제어 방식이 아닌 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "Stop-and-Wait",
+      "TCP",
+      "혼잡 제어"
+    ],
+    "difficulty": "하",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 186. TCP 혼잡 제어 방식이 아닌 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-06-22",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "TCP의 혼잡 제어 방식이 아닌 것은?",
+    "body": "",
+    "answer": "Stop-and-Wait",
+    "explanation": "Slow Start, AIMD, Congestion Avoidance는 TCP의 대표적인 혼잡 제어 기법이고, Stop-and-Wait는 송신 후 확인 응답을 기다리는 흐름 제어 방식이다.",
+    "rubric": [],
+    "choices": [
+      "Slow Start",
+      "AIMD",
+      "Stop-and-Wait",
+      "Congestion Avoidance"
+    ],
+    "answer_index": 2,
+    "topic": "TCP 혼잡 제어 방식이 아닌 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "Stop-and-Wait",
+      "TCP",
+      "혼잡 제어"
+    ],
+    "difficulty": "하",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 186. TCP 혼잡 제어 방식이 아닌 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 186. TCP 혼잡 제어 방식이 아닌 것은?\n1. Slow Start\n2. AIMD\n3. Stop-and-Wait\n4. Congestion Avoidance\n\n**답:** 3번\n\n## 약어 풀이\n\n- CPU: Central Processing Unit, 중앙처리장치\n- DB: Database, 데이터베이스\n- DBMS: Database Management System, 데이터베이스 관리 시스템\n- DDoS: Distributed Denial of Service, 분산 서비스 거부 공격\n- DMA: Direct Memory Access, 직접 메모리 접근\n- HRN: Highest Response-ratio Next, 최고 응답률 우선\n- IT: Information Technology, 정보기술\n- TCP: Transmission Control Protocol, 전송 제어 프로토콜",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 heading 번호가 남아 있었음",
+      "answer와 explanation이 모두 '3번'으로만 적혀 있어 정답 내용과 해설이 불충분했음"
+    ],
+    "changes": [
+      "prompt를 앱에서 바로 쓰기 좋은 순수 질문 문장으로 정리함",
+      "answer를 실제 정답 선지 텍스트로 바꾸고 explanation에 혼잡 제어와 흐름 제어의 차이를 근거로 보강함"
+    ]
+  }
+}

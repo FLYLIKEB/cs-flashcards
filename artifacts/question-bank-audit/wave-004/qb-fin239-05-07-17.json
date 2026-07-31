@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-17",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-17",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 203. (약술) Daisy Chain 개념",
+    "body": "→ 데이지 체인이란 연속적으로 연결되어 있는 하드웨어 장치들의 구성이다",
+    "answer": "데이지 체인은 장치들을 직렬로 연속 연결하는 구성 방식이다.",
+    "explanation": "데이지 체인은 장치들을 직렬로 연속 연결하는 구성 방식이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "(약술) Daisy Chain 개념",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "Daisy Chain"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 203. (약술) Daisy Chain 개념",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-17",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "Daisy Chain이란 무엇인가?",
+    "body": "",
+    "answer": "Daisy Chain은 여러 하드웨어 장치를 직렬로 연속 연결하는 구성 방식이다.",
+    "explanation": "여러 장치를 차례대로 연결해 신호나 제어가 앞 장치에서 다음 장치로 전달되는 구조를 뜻한다. 직렬 연결 구조이므로 중간 장치 장애가 뒤쪽 장치들에 영향을 줄 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "(약술) Daisy Chain 개념",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "Daisy Chain",
+      "데이지 체인",
+      "직렬 연결"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 203. (약술) Daisy Chain 개념",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 203. (약술) Daisy Chain 개념\n\n  → 데이지 체인이란 연속적으로 연결되어 있는 하드웨어 장치들의 구성이다\n**답(AI답변):** 데이지 체인은 장치들을 직렬로 연속 연결하는 구성 방식이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 heading이 남아 있어 질문 문장으로 바로 쓰기 어려웠다.",
+      "body에 화살표 정의문이 남아 있어 질문 본문이 아니라 답 일부처럼 보였다.",
+      "explanation이 answer와 동일해 보충 설명이 없었고 keywords도 단일 영문 용어만 있었다."
+    ],
+    "changes": [
+      "prompt를 명시적인 개념 질문으로 정리하고 body는 빈 문자열로 정리했다.",
+      "answer를 간결한 정의로 유지하면서 explanation에 직렬 전달 구조와 장애 영향 설명을 추가했다.",
+      "keywords에 한글 용어와 핵심 개념어를 보강했다."
+    ]
+  }
+}

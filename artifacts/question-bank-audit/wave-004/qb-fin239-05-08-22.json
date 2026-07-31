@@ -1,0 +1,96 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-22",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-149",
+    "term": "JVM",
+    "english": "JVM",
+    "category": "프로그래밍 언어",
+    "alphabet_index": "J",
+    "korean_initial": "J",
+    "definition": "JVM은 Java 바이트코드를 플랫폼별 기계 실행으로 연결하고 메모리 관리·보안·런타임 최적화를 제공하는 가상 머신입니다.",
+    "detailed_explanation": "의미: JVM은 클래스 로딩, 바이트코드 검증, 실행 엔진, 힙·스택 메모리 관리, 가비지 컬렉션을 포함하는 런타임 환경입니다. 같은 바이트코드가 여러 운영체제에서 동작하도록 추상화하지만, 실제 성능은 JVM 구현과 설정에 영향을 받습니다. 이 영역은 사람이 쓴 코드가 실제 실행 형태로 바뀌는 길을 설명합니다. 소스 코드, 중간 표현, 기계어, 런타임 환경을 단계별로 나누어 보면 오류를 언제 발견하는지, 성능을 어디서 얻는지, 배포 파일이 왜 달라지는지 이해하기 쉽습니다. 활용: Java, Kotlin, Scala 기반 서버의 실행 기반이며 금융권에서는 안정적인 모니터링과 튜닝 도구가 장점입니다. 면접에서는 JDK·JRE와 구분하고, 컴파일러가 만든 바이트코드를 JVM이 인터프리트·JIT로 실행한다는 흐름을 설명해야 합니다. 개발과 운영에서는 빌드 단계, 실행 환경, 성능 튜닝 지점, 오류 메시지가 어느 계층에서 나오는지를 구분하는 데 도움이 됩니다. 단, 실제 런타임은 여러 방식을 섞는 경우가 많으므로 특정 언어를 한 단어로만 단정하지 말고 버전과 실행 환경을 확인해야 합니다.",
+    "related_concepts": "[[불변성]], [[Java]], [[바이트코드]], [[JIT 컴파일]], [[컴파일러]]",
+    "source_files": "05-08-산업은행-기출.md",
+    "exam_note": "프로그래밍 언어 문제에서는 JVM의 정의만 쓰지 말고 관련 개념(불변성, Java, 바이트코드)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "상",
+    "concept_image_url": "/api/ai-images/CS-149-20260720-053938-1cfeb8c9.png",
+    "concept_image_alt": "JVM(프로그래밍 언어) 개념 참고 이미지",
+    "sort_order": 148,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-149-20260720-053938-1cfeb8c9.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-22",
+    "card_id": "CS-149",
+    "question_type": "subjective",
+    "prompt": "### 227. JVM에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: JVM설명 약술",
+    "answer": "JVM은 Java 바이트코드를 실행하는 가상머신으로 플랫폼 독립성, 메모리 관리, 가비지 컬렉션을 제공한다.",
+    "explanation": "JVM은 Java 바이트코드를 실행하는 가상머신으로 플랫폼 독립성, 메모리 관리, 가비지 컬렉션을 제공한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "JVM에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "JVM"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 227. JVM에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-22",
+    "card_id": "CS-149",
+    "question_type": "subjective",
+    "prompt": "JVM이란 무엇이며 어떤 역할을 하는지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 227. JVM설명 약술",
+    "answer": "JVM은 Java 바이트코드를 실행하는 가상 머신으로, 운영체제와 하드웨어 차이를 추상화해 플랫폼 독립적인 실행 환경을 제공하고 메모리 관리와 가비지 컬렉션 같은 런타임 기능을 담당한다.",
+    "explanation": "원문은 약술 제목과 모범답안만 남아 있어 실전형 문항으로 풀 수 없으므로 JVM의 정의와 핵심 역할을 묻는 개념문제로 정리했다. JVM의 핵심은 바이트코드 실행, 플랫폼 독립성 제공, 메모리 관리 및 가비지 컬렉션 같은 런타임 지원이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "JVM",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "JVM",
+      "Java 바이트코드",
+      "가상 머신",
+      "가비지 컬렉션"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 227. JVM설명 약술",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 227. JVM설명 약술\n**답(AI답변):** JVM은 Java 바이트코드를 실행하는 가상머신으로 플랫폼 독립성, 메모리 관리, 가비지 컬렉션을 제공한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있어 질문문만으로 정리되지 않았음",
+      "원문이 약술 제목과 AI답변만 남아 있어 실전형 문항으로는 풀이 근거가 부족했음",
+      "body의 변환 메모 문구가 공통 규칙의 정확한 형식과 일치하지 않았음"
+    ],
+    "changes": [
+      "prompt를 JVM의 정의와 역할을 묻는 명시적 개념 질문으로 정리함",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 교체하고 원문 제목을 명시함",
+      "answer·explanation·topic·keywords·source_location을 JVM 카드와 원문에 맞게 정리함"
+    ]
+  }
+}

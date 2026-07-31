@@ -1,0 +1,95 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-15",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-610",
+    "term": "해시 함수",
+    "english": "Hash Function",
+    "category": "자료구조·알고리즘",
+    "alphabet_index": "#",
+    "korean_initial": "ㅎ",
+    "definition": "해시 함수는 임의 길이의 입력(키)을 고정 범위의 해시값으로 변환하는 함수입니다. 이 해시값은 해시 테이블의 인덱스 결정, 중복 탐지 또는 무결성 검증 같은 연산에 사용됩니다.",
+    "detailed_explanation": "의미: 해시 함수는 같은 입력에 대해 항상 같은 해시값을 반환해야 하고, 가능한 한 결과를 균등하게 분산시켜 충돌(서로 다른 입력이 같은 해시값을 갖는 경우)을 최소화해야 합니다. 자료구조에서 쓰이는 해시는 주로 계산 속도와 분포(균등성)가 중요하며, 암호학적 해시는 여기에 더해 역상 저항성(주어진 해시값으로 원래 입력을 찾기 어려움), 충돌 저항성(서로 다른 입력이 같은 해시값을 만들기 어려움) 같은 보안 특성이 필요합니다. 같은 데이터를 저장하는 방식에 따라 조회·삽입·삭제·순회 비용이 크게 달라지므로 평균 성능뿐 아니라 최악 경우 성능과 메모리 사용을 함께 고려해야 합니다.\n활용: 해시 함수는 해시 테이블의 인덱스 계산, 캐시 샤딩, 중복 탐지, 비밀번호 저장 전처리 등에서 쓰입니다. 간단한 나머지 연산 방식은 특정 패턴의 키에 취약할 수 있고, 보안 목적에는 SHA 계열 같은 강한 해시와 salt를 함께 써야 합니다. 실무에서는 데이터 크기, 조회 대 갱신 비율, 순서 보장 필요성, 캐시 효율성, 동시성 제어 등을 기준으로 해시 방법을 선택하며, 이름만 익숙하다고 바로 적용하지 말고 병목 지점을 먼저 파악한 뒤 경계 조건과 최악 입력에 대한 테스트를 반드시 수행해야 합니다.",
+    "related_concepts": "[[최소 힙]], [[해시 테이블]], [[충돌]], [[체이닝]], [[시간 복잡도]]",
+    "source_files": "04-04-네트워크-프로토콜-보안.md; 05-12-보안-기출-모음.md; 05-14-20-한국은행-2025-컴퓨터공학-학술-10-자료구조-해시.md",
+    "exam_note": "정의만 쓰지 말고 해시 테이블·충돌(체이닝·오픈 어드레싱)·최소 힙 등과의 차이(성능·용도)를 간단히 비교해 설명하라.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-610-20260719-175814-42ef33c7.png",
+    "concept_image_alt": "해시 함수(자료구조·알고리즘) 개념 참고 이미지",
+    "sort_order": 609,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-610-20260719-175814-42ef33c7.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-15",
+    "card_id": "CS-610",
+    "question_type": "subjective",
+    "prompt": "### 102. 해시함수 설명중 옳지않은 것은?",
+    "body": "",
+    "answer": "좋은 해시함수는 일방향성, 충돌저항성, 빠른 계산, 입력 변화에 따른 큰 출력 변화가 특징이다.",
+    "explanation": "좋은 해시함수는 일방향성, 충돌저항성, 빠른 계산, 입력 변화에 따른 큰 출력 변화가 특징이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "해시함수 설명중 옳지않은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "해시 함수",
+      "Hash Function"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 102. 해시함수 설명중 옳지않은 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-15",
+    "card_id": "CS-610",
+    "question_type": "subjective",
+    "prompt": "좋은 해시 함수의 주요 특성을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 102. 해시함수 설명중 옳지않은 것은?",
+    "answer": "해시 함수는 입력 데이터를 고정 범위의 해시값으로 변환하며, 좋은 해시 함수는 같은 입력에 같은 값을 반환하고 값을 균등하게 분산시켜 충돌을 줄이면서도 계산이 빨라야 한다.",
+    "explanation": "원문은 '옳지 않은 것'을 고르는 문제이지만 선택지가 없어 실전형으로는 풀 수 없다. linked_card 정의에 맞춰 해시 함수의 핵심 특성을 개념형으로 재구성했고, 자료구조 관점에서 중요한 결정성, 균등 분포, 충돌 최소화, 계산 효율을 답과 해설에 반영했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "해시 함수",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "해시 함수",
+      "Hash Function",
+      "균등 분포",
+      "충돌"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 102. 해시함수 설명중 옳지않은 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "해시 함수의 정의와 좋은 해시 함수의 성질을 3~5문장으로 설명",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 102. 해시함수 설명중 옳지않은 것은?\n**답(AI답변):** 좋은 해시함수는 일방향성, 충돌저항성, 빠른 계산, 입력 변화에 따른 큰 출력 변화가 특징이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문이 '옳지 않은 것'을 묻는 객관식 형태인데 선택지가 없어 실제로는 정답을 판별할 수 없었다.",
+      "prompt에 마크다운 번호가 남아 있었고 answer/explanation도 AI답변 문장을 그대로 복제해 문제 형식과 맞지 않았다."
+    ],
+    "changes": [
+      "불완전한 원문을 해시 함수의 주요 특성을 설명하는 개념형 subjective 문항으로 변환했다.",
+      "prompt, body, answer, explanation, topic, keywords, answer_guide를 정리해 linked_card의 해시 함수 정의와 일치시키고 audit 상태를 converted로 갱신했다."
+    ]
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-a924bcbea1649b08040b5537",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-599",
+    "term": "프록시",
+    "english": "Proxy",
+    "category": "네트워크",
+    "alphabet_index": "#",
+    "korean_initial": "ㅍ",
+    "definition": "프록시는 클라이언트와 서버 사이에서 요청과 응답을 대신 중계하는 서버로, 캐시·접근 제어·로깅·보안 검사·익명화 등 다양한 부가 기능을 제공합니다. 네트워크 계층에서 책임 분리와 장애 지점 파악에 유용합니다.",
+    "detailed_explanation": "의미: 프록시는 통신의 중간에 위치해 클라이언트 대신 서버에 요청을 보내고, 서버의 응답을 클라이언트에 전달하는 중계자 역할을 하는 서버입니다. 클라이언트 쪽을 대신하면 포워드 프록시, 서버 쪽을 대신하면 리버스 프록시라고 부릅니다. 각 프록시는 요청·응답을 가로채 헤더나 바디를 변경하거나 상태를 저장(캐시)할 수 있습니다.\n활용: 프록시는 사내 인터넷 접근 통제, 웹 캐싱으로 응답 속도 향상, 악성 사이트 차단, API 게이트웨이 역할, TLS 종료(암호화 부담 경감), 로드 밸런싱, WAF 연계 등 다양한 곳에 쓰입니다. 잘못 설정하면 인증 우회, 헤더 위조, 내부 주소 노출 같은 보안 문제가 생길 수 있으니 주의해야 합니다. CDN은 전 세계 엣지에 분산된 캐싱 프록시 성격을 가지며, WebSocket 같은 지속 연결 프로토콜은 프록시의 업그레이드와 타임아웃 지원을 확인해야 합니다. 학습·운영 시에는 프록시가 어느 계층에서 동작하는지, 어떤 상태나 헤더를 만들고 바꾸는지, 장애 발생 시 어떤 로그와 패킷 증거로 확인할지 순서대로 떠올리면 이해와 문제 해결에 도움이 됩니다. 또한 운영 환경에서는 기본 설정을 그대로 쓰지 말고 주소 범위, 포트, 타임아웃, 캐시 정책, 재전송 기준 등을 서비스 특성에 맞춰 조정해야 합니다.",
+    "related_concepts": "[[REST]], [[WebSocket]], [[캐시 서버]], [[CDN]], [[TCP]]",
+    "source_files": "보강 개념(페이지 직접 언급 없음)",
+    "exam_note": "정의만 쓰지 말고 비교로 차별화: 포워드 vs 리버스, 프록시 vs CDN(분산 캐시), REST vs WebSocket(업그레이드·타임아웃) 차이 위주로 짧게 정리하세요.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-599-20260719-115823-b3e64487.png",
+    "concept_image_alt": "프록시(네트워크) 개념 참고 이미지",
+    "sort_order": 598,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-599-20260719-115823-b3e64487.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-a924bcbea1649b08040b5537",
+    "card_id": "CS-599",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]는 클라이언트와 서버 사이에서 요청과 응답을 대신 중계하는 서버로, 캐시·접근 제어·로깅·보안 검사·익명화 등 다양한 부가 기능을 제공합니다.",
+    "answer": "프록시",
+    "explanation": "프록시는 클라이언트와 서버 사이에서 요청과 응답을 대신 중계하는 서버로, 캐시·접근 제어·로깅·보안 검사·익명화 등 다양한 부가 기능을 제공합니다. 네트워크 계층에서 책임 분리와 장애 지점 파악에 유용합니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "프록시",
+      "REST",
+      "CDN",
+      "TCP"
+    ],
+    "answer_index": 0,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "프록시",
+      "Proxy",
+      "REST",
+      "WebSocket",
+      "캐시 서버",
+      "CDN",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "보강 개념(페이지 직접 언급 없음)",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-a924bcbea1649b08040b5537",
+    "card_id": "CS-599",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 네트워크 개념으로 가장 적절한 것을 고르시오.",
+    "body": "클라이언트와 서버 사이에서 요청과 응답을 대신 중계하며, 캐시·접근 제어·로깅·보안 검사·익명화 등 다양한 부가 기능을 제공하는 서버를 가리킨다.",
+    "answer": "프록시",
+    "explanation": "프록시는 클라이언트와 서버 사이에서 요청과 응답을 대신 중계하는 서버로, 캐시·접근 제어·로깅·보안 검사·익명화 등 다양한 부가 기능을 제공합니다. 네트워크 계층에서 책임 분리와 장애 지점 파악에 유용합니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "프록시",
+      "REST",
+      "CDN",
+      "TCP"
+    ],
+    "answer_index": 0,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "프록시",
+      "Proxy",
+      "캐시",
+      "접근 제어",
+      "익명화"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "보강 개념(페이지 직접 언급 없음)",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row.body에 literal [?] placeholder가 남아 있어 문제를 그대로 풀기 어려웠음",
+      "keywords에 REST·WebSocket·TCP 등 비핵심/오답 유도 용어가 섞여 있었음"
+    ],
+    "changes": [
+      "proposed_row.prompt/body를 자연스러운 개념 설명으로 다듬어 placeholder를 제거함",
+      "keywords를 프록시 중심의 핵심 용어만 남기도록 정리함"
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-21",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-21",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 226. 터널링과 VPN의 개념과 차이를 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 터널링, vpn 약술",
+    "answer": "공용망 위에 암호화된 가상 사설 터널을 만들어 안전하게 통신하는 기술이다.",
+    "explanation": "공용망 위에 암호화된 가상 사설 터널을 만들어 안전하게 통신하는 기술이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "터널링과 VPN의 개념과 차이를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "VPN",
+      "터널링과 VPN",
+      "터널링"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 226. 터널링과 VPN의 개념과 차이를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-21",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "터널링과 VPN의 개념을 설명하고 두 기술의 차이를 쓰시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 226. 터널링, vpn 약술",
+    "answer": "터널링은 공용망 위에 가상의 통신 경로를 만들어 다른 프로토콜이나 사설망 트래픽을 캡슐화해 전달하는 기술이고, VPN은 이런 터널링에 인증과 암호화를 결합해 공용망에서 사설망처럼 안전하게 통신하게 하는 서비스 또는 기술이다. 즉 터널링은 가상 경로를 만드는 전송 방식이고, VPN은 그 경로에 보안 기능을 더해 원격 접속이나 지사 간 연결에 활용하는 더 넓은 개념이다.",
+    "explanation": "원문은 약술형 제목과 짧은 AI답변만 남아 있어 실전형 서술문제로 채점하기에 정보가 부족했다. 따라서 터널링의 캡슐화 개념, VPN의 보안 통신 개념, 그리고 터널링은 VPN을 구성하는 핵심 메커니즘 중 하나라는 차이를 명시하는 개념문제로 정리했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크 보안",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "터널링",
+      "VPN",
+      "캡슐화",
+      "암호화",
+      "원격 접속"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 226. 터널링과 VPN의 개념과 차이를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 226. 터널링, vpn 약술\n**답(AI답변):** 공용망 위에 암호화된 가상 사설 터널을 만들어 안전하게 통신하는 기술이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 헤딩과 번호가 남아 있어 질문 문장만 남기지 못했다.",
+      "body의 변환 메모 문구가 공통 규칙의 지정 형식과 일치하지 않았다.",
+      "answer와 explanation이 VPN 정의 한 줄만 반복해 터널링 개념과 두 기술의 차이를 설명하지 못했다.",
+      "topic과 keywords가 질문 문장 반복 위주라 개념 분류와 검색성이 약했다."
+    ],
+    "changes": [
+      "불완전한 약술 원문을 명시적 개념 비교 질문으로 정리하고 prompt를 순수 질문 문장으로 수정했다.",
+      "body를 공통 규칙의 두 줄 형식으로 교체하고 원문 제목을 정리했다.",
+      "answer와 explanation을 터널링 정의, VPN 정의, 양자의 관계와 차이가 드러나도록 다시 작성했다.",
+      "topic을 네트워크 보안으로 정리하고 keywords를 핵심 용어 중심으로 정제했다."
+    ]
+  }
+}

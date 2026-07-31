@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-176e9dd999dbaab29c23d544",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-176e9dd999dbaab29c23d544",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 5. 플래시 메모리",
+    "body": "플래시 메모리와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n플래시 메모리에서 TLC(Triple Level Cell)는 SLC(Single Level Cell), MLC(Multiple Level Cell)에 비해 단위 면적당 저장 용량이 증가하지만 읽기 및 쓰기 속도가 떨어진다. 그 이유를 설명하시오.\n\n#### 2.\n\n플래시 메모리를 사용하는 SSD(Solid State Drive)는 블록과 페이지를 기반으로 하기 때문에 섹터를 기반으로 하는 운영체제에서 직접 사용이 불가능하다. 이 때문에 SSD 컨트롤러에서 플래시 변환 계층(Flash Translation Layer, FTL)을 사용하여 물리 블록과 페이지 위에 논리 섹터를 구현하고 있다. FTL에 포함되는 다음 두 기능을 설명하시오.\n\n- 웨어 레벨링(Wear Leveling)\n- 가비지 콜렉션(Garbage Collection)",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "플래시 메모리",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "플래시 메모리"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 5. 플래시 메모리",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-176e9dd999dbaab29c23d544",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "플래시 메모리의 TLC가 SLC·MLC보다 읽기·쓰기 속도가 느린 이유와 SSD의 FTL 기능인 웨어 레벨링 및 가비지 콜렉션을 설명하시오.",
+    "body": "다음 내용을 모두 설명하시오.\n- TLC가 SLC·MLC보다 느린 이유\n- FTL의 웨어 레벨링\n- FTL의 가비지 콜렉션",
+    "answer": "TLC는 한 셀에 3비트를 저장하므로 SLC·MLC보다 더 많은 전압 상태를 정밀하게 구분하고 프로그램해야 해서 읽기·쓰기 시간이 길어지고 오류 허용 범위도 좁아 속도가 떨어진다. 웨어 레벨링은 쓰기/소거를 여러 블록에 고르게 분산해 특정 블록의 조기 마모를 막는 기능이고, 가비지 콜렉션은 유효 페이지를 다른 블록으로 옮긴 뒤 무효 페이지가 많은 블록을 소거하여 재사용 가능한 빈 공간을 확보하는 기능이다.",
+    "explanation": "TLC는 셀당 저장 비트 수를 늘려 집적도와 용량 효율을 높이는 대신, 셀 상태 수가 많아져 판독 시 기준 전압 비교가 더 복잡하고 기록 시 목표 전압에 맞추는 과정도 더 오래 걸린다. SSD는 운영체제가 기대하는 논리 섹터와 실제 NAND의 블록·페이지 구조가 다르므로 FTL이 이를 중개한다. 이때 웨어 레벨링은 블록 수명을 균등하게 쓰기 위한 핵심 기법이고, 가비지 콜렉션은 무효화된 페이지를 정리해 연속적인 쓰기 공간을 확보하는 핵심 기법이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "플래시 메모리",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "플래시 메모리",
+      "TLC",
+      "FTL",
+      "웨어 레벨링",
+      "가비지 콜렉션",
+      "SSD"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 5. 플래시 메모리",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 5. 플래시 메모리\n\n플래시 메모리와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n플래시 메모리에서 TLC(Triple Level Cell)는 SLC(Single Level Cell), MLC(Multiple Level Cell)에 비해 단위 면적당 저장 용량이 증가하지만 읽기 및 쓰기 속도가 떨어진다. 그 이유를 설명하시오.\n\n#### 2.\n\n플래시 메모리를 사용하는 SSD(Solid State Drive)는 블록과 페이지를 기반으로 하기 때문에 섹터를 기반으로 하는 운영체제에서 직접 사용이 불가능하다. 이 때문에 SSD 컨트롤러에서 플래시 변환 계층(Flash Translation Layer, FTL)을 사용하여 물리 블록과 페이지 위에 논리 섹터를 구현하고 있다. FTL에 포함되는 다음 두 기능을 설명하시오.\n\n- 웨어 레벨링(Wear Leveling)\n- 가비지 콜렉션(Garbage Collection)",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt가 마크다운 제목만 남아 있어 실제 질문이 드러나지 않음",
+      "answer와 explanation이 비어 있어 학습/채점에 사용할 수 없음",
+      "keywords가 핵심 개념을 충분히 반영하지 못함"
+    ],
+    "changes": [
+      "prompt를 단일 주관식 질문 문장으로 정리함",
+      "body를 풀이에 필요한 세 항목만 남기도록 축약함",
+      "정답과 해설에 TLC 속도 저하 원인, 웨어 레벨링, 가비지 콜렉션 설명을 보강함",
+      "keywords에 TLC, FTL, 웨어 레벨링, 가비지 콜렉션, SSD를 추가함"
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-f2deb6d0785076b6b6e06099",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-f2deb6d0785076b6b6e06099",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 7. TCP 연결과 혼잡제어",
+    "body": "TCP 연결과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**7-1 TCP 3-way Handshake 그림**\n\n![7-1 TCP 3-way Handshake 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0005.bmp)\n\n다음은 호스트 `A`가 호스트 `B`로 보내는 TCP 3-way Handshake의 연결 과정이다. `C`는 1Byte라고 할 때, 다음 그림의 빈칸을 작성하시오.\n\n#### 2.\n\nTCP 통신 중 발생할 수 있는 SYN Flooding의 공격 방식과 해결 방법을 설명하시오.\n\n#### 3.\n\n**7-3 혼잡 윈도우 변화 그래프**\n\n![7-3 혼잡 윈도우 변화 그래프](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0006.png)\n\nTCP는 혼잡 윈도우(Congestion Window)를 사용하여 혼잡제어를 한다. 다음은 세그먼트 전송 수에 따른 TCP 혼잡 윈도우의 크기 변화를 나타낸 것이다. 다음 물음에 답하시오.\n\n1. 위 그래프 구간을 지칭하는 혼잡제어 알고리즘 `(가)`, `(나)`의 이름을 작성하시오.\n2. 11번째 세그먼트를 전송할 때 혼잡 윈도우의 크기가 `1/2`로 줄어든 이유를 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "TCP 연결과 혼잡제어",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "TCP 연결과 혼잡제어",
+      "TCP"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 7. TCP 연결과 혼잡제어",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-f2deb6d0785076b6b6e06099",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "TCP의 3-way Handshake, SYN Flooding 공격과 대응 방법, 그리고 혼잡제어의 핵심 원리를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 7. TCP 연결과 혼잡제어",
+    "answer": "TCP 3-way Handshake는 SYN, SYN+ACK, ACK의 3단계로 송수신 측의 초기 순서번호와 연결 가능 여부를 확인해 연결을 설정한다. SYN Flooding은 위조된 출발지 IP로 SYN을 대량 전송해 서버의 반개방 연결 큐를 고갈시키는 공격이며, SYN Cookie 적용, backlog 확장, SYN rate limiting 등으로 대응한다. TCP 혼잡제어는 Slow Start와 Congestion Avoidance를 통해 혼잡 윈도우를 조절하고, 손실이나 중복 ACK가 발생하면 혼잡을 감지해 윈도우를 줄여 네트워크 부하를 완화한다.",
+    "explanation": "원문은 핸드셰이크 빈칸과 혼잡 윈도우 그래프를 보고 답해야 하지만 핵심 그림 정보가 텍스트로 제공되지 않아 실전형 정답을 확정할 수 없다. 따라서 TCP 연결 설정, SYN Flooding의 원리와 방어, 혼잡제어의 대표 단계와 손실 대응을 묻는 개념형 문항으로 변환했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "TCP 연결과 혼잡제어",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "TCP 3-way Handshake",
+      "SYN Flooding",
+      "혼잡제어",
+      "Slow Start",
+      "Congestion Avoidance"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 7. TCP 연결과 혼잡제어",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 7. TCP 연결과 혼잡제어\n\nTCP 연결과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**7-1 TCP 3-way Handshake 그림**\n\n![7-1 TCP 3-way Handshake 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0005.bmp)\n\n다음은 호스트 `A`가 호스트 `B`로 보내는 TCP 3-way Handshake의 연결 과정이다. `C`는 1Byte라고 할 때, 다음 그림의 빈칸을 작성하시오.\n\n#### 2.\n\nTCP 통신 중 발생할 수 있는 SYN Flooding의 공격 방식과 해결 방법을 설명하시오.\n\n#### 3.\n\n**7-3 혼잡 윈도우 변화 그래프**\n\n![7-3 혼잡 윈도우 변화 그래프](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0006.png)\n\nTCP는 혼잡 윈도우(Congestion Window)를 사용하여 혼잡제어를 한다. 다음은 세그먼트 전송 수에 따른 TCP 혼잡 윈도우의 크기 변화를 나타낸 것이다. 다음 물음에 답하시오.\n\n1. 위 그래프 구간을 지칭하는 혼잡제어 알고리즘 `(가)`, `(나)`의 이름을 작성하시오.\n2. 11번째 세그먼트를 전송할 때 혼잡 윈도우의 크기가 `1/2`로 줄어든 이유를 설명하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "핸드셰이크 그림과 혼잡 윈도우 그래프가 없어 원문 실전형 문항을 그대로 풀 수 없음",
+      "prompt와 body에 마크다운 헤딩과 이미지 링크가 섞여 있어 문제 줄기가 불명확함",
+      "answer와 explanation이 비어 있음"
+    ],
+    "changes": [
+      "실전형 복합 문항을 TCP 연결·SYN Flooding·혼잡제어 개념형 서술 문제로 변환",
+      "body를 변환 메모 2줄 형식으로 정리하고 마크다운/이미지 의존성을 제거",
+      "정답·해설을 보강하고 keywords를 핵심 TCP 용어로 정리"
+    ]
+  }
+}

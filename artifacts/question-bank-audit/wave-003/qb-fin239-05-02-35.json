@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-35",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-35",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 65. JAVA 코드 빈칸 채우기 문제(연산자 주어지고 ㄱ,ㄴ,ㄷ 채워넣기)(주관식)",
+    "body": "```java\nimport java.util.*;\n\npublic class Main {\n    public static int sum(List<Integer> list) {\n        int total = 0;\n        ㄱ<Integer> it = list.ㄴ();\n\n        while (it.hasNext()) {\n            total += it.next();\n        }\n\n        ㄷ total;\n    }\n}\n```\n\n연산자 리스트 : Iterable, Collection, List, Stream, getIterator, iterator, continue, return",
+    "answer": "ㄱ - Iterator , ㄴ - iterator, ㄷ - return",
+    "explanation": "ㄱ - Iterator , ㄴ - iterator, ㄷ - return",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "JAVA 코드 빈칸 채우기 문제(연산자 주어지고 ㄱ,ㄴ,ㄷ 채워넣기)",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "ㄷ 채워넣기)"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 65. JAVA 코드 빈칸 채우기 문제(연산자 주어지고 ㄱ,ㄴ,ㄷ 채워넣기)(주관식)",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-35",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "Java 코드의 빈칸 ㄱ, ㄴ, ㄷ에 들어갈 알맞은 것을 쓰시오.",
+    "body": "```java\nimport java.util.*;\n\npublic class Main {\n    public static int sum(List<Integer> list) {\n        int total = 0;\n        ㄱ<Integer> it = list.ㄴ();\n\n        while (it.hasNext()) {\n            total += it.next();\n        }\n\n        ㄷ total;\n    }\n}\n```\n\n연산자 후보: Iterable, Collection, List, Stream, getIterator, iterator, continue, return",
+    "answer": "ㄱ=Iterator, ㄴ=iterator, ㄷ=return",
+    "explanation": "list는 List<Integer>이므로 반복자를 얻으려면 iterator() 메서드를 호출해야 하고, 그 반환 타입은 Iterator<Integer>이다. 누적 합 total을 함수 결과로 돌려주어야 하므로 마지막 빈칸에는 return이 들어간다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Java 코드 빈칸 채우기",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "Iterator",
+      "iterator()",
+      "return"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 65. JAVA 코드 빈칸 채우기 문제(연산자 주어지고 ㄱ,ㄴ,ㄷ 채워넣기)(주관식)",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 90,
+    "answer_guide": "ㄱ, ㄴ, ㄷ에 들어갈 식별자와 키워드를 모두 맞게 쓰면 정답.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 65. JAVA 코드 빈칸 채우기 문제(연산자 주어지고 ㄱ,ㄴ,ㄷ 채워넣기)(주관식)\n\n```java\nimport java.util.*;\n\npublic class Main {\n    public static int sum(List<Integer> list) {\n        int total = 0;\n        ㄱ<Integer> it = list.ㄴ();\n\n        while (it.hasNext()) {\n            total += it.next();\n        }\n\n        ㄷ total;\n    }\n}\n```\n\n연산자 리스트 : Iterable, Collection, List, Stream, getIterator, iterator, continue, return\n\n**답:** ㄱ - Iterator , ㄴ - iterator, ㄷ - return",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목과 장황한 메타 설명이 섞여 있었다.",
+      "answer와 explanation이 동일한 나열형 문구뿐이라 풀이 근거가 없었다.",
+      "keywords에 의미 없는 조각 텍스트가 포함되어 있었고 answer_guide와 예상 시간이 단답형 문제 성격과 맞지 않았다."
+    ],
+    "changes": [
+      "prompt를 깔끔한 문제 지시문으로 정리하고 question_type을 short로 조정했다.",
+      "body의 후보 연산자 표기를 정리하고 정답을 단답형 형식으로 정리했으며 explanation에 타입과 메서드 선택 근거를 추가했다.",
+      "keywords를 Java/Iterator 관련 핵심 용어로 교체하고 answer_guide 및 expected_time_seconds를 단답형 문제에 맞게 수정했다."
+    ]
+  }
+}

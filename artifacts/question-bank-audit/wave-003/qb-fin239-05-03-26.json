@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-26",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 113. NoSQL의 특징이 아닌 것은?",
+    "body": "",
+    "answer": "NoSQL 사례에는 Oracle, MySQL이 있다(x)",
+    "explanation": "→ NoSQL에는 MongoDB, HBase, Cassandra 등이 있음",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "NoSQL의 특징이 아닌 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "NoSQL"
+    ],
+    "difficulty": "상",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 113. NoSQL의 특징이 아닌 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "NoSQL의 특징과 관계형 데이터베이스와의 차이점을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 113. NoSQL의 특징이 아닌 것은?",
+    "answer": "NoSQL은 고정 스키마보다 유연한 데이터 모델과 수평 확장에 강점을 가지는 비관계형 데이터 저장 방식이다. 대표 사례로는 MongoDB, HBase, Cassandra 등이 있으며 Oracle과 MySQL은 일반적으로 관계형 데이터베이스로 분류된다.",
+    "explanation": "원문은 객관식처럼 작성되었지만 선택지가 없어 그대로는 풀이가 불가능하다. 제시된 정답 단서에 따르면 핵심은 Oracle·MySQL이 NoSQL이 아니라 관계형 데이터베이스라는 점과, NoSQL의 대표 제품 및 특성을 구분하는 것이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "NoSQL",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "NoSQL",
+      "관계형 데이터베이스",
+      "MongoDB",
+      "HBase",
+      "Cassandra"
+    ],
+    "difficulty": "상",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 113. NoSQL의 특징이 아닌 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 113. NoSQL의 특징이 아닌 것은?\n\n  **답:** NoSQL 사례에는 Oracle, MySQL이 있다(x)\n\n  → NoSQL에는 MongoDB, HBase, Cassandra 등이 있음",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문 prompt에 마크다운 헤더가 남아 있고 객관식 형태인데 선택지가 없어 실전형 문제로는 풀 수 없었습니다.",
+      "answer와 explanation이 단편적인 정오표 수준이라 개념과 분류 기준이 충분히 드러나지 않았습니다.",
+      "topic이 질문 문장 전체였고 keywords가 너무 좁아 핵심 개념 구분이 부족했습니다."
+    ],
+    "changes": [
+      "불완전한 원문을 NoSQL의 특징과 관계형 데이터베이스와의 차이를 묻는 개념형 subjective 문항으로 변환했습니다.",
+      "body를 규칙에 맞는 2줄 변환 메모로 교체하고 prompt의 마크다운 잡음을 제거했습니다.",
+      "answer·explanation을 NoSQL의 특성과 Oracle·MySQL의 관계형 DB 분류가 드러나도록 보강하고 topic·keywords를 정리했습니다."
+    ]
+  }
+}

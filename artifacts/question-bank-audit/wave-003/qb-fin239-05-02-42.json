@@ -1,0 +1,85 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-42",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-42",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 72. 다음 Python 코드의 실행결과는?",
+    "body": "```python\nx = [1, 2, 3]\ny = x\ny.append(4)\nprint(len(x))\n```",
+    "answer": "3번",
+    "explanation": "3번",
+    "rubric": [],
+    "choices": [
+      "오류",
+      "3",
+      "4",
+      "None"
+    ],
+    "answer_index": 2,
+    "topic": "다음 Python 코드의 실행결과는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Python"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 72. 다음 Python 코드의 실행결과는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-42",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "다음 Python 코드의 실행 결과는?",
+    "body": "```python\nx = [1, 2, 3]\ny = x\ny.append(4)\nprint(len(x))\n```",
+    "answer": "4",
+    "explanation": "y는 x와 같은 리스트 객체를 참조하므로 y.append(4)를 실행하면 x도 [1, 2, 3, 4]가 된다. 따라서 len(x)의 출력값은 4이다.",
+    "rubric": [],
+    "choices": [
+      "오류",
+      "3",
+      "4",
+      "None"
+    ],
+    "answer_index": 2,
+    "topic": "다음 Python 코드의 실행결과는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Python",
+      "list",
+      "reference",
+      "append"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 72. 다음 Python 코드의 실행결과는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 72. 다음 Python 코드의 실행결과는?\n\n```python\nx = [1, 2, 3]\ny = x\ny.append(4)\nprint(len(x))\n```\n1. 오류\n2. 3\n3. 4\n4. None\n\n**답:** 3번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목 표식과 문항 번호가 남아 있었음",
+      "answer와 explanation이 모두 선지 표기만 남아 있어 정답 값과 풀이가 누락되어 있었음",
+      "keywords가 지나치게 포괄적이라 코드의 핵심 개념이 드러나지 않았음"
+    ],
+    "changes": [
+      "prompt를 앱에 바로 표시 가능한 질문 문장으로 정리함",
+      "answer를 실제 출력값인 4로 수정하고 리스트 참조 공유와 append 동작을 설명하는 explanation을 추가함",
+      "keywords를 Python list 참조와 append 개념 중심으로 정리함"
+    ]
+  }
+}

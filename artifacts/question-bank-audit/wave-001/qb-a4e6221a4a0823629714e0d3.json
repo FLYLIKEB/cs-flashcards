@@ -1,0 +1,116 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-a4e6221a4a0823629714e0d3",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-611",
+    "term": "혼잡 제어",
+    "english": "Congestion Control",
+    "category": "네트워크",
+    "alphabet_index": "#",
+    "korean_initial": "ㅎ",
+    "definition": "혼잡 제어는 네트워크 내 병목을 감지해 송신자가 전송량을 동적으로 줄임으로써 패킷 손실과 지연 폭증을 방지하는 전송 계층의 제어 메커니즘입니다. 계층별 책임과 실제 장애 지점을 구분해 전체 네트워크의 안정성과 공정성을 확보하는 기준으로 사용됩니다.",
+    "detailed_explanation": "의미: 혼잡 제어는 송신자가 네트워크가 처리할 수 있는 수준으로 전송 속도를 맞추는 메커니즘입니다. TCP는 패킷 손실, 중복 ACK, RTT 변화 등 네트워크 상태 신호를 보고 혼잡 윈도우(cwnd)를 조절하며, 대표적인 동작 원리는 초기 성장 단계의 Slow Start와 이후의 AIMD(점증적 증가·배수적 감소) 기반 혼잡 회피입니다.\n활용: 흐름 제어가 수신자 버퍼 오버플로우를 막는다면 혼잡 제어는 라우터와 링크 같은 네트워크 내부 병목을 보호합니다. 예를 들어 금융 서비스에서 특정 시간대에 응답 지연과 재전송이 증가하면 서버 성능뿐 아니라 회선 혼잡, 패킷 손실, QoS 정책 등 네트워크 원인을 함께 점검해야 합니다. 학습할 때는 혼잡 제어가 어느 계층에서 동작하는지, 어떤 상태값(예: cwnd, RTT, 손실 발생 지표)을 갱신하는지, 장애 시 어떤 로그와 패킷 증거로 확인할지 순서대로 정리하면 이해하기 쉽습니다. 운영에서는 성능과 안정성의 균형을 위해 기본 설정만 그대로 쓰지 말고 주소·포트 범위, 타임아웃, 캐시 동작, 재전송 기준 등 서비스 특성에 맞게 조정해야 합니다.",
+    "related_concepts": "[[4-Way Handshake]], [[흐름 제어]], [[슬라이딩 윈도우]], [[Stop-and-Wait]], [[TCP]]",
+    "source_files": "04-04-네트워크-프로토콜-보안.md; 05-06-예탁결제원-기출.md; 05-11-네트워크-기출-모음.md",
+    "exam_note": "정의만 쓰지 말고 계층·목적(혼잡 vs 흐름)·주요 상태값(cwnd/ACK/RTT) 관점에서 4‑Way Handshake, 흐름 제어, 슬라이딩 윈도우와 간단히 비교해 쓰라.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-611-20260719-115054-1235d551.png",
+    "concept_image_alt": "혼잡 제어(네트워크) 개념 참고 이미지",
+    "sort_order": 610,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-611-20260719-115054-1235d551.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-a4e6221a4a0823629714e0d3",
+    "card_id": "CS-611",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]는 네트워크 내 병목을 감지해 송신자가 전송량을 동적으로 줄임으로써 패킷 손실과 지연 폭증을 방지하는 전송 계층의 제어 메커니즘입니다.",
+    "answer": "혼잡 제어",
+    "explanation": "혼잡 제어는 네트워크 내 병목을 감지해 송신자가 전송량을 동적으로 줄임으로써 패킷 손실과 지연 폭증을 방지하는 전송 계층의 제어 메커니즘입니다. 계층별 책임과 실제 장애 지점을 구분해 전체 네트워크의 안정성과 공정성을 확보하는 기준으로 사용됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "혼잡 제어",
+      "4-Way Handshake",
+      "흐름 제어",
+      "슬라이딩 윈도우"
+    ],
+    "answer_index": 0,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "혼잡 제어",
+      "Congestion Control",
+      "4-Way Handshake",
+      "흐름 제어",
+      "슬라이딩 윈도우",
+      "Stop-and-Wait",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "04-04-네트워크-프로토콜-보안.md; 05-06-예탁결제원-기출.md; 05-11-네트워크-기출-모음.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-a4e6221a4a0823629714e0d3",
+    "card_id": "CS-611",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "네트워크 내 병목을 감지해 송신자가 전송량을 동적으로 줄임으로써 패킷 손실과 지연 폭증을 방지하는 전송 계층의 제어 메커니즘입니다.",
+    "answer": "혼잡 제어",
+    "explanation": "혼잡 제어는 네트워크 내 병목을 감지해 송신자가 전송량을 동적으로 줄임으로써 패킷 손실과 지연 폭증을 방지하는 전송 계층의 제어 메커니즘입니다. 계층별 책임과 실제 장애 지점을 구분해 전체 네트워크의 안정성과 공정성을 확보하는 기준으로 사용됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "혼잡 제어",
+      "4-Way Handshake",
+      "흐름 제어",
+      "슬라이딩 윈도우"
+    ],
+    "answer_index": 0,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "혼잡 제어",
+      "Congestion Control",
+      "TCP",
+      "전송 계층"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "04-04-네트워크-프로토콜-보안.md; 05-06-예탁결제원-기출.md; 05-11-네트워크-기출-모음.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 placeholder 기호가 남아 있었음",
+      "category가 비어 있었음",
+      "keywords에 오답 선택지 위주 잡음이 포함되어 있었음"
+    ],
+    "changes": [
+      "body에서 placeholder를 제거해 설명형 문장으로 정리함",
+      "category를 네트워크로 보정함",
+      "keywords를 혼잡 제어 중심의 핵심 용어로 축약함"
+    ]
+  }
+}

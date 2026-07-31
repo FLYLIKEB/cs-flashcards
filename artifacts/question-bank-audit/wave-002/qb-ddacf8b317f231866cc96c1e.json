@@ -1,0 +1,112 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-ddacf8b317f231866cc96c1e",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-248",
+    "term": "RIP",
+    "english": "RIP",
+    "category": "네트워크",
+    "alphabet_index": "R",
+    "korean_initial": "R",
+    "definition": "RIP은 홉 수(경유하는 라우터 수)를 비용으로 사용하는 거리 벡터 라우팅 프로토콜로, 최대 홉 수가 15로 제한되어 소규모 네트워크에 적합합니다. 구현과 설정이 단순한 대신 수렴 속도와 확장성에서 제약이 있어 실무에서는 OSPF나 BGP와 역할이 구분됩니다.",
+    "detailed_explanation": "의미: RIP은 Routing Information Protocol의 약자로, 목적지까지 거치는 라우터 수(홉 수)를 경로 비용으로 삼아 최단 홉 경로를 선택합니다. 홉 수는 최대 15까지 허용되며, 값이 16이면 그 목적지는 도달 불가능(unreachable)으로 간주됩니다. 즉, 네트워크가 커져 홉 수가 16 이상이면 RIP으로는 경로를 표현할 수 없습니다.\n\n활용: 설정이 간단해 학습용이나 소규모 네트워크에 적합하지만, 수렴 속도가 느리고 대역폭·지연 같은 경로 품질을 반영하지 못하는 단점이 있습니다. 보다 정교한 경로 계산은 링크 상태와 비용을 쓰는 OSPF가 담당하고, AS 간 정책 라우팅은 BGP가 담당합니다. RIP의 대표적인 문제인 count-to-infinity를 완화하기 위해 split horizon, route poisoning 같은 기법을 사용합니다. 학습할 때는 RIP이 네트워크 계층에서 동작한다는 점, 라우팅 테이블과 타이머·업데이트 패킷으로 상태를 유지·갱신한다는 점, 장애 시 로그와 라우팅 업데이트(패킷)를 통해 문제를 추적할 수 있다는 흐름으로 생각하면 이해하기 쉽습니다. 실제 운영에서는 기본 설정을 그대로 쓰기보다 주소 범위, 포트(프로토콜), 타임아웃·타이머, 캐시 정책과 재전송 기준 등을 서비스 특성에 맞게 검토해야 안정성이 확보됩니다.",
+    "related_concepts": "[[정적 라우팅]], [[동적 라우팅]], [[OSPF]], [[BGP]], [[TCP]]",
+    "source_files": "04-02-프로그래밍-SQL-분산-클라우드.md; 05-14-32-한국은행-2026-컴퓨터공학-학술-7-보안.md; 10-03-01-XSS-SQL-Injection.md",
+    "exam_note": "정의만 쓰지 말고 정적 라우팅·OSPF·BGP와 비교해 수렴 속도, 확장성, 메트릭 차이를 짧게 정리하라.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-248-20260719-115316-ef16fde1.png",
+    "concept_image_alt": "RIP(네트워크) 개념 참고 이미지",
+    "sort_order": 247,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-248-20260719-115316-ef16fde1.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-ddacf8b317f231866cc96c1e",
+    "card_id": "CS-248",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]은 홉 수(경유하는 라우터 수)를 비용으로 사용하는 거리 벡터 라우팅 프로토콜로, 최대 홉 수가 15로 제한되어 소규모 네트워크에 적합합니다.",
+    "answer": "RIP",
+    "explanation": "RIP은 홉 수(경유하는 라우터 수)를 비용으로 사용하는 거리 벡터 라우팅 프로토콜로, 최대 홉 수가 15로 제한되어 소규모 네트워크에 적합합니다. 구현과 설정이 단순한 대신 수렴 속도와 확장성에서 제약이 있어 실무에서는 OSPF나 BGP와 역할이 구분됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "정적 라우팅",
+      "동적 라우팅",
+      "RIP",
+      "TCP"
+    ],
+    "answer_index": 2,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "RIP",
+      "정적 라우팅",
+      "동적 라우팅",
+      "OSPF",
+      "BGP",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "04-02-프로그래밍-SQL-분산-클라우드.md; 05-14-32-한국은행-2026-컴퓨터공학-학술-7-보안.md; 10-03-01-XSS-SQL-Injection.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-ddacf8b317f231866cc96c1e",
+    "card_id": "CS-248",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 라우팅 프로토콜은 무엇인가?",
+    "body": "홉 수(경유하는 라우터 수)를 비용으로 사용하는 거리 벡터 라우팅 프로토콜로, 최대 홉 수가 15로 제한되어 소규모 네트워크에 적합합니다.",
+    "answer": "RIP",
+    "explanation": "RIP은 홉 수(경유하는 라우터 수)를 비용으로 사용하는 거리 벡터 라우팅 프로토콜로, 최대 홉 수가 15로 제한되어 소규모 네트워크에 적합합니다. 구현과 설정이 단순한 대신 수렴 속도와 확장성에서 제약이 있어 실무에서는 OSPF나 BGP와 역할이 구분됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "정적 라우팅",
+      "동적 라우팅",
+      "RIP",
+      "TCP"
+    ],
+    "answer_index": 2,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "RIP",
+      "거리 벡터 라우팅",
+      "홉 수"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "04-02-프로그래밍-SQL-분산-클라우드.md; 05-14-32-한국은행-2026-컴퓨터공학-학술-7-보안.md; 10-03-01-XSS-SQL-Injection.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "문항 본문에 불필요한 빈칸 표기가 남아 있음",
+      "category가 비어 있고 keywords에 관련 없는 선택지가 과다 포함됨"
+    ],
+    "changes": [
+      "prompt/body를 RIP 식별형 문항으로 정리함",
+      "category를 네트워크로 보완하고 keywords를 핵심 개념만 남기도록 정리함"
+    ]
+  }
+}

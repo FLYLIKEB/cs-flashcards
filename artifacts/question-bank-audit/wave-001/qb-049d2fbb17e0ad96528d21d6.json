@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-049d2fbb17e0ad96528d21d6",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-049d2fbb17e0ad96528d21d6",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 7. 아래 그림은 브리지(Bridge)의 구성도이다.",
+    "body": "![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/09.%20%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%282009%29.html/bindata/BIN0002.bmp)\n\n다음 순서대로 프레임(Frame)을 전송한 후 B1, B2 브리지의 Forwarding table 상태를 완성하시오.\n\n(전송 순서) ⓐ C sends to A ⓑ F sends to E ⓒ E sends to F ⓓ D sends to B  \n조건1. Forwarding table은 목적지(Destination)와 포트번호 2개의 컬럼으로 되어 있음  \n조건2. 초기 상태의 Forwarding table은 비어 있음  \n조건3. Forwarding table에 입력된 순서는 변경하지 말 것\n\n#### Bridge B1\n\n| 목적지 | 포트번호 |\n| --- | --- |\n|  |  |\n\n#### Bridge B2\n\n| 목적지 | 포트번호 |\n| --- | --- |\n|  |  |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "아래 그림은 브리지(Bridge)의 구성도이다.",
+    "field_name": "전산학술",
+    "category": "네트워크",
+    "keywords": [
+      "아래 그림은 브리지 의 구성도이다.",
+      "Bridge",
+      "브리지"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 7. 아래 그림은 브리지(Bridge)의 구성도이다.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-049d2fbb17e0ad96528d21d6",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "브리지의 포워딩 테이블은 어떤 원리로 학습되며 프레임 전달 시 어떻게 갱신되는가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 7. 아래 그림은 브리지(Bridge)의 구성도이다.",
+    "answer": "브리지는 수신한 프레임의 출발지 MAC 주소와 유입 포트를 보고 포워딩 테이블을 학습한다. 이후 목적지 MAC 주소가 테이블에 있으면 해당 포트로만 전달하고, 없으면 수신 포트를 제외한 나머지 포트로 플러딩한다. 같은 출발지 주소의 프레임이 다른 포트로 들어오면 해당 엔트리를 새 포트 정보로 갱신한다.",
+    "explanation": "브리지의 포워딩 테이블은 목적지별 정적 답안을 미리 채우는 표가 아니라, 실제 프레임이 들어올 때마다 출발지 주소를 기준으로 학습되는 MAC 학습 결과이다. 따라서 각 전송 단계에서는 먼저 출발지와 유입 포트를 기록하고, 그 다음 목적지의 존재 여부에 따라 선택 전달 또는 플러딩을 수행한다. 원문은 최종 표를 계산하려면 그림 속 호스트와 브리지 포트 연결 관계가 반드시 필요하지만, 제공된 텍스트만으로는 그 토폴로지를 확정할 수 없어 개념형으로 전환하는 것이 적절하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "브리지",
+    "field_name": "전산학술",
+    "category": "네트워크",
+    "keywords": [
+      "브리지",
+      "Bridge",
+      "포워딩 테이블",
+      "MAC 학습",
+      "플러딩"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 7. 아래 그림은 브리지(Bridge)의 구성도이다.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 7. 아래 그림은 브리지(Bridge)의 구성도이다.\n\n![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/09.%20%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%282009%29.html/bindata/BIN0002.bmp)\n\n다음 순서대로 프레임(Frame)을 전송한 후 B1, B2 브리지의 Forwarding table 상태를 완성하시오.\n\n(전송 순서) ⓐ C sends to A ⓑ F sends to E ⓒ E sends to F ⓓ D sends to B  \n조건1. Forwarding table은 목적지(Destination)와 포트번호 2개의 컬럼으로 되어 있음  \n조건2. 초기 상태의 Forwarding table은 비어 있음  \n조건3. Forwarding table에 입력된 순서는 변경하지 말 것\n\n#### Bridge B1\n\n| 목적지 | 포트번호 |\n| --- | --- |\n|  |  |\n\n#### Bridge B2\n\n| 목적지 | 포트번호 |\n| --- | --- |\n|  |  |",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문 정답 계산에 필요한 브리지 토폴로지 그림 정보가 텍스트에 없어 실전형으로는 풀이가 불가능함.",
+      "정답과 해설이 비어 있고 키워드에 질문 문장 찌꺼기가 남아 있음."
+    ],
+    "changes": [
+      "브리지 포워딩 테이블 학습 원리를 묻는 개념형 주관식으로 변환함.",
+      "변환 메모 2줄 본문, 정답·해설, 정제된 topic·keywords를 채움."
+    ]
+  }
+}

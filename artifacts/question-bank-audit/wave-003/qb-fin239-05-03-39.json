@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-39",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-39",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 126. 하나 이상의 변수 간의 영향이나 관계를 분석 및 추정하는 기술은?",
+    "body": "",
+    "answer": "회귀분석",
+    "explanation": "회귀분석",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "하나 이상의 변수 간의 영향이나 관계를 분석 및 추정하는 기술은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "추정하는 기술은",
+      "회귀분석"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 126. 하나 이상의 변수 간의 영향이나 관계를 분석 및 추정하는 기술은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-39",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "하나 이상의 변수 간의 영향이나 관계를 분석 및 추정하는 기술은 무엇인가?",
+    "body": "",
+    "answer": "회귀분석",
+    "explanation": "회귀분석은 하나 이상의 독립변수와 종속변수 사이의 관계를 분석하고 그 영향을 추정하는 대표적인 통계 기법이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "회귀분석",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "회귀분석",
+      "변수 관계 분석",
+      "통계적 추정"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 126. 하나 이상의 변수 간의 영향이나 관계를 분석 및 추정하는 기술은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "핵심 용어를 정확히 쓰면 정답으로 인정한다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 126. 하나 이상의 변수 간의 영향이나 관계를 분석 및 추정하는 기술은?\n\n  **답:** 회귀분석",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 heading과 문항 번호가 남아 있었다.",
+      "question_type이 단답형 문항에 비해 과도하게 넓은 subjective로 설정되어 있었다.",
+      "explanation이 정답만 반복했고, topic과 keywords에 문제 문장 찌꺼기가 남아 있었다."
+    ],
+    "changes": [
+      "prompt를 질문 문장만 남도록 정리하고 question_type을 short로 조정했다.",
+      "answer는 유지하면서 회귀분석의 의미를 설명하는 해설을 보강했다.",
+      "topic을 '회귀분석'으로 정리하고 keywords와 answer_guide를 단답형 문항에 맞게 수정했다."
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-3949a8b3bcacb2b001634849",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-3949a8b3bcacb2b001634849",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 1. 급여시스템 데이터베이스",
+    "body": "아래는 어느 회사의 급여시스템 데이터베이스이다. 다음 물음에 답하시오.\n\n```text\n직원(직원번호, 이름, 직책, 부서번호*, 입사일자)\n부서(부서번호, 부서명)\n급여(직원번호*, 금액, 지급일자)\n```\n\n주) 밑줄 친 부분은 기본키(primary key), `*`는 외래키(foreign key)를 의미하며, 지급일자는 `YYYYMMDD` 형식이다.\n\n#### 1.\n\n2023년 8월 21일 직원에게 정기급여가 지급되었다. 이날 지급된 정기급여 금액이 3,000,000원 이상인 직원의 직원번호와 지급한 금액을 조회하는 SQL문을 작성하시오. (조회 결과는 직원번호 오름차순으로 표시)\n\n#### 2.\n\n직원들이 소속된 부서가 바뀌지 않았을 때, 소속 부서명이 `조사국`인 직원들에게 2022년 한 해 지급된 총 급여액을 조회하는 SQL문을 작성하시오.\n\n#### 3.\n\n`부서` 테이블에 문자형(`CHAR`) 8Byte인 `부서위치` 열(column)을 추가하는 SQL문을 작성하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "급여시스템 데이터베이스",
+    "field_name": "컴퓨터공학 학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "급여시스템 데이터베이스",
+      "데이터베이스"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 1. 급여시스템 데이터베이스",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-3949a8b3bcacb2b001634849",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "급여시스템 데이터베이스에서 조회 SQL과 스키마 변경 SQL의 차이를 설명하시오.",
+    "body": "변환 메모: 원문이 하나의 row에 3개 실전형 문항을 함께 담고 있어 단일 문항으로 사용하기 어려워 개념문제로 변환함.\n원문 제목: 1. 급여시스템 데이터베이스",
+    "answer": "조회 SQL은 테이블의 데이터를 검색·필터링·정렬·집계하기 위한 문장이고, 스키마 변경 SQL은 테이블 구조 자체를 추가·수정·삭제하는 문장이다. 예를 들어 급여 지급 내역 조회는 SELECT로 처리하고, 부서 테이블에 부서위치 열을 추가하는 작업은 ALTER TABLE로 처리한다.",
+    "explanation": "원문 1번과 2번은 급여 조건 조회와 부서별 연간 급여 합계 계산을 요구하므로 SELECT, WHERE, ORDER BY, SUM, JOIN 같은 조회 연산이 핵심이다. 원문 3번은 부서 테이블에 CHAR(8) 형식의 열을 추가하는 작업이므로 데이터 조회가 아니라 스키마 정의 변경에 해당한다. 따라서 이 문항은 조회 SQL(DQL)과 테이블 구조 변경 SQL(DDL)의 역할 차이를 이해하는 개념 문제로 정리하는 것이 적절하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "급여시스템 데이터베이스",
+    "field_name": "컴퓨터공학 학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL",
+      "SELECT",
+      "ALTER TABLE",
+      "DDL",
+      "DQL"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 1. 급여시스템 데이터베이스",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "조회 SQL과 스키마 변경 SQL의 역할 차이를 구분해 설명하고 예시를 제시한다.",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 1. 급여시스템 데이터베이스\n\n아래는 어느 회사의 급여시스템 데이터베이스이다. 다음 물음에 답하시오.\n\n```text\n직원(직원번호, 이름, 직책, 부서번호*, 입사일자)\n부서(부서번호, 부서명)\n급여(직원번호*, 금액, 지급일자)\n```\n\n주) 밑줄 친 부분은 기본키(primary key), `*`는 외래키(foreign key)를 의미하며, 지급일자는 `YYYYMMDD` 형식이다.\n\n#### 1.\n\n2023년 8월 21일 직원에게 정기급여가 지급되었다. 이날 지급된 정기급여 금액이 3,000,000원 이상인 직원의 직원번호와 지급한 금액을 조회하는 SQL문을 작성하시오. (조회 결과는 직원번호 오름차순으로 표시)\n\n#### 2.\n\n직원들이 소속된 부서가 바뀌지 않았을 때, 소속 부서명이 `조사국`인 직원들에게 2022년 한 해 지급된 총 급여액을 조회하는 SQL문을 작성하시오.\n\n#### 3.\n\n`부서` 테이블에 문자형(`CHAR`) 8Byte인 `부서위치` 열(column)을 추가하는 SQL문을 작성하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "한 row에 3개 실전형 하위 문항이 함께 들어 있어 단일 문제로 사용할 수 없음",
+      "prompt에 마크다운 제목이 남아 있고 answer/explanation이 비어 있음",
+      "keywords와 answer_guide가 실제 문항 형태와 잘 맞지 않음"
+    ],
+    "changes": [
+      "단일 사용이 가능하도록 조회 SQL과 스키마 변경 SQL의 차이를 묻는 개념문제로 변환",
+      "prompt/body를 정리하고 변환 메모 및 원문 제목을 추가",
+      "정답, 해설, 키워드, answer_guide를 변환된 문항에 맞게 보완"
+    ]
+  }
+}

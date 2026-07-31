@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-33",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-33",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 63. 드릴다운 기법이란?",
+    "body": "- 드릴다운: 데이터 분석에서 상위 수준의 데이터를 하위 수준의 데이터로 세분화하여 분석하는 방법",
+    "answer": "상위 요약 데이터에서 하위 상세 데이터로 단계적으로 내려가며 분석하는 기법이다.",
+    "explanation": "상위 요약 데이터에서 하위 상세 데이터로 단계적으로 내려가며 분석하는 기법이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "드릴다운 기법이란?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "드릴다운 기법이란"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 63. 드릴다운 기법이란?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-33",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "드릴다운 기법이란 무엇인가?",
+    "body": "",
+    "answer": "상위 수준의 요약 데이터를 하위 수준의 상세 데이터로 세분화해 내려가며 분석하는 기법이다.",
+    "explanation": "드릴다운은 집계된 결과에서 출발해 지역별, 상품별, 기간별 등 더 세부적인 차원으로 내려가 원인을 분석하는 방식이다. 반대로 상세 데이터를 상위 수준으로 묶어 보는 것은 롤업이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "드릴다운",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "드릴다운",
+      "데이터 분석",
+      "OLAP"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 63. 드릴다운 기법이란?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 63. 드릴다운 기법이란?\n- 드릴다운: 데이터 분석에서 상위 수준의 데이터를 하위 수준의 데이터로 세분화하여 분석하는 방법\n**답(AI답변):** 상위 요약 데이터에서 하위 상세 데이터로 단계적으로 내려가며 분석하는 기법이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 markdown heading 번호가 남아 있었음",
+      "body에 정답 정의가 그대로 들어 있어 답이 노출되고 있었음",
+      "keywords와 topic이 질문 문장 형태여서 검색·분류용으로 부적절했음",
+      "explanation이 answer와 동일해 보충 설명이 부족했음"
+    ],
+    "changes": [
+      "prompt를 깔끔한 질문 문장으로 정리함",
+      "body를 비워 정답 누설을 제거함",
+      "answer를 간결하게 다듬고 explanation에 drill-down의 분석 방향과 roll-up 대비를 추가함",
+      "topic과 keywords를 드릴다운 중심의 간결한 용어로 정리함"
+    ]
+  }
+}

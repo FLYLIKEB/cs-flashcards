@@ -1,0 +1,83 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-06-17",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-06-17",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 181. 다음 중 삽입정렬의 특징으로 옳은 것은?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "2번",
+    "rubric": [],
+    "choices": [
+      "항상 O(n log n)이다",
+      "안정 정렬이다",
+      "추가 메모리가 필요하다",
+      "분할 정복 방식이다"
+    ],
+    "answer_index": 1,
+    "topic": "다음 중 삽입정렬의 특징으로 옳은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "안정 정렬이다"
+    ],
+    "difficulty": "하",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 181. 다음 중 삽입정렬의 특징으로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-06-17",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "삽입정렬의 특징으로 옳은 것은?",
+    "body": "",
+    "answer": "안정 정렬이다",
+    "explanation": "삽입정렬은 같은 값의 상대적 순서를 유지하는 안정 정렬이다. 평균·최악 시간 복잡도는 O(n²)이며, 보통 제자리 정렬로 추가 메모리를 거의 사용하지 않고 분할 정복 방식도 아니다.",
+    "rubric": [],
+    "choices": [
+      "항상 O(n log n)이다",
+      "안정 정렬이다",
+      "추가 메모리가 필요하다",
+      "분할 정복 방식이다"
+    ],
+    "answer_index": 1,
+    "topic": "삽입정렬",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "삽입정렬",
+      "안정 정렬"
+    ],
+    "difficulty": "하",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 181. 다음 중 삽입정렬의 특징으로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 181. 다음 중 삽입정렬의 특징으로 옳은 것은?\n1. 항상 O(n log n)이다\n2. 안정 정렬이다\n3. 추가 메모리가 필요하다\n4. 분할 정복 방식이다\n\n**답:** 2번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었다.",
+      "answer와 explanation이 모두 '2번'으로만 기록되어 학습용 정보가 부족했다.",
+      "keywords가 정답 문장 전체라서 검색용 키워드로 부적절했다."
+    ],
+    "changes": [
+      "prompt를 순수한 질문 문장으로 정리했다.",
+      "answer를 정답 내용으로 바꾸고 explanation에 정답 근거와 오답 구분 포인트를 보강했다.",
+      "topic과 keywords를 삽입정렬 중심의 간결한 용어로 정리했다."
+    ]
+  }
+}

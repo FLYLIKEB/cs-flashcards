@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-5543f8cf334e8434ab0109c5",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-5543f8cf334e8434ab0109c5",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 3. 다음에 대하여 간략히 기술하시오.",
+    "body": "1. Ajax(Asynchronous JavaScript and XML)의 장단점\n\n## Ⅱ. 다음 물음에 답하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "다음에 대하여 간략히 기술하시오.",
+    "field_name": "전산학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "XML",
+      "Java"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2011 전산학술 발췌 · 3. 다음에 대하여 간략히 기술하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-5543f8cf334e8434ab0109c5",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "Ajax(Asynchronous JavaScript and XML)의 장단점을 간략히 기술하시오.",
+    "body": "",
+    "answer": "장점은 웹페이지 전체를 새로 고치지 않고 비동기적으로 필요한 데이터만 주고받아 응답성과 사용자 경험을 높이고, 대역폭 사용을 줄일 수 있다는 점이다. 단점은 자바스크립트 의존성이 높아 구현·디버깅이 복잡하고, 브라우저 호환성·보안·히스토리 관리·SEO 측면에서 문제가 생길 수 있다는 점이다.",
+    "explanation": "Ajax는 JavaScript를 이용해 서버와 비동기 통신을 수행하여 화면 일부만 갱신하는 웹 개발 방식이다. 따라서 전체 페이지 재로딩이 없어 빠른 상호작용이 가능하지만, 클라이언트 측 로직이 증가해 개발 복잡성이 커지고 보안 및 브라우저 처리 이슈를 함께 고려해야 한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Ajax",
+    "field_name": "전산학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Ajax",
+      "JavaScript",
+      "비동기 통신",
+      "XML"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2011 전산학술 발췌 · Ajax(Asynchronous JavaScript and XML)의 장단점",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 3. 다음에 대하여 간략히 기술하시오.\n\n1. Ajax(Asynchronous JavaScript and XML)의 장단점\n\n## Ⅱ. 다음 물음에 답하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트와 본문에 마크다운 헤더·번호 등 원문 잡음이 남아 있었음",
+      "정답·해설이 비어 있어 주관식 문항으로 사용할 수 없었음",
+      "topic·keywords·source_location이 Ajax 문항과 구체적으로 맞지 않았음"
+    ],
+    "changes": [
+      "프롬프트를 Ajax 장단점 서술형 질문으로 정리하고 불필요한 본문을 제거함",
+      "Ajax의 장점과 단점을 반영한 정답과 해설을 작성함",
+      "topic·keywords·source_location을 Ajax 중심으로 정비함"
+    ]
+  }
+}

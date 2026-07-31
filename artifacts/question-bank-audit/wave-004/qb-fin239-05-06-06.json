@@ -1,0 +1,73 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-06-06",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-06-06",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 170. 하노이탑에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 하노이탑 문제",
+    "answer": "n개 원반의 최소 이동 횟수는 2^n - 1이며 재귀적으로 n-1개 이동, 큰 원반 이동, n-1개 이동 순서다.",
+    "explanation": "n개 원반의 최소 이동 횟수는 2^n - 1이며 재귀적으로 n-1개 이동, 큰 원반 이동, n-1개 이동 순서다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "하노이탑에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "하노이탑"
+    ],
+    "difficulty": "중",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 170. 하노이탑에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-06-06",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "하노이탑의 규칙과 최소 이동 횟수 공식을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 170. 하노이탑 문제",
+    "answer": "하노이탑은 큰 원반을 작은 원반 위에 놓을 수 없다는 규칙 아래 원반 전체를 다른 기둥으로 옮기는 재귀 문제이며, 원반이 n개일 때 최소 이동 횟수는 2^n - 1이다.",
+    "explanation": "n개의 원반을 옮기려면 먼저 위의 n-1개를 보조 기둥으로 옮기고, 가장 큰 원반 1개를 목적 기둥으로 옮긴 뒤, 다시 n-1개를 목적 기둥으로 옮겨야 한다. 이 재귀 관계는 T(n)=2T(n-1)+1이고 해는 2^n-1이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "하노이탑",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "하노이탑",
+      "재귀",
+      "최소 이동 횟수"
+    ],
+    "difficulty": "중",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 170. 하노이탑에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 markdown heading이 남아 있었음",
+      "불완전 문제 변환 문구가 공통 규칙 문구와 다르고 원문 제목도 불완전했음",
+      "topic과 keywords가 설명형 문장 기준으로 남아 있었고 explanation이 answer와 중복됐음"
+    ],
+    "changes": [
+      "실전형으로 풀 수 없는 원문을 하노이탑 규칙과 최소 이동 횟수를 묻는 개념문제로 정리함",
+      "body를 공통 규칙의 정확한 2줄 변환 형식으로 수정하고 원문 제목을 보존함",
+      "answer와 explanation을 분리해 재귀 원리와 점화식을 보강하고 topic/keywords를 정제함"
+    ]
+  }
+}

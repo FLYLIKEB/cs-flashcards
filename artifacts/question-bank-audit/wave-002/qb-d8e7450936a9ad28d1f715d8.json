@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-d8e7450936a9ad28d1f715d8",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-d8e7450936a9ad28d1f715d8",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 6. 네트워크",
+    "body": "### 1.\n\n여러 대의 PC가 있고, 공유기를 이용하여 사설 네트워크를 구성하려고 한다. 이때, 사설 IP주소를 할당받은 PC는 어떻게 외부 인터넷과 통신하는지 그 구성을 기술하고, IPv4 체계에서 사설 IP주소를 구분함으로써 가질 수 있는 이점을 설명하시오.\n\n### 2.\n\n허브와 L2스위치의 차이점을 기술하시오.\n\n### 3.\n\nL2스위치와 라우터의 차이점을 기술하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "네트워크",
+      "IPv4"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 6. 네트워크 · 6. 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-d8e7450936a9ad28d1f715d8",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "사설 IP 기반 네트워크에서 NAT의 역할과 허브, L2 스위치, 라우터의 차이를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 6. 네트워크",
+    "answer": "사설 IP를 사용하는 PC는 공유기에서 NAT를 통해 공인 IP로 주소 변환되어 외부 인터넷과 통신한다. 허브는 수신 프레임을 모든 포트로 단순 전송하고, L2 스위치는 MAC 주소를 학습해 필요한 포트로만 프레임을 전달한다. 라우터는 IP 계층에서 서로 다른 네트워크를 연결하며 경로 선택과 브로드캐스트 영역 분리를 수행한다.",
+    "explanation": "원문은 섹션 제목 아래 서로 다른 3개 서술형 문항이 합쳐져 있어 단일 문제 행으로 직접 사용하기 어렵다. 따라서 사설 IP/NAT와 네트워크 장비 비교라는 공통 주제를 묻는 개념형 질문으로 재구성했다. NAT는 여러 내부 호스트가 제한된 공인 IPv4 주소를 공유하게 해 주소 절약과 내부 주소 은닉에 기여한다. 허브는 물리 계층 수준의 단순 중계 장비이고, L2 스위치는 데이터링크 계층에서 충돌을 줄이며 효율적으로 프레임을 전달한다. 라우터는 계층 3에서 네트워크 간 패킷 전달과 경로 제어를 담당하므로 L2 스위치와 역할이 다르다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "사설 IP",
+      "NAT",
+      "허브",
+      "L2 스위치",
+      "라우터"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 6. 네트워크 · 6. 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트가 섹션 제목만 남아 있어 문제 문장으로 사용할 수 없음",
+      "서로 다른 3개 서술형 문항이 한 행에 합쳐져 단일 문항 구조가 깨짐",
+      "정답과 해설이 비어 있음"
+    ],
+    "changes": [
+      "사설 IP/NAT와 네트워크 장비 비교를 묻는 단일 개념형 질문으로 변환",
+      "변환 메모 2줄 본문과 정답·해설을 추가",
+      "키워드를 NAT·허브·L2 스위치·라우터 중심으로 정리"
+    ]
+  }
+}

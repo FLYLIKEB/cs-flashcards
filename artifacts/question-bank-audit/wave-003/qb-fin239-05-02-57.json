@@ -1,0 +1,105 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-57",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-255",
+    "term": "Round Robin",
+    "english": "Round Robin",
+    "category": "운영체제",
+    "alphabet_index": "R",
+    "korean_initial": "R",
+    "definition": "Round Robin은 준비 큐의 프로세스들에 고정된 time quantum을 순환 배정하는 선점형 스케줄링 기법으로, 대화형 시스템에서 공정한 응답성을 제공하지만 time quantum 크기에 따라 문맥 교환 비용과 평균 대기시간이 달라집니다.",
+    "detailed_explanation": "의미: Round Robin은 준비 큐의 프로세스가 정해진 time quantum 동안 CPU를 사용하고, 끝나지 않으면 큐 뒤로 이동하는 방식입니다. 시간 할당량이 너무 길면 FCFS에 가까워지고, 너무 짧으면 문맥 교환 오버헤드가 커집니다. 은행 창구에서 손님을 어떤 순서로 부를지 정하는 문제로 비유하면 쉽습니다. 평균 대기시간, 응답성, 공정성, 문맥 교환 비용은 서로 동시에 좋아지기 어렵기 때문에 알고리즘마다 우선하는 목표가 다릅니다. 활용: 대화형 시스템에서 공정한 응답성을 제공하기 좋은 기본 정책입니다. 그러나 CPU 집약 작업과 I/O 집약 작업을 동일하게 돌리면 최적은 아닐 수 있어 우선순위나 멀티레벨 피드백 큐와 결합됩니다. 금융 창구·콜센터 시스템처럼 다수 요청의 체감 응답시간이 중요한 환경에서 설명하기 좋습니다. 시험에서는 선점 여부, 평균 대기시간, 기아 가능성, 응답시간을 표로 비교하면 좋습니다. 실무 운영에서는 배치 처리와 대화형 서비스의 요구가 다르므로 하나의 알고리즘이 항상 최선이라고 단정하지 않는 것이 중요합니다.",
+    "related_concepts": "[[SRTF]], [[HRN]], [[우선순위 스케줄링]], [[멀티레벨 큐]], [[프로세스]]",
+    "source_files": "05-09-운영체제-기출-모음.md; 06-02-02-선점형과-비선점형.md; 06-02-00-CPU-스케줄링.md",
+    "exam_note": "운영체제 문제에서는 Round Robin의 정의만 쓰지 말고 관련 개념(SRTF, HRN, 우선순위 스케줄링)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-255-20260719-102440-ba73e360.png",
+    "concept_image_alt": "Round Robin(운영체제) 개념 참고 이미지",
+    "sort_order": 254,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-255-20260719-102440-ba73e360.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-57",
+    "card_id": "CS-255",
+    "question_type": "multiple_choice",
+    "prompt": "### 87. Round Robin 문제. 타임 슬라이스 = 2일 때 실행 순서로 옳은 것은?",
+    "body": "프로세스                                       실행시간\nP1                                         5\nP2                                         3",
+    "answer": "1번",
+    "explanation": "1번",
+    "rubric": [],
+    "choices": [
+      "P1 → P2 → P1 → P2 → P1",
+      "P1 → P1 → P2 → P2 → P1",
+      "P2 → P1 → P2 → P1 → P1",
+      "P1 → P2 → P2 → P1 → P1"
+    ],
+    "answer_index": 0,
+    "topic": "Round Robin 문제. 타임 슬라이스 = 2일 때 실행 순서로 옳은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "Round Robin",
+      "프로세스",
+      "Round Robin 문제. 타임 슬라이스 = 2일 때 실행 순서로"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 87. Round Robin 문제. 타임 슬라이스 = 2일 때 실행 순서로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-57",
+    "card_id": "CS-255",
+    "question_type": "multiple_choice",
+    "prompt": "Round Robin 스케줄링에서 타임 슬라이스가 2일 때 실행 순서로 옳은 것은?",
+    "body": "프로세스                                       실행시간\nP1                                         5\nP2                                         3",
+    "answer": "P1 → P2 → P1 → P2 → P1",
+    "explanation": "Round Robin에서 P1이 2만큼 실행된 뒤 남은 시간 3으로 큐 뒤로 가고, P2가 2만큼 실행된 뒤 남은 시간 1로 다시 대기한다. 이후 P1이 2, P2가 1로 종료, 마지막으로 P1이 1 실행되므로 순서는 P1 → P2 → P1 → P2 → P1이다.",
+    "rubric": [],
+    "choices": [
+      "P1 → P2 → P1 → P2 → P1",
+      "P1 → P1 → P2 → P2 → P1",
+      "P2 → P1 → P2 → P1 → P1",
+      "P1 → P2 → P2 → P1 → P1"
+    ],
+    "answer_index": 0,
+    "topic": "Round Robin 스케줄링",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "Round Robin",
+      "타임 슬라이스",
+      "프로세스 스케줄링"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 87. Round Robin 문제. 타임 슬라이스 = 2일 때 실행 순서로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 87. Round Robin 문제. 타임 슬라이스 = 2일 때 실행 순서로 옳은 것은?\n\n프로세스                                       실행시간\nP1                                         5\nP2                                         3\n1. P1 → P2 → P1 → P2 → P1\n2. P1 → P1 → P2 → P2 → P1\n3. P2 → P1 → P2 → P1 → P1\n4. P1 → P2 → P2 → P1 → P1\n\n**답:** 1번\n\n## 약어 풀이\n\n- 2NF: Second Normal Form, 제2정규형\n- AES: Advanced Encryption Standard, 고급 암호화 표준\n- AI: Artificial Intelligence, 인공지능\n- BFS: Breadth-First Search, 너비 우선 탐색\n- COCOMO: Constructive Cost Model, 소프트웨어 비용 산정 모델\n- CPU: Central Processing Unit, 중앙처리장치\n- DB: Database, 데이터베이스\n- DFS: Depth-First Search, 깊이 우선 탐색\n- FIFO: First In, First Out, 선입선출\n- GROUP BY: SQL 그룹화 절\n- HRN: Highest Response-ratio Next, 최고 응답률 우선\n- HTTP: HyperText Transfer Protocol, 하이퍼텍스트 전송 프로토콜\n- INSERT: SQL 삽입 명령\n- IP: Internet Protocol, 인터넷 프로토콜\n- IT: Information Technology, 정보기술\n- JOIN: SQL 테이블 결합 연산\n- LRU: Least Recently Used, 최근 최소 사용\n- OSI: Open Systems Interconnection, 개방형 시스템 상호연결\n- RAID: Redundant Array of Independent Disks, 독립 디스크 중복 배열\n- RAM: Random Access Memory, 임의 접근 메모리\n- ROM: Read Only Memory, 읽기 전용 메모리\n- RSA: Rivest-Shamir-Adleman, 공개키 암호 알고리즘\n- SELECT: SQL 조회 명령\n- SHA: Secure Hash Algorithm, 안전 해시 알고리즘\n- SJF: Shortest Job First, 최단 작업 우선\n- SQL: Structured Query Language, 구조화 질의어\n- SSL: Secure Sockets Layer, 보안 소켓 계층\n- SYN: Synchronize, TCP 연결 동기화 플래그\n- TCP: Transmission Control Protocol, 전송 제어 프로토콜\n- TLS: Transport Layer Security, 전송 계층 보안\n- UDP: User Datagram Protocol, 사용자 데이터그램 프로토콜\n- UPDATE: SQL 수정 명령",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었고 answer/explanation이 선지 번호만 있어 학습용으로 부적절했음.",
+      "topic과 keywords에 문제 문장 조각이 그대로 들어가 있어 카드 용어 중심 정리가 필요했음."
+    ],
+    "changes": [
+      "prompt를 깨끗한 질문문으로 정리하고 answer를 실제 실행 순서로, explanation을 Round Robin 계산 근거로 보강함.",
+      "topic을 Round Robin 스케줄링으로 정리하고 keywords를 타임 슬라이스·프로세스 스케줄링 중심으로 정제함."
+    ]
+  }
+}

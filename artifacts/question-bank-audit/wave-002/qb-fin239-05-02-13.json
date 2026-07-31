@@ -1,0 +1,94 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-13",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-226",
+    "term": "RAID",
+    "english": "RAID",
+    "category": "운영체제",
+    "alphabet_index": "R",
+    "korean_initial": "R",
+    "definition": "RAID는 여러 개의 물리 디스크를 하나의 논리 볼륨으로 묶어 스트라이핑, 미러링, 패리티 등 레벨 조합으로 성능·용량·장애 허용성을 조절하는 저장장치 구성 방식입니다. 시스템의 요구에 맞춰 읽기/쓰기 성능과 데이터 가용성 사이를 균형 있게 설계할 때 사용합니다.",
+    "detailed_explanation": "의미: RAID는 Redundant Array of Independent Disks로, 여러 디스크를 하나의 논리 볼륨처럼 사용합니다. RAID 0은 성능과 용량, RAID 1은 복제, RAID 5는 분산 패리티처럼 레벨마다 목표와 손실 조건이 다릅니다. 파일과 저장장치는 도서관의 서가, 목록 카드, 백업 장치처럼 데이터를 오래 보관하고 다시 찾게 해 주는 계층입니다. 속도, 공간 효율, 장애 복구성은 서로 교환관계가 있으므로 구조의 장단점을 함께 봐야 합니다. 활용: RAID는 백업이 아니라 디스크 장애에 대한 가용성 기술입니다. 삭제, 랜섬웨어, 논리 오류는 그대로 복제될 수 있어 별도 백업과 검증이 필요합니다. 금융권에서는 RTO/RPO, 재빌드 시간, 컨트롤러 장애, 쓰기 성능을 함께 고려해 스토리지 정책을 정해야 합니다. 시험에서는 저장 구조가 성능, 공간, 복구성 중 무엇을 개선하고 무엇을 희생하는지 비교하면 좋습니다. 실무에서는 백업, 권한, 장애 복구 절차까지 함께 확인해야 저장 구조를 안다는 것이 실제 데이터 보호로 이어집니다.",
+    "related_concepts": "[[아이노드]], [[저널링 파일 시스템]], [[RAID 0]], [[RAID 1]], [[프로세스]]",
+    "source_files": "05-09-운영체제-기출-모음.md; 05-08-산업은행-기출.md; 04-IT-필기-핵심정리.md",
+    "exam_note": "운영체제 문제에서는 RAID의 정의만 쓰지 말고 관련 개념(아이노드, 저널링 파일 시스템, RAID 0)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-226-20260719-102354-a88a0779.png",
+    "concept_image_alt": "RAID(운영체제) 개념 참고 이미지",
+    "sort_order": 225,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-226-20260719-102354-a88a0779.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-13",
+    "card_id": "CS-226",
+    "question_type": "subjective",
+    "prompt": "### 43. RAID 뜻",
+    "body": "- RAID(Redundant Array of Independent Disks): 여러 개의 하드디스크를 묶어 데이터의 중복 저장과 성능\n향상을 도모하는 기술",
+    "answer": "RAID는 여러 개의 물리 디스크를 하나의 논리 볼륨으로 묶어 스트라이핑, 미러링, 패리티 등 레벨 조합으로 성능·용량·장애 허용성을 조절하는 저장장치 구성 방식입니다. 시스템의 요구에 맞춰 읽기/쓰기 성능과 데이터 가용성 사이를 균형 있게 설계할 때 사용합니다.",
+    "explanation": "RAID는 여러 개의 물리 디스크를 하나의 논리 볼륨으로 묶어 스트라이핑, 미러링, 패리티 등 레벨 조합으로 성능·용량·장애 허용성을 조절하는 저장장치 구성 방식입니다. 시스템의 요구에 맞춰 읽기/쓰기 성능과 데이터 가용성 사이를 균형 있게 설계할 때 사용합니다.\n\n의미: RAID는 Redundant Array of Independent Disks로, 여러 디스크를 하나의 논리 볼륨처럼 사용합니다. RAID 0은 성능과 용량, RAID 1은 복제, RAID 5는 분산 패리티처럼 레벨마다 목표와 손실 조건이 다릅니다. 파일과 저장장치는 도서관의 서가, 목록 카드, 백업 장치처럼 데이터를 오래 보관하고 다시 찾게 해 주는 계층입니다. 속도, 공간 효율, 장애 복구성은 서로 교환관계가 있으므로 구조의 장단점을 함께 봐야 합니다. 활용: RAID는 백업이 아니라 디스크 장애에 대한 가용성 기술입니다. 삭제, 랜섬웨어, 논리 오류는 그대로 복제될 수 있어 별도 백업과 검증이 필요합니다. 금융권에서는 RTO/RPO, 재빌드 시간, 컨트롤러 장애, 쓰기 성능을 함께 고려해 스토리지 정책을 정해야 합니다. 시험에서는 저장 구조가 성능, 공간, 복구성 중 무엇을 개선하고 무엇을 희생하는지 비교하면 좋습니다. 실무에서는 백업, 권한, 장애 복구 절차까지 함께 확인해야 저장 구조를 안다는 것이 실제 데이터 보호로 이어집니다.\n\n운영체제 문제에서는 RAID의 정의만 쓰지 말고 관련 개념(아이노드, 저널링 파일 시스템, RAID 0)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "RAID 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "RAID"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 43. RAID 뜻",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-13",
+    "card_id": "CS-226",
+    "question_type": "subjective",
+    "prompt": "RAID란 무엇인지 설명하시오.",
+    "body": "",
+    "answer": "RAID는 여러 개의 물리 디스크를 하나의 논리 볼륨으로 묶어 스트라이핑, 미러링, 패리티 등을 통해 성능, 용량, 장애 허용성을 조절하는 저장장치 구성 방식이다.",
+    "explanation": "RAID는 Redundant Array of Independent Disks의 약자이다. 여러 디스크를 하나처럼 구성해 성능 향상이나 장애 대응을 도모하며, RAID 0·1·5처럼 레벨에 따라 성능, 공간 효율, 복구성이 달라진다. 다만 RAID 자체가 백업을 대체하는 것은 아니다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "RAID란 무엇인지 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "RAID",
+      "Redundant Array of Independent Disks"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 43. RAID란 무엇인지 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 43. RAID 뜻\n- RAID(Redundant Array of Independent Disks): 여러 개의 하드디스크를 묶어 데이터의 중복 저장과 성능\n향상을 도모하는 기술\n**답(AI답변):** 여러 디스크를 묶어 성능 향상 또는 장애 대비 중복성을 제공하는 저장장치 구성 기술이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었음",
+      "body가 정답 정의를 그대로 노출했음",
+      "category가 RAID 개념과 맞지 않았음"
+    ],
+    "changes": [
+      "prompt를 서술형 질문으로 정리함",
+      "body를 비우고 answer/explanation을 간결하게 다듬음",
+      "category·keywords·topic·source_location을 RAID 개념에 맞게 정리함"
+    ]
+  }
+}

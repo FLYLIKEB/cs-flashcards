@@ -1,0 +1,97 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-18",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-190",
+    "term": "OSPF",
+    "english": "OSPF",
+    "category": "네트워크",
+    "alphabet_index": "O",
+    "korean_initial": "O",
+    "definition": "OSPF는 링크 상태 정보를 교환해 각 라우터가 동일한 토폴로지 데이터베이스를 기반으로 최단 경로를 계산하는 내부(IGP)용 동적 라우팅 프로토콜입니다. 빠른 수렴성과 Area 기반 계층화로 대규모 조직망의 라우팅 관리와 장애 국소화에 유리합니다.",
+    "detailed_explanation": "의미: OSPF(Open Shortest Path First)는 각 라우터가 링크 상태 정보를 수집·교환해 동일한 토폴로지 데이터베이스를 구성하고, SPF(최단 경로 우선) 알고리즘으로 네트워크의 최단 경로를 계산하는 내부용(IGP) 동적 라우팅 프로토콜입니다. 홉 수만 보는 거리 벡터 방식(RIP)보다 대규모 내부망에서 더 빠르게 수렴하고 정확한 경로 선택이 가능합니다.\n\n활용: 기업·공공기관의 내부 백본, 데이터센터, 지점망 등에서 Area 설계로 라우팅 정보를 계층화해 관리하며, 운영 시에는 링크 비용 설정, DR/BDR 선출 방식, 인증, 경로 재분배 등 세부 옵션을 조정해 성능과 안정성을 확보합니다. 학습할 때는 OSPF가 네트워크 구조에서 어느 위치에서 동작하는지, 라우터가 생성·갱신하는 상태값(예: 토폴로지 데이터베이스, 이웃 상태)은 무엇인지, 장애 발생 시 어떤 로그와 패킷 근거로 원인을 추적할지 순서대로 떠올리면 이해하기 쉽습니다. 실제 운영에서는 기본값을 그대로 사용하기보다 주소 범위, 타이머(재전송·타임아웃), 캐시 정책 등을 서비스 특성에 맞게 검토·조정해야 합니다.",
+    "related_concepts": "[[동적 라우팅]], [[RIP]], [[BGP]], [[NAT]], [[TCP]]",
+    "source_files": "08-04-라우팅과-서브넷.md; 05-11-네트워크-기출-모음.md; 05-02-기업은행-기출.md",
+    "exam_note": "정의만 쓰지 말고 RIP·BGP 등과 비교해 IGP/EGP 구분, 수렴속도, Area 계층화 차이를 짧게 정리하세요.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "상",
+    "concept_image_url": "/api/ai-images/CS-190-20260719-114432-31fde28d.png",
+    "concept_image_alt": "OSPF(네트워크) 개념 참고 이미지",
+    "sort_order": 189,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-190-20260719-114432-31fde28d.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-18",
+    "card_id": "CS-190",
+    "question_type": "subjective",
+    "prompt": "### 48. OSPF 뜻",
+    "body": "- OSPF(Open Shortest Path First): 링크 상태 라우팅 프로토콜",
+    "answer": "OSPF는 링크 상태 정보를 교환해 각 라우터가 동일한 토폴로지 데이터베이스를 기반으로 최단 경로를 계산하는 내부(IGP)용 동적 라우팅 프로토콜입니다. 빠른 수렴성과 Area 기반 계층화로 대규모 조직망의 라우팅 관리와 장애 국소화에 유리합니다.",
+    "explanation": "OSPF는 링크 상태 정보를 교환해 각 라우터가 동일한 토폴로지 데이터베이스를 기반으로 최단 경로를 계산하는 내부(IGP)용 동적 라우팅 프로토콜입니다. 빠른 수렴성과 Area 기반 계층화로 대규모 조직망의 라우팅 관리와 장애 국소화에 유리합니다.\n\n의미: OSPF(Open Shortest Path First)는 각 라우터가 링크 상태 정보를 수집·교환해 동일한 토폴로지 데이터베이스를 구성하고, SPF(최단 경로 우선) 알고리즘으로 네트워크의 최단 경로를 계산하는 내부용(IGP) 동적 라우팅 프로토콜입니다. 홉 수만 보는 거리 벡터 방식(RIP)보다 대규모 내부망에서 더 빠르게 수렴하고 정확한 경로 선택이 가능합니다.\n\n활용: 기업·공공기관의 내부 백본, 데이터센터, 지점망 등에서 Area 설계로 라우팅 정보를 계층화해 관리하며, 운영 시에는 링크 비용 설정, DR/BDR 선출 방식, 인증, 경로 재분배 등 세부 옵션을 조정해 성능과 안정성을 확보합니다. 학습할 때는 OSPF가 네트워크 구조에서 어느 위치에서 동작하는지, 라우터가 생성·갱신하는 상태값(예: 토폴로지 데이터베이스, 이웃 상태)은 무엇인지, 장애 발생 시 어떤 로그와 패킷 근거로 원인을 추적할지 순서대로 떠올리면 이해하기 쉽습니다. 실제 운영에서는 기본값을 그대로 사용하기보다 주소 범위, 타이머(재전송·타임아웃), 캐시 정책 등을 서비스 특성에 맞게 검토·조정해야 합니다.\n\n정의만 쓰지 말고 RIP·BGP 등과 비교해 IGP/EGP 구분, 수렴속도, Area 계층화 차이를 짧게 정리하세요.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "OSPF 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "OSPF",
+      "최단 경로"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 48. OSPF 뜻",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-18",
+    "card_id": "CS-190",
+    "question_type": "subjective",
+    "prompt": "OSPF란 무엇인가?",
+    "body": "OSPF는 Open Shortest Path First의 약자이다.",
+    "answer": "OSPF(Open Shortest Path First)는 링크 상태 정보를 교환해 각 라우터가 동일한 토폴로지 데이터베이스를 바탕으로 최단 경로를 계산하는 내부 게이트웨이 라우팅 프로토콜이다.",
+    "explanation": "OSPF는 링크 상태 기반 IGP로서 각 라우터가 네트워크 토폴로지 정보를 공유한 뒤 SPF(다익스트라) 알고리즘으로 최단 경로를 계산한다. RIP보다 수렴이 빠르고 Area 기반 계층화가 가능해 대규모 내부망에 적합하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "OSPF 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "OSPF",
+      "링크 상태 라우팅",
+      "IGP"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 48. OSPF 뜻",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 48. OSPF 뜻\n- OSPF(Open Shortest Path First): 링크 상태 라우팅 프로토콜\n**답(AI답변):** 링크 상태 기반 내부 라우팅 프로토콜로 최단 경로 계산에 다익스트라 알고리즘을 사용한다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 제목과 문항 번호가 남아 있음",
+      "body에 정답성 설명이 직접 노출됨",
+      "explanation에 AI답변 기반 군더더기와 수험 지시문이 포함됨"
+    ],
+    "changes": [
+      "prompt를 개념형 질문으로 정리함",
+      "body를 약어 풀네임만 남기도록 정리함",
+      "answer/explanation을 OSPF 정의와 핵심 특성 중심으로 간결화함",
+      "keywords를 카드 용어에 맞춰 정리함"
+    ]
+  }
+}

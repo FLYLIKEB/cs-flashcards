@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-3fe29f3c592e0c3716c4e032",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-3fe29f3c592e0c3716c4e032",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 5. 머신러닝",
+    "body": "K-Nearest Neighbor(K-NN) 알고리즘은 머신러닝 알고리즘 중 간단하고 이해하기 쉬운 분류(Classification) 알고리즘이다. 다음 물음에 답하시오.\n\n#### 1.\n\n지도 학습(Supervised Learning)과 비지도 학습(Unsupervised Learning)을 비교하여 설명하시오.\n\n#### 2.\n\n**5-2 K-NN 유클리드 거리 공식**\n\n![5-2 K-NN 유클리드 거리 공식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0006.bmp)\n\n**5-2 K-NN 좌표 그림**\n\n![5-2 K-NN 좌표 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0007.bmp)\n\n어느 한 스포츠 센터는 축구선수에 대한 키, 몸무게, 성별 데이터를 보유하고 있다. 아래 기존 데이터를 활용하여 신규 데이터인 `키 170cm, 몸무게 60kg인 운동선수`의 성별을 K-NN 알고리즘을 통해 예측하고자 한다.\n\n| 구분 | 키(cm) | 몸무게(kg) | 성별 |\n|---|---:|---:|---|\n| A | 180 | 90 | 남 |\n| B | 175 | 75 | 남 |\n| C | 170 | 75 | 남 |\n| D | 170 | 65 | 여 |\n| E | 160 | 55 | 여 |\n\n1. 기존 데이터와 신규 데이터 간 거리 값을 나타낸 표의 빈칸을 모두 채우시오.\n2. 좌표 상에 기존 데이터와 신규 데이터를 모두 표시하고, `K=3`일 때 새로운 운동선수 데이터의 성별을 판단하시오. (좌표 상 레이블: 남성 `●`, 여성 `○`, 새로운 데이터 `X`)\n\n#### 3.\n\nK-NN 알고리즘에서 사용할 수 있는 유클리드 거리를 구하는 함수를 C 언어로 구현하고자 한다. 다음 빈칸을 완성하시오. (`math.h`의 `sqrt`, `pow` 활용 가능)\n\n```c\n#include <stdio.h>\n#include <math.h>\n\nstruct Point{\n    int x, y;\n};\n\nint main( ){\n    struct Point start, end;\n    double distance;\n    scanf_s(\"%d %d\", &start.x, &start.y);\n    scanf_s(\"%d %d\", &end.x, &end.y);\n\n    distance =\n    printf(\"두 점 사이의 거리는 %f입니다.\\n\", distance);\n    return 0;\n}\n```",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "머신러닝"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2022 컴퓨터공학 학술 파트 I · 5. 머신러닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-3fe29f3c592e0c3716c4e032",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "K-NN 알고리즘이 지도 학습으로 분류되는 이유와 유클리드 거리를 이용한 기본 분류 원리를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 5. 머신러닝",
+    "answer": "K-NN은 정답 라벨이 붙은 기존 데이터를 바탕으로 새로운 데이터를 가장 가까운 이웃들의 다수결로 분류하므로 지도 학습에 해당한다. 분류 시에는 보통 유클리드 거리로 새 데이터와 각 학습 데이터 사이의 거리를 계산한 뒤, 가장 가까운 K개의 이웃이 어떤 클래스에 속하는지 비교하여 최종 클래스를 결정한다.",
+    "explanation": "원문은 지도 학습과 비지도 학습 비교, 표의 빈칸 계산, 좌표 시각화, C 코드 완성까지 여러 하위 문항이 한 행에 합쳐져 있고 일부 실전형 산출물은 별도 표·그림 완성이 전제된다. 따라서 단일 질문은행 행으로는 채점 가능한 개념형 문항으로 정리하는 것이 적절하다. K-NN은 학습 단계에서 라벨이 있는 데이터를 저장해 두고, 예측 단계에서 거리 기반으로 가장 가까운 이웃들을 찾아 다수 클래스에 할당하는 대표적인 비모수 지도 학습 분류 방식이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "K-NN",
+      "지도 학습",
+      "유클리드 거리",
+      "분류 알고리즘"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2022 컴퓨터공학 학술 파트 I · 5. 머신러닝",
+    "section": "전공필기",
+    "points": 5,
+    "expected_time_seconds": 180,
+    "answer_guide": "K-NN의 지도 학습 성격과 거리 기반 분류 절차를 3~5문장으로 설명",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 5. 머신러닝\n\nK-Nearest Neighbor(K-NN) 알고리즘은 머신러닝 알고리즘 중 간단하고 이해하기 쉬운 분류(Classification) 알고리즘이다. 다음 물음에 답하시오.\n\n#### 1.\n\n지도 학습(Supervised Learning)과 비지도 학습(Unsupervised Learning)을 비교하여 설명하시오.\n\n#### 2.\n\n**5-2 K-NN 유클리드 거리 공식**\n\n![5-2 K-NN 유클리드 거리 공식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0006.bmp)\n\n**5-2 K-NN 좌표 그림**\n\n![5-2 K-NN 좌표 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0007.bmp)\n\n어느 한 스포츠 센터는 축구선수에 대한 키, 몸무게, 성별 데이터를 보유하고 있다. 아래 기존 데이터를 활용하여 신규 데이터인 `키 170cm, 몸무게 60kg인 운동선수`의 성별을 K-NN 알고리즘을 통해 예측하고자 한다.\n\n| 구분 | 키(cm) | 몸무게(kg) | 성별 |\n|---|---:|---:|---|\n| A | 180 | 90 | 남 |\n| B | 175 | 75 | 남 |\n| C | 170 | 75 | 남 |\n| D | 170 | 65 | 여 |\n| E | 160 | 55 | 여 |\n\n1. 기존 데이터와 신규 데이터 간 거리 값을 나타낸 표의 빈칸을 모두 채우시오.\n2. 좌표 상에 기존 데이터와 신규 데이터를 모두 표시하고, `K=3`일 때 새로운 운동선수 데이터의 성별을 판단하시오. (좌표 상 레이블: 남성 `●`, 여성 `○`, 새로운 데이터 `X`)\n\n#### 3.\n\nK-NN 알고리즘에서 사용할 수 있는 유클리드 거리를 구하는 함수를 C 언어로 구현하고자 한다. 다음 빈칸을 완성하시오. (`math.h`의 `sqrt`, `pow` 활용 가능)\n\n```c\n#include <stdio.h>\n#include <math.h>\n\nstruct Point{\n    int x, y;\n};\n\nint main( ){\n    struct Point start, end;\n    double distance;\n    scanf_s(\"%d %d\", &start.x, &start.y);\n    scanf_s(\"%d %d\", &end.x, &end.y);\n\n    distance =\n    printf(\"두 점 사이의 거리는 %f입니다.\\n\", distance);\n    return 0;\n}\n```",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "질문 행에 여러 하위 문항이 혼합되어 단일 DB 문항으로 사용하기 어려움",
+      "프롬프트가 질문이 아니라 마크다운 섹션 제목만 포함함",
+      "실전형 풀이에 필요한 표·그림 기반 산출물이 일부 누락되어 있음"
+    ],
+    "changes": [
+      "K-NN의 지도 학습 성격과 분류 원리를 묻는 개념형 주관식으로 변환",
+      "body를 변환 메모 2줄 형식으로 정리",
+      "정답·해설·키워드와 소요 시간/배점을 변환된 문항에 맞게 수정"
+    ]
+  }
+}

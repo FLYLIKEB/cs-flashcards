@@ -1,0 +1,96 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-16",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-125",
+    "term": "HRN",
+    "english": "HRN",
+    "category": "운영체제",
+    "alphabet_index": "H",
+    "korean_initial": "H",
+    "definition": "HRN(Highest Response Ratio Next)은 (대기시간+서비스시간)/서비스시간으로 계산한 응답률이 가장 높은 작업을 먼저 실행하는 비선점형 스케줄링 알고리즘입니다. 짧은 작업을 우대하면서도 오래 기다린 작업의 우선순위를 점차 올려 기아(starvation)를 완화합니다.",
+    "detailed_explanation": "의미: HRN은 Highest Response Ratio Next의 약자로 응답률을 (대기시간+서비스시간)/서비스시간으로 계산해 가장 큰 작업을 선택합니다. SJF처럼 짧은 작업에 유리하지만 오래 기다린 긴 작업의 우선순위도 점차 높아지는 특징이 있습니다. 은행 창구에서 손님을 어떤 순서로 부를지 정하는 문제로 비유하면 쉽습니다. 평균 대기시간, 응답성, 공정성, 문맥 교환 비용은 서로 동시에 좋아지기 어렵기 때문에 알고리즘마다 우선하는 목표가 다릅니다. 활용: HRN은 기아 문제를 줄이는 SJF 보완책으로 면접에서 비교 포인트가 됩니다. 다만 예상 실행시간을 알아야 하므로 실제 운영체제에서는 추정 오차가 성능에 영향을 줍니다. 금융 배치 스케줄러에서는 작업 소요시간 통계와 대기 SLA를 함께 반영하는 정책으로 연결해 설명할 수 있습니다. 시험에서는 선점 여부, 평균 대기시간, 기아 가능성, 응답시간을 표로 비교하면 좋습니다. 실무 운영에서는 배치 처리와 대화형 서비스의 요구가 다르므로 하나의 알고리즘이 항상 최선이라고 단정하지 않는 것이 중요합니다.",
+    "related_concepts": "[[SJF]], [[SRTF]], [[Round Robin]], [[우선순위 스케줄링]], [[프로세스]]",
+    "source_files": "05-09-운영체제-기출-모음.md; 06-02-02-선점형과-비선점형.md; 06-02-00-CPU-스케줄링.md",
+    "exam_note": "운영체제 문제에서는 HRN의 정의만 쓰지 말고 관련 개념(SJF, SRTF, Round Robin)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-125-20260719-102145-0301208f.png",
+    "concept_image_alt": "HRN(운영체제) 개념 참고 이미지",
+    "sort_order": 124,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-125-20260719-102145-0301208f.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-16",
+    "card_id": "CS-125",
+    "question_type": "subjective",
+    "prompt": "### 46. HRN에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: HRN 계산문제",
+    "answer": "HRN 우선순위 = (대기시간 + 서비스시간) / 서비스시간. 값이 큰 작업을 먼저 처리한다.",
+    "explanation": "HRN 우선순위 = (대기시간 + 서비스시간) / 서비스시간. 값이 큰 작업을 먼저 처리한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "HRN에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "HRN"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 46. HRN에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-16",
+    "card_id": "CS-125",
+    "question_type": "subjective",
+    "prompt": "HRN(Highest Response Ratio Next)의 핵심 원리와 스케줄링 기준을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 46. HRN 계산문제",
+    "answer": "HRN은 (대기시간 + 서비스시간) / 서비스시간으로 계산한 응답률이 가장 큰 작업을 먼저 선택하는 비선점형 스케줄링 방식이다.",
+    "explanation": "HRN은 대기시간이 길수록 응답률이 커지므로 짧은 작업을 우대하는 SJF의 장점을 유지하면서 오래 기다린 작업의 우선순위도 높여 기아 현상을 완화한다. 따라서 서비스시간 대비 대기시간을 함께 반영해 우선순위를 정하는 것이 핵심 풀이 기준이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "HRN",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "HRN",
+      "응답률",
+      "비선점 스케줄링"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 46. HRN에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 46. HRN 계산문제\n**답(AI답변):** HRN 우선순위 = (대기시간 + 서비스시간) / 서비스시간. 값이 큰 작업을 먼저 처리한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트에 마크다운 번호가 남아 있었음",
+      "변환 메모 문구가 공통 규칙과 불일치했음",
+      "원문 정보 부족으로 계산형 문제를 그대로 풀 수 없었음"
+    ],
+    "changes": [
+      "프롬프트를 개념형 질문으로 정리함",
+      "body를 규칙에 맞는 2줄 변환 메모로 수정함",
+      "정답·해설을 HRN 정의와 선택 기준 중심으로 보강함",
+      "topic과 keywords를 HRN 개념에 맞게 정리함"
+    ]
+  }
+}

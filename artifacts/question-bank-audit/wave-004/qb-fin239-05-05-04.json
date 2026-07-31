@@ -1,0 +1,89 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-05-04",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-05-04",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 161. 클래스 설계원칙에 대한 바른 설명은?",
+    "body": "",
+    "answer": "5번",
+    "explanation": "모든선지가 맞음",
+    "rubric": [],
+    "choices": [
+      "단일 책임 원칙: 하나의 클래스는 오직 하나의 책임만 가져야 한다.",
+      "개방-폐쇄 원칙: 클래스는 확장에는 열려 있어야 하며, 변경에는 닫혀 있어야 한다.",
+      "리스코프 교체 원칙: 서브타입은 언제나 자신의 기반 타입으로 교체할 수 있어야 한다.",
+      "의존성 역전 원칙: 고수준 모듈은 저수준 모듈에 의존해서는 안 되며, 둘 다 추상화에 의존해야 한다.",
+      "모든선지가 맞음"
+    ],
+    "answer_index": 4,
+    "topic": "클래스 설계원칙에 대한 바른 설명은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "클래스 설계원칙",
+      "모든선지가 맞음"
+    ],
+    "difficulty": "하",
+    "issuer": "SGI서울보증",
+    "source_location": "SGI서울보증 기출 · 161. 클래스 설계원칙에 대한 바른 설명은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-05-04",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "클래스 설계원칙에 대한 바른 설명은?",
+    "body": "",
+    "answer": "모든 선지가 맞다.",
+    "explanation": "제시된 1~4번은 각각 단일 책임 원칙, 개방-폐쇄 원칙, 리스코프 치환 원칙, 의존성 역전 원칙의 올바른 설명이므로 정답은 모든 선지가 맞다는 선택지이다.",
+    "rubric": [],
+    "choices": [
+      "단일 책임 원칙: 하나의 클래스는 오직 하나의 책임만 가져야 한다.",
+      "개방-폐쇄 원칙: 클래스는 확장에는 열려 있어야 하며, 변경에는 닫혀 있어야 한다.",
+      "리스코프 교체 원칙: 서브타입은 언제나 자신의 기반 타입으로 교체할 수 있어야 한다.",
+      "의존성 역전 원칙: 고수준 모듈은 저수준 모듈에 의존해서는 안 되며, 둘 다 추상화에 의존해야 한다.",
+      "모든 선지가 맞다."
+    ],
+    "answer_index": 4,
+    "topic": "클래스 설계원칙",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "SOLID",
+      "단일 책임 원칙",
+      "개방-폐쇄 원칙",
+      "리스코프 치환 원칙",
+      "의존성 역전 원칙"
+    ],
+    "difficulty": "하",
+    "issuer": "SGI서울보증",
+    "source_location": "SGI서울보증 기출 · 161. 클래스 설계원칙에 대한 바른 설명은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 161. 클래스 설계원칙에 대한 바른 설명은?\n1. 단일 책임 원칙: 하나의 클래스는 오직 하나의 책임만 가져야 한다.\n2. 개방-폐쇄 원칙: 클래스는 확장에는 열려 있어야 하며, 변경에는 닫혀 있어야 한다.\n3. 리스코프 교체 원칙: 서브타입은 언제나 자신의 기반 타입으로 교체할 수 있어야 한다.\n4. 의존성 역전 원칙: 고수준 모듈은 저수준 모듈에 의존해서는 안 되며, 둘 다 추상화에 의존해야 한다.\n\n  **답:** 모든선지가 맞음",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 heading 표식이 남아 있었음",
+      "answer가 '5번'으로만 적혀 있어 최종 정답 텍스트가 불명확했음",
+      "explanation과 keywords에 '모든선지가 맞음' 같은 요약·정답형 잡음이 남아 있었음"
+    ],
+    "changes": [
+      "prompt를 깨끗한 질문 문장으로 정리함",
+      "answer를 실제 정답 문장으로 바꾸고 choices 표기도 자연스럽게 정리함",
+      "explanation을 SOLID 원칙 근거가 드러나도록 보강하고 topic·keywords를 개념 중심으로 정리함"
+    ]
+  }
+}

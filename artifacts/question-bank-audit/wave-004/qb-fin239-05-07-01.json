@@ -1,0 +1,96 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-01",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-167",
+    "term": "중간자 공격",
+    "english": "Man-in-the-Middle Attack",
+    "category": "보안",
+    "alphabet_index": "M",
+    "korean_initial": "ㅈ",
+    "definition": "중간자 공격은 통신 양 끝 사이에 공격자가 끼어들어 메시지를 도청·변조·재전송하면서도 정상 통신처럼 보이게 하는 공격이며, 최소 권한·검증·감사 관점에서 보호 대상과 실패 영향을 함께 판단해야 합니다.",
+    "detailed_explanation": "의미: 중간자 공격은 Man-in-the-Middle로, 클라이언트와 서버가 서로 직접 통신한다고 믿는 동안 공격자가 트래픽을 가로채거나 조작하는 방식입니다. ARP 스푸핑, DNS 스푸핑, 악성 프록시, 위조 인증서가 진입점이 될 수 있습니다. 활용: 평문 HTTP, 약한 Wi-Fi, 인증서 경고 무시, 내부망 신뢰 과잉 환경에서 위험이 커집니다. TLS는 서버 인증과 암호화로 내용을 보호하지만, 루트 인증서 탈취나 검증 우회가 있으면 효과가 약해집니다. 금융권에서는 인증서 핀닝, HSTS, VPN, 네트워크 세그먼트 통제, 이상 경로 탐지, 제로 트러스트 기반 재검증을 대응 포인트로 설명할 수 있습니다. 처음 학습할 때는 중간자 공격을 단일 제품이 아니라 자산 식별, 정책 설정, 기술 통제, 로그 확인, 사고 대응이 이어지는 흐름으로 보면 이해가 쉽습니다. 실제 운영에서는 보안을 강화할수록 사용자 편의와 처리 속도가 영향을 받을 수 있으므로, 민감도와 업무 필요성을 기준으로 예외를 최소화하고 남긴 예외는 만료일과 책임자를 정해 점검해야 합니다.",
+    "related_concepts": "[[ARP 스푸핑]], [[DNS 스푸핑]], [[제로 트러스트]], [[VPN]], [[인증]]",
+    "source_files": "04-IT-필기-핵심정리.md; 04-04-네트워크-프로토콜-보안.md; 05-12-보안-기출-모음.md",
+    "exam_note": "보안 문제에서는 중간자 공격의 정의만 쓰지 말고 관련 개념(ARP 스푸핑, DNS 스푸핑, 제로 트러스트)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "상",
+    "concept_image_url": "/api/ai-images/CS-167-20260720-052350-313bd3b9.png",
+    "concept_image_alt": "중간자 공격(보안) 개념 참고 이미지",
+    "sort_order": 166,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-167-20260720-052350-313bd3b9.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-01",
+    "card_id": "CS-167",
+    "question_type": "subjective",
+    "prompt": "### 187. 중간자 공격에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 중간자 공격 문제",
+    "answer": "중간자 공격은 통신 당사자 사이에 공격자가 개입해 도청·변조하는 공격이다.",
+    "explanation": "중간자 공격은 통신 당사자 사이에 공격자가 개입해 도청·변조하는 공격이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "중간자 공격에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "중간자 공격",
+      "Man-in-the-Middle Attack"
+    ],
+    "difficulty": "상",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 187. 중간자 공격에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-01",
+    "card_id": "CS-167",
+    "question_type": "subjective",
+    "prompt": "중간자 공격(Man-in-the-Middle Attack)이 무엇인지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 187. 중간자 공격 문제",
+    "answer": "중간자 공격은 통신 양 끝 당사자 사이에 공격자가 끼어들어 메시지를 가로채고 도청·변조·재전송하면서도 정상 통신처럼 보이게 만드는 공격이다.",
+    "explanation": "핵심은 공격자가 송신자와 수신자 사이의 통신 경로를 중간에서 장악해 양측이 서로 직접 통신한다고 믿게 만드는 데 있다. 이 과정에서 평문 정보 탈취뿐 아니라 메시지 변조와 세션 하이재킹까지 발생할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "중간자 공격",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "중간자 공격",
+      "Man-in-the-Middle Attack",
+      "통신 보안"
+    ],
+    "difficulty": "상",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 187. 중간자 공격에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 187. 중간자 공격 문제\n**답(AI답변):** 중간자 공격은 통신 당사자 사이에 공격자가 개입해 도청·변조하는 공격이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row.prompt에 마크다운 번호 헤더가 남아 있어 질문 문장만 남기지 못했다.",
+      "변환된 body 문구가 공통 규칙의 지정 문구와 일치하지 않았고 원문 제목도 불완전했다.",
+      "answer와 explanation이 동일한 한 문장이라 개념 설명 근거가 부족했다."
+    ],
+    "changes": [
+      "불완전한 원문을 유지하지 않고 중간자 공격의 정의를 묻는 명시적 개념 질문으로 정리했다.",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 교체하고 원문 제목을 source_excerpt 기준으로 보정했다.",
+      "answer와 explanation을 카드 정의에 맞춰 보강하고 topic 및 keywords를 카드 정렬에 맞게 정리했다."
+    ]
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-007acd96c2baa60931b411b9",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-388",
+    "term": "동적 라우팅",
+    "english": "Dynamic Routing",
+    "category": "네트워크",
+    "alphabet_index": "#",
+    "korean_initial": "ㄷ",
+    "definition": "동적 라우팅은 라우터들이 RIP·OSPF·BGP 같은 라우팅 프로토콜로 경로 정보를 서로 교환해 네트워크 장애나 토폴로지 변경 시 라우팅 테이블을 자동으로 갱신하는 방식으로, 정적 라우팅보다 운영과 장애 대응을 자동화할 수 있습니다.",
+    "detailed_explanation": "의미: 동적 라우팅은 관리자가 모든 경로를 수동으로 입력하지 않아도 되도록, RIP·OSPF·BGP 같은 프로토콜이 주변 라우터와 정보를 교환해 경로를 자동으로 학습하고 최적 경로를 선택하며 라우팅 테이블을 갱신하는 방식입니다. 네트워크가 커질수록 수동 관리 부담이 줄고 장애 대응 속도가 개선됩니다.\n\n활용: 지점망, 데이터센터, 인터넷 연동처럼 경로가 많거나 이중화가 필요한 환경에서 주로 사용됩니다. 단점으로는 설정 오류가 네트워크 전체로 빠르게 전파될 수 있고, 수렴 시간 지연·라우팅 루프·경로 재분배 문제 등이 발생할 수 있다는 점이 있습니다. 금융권에서는 대외기관 회선 이중화와 내부망 백본에 적용하며, 잘못된 경로 주입을 막기 위해 경로 필터링과 인증을 반드시 적용합니다. 학습·면접 준비 시에는 정적 라우팅과 자동화·복잡도·장애 대응 측면을 비교해 보고, 동적 라우팅이 어느 계층에서 동작하는지, 어떤 상태값을 변경하는지, 장애 발생 시 어떤 로그·패킷 증거로 문제를 확인할지 순서대로 떠올리면 이해가 쉬워집니다. 실제 운영에서는 기본값만 사용하지 말고 주소 범위, 포트, 타임아웃, 캐시, 재전송 기준 등을 서비스 특성에 맞게 검토해 성능과 안정성을 확보해야 합니다.",
+    "related_concepts": "[[라우팅]], [[정적 라우팅]], [[RIP]], [[OSPF]], [[TCP]]",
+    "source_files": "05-14-06-한국은행-2022-컴퓨터공학-학술-파트-I.md",
+    "exam_note": "정의만 쓰지 말고 정적 라우팅과 비교(자동화 vs 수동, 복잡도·수렴성·장애대응 차이)하고 예로 RIP/OSPF/BGP를 짧게 언급하세요.",
+    "bok_appeared": "O",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-388-20260719-114734-044e472c.png",
+    "concept_image_alt": "동적 라우팅(네트워크) 개념 참고 이미지",
+    "sort_order": 387,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-388-20260719-114734-044e472c.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-007acd96c2baa60931b411b9",
+    "card_id": "CS-388",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]은 라우터들이 RIP·OSPF·BGP 같은 라우팅 프로토콜로 경로 정보를 서로 교환해 네트워크 장애나 토폴로지 변경 시 라우팅 테이블을 자동으로 갱신하는 방식으로, 정적 라우팅보다 운영과 장애 대응을 자동화할 수 있습니다.",
+    "answer": "동적 라우팅",
+    "explanation": "동적 라우팅은 라우터들이 RIP·OSPF·BGP 같은 라우팅 프로토콜로 경로 정보를 서로 교환해 네트워크 장애나 토폴로지 변경 시 라우팅 테이블을 자동으로 갱신하는 방식으로, 정적 라우팅보다 운영과 장애 대응을 자동화할 수 있습니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "라우팅",
+      "동적 라우팅",
+      "TCP",
+      "정적 라우팅"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "동적 라우팅",
+      "Dynamic Routing",
+      "라우팅",
+      "정적 라우팅",
+      "RIP",
+      "OSPF",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-14-06-한국은행-2022-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-007acd96c2baa60931b411b9",
+    "card_id": "CS-388",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "라우터들이 RIP·OSPF·BGP 같은 라우팅 프로토콜로 경로 정보를 서로 교환해 네트워크 장애나 토폴로지 변경 시 라우팅 테이블을 자동으로 갱신하는 방식으로, 정적 라우팅보다 운영과 장애 대응을 자동화할 수 있습니다.",
+    "answer": "동적 라우팅",
+    "explanation": "동적 라우팅은 라우터들이 RIP·OSPF·BGP 같은 라우팅 프로토콜로 경로 정보를 서로 교환해 네트워크 장애나 토폴로지 변경 시 라우팅 테이블을 자동으로 갱신하는 방식으로, 정적 라우팅보다 운영과 장애 대응을 자동화할 수 있습니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "라우팅",
+      "동적 라우팅",
+      "TCP",
+      "정적 라우팅"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "동적 라우팅",
+      "Dynamic Routing",
+      "라우팅",
+      "정적 라우팅",
+      "RIP",
+      "OSPF",
+      "BGP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-14-06-한국은행-2022-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 placeholder 기호가 남아 있었습니다.",
+      "category가 비어 있었고 keywords에 관련성 낮은 용어가 포함돼 있었습니다."
+    ],
+    "changes": [
+      "body에서 [?] placeholder를 제거해 설명문만 남겼습니다.",
+      "linked_card에 맞춰 category를 네트워크로 보정하고 keywords를 동적 라우팅 중심 용어로 정리했습니다."
+    ]
+  }
+}

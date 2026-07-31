@@ -1,0 +1,85 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-09",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-09",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 96. C언어 변수가 안되는 것",
+    "body": "",
+    "answer": "auto",
+    "explanation": "- auto는 C언어에서 예약어로, 변수의 저장 클래스를 지정하는 데 사용됩니다. 따라서 변수명으로 사용할\n        수 없습니다.",
+    "rubric": [],
+    "choices": [
+      "_myVariable",
+      "variable_name",
+      "auto",
+      "var123"
+    ],
+    "answer_index": 2,
+    "topic": "C언어 변수가 안되는 것",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "auto"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 96. C언어 변수가 안되는 것",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-09",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "C언어에서 변수명으로 사용할 수 없는 것은?",
+    "body": "",
+    "answer": "auto",
+    "explanation": "auto는 C언어 예약어이므로 변수명으로 사용할 수 없다. 나머지 선택지는 식별자 규칙에 맞는 변수명으로 사용할 수 있다.",
+    "rubric": [],
+    "choices": [
+      "_myVariable",
+      "variable_name",
+      "auto",
+      "var123"
+    ],
+    "answer_index": 2,
+    "topic": "C언어 변수가 안되는 것",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "C언어",
+      "식별자",
+      "예약어",
+      "auto"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 96. C언어 변수가 안되는 것",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 96. C언어 변수가 안되는 것\n1. _myVariable\n2. variable_name\n3. auto\n4. var123\n\n  **답:** auto\n- auto는 C언어에서 예약어로, 변수의 저장 클래스를 지정하는 데 사용됩니다. 따라서 변수명으로 사용할\n        수 없습니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 어색한 원문 제목이 남아 있었다.",
+      "explanation에 불필요한 마크다운 기호와 줄바꿈이 섞여 있었다.",
+      "keywords가 정답 단어 하나만 있어 식별자/예약어 개념을 충분히 반영하지 못했다."
+    ],
+    "changes": [
+      "prompt를 실제 문제형 문장인 'C언어에서 변수명으로 사용할 수 없는 것은?'으로 정리했다.",
+      "explanation을 예약어와 식별자 규칙 기준으로 간결하게 다시 작성했다.",
+      "keywords를 C언어, 식별자, 예약어, auto로 보강했다."
+    ]
+  }
+}

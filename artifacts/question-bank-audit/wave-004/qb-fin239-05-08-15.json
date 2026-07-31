@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-15",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-15",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 220. ping localhost에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: ping localhost 문제",
+    "answer": "Ping은 ICMP Echo Request/Reply를 이용해 대상 호스트의 도달성과 왕복 지연 시간(RTT)을 확인하는 기본 네트워크 진단 도구입니다. 네트워크 경로, 라우팅, 방화벽 차단 등 장애 원인 구분의 첫 단계로 자주 사용됩니다.",
+    "explanation": "Ping은 ICMP Echo Request/Reply를 이용해 대상 호스트의 도달성과 왕복 지연 시간(RTT)을 확인하는 기본 네트워크 진단 도구입니다. 네트워크 경로, 라우팅, 방화벽 차단 등 장애 원인 구분의 첫 단계로 자주 사용됩니다.\n\n의미: Ping은 ICMP Echo Request를 보내고 Echo Reply를 받아 대상 호스트까지 네트워크 경로가 연결되어 있는지와 왕복 지연시간(RTT)을 측정합니다. 다만 TCP 포트의 열린 상태나 애플리케이션의 정상 동작까지 보장하지 않는, 단순한 도달성 확인 도구입니다.\n활용: 장애 분석의 초기에 DNS 해석 문제·IP 도달성·라우팅·방화벽 차단 여부를 분리해 확인할 때 주로 사용합니다. 응답이 없다고 곧바로 서버가 다운된 것으로 단정하면 안 되고, ICMP 차단 정책이나 비대칭 경로 등 다른 원인이 있을 수 있습니다. 금융권 등에서는 외부 Ping을 제한해 정보 노출을 줄이는 경우가 많아 telnet/nc, curl, traceroute, 서버 로그 등 다른 수단과 함께 확인해야 합니다. 면접에서는 Ping이 ICMP 기반이어서 TCP/UDP 서비스 상태와 다르다는 점을 분명히 하면 좋습니다. 학습할 때는 Ping이 어떤 계층에서 동작하는지, 어떤 상태나 로그·패킷 증거를 생성하는지, 장애가 났을 때 어떤 순서로 확인할지 차례로 떠올리면 이해가 쉬워집니다. 운영에서는 단순 기본값을 그대로 쓰지 말고 주소 범위·포트·타임아웃·캐시·재전송 기준 등을 서비스 특성에 맞게 조정해 성능과 안정성을 확보해야 합니다.\n\nPing 정의와 함께 ICMP vs TCP/UDP(도달성 vs 서비스 상태), NAT·방화벽 영향 차이를 간단히 비교해 서술하세요.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "ping localhost에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "Ping",
+      "ping localhost"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 220. ping localhost에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-15",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "localhost와 ping localhost의 의미를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 220. ping localhost 문제",
+    "answer": "localhost는 자기 자신을 가리키는 루프백 주소이며, ping localhost는 로컬 시스템의 TCP/IP 스택과 루프백 인터페이스가 정상 동작하는지 확인하는 기본 진단 명령이다.",
+    "explanation": "localhost는 일반적으로 127.0.0.1(IPv4) 또는 ::1(IPv6)로 해석되며 외부 네트워크를 거치지 않고 자기 자신에게 연결된다. 따라서 ping localhost는 원격 호스트 연결 상태를 점검하는 것이 아니라 로컬 네트워크 설정, IP 스택, 루프백 인터페이스의 정상 여부를 확인하는 용도라는 점이 핵심이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "localhost와 ping localhost",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "localhost",
+      "루프백 주소",
+      "ping",
+      "ICMP"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 220. ping localhost 문제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "localhost의 의미와 ping localhost의 점검 대상을 구분해 2~4문장으로 설명",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 220. ping localhost 문제\n**답(AI답변):** localhost는 127.0.0.1 루프백 주소로 자기 자신과 TCP/IP 스택이 정상인지 확인하는 데 사용한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있고 개념형 변환 규칙의 본문 문구와 일치하지 않았음",
+      "answer와 explanation에 일반적인 ping 설명이 과도하게 섞여 있어 localhost 진단 의미와 초점이 어긋났음",
+      "keywords와 topic이 구체성이 부족하고 source_excerpt의 핵심인 localhost/루프백 개념을 충분히 반영하지 않았음"
+    ],
+    "changes": [
+      "불완전한 실전형 문항을 localhost와 ping localhost의 의미를 묻는 명시적 개념문제로 재작성함",
+      "body를 공통 규칙의 정확한 2줄 변환 메모 형식으로 수정함",
+      "answer/explanation을 루프백 주소와 로컬 TCP/IP 스택 점검 용도 중심으로 정리하고 관련 keywords, topic, source_location, answer_guide를 정합화함"
+    ]
+  }
+}

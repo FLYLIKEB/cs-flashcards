@@ -1,0 +1,79 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-641268a2abe70d753eba1165",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-641268a2abe70d753eba1165",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 4. 상대적으로 저렴하고 신뢰성이 낮은 여러 개의 디스크 드라이브를 하나의 유니트로 동작하도록 함으로써 스토리지의 신뢰도를 높이는 기술을 RAID(Redundant array of inexpensive disks)라고 한다. 아래 물음에 답하시오.",
+    "body": "#### 1.\n\nRAID-0, RAID-1 및 RAID-5의 특성과 장단점을 각각 설명하시오.\n\n#### 2.\n\n아래와 같이 4개의 드라이브로 구성된 디스크 4개를 이용하여 스토리지를 RAID-0+1 및 RAID-5 방식으로 각각 구성하시오.\n\n![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202011%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%EC%B5%9C%EC%A2%85%29.html/bindata/BIN0001.bmp)\n\n주) 원문에서는 일반 디스크와 패리티 디스크를 서로 다른 도형 표기로 구분한다.\n\n#### 3.\n\n‘나’ 문항에서 개별 디스크 드라이브의 용량이 20GB라고 할 때 RAID-0+1 및 RAID-5 방식으로 구성된 스토리지의 사용 가능 용량을 각각 구하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "상대적으로 저렴하고 신뢰성이 낮은 여러 개의 디스크 드라이브를 하나의 유니트로 동작하도록 함으로써 스토리지의 신뢰도를 높이는 기술을 RAID(Redundant array of inexpensive disks)라고 한다. 아래 물음에 답하시오.",
+    "field_name": "전산학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "RAID"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2011 전산학술 발췌 · 4. 상대적으로 저렴하고 신뢰성이 낮은 여러 개의 디스크 드라이브를 하나의 유니트로 동작하도록 함으로써 스토리지의 신뢰도를 높이는 기술을 RAID(Redundant array of inexpensive disks)라고 한다. 아래 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-641268a2abe70d753eba1165",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "RAID-0, RAID-1, RAID-5, RAID-0+1의 특징과 사용 가능 용량 계산 방식을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 4. 상대적으로 저렴하고 신뢰성이 낮은 여러 개의 디스크 드라이브를 하나의 유니트로 동작하도록 함으로써 스토리지의 신뢰도를 높이는 기술을 RAID(Redundant array of inexpensive disks)라고 한다. 아래 물음에 답하시오.",
+    "answer": "RAID-0은 스트라이핑만 사용하므로 성능은 좋지만 장애 허용성이 없고, RAID-1은 미러링으로 신뢰성은 높지만 동일 용량의 디스크가 한 쌍씩 필요해 효율이 낮다. RAID-5는 블록 단위 스트라이핑과 분산 패리티를 사용해 읽기 성능·용량 효율·장애 허용성을 절충한다. RAID-0+1은 미러링된 두 스트라이프 집합으로 이해할 수 있으며, 사용 가능 용량은 전체 디스크 용량의 절반이다. RAID-5의 사용 가능 용량은 (디스크 수-1)×개별 디스크 용량으로 계산한다.",
+    "explanation": "원문은 RAID-0+1과 RAID-5의 실제 배치도를 그리게 하는 문항을 포함하지만, 제시 그림이 누락되어 실전형 구성 문제로는 완결되지 않는다. 따라서 RAID 계층의 핵심 개념으로 변환했다. 4개의 20GB 디스크라면 RAID-0+1은 미러링 때문에 2개 디스크 용량만 사용 가능하므로 40GB이고, RAID-5는 1개 디스크 분량을 패리티에 사용하므로 60GB이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "RAID",
+    "field_name": "전산학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "RAID",
+      "striping",
+      "mirroring",
+      "parity",
+      "usable capacity"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2011 전산학술 발췌 · 4. 상대적으로 저렴하고 신뢰성이 낮은 여러 개의 디스크 드라이브를 하나의 유니트로 동작하도록 함으로써 스토리지의 신뢰도를 높이는 기술을 RAID(Redundant array of inexpensive disks)라고 한다. 아래 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 4. 상대적으로 저렴하고 신뢰성이 낮은 여러 개의 디스크 드라이브를 하나의 유니트로 동작하도록 함으로써 스토리지의 신뢰도를 높이는 기술을 RAID(Redundant array of inexpensive disks)라고 한다. 아래 물음에 답하시오.\n\n#### 1.\n\nRAID-0, RAID-1 및 RAID-5의 특성과 장단점을 각각 설명하시오.\n\n#### 2.\n\n아래와 같이 4개의 드라이브로 구성된 디스크 4개를 이용하여 스토리지를 RAID-0+1 및 RAID-5 방식으로 각각 구성하시오.\n\n![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202011%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%EC%B5%9C%EC%A2%85%29.html/bindata/BIN0001.bmp)\n\n주) 원문에서는 일반 디스크와 패리티 디스크를 서로 다른 도형 표기로 구분한다.\n\n#### 3.\n\n‘나’ 문항에서 개별 디스크 드라이브의 용량이 20GB라고 할 때 RAID-0+1 및 RAID-5 방식으로 구성된 스토리지의 사용 가능 용량을 각각 구하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문이 복합 서술형인데 단일 DB 행으로 분리되지 않음",
+      "구성 문제의 핵심 도식이 누락되어 원문 그대로는 완전 풀이가 어려움",
+      "prompt와 topic에 마크다운·장문 원문이 그대로 들어가 있음",
+      "answer와 explanation이 비어 있음"
+    ],
+    "changes": [
+      "누락된 도식을 전제로 한 실전형 문항을 RAID 개념 설명 문제로 변환함",
+      "prompt를 마크다운 없는 단일 질문으로 정리함",
+      "body를 변환 메모 2줄만 남기도록 교체함",
+      "RAID 수준별 특징과 용량 계산 원리를 answer/explanation에 보강함",
+      "topic과 keywords를 RAID 핵심 용어 중심으로 정리함"
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-e47fd48048d4599c2c52540c",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-e47fd48048d4599c2c52540c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 4. 은행 데이터베이스의 테이블이 아래와 같을 때 물음에 답하시오.",
+    "body": "- 고객(성명, 주소, 나이)\n- 지점(지점명, 주소, 자산)\n- 계좌(계좌번호, 지점명, 잔고, 구분)\n- 예금(성명, 계좌번호)\n- 주) 원문에서는 기본키(Primary Key)와 외래키(Foreign Key)를 별도 표기로 구분한다.\n\n#### 1.\n\n아래와 같은 조건을 가지고 있는 `계좌` 테이블을 생성하는 SQL을 작성하시오.\n\n- 계좌번호는 문자 10자리, 지점명은 문자 20자리, 잔고는 정수, 구분은 문자 10자리이다.\n- `지점` 테이블의 지점명이 바뀌면 `계좌` 테이블의 지점명도 자동으로 바뀐다.\n- 잔고는 0 이상이고, 구분의 기본값은 `예금`이다.\n\n#### 2.\n\n성이 `김`씨이고 나이가 20대이며 최소한 2개의 계좌를 가진 고객들의 성명과 잔고의 평균을 구하는 SQL을 작성하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "은행 데이터베이스의 테이블이 아래와 같을 때 물음에 답하시오.",
+    "field_name": "전산학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "데이터베이스"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 4. 은행 데이터베이스의 테이블이 아래와 같을 때 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-e47fd48048d4599c2c52540c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "은행 데이터베이스 스키마를 바탕으로 계좌 테이블 생성 SQL과 조건에 맞는 고객별 평균 잔고 조회 SQL을 작성하시오.",
+    "body": "- 고객(성명, 주소, 나이)\n- 지점(지점명, 주소, 자산)\n- 계좌(계좌번호, 지점명, 잔고, 구분)\n- 예금(성명, 계좌번호)\n\n1) 다음 조건을 만족하는 `계좌` 테이블 생성 SQL을 작성하시오.\n- 계좌번호: 문자 10자리\n- 지점명: 문자 20자리\n- 잔고: 정수, 0 이상\n- 구분: 문자 10자리, 기본값 `예금`\n- `지점` 테이블의 지점명이 변경되면 `계좌` 테이블의 지점명도 자동으로 변경\n\n2) 성이 `김`씨이고 나이가 20대이며 최소 2개의 계좌를 가진 고객의 성명과 평균 잔고를 구하는 SQL을 작성하시오.",
+    "answer": "CREATE TABLE 계좌 (\n    계좌번호 CHAR(10) PRIMARY KEY,\n    지점명 CHAR(20),\n    잔고 INT CHECK (잔고 >= 0),\n    구분 CHAR(10) DEFAULT '예금',\n    FOREIGN KEY (지점명) REFERENCES 지점(지점명)\n        ON UPDATE CASCADE\n);\n\nSELECT c.성명, AVG(a.잔고) AS 평균잔고\nFROM 고객 c\nJOIN 예금 d ON c.성명 = d.성명\nJOIN 계좌 a ON d.계좌번호 = a.계좌번호\nWHERE c.성명 LIKE '김%'\n  AND c.나이 BETWEEN 20 AND 29\nGROUP BY c.성명\nHAVING COUNT(*) >= 2;",
+    "explanation": "계좌 테이블은 지점 테이블의 지점명을 참조하므로 외래키에 ON UPDATE CASCADE를 지정해야 지점명 변경 시 참조값이 함께 갱신된다. 잔고 조건은 CHECK, 구분 기본값은 DEFAULT로 표현한다. 평균 잔고 조회는 고객-예금-계좌를 조인한 뒤 김씨이면서 20대인 고객만 필터링하고, 고객별 그룹화 후 HAVING COUNT(*) >= 2로 계좌 수 조건을 적용한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "은행 데이터베이스 SQL",
+    "field_name": "전산학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL",
+      "CREATE TABLE",
+      "FOREIGN KEY",
+      "ON UPDATE CASCADE",
+      "AVG",
+      "GROUP BY"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 4. 은행 데이터베이스의 테이블이 아래와 같을 때 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 4. 은행 데이터베이스의 테이블이 아래와 같을 때 물음에 답하시오.\n\n- 고객(성명, 주소, 나이)\n- 지점(지점명, 주소, 자산)\n- 계좌(계좌번호, 지점명, 잔고, 구분)\n- 예금(성명, 계좌번호)\n- 주) 원문에서는 기본키(Primary Key)와 외래키(Foreign Key)를 별도 표기로 구분한다.\n\n#### 1.\n\n아래와 같은 조건을 가지고 있는 `계좌` 테이블을 생성하는 SQL을 작성하시오.\n\n- 계좌번호는 문자 10자리, 지점명은 문자 20자리, 잔고는 정수, 구분은 문자 10자리이다.\n- `지점` 테이블의 지점명이 바뀌면 `계좌` 테이블의 지점명도 자동으로 바뀐다.\n- 잔고는 0 이상이고, 구분의 기본값은 `예금`이다.\n\n#### 2.\n\n성이 `김`씨이고 나이가 20대이며 최소한 2개의 계좌를 가진 고객들의 성명과 잔고의 평균을 구하는 SQL을 작성하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "질문 stem에 마크다운 헤딩과 복수 소문항이 그대로 섞여 있음",
+      "정답과 해설이 비어 있어 앱에서 풀이 불가함",
+      "키워드와 topic이 지나치게 포괄적임"
+    ],
+    "changes": [
+      "prompt를 단일 문제 stem으로 정리하고 body에 스키마와 조건만 유지함",
+      "계좌 테이블 생성 SQL과 평균 잔고 조회 SQL 정답을 보강함",
+      "해설·topic·keywords를 SQL 중심으로 정리함"
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-7c5179bf964d7e2a1cf70962",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-7c5179bf964d7e2a1cf70962",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 4. 다음 그림은 프로세스 실행 중 페이지 부재(page fault)가 발생했을 때 이를 처리하는 과정이다. 물음에 답하시오.",
+    "body": "![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202013%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%EC%B5%9C%EC%A2%85%29.html/bindata/BIN0004.bmp)\n\n#### 1.\n\n②∼⑥의 처리과정을 다음 용어를 사용하여 간단히 설명하시오.\n\n트랩(trap), 페이지 교체, 교체될 프레임(victim frame)\n\n① 프로세스 내부 테이블을 검사하여 해당 메모리 참조가 유효한지 확인한다. 유효하다면 페이지 테이블을 참조한다.\n\n②\n\n③\n\n④\n\n⑤\n\n⑥\n\n#### 2.\n\n프로그램 실행 시작 시 프로그램의 전부를 물리 메모리에 적재하는 방식에 비해 요구 페이징(demand paging) 방식은 페이지 부재로 인한 성능 저하가 발생한다. 성능 저하율을 10% 이내로 낮추려면 페이지 부재율은 어느 수준 이하가 되어야 하는가? 단, 메모리 접근시간은 200ns이고 평균 페이지 부재 처리시간은 8ms라고 가정한다.\n\n#### 3.\n\n쓰레싱(thrashing)에 대해 간단히 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "다음 그림은 프로세스 실행 중 페이지 부재(page fault)가 발생했을 때 이를 처리하는 과정이다. 물음에 답하시오.",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스",
+      "페이지 부재"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2013 전산학술 발췌 · 4. 다음 그림은 프로세스 실행 중 페이지 부재(page fault)가 발생했을 때 이를 처리하는 과정이다. 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-7c5179bf964d7e2a1cf70962",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "페이지 부재(page fault)가 발생했을 때 운영체제가 이를 처리하는 과정을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 4. 다음 그림은 프로세스 실행 중 페이지 부재(page fault)가 발생했을 때 이를 처리하는 과정이다. 물음에 답하시오.",
+    "answer": "페이지 부재가 발생하면 운영체제는 먼저 해당 참조가 유효한지 확인하고, 유효하면 트랩을 발생시켜 디스크에서 필요한 페이지를 찾는다. 빈 프레임이 없으면 페이지 교체 알고리즘으로 victim frame을 선택해 내보낸 뒤 필요한 페이지를 적재하고 페이지 테이블을 갱신한 후 명령을 다시 실행한다.",
+    "explanation": "페이지 부재 처리의 핵심 단계는 주소 참조의 유효성 검사, 페이지 부재 트랩 발생, 보조기억장치 접근, 필요 시 victim frame 선택을 통한 페이지 교체, 페이지 적재 후 페이지 테이블 갱신, 그리고 중단된 명령 재시작이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "페이지 부재 처리",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "페이지 부재",
+      "트랩",
+      "페이지 교체",
+      "victim frame",
+      "요구 페이징"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2013 전산학술 발췌 · 4. 다음 그림은 프로세스 실행 중 페이지 부재(page fault)가 발생했을 때 이를 처리하는 과정이다. 물음에 답하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 4. 다음 그림은 프로세스 실행 중 페이지 부재(page fault)가 발생했을 때 이를 처리하는 과정이다. 물음에 답하시오.\n\n![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202013%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%EC%B5%9C%EC%A2%85%29.html/bindata/BIN0004.bmp)\n\n#### 1.\n\n②∼⑥의 처리과정을 다음 용어를 사용하여 간단히 설명하시오.\n\n트랩(trap), 페이지 교체, 교체될 프레임(victim frame)\n\n① 프로세스 내부 테이블을 검사하여 해당 메모리 참조가 유효한지 확인한다. 유효하다면 페이지 테이블을 참조한다.\n\n②\n\n③\n\n④\n\n⑤\n\n⑥\n\n#### 2.\n\n프로그램 실행 시작 시 프로그램의 전부를 물리 메모리에 적재하는 방식에 비해 요구 페이징(demand paging) 방식은 페이지 부재로 인한 성능 저하가 발생한다. 성능 저하율을 10% 이내로 낮추려면 페이지 부재율은 어느 수준 이하가 되어야 하는가? 단, 메모리 접근시간은 200ns이고 평균 페이지 부재 처리시간은 8ms라고 가정한다.\n\n#### 3.\n\n쓰레싱(thrashing)에 대해 간단히 설명하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문이 그림 의존형인데 핵심 도식 정보가 빠져 있고 여러 소문항이 한 행에 합쳐져 있어 그대로는 풀이가 어렵다.",
+      "정답과 해설이 비어 있고 prompt/topic에 마크다운형 원문 문구가 그대로 남아 있다."
+    ],
+    "changes": [
+      "페이지 부재 처리 절차를 묻는 단일 개념형 subjective 문항으로 변환했다.",
+      "body를 변환 메모 2줄로 정리하고 answer, explanation, topic, keywords를 운영체제 개념에 맞게 보완했다."
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-b4526d120a85ff0f49f9b549",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-b4526d120a85ff0f49f9b549",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 5. LOG 기반 복구기법은 트랜잭션이 종료되기 전 예기치 않은 시스템 사고가 발생할 경우 실행결과를 이전 값으로 되돌리는 UNDO연산과 실행을 다시 시키는 REDO연산을 사용한다. (1)메모리 버퍼의 용량이 충분해서 COMMIT되지 않은 변경 자료가 항상 메모리에 대기된다면 UNDO연산과 REDO연산이 필요한가? (2)반면에 COMMIT될 때 변경 자료가 항상 디스크에 저장된다면 UNDO연산과 REDO연산이 필요한가? 다음 보기 중 올바른 것을 고르시오.",
+    "body": "|  | (1) UNCOMMIT된 자료는 항상 메모리에 대기 | (2) COMMIT된 자료는 항상 디스크에 저장 |\n| --- | --- | --- |\n| A. | UNDO 필요, REDO 필요 | UNDO 불필요, REDO 필요 |\n| B. | UNDO 필요, REDO 불필요 | UNDO 불필요, REDO 불필요 |\n| C. | UNDO 불필요, REDO 필요 | UNDO 필요, REDO 필요 |\n| D. | UNDO 불필요, REDO 불필요 | UNDO 필요, REDO 불필요 |\n| E. | UNDO 불필요, REDO 필요 | UNDO 불필요, REDO 필요 |\n\n## Ⅱ. 다음 물음에 간략히 답하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "LOG 기반 복구기법은 트랜잭션이 종료되기 전 예기치 않은 시스템 사고가 발생할 경우 실행결과를 이전 값으로 되돌리는 UNDO연산과 실행을 다시 시키는 REDO연산을 사용한다. (1)메모리 버퍼의 용량이 충분해서 COMMIT되지 않은 변경 자료가 항상 메모리에 대기된다면 UNDO연산과 REDO연산이 필요한가? (2)반면에 COMMIT될 때 변경 자료가 항상 디스크에 저장된다면 UNDO연산과 REDO연산이 필요한가? 다음 보기 중 올바른 것을 고르시오.",
+    "field_name": "전산학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "트랜잭션"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 5. LOG 기반 복구기법은 트랜잭션이 종료되기 전 예기치 않은 시스템 사고가 발생할 경우 실행결과를 이전 값으로 되돌리는 UNDO연산과 실행을 다시 시키는 REDO연산을 사용한다. (1)메모리 버퍼의 용량이 충분해서 COMMIT되지 않은 변경 자료가 항상 메모리에 대기된다면 UNDO연산과 REDO연산이 필요한가? (2)반면에 COMMIT될 때 변경 자료가 항상 디스크에 저장된다면 UNDO연산과 REDO연산이 필요한가",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-b4526d120a85ff0f49f9b549",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "LOG 기반 복구기법에서 다음 두 조건에 대한 UNDO/REDO 필요 여부를 올바르게 짝지은 것은?",
+    "body": "(1) 메모리 버퍼의 용량이 충분하여 COMMIT되지 않은 변경 자료는 항상 메모리에만 대기한다.\n(2) COMMIT될 때 변경 자료는 항상 디스크에 저장된다.",
+    "answer": "(1) UNDO 불필요, REDO 필요 / (2) UNDO 필요, REDO 불필요",
+    "explanation": "(1)은 미커밋 변경이 디스크로 내려가지 않는 no-steal 상황이므로 UNDO는 필요 없고, 커밋된 변경이 아직 디스크에 없을 수 있어 REDO는 필요하다. (2)는 커밋 시점에 변경 자료를 반드시 디스크에 반영하는 force 상황이므로 REDO는 필요 없지만, 미커밋 변경이 디스크에 기록될 수 있으므로 UNDO는 필요하다.",
+    "rubric": [],
+    "choices": [
+      "(1) UNDO 필요, REDO 필요 / (2) UNDO 불필요, REDO 필요",
+      "(1) UNDO 필요, REDO 불필요 / (2) UNDO 불필요, REDO 불필요",
+      "(1) UNDO 불필요, REDO 필요 / (2) UNDO 필요, REDO 필요",
+      "(1) UNDO 불필요, REDO 필요 / (2) UNDO 필요, REDO 불필요",
+      "(1) UNDO 불필요, REDO 필요 / (2) UNDO 불필요, REDO 필요"
+    ],
+    "answer_index": 3,
+    "topic": "LOG 기반 복구기법에서 조건별 UNDO/REDO 필요 여부",
+    "field_name": "전산학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "로그 기반 복구",
+      "UNDO",
+      "REDO",
+      "트랜잭션 복구"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 5. LOG 기반 복구기법은 트랜잭션이 종료되기 전 예기치 않은 시스템 사고가 발생할 경우 실행결과를 이전 값으로 되돌리는 UNDO연산과 실행을 다시 시키는 REDO연산을 사용한다. (1)메모리 버퍼의 용량이 충분해서 COMMIT되지 않은 변경 자료가 항상 메모리에 대기된다면 UNDO연산과 REDO연산이 필요한가? (2)반면에 COMMIT될 때 변경 자료가 항상 디스크에 저장된다면 UNDO연산과 REDO연산이 필요한가",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 5. LOG 기반 복구기법은 트랜잭션이 종료되기 전 예기치 않은 시스템 사고가 발생할 경우 실행결과를 이전 값으로 되돌리는 UNDO연산과 실행을 다시 시키는 REDO연산을 사용한다. (1)메모리 버퍼의 용량이 충분해서 COMMIT되지 않은 변경 자료가 항상 메모리에 대기된다면 UNDO연산과 REDO연산이 필요한가? (2)반면에 COMMIT될 때 변경 자료가 항상 디스크에 저장된다면 UNDO연산과 REDO연산이 필요한가? 다음 보기 중 올바른 것을 고르시오.\n\n|  | (1) UNCOMMIT된 자료는 항상 메모리에 대기 | (2) COMMIT된 자료는 항상 디스크에 저장 |\n| --- | --- | --- |\n| A. | UNDO 필요, REDO 필요 | UNDO 불필요, REDO 필요 |\n| B. | UNDO 필요, REDO 불필요 | UNDO 불필요, REDO 불필요 |\n| C. | UNDO 불필요, REDO 필요 | UNDO 필요, REDO 필요 |\n| D. | UNDO 불필요, REDO 불필요 | UNDO 필요, REDO 불필요 |\n| E. | UNDO 불필요, REDO 필요 | UNDO 불필요, REDO 필요 |\n\n## Ⅱ. 다음 물음에 간략히 답하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "객관식 문제인데 question_type, choices, answer_index가 비어 있었음",
+      "prompt와 body에 마크다운/보기 표/다음 문항 머리말이 섞여 있었음",
+      "정답, 해설, keywords, answer_guide가 문제 형식과 맞지 않았음"
+    ],
+    "changes": [
+      "question_type을 multiple_choice로 바로잡고 선택지 5개와 answer_index를 채움",
+      "prompt를 질문 문장만 남기고 body를 풀이에 필요한 두 조건만 남기도록 정리함",
+      "정답과 해설을 보완하고 keywords를 복구 개념 중심으로 정리했으며 answer_guide를 비움"
+    ]
+  }
+}

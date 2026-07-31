@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-5a00d8bd684f3dd4134e37d0",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-5a00d8bd684f3dd4134e37d0",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 3. 메모리 관리 기법",
+    "body": "메모리 관리 기법과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n대표적인 분산 메모리 할당 방식인 페이징(Paging), 세그먼트(Segment) 기법의 장점과 단점을 설명하시오.\n\n#### 2.\n\n**3-2 페이지 테이블 그림**\n\n![3-2 페이지 테이블 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0002.bmp)\n\n페이징 기법의 주소변환 과정은 아래와 같다. 16비트 논리 주소를 이용하는 4KB 크기의 페이지를 갖는 시스템이 있을 때 주어진 논리 주소를 물리 주소로 변환하여 2진수로 답하시오.\n\n##### 페이지 테이블\n\n| 페이지 번호 | 프레임 번호 |\n|---:|---|\n| 0 | 010 |\n| 1 | 001 |\n| 2 | 110 |\n| 3 | 000 |\n| 4 | 100 |\n| 5 | 011 |\n| 6 | 000 |\n| 7 | 000 |\n| 8 | 000 |\n| 9 | 101 |\n| 10 | 000 |\n| 11 | 111 |\n| 12 | 000 |\n| 13 | 000 |\n| 14 | 000 |\n| 15 | 000 |\n\n##### 논리 주소\n\n```text\n0 0 1 0 0 0 0 0 0 0 0 0 0 1 0 0\n```\n\n#### 3.\n\n**3-3 논리 주소 형식**\n\n![3-3 논리 주소 형식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0003.bmp)\n\n**3-3 세그먼트 메모리 주소변환**\n\n![3-3 세그먼트 메모리 주소변환](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0004.bmp)\n\n페이징과 세그먼트 기법의 단점을 해결하고 각각의 장점을 취하기 위한 방법으로 페이지화된 세그먼트 메모리 할당기법이 등장하였다. 페이지화된 세그먼트 메모리 할당기법을 사용하는 시스템의 논리 주소 형식이 아래와 같을 때, 세그먼트 번호·페이지 번호·페이지 변위 필드 값이 주어진 세그먼트 논리 주소가 매핑되는 프레임 번호 및 변위를 10진수로 답하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "메모리 관리 기법",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "메모리 관리 기법",
+      "메모리 관리",
+      "2진수"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2022 컴퓨터공학 학술 파트 I · 3. 메모리 관리 기법",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-5a00d8bd684f3dd4134e37d0",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "페이징 기법과 세그먼트 기법의 장단점을 설명하고, 페이지화된 세그먼트 기법이 이를 어떻게 보완하는지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 3. 메모리 관리 기법",
+    "answer": "페이징은 고정 크기 페이지로 메모리를 나누어 외부 단편화를 줄이고 할당·재배치를 단순화하지만, 페이지 테이블 관리 오버헤드와 내부 단편화가 발생할 수 있다. 세그먼트는 논리 단위별 보호·공유가 쉬워 사용자 관점에 자연스럽지만, 가변 크기 할당이라 외부 단편화가 생기고 압축 비용이 든다. 페이지화된 세그먼트 기법은 세그먼트별 논리 구조와 보호 장점을 유지하면서 각 세그먼트를 다시 페이지로 나누어 외부 단편화를 완화한다.",
+    "explanation": "원문은 1번 서술형과 2·3번 계산형이 한 행에 합쳐져 있고, 3번 계산에 필요한 세그먼트 번호·페이지 번호·변위 값이 제공되지 않아 실전형 문제로는 완결되지 않는다. 따라서 출제 의도를 보존할 수 있는 범위에서 페이징, 세그먼트, 페이지화된 세그먼트의 비교 개념을 묻는 서술형으로 정리했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "메모리 관리 기법",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "페이징",
+      "세그먼트",
+      "페이지화된 세그먼트",
+      "메모리 관리"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2022 컴퓨터공학 학술 파트 I · 3. 메모리 관리 기법",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "페이징과 세그먼트의 원리, 장단점, 페이지화된 세그먼트의 보완점을 함께 설명한다.",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 3. 메모리 관리 기법\n\n메모리 관리 기법과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n대표적인 분산 메모리 할당 방식인 페이징(Paging), 세그먼트(Segment) 기법의 장점과 단점을 설명하시오.\n\n#### 2.\n\n**3-2 페이지 테이블 그림**\n\n![3-2 페이지 테이블 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0002.bmp)\n\n페이징 기법의 주소변환 과정은 아래와 같다. 16비트 논리 주소를 이용하는 4KB 크기의 페이지를 갖는 시스템이 있을 때 주어진 논리 주소를 물리 주소로 변환하여 2진수로 답하시오.\n\n##### 페이지 테이블\n\n| 페이지 번호 | 프레임 번호 |\n|---:|---|\n| 0 | 010 |\n| 1 | 001 |\n| 2 | 110 |\n| 3 | 000 |\n| 4 | 100 |\n| 5 | 011 |\n| 6 | 000 |\n| 7 | 000 |\n| 8 | 000 |\n| 9 | 101 |\n| 10 | 000 |\n| 11 | 111 |\n| 12 | 000 |\n| 13 | 000 |\n| 14 | 000 |\n| 15 | 000 |\n\n##### 논리 주소\n\n```text\n0 0 1 0 0 0 0 0 0 0 0 0 0 1 0 0\n```\n\n#### 3.\n\n**3-3 논리 주소 형식**\n\n![3-3 논리 주소 형식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0003.bmp)\n\n**3-3 세그먼트 메모리 주소변환**\n\n![3-3 세그먼트 메모리 주소변환](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0004.bmp)\n\n페이징과 세그먼트 기법의 단점을 해결하고 각각의 장점을 취하기 위한 방법으로 페이지화된 세그먼트 메모리 할당기법이 등장하였다. 페이지화된 세그먼트 메모리 할당기법을 사용하는 시스템의 논리 주소 형식이 아래와 같을 때, 세그먼트 번호·페이지 번호·페이지 변위 필드 값이 주어진 세그먼트 논리 주소가 매핑되는 프레임 번호 및 변위를 10진수로 답하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "한 행에 서로 다른 3개 문항이 합쳐져 있음",
+      "3번 계산에 필요한 입력값이 누락되어 원문 그대로는 풀이 불가",
+      "prompt와 body에 마크다운 제목·이미지 노이즈가 포함됨"
+    ],
+    "changes": [
+      "불완전한 실전형 문항을 메모리 관리 개념 서술형으로 변환",
+      "prompt를 단일 질문 문장으로 정리하고 body를 변환 메모 2줄로 교체",
+      "answer, explanation, keywords, answer_guide를 변환된 문항에 맞게 보정"
+    ]
+  }
+}

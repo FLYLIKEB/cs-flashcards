@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-df95cfeb06a5898759b809d1",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-df95cfeb06a5898759b809d1",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 8. 5비트 길이의 CRC(Cyclic Redundancy Check) 생성 다항식 G(x) = X4 + X3 + 1을 사용해서 6비트 길이의 메시지 “110011”을 송신할 때, modulo-2 연산을 이용해서 CRC코드를 구하는 과정과 결과를 작성하시오.",
+    "body": "",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "5비트 길이의 CRC(Cyclic Redundancy Check) 생성 다항식 G(x) = X4 + X3 + 1을 사용해서 6비트 길이의 메시지 “110011”을 송신할 때, modulo-2 연산을 이용해서 CRC코드를 구하는 과정과 결과를 작성하시오.",
+    "field_name": "전산학술",
+    "category": "네트워크",
+    "keywords": [
+      "CRC"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 8. 5비트 길이의 CRC(Cyclic Redundancy Check) 생성 다항식 G(x) = X4 + X3 + 1을 사용해서 6비트 길이의 메시지 “110011”을 송신할 때, modulo-2 연산을 이용해서 CRC코드를 구하는 과정과 결과를 작성하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-df95cfeb06a5898759b809d1",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "5비트 길이의 CRC 생성 다항식 G(x)=x^4+x^3+1을 사용하여 6비트 메시지 110011의 CRC 코드를 구하시오.",
+    "body": "메시지: 110011\n생성 다항식의 비트열: 11001",
+    "answer": "CRC 나머지는 1001이며, 송신 비트열은 1100111001이다.",
+    "explanation": "생성 다항식 G(x)=x^4+x^3+1은 비트열 11001이므로 차수 4만큼 0을 덧붙여 1100110000을 만든다. 이를 11001로 modulo-2 나눗셈하면 첫 XOR 후 0000010000이 되고, 마지막 1이 있는 위치에서 다시 11001을 XOR하면 0000001001이 된다. 따라서 나머지 CRC는 1001이고 원 메시지 뒤에 붙인 최종 코드워드는 1100111001이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "CRC",
+    "field_name": "전산학술",
+    "category": "네트워크",
+    "keywords": [
+      "CRC",
+      "modulo-2 division",
+      "error detection"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 8. 5비트 길이의 CRC(Cyclic Redundancy Check) 생성 다항식 G(x) = X4 + X3 + 1을 사용해서 6비트 길이의 메시지 “110011”을 송신할 때, modulo-2 연산을 이용해서 CRC코드를 구하는 과정과 결과를 작성하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "메시지에 4개의 0을 덧붙인 뒤 생성 다항식 11001로 modulo-2 나눗셈하여 CRC 나머지와 최종 송신 비트열을 계산한다.",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 8. 5비트 길이의 CRC(Cyclic Redundancy Check) 생성 다항식 G(x) = X4 + X3 + 1을 사용해서 6비트 길이의 메시지 “110011”을 송신할 때, modulo-2 연산을 이용해서 CRC코드를 구하는 과정과 결과를 작성하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 번호/마크다운이 남아 있었음",
+      "정답·해설·주제가 비어 있거나 부정확했음",
+      "주관식 계산 문제에 맞는 안내 문구가 아니었음"
+    ],
+    "changes": [
+      "질문 문장을 정리하고 계산에 필요한 비트열을 본문에 분리함",
+      "CRC 나머지와 최종 코드워드를 정답·해설에 채움",
+      "topic·keywords·answer_guide를 CRC 계산 문제에 맞게 수정함"
+    ]
+  }
+}

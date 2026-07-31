@@ -1,0 +1,86 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-14",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-14",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 101. 사용자와 데이터원이 위치상 가까이 있어서 좋은 방식은?",
+    "body": "",
+    "answer": "4번",
+    "explanation": "- WAN : WAN은 넓은 지역에 걸쳐 데이터를 전달하는 네트워크입니다. 주로 도시, 국가 또는 대륙 간의\n        연결에 사용됩니다. 사용자와 데이터원이 물리적으로 가까운 경우에는 적합하지 않습니다.\n- GAN : GAN은 전 세계적인 범위의 네트워크를 의미합니다. 이는 WAN보다 더 넓은 범위를 포괄하며,\n        사용자와 데이터원이 물리적으로 가까운 경우에는 적합하지 않습니다.\n- VPN : VPN은 공용 네트워크를 통해 프라이빗 네트워크를 구축하는 방식입니다. 보안과 프라이버시를\n        제공하지만, 물리적 거리와 상관없이 사용됩니다.",
+    "rubric": [],
+    "choices": [
+      "WAN",
+      "GAN",
+      "VPN",
+      "LAN"
+    ],
+    "answer_index": 3,
+    "topic": "사용자와 데이터원이 위치상 가까이 있어서 좋은 방식은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "사용자",
+      "LAN",
+      "프라이빗 클라우드"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 101. 사용자와 데이터원이 위치상 가까이 있어서 좋은 방식은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-14",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "사용자와 데이터원이 위치상 가까이 있을 때 적합한 네트워크 방식은?",
+    "body": "",
+    "answer": "LAN",
+    "explanation": "LAN은 근거리 통신망으로, 사용자와 데이터원이 물리적으로 가까운 환경에서 효율적으로 연결할 때 적합하다. WAN과 GAN은 더 넓은 지역을 연결하는 네트워크이고, VPN은 전송 범위가 아니라 보안 연결 방식에 해당한다.",
+    "rubric": [],
+    "choices": [
+      "WAN",
+      "GAN",
+      "VPN",
+      "LAN"
+    ],
+    "answer_index": 3,
+    "topic": "LAN",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "LAN",
+      "근거리 통신망",
+      "네트워크"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 101. 사용자와 데이터원이 위치상 가까이 있어서 좋은 방식은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 101. 사용자와 데이터원이 위치상 가까이 있어서 좋은 방식은?\n1. WAN\n2. GAN\n3. VPN\n4. LAN\n\n  **답:** 4번\n- WAN : WAN은 넓은 지역에 걸쳐 데이터를 전달하는 네트워크입니다. 주로 도시, 국가 또는 대륙 간의\n        연결에 사용됩니다. 사용자와 데이터원이 물리적으로 가까운 경우에는 적합하지 않습니다.\n- GAN : GAN은 전 세계적인 범위의 네트워크를 의미합니다. 이는 WAN보다 더 넓은 범위를 포괄하며,\n        사용자와 데이터원이 물리적으로 가까운 경우에는 적합하지 않습니다.\n- VPN : VPN은 공용 네트워크를 통해 프라이빗 네트워크를 구축하는 방식입니다. 보안과 프라이버시를\n        제공하지만, 물리적 거리와 상관없이 사용됩니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었다.",
+      "answer가 정답 내용이 아닌 번호 표기였다.",
+      "keywords에 일반어와 문제와 무관한 용어가 포함돼 있었다."
+    ],
+    "changes": [
+      "prompt를 자연스러운 질문형 문장으로 정리했다.",
+      "answer를 실제 정답인 LAN으로 수정하고 explanation을 핵심 비교 중심으로 재작성했다.",
+      "topic과 keywords를 LAN 중심의 간결한 용어로 정리했다."
+    ]
+  }
+}

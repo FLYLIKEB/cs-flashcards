@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-043aa82ecc6d7bbbee91dc63",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-043aa82ecc6d7bbbee91dc63",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 13. 정보보호: 사회공학, XSS, CSRF",
+    "body": "정보보호와 관련하여 다음 물음에 답하시오.\n\n1. 사회공학 기법(Social Engineering)에 대하여 설명하고 관련된 예시를 서술하시오.\n\n2. 웹 어플리케이션 공격 중 **사이트 간 스크립팅(XSS, Cross Site Scripting)** 및 **사이트 간 요청 위조(CSRF, Cross Site Request Forgery)**에 대하여 각각 설명하고 차이점을 비교하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "정보보호: 사회공학, XSS, CSRF",
+    "field_name": "컴퓨터공학 학술",
+    "category": "보안",
+    "keywords": [
+      "정보보호",
+      "사회공학",
+      "XSS",
+      "CSRF"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 13. 정보보호: 사회공학, XSS, CSRF · 13. 정보보호: 사회공학, XSS, CSRF",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-043aa82ecc6d7bbbee91dc63",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "사회공학 기법을 설명하고 예시를 제시한 뒤 XSS와 CSRF를 각각 설명하고 차이점을 비교하시오.",
+    "body": "1. 사회공학 기법(Social Engineering)의 개념과 관련 예시를 서술하시오.\n2. 사이트 간 스크립팅(XSS)과 사이트 간 요청 위조(CSRF)를 각각 설명하고 차이점을 비교하시오.",
+    "answer": "사회공학은 사람의 심리적 취약점을 이용해 비밀정보나 권한을 탈취하는 공격 기법이며, 피싱 메일이나 전화 사칭으로 계정정보를 빼내는 방식이 대표적이다. XSS는 공격자가 웹 페이지에 악성 스크립트를 삽입해 다른 사용자의 브라우저에서 실행되게 하는 공격이고, CSRF는 인증된 사용자의 권한을 악용해 의도하지 않은 요청을 서버로 보내게 하는 공격이다. XSS는 주로 브라우저에 전달되는 콘텐츠를 오염시켜 클라이언트 측 스크립트 실행을 노리고, CSRF는 사용자의 세션과 신뢰된 요청을 악용해 서버 측 상태 변경을 유도한다.",
+    "explanation": "사회공학은 기술적 취약점보다 사람의 신뢰, 부주의, 권위 복종 심리를 노린다는 점이 핵심이다. 피싱, 스미싱, 프리텍스팅, 테일게이팅 등이 전형적 예시다. XSS는 입력값 검증 미흡과 출력 인코딩 부재를 악용해 세션 탈취, 쿠키 탈취, 악성 스크립트 실행을 유발한다. CSRF는 사용자가 이미 로그인한 상태라는 점을 이용해 송금, 정보변경 같은 요청을 위조한다. 따라서 XSS 대응은 입력 검증, 출력 인코딩, CSP 등이 중요하고, CSRF 대응은 CSRF 토큰, SameSite 쿠키, 재인증 등이 중요하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "정보보호: 사회공학, XSS, CSRF",
+    "field_name": "컴퓨터공학 학술",
+    "category": "보안",
+    "keywords": [
+      "정보보호",
+      "사회공학",
+      "XSS",
+      "CSRF"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 13. 정보보호: 사회공학, XSS, CSRF · 13. 정보보호: 사회공학, XSS, CSRF",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 제목만 남아 있어 실제 질문이 본문에만 있었음",
+      "정답과 해설이 비어 있어 채점 가능한 행으로 사용할 수 없었음"
+    ],
+    "changes": [
+      "프롬프트를 실제 서술형 질문으로 정리하고 본문을 하위 문항만 남도록 정제함",
+      "사회공학, XSS, CSRF의 핵심 정의·예시·차이점이 드러나는 정답과 해설을 보강함"
+    ]
+  }
+}

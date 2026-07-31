@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-12",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-12",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 217. B트리 삽입에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: B트리 삽입 문제",
+    "answer": "B-Tree 삽입은 리프에 키를 넣고 노드가 넘치면 중간 키를 부모로 올리며 분할한다.",
+    "explanation": "B-Tree 삽입은 리프에 키를 넣고 노드가 넘치면 중간 키를 부모로 올리며 분할한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "B트리 삽입에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "B트리 삽입"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 217. B트리 삽입에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-12",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "B트리에서 키를 삽입하는 과정을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 217. B트리 삽입 문제",
+    "answer": "B트리 삽입은 먼저 적절한 리프 노드에 키를 넣고, 노드의 키 수가 한도를 초과하면 가운데 키를 부모 노드로 올리면서 노드를 둘로 분할하는 방식으로 수행한다. 이 분할이 부모까지 전파되면 같은 과정을 반복하고, 루트가 분할되면 새로운 루트가 생성되어 트리 높이가 1 증가한다.",
+    "explanation": "B트리는 모든 리프의 높이를 같게 유지해야 하므로 삽입은 탐색으로 위치를 찾은 뒤 리프에 먼저 반영한다. 삽입 후 오버플로가 발생하면 중간 키를 승격시키고 좌우 노드로 분할해 균형과 정렬 상태를 유지한다. 부모도 넘치면 분할을 재귀적으로 반복하며, 루트 분할 시에만 트리 높이가 증가한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "B트리",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "B트리",
+      "삽입",
+      "노드 분할",
+      "키 승격"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 217. B트리 삽입에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 217. B트리 삽입 문제\n**답(AI답변):** B-Tree 삽입은 리프에 키를 넣고 노드가 넘치면 중간 키를 부모로 올리며 분할한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 헤딩과 번호가 남아 있어 질문 문장만 남기지 못했다.",
+      "불완전 출처 변환 문구가 공통 규칙의 정확한 형식과 다르고 원문 제목도 정리되지 않았다.",
+      "answer와 explanation이 동일한 한 문장뿐이라 삽입 과정과 분할 전파를 충분히 설명하지 못했다.",
+      "topic과 keywords가 질문 문장 형태라 검색·분류용 메타데이터로 부정확했다."
+    ],
+    "changes": [
+      "불완전 출처 규칙에 맞춰 개념문제 prompt와 body 두 줄을 정리했다.",
+      "B트리 삽입의 리프 삽입, 오버플로 분할, 키 승격, 루트 분할을 반영해 answer와 explanation을 보강했다.",
+      "topic을 B트리로 정리하고 keywords를 핵심 용어 중심으로 재구성했다."
+    ]
+  }
+}

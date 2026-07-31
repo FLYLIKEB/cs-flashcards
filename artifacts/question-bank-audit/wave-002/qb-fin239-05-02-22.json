@@ -1,0 +1,95 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-22",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-131",
+    "term": "ICMP",
+    "english": "ICMP",
+    "category": "네트워크",
+    "alphabet_index": "I",
+    "korean_initial": "I",
+    "definition": "ICMP(Internet Control Message Protocol)는 IP 계층에서 오류와 진단 메시지를 주고받는 제어 프로토콜로, 도달 불가, 시간 초과, 경로 확인 등 네트워크 상태를 알립니다. 이를 통해 계층별 책임을 구분하고 실제 장애 지점을 진단하는 기준으로 사용됩니다.",
+    "detailed_explanation": "의미: ICMP는 Internet Control Message Protocol로, IP 패킷 전달 과정에서 발생한 오류나 네트워크 상태를 송신자에게 알리는 제어 프로토콜입니다. TCP·UDP처럼 애플리케이션 데이터를 전달하는 것이 목적이 아니라 네트워크 계층의 진단과 제어를 돕기 위해 상태 정보(예: 도달 불가, 시간 초과, TTL 초과, Echo 응답)를 주고받습니다.\n활용: Ping은 ICMP의 Echo Request/Reply를 사용해 도달성과 왕복 시간을 확인하고, traceroute는 경로상의 라우터에서 TTL이 초과될 때 생성되는 ICMP 메시지로 경로를 추적합니다. 보안 관점에서 ICMP를 전부 차단하면 정보 유출은 줄지만 PMTUD 실패나 장애 진단의 어려움 같은 부작용이 생깁니다. 따라서 금융권 등 민감한 환경에서는 필요한 유형만 허용하고 외부 Echo 응답을 제한하며 로그 기반 이상 탐지와 병행하는 정책적 균형이 중요합니다. 학습 초기에는 ICMP가 네트워크 스택의 어느 계층에서 동작하는지, 어떤 상태를 보고하는지, 장애 시 어떤 로그와 패킷 증거를 확인할지 순서대로 정리하면 이해하기 쉽고, 실제 운영에서는 주소 범위·타입 허용, 타임아웃·재전송 기준 등을 서비스 특성에 맞게 검토하세요.",
+    "related_concepts": "[[BGP]], [[NAT]], [[Ping]], [[TCP]], [[IP]]",
+    "source_files": "05-14-15-한국은행-2025-컴퓨터공학-학술-5-데이터-통신.md; 05-06-예탁결제원-기출.md; 08-01-OSI와-TCP-IP.md",
+    "exam_note": "ICMP 정의뿐 아니라 Ping·NAT·BGP와 ‘목적·계층·용도’ 차이를 짧게 비교해 적으세요.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-131-20260719-114311-78feae9a.png",
+    "concept_image_alt": "ICMP(네트워크) 개념 참고 이미지",
+    "sort_order": 130,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-131-20260719-114311-78feae9a.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-22",
+    "card_id": "CS-131",
+    "question_type": "short",
+    "prompt": "### 52. ICMP 뜻",
+    "body": "- ICMP(Internet Control Message Protocol): 인터넷 프로토콜(IP)에서 오류 메시지와 제어 메시지를 전송하는\n데 사용되는 프로토콜",
+    "answer": "IP 계층의 오류 보고 및 제어 메시지 전송 프로토콜이다. ping이 ICMP Echo Request/Reply를 사용한다.",
+    "explanation": "IP 계층의 오류 보고 및 제어 메시지 전송 프로토콜이다. ping이 ICMP Echo Request/Reply를 사용한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "ICMP 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "ICMP",
+      "IP"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 52. ICMP 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-22",
+    "card_id": "CS-131",
+    "question_type": "short",
+    "prompt": "ICMP란 무엇인가?",
+    "body": "ICMP(Internet Control Message Protocol)",
+    "answer": "IP 계층에서 오류 보고와 제어 메시지 전달을 담당하는 프로토콜이다.",
+    "explanation": "ICMP는 IP 패킷 전달 과정의 오류와 네트워크 상태를 알리기 위한 제어 프로토콜이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "ICMP 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "ICMP",
+      "IP"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 52. ICMP 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 52. ICMP 뜻\n- ICMP(Internet Control Message Protocol): 인터넷 프로토콜(IP)에서 오류 메시지와 제어 메시지를 전송하는\n데 사용되는 프로토콜\n**답(AI답변):** IP 계층의 오류 보고 및 제어 메시지 전송 프로토콜이다. ping이 ICMP Echo Request/Reply를 사용한다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있음",
+      "body에 불필요한 글머리표와 줄바꿈이 있음",
+      "answer와 explanation에 예시 문장이 섞여 있음"
+    ],
+    "changes": [
+      "prompt를 깔끔한 개념 질문으로 정리함",
+      "body를 핵심 용어만 남기도록 정리함",
+      "answer는 정의만 남기고 explanation은 보조 설명으로 분리함"
+    ]
+  }
+}

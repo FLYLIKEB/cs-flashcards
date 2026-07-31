@@ -1,0 +1,97 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-11",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-347",
+    "term": "XSS",
+    "english": "XSS",
+    "category": "보안",
+    "alphabet_index": "X",
+    "korean_initial": "X",
+    "definition": "XSS는 신뢰되지 않은 입력이 웹 페이지에서 스크립트로 실행되어 세션 탈취나 화면 변조를 일으키는 클라이언트 측 공격이며, 최소 권한·검증·감사 관점에서 보호 대상과 실패 영향을 함께 판단해야 합니다.",
+    "detailed_explanation": "의미: XSS는 Cross-Site Scripting으로, 공격자가 삽입한 스크립트가 피해자의 브라우저에서 해당 사이트 권한으로 실행되는 취약점입니다. 저장형, 반사형, DOM 기반 유형이 있으며, 서버와 브라우저가 데이터를 코드와 구분하지 못할 때 발생합니다. 활용: 세션 쿠키 탈취, CSRF 토큰 탈취, 피싱 UI 삽입, 사용자 대신 요청 전송에 악용됩니다. 대응은 입력 검증만으로 부족하며 출력 위치별 인코딩, Content Security Policy, HttpOnly 쿠키, 안전한 템플릿 사용이 필요합니다. SQL Injection이 DB 질의 조작이라면 XSS는 브라우저 실행 문맥 조작입니다. 금융권 화면에서는 고객명, 게시글, 상담 내용처럼 저장 데이터 출력 지점을 특히 주의해야 합니다. 처음 학습할 때는 XSS을 단일 제품이 아니라 자산 식별, 정책 설정, 기술 통제, 로그 확인, 사고 대응이 이어지는 흐름으로 보면 이해가 쉽습니다. 실제 운영에서는 보안을 강화할수록 사용자 편의와 처리 속도가 영향을 받을 수 있으므로, 민감도와 업무 필요성을 기준으로 예외를 최소화하고 남긴 예외는 만료일과 책임자를 정해 점검해야 합니다.",
+    "related_concepts": "[[파밍]], [[사회공학]], [[SQL Injection]], [[CSRF]], [[인증]]",
+    "source_files": "05-14-32-한국은행-2026-컴퓨터공학-학술-7-보안.md; 10-03-01-XSS-SQL-Injection.md; 05-01-우리은행-기출.md",
+    "exam_note": "보안 문제에서는 XSS의 정의만 쓰지 말고 관련 개념(파밍, 사회공학, SQL Injection)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "상",
+    "concept_image_url": "/api/ai-images/CS-347-20260720-053453-473a0b59.png",
+    "concept_image_alt": "XSS(보안) 개념 참고 이미지",
+    "sort_order": 346,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-347-20260720-053453-473a0b59.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-11",
+    "card_id": "CS-347",
+    "question_type": "subjective",
+    "prompt": "### 11. XSS, SQL Injection 같은 공격기법 객관식으로에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: XSS, SQL Injection 같은 공격기법 객관식으로 주면서 아래에 해당하는 공격기법 선택하라는 문제",
+    "answer": "XSS는 악성 스크립트를 웹페이지에 삽입해 사용자의 브라우저에서 실행시키는 공격이고, SQL Injection은 입력값에 SQL 구문을 삽입해 DB를 조작하는 공격이다.",
+    "explanation": "XSS는 악성 스크립트를 웹페이지에 삽입해 사용자의 브라우저에서 실행시키는 공격이고, SQL Injection은 입력값에 SQL 구문을 삽입해 DB를 조작하는 공격이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "XSS, SQL Injection 같은 공격기법 객관식으로에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "XSS",
+      "SQL",
+      "SQL Injection"
+    ],
+    "difficulty": "상",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 11. XSS, SQL Injection 같은 공격기법 객관식으로에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-11",
+    "card_id": "CS-347",
+    "question_type": "subjective",
+    "prompt": "XSS와 SQL Injection의 개념과 차이를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: XSS, SQL Injection 같은 공격기법 객관식으로 주면서 아래에 해당하는 공격기법 선택하라는 문제",
+    "answer": "XSS는 웹 페이지에 삽입된 악성 스크립트가 사용자의 브라우저에서 실행되는 공격이고, SQL Injection은 입력값에 SQL 구문을 주입해 데이터베이스 질의를 조작하는 공격이다. XSS는 클라이언트 측 실행 문맥을, SQL Injection은 서버 측 데이터베이스를 주된 공격 대상으로 삼는다는 점이 다르다.",
+    "explanation": "둘 다 신뢰되지 않은 입력을 악용하지만, XSS는 출력 데이터가 스크립트로 해석될 때 발생하고 SQL Injection은 입력 데이터가 SQL 명령으로 조합될 때 발생한다. 따라서 XSS는 출력 인코딩, CSP, 안전한 템플릿 사용이 중요하고 SQL Injection은 준비된 문장과 입력 검증이 핵심 대응이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "XSS와 SQL Injection",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "XSS",
+      "SQL Injection",
+      "웹 보안 공격"
+    ],
+    "difficulty": "상",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 11. XSS, SQL Injection 같은 공격기법 객관식으로 주면서 아래에 해당하는 공격기법 선택하라는 문제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 11. XSS, SQL Injection 같은 공격기법 객관식으로 주면서 아래에 해당하는 공격기법 선택하라는 문제\n**답(AI답변):** XSS는 악성 스크립트를 웹페이지에 삽입해 사용자의 브라우저에서 실행시키는 공격이고, SQL Injection은 입력값에 SQL 구문을 삽입해 DB를 조작하는 공격이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문 문제에 선택지와 세부 조건이 없어 실전형으로는 풀이 불가",
+      "prompt와 topic에 마크다운/어색한 문구가 남아 있음",
+      "body 변환 메모가 공통 규칙 문구와 불일치"
+    ],
+    "changes": [
+      "문제를 XSS와 SQL Injection 비교 개념문제로 재작성",
+      "body를 규칙에 맞는 2줄 변환 메모로 정리",
+      "keywords·topic·source_location을 문항 의미에 맞게 정리"
+    ]
+  }
+}

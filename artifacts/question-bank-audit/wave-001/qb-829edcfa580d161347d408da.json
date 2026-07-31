@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-829edcfa580d161347d408da",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-829edcfa580d161347d408da",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 11. 동적 계획법",
+    "body": "동적 계획법(Dynamic Programming) 알고리즘과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n이항 계수(Binomial Coefficient)는 `n`개의 서로 다른 원소 중에서 `r`개의 원소를 순서 없이 골라내는 방법의 수를 나타낸다. 아래 두 코드 `A`, `B`로 이를 계산할 때 시간복잡도를 각각 구하시오.\n\n##### A코드\n\n```c\nint bino(int n, int r) {\n    if (r==0 || n==r) return 1;\n    return bino(n-1,r-1) + bino(n-1,r);\n}\n```\n\n##### B코드\n\n```c\nint cache[MAX][MAX]; // 모두 -1로 초기화하였다고 가정\n\nint bino(int n, int r) {\n    for(int i=0; i<=n; i++) {\n        for(int j=0; j<=r; j++) {\n            if (i==j || j==0) cache[i][j] = 1;\n            else cache[i][j] = cache[i-1][j-1] + cache[i-1][j];\n        }\n    }\n    return cache[n][r];\n}\n```\n\n#### 2.\n\n위 경우와 같이 동적 계획법을 적용할 수 있는 조건에 대해 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "동적 계획법",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "동적 계획법"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 11. 동적 계획법",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-829edcfa580d161347d408da",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "이항 계수를 계산하는 두 코드 A와 B의 시간복잡도를 각각 구하고, 이와 같이 동적 계획법을 적용할 수 있는 조건을 설명하시오.",
+    "body": "이항 계수(Binomial Coefficient)는 n개의 서로 다른 원소 중에서 r개의 원소를 순서 없이 고르는 방법의 수를 의미한다. 다음 두 코드 A, B를 비교하라.\n\nA코드\n```c\nint bino(int n, int r) {\n    if (r==0 || n==r) return 1;\n    return bino(n-1,r-1) + bino(n-1,r);\n}\n```\n\nB코드\n```c\nint cache[MAX][MAX]; // 모두 -1로 초기화하였다고 가정\n\nint bino(int n, int r) {\n    for(int i=0; i<=n; i++) {\n        for(int j=0; j<=r; j++) {\n            if (i==j || j==0) cache[i][j] = 1;\n            else cache[i][j] = cache[i-1][j-1] + cache[i-1][j];\n        }\n    }\n    return cache[n][r];\n}\n```",
+    "answer": "A코드는 지수 시간 O(2^n), B코드는 O(nr)이며, 동적 계획법은 중복 부분 문제와 최적 부분 구조가 있을 때 적용할 수 있다.",
+    "explanation": "A코드는 같은 부분 문제를 반복 재귀 호출하므로 호출 수가 피보나치식으로 증가해 지수 시간이 든다. B코드는 0≤i≤n, 0≤j≤r 범위의 각 부분 문제를 표에 한 번씩만 채우므로 시간복잡도는 O(nr)이다. 동적 계획법은 큰 문제가 더 작은 부분 문제로 나뉘고, 그 부분 문제들이 반복되며, 부분 문제의 최적해를 이용해 전체 문제의 최적해를 구성할 수 있을 때 적합하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "동적 계획법",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "동적 계획법",
+      "이항 계수",
+      "중복 부분 문제",
+      "최적 부분 구조"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 11. 동적 계획법",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 11. 동적 계획법\n\n동적 계획법(Dynamic Programming) 알고리즘과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n이항 계수(Binomial Coefficient)는 `n`개의 서로 다른 원소 중에서 `r`개의 원소를 순서 없이 골라내는 방법의 수를 나타낸다. 아래 두 코드 `A`, `B`로 이를 계산할 때 시간복잡도를 각각 구하시오.\n\n##### A코드\n\n```c\nint bino(int n, int r) {\n    if (r==0 || n==r) return 1;\n    return bino(n-1,r-1) + bino(n-1,r);\n}\n```\n\n##### B코드\n\n```c\nint cache[MAX][MAX]; // 모두 -1로 초기화하였다고 가정\n\nint bino(int n, int r) {\n    for(int i=0; i<=n; i++) {\n        for(int j=0; j<=r; j++) {\n            if (i==j || j==0) cache[i][j] = 1;\n            else cache[i][j] = cache[i-1][j-1] + cache[i-1][j];\n        }\n    }\n    return cache[n][r];\n}\n```\n\n#### 2.\n\n위 경우와 같이 동적 계획법을 적용할 수 있는 조건에 대해 설명하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트가 제목만 남아 있어 질문 의도가 드러나지 않음",
+      "정답과 해설이 비어 있음",
+      "키워드가 핵심 개념을 충분히 반영하지 못함"
+    ],
+    "changes": [
+      "프롬프트를 시간복잡도와 적용 조건을 모두 묻는 완전한 서술형 질문으로 정리함",
+      "본문을 문제 풀이에 필요한 설명과 코드만 남기도록 정리하고 정답·해설을 채움",
+      "키워드를 이항 계수·중복 부분 문제·최적 부분 구조까지 보강함"
+    ]
+  }
+}

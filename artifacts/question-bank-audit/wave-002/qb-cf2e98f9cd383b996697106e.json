@@ -1,0 +1,115 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-cf2e98f9cd383b996697106e",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-233",
+    "term": "RARP",
+    "english": "RARP",
+    "category": "네트워크",
+    "alphabet_index": "R",
+    "korean_initial": "R",
+    "definition": "RARP(Reverse ARP)는 자신의 MAC 주소를 이용해 네트워크에서 자기 IP 주소를 조회하던 프로토콜로, 주로 디스크 없는 워크스테이션의 부팅 시 IP를 얻는 용도로 사용되었습니다. 오늘날에는 DHCP/BOOTP에 의해 거의 대체되었으며, 계층별 책임과 장애 범위 논의에서 예시로 자주 언급됩니다.",
+    "detailed_explanation": "의미: RARP는 ARP와 반대로 동작해 MAC 주소를 이용해 해당 장비에 할당된 IP 주소를 찾아오는 프로토콜입니다. 주로 부팅 시 자기 IP를 모르는 디스크 없는 워크스테이션이 서버에 질의해 자신의 IP를 얻는 용도로 설계되었습니다. 활용: 현재는 DHCP나 BOOTP가 IP뿐 아니라 게이트웨이·DNS 등 추가 설정까지 제공하므로 실무에서는 거의 쓰이지 않습니다. RARP는 같은 LAN(브로드캐스트 도메인) 내에서만 동작하고 라우터를 넘나들며 구성 정보를 배포하는 데 한계가 있어 DHCP로 대체되었다고 설명하면 정확합니다. 학습·운영 관점에서는 RARP가 데이터링크 계층 주변의 주소 해석 문제를 다룬다는 점과, 어떤 계층에서 동작하는지·어떤 상태를 만들거나 바꾸는지·장애 발생 시 어떤 로그나 패킷 증거로 확인할지 순서대로 떠올리면 이해가 쉽습니다. 운영 시에는 기본값을 그대로 쓰지 않고 주소 범위, 포트, 타임아웃, 캐시 및 재전송 기준 등을 서비스 특성에 맞춰 검토해야 합니다.",
+    "related_concepts": "[[MAC 주소]], [[ARP]], [[IP]], [[IPv4]], [[TCP]]",
+    "source_files": "05-14-10-한국은행-2024-컴퓨터공학-학술-파트-I.md",
+    "exam_note": "정의뿐 아니라 ARP와의 반대성(매핑 방향), MAC↔IP 역할, 같은 LAN 한계 및 DHCP/BOOTP로 대체된 이유를 짧게 비교해 쓰세요.",
+    "bok_appeared": "O",
+    "importance": "하",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-233-20260719-115206-01d6f22b.png",
+    "concept_image_alt": "RARP(네트워크) 개념 참고 이미지",
+    "sort_order": 232,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-233-20260719-115206-01d6f22b.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-cf2e98f9cd383b996697106e",
+    "card_id": "CS-233",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?](Reverse ARP)는 자신의 MAC 주소를 이용해 네트워크에서 자기 IP 주소를 조회하던 프로토콜로, 주로 디스크 없는 워크스테이션의 부팅 시 IP를 얻는 용도로 사용되었습니다.",
+    "answer": "RARP",
+    "explanation": "RARP(Reverse ARP)는 자신의 MAC 주소를 이용해 네트워크에서 자기 IP 주소를 조회하던 프로토콜로, 주로 디스크 없는 워크스테이션의 부팅 시 IP를 얻는 용도로 사용되었습니다. 오늘날에는 DHCP/BOOTP에 의해 거의 대체되었으며, 계층별 책임과 장애 범위 논의에서 예시로 자주 언급됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "TCP",
+      "RARP",
+      "MAC 주소",
+      "IP"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "RARP",
+      "MAC 주소",
+      "ARP",
+      "IP",
+      "IPv4",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-14-10-한국은행-2024-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-cf2e98f9cd383b996697106e",
+    "card_id": "CS-233",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "자신의 MAC 주소를 이용해 네트워크에서 자기 IP 주소를 조회하던 프로토콜로, 주로 디스크 없는 워크스테이션의 부팅 시 IP를 얻는 용도로 사용되었다.",
+    "answer": "RARP",
+    "explanation": "RARP(Reverse ARP)는 자신의 MAC 주소를 이용해 네트워크에서 자기 IP 주소를 조회하던 프로토콜이다. 주로 디스크 없는 워크스테이션이 부팅 시 자신의 IP 주소를 얻는 용도로 사용되었으며, 현재는 DHCP/BOOTP에 의해 대부분 대체되었다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "TCP",
+      "RARP",
+      "MAC 주소",
+      "IP"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "RARP",
+      "Reverse ARP",
+      "MAC 주소",
+      "IP 주소",
+      "디스크 없는 워크스테이션"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-14-10-한국은행-2024-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 마크다운 잡음과 정답 유추 단서가 남아 있었음",
+      "keywords와 category가 카드 기준으로 정리되지 않았음"
+    ],
+    "changes": [
+      "body를 정제해 불필요한 표기와 직접 단서를 제거함",
+      "explanation을 간결하게 다듬고 category를 네트워크로 보정함",
+      "keywords를 카드 중심 핵심 용어로 재구성함"
+    ]
+  }
+}

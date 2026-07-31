@@ -1,0 +1,84 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-10",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-10",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 40. 다음 중 스크립트 언어인 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "3번",
+    "rubric": [],
+    "choices": [
+      "C",
+      "Java",
+      "Python",
+      "C++"
+    ],
+    "answer_index": 2,
+    "topic": "다음 중 스크립트 언어인 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "스크립트 언어",
+      "Python"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 40. 다음 중 스크립트 언어인 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-10",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "다음 중 스크립트 언어인 것은?",
+    "body": "",
+    "answer": "Python",
+    "explanation": "Python은 인터프리터 기반으로 많이 사용되는 대표적인 스크립트 언어이다. C, Java, C++은 일반적으로 컴파일 언어로 분류된다.",
+    "rubric": [],
+    "choices": [
+      "C",
+      "Java",
+      "Python",
+      "C++"
+    ],
+    "answer_index": 2,
+    "topic": "스크립트 언어",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "스크립트 언어",
+      "Python"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 40. 다음 중 스크립트 언어인 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 40. 다음 중 스크립트 언어인 것은?\n1. C\n2. Java\n3. Python\n4. C++\n\n**답:** 3번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 헤딩과 번호가 남아 있었음",
+      "정답과 해설이 선지 번호만 있어 내용이 부족했음",
+      "topic이 질문 문장 전체로 들어가 있었음"
+    ],
+    "changes": [
+      "prompt를 깨끗한 질문 문장으로 정리함",
+      "answer를 Python으로, explanation을 근거 설명으로 보강함",
+      "topic을 스크립트 언어로 정리함"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-ca2d8b24efc44114f0bc83a8",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-ca2d8b24efc44114f0bc83a8",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 6. 머신러닝",
+    "body": "머신러닝과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**6-1 선형 회귀 학습 모델**\n\n![6-1 선형 회귀 학습 모델](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0009.png)\n\n경사하강법(gradient descent)은 손실함수를 편미분하여 기울기를 구하고, 기울어진 방향으로 나아가기를 반복하여 손실함수의 최솟값을 찾아가는 방법이다. 학습률(learning rate)이 너무 크거나 작을 때 발생할 수 있는 문제점을 각각 서술하시오.\n\n#### 2.\n\n**6-2 경사하강법 국소 최솟값 그림**\n\n![6-2 경사하강법 국소 최솟값 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000A.png)\n\n경사하강법을 이용하여 최적해를 구할 때, 국소 최솟값(local minimum)에 빠져 전역 최솟값을 찾지 못할 수 있다. 전역 최솟값 발견 확률을 높일 수 있는 방법을 제시하시오.\n\n#### 3.\n\n머신러닝에서 발생할 수 있는 과잉 적합(overfitting)과 과소 적합(underfitting)에 대해 서술하시오.\n\n#### 4.\n\n**6-4-1 퍼셉트론 구조**\n\n![6-4-1 퍼셉트론 구조](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000B.png)\n\n**6-4-2 활성화 함수 ReLU**\n\n![6-4-2 활성화 함수 ReLU](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000C.png)\n\n**6-4-3 다층 인공 신경망 그림**\n\n![6-4-3 다층 인공 신경망 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000D.png)\n\n인공 신경망은 생물학적 뉴런을 기반으로 만들어낸 수학적 모델인 퍼셉트론(perceptron)을 사용하며, 아래 그림의 퍼셉트론은 활성화 함수로 비선형 함수인 ReLU를 사용한다. 위와 같은 퍼셉트론 3개로 구성한 다층 인공 신경망에서 최초 입력값을 `(0,0)`, `(1,1)`로 입력하는 경우 출력값 `y`를 차례대로 구하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "머신러닝"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 6. 머신러닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-ca2d8b24efc44114f0bc83a8",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "머신러닝에서 발생할 수 있는 과잉 적합(overfitting)과 과소 적합(underfitting)의 차이를 설명하시오.",
+    "body": "",
+    "answer": "과잉 적합은 모델이 학습 데이터에 지나치게 맞춰져 새로운 데이터에 대한 일반화 성능이 떨어지는 상태이고, 과소 적합은 모델이 데이터의 중요한 패턴을 충분히 학습하지 못해 학습 데이터와 새로운 데이터 모두에서 성능이 낮은 상태이다.",
+    "explanation": "과잉 적합은 모델이 너무 복잡하거나 데이터가 부족할 때 자주 발생하며 규제, 교차검증, 데이터 확대 등으로 완화할 수 있다. 과소 적합은 모델이 너무 단순하거나 학습이 충분하지 않을 때 발생하며 더 적절한 모델 선택, 특징 확장, 학습 증가 등으로 개선할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "머신러닝",
+      "과잉 적합",
+      "과소 적합",
+      "overfitting",
+      "underfitting"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 6. 머신러닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 6. 머신러닝\n\n머신러닝과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**6-1 선형 회귀 학습 모델**\n\n![6-1 선형 회귀 학습 모델](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0009.png)\n\n경사하강법(gradient descent)은 손실함수를 편미분하여 기울기를 구하고, 기울어진 방향으로 나아가기를 반복하여 손실함수의 최솟값을 찾아가는 방법이다. 학습률(learning rate)이 너무 크거나 작을 때 발생할 수 있는 문제점을 각각 서술하시오.\n\n#### 2.\n\n**6-2 경사하강법 국소 최솟값 그림**\n\n![6-2 경사하강법 국소 최솟값 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000A.png)\n\n경사하강법을 이용하여 최적해를 구할 때, 국소 최솟값(local minimum)에 빠져 전역 최솟값을 찾지 못할 수 있다. 전역 최솟값 발견 확률을 높일 수 있는 방법을 제시하시오.\n\n#### 3.\n\n머신러닝에서 발생할 수 있는 과잉 적합(overfitting)과 과소 적합(underfitting)에 대해 서술하시오.\n\n#### 4.\n\n**6-4-1 퍼셉트론 구조**\n\n![6-4-1 퍼셉트론 구조](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000B.png)\n\n**6-4-2 활성화 함수 ReLU**\n\n![6-4-2 활성화 함수 ReLU](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000C.png)\n\n**6-4-3 다층 인공 신경망 그림**\n\n![6-4-3 다층 인공 신경망 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000D.png)\n\n인공 신경망은 생물학적 뉴런을 기반으로 만들어낸 수학적 모델인 퍼셉트론(perceptron)을 사용하며, 아래 그림의 퍼셉트론은 활성화 함수로 비선형 함수인 ReLU를 사용한다. 위와 같은 퍼셉트론 3개로 구성한 다층 인공 신경망에서 최초 입력값을 `(0,0)`, `(1,1)`로 입력하는 경우 출력값 `y`를 차례대로 구하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "여러 소문항과 이미지가 한 행에 합쳐져 단일 문제로 사용하기 어려움",
+      "prompt에 마크다운 제목이 남아 있고 answer/explanation이 비어 있음"
+    ],
+    "changes": [
+      "이미지 없이도 풀 수 있는 3번 소문항만 추출해 단일 서술형 문제로 정리",
+      "정답·해설과 핵심 키워드를 보강하고 불필요한 본문을 제거"
+    ]
+  }
+}

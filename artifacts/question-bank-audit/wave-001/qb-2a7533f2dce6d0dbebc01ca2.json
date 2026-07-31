@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-2a7533f2dce6d0dbebc01ca2",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-2a7533f2dce6d0dbebc01ca2",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 5. 그래프 알고리즘 및 정렬",
+    "body": "**그림 5-1. 문제용 그래프**\n\n![그림 5-1. 문제용 그래프](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202026%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C.html/bindata/BIN0002.png)\n\n다음 그래프를 보고, 물음에 답하시오.\n\n#### 그래프\n\n```mermaid\ngraph LR\n    S((S)) ---|5| A((A))\n    S ---|10| C((C))\n    A ---|9| B((B))\n    A ---|6| C\n    C ---|3| B\n    B ---|10| E((E))\n    C ---|7| E\n    C ---|4| D((D))\n    C ---|10| F((F))\n    F ---|1| D\n    D ---|4| E\n```\n\n그래프의 간선은 다음과 같다.\n\n| 간선 | 가중치 |\n|---|---:|\n| S-A | 5 |\n| S-C | 10 |\n| A-B | 9 |\n| A-C | 6 |\n| C-B | 3 |\n| B-E | 10 |\n| C-E | 7 |\n| C-D | 4 |\n| C-F | 10 |\n| F-D | 1 |\n| D-E | 4 |\n\n### 1.\n\n**그림 5-2. 크루스칼 알고리즘 그림**\n\n![그림 5-2. 크루스칼 알고리즘 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202026%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C.html/bindata/BIN0003.png)\n\n크루스칼(Kruskal’s) 알고리즘으로 생성된 경로를 그리시오.\n\n### 2.\n\n단일 시작점에서 다른 지점까지의 최단 경로(shortest-path)를 구하는 알고리즘으로 다익스트라(Dijkstra) 알고리즘이 있다. 위 그래프의 S부터 시작해서 다익스트라 알고리즘으로 계산되는 값(dist)을 단계별로 표현하시오. 단, 업데이트되지 않는 과정은 생략.\n\n#### 답변 예시\n\n| step | S | A | B | C | D | E | F |\n|---:|---|---|---|---|---|---|---|\n| 1 | - | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ |\n| 2 |  |  |  |  |  |  |  |\n| … |  |  |  |  |  |  |  |\n\n### 3.\n\n다익스트라(Dijkstra) 알고리즘이 다른 최단 경로 알고리즘과 비교할 때 가지는 한계와 대체할 수 있는 알고리즘을 제시하고, 다익스트라 알고리즘과 비교해서 제시한 알고리즘의 동작방식이 어떻게 다른지 설명하시오.\n\n### 4.\n\n데이터를 순서대로 정렬하기 위해 다음과 같이 동일한 평균 시간복잡도를 갖는 두 가지 코드를 작성하였다. 각 코드에서 발생할 수 있는 최악의 시간복잡도를 제시하시오. 그리고, 평균 시간복잡도와 최악의 시간복잡도가 차이나는 경우 그 이유에 대하여 설명하시오.\n\n#### A정렬\\*\n\n```c\nint partition(int A[], int first, int last) {\n    int low, high, p;\n    p = A[last];\n    low = first;\n    high = last - 1;\n\n    while (low < high) {\n        while (p > A[low]) low++;\n        while (p < A[high]) high--;\n        if (low < high)\n            swap(&A[low], &A[high]);\n    }\n\n    swap(&A[low], &A[last]);\n    return low;\n}\n\nvoid aSort(int A[], int first, int last) {\n    if (first < last) {\n        int pivotIndex = partition(A, first, last);\n        aSort(A, first, pivotIndex - 1);\n        aSort(A, pivotIndex + 1, last);\n    }\n}\n```\n\n#### B정렬\\*\\*\n\n```c\nint sorted[MAX];\n\nvoid _bSort(int list[], int left, int mid, int right) {\n    int i, j, k, l;\n    i = left;\n    j = mid + 1;\n    k = left;\n\n    while (i <= mid && j <= right) {\n        if (list[i] <= list[j])\n            sorted[k++] = list[i++];\n        else\n            sorted[k++] = list[j++];\n    }\n\n    if (i > mid) {\n        for (l = j; l <= right; l++)\n            sorted[k++] = list[l];\n    } else {\n        for (l = i; l <= mid; l++)\n            sorted[k++] = list[l];\n    }\n\n    for (l = left; l <= right; l++)\n        list[l] = sorted[l];\n}\n\nvoid bSort(int A[], int first, int last) {\n    int mid;\n    if (first < last) {\n        mid = (first + last) / 2;\n        bSort(A, first, mid);\n        bSort(A, mid + 1, last);\n        _bSort(A, first, mid, last);\n    }\n}\n```\n\n> \\* swap은 첫 번째와 두 번째 인자의 값을 서로 교환하는 함수  \n> \\*\\* MAX는 충분히 큰 값임",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "그래프 알고리즘 및 정렬",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "그래프 알고리즘 및 정렬",
+      "그래프 알고리즘"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 5. 그래프 알고리즘 및 정렬 · 5. 그래프 알고리즘 및 정렬",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-2a7533f2dce6d0dbebc01ca2",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "다익스트라 알고리즘은 어떤 한계가 있으며, 이를 보완하는 대체 최단 경로 알고리즘은 무엇인가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 5. 그래프 알고리즘 및 정렬",
+    "answer": "다익스트라 알고리즘은 음수 가중치가 있는 그래프에서는 올바른 최단 경로를 보장하지 못하며, 이런 경우 벨만-포드 알고리즘을 사용할 수 있다.",
+    "explanation": "다익스트라는 현재까지 최단 거리가 가장 짧은 정점을 확정해 나가는 탐욕적 방식이어서 음수 간선 때문에 나중에 더 짧아지는 경로를 반영하지 못한다. 반면 벨만-포드는 모든 간선을 반복적으로 완화하여 거리 값을 갱신하므로 음수 가중치를 처리할 수 있고, 음수 사이클 존재 여부도 판별할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "그래프 알고리즘 및 정렬",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "다익스트라 알고리즘",
+      "벨만-포드 알고리즘",
+      "최단 경로",
+      "음수 가중치"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 5. 그래프 알고리즘 및 정렬 · 5. 그래프 알고리즘 및 정렬",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 180,
+    "answer_guide": "한계 → 대체 알고리즘 → 동작 차이를 3~5문장으로 설명",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "section heading and four subquestions were bundled into one row",
+      "original prompt/body were not a single clean solvable question",
+      "answer and explanation were empty"
+    ],
+    "changes": [
+      "converted the row into a single concept question about Dijkstra limitations",
+      "replaced body with the required two-line conversion note and original title",
+      "filled answer, explanation, keywords, and aligned timing/answer guide"
+    ]
+  }
+}

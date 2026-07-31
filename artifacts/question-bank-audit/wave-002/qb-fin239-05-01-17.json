@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-17",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-17",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "### 17. 디도스 공격 뜻",
+    "body": "- 디도스 공격(DDoS): 여러 대의 컴퓨터를 통해 특정 서버나 네트워크에 과도한 트래픽을 유발시켜 정상적인\n서비스 운영을 방해하거나 마비시키는 사이버 공격",
+    "answer": "여러 감염 장비에서 대량 트래픽을 보내 서비스 가용성을 마비시키는 분산 서비스 거부 공격이다.",
+    "explanation": "여러 감염 장비에서 대량 트래픽을 보내 서비스 가용성을 마비시키는 분산 서비스 거부 공격이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "디도스 공격 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "DDoS",
+      "디도스 공격"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 17. 디도스 공격 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-17",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "디도스 공격(DDoS)의 뜻을 설명하시오.",
+    "body": "",
+    "answer": "여러 대의 컴퓨터에서 동시에 대량 트래픽을 보내 특정 서버나 네트워크의 정상적인 서비스 제공을 방해하거나 마비시키는 분산 서비스 거부 공격이다.",
+    "explanation": "DDoS는 여러 감염 장비를 동원해 트래픽을 집중시키므로 단일 출발지의 DoS보다 규모가 크고 방어가 더 어렵다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "디도스 공격 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "DDoS",
+      "디도스 공격"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 17. 디도스 공격 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 17. 디도스 공격 뜻\n- 디도스 공격(DDoS): 여러 대의 컴퓨터를 통해 특정 서버나 네트워크에 과도한 트래픽을 유발시켜 정상적인\n서비스 운영을 방해하거나 마비시키는 사이버 공격\n**답(AI답변):** 여러 감염 장비에서 대량 트래픽을 보내 서비스 가용성을 마비시키는 분산 서비스 거부 공격이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 헤딩이 남아 있음",
+      "body에 정답 정의가 그대로 노출됨",
+      "explanation이 answer를 그대로 반복함"
+    ],
+    "changes": [
+      "프롬프트를 자연스러운 서술형 질문으로 정리함",
+      "정답 누출 body를 제거함",
+      "answer와 explanation을 역할에 맞게 분리함"
+    ]
+  }
+}

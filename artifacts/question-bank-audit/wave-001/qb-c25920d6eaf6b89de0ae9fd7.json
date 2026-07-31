@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-c25920d6eaf6b89de0ae9fd7",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-c25920d6eaf6b89de0ae9fd7",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 4. 라우팅",
+    "body": "라우팅과 관련된 다음 물음에 답하시오.\n\n#### 1.\n\n다음은 리눅스 서버에서 `netstat -rn` 명령을 수행하여 출력된 라우팅 테이블이다.\n\n| Destination | Gateway | Genmask | Flags | Interface |\n|---|---|---|---|---|\n| 30.160.0.100 | 30.160.0.1 | 255.255.255.255 | UGH | eth0 |\n| 30.160.0.8 | 30.160.0.2 | 255.255.255.248 | UG | eth0 |\n| 30.160.64.0 | 30.160.0.3 | 255.255.192.0 | UG | eth0 |\n| 0.0.0.0 | 30.160.0.4 | 0.0.0.0 | UG | eth0 |\n\n1. 아래 호스트로 `ping` 명령을 수행했을 때, 라우팅되는 게이트웨이 IP 주소를 각각 답하시오.\n   - (A) `30.160.0.100`\n   - (B) `30.160.100.16`\n   - (C) `30.160.10.0`\n2. 기본 게이트웨이(Default gateway)의 역할을 설명하시오.\n\n#### 2.\n\n라우팅 프로토콜 중 동적 라우팅의 거리벡터(Distance Vector) 방식과 연결상태(Link State) 방식의 차이점을 설명하시오.\n\n#### 3.\n\n**4-3 라우팅 그래프**\n\n![4-3 라우팅 그래프](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0005.bmp)\n\n다익스트라 알고리즘(Dijkstra algorithm)에 대한 설명을 참고하여, 시작 라우터 `A`에서 라우터 `D`까지만 방문했을 때 각 라우터의 최단거리 배열을 구하시오.\n\n##### 초기 값\n\n| A | B | C | D | E | F | G |\n|---|---|---|---|---|---|---|\n| 0 | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "라우팅",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "라우팅"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2022 컴퓨터공학 학술 파트 I · 4. 라우팅",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-c25920d6eaf6b89de0ae9fd7",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "기본 게이트웨이의 역할과 동적 라우팅의 거리벡터 방식·연결상태 방식의 차이점을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 4. 라우팅",
+    "answer": "기본 게이트웨이는 목적지에 대한 더 구체적인 경로가 라우팅 테이블에 없을 때 패킷을 전달하는 기본 경로이다. 거리벡터 방식은 이웃 라우터와 목적지까지의 거리 정보를 주기적으로 교환해 경로를 계산하고, 연결상태 방식은 각 라우터가 네트워크 토폴로지 정보를 수집한 뒤 다익스트라 알고리즘 등으로 전체 최단 경로를 계산한다.",
+    "explanation": "원문은 라우팅 테이블 해석, 기본 게이트웨이 설명, 거리벡터와 연결상태 비교, 다익스트라 그래프 계산을 한 문항에 섞어 두었고, 특히 4-3 라우팅 그래프 이미지와 후속 최단거리 배열 정보가 없어 마지막 하위 문항은 실제로 풀 수 없다. 따라서 공통 규칙에 따라 라우팅의 핵심 개념을 묻는 서술형으로 변환했다. 기본 게이트웨이는 미지의 목적지에 대한 출구 역할을 하며, 거리벡터는 이웃 기반·주기적 갱신·구현 단순성이 특징이고 연결상태는 전체 토폴로지 기반·빠른 수렴·계산량 증가가 특징이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "라우팅",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "라우팅",
+      "기본 게이트웨이",
+      "거리벡터 라우팅",
+      "연결상태 라우팅"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2022 컴퓨터공학 학술 파트 I · 4. 라우팅",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 4. 라우팅\n\n라우팅과 관련된 다음 물음에 답하시오.\n\n#### 1.\n\n다음은 리눅스 서버에서 `netstat -rn` 명령을 수행하여 출력된 라우팅 테이블이다.\n\n| Destination | Gateway | Genmask | Flags | Interface |\n|---|---|---|---|---|\n| 30.160.0.100 | 30.160.0.1 | 255.255.255.255 | UGH | eth0 |\n| 30.160.0.8 | 30.160.0.2 | 255.255.255.248 | UG | eth0 |\n| 30.160.64.0 | 30.160.0.3 | 255.255.192.0 | UG | eth0 |\n| 0.0.0.0 | 30.160.0.4 | 0.0.0.0 | UG | eth0 |\n\n1. 아래 호스트로 `ping` 명령을 수행했을 때, 라우팅되는 게이트웨이 IP 주소를 각각 답하시오.\n   - (A) `30.160.0.100`\n   - (B) `30.160.100.16`\n   - (C) `30.160.10.0`\n2. 기본 게이트웨이(Default gateway)의 역할을 설명하시오.\n\n#### 2.\n\n라우팅 프로토콜 중 동적 라우팅의 거리벡터(Distance Vector) 방식과 연결상태(Link State) 방식의 차이점을 설명하시오.\n\n#### 3.\n\n**4-3 라우팅 그래프**\n\n![4-3 라우팅 그래프](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202022%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0005.bmp)\n\n다익스트라 알고리즘(Dijkstra algorithm)에 대한 설명을 참고하여, 시작 라우터 `A`에서 라우터 `D`까지만 방문했을 때 각 라우터의 최단거리 배열을 구하시오.\n\n##### 초기 값\n\n| A | B | C | D | E | F | G |\n|---|---|---|---|---|---|---|\n| 0 | ∞ | ∞ | ∞ | ∞ | ∞ | ∞ |",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트가 질문이 아니라 섹션 제목만 담고 있음",
+      "서로 다른 하위 문항이 한 row에 혼합되어 있음",
+      "다익스트라 풀이에 필요한 라우팅 그래프가 없어 원문 그대로는 불완전함"
+    ],
+    "changes": [
+      "프롬프트를 라우팅 핵심 개념을 묻는 서술형 질문으로 변환함",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 교체함",
+      "answer/explanation을 기본 게이트웨이와 거리벡터·연결상태 비교 중심으로 보강함",
+      "keywords를 개념 중심 용어로 정리함"
+    ]
+  }
+}

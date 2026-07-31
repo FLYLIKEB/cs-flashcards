@@ -1,0 +1,81 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-d06de99151e67e5de6fadba8",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-d06de99151e67e5de6fadba8",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 4. 아래 그림은 논리회로의 동작상태 변화에 대한 흐름을 나타낸 것이다. RS(Reset Set) 플립플롭을 이용하여 논리회로를 설계하고자 할 경우 상태표 ( ) 안에 들어갈 내용을 올바르게 연결한 것은 ?",
+    "body": "![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/09.%20%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%282009%29.html/bindata/BIN0001.bmp)\n\n| 현재 상태 A B | 입력 X | 다음 상태 A B | 플립플롭 입력 SA RA | 플립플롭 입력 SB RB |\n| --- | --- | --- | --- | --- |\n| 0 0 | 0 | 0 0 | 0 X | 0 X |\n| 0 0 | 1 | 0 1 | 0 X | ( ④ ) |\n| 0 1 | 0 | 0 1 | 0 X | X 0 |\n| 0 1 | 1 | ( ① ) | ( ② ) | ( ⑤ ) |\n| 1 0 | 0 | 1 0 | X 0 | 0 X |\n| 1 0 | 1 | 0 0 | ( ③ ) | 0 X |\n\n|  | ① | ② | ③ | ④ | ⑤ |\n| --- | --- | --- | --- | --- | --- |\n| A. | 10 | 10 | 01 | 0X | 10 |\n| B. | 01 | X0 | 01 | 00 | 01 |\n| C. | 10 | 01 | 10 | 01 | 10 |\n| D. | 01 | 10 | 01 | 10 | 01 |\n| E. | 10 | 10 | 01 | 10 | 01 |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "아래 그림은 논리회로의 동작상태 변화에 대한 흐름을 나타낸 것이다. RS(Reset Set) 플립플롭을 이용하여 논리회로를 설계하고자 할 경우 상태표 ( ) 안에 들어갈 내용을 올바르게 연결한 것은 ?",
+    "field_name": "전산학술",
+    "category": "네트워크",
+    "keywords": [
+      "논리회로",
+      "플립플롭"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 4. 아래 그림은 논리회로의 동작상태 변화에 대한 흐름을 나타낸 것이다. RS(Reset Set) 플립플롭을 이용하여 논리회로를 설계하고자 할 경우 상태표 ( ) 안에 들어갈 내용을 올바르게 연결한 것은 ?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-d06de99151e67e5de6fadba8",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "아래 상태표의 빈칸 ①~⑤에 들어갈 내용을 올바르게 연결한 것은?",
+    "body": "RS(Reset-Set) 플립플롭을 이용해 논리회로를 설계할 때의 상태표이다.\n\n| 현재 상태 A B | 입력 X | 다음 상태 A B | 플립플롭 입력 SA RA | 플립플롭 입력 SB RB |\n| --- | --- | --- | --- | --- |\n| 0 0 | 0 | 0 0 | 0 X | 0 X |\n| 0 0 | 1 | 0 1 | 0 X | ( ④ ) |\n| 0 1 | 0 | 0 1 | 0 X | X 0 |\n| 0 1 | 1 | ( ① ) | ( ② ) | ( ⑤ ) |\n| 1 0 | 0 | 1 0 | X 0 | 0 X |\n| 1 0 | 1 | 0 0 | ( ③ ) | 0 X |",
+    "answer": "E",
+    "explanation": "RS 플립플롭의 여자표는 0→0일 때 0X, 0→1일 때 10, 1→0일 때 01, 1→1일 때 X0이다. 따라서 0→1인 B의 입력인 ④는 10이고, 1→0인 A의 입력인 ③은 01이다. 남은 행에서 A의 입력 ②가 10이려면 다음 상태의 A는 1이어야 하므로 ①은 10이고, B는 1→0이 되어 ⑤는 01이다. 이를 모두 만족하는 선택지는 E이다.",
+    "rubric": [],
+    "choices": [
+      "① 10, ② 10, ③ 01, ④ 0X, ⑤ 10",
+      "① 01, ② X0, ③ 01, ④ 00, ⑤ 01",
+      "① 10, ② 01, ③ 10, ④ 01, ⑤ 10",
+      "① 01, ② 10, ③ 01, ④ 10, ⑤ 01",
+      "① 10, ② 10, ③ 01, ④ 10, ⑤ 01"
+    ],
+    "answer_index": 4,
+    "topic": "논리회로",
+    "field_name": "전산학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "논리회로",
+      "RS 플립플롭",
+      "상태표"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 4. RS 플립플롭 상태표 빈칸 연결",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정답 선택 후 RS 플립플롭 여자표를 근거로 빈칸 계산 과정을 간단히 설명",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 4. 아래 그림은 논리회로의 동작상태 변화에 대한 흐름을 나타낸 것이다. RS(Reset Set) 플립플롭을 이용하여 논리회로를 설계하고자 할 경우 상태표 ( ) 안에 들어갈 내용을 올바르게 연결한 것은 ?\n\n![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/09.%20%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%282009%29.html/bindata/BIN0001.bmp)\n\n| 현재 상태 A B | 입력 X | 다음 상태 A B | 플립플롭 입력 SA RA | 플립플롭 입력 SB RB |\n| --- | --- | --- | --- | --- |\n| 0 0 | 0 | 0 0 | 0 X | 0 X |\n| 0 0 | 1 | 0 1 | 0 X | ( ④ ) |\n| 0 1 | 0 | 0 1 | 0 X | X 0 |\n| 0 1 | 1 | ( ① ) | ( ② ) | ( ⑤ ) |\n| 1 0 | 0 | 1 0 | X 0 | 0 X |\n| 1 0 | 1 | 0 0 | ( ③ ) | 0 X |\n\n|  | ① | ② | ③ | ④ | ⑤ |\n| --- | --- | --- | --- | --- | --- |\n| A. | 10 | 10 | 01 | 0X | 10 |\n| B. | 01 | X0 | 01 | 00 | 01 |\n| C. | 10 | 01 | 10 | 01 | 10 |\n| D. | 01 | 10 | 01 | 10 | 01 |\n| E. | 10 | 10 | 01 | 10 | 01 |",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "객관식 문제인데 question_type, choices, answer_index가 비어 있었음",
+      "prompt에 마크다운 제목이 남아 있고 answer/explanation이 누락되어 있었음",
+      "category와 topic이 문제 내용과 맞지 않았음"
+    ],
+    "changes": [
+      "question_type을 multiple_choice로 바꾸고 선택지 5개와 정답 인덱스를 채움",
+      "prompt/body를 정리하고 정답 E와 풀이를 추가함",
+      "topic, category, keywords, source_location, answer_guide를 문제 내용에 맞게 보정함"
+    ]
+  }
+}

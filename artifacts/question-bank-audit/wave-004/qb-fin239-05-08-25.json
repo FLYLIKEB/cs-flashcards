@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-25",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-25",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 230. B+트리 자료구조에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: B+트리 자료구조 문제",
+    "answer": "B+Tree는 실제 데이터 포인터를 리프 노드에 모으고 리프를 연결 리스트로 연결해 범위 검색에 유리하다.",
+    "explanation": "B+Tree는 실제 데이터 포인터를 리프 노드에 모으고 리프를 연결 리스트로 연결해 범위 검색에 유리하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "B+트리 자료구조에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "자료구조",
+      "B+트리 자료구조"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 230. B+트리 자료구조에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-25",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "B+트리 자료구조의 구조와 주요 특징을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 230. B+트리 자료구조 문제",
+    "answer": "B+트리는 모든 실제 데이터 포인터를 리프 노드에 저장하고, 내부 노드는 탐색용 키만 가지며, 리프 노드들이 순차 연결되어 있어 범위 검색과 순차 접근에 효율적인 균형 트리 인덱스 구조이다.",
+    "explanation": "B+트리는 각 리프가 같은 높이에 있어 탐색 성능이 안정적이고, 내부 노드는 분기 역할만 수행해 트리 높이를 낮추기 쉽다. 또한 리프 노드가 연결 리스트처럼 이어져 있어 구간 조회와 정렬 순서 접근이 유리하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "B+트리",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "B+트리",
+      "리프 노드",
+      "인덱스",
+      "범위 검색"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 230. B+트리 자료구조에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 230. B+트리 자료구조 문제\n**답(AI답변):** B+Tree는 실제 데이터 포인터를 리프 노드에 모으고 리프를 연결 리스트로 연결해 범위 검색에 유리하다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 헤딩과 번호가 남아 있어 질문 문장으로 바로 쓰기 어려웠다.",
+      "원문 정보가 불완전한데 body의 변환 메모 문구가 공통 규칙의 고정 문구와 달랐다.",
+      "topic과 keywords가 장문·중복 위주여서 핵심 개념어 중심으로 정리가 필요했다."
+    ],
+    "changes": [
+      "불완전한 원문을 B+트리의 구조와 특징을 묻는 명시적 개념문제로 정리했다.",
+      "body를 공통 규칙에 맞는 2줄 변환 메모 형식으로 수정했다.",
+      "answer/explanation을 B+트리의 내부·리프 구조와 범위 검색 장점이 드러나도록 보강하고 topic/keywords를 정제했다."
+    ]
+  }
+}

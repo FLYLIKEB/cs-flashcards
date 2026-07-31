@@ -1,0 +1,81 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-f0a74e55c44984956d27708e",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-f0a74e55c44984956d27708e",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 2. 그림과 같이 데이터 통신 속도가 4800bps인 회선에서 패리티 비트를 사용하여 ASCII 코드를 동기 또는 비동기 방식으로 전송할 경우 초당 문자처리 수를 올바르게 연결한 것은?",
+    "body": "![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/09.%20%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%282010%29.html/bindata/BIN0002.bmp)\n\n|  | (1) 동기 방식으로 전송할 경우 | (2) 비동기 방식으로 전송할 경우 |\n| --- | --- | --- |\n| A. | 600자/초 | 600자/초 |\n| B. | 480자/초 | 300자/초 |\n| C. | 600자/초 | 300자/초 |\n| D. | 600자/초 | 480자/초 |\n| E. | 480자/초 | 480자/초 |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "그림과 같이 데이터 통신 속도가 4800bps인 회선에서 패리티 비트를 사용하여 ASCII 코드를 동기 또는 비동기 방식으로 전송할 경우 초당 문자처리 수를 올바르게 연결한 것은?",
+    "field_name": "전산학술",
+    "category": "네트워크",
+    "keywords": [
+      "데이터 통신"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 2. 그림과 같이 데이터 통신 속도가 4800bps인 회선에서 패리티 비트를 사용하여 ASCII 코드를 동기 또는 비동기 방식으로 전송할 경우 초당 문자처리 수를 올바르게 연결한 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-f0a74e55c44984956d27708e",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "데이터 통신 속도가 4800bps인 회선에서 패리티 비트를 사용하는 ASCII 전송 시, 동기 방식과 비동기 방식의 초당 문자 처리 수를 올바르게 연결한 것은?",
+    "body": "회선 속도는 4800bps이다. ASCII는 7비트 데이터에 패리티 비트 1비트를 사용한다. 비동기 전송은 문자마다 시작 비트 1개와 정지 비트 1개를 추가한다.",
+    "answer": "D",
+    "explanation": "동기 전송은 문자당 7비트 데이터 + 1비트 패리티로 8비트를 보내므로 4800/8 = 600자/초이다. 비동기 전송은 여기에 시작 비트 1개와 정지 비트 1개가 더해져 문자당 10비트이므로 4800/10 = 480자/초이다. 따라서 (동기 600자/초, 비동기 480자/초)인 D가 정답이다.",
+    "rubric": [],
+    "choices": [
+      "A. 동기 600자/초, 비동기 600자/초",
+      "B. 동기 480자/초, 비동기 300자/초",
+      "C. 동기 600자/초, 비동기 300자/초",
+      "D. 동기 600자/초, 비동기 480자/초",
+      "E. 동기 480자/초, 비동기 480자/초"
+    ],
+    "answer_index": 3,
+    "topic": "데이터 통신",
+    "field_name": "전산학술",
+    "category": "네트워크",
+    "keywords": [
+      "ASCII",
+      "패리티 비트",
+      "동기 전송",
+      "비동기 전송"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 2. 그림과 같이 데이터 통신 속도가 4800bps인 회선에서 패리티 비트를 사용하여 ASCII 코드를 동기 또는 비동기 방식으로 전송할 경우 초당 문자처리 수를 올바르게 연결한 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 90,
+    "answer_guide": "동기 전송은 8비트, 비동기 전송은 시작/정지 비트를 포함해 10비트로 계산해 정답을 고른다.",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 2. 그림과 같이 데이터 통신 속도가 4800bps인 회선에서 패리티 비트를 사용하여 ASCII 코드를 동기 또는 비동기 방식으로 전송할 경우 초당 문자처리 수를 올바르게 연결한 것은?\n\n![문제 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/09.%20%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0%282010%29.html/bindata/BIN0002.bmp)\n\n|  | (1) 동기 방식으로 전송할 경우 | (2) 비동기 방식으로 전송할 경우 |\n| --- | --- | --- |\n| A. | 600자/초 | 600자/초 |\n| B. | 480자/초 | 300자/초 |\n| C. | 600자/초 | 300자/초 |\n| D. | 600자/초 | 480자/초 |\n| E. | 480자/초 | 480자/초 |",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "객관식 문항인데 subjective로 잘못 분류됨",
+      "정답·해설·선지가 비어 있었음",
+      "프롬프트와 본문에 마크다운/이미지 표 의존성이 남아 있었음"
+    ],
+    "changes": [
+      "question_type을 multiple_choice로 수정하고 선택지와 answer_index를 복원함",
+      "정답을 D로 채우고 동기·비동기 전송 비트 수 계산 해설을 추가함",
+      "프롬프트·본문·키워드를 정리해 이미지 없이도 풀 수 있게 수정함"
+    ]
+  }
+}

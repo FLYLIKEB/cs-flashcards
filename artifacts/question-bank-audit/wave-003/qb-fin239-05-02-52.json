@@ -1,0 +1,86 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-52",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-52",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 82. 다음 중 OSI 계층과 기능 연결이 옳지 않은 것은?",
+    "body": "",
+    "answer": "4번",
+    "explanation": "4번",
+    "rubric": [],
+    "choices": [
+      "Transport → 흐름 제어",
+      "Network → 라우팅",
+      "Data Link → 오류 검출",
+      "Application → 패킷 전달"
+    ],
+    "answer_index": 3,
+    "topic": "다음 중 OSI 계층과 기능 연결이 옳지 않은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "기능 연결이",
+      "Application → 패킷 전달"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 82. 다음 중 OSI 계층과 기능 연결이 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-52",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "다음 중 OSI 계층과 기능 연결이 옳지 않은 것은?",
+    "body": "",
+    "answer": "Application → 패킷 전달",
+    "explanation": "패킷의 논리적 전달과 경로 선택은 Network 계층의 기능이다. Application 계층은 사용자 응용 서비스와 인터페이스를 제공하므로 'Application → 패킷 전달' 연결이 옳지 않다.",
+    "rubric": [],
+    "choices": [
+      "Transport → 흐름 제어",
+      "Network → 라우팅",
+      "Data Link → 오류 검출",
+      "Application → 패킷 전달"
+    ],
+    "answer_index": 3,
+    "topic": "OSI 계층",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "OSI 계층",
+      "Application 계층",
+      "Network 계층",
+      "패킷 전달"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 82. 다음 중 OSI 계층과 기능 연결이 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 82. 다음 중 OSI 계층과 기능 연결이 옳지 않은 것은?\n1. Transport → 흐름 제어\n2. Network → 라우팅\n3. Data Link → 오류 검출\n4. Application → 패킷 전달\n\n**답:** 4번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 번호가 남아 있었음",
+      "answer와 explanation이 '4번'만 적혀 있어 정답 내용과 근거가 부족했음",
+      "topic과 keywords에 문제 문구 조각이 들어가 있어 검색용 메타데이터로 부적절했음"
+    ],
+    "changes": [
+      "prompt를 순수 질문 문장으로 정리함",
+      "answer를 실제 정답 선지 텍스트로 바꾸고 explanation에 OSI 계층 기능 근거를 보강함",
+      "topic을 'OSI 계층'으로 정리하고 keywords를 핵심 용어 중심으로 교체함"
+    ]
+  }
+}

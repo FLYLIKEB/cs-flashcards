@@ -1,0 +1,115 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-5a792c5af662b2c73ff4bf5a",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-116",
+    "term": "Go-Back-N",
+    "english": "Go-Back-N",
+    "category": "네트워크",
+    "alphabet_index": "G",
+    "korean_initial": "G",
+    "definition": "Go-Back-N은 슬라이딩 윈도우 기반 ARQ 방식으로, 오류나 누락이 발생한 프레임 이후의 모든 미확인 프레임을 송신자가 다시 전송하여 신뢰성을 확보하는 전송 기법입니다. 수신은 순서대로만 받아들이고 누적 ACK를 사용해 구현이 단순하지만, 손실이 발생하면 불필요한 재전송이 늘어날 수 있습니다.",
+    "detailed_explanation": "의미: Go-Back-N은 송신자가 슬라이딩 윈도우 크기만큼 여러 프레임을 연속 전송할 수 있는 ARQ 방식입니다. 수신자는 순서대로 도착한 프레임만 받아들이고, 오류나 누락이 생기면 그 지점 이후의 프레임은 모두 버립니다. 누적 ACK를 사용하므로 구현이 단순하지만, 한 프레임의 손실이 이후의 정상 프레임들까지 송신자가 다시 보내게 만드는 원인이 됩니다.\n\n활용: Stop-and-Wait보다 처리량이 우수하고, Selective Repeat보다 수신 측 버퍼 관리와 제어가 단순해서 구현과 운영이 비교적 쉽습니다. 손실률이 낮고 지연이 작은 링크에서는 효율적이지만, 지연이 크거나 손실이 잦은 환경에서는 불필요한 재전송이 많아 비효율적입니다. 실무에서는 윈도우 크기, 타임아웃 등 파라미터를 서비스 특성에 맞춰 조정하고, 장애 발생 시에는 관련 상태값(순서 번호, ACK 상태)과 캡처된 패킷을 통해 재전송 원인과 범위를 확인하는 것이 도움이 됩니다.",
+    "related_concepts": "[[슬라이딩 윈도우]], [[Stop-and-Wait]], [[Selective Repeat]], [[AIMD]], [[TCP]]",
+    "source_files": "05-14-01-한국은행-2019-컴퓨터공학-학술-파트-I.md",
+    "exam_note": "정의만 쓰지 말고 슬라이딩 윈도우·Stop-and-Wait·Selective Repeat의 핵심 차이를 짧게 비교해 쓰세요.",
+    "bok_appeared": "O",
+    "importance": "중",
+    "difficulty": "상",
+    "concept_image_url": "/api/ai-images/CS-116-20260719-114237-fd0a0392.png",
+    "concept_image_alt": "Go-Back-N(네트워크) 개념 참고 이미지",
+    "sort_order": 115,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-116-20260719-114237-fd0a0392.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-5a792c5af662b2c73ff4bf5a",
+    "card_id": "CS-116",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]은 슬라이딩 윈도우 기반 ARQ 방식으로, 오류나 누락이 발생한 프레임 이후의 모든 미확인 프레임을 송신자가 다시 전송하여 신뢰성을 확보하는 전송 기법입니다.",
+    "answer": "Go-Back-N",
+    "explanation": "Go-Back-N은 슬라이딩 윈도우 기반 ARQ 방식으로, 오류나 누락이 발생한 프레임 이후의 모든 미확인 프레임을 송신자가 다시 전송하여 신뢰성을 확보하는 전송 기법입니다. 수신은 순서대로만 받아들이고 누적 ACK를 사용해 구현이 단순하지만, 손실이 발생하면 불필요한 재전송이 늘어날 수 있습니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "Go-Back-N",
+      "Selective Repeat",
+      "AIMD",
+      "Stop-and-Wait"
+    ],
+    "answer_index": 0,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "Go-Back-N",
+      "슬라이딩 윈도우",
+      "Stop-and-Wait",
+      "Selective Repeat",
+      "AIMD",
+      "TCP"
+    ],
+    "difficulty": "상",
+    "issuer": "카드 생성",
+    "source_location": "05-14-01-한국은행-2019-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-5a792c5af662b2c73ff4bf5a",
+    "card_id": "CS-116",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "슬라이딩 윈도우 기반 ARQ 방식으로, 오류나 누락이 발생한 프레임 이후의 모든 미확인 프레임을 송신자가 다시 전송하여 신뢰성을 확보하는 전송 기법입니다.",
+    "answer": "Go-Back-N",
+    "explanation": "Go-Back-N은 수신 측이 순서대로 도착한 프레임만 받아들이고 누적 ACK를 사용하므로 구현이 단순하다. 대신 한 프레임에 오류나 누락이 생기면 그 이후의 미확인 프레임까지 다시 전송해야 해 불필요한 재전송이 늘어날 수 있다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "Go-Back-N",
+      "Selective Repeat",
+      "AIMD",
+      "Stop-and-Wait"
+    ],
+    "answer_index": 0,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "Go-Back-N",
+      "슬라이딩 윈도우",
+      "ARQ",
+      "누적 ACK",
+      "재전송"
+    ],
+    "difficulty": "상",
+    "issuer": "카드 생성",
+    "source_location": "05-14-01-한국은행-2019-컴퓨터공학-학술-파트-I.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 불필요한 빈칸 표기([?])가 남아 있었음",
+      "category가 비어 있고 keywords에 관련성 낮은 용어가 섞여 있었음"
+    ],
+    "changes": [
+      "body에서 placeholder를 제거해 질문 본문을 정리함",
+      "category를 linked_card와 일치시키고 keywords를 핵심 개념 위주로 정제함",
+      "explanation을 Go-Back-N의 핵심 동작과 한계 중심으로 다듬음"
+    ]
+  }
+}

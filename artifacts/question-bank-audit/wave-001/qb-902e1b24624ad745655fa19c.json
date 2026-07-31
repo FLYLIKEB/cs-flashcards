@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-902e1b24624ad745655fa19c",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-902e1b24624ad745655fa19c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 6. DNS",
+    "body": "DNS(Domain Name System)는 계층 구조로 분산된 서버들로 구성되어 있고 각 서버에는 자원 레코드(RR, Resource Record)를 저장하고 있다. 각 자원 레코드는 아래와 같이 4개의 필드로 구성된 튜플(Tuple)로 구성되어 있으며 이 정보를 통해 사용자는 원하는 IP 및 기타 정보를 획득할 수 있다.\n\n```text\n(Name, Value, Type, TTL)\n```\n\n#### 1.\n\nDNS 레코드 Type 종류를 3가지 이상 간략히 설명하시오.  \n예: AAAA 레코드: 도메인 정보와 IPv6 주소를 저장\n\n#### 2.\n\n**2-1 DNS 재귀적 질의·반복적 질의 그림**\n\n![2-1 DNS 재귀적 질의·반복적 질의 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202025%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0002.bmp)\n\n다음의 그림에서 DNS의 **재귀적 질의(Recursive Query)**와 **반복적 질의(Iterative Query)**의 흐름도를 작성하시오.  \n요청 호스트로부터 시작하며 처음 `1번`과 마지막 `8번`은 표시되어 있음.\n\n```text\n재귀적 질의(Recursive Query)\n\n요청 호스트 → Local DNS 서버: ①\nLocal DNS 서버 → Root DNS 서버: ②\nRoot DNS 서버 → Top Level Domain DNS 서버: ③\nTop Level Domain DNS 서버 → Authoritative DNS 서버: ④\nAuthoritative DNS 서버 → Top Level Domain DNS 서버: ⑤\nTop Level Domain DNS 서버 → Root DNS 서버: ⑥\nRoot DNS 서버 → Local DNS 서버: ⑦\nLocal DNS 서버 → 요청 호스트: ⑧\n\n반복적 질의(Iterative Query)\n\n요청 호스트 → Local DNS 서버: ①\nLocal DNS 서버 → Root DNS 서버: ②\nRoot DNS 서버 → Local DNS 서버: ③\nLocal DNS 서버 → Top Level Domain DNS 서버: ④\nTop Level Domain DNS 서버 → Local DNS 서버: ⑤\nLocal DNS 서버 → Authoritative DNS 서버: ⑥\nAuthoritative DNS 서버 → Local DNS 서버: ⑦\nLocal DNS 서버 → 요청 호스트: ⑧\n```",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "DNS",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "DNS"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 6. DNS · 6. DNS",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-902e1b24624ad745655fa19c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "DNS의 재귀적 질의(Recursive Query)와 반복적 질의(Iterative Query)의 차이를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 6. DNS",
+    "answer": "재귀적 질의는 DNS 서버가 다른 DNS 서버들에 대신 질의하여 최종 결과를 한 번에 돌려주는 방식이고, 반복적 질의는 각 DNS 서버가 다음에 질의할 서버 정보만 알려 주어 요청 측이 순차적으로 다시 질의하는 방식이다.",
+    "explanation": "재귀적 질의에서는 요청을 받은 서버가 결과를 얻을 때까지 조회를 대행하므로 클라이언트가 단순해진다. 반복적 질의에서는 로컬 DNS 서버가 루트 DNS, TLD DNS, 권한 DNS로 차례로 이동하며 참조 정보를 받아 최종 답을 찾는다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "DNS",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "DNS",
+      "재귀적 질의",
+      "반복적 질의"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 6. DNS · 6. DNS",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 240,
+    "answer_guide": "정의 → 질의 흐름 → 차이점 순으로 3~5문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트가 제목만 남아 있어 문제 문장이 아님",
+      "본문이 복수 문항과 그림 의존형 서술을 함께 담고 있음",
+      "본문에 질의 흐름 정답이 그대로 노출되어 있음",
+      "source_excerpt와 linked_card가 비어 있어 원문 복원이 어려움"
+    ],
+    "changes": [
+      "DNS 재귀 질의와 반복 질의의 차이를 묻는 단일 개념문제로 변환",
+      "변환 메모 2줄 형식의 본문으로 교체",
+      "정답·해설·키워드·소요시간·답안 가이드를 변환 문제에 맞게 정리"
+    ]
+  }
+}

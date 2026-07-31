@@ -1,0 +1,119 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-f450a9e04566abc4f52da124",
+  "wave": 2,
+  "linked_card": {
+    "card_id": "CS-385",
+    "term": "데이터링크 계층",
+    "english": "Data Link Layer",
+    "category": "네트워크",
+    "alphabet_index": "#",
+    "korean_initial": "ㄷ",
+    "definition": "데이터링크 계층은 OSI의 2계층으로, 같은 물리 링크 내에서 MAC 주소를 기반으로 프레임을 전달하고 오류 검출 및 매체 접근 제어를 수행합니다. 이 계층은 링크 상태·MAC 학습·태깅 등 물리적 연결 문제를 진단할 때 기준이 됩니다.",
+    "detailed_explanation": "의미: 데이터링크 계층은 물리 계층에서 전송되는 비트들을 프레임 단위로 묶어 같은 LAN(물리 링크) 안의 목적지 장비를 MAC 주소로 식별해 전달합니다. 이더넷, 스위치, VLAN, ARP처럼 물리적·링크 수준의 기술과 밀접하게 연관되며 오류 검출(FCS 등), 흐름 제어, 매체 접근 제어(예: CSMA/CD) 기능을 담당합니다.\n활용: 스위치는 포트별로 MAC 주소 테이블을 학습해 필요한 포트로만 프레임을 전달하고, VLAN은 논리적으로 브로드캐스트 도메인을 분리해 트래픽을 격리합니다. 네트워크 장애를 조사할 때는 링크 업/다운 여부, MAC 학습 상태, 루프 여부(STP 동작), VLAN 태깅 오류 등을 우선 체크하며 ARP는 MAC과 IP를 연결해 L2와 L3 사이를 이어주는 역할을 합니다. IP가 다른 서브넷으로 가려면 라우터(L3)가 필요하다는 점을 기억하세요. 실제 운영에서는 성능·안정성 관점에서 주소 범위, 포트 설정, 타임아웃, 캐시 정책, 재전송 기준 등을 서비스 특성에 맞게 조정하는 것이 중요합니다.",
+    "related_concepts": "[[TCP/IP 모델]], [[물리 계층]], [[네트워크 계층]], [[전송 계층]], [[TCP]]",
+    "source_files": "08-01-OSI와-TCP-IP.md",
+    "exam_note": "정의만 쓰지 말고 TCP/IP 모델·물리 계층(비트 전송)·네트워크 계층(IP/서브넷 라우팅)과의 차이(MAC vs IP, LAN vs 서브넷)를 비교해 간단히 기술하세요.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-385-20260719-114744-6fabc471.png",
+    "concept_image_alt": "데이터링크 계층(네트워크) 개념 참고 이미지",
+    "sort_order": 384,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-385-20260719-114744-6fabc471.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-f450a9e04566abc4f52da124",
+    "card_id": "CS-385",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?]은 OSI의 2계층으로, 같은 물리 링크 내에서 MAC 주소를 기반으로 프레임을 전달하고 오류 검출 및 매체 접근 제어를 수행합니다.",
+    "answer": "데이터링크 계층",
+    "explanation": "데이터링크 계층은 OSI의 2계층으로, 같은 물리 링크 내에서 MAC 주소를 기반으로 프레임을 전달하고 오류 검출 및 매체 접근 제어를 수행합니다. 이 계층은 링크 상태·MAC 학습·태깅 등 물리적 연결 문제를 진단할 때 기준이 됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "네트워크 계층",
+      "데이터링크 계층",
+      "TCP",
+      "TCP/IP 모델"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "데이터링크 계층",
+      "Data Link Layer",
+      "TCP",
+      "IP 모델",
+      "물리 계층",
+      "네트워크 계층",
+      "전송 계층"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "08-01-OSI와-TCP-IP.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-f450a9e04566abc4f52da124",
+    "card_id": "CS-385",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "OSI의 2계층으로, 같은 물리 링크 내에서 MAC 주소를 기반으로 프레임을 전달하고 오류 검출 및 매체 접근 제어를 수행하는 계층이다.",
+    "answer": "데이터링크 계층",
+    "explanation": "데이터링크 계층은 OSI의 2계층으로, 같은 물리 링크 내에서 MAC 주소를 기반으로 프레임을 전달하고 오류 검출 및 매체 접근 제어를 수행합니다. 이 계층은 링크 상태·MAC 학습·태깅 등 물리적 연결 문제를 진단할 때 기준이 됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "네트워크 계층",
+      "데이터링크 계층",
+      "TCP",
+      "TCP/IP 모델"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "데이터링크 계층",
+      "Data Link Layer",
+      "OSI 2계층",
+      "MAC 주소",
+      "프레임 전달",
+      "오류 검출",
+      "매체 접근 제어"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "08-01-OSI와-TCP-IP.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 placeholder 기호가 남아 있음",
+      "category가 비어 있음",
+      "keywords에 관련성 낮은 용어가 섞여 있음"
+    ],
+    "changes": [
+      "body를 자연스러운 설명문으로 정리함",
+      "category를 네트워크로 보정함",
+      "keywords를 핵심 개념 중심으로 정리함"
+    ]
+  }
+}

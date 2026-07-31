@@ -1,0 +1,110 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-02",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-036",
+    "term": "C 언어",
+    "english": "C Programming Language",
+    "category": "프로그래밍 언어",
+    "alphabet_index": "C",
+    "korean_initial": "C",
+    "definition": "C 언어는 하드웨어에 가까운 메모리 제어와 이식 가능한 절차적 문법을 제공해 운영체제·임베디드 구현에 널리 쓰이는 컴파일 언어입니다.",
+    "detailed_explanation": "의미: C 언어는 포인터, 배열, 구조체, 함수 호출을 통해 메모리 배치와 실행 비용을 비교적 직접 다루는 절차적 언어입니다. 추상화 수준은 낮지만 표준 라이브러리와 컴파일러가 다양한 플랫폼을 지원해 시스템 소프트웨어의 공통 기반이 됐습니다. 이 영역은 사람이 쓴 코드가 실제 실행 형태로 바뀌는 길을 설명합니다. 소스 코드, 중간 표현, 기계어, 런타임 환경을 단계별로 나누어 보면 오류를 언제 발견하는지, 성능을 어디서 얻는지, 배포 파일이 왜 달라지는지 이해하기 쉽습니다. 활용: 운영체제, 네트워크 모듈, 금융권 저지연 연산처럼 성능과 예측 가능성이 중요한 곳에서 쓰입니다. 경계 검사와 자동 메모리 관리가 약하므로 버퍼 오버플로, 댕글링 포인터, 수명 관리를 주의해야 하며 Java 같은 관리형 언어와 비교 포인트가 됩니다. 개발과 운영에서는 빌드 단계, 실행 환경, 성능 튜닝 지점, 오류 메시지가 어느 계층에서 나오는지를 구분하는 데 도움이 됩니다. 단, 실제 런타임은 여러 방식을 섞는 경우가 많으므로 특정 언어를 한 단어로만 단정하지 말고 버전과 실행 환경을 확인해야 합니다.",
+    "related_concepts": "[[바이트코드]], [[JIT 컴파일]], [[static 변수]], [[전역 변수]], [[컴파일러]]",
+    "source_files": "04-02-프로그래밍-SQL-분산-클라우드.md",
+    "exam_note": "프로그래밍 언어 문제에서는 C 언어의 정의만 쓰지 말고 관련 개념(바이트코드, JIT 컴파일, static 변수)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-036-20260720-053830-93e92a12.png",
+    "concept_image_alt": "C 언어(프로그래밍 언어) 개념 참고 이미지",
+    "sort_order": 35,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-036-20260720-053830-93e92a12.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-02",
+    "card_id": "CS-036",
+    "question_type": "multiple_choice",
+    "prompt": "### 89. C언어에서 문자열을 비교하는 함수는?",
+    "body": "",
+    "answer": "1번",
+    "explanation": "- strncmp: 이 함수는 주어진 길이만큼 두 문자열을 비교합니다. 지정된 길이만큼만 비교하기 때문에 전체\n       문자열이 아닌 일부만 비교하고 싶을 때 유용합니다.\n- strcpy: 이 함수는 한 문자열을 다른 문자열에 복사하는 함수입니다. 문자열을 비교하는 기능이 아니라,\n       문자열을 복사하는 기능을 제공합니다.\n- strcat: 이 함수는 한 문자열의 끝에 다른 문자열을 이어붙이는 함수입니다. 문자열을 비교하는 기능이\n       아니라, 문자열을 연결하는 기능을 제공합니다.",
+    "rubric": [],
+    "choices": [
+      "strcmp",
+      "strncmp",
+      "strcpy",
+      "strcat"
+    ],
+    "answer_index": 0,
+    "topic": "C언어에서 문자열을 비교하는 함수는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "C 언어",
+      "C Programming Language",
+      "strcmp"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 89. C언어에서 문자열을 비교하는 함수는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-02",
+    "card_id": "CS-036",
+    "question_type": "multiple_choice",
+    "prompt": "C언어에서 문자열을 비교하는 함수는?",
+    "body": "",
+    "answer": "strcmp",
+    "explanation": "strcmp는 두 문자열 전체를 비교하는 표준 함수다. strncmp는 지정한 길이만큼만 비교하고, strcpy는 문자열을 복사하며, strcat은 문자열을 이어 붙인다.",
+    "rubric": [],
+    "choices": [
+      "strcmp",
+      "strncmp",
+      "strcpy",
+      "strcat"
+    ],
+    "answer_index": 0,
+    "topic": "C 문자열 함수",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "C 언어",
+      "C Programming Language",
+      "문자열 비교",
+      "strcmp"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 89. C언어에서 문자열을 비교하는 함수는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 89. C언어에서 문자열을 비교하는 함수는?\n1. strcmp\n2. strncmp\n3. strcpy\n4. strcat\n\n  **답:** 1번\n- strncmp: 이 함수는 주어진 길이만큼 두 문자열을 비교합니다. 지정된 길이만큼만 비교하기 때문에 전체\n       문자열이 아닌 일부만 비교하고 싶을 때 유용합니다.\n- strcpy: 이 함수는 한 문자열을 다른 문자열에 복사하는 함수입니다. 문자열을 비교하는 기능이 아니라,\n       문자열을 복사하는 기능을 제공합니다.\n- strcat: 이 함수는 한 문자열의 끝에 다른 문자열을 이어붙이는 함수입니다. 문자열을 비교하는 기능이\n       아니라, 문자열을 연결하는 기능을 제공합니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "answer가 선지 번호만 적혀 있어 정답 텍스트가 아니었음",
+      "explanation이 정답 함수 설명 없이 오답 설명만 나열하고 있었음",
+      "topic이 질문 문장을 그대로 반복하고 keywords가 핵심 개념을 충분히 드러내지 못했음"
+    ],
+    "changes": [
+      "prompt를 질문 본문만 남기도록 정리함",
+      "answer를 정답 함수명인 strcmp로 수정함",
+      "explanation을 정답과 오답 구분이 드러나는 간결한 해설로 교체함",
+      "topic을 C 문자열 함수로 정리하고 keywords에 문자열 비교를 추가함"
+    ]
+  }
+}

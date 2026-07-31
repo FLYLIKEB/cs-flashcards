@@ -1,0 +1,73 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-24",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-24",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 54. SJF 대기시간에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: SJF 대기시간 계산문제",
+    "answer": "SJF는 실행 시간이 짧은 작업부터 처리한다. 평균 대기시간은 각 프로세스의 대기시간 합을 프로세스 수로 나누어 계산한다.",
+    "explanation": "SJF는 실행 시간이 짧은 작업부터 처리한다. 평균 대기시간은 각 프로세스의 대기시간 합을 프로세스 수로 나누어 계산한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SJF 대기시간에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "SJF",
+      "SJF 대기시간"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 54. SJF 대기시간에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-24",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "SJF 스케줄링에서 평균 대기시간의 계산 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 54. SJF 대기시간 계산문제",
+    "answer": "SJF는 CPU 버스트가 가장 짧은 프로세스부터 실행하는 스케줄링이며, 각 프로세스의 대기시간을 구해 모두 더한 뒤 프로세스 수로 나누면 평균 대기시간이 된다.",
+    "explanation": "SJF 대기시간 문제는 실행 순서를 CPU 버스트가 짧은 순으로 정한 뒤, 각 프로세스가 시작되기 전까지 기다린 시간을 계산해 합산한다. 그 합을 전체 프로세스 수로 나누면 평균 대기시간을 구할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SJF 대기시간에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "SJF",
+      "평균 대기시간"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 54. SJF 대기시간에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 54. SJF 대기시간 계산문제\n**답(AI답변):** SJF는 실행 시간이 짧은 작업부터 처리한다. 평균 대기시간은 각 프로세스의 대기시간 합을 프로세스 수로 나누어 계산한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트에 마크다운 헤딩이 남아 있음",
+      "변환 메모 문구가 공통 규칙과 다름"
+    ],
+    "changes": [
+      "개념문제 프롬프트로 정리",
+      "변환 본문을 규칙 문구로 교체",
+      "정답·해설과 키워드를 SJF 평균 대기시간 개념에 맞게 보정"
+    ]
+  }
+}

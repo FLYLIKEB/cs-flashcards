@@ -1,0 +1,80 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-5faf899749c4fea6b406223a",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-5faf899749c4fea6b406223a",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 11. 운영체제: 교착상태와 스케줄링",
+    "body": "운영체제와 관련하여 다음 물음에 답하시오.\n\n1. 교착상태를 회피(Avoidance)하기 위한 알고리즘에는 은행원 알고리즘(Banker's Algorithm)이 있다. 은행원 알고리즘은 자원 할당 결정 전에 예상되는 모든 자원의 최대 할당량을 가지고 시뮬레이션하여 안전한 상태(Safe State)에서만 자원 요청을 허용하는 방법이다. 아래의 표를 보고 은행원 알고리즘을 이용하여 가용자원을 어떤 순서로 할당할 수 있는지 쓰시오.\n\n   단, 시스템은 총 12개의 자원을 가지고 있다고 가정.\n\n   | 프로세스 | 할당 중인 자원량 | 추가로 필요한 자원량 |\n   |---|---:|---:|\n   | P0 | 5 | 5 |\n   | P1 | 2 | 2 |\n   | P2 | 2 | 7 |\n\n2. 프로세스 스케줄링의 유형에는 **선점형 스케줄링(Preemptive Scheduling)**과 **비선점형 스케줄링(Non-Preemptive Scheduling)**이 있다. 두 스케줄링에 대해 설명하고 장·단점을 각각 서술하시오.\n\n3. **3-1 FCFS 간트 차트 양식**\n\n   ![3-1 FCFS 간트 차트 양식](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202025%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000A.bmp)\n\n   프로세스 스케줄링 알고리즘에는 1. FCFS(First-Come-First-Served) 스케줄링, 2. SRT(Shortest Remaining Time First) 스케줄링이 있다. 단일 프로세서 환경에서 아래와 같이 프로세스가 도착했을 때, 위의 두 프로세스 스케줄링 알고리즘에 따른 프로세스의 실행 순서를 간트 차트(Gantt Chart)에 표현하시오.\n\n   | 프로세스 | 도착시간 | 실행시간 |\n   |---|---:|---:|\n   | P1 | 0 | 3 |\n   | P2 | 2 | 6 |\n   | P3 | 4 | 4 |\n   | P4 | 8 | 2 |\n\n   1. FCFS(First-Come-First-Served) 스케줄링\n\n      ```text\n      [FCFS 간트 차트를 여기에 작성]\n      ```\n\n   2. SRT(Shortest Remaining Time First) 스케줄링\n\n      ```text\n      [SRT 간트 차트를 여기에 작성]\n      ```\n\n4. 페이징(Paging) 기법 중 **OPT(OPTimal Replacement)**, **LRU(Least Recently Used)**, **LFU(Least Frequently Used)** 기법에 대해 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제: 교착상태와 스케줄링",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "운영체제",
+      "교착상태와 스케줄링",
+      "프로세스",
+      "스케줄링",
+      "교착상태",
+      "은행원 알고리즘"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 11. 운영체제: 교착상태와 스케줄링 · 11. 운영체제: 교착상태와 스케줄링",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-5faf899749c4fea6b406223a",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "은행원 알고리즘(Banker's Algorithm)은 무엇이며, 왜 안전 상태(Safe State)에서만 자원 요청을 허용하는가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 11. 운영체제: 교착상태와 스케줄링",
+    "answer": "은행원 알고리즘은 각 프로세스의 최대 자원 요구량을 미리 가정하고 자원 할당 후에도 시스템이 모든 프로세스를 완료할 수 있는 안전 순서가 존재하는지 검사하여, 안전 상태일 때만 요청을 허용하는 교착상태 회피 알고리즘이다.",
+    "explanation": "원문 행은 은행원 알고리즘 계산, 선점형·비선점형 스케줄링 비교, FCFS·SRT 간트 차트 작성, 페이지 교체 기법 설명이 한데 묶인 복합 문항이어서 단일 DB 문제로 쓰기 어렵다. 은행원 알고리즘의 핵심은 요청을 즉시 수락했을 때도 각 프로세스가 차례로 종료될 수 있는 안전 순서가 남아 있는지를 시뮬레이션하는 것이다. 안전 상태가 아니면 일부 프로세스가 필요한 자원을 끝내 받지 못해 교착상태로 진입할 수 있으므로 요청을 보류하거나 거절한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제: 교착상태와 스케줄링",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "은행원 알고리즘",
+      "교착상태",
+      "안전 상태",
+      "자원 할당"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 11. 운영체제: 교착상태와 스케줄링 · 11. 운영체제: 교착상태와 스케줄링",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 180,
+    "answer_guide": "알고리즘 개념 → 안전 상태 의미 → 허용 이유를 3~5문장으로 설명",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트가 질문이 아니라 마크다운 섹션 제목만 담고 있었음",
+      "은행원 알고리즘·스케줄링·간트 차트·페이지 교체까지 4개 하위 문항이 한 행에 합쳐져 있었음",
+      "정답과 해설이 비어 있어 원문 그대로는 단일 학습용 문제로 사용하기 어려웠음"
+    ],
+    "changes": [
+      "은행원 알고리즘의 의미와 안전 상태 허용 이유를 묻는 단일 개념형 주관식으로 변환",
+      "body를 규칙에 맞는 2줄 변환 메모로 교체",
+      "정답·해설·키워드·예상 풀이 시간을 보정해 바로 사용 가능한 행으로 정리"
+    ]
+  }
+}

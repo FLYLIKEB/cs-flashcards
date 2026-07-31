@@ -1,0 +1,95 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-30",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-292",
+    "term": "SSL",
+    "english": "SSL",
+    "category": "네트워크",
+    "alphabet_index": "S",
+    "korean_initial": "S",
+    "definition": "SSL(Secure Sockets Layer)은 클라이언트와 서버 사이에 암호화된 통신 채널을 제공하기 위해 개발된 초기 보안 프로토콜로, 여러 취약점으로 인해 현재는 TLS로 대체되어 사용됩니다. 실무에서는 여전히 ‘SSL 인증서’라는 용어가 관습적으로 쓰이며 장애 진단이나 계층별 책임 구분 시 참고되는 개념입니다.",
+    "detailed_explanation": "의미: SSL은 Secure Sockets Layer의 약자로, 클라이언트와 서버 사이에 암호화된 통신 채널을 만드는 목적으로 설계된 프로토콜입니다. 과거의 SSL 2.0·3.0은 심각한 취약점이 발견되어 사용을 중단해야 하고, 현재는 TLS가 표준으로 사용됩니다. 다만 실무에서는 관습적으로 ‘SSL 인증서’라는 표현이 남아 있습니다.\n\n활용: 면접이나 문서에서는 ‘HTTPS가 SSL을 쓴다’고 단정하기보다 ‘현대 HTTPS는 TLS를 사용한다’고 설명하는 것이 정확합니다. TLS는 인증서 검증, 키 교환(비대칭), 대칭키 암호화, 무결성 보호(예: MAC)를 결합하여 안전한 통신을 제공합니다. 운영상 위험 요소로는 구형 SSL/TLS 버전 허용, 약한 cipher suite 사용, 인증서 검증 생략 등이 있으며, 특히 금융권에서는 취약 프로토콜 비활성화 및 인증서 만료 관리를 엄격히 해야 합니다. 처음 학습할 때는 SSL/TLS가 네트워크의 어느 계층에서 동작하는지, 어떤 상태값(세션, 인증서 상태 등)을 만들거나 바꾸는지, 장애 발생 시 어떤 로그와 패킷 증거로 확인할지를 순서대로 떠올리면 이해하기 쉽습니다. 실제 운영에서는 성능과 안정성도 중요하므로 기본 설정을 그대로 쓰지 말고 주소 범위·포트·타임아웃·캐시·재전송 기준 등을 서비스 특성에 맞게 검토해야 합니다.",
+    "related_concepts": "[[반복 질의]], [[TLS]], [[대칭키 암호]], [[공개키 암호]], [[TCP]]",
+    "source_files": "05-14-02-한국은행-2019-컴퓨터공학-학술-파트-II.md; 05-04-금융결제원-기출.md; 04-04-네트워크-프로토콜-보안.md",
+    "exam_note": "정의뿐 아니라 TLS와의 차이(현재는 TLS 사용)와 대칭/비대칭 암호 역할을 비교해 설명하라.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-292-20260719-115458-ace4f382.png",
+    "concept_image_alt": "SSL(네트워크) 개념 참고 이미지",
+    "sort_order": 291,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-292-20260719-115458-ace4f382.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-30",
+    "card_id": "CS-292",
+    "question_type": "subjective",
+    "prompt": "### 60. SSL에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: SSL에 대한 설명으로 옳지 않은 것은?",
+    "answer": "SSL/TLS는 전송 계층 보안 프로토콜로 인증, 암호화, 무결성을 제공한다.",
+    "explanation": "SSL/TLS는 전송 계층 보안 프로토콜로 인증, 암호화, 무결성을 제공한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SSL에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "SSL"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 60. SSL에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-30",
+    "card_id": "CS-292",
+    "question_type": "subjective",
+    "prompt": "SSL에 대해 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 60. SSL에 대한 설명으로 옳지 않은 것은?",
+    "answer": "SSL은 클라이언트와 서버 사이에 암호화된 통신 채널을 제공하기 위해 개발된 초기 보안 프로토콜이며, 현재는 취약점 때문에 TLS로 대체되어 사용된다.",
+    "explanation": "원문은 '옳지 않은 것은?'이라고 묻지만 선택지가 없어 실전형으로는 정답을 확정할 수 없다. 따라서 SSL의 핵심 개념을 묻는 문제로 변환했다. SSL은 서버·클라이언트 인증, 암호화, 무결성 보호를 제공하는 보안 프로토콜이지만, 현대 웹 보안에서는 SSL 대신 TLS가 표준으로 사용된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SSL",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "SSL",
+      "TLS",
+      "전송 계층 보안"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 60. SSL에 대한 설명으로 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 60. SSL에 대한 설명으로 옳지 않은 것은?\n**답(AI답변):** SSL/TLS는 전송 계층 보안 프로토콜로 인증, 암호화, 무결성을 제공한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문이 '옳지 않은 것'을 묻지만 선택지가 없어 실전형 문제로는 정답을 확정할 수 없었다.",
+      "proposed_row의 prompt에 마크다운 헤딩이 남아 있었고 body의 변환 메모 문구가 공통 규칙과 달랐다.",
+      "answer와 explanation이 동일한 한 줄 요약이라 SSL과 TLS의 관계 설명이 부족했다."
+    ],
+    "changes": [
+      "문제를 SSL 개념 설명형 주관식으로 변환하고 prompt를 정리했다.",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 교체했다.",
+      "answer/explanation을 SSL의 정의와 TLS로의 대체 사실이 드러나도록 보강하고 topic, keywords, source_location을 정합적으로 수정했다."
+    ]
+  }
+}

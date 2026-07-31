@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-13",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-13",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 199. 전위 중위 연산자에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 전위 중위 연산자 트리그리기 문제",
+    "answer": "전위 순회는 Root-Left-Right, 중위 순회는 Left-Root-Right 순서다. 두 순회를 이용해 이진트리를 복원할 수 있다.",
+    "explanation": "전위 순회는 Root-Left-Right, 중위 순회는 Left-Root-Right 순서다. 두 순회를 이용해 이진트리를 복원할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "전위 중위 연산자에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "전위 중위 연산자"
+    ],
+    "difficulty": "상",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 199. 전위 중위 연산자에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-13",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "전위 순회와 중위 순회의 순서를 설명하고, 두 순회 결과를 이용해 이진트리를 복원하는 원리를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 199. 전위 중위 연산자 트리그리기 문제",
+    "answer": "전위 순회는 Root-Left-Right, 중위 순회는 Left-Root-Right 순서이며, 전위 순회의 첫 원소를 루트로 잡고 중위 순회에서 그 루트를 기준으로 좌우 서브트리를 나누어 재귀적으로 복원한다.",
+    "explanation": "전위 순회에서는 가장 먼저 방문한 노드가 항상 현재 서브트리의 루트다. 중위 순회에서는 루트의 왼쪽이 왼쪽 서브트리, 오른쪽이 오른쪽 서브트리에 해당하므로 루트 위치를 기준으로 문제를 분할할 수 있다. 각 분할 구간에 대해 같은 과정을 반복하면 전체 이진트리를 복원할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "트리 순회",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "전위 순회",
+      "중위 순회",
+      "트리 순회",
+      "이진트리 복원"
+    ],
+    "difficulty": "상",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 199. 전위 중위 연산자 트리그리기 문제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "전위·중위 순회의 순서와 이진트리 복원 원리를 3~5문장으로 설명",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 199. 전위 중위 연산자 트리그리기 문제\n**답(AI답변):** 전위 순회는 Root-Left-Right, 중위 순회는 Left-Root-Right 순서다. 두 순회를 이용해 이진트리를 복원할 수 있다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 markdown heading이 남아 있고 용어가 부정확했습니다.",
+      "body의 변환 메모 문구가 공통 규칙과 다르고 원문 제목 정리가 미흡했습니다.",
+      "keywords와 topic이 질문 문장을 그대로 재사용해 검색성과 정합성이 떨어졌습니다.",
+      "source_location이 변환된 질문 문장을 가리켜 원문 출처 표기가 흐려졌습니다."
+    ],
+    "changes": [
+      "불완전한 실전형 문제를 전위·중위 순회와 이진트리 복원 원리를 묻는 명시적 개념문제로 정리했습니다.",
+      "body를 공통 규칙의 2줄 변환 메모 형식에 맞추고 원문 제목을 정리했습니다.",
+      "answer와 explanation을 순회 순서와 복원 절차가 드러나도록 분리해 보강했습니다.",
+      "topic, keywords, source_location, answer_guide를 트리 순회 개념에 맞게 정리했습니다."
+    ]
+  }
+}

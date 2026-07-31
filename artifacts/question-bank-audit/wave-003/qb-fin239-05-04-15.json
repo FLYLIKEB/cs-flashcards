@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-15",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-15",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 144. TLB 적중률에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: TLB 적중률 계산문제",
+    "answer": "유효 접근시간(EAT)은 TLB hit/miss 비율을 가중평균해 계산한다. 일반식은 h×hit_time + (1-h)×miss_time 형태다.",
+    "explanation": "유효 접근시간(EAT)은 TLB hit/miss 비율을 가중평균해 계산한다. 일반식은 h×hit_time + (1-h)×miss_time 형태다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "TLB 적중률에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "TLB",
+      "TLB 적중률"
+    ],
+    "difficulty": "상",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 144. TLB 적중률에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-15",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "TLB 적중률이 무엇이며, 적중률이 유효 접근 시간(EAT)에 어떤 영향을 주는지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 144. TLB 적중률 계산문제",
+    "answer": "TLB 적중률은 페이지 번호 변환을 위해 TLB를 조회했을 때 원하는 항목을 바로 찾는 비율이며, 적중률이 높을수록 메모리의 페이지 테이블 접근이 줄어 유효 접근 시간(EAT)이 짧아진다.",
+    "explanation": "TLB hit가 발생하면 주소 변환이 빠르게 끝나지만 miss가 발생하면 페이지 테이블을 추가로 조회해야 하므로 시간이 더 든다. 따라서 EAT는 적중 시 시간과 실패 시 시간을 적중률로 가중평균해 구하며, 적중률이 올라갈수록 평균 접근 시간이 감소한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "TLB 적중률",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "TLB",
+      "TLB 적중률",
+      "유효 접근 시간"
+    ],
+    "difficulty": "상",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 144. TLB 적중률에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 적중/실패 시 차이 → EAT 영향 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 144. TLB 적중률 계산문제\n**답(AI답변):** 유효 접근시간(EAT)은 TLB hit/miss 비율을 가중평균해 계산한다. 일반식은 h×hit_time + (1-h)×miss_time 형태다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row가 마크다운 헤더를 포함한 prompt와 기존 변환 문구를 그대로 유지해 common rules의 개념문제 변환 형식에 맞지 않았음",
+      "answer와 explanation이 동일했고, TLB 적중률의 정의와 EAT 영향 설명이 충분히 분리되지 않았음",
+      "topic과 keywords가 문제 문장 위주여서 학습용 개념 태그로 다듬을 필요가 있었음"
+    ],
+    "changes": [
+      "불완전한 계산문제를 TLB 적중률과 EAT 관계를 묻는 명시적 개념문제로 정리하고 prompt의 마크다운 표식을 제거함",
+      "body를 common rules가 요구하는 정확한 두 줄 변환 메모 형식으로 수정함",
+      "answer에는 핵심 정의와 효과만 남기고 explanation에는 hit/miss와 가중평균 원리를 보강함",
+      "topic, keywords, answer_guide를 개념 학습용 형식으로 정리함"
+    ]
+  }
+}

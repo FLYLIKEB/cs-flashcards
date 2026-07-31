@@ -1,0 +1,97 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-05",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-445",
+    "term": "서브넷 마스크",
+    "english": "Subnet Mask",
+    "category": "네트워크",
+    "alphabet_index": "#",
+    "korean_initial": "ㅅ",
+    "definition": "서브넷 마스크는 IP 주소의 비트 중 네트워크 부분과 호스트 부분을 구별하는 비트 마스크로, 같은 서브넷인지 판단해 패킷을 로컬로 전달할지 또는 게이트웨이로 라우팅할지 결정합니다. 보통 CIDR 표기(/24 등)로 간결하게 표현됩니다.",
+    "detailed_explanation": "의미: 서브넷 마스크는 IPv4 주소의 각 비트가 네트워크 식별에 쓰이는지 호스트 식별에 쓰이는지를 표시하는 비트 패턴입니다. 예를 들어 255.255.255.0은 앞 24비트가 네트워크 부분임을 의미하므로 /24와 동일합니다.\n활용: 호스트는 자신의 IP와 목적지 IP에 서브넷 마스크를 적용해 두 주소가 같은 네트워크에 속하는지 계산합니다. 같은 서브넷이면 ARP를 통해 직접 전달하고, 다르면 기본 게이트웨이로 패킷을 보냅니다. 마스크가 잘못 설정되면 같은 물리망을 다른 네트워크로 오인하거나 게이트웨이를 우회해 통신이 실패하는 등의 장애가 발생합니다. CIDR은 마스크를 프리픽스 길이로 간결히 표현하는 방법이며, 실제 운영에서는 서브넷 설계를 통해 대역 분리, 방화벽 정책 범위, 라우팅 요약 등을 관리합니다. 문제 확인 시에는 ARP 테이블, 라우팅 테이블, 패킷 캡처를 통해 서브넷 판정 결과와 전달 경로를 점검하면 원인 규명이 쉽습니다. 운영 환경에서는 주소 범위와 서비스 특성에 맞춰 마스크와 관련 설정(포트, 타임아웃, 캐시 등)을 함께 검토해 안정성과 성능을 확보해야 합니다.",
+    "related_concepts": "[[IPv6]], [[서브넷]], [[CIDR]], [[라우팅]], [[TCP]]",
+    "source_files": "05-08-산업은행-기출.md; 05-14-01-한국은행-2019-컴퓨터공학-학술-파트-I.md; 05-11-네트워크-기출-모음.md",
+    "exam_note": "정의뿐 아니라 CIDR 표기와 IPv6·서브넷 간 차이를 간단히 비교해 쓰세요.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-445-20260719-115722-845fa5b3.png",
+    "concept_image_alt": "서브넷 마스크(네트워크) 개념 참고 이미지",
+    "sort_order": 444,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-445-20260719-115722-845fa5b3.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-05",
+    "card_id": "CS-445",
+    "question_type": "subjective",
+    "prompt": "### 210. 서브넷 마스크에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 아이피주소 6개 나누고 25개씩 호스트 아이디 할때 서브넷 마스크 십진수는?",
+    "answer": "25개 호스트가 필요하면 호스트 비트 5개(/27, 30 hosts)를 사용한다. 6개 서브넷도 /27의 8개 서브넷으로 충족하며 마스크는 255.255.255.224다.",
+    "explanation": "25개 호스트가 필요하면 호스트 비트 5개(/27, 30 hosts)를 사용한다. 6개 서브넷도 /27의 8개 서브넷으로 충족하며 마스크는 255.255.255.224다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "서브넷 마스크에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "서브넷 마스크",
+      "Subnet Mask"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 210. 서브넷 마스크에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-05",
+    "card_id": "CS-445",
+    "question_type": "short",
+    "prompt": "IP 주소를 6개 서브넷으로 나누고 각 서브넷에서 25개의 호스트 ID가 필요할 때, 서브넷 마스크를 십진수로 쓰시오.",
+    "body": "",
+    "answer": "255.255.255.224",
+    "explanation": "25개의 호스트를 수용하려면 호스트 비트가 5개 필요하므로 2^5-2=30개의 사용 가능한 호스트를 갖는 /27 프리픽스를 사용한다. /27은 8개의 서브넷을 만들 수 있어 6개 서브넷 요구도 충족하므로 십진수 서브넷 마스크는 255.255.255.224이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "서브넷 마스크",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "서브넷 마스크",
+      "Subnet Mask",
+      "서브네팅",
+      "CIDR /27"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 210. 아이피주소 6개 나누고 25개씩 호스트 아이디 할때 서브넷 마스크 십진수는?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "십진수 서브넷 마스크만 정확히 기재.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 210. 아이피주소 6개 나누고 25개씩 호스트 아이디 할때 서브넷 마스크 십진수는? (약술)\n**답(AI답변):** 25개 호스트가 필요하면 호스트 비트 5개(/27, 30 hosts)를 사용한다. 6개 서브넷도 /27의 8개 서브넷으로 충족하며 마스크는 255.255.255.224다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "풀이 가능한 계산형 문제를 불필요하게 개념문제로 변환했고 변환 메모가 body에 남아 있었다.",
+      "prompt에 markdown 번호가 포함되어 있었고 answer/explanation에 최종 정답 외의 풀이 문장이 섞여 있었다.",
+      "question_type과 answer_guide가 단답형 계산 문제 성격과 맞지 않았다."
+    ],
+    "changes": [
+      "원문 조건을 유지한 단답형 계산 문제로 복원하고 prompt를 깨끗한 문장으로 정리했다.",
+      "body의 변환 메모를 제거하고 answer를 최종 정답 255.255.255.224만 남기도록 수정했다.",
+      "explanation, topic, keywords, source_location, answer_guide를 서브넷 마스크 /27 계산 맥락에 맞게 정리했다."
+    ]
+  }
+}

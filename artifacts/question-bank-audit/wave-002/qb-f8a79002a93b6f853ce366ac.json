@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-f8a79002a93b6f853ce366ac",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-f8a79002a93b6f853ce366ac",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 9. 운영체제 메모리 관리",
+    "body": "운영체제의 메모리 관리 기법과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**9-1 스래싱 그림**\n\n![9-1 스래싱 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000A.png)\n\n다음 그림의 `□□□`에 들어갈 현상의 이름을 작성하고 발생 이유를 설명하시오.\n\n\n#### 2.\n\n페이지가 담고있는 내용은 크게 보조 저장장치에서 읽어온 파일 데이터와, 프로세스의 스택·힙 등 실행 데이터로 구분할 수 있다. 시스템 메모리 부족으로 인해 기존 페이지를 내보내야 할 경우, 담고 있는 데이터에 따라 적절한 처리 방식을 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제 메모리 관리",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "운영체제 메모리 관리",
+      "프로세스",
+      "메모리 관리",
+      "스택"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 9. 운영체제 메모리 관리",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-f8a79002a93b6f853ce366ac",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "스래싱의 의미와 발생 이유를 설명하고, 메모리 부족 시 파일 데이터 페이지와 프로세스 실행 데이터 페이지를 각각 어떻게 처리해야 하는지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 9. 운영체제 메모리 관리",
+    "answer": "스래싱은 페이지 부재가 과도하게 발생해 CPU가 실제 실행보다 페이지 교체에 대부분의 시간을 쓰는 현상이다. 주된 이유는 작업 집합에 비해 물리 메모리가 부족하거나 다중 프로그래밍 정도가 지나치게 높아 필요한 페이지를 계속 다시 불러와야 하기 때문이다. 메모리 부족 시 파일 데이터 페이지는 원본 파일에서 다시 읽을 수 있으면 버리고 필요 시 재적재하면 되지만, 스택·힙 등 실행 데이터 페이지는 수정 내용이 있으므로 스왑 영역이나 보조저장장치에 기록한 뒤 내보내야 한다.",
+    "explanation": "원문 1번은 그림 의존성이 커 앱에서 그대로는 풀이 근거가 부족하므로 개념형으로 정리했다. 스래싱은 높은 페이지 폴트율 때문에 디스크 I/O가 급증하는 상태를 말한다. 파일 기반 페이지는 재읽기가 가능해 클린 페이지면 폐기 중심으로 처리할 수 있지만, 프로세스의 익명 페이지나 더티 페이지는 내용을 잃지 않도록 swap-out 또는 write-back 후 교체해야 한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제 메모리 관리",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "스래싱",
+      "페이지 부재",
+      "페이지 교체",
+      "파일 페이지",
+      "익명 페이지"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 9. 운영체제 메모리 관리",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 9. 운영체제 메모리 관리\n\n운영체제의 메모리 관리 기법과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**9-1 스래싱 그림**\n\n![9-1 스래싱 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202024%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000A.png)\n\n다음 그림의 `□□□`에 들어갈 현상의 이름을 작성하고 발생 이유를 설명하시오.\n\n\n#### 2.\n\n페이지가 담고있는 내용은 크게 보조 저장장치에서 읽어온 파일 데이터와, 프로세스의 스택·힙 등 실행 데이터로 구분할 수 있다. 시스템 메모리 부족으로 인해 기존 페이지를 내보내야 할 경우, 담고 있는 데이터에 따라 적절한 처리 방식을 설명하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "문항이 그림 의존적인 복합 서술형이라 앱에서 그대로 풀기 어렵다.",
+      "prompt가 제목 마크다운만 담고 있어 질문 역할을 하지 못한다."
+    ],
+    "changes": [
+      "그림 의존 원문을 스래싱과 페이지 퇴출 처리 개념형 서술문항으로 변환했다.",
+      "prompt·body·answer·explanation·keywords를 정리하고 변환 상태를 반영했다."
+    ]
+  }
+}

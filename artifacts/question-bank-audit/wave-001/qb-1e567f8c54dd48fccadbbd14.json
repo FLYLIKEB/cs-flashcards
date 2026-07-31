@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-1e567f8c54dd48fccadbbd14",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-1e567f8c54dd48fccadbbd14",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 6. 클라우드 컴퓨팅과 유틸리티 컴퓨팅을 비교하시오.",
+    "body": "## Ⅲ. 다음 물음에 답하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "클라우드 컴퓨팅과 유틸리티 컴퓨팅을 비교하시오.",
+    "field_name": "전산학술",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "클라우드",
+      "유틸리티 컴퓨팅"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 6. 클라우드 컴퓨팅과 유틸리티 컴퓨팅을 비교하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-1e567f8c54dd48fccadbbd14",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "클라우드 컴퓨팅과 유틸리티 컴퓨팅을 비교하시오.",
+    "body": "",
+    "answer": "클라우드 컴퓨팅은 인터넷 기반의 가상화된 IT 자원과 플랫폼·소프트웨어까지를 필요 시 제공하는 서비스 모델이고, 유틸리티 컴퓨팅은 전기·수도처럼 컴퓨팅 자원을 사용량 기준으로 제공·과금하는 운영 개념이다. 즉 클라우드 컴퓨팅은 서비스 제공 방식 전반을 포괄하고, 유틸리티 컴퓨팅은 그중 자원 공급과 종량제 과금 관점에 초점을 둔다.",
+    "explanation": "클라우드 컴퓨팅은 IaaS·PaaS·SaaS처럼 네트워크를 통해 확장 가능하고 셀프서비스형으로 자원을 제공하는 것이 핵심이다. 유틸리티 컴퓨팅은 CPU, 스토리지, 네트워크 등의 자원을 계량해 필요한 만큼 쓰고 비용을 지불하는 데 중점을 둔다. 두 개념 모두 자원의 효율적 공유를 지향하지만, 클라우드는 아키텍처·서비스 모델까지 포함하는 더 넓은 개념이고 유틸리티 컴퓨팅은 과금·공급 방식 측면의 개념으로 이해하면 된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "클라우드 컴퓨팅",
+    "field_name": "전산학술",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "클라우드 컴퓨팅",
+      "유틸리티 컴퓨팅",
+      "종량 과금",
+      "가상화"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2010 전산학술 발췌 · 6. 클라우드 컴퓨팅과 유틸리티 컴퓨팅을 비교하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 6. 클라우드 컴퓨팅과 유틸리티 컴퓨팅을 비교하시오.\n\n## Ⅲ. 다음 물음에 답하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트와 본문에 마크다운/시험 지시문 잡음이 남아 있었음",
+      "정답과 해설이 비어 있어 주관식 채점 근거가 없었음",
+      "토픽과 키워드가 질문 문장 위주라 정제 필요"
+    ],
+    "changes": [
+      "프롬프트를 깨끗한 질문 문장으로 정리하고 불필요한 본문을 제거함",
+      "클라우드 컴퓨팅과 유틸리티 컴퓨팅의 비교 답안과 해설을 보강함",
+      "토픽을 정규화하고 키워드를 개념 중심으로 정리함"
+    ]
+  }
+}

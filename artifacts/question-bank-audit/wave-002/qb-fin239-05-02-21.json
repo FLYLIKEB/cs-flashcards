@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-21",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-21",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 51. 스키마 종류/개념",
+    "body": "- 스키마: 데이터베이스 구조를 정의하는 것",
+    "answer": "DB 구조와 제약조건의 정의다. 외부 스키마, 개념 스키마, 내부 스키마로 구분한다.",
+    "explanation": "DB 구조와 제약조건의 정의다. 외부 스키마, 개념 스키마, 내부 스키마로 구분한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "스키마 종류/개념",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "데이터베이스",
+      "스키마 종류"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 51. 스키마 종류/개념",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-21",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "스키마의 개념과 종류를 설명하시오.",
+    "body": "",
+    "answer": "스키마는 데이터베이스의 구조와 제약조건을 정의한 것이다. 종류는 사용자 관점의 외부 스키마, 전체 데이터베이스 논리 구조를 나타내는 개념 스키마, 물리적 저장 구조를 정의하는 내부 스키마다.",
+    "explanation": "스키마는 데이터 자체가 아니라 데이터를 어떻게 저장·표현·접근할지를 규정하는 설계도이다. 외부 스키마는 사용자나 응용프로그램별 뷰, 개념 스키마는 조직 전체의 논리적 구조, 내부 스키마는 저장장치 관점의 물리적 구조를 정의한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "스키마 종류/개념",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "스키마",
+      "외부 스키마",
+      "개념 스키마",
+      "내부 스키마"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 51. 스키마 종류/개념",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 51. 스키마 종류/개념\n- 스키마: 데이터베이스 구조를 정의하는 것\n**답(AI답변):** DB 구조와 제약조건의 정의다. 외부 스키마, 개념 스키마, 내부 스키마로 구분한다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호 헤딩이 남아 있어 문제 문장으로 바로 쓰기 어려움",
+      "body에 정답 일부가 섞여 있고 explanation이 답안과 중복됨",
+      "keywords가 포괄적이라 핵심 개념 구분이 약함"
+    ],
+    "changes": [
+      "prompt를 서술형 질문 문장으로 정리하고 body를 비움",
+      "정답을 스키마 정의와 세 종류의 역할까지 포함하도록 보강하고 explanation을 분리함",
+      "keywords를 스키마 3계층 중심으로 구체화함"
+    ]
+  }
+}

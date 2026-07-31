@@ -1,0 +1,72 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-1c6323ee0355c2ae0325c581",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-1c6323ee0355c2ae0325c581",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 3. 네트워크",
+    "body": "네트워크와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**3-1 DHCP 동작 시나리오**\n\n![3-1 DHCP 동작 시나리오](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0004.bmp)\n\n아래는 동적 호스트 구성 프로토콜(DHCP, Dynamic Host Configuration Protocol)의 간단한 동작 시나리오이다. 다음 물음에 답하시오.\n\n1. DHCP에 대해 설명하시오.\n2. `DISCOVER`, `OFFER`, `REQUEST`, `ACK` 4단계에서 브로드캐스팅을 하는 이유를 각각 설명하시오.\n\n#### 2.\n\n`210.11.21.0/24`의 주소 블록을 할당받은 기관이 있다. 이 기관은 각각 100개, 50개, 10개의 호스트를 사용할 수 있도록 3개의 서브블록을 효율적으로 구성하려고 한다. 다음 물음에 답하시오.\n\n1. 각 서브블록의 서브넷마스크를 구하시오.\n2. 각 서브블록의 첫 번째 IP 주소를 구하시오.\n3. 각 서브블록의 사용 가능한 호스트 개수를 구하시오.\n\n#### 3.\n\n네트워크의 성능은 지연(delay), 처리량(throughput), 패킷 손실률(packet loss)로 측정할 수 있다. 네트워크상 지연의 4가지 형태인 전송 지연, 전파 지연, 처리 지연, 큐잉 지연에 대해 각각 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "네트워크"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 3. 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-1c6323ee0355c2ae0325c581",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "DHCP의 역할과 DORA(DISCOVER, OFFER, REQUEST, ACK) 절차에서 각 단계가 브로드캐스트를 사용하는 이유를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 3. 네트워크",
+    "answer": "DHCP는 호스트에 IP 주소, 서브넷 마스크, 기본 게이트웨이, DNS 서버 같은 네트워크 설정을 자동 할당·관리하는 프로토콜이다. DISCOVER는 IP가 없는 클라이언트가 DHCP 서버를 찾기 위해 브로드캐스트하고, OFFER는 아직 클라이언트의 정확한 IP 사용이 확정되지 않은 상태에서 제안 정보를 전달하기 위해 브로드캐스트될 수 있다. REQUEST는 여러 서버 제안 중 하나를 선택했음을 모든 DHCP 서버에 알리고 기존 임대 연장 요청도 전달하기 위해 브로드캐스트한다. ACK는 최종 할당 정보를 클라이언트에 통지해 설정을 확정하기 위한 단계이다.",
+    "explanation": "원문 행은 DHCP 서술형, 서브넷팅 계산, 지연 유형 설명이 한 행에 합쳐져 있어 단일 문제로 사용하기 어렵고 DHCP 도식 이미지도 누락되어 있다. 따라서 source excerpt에서 가장 구체적으로 제시된 첫 하위 문항을 바탕으로 개념형 주관식으로 변환했다. DHCP의 DORA 절차 핵심은 주소가 없는 초기 클라이언트가 서버를 찾고, 서버 제안을 수신하고, 선택 결과를 전체 서버에 알리고, 마지막으로 설정을 확정받는 흐름이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "DHCP",
+      "DORA",
+      "브로드캐스트"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2023 컴퓨터공학 학술 파트 I · 3. 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 3. 네트워크\n\n네트워크와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**3-1 DHCP 동작 시나리오**\n\n![3-1 DHCP 동작 시나리오](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202023%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN0004.bmp)\n\n아래는 동적 호스트 구성 프로토콜(DHCP, Dynamic Host Configuration Protocol)의 간단한 동작 시나리오이다. 다음 물음에 답하시오.\n\n1. DHCP에 대해 설명하시오.\n2. `DISCOVER`, `OFFER`, `REQUEST`, `ACK` 4단계에서 브로드캐스팅을 하는 이유를 각각 설명하시오.\n\n#### 2.\n\n`210.11.21.0/24`의 주소 블록을 할당받은 기관이 있다. 이 기관은 각각 100개, 50개, 10개의 호스트를 사용할 수 있도록 3개의 서브블록을 효율적으로 구성하려고 한다. 다음 물음에 답하시오.\n\n1. 각 서브블록의 서브넷마스크를 구하시오.\n2. 각 서브블록의 첫 번째 IP 주소를 구하시오.\n3. 각 서브블록의 사용 가능한 호스트 개수를 구하시오.\n\n#### 3.\n\n네트워크의 성능은 지연(delay), 처리량(throughput), 패킷 손실률(packet loss)로 측정할 수 있다. 네트워크상 지연의 4가지 형태인 전송 지연, 전파 지연, 처리 지연, 큐잉 지연에 대해 각각 설명하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "섹션 제목과 서로 다른 3개 하위 문제가 한 행에 합쳐져 단일 문제로 사용할 수 없음",
+      "DHCP 도식 이미지 의존성이 있으나 답안 필드가 비어 있음"
+    ],
+    "changes": [
+      "DHCP와 DORA 브로드캐스트 이유를 묻는 단일 개념형 주관식으로 변환",
+      "변환 메모 2줄 본문, 정답·해설, 관련 키워드를 정리"
+    ]
+  }
+}

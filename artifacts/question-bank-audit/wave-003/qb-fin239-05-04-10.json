@@ -1,0 +1,97 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-10",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-329",
+    "term": "UDP",
+    "english": "User Datagram Protocol",
+    "category": "네트워크",
+    "alphabet_index": "U",
+    "korean_initial": "U",
+    "definition": "UDP는 연결 설정과 재전송 보장 없이 데이터그램을 빠르게 전송하는 전송 계층 프로토콜입니다. 지연 민감 서비스에 적합하며, 네트워크 설계에서 계층별 책임과 장애 지점 구분의 기준으로 활용됩니다.",
+    "detailed_explanation": "의미: UDP(User Datagram Protocol)는 포트 번호와 체크섬 정도의 최소한의 기능만 제공하는 프로토콜로, 순서 보장, 흐름 제어, 혼잡 제어, 자동 재전송을 기본으로 제공하지 않습니다. 결과적으로 TCP보다 오버헤드와 지연이 작아 빠른 전송이 가능하지만, 신뢰성(정확한 전달·순서 보장 등)은 애플리케이션이 필요에 따라 직접 구현해야 합니다.\n활용: DNS, VoIP, 실시간 스트리밍, 온라인 게임 등 지연과 처리 지연이 중요하고 일부 패킷 손실을 허용할 수 있는 서비스에서 주로 사용됩니다. 또한 QUIC/HTTP/3처럼 애플리케이션 계층에서 신뢰성 보강을 하면서 UDP의 저지연 특성을 활용하는 사례도 있습니다. 반대로 금융 거래처럼 정확한 순서와 재전송 보장이 필요한 경우에는 추가적인 보장 메커니즘이 필요합니다. 학습·면접 관점에서는 UDP가 ‘무조건 불안전한 것’이 아니라 설계 목적이 다르다는 점을 TCP(예: 3-way handshake)와 비교해 설명하면 이해도가 높아집니다. 운영에서는 주소·포트 관리, 타임아웃·캐시·재전송 기준 등을 서비스 특성에 맞춰 검토해야 합니다.",
+    "related_concepts": "[[Ping]], [[TCP]], [[3-Way Handshake]], [[4-Way Handshake]], [[IP]]",
+    "source_files": "04-IT-필기-핵심정리.md; 02-01-기본-전제와-일정.md; 05-04-금융결제원-기출.md",
+    "exam_note": "정의만 쓰지 말고 TCP(연결·재전송 보장)·3-way handshake와 비교해 ‘무연결·무재전송·저지연’ 차이를 간단히 적으세요.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-329-20260719-114630-cdc98922.png",
+    "concept_image_alt": "UDP(네트워크) 개념 참고 이미지",
+    "sort_order": 328,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-329-20260719-114630-cdc98922.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-10",
+    "card_id": "CS-329",
+    "question_type": "subjective",
+    "prompt": "### 139. UDP 특징",
+    "body": "",
+    "answer": "UDP는 비연결형, 비신뢰성, 순서/재전송 보장 없음, 낮은 오버헤드와 빠른 속도가 특징이다.",
+    "explanation": "UDP는 비연결형, 비신뢰성, 순서/재전송 보장 없음, 낮은 오버헤드와 빠른 속도가 특징이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "UDP 특징",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "UDP",
+      "User Datagram Protocol"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 139. UDP 특징",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-10",
+    "card_id": "CS-329",
+    "question_type": "subjective",
+    "prompt": "UDP의 주요 특징을 설명하시오.",
+    "body": "",
+    "answer": "UDP는 연결 설정 없이 데이터를 보내는 비연결형 전송 계층 프로토콜로, 순서 보장·흐름 제어·혼잡 제어·자동 재전송을 기본 제공하지 않아 오버헤드가 작고 지연이 낮다.",
+    "explanation": "UDP(User Datagram Protocol)는 최소한의 헤더만 사용해 빠르게 데이터그램을 전달한다. 대신 전달 보장, 순서 보장, 재전송 같은 신뢰성 기능은 기본 제공하지 않으므로 DNS, VoIP, 실시간 스트리밍처럼 일부 손실보다 지연 감소가 더 중요한 서비스에 적합하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "UDP 특징",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "UDP",
+      "User Datagram Protocol",
+      "비연결형",
+      "저지연"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 139. UDP 특징",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 139. UDP 특징\n**답(AI답변):** UDP는 비연결형, 비신뢰성, 순서/재전송 보장 없음, 낮은 오버헤드와 빠른 속도가 특징이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row.prompt에 마크다운 제목과 문항 번호가 남아 있어 질문형 문장으로 바로 쓰기 어려웠다.",
+      "answer와 explanation이 동일한 한 줄 요약이라 UDP의 핵심 특성과 활용 맥락이 충분히 분리되지 않았다.",
+      "keywords가 카드 용어 외 핵심 특징을 반영하지 못했다."
+    ],
+    "changes": [
+      "prompt를 마크다운 없는 서술형 질문 문장으로 정리했다.",
+      "answer는 최종 정답만 남기고, explanation은 비연결형·무보장 특성과 적합한 활용 예시를 분리해 보강했다.",
+      "keywords에 비연결형과 저지연을 추가해 카드 내용과 문항 주제를 맞췄다."
+    ]
+  }
+}

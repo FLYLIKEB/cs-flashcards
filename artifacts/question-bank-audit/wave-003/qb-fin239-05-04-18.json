@@ -1,0 +1,97 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-18",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-063",
+    "term": "형상 관리",
+    "english": "Configuration Management",
+    "category": "소프트웨어공학",
+    "alphabet_index": "C",
+    "korean_initial": "ㅎ",
+    "definition": "형상 관리는 소스 코드, 문서, 설정, 빌드 산출물 등 소프트웨어 구성요소의 버전과 변경 이력을 통제해 특정 시점의 제품 상태를 재현하고 감사할 수 있게 하는 관리 활동입니다. 이를 통해 요구사항·설계·구현·테스트·유지보수 간의 연결을 명확히 하고 소프트웨어 품질과 변경 비용을 관리합니다.",
+    "detailed_explanation": "의미: 형상 관리는 소프트웨어를 구성하는 항목(코드, 문서, 설정, 빌드 산출물 등)을 식별하고, 변경 요청·승인·버전·릴리스 기준선(베이스라인)을 체계적으로 관리하는 활동입니다. Git 같은 버전 관리 도구가 핵심 역할을 하지만 형상 관리는 단지 코드 버전 관리에 그치지 않고 문서, 환경 설정, 배포 산출물, 변경 승인 이력까지 포함합니다. 버전과 변경 이력, 기준선을 통제하면 특정 시점의 상태를 재현할 수 있어 문제 원인 분석과 감사를 가능하게 합니다. 학습할 때는 이 개념이 ‘요구를 정리하는 활동’인지, ‘설계를 나누는 원칙’인지, 혹은 ‘품질을 확인하는 방법’인지 구분해 보면 이해가 쉽습니다. 작은 팀 프로젝트에서는 기능 구현뿐 아니라 결정 기준, 책임 분담, 피드백 시점을 미리 정해 두면 반복 작업과 재작업을 줄일 수 있습니다. 핵심은 산출물 자체보다 변경을 안전하게 다루는 구조를 만드는 것이며, 절차가 과하면 속도가 느려지고 절차가 없으면 결함이 뒤늦게 커질 위험이 있습니다. 동등 분할이나 회귀 테스트와 비교하면, 형상 관리는 변경의 경계와 이력을 명확히 하는 쪽에 더 중점을 둡니다.\n활용: 예를 들어 금융권 운영에서는 어떤 소스와 DB 스크립트, 설정값이 특정 배포에 포함됐는지 재현할 수 있어야 장애 분석과 감사 대응이 가능합니다. 브랜치 전략, 태그·릴리스 노트, 접근 권한 같은 표준이 없으면 긴급 패치와 정기 배포가 충돌해 운영 위험이 커집니다. 시험이나 면접에서는 형상 관리를 요구사항 추적, 품질 보증, 일정 관리, 유지보수성 등 어떤 문제와 연결되는지 설명하면 좋고, 실무에서는 프로젝트 성격에 맞게 적용 범위를 조절하고 합의된 기준과 피드백 기록을 남기는 것이 중요합니다.",
+    "related_concepts": "[[동등 분할]], [[회귀 테스트]], [[Git]], [[브랜치]], [[테스트]]",
+    "source_files": "보강 개념(페이지 직접 언급 없음)",
+    "exam_note": "정의뿐 아니라 동등 분할·회귀 테스트·Git과의 차이·연계를 짧게 비교해 쓰세요.",
+    "bok_appeared": "",
+    "importance": "하",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-063-20260719-163445-5a8d1683.png",
+    "concept_image_alt": "형상 관리(소프트웨어공학) 개념 참고 이미지",
+    "sort_order": 62,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-063-20260719-163445-5a8d1683.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-18",
+    "card_id": "CS-063",
+    "question_type": "subjective",
+    "prompt": "### 147. 형상관리자 역할은?",
+    "body": "",
+    "answer": "형상관리자는 변경 이력, 버전, 산출물 기준선, 릴리스 구성을 관리한다.",
+    "explanation": "형상관리자는 변경 이력, 버전, 산출물 기준선, 릴리스 구성을 관리한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "형상관리자 역할은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "형상 관리",
+      "Configuration Management",
+      "형상관리자 역할은"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 147. 형상관리자 역할은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-18",
+    "card_id": "CS-063",
+    "question_type": "subjective",
+    "prompt": "형상관리자의 역할은 무엇인가?",
+    "body": "",
+    "answer": "변경 이력, 버전, 산출물 기준선, 릴리스 구성을 관리한다.",
+    "explanation": "형상관리자는 소프트웨어 산출물의 변경 사항과 버전을 통제하고 기준선과 릴리스 구성을 관리하여 특정 시점의 상태를 재현하고 변경을 추적할 수 있게 한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "형상 관리",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "형상 관리",
+      "Configuration Management",
+      "형상관리자"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 147. 형상관리자 역할은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 147. 형상관리자 역할은?\n**답(AI답변):** 형상관리자는 변경 이력, 버전, 산출물 기준선, 릴리스 구성을 관리한다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row.prompt에 마크다운 제목 기호와 문항 번호가 남아 있었다.",
+      "keywords에 질문 문구가 그대로 들어가 있어 검색용 키워드로 부적절했다.",
+      "topic이 카드 개념보다 질문 표현에 치우쳐 있었고 explanation이 정답 문장을 그대로 반복했다."
+    ],
+    "changes": [
+      "prompt를 '형상관리자의 역할은 무엇인가?'로 정리했다.",
+      "answer는 핵심 답만 남기고 explanation은 변경 통제와 재현 가능성까지 보강했다.",
+      "topic을 '형상 관리'로 맞추고 keywords를 카드 정렬형 용어로 정리했다."
+    ]
+  }
+}

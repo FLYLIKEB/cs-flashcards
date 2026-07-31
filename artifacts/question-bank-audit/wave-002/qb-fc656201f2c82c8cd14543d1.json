@@ -1,0 +1,79 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fc656201f2c82c8cd14543d1",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fc656201f2c82c8cd14543d1",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 2. 다음을 후위표기식(Postfix expression)으로 올바르게 나타낸 것은 ?",
+    "body": "(힌트) cos과 sin은 unary 연산자, 나머지(-, ^, *, =)는 binary 연산자\n\nA. 2 θ * cos θ cos 2 ^ θ sin 2 ^ - =\n\nB. 2 θ * cos θ cos 2 ^ θ sin 2 - ^ =\n\nC. 2 θ * cos cos 2 ^ θ θ sin 2 ^ - =\n\nD. 2 θ cos * θ cos 2 θ ^ sin 2 ^ - =\n\nE. 2 θ * cos θ cos 2 ^ sin θ 2 ^ - =",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [
+      "2 θ * cos θ cos 2 ^ θ sin 2 ^ - =",
+      "2 θ * cos θ cos 2 ^ θ sin 2 - ^ =",
+      "2 θ * cos cos 2 ^ θ θ sin 2 ^ - =",
+      "2 θ cos * θ cos 2 θ ^ sin 2 ^ - =",
+      "2 θ * cos θ cos 2 ^ sin θ 2 ^ - ="
+    ],
+    "answer_index": null,
+    "topic": "다음을 후위표기식(Postfix expression)으로 올바르게 나타낸 것은 ?",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "후위표기식"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 2. 다음을 후위표기식(Postfix expression)으로 올바르게 나타낸 것은 ?",
+    "section": "전공필기",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fc656201f2c82c8cd14543d1",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "후위표기식(Postfix expression)의 특징을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 2. 다음을 후위표기식(Postfix expression)으로 올바르게 나타낸 것은 ?",
+    "answer": "후위표기식은 연산자를 피연산자 뒤에 표기하는 방식이며, 괄호 없이도 연산 순서를 표현할 수 있어 스택을 이용한 계산과 구문 처리에 적합하다.",
+    "explanation": "원문은 '다음을 후위표기식으로 나타내라'고 했지만 정작 변환 대상이 되는 중위표기식이 제시되지 않아 정답 선택이 불가능하다. 따라서 후위표기식의 정의와 핵심 장점을 묻는 개념문제로 바꾸는 것이 타당하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "다음을 후위표기식(Postfix expression)으로 올바르게 나타낸 것은 ?",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "후위표기식",
+      "Postfix expression",
+      "스택"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 2. 다음을 후위표기식(Postfix expression)으로 올바르게 나타낸 것은 ?",
+    "section": "전공필기",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 2. 다음을 후위표기식(Postfix expression)으로 올바르게 나타낸 것은 ?\n\n(힌트) cos과 sin은 unary 연산자, 나머지(-, ^, *, =)는 binary 연산자\n\nA. 2 θ * cos θ cos 2 ^ θ sin 2 ^ - =\n\nB. 2 θ * cos θ cos 2 ^ θ sin 2 - ^ =\n\nC. 2 θ * cos cos 2 ^ θ θ sin 2 ^ - =\n\nD. 2 θ cos * θ cos 2 θ ^ sin 2 ^ - =\n\nE. 2 θ * cos θ cos 2 ^ sin θ 2 ^ - =",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "변환 대상 중위표기식이 빠져 있어 원문 객관식으로는 정답을 결정할 수 없음",
+      "prompt와 body에 원문 마크다운/선지 중복이 남아 있음"
+    ],
+    "changes": [
+      "불완전한 원문을 후위표기식 개념 단답형 문제로 변환",
+      "body를 변환 메모 2줄로 정리하고 choices와 answer_index를 비움",
+      "정의·장점을 담은 answer/explanation과 관련 keywords를 보강"
+    ]
+  }
+}

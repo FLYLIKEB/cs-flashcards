@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-23",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-23",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 228. DFS와 BFS의 개념과 그래프 경로 탐색 방법을 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: DFS와 BFS와 그래프 경로&개념",
+    "answer": "DFS는 깊이 우선 탐색(스택/재귀), BFS는 너비 우선 탐색(큐)이며 BFS는 무가중 그래프 최단경로에 적합하다.",
+    "explanation": "DFS는 깊이 우선 탐색(스택/재귀), BFS는 너비 우선 탐색(큐)이며 BFS는 무가중 그래프 최단경로에 적합하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "DFS와 BFS의 개념과 그래프 경로 탐색 방법을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "BFS",
+      "DFS",
+      "그래프 경로 탐색"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 228. DFS와 BFS의 개념과 그래프 경로 탐색 방법을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-23",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "DFS와 BFS의 개념을 비교하고 그래프 경로 탐색에서 각각 어떻게 사용되는지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 228. DFS와 BFS와 그래프 경로&개념",
+    "answer": "DFS는 스택이나 재귀를 사용해 한 경로를 끝까지 우선 탐색하는 방법이고, BFS는 큐를 사용해 같은 깊이의 정점을 먼저 넓게 탐색하는 방법이다. 그래프 경로 탐색에서는 DFS가 전체 경로 탐색이나 연결 요소 확인에 자주 쓰이고, BFS는 무가중 그래프에서 최단 경로를 찾는 데 적합하다.",
+    "explanation": "DFS는 현재 정점에서 인접 정점을 따라 깊게 내려가며 탐색하므로 백트래킹, 경로 존재 여부 확인, 연결 요소 탐색에 적합하다. BFS는 시작점에서 가까운 정점부터 레벨 순서대로 방문하므로 간선 가중치가 없는 그래프에서는 먼저 도달한 경로가 최단 경로가 된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "DFS/BFS",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "DFS",
+      "BFS",
+      "깊이 우선 탐색",
+      "너비 우선 탐색",
+      "최단 경로"
+    ],
+    "difficulty": "상",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 228. DFS와 BFS의 개념과 그래프 경로 탐색 방법을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 228. DFS와 BFS와 그래프 경로&개념\n**답(AI답변):** DFS는 깊이 우선 탐색(스택/재귀), BFS는 너비 우선 탐색(큐)이며 BFS는 무가중 그래프 최단경로에 적합하다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row prompt에 마크다운 헤딩과 번호가 남아 있어 질문문이 깨끗하지 않았음",
+      "body의 변환 메모 문구가 공통 규칙의 정확한 두 줄 형식을 따르지 않았음",
+      "topic이 문장형 전체 질문이어서 주제 필드로 부적절했고 answer/explanation이 지나치게 압축되어 있었음"
+    ],
+    "changes": [
+      "불완전한 원문을 유지하되 마크다운을 제거한 개념형 질문으로 prompt를 정리함",
+      "body를 공통 규칙의 정확한 변환 메모 두 줄로 교체함",
+      "answer와 explanation을 DFS/BFS의 탐색 방식과 경로 탐색 활용 차이가 드러나도록 보강하고 topic/keywords를 정리함"
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-44",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-317",
+    "term": "트랜잭션",
+    "english": "Transaction",
+    "category": "데이터베이스",
+    "alphabet_index": "T",
+    "korean_initial": "ㅌ",
+    "definition": "트랜잭션은 데이터베이스에서 하나의 논리적 작업 단위로 처리되는 여러 연산의 묶음으로, ACID(원자성, 일관성, 고립성, 지속성)를 통해 전체가 모두 적용되거나 전혀 적용되지 않도록 보장합니다.",
+    "detailed_explanation": "의미: 트랜잭션은 여러 SQL 연산을 하나의 논리적 실행 단위로 묶어, 모든 연산이 성공하면 커밋하여 영구 반영하고, 문제 발생 시 전체를 롤백해 처음 상태로 되돌리는 실행 단위입니다. ACID 속성(원자성, 일관성, 고립성, 지속성)은 일부만 반영되거나 제약이 깨지는 상황, 동시성 간섭, 커밋 손실 등을 방지합니다. 예를 들어 계좌이체는 출금과 입금이 함께 완료되어야 하므로 트랜잭션이 필수적입니다. 내부적으로는 잠금(lock), 로그(undo/redo), 버전 관리(낙관적/비관적 동시성 제어), 체크포인트 같은 메커니즘이 고장이나 동시 실행 문제를 처리합니다.\n활용: 실무에서는 출금·입금·거래 기록 등 관련 작업을 하나의 트랜잭션으로 묶어 정합성을 유지합니다. 트랜잭션 범위를 너무 넓게 잡으면 락 경합과 데드락 위험이 커지고, 너무 좁게 잡으면 업무 일관성이 깨질 수 있으므로 적절한 범위 설정이 중요합니다. 격리 수준(isolation level)과 재시도 정책을 함께 설계하고 커밋 기준을 명확히 해야 하며, 금융·공공 등 정합성이 중요한 시스템에서는 성능을 위해 보호 장치를 낮추기 전에 가능한 실패 시나리오를 먼저 검토해야 합니다.",
+    "related_concepts": "[[무손실 분해]], [[종속성 보존]], [[ACID]], [[원자성]], [[SQL]]",
+    "source_files": "05-08-산업은행-기출.md; 05-05-SGI서울보증-기출.md; 02-01-기본-전제와-일정.md",
+    "exam_note": "정의만 쓰지 말고 ACID와 무손실 분해·종속성 보존 등 관련 개념과의 차이를 간단히 비교해 쓰세요.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-317-20260719-124249-4dad0414.png",
+    "concept_image_alt": "트랜잭션(데이터베이스) 개념 참고 이미지",
+    "sort_order": 316,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-317-20260719-124249-4dad0414.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-44",
+    "card_id": "CS-317",
+    "question_type": "multiple_choice",
+    "prompt": "### 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?",
+    "body": "",
+    "answer": "1번",
+    "explanation": "1번",
+    "rubric": [],
+    "choices": [
+      "Dirty Read",
+      "Lost Update",
+      "Phantom Read",
+      "Non-repeatable Read"
+    ],
+    "answer_index": 0,
+    "topic": "두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "트랜잭션",
+      "Transaction",
+      "Dirty Read"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-44",
+    "card_id": "CS-317",
+    "question_type": "multiple_choice",
+    "prompt": "두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 커밋되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?",
+    "body": "",
+    "answer": "Dirty Read",
+    "explanation": "Dirty Read는 다른 트랜잭션이 아직 커밋하지 않은 변경 데이터를 읽는 현상이다. Lost Update는 갱신 결과가 덮어써지는 경우이고, Non-repeatable Read와 Phantom Read는 커밋된 데이터를 반복 조회할 때 결과가 달라지는 문제다.",
+    "rubric": [],
+    "choices": [
+      "Dirty Read",
+      "Lost Update",
+      "Phantom Read",
+      "Non-repeatable Read"
+    ],
+    "answer_index": 0,
+    "topic": "트랜잭션 동시성 이상",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "트랜잭션",
+      "Transaction",
+      "Dirty Read",
+      "동시성 이상"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는\n경우 발생하는 문제는?\n1. Dirty Read\n2. Lost Update\n3. Phantom Read\n4. Non-repeatable Read\n\n**답:** 1번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row prompt에 마크다운 헤딩과 문항 번호가 남아 있었다.",
+      "answer와 explanation이 '1번'으로만 되어 있어 정답과 해설로 사용할 수 없었다.",
+      "topic이 질문 문장 전체를 복제하고 있어 주제 필드로 부적절했다.",
+      "audit가 clean으로 되어 있었지만 실제 수정이 필요한 상태였다."
+    ],
+    "changes": [
+      "prompt를 문항 번호와 마크다운을 제거한 순수 질문문으로 정리했다.",
+      "answer를 'Dirty Read'로 수정하고 보기 간 차이를 설명하는 해설을 보강했다.",
+      "topic을 '트랜잭션 동시성 이상'으로 정리하고 keywords를 해당 개념 중심으로 정제했다.",
+      "audit status와 이슈/변경 내역을 실제 수정 사항에 맞게 업데이트했다."
+    ]
+  }
+}

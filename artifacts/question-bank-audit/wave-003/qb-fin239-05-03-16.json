@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-16",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-16",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 103. Java 상속에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: JAVA 상속코드 주면서 출력결과 쓰라는 문제",
+    "answer": "자식 클래스는 부모 클래스의 필드/메서드를 상속하며, 오버라이딩 시 실제 객체 타입의 메서드가 호출된다.",
+    "explanation": "자식 클래스는 부모 클래스의 필드/메서드를 상속하며, 오버라이딩 시 실제 객체 타입의 메서드가 호출된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Java 상속에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "Java 상속"
+    ],
+    "difficulty": "상",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 103. Java 상속에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-16",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "Java에서 상속과 다형성, 그리고 instanceof 판별 순서의 의미를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 103. JAVA 상속코드 주면서 출력결과 쓰라는 문제",
+    "answer": "상속은 자식 클래스가 부모 클래스의 속성과 메서드를 물려받는 것이고, 다형성은 부모 타입 참조가 자식 객체를 가리킬 수 있는 성질이다. 따라서 오버라이딩된 메서드는 실제 객체 타입 기준으로 동작하며, instanceof 는 먼저 참이 되는 조건에서 분기가 종료되므로 상위 타입 검사부터 하면 하위 타입 여부를 구분하지 못할 수 있다.",
+    "explanation": "원문은 코드와 선택지가 불완전해 정확한 출력값을 확정할 수 없으므로 상속·다형성·instanceof 개념을 묻는 문제로 정리했다. A a = new C() 같은 참조는 선언 타입은 A지만 실제 객체는 C이므로 메서드 호출은 C의 오버라이딩 여부에 따라 결정된다. 또한 if-else if 체인에서 instanceof A를 먼저 검사하면 C 객체도 A의 인스턴스이므로 첫 조건에서 바로 종료되어 뒤의 B, C, D 검사는 실행되지 않는다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Java 상속과 다형성",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "상속",
+      "다형성",
+      "오버라이딩",
+      "instanceof"
+    ],
+    "difficulty": "상",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 103. Java 상속에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 103. JAVA 상속코드 주면서 출력결과 쓰라는 문제\n\nEx) 예시코드\n\n  class A {~~)\n\n  Class B extends A{~~~}\n\n  class C extends B{~~~}\n\n  class D extends C{~~}\n\n  A a = new C()\n\n  Bb=a\n\n  if (a instance of A){print A}\n\n  else if(a instance of B){print B}\n\n  else if (a instance of C) {print C}\n\n  else if(a instance of D} {print D}\n**답(AI답변):** 자식 클래스는 부모 클래스의 필드/메서드를 상속하며, 오버라이딩 시 실제 객체 타입의 메서드가 호출된다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있고 원문은 불완전한 코드 메모라 실제 출력 문제로 풀 수 없었음",
+      "body의 변환 메모 문구가 공통 규칙과 달랐고 answer/explanation이 동일한 한 문장으로 너무 축약되어 있었음",
+      "topic과 keywords가 문제 의도를 충분히 드러내지 못했음"
+    ],
+    "changes": [
+      "불완전한 원문을 상속·다형성·instanceof 개념을 묻는 주관식 문제로 명시적으로 변환함",
+      "body를 규칙상 지정된 두 줄 메모 형식으로 수정하고 prompt의 마크다운 잡음을 제거함",
+      "answer와 explanation을 상속, 오버라이딩, instanceof 판별 순서가 드러나도록 보강하고 keywords/topic을 정리함"
+    ]
+  }
+}

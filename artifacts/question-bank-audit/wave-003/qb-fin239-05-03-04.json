@@ -1,0 +1,80 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-04",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-04",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 91. 베스천 호스트(Bastion Host)에 관해 틀린 내용은?",
+    "body": "",
+    "answer": "4번",
+    "explanation": "위 3개 지문은 모두 옳은 지문임.\n\n베스천 호스트는 외부망과 내부망 사이에서 보안 관문 역할을 하는 강화된 서버다.",
+    "rubric": [],
+    "choices": [
+      "침입 차단 소프트웨어가 설치되어 내부와 외부 네트워크 사이에서 일종의 게이트 역할을 수행하는 호스트",
+      "배스천 호스트는 방화벽 시스템이 가지는 기능 중 가장 중요한 기능을 제공",
+      "배스천(Bastion)은 중세시대에 성 외곽을 보호하기 위해 돌출된 부분을 의미",
+      "위 3개 지문은 모두 옳은 지문임."
+    ],
+    "answer_index": 3,
+    "topic": "베스천 호스트(Bastion Host)에 관해 틀린 내용은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "Bastion Host"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 91. 베스천 호스트(Bastion Host)에 관해 틀린 내용은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-04",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "베스천 호스트(Bastion Host)는 무엇이며 어떤 역할을 하는가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 91. 베스천 호스트(Bastion Host)에 관해 틀린 내용은?",
+    "answer": "베스천 호스트는 외부 네트워크와 내부 네트워크 사이에 위치하며 접근을 통제하고 보안 관문 역할을 수행하는 강화된 호스트이다.",
+    "explanation": "source_excerpt에는 1~3번 진술이 모두 옳다고 적혀 있어 원래의 '틀린 내용' 객관식으로는 오답 선지를 확정할 수 없다. 따라서 베스천 호스트의 정의와 역할을 묻는 개념형 문항으로 바꾸는 것이 타당하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "베스천 호스트",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "베스천 호스트",
+      "Bastion Host",
+      "보안 관문",
+      "방화벽"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 91. 베스천 호스트(Bastion Host)에 관해 틀린 내용은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "베스천 호스트가 위치하는 구간과 핵심 역할인 접근 통제·보안 관문 기능을 함께 쓰면 된다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 91. 베스천 호스트(Bastion Host)에 관해 틀린 내용은?\n1. 침입 차단 소프트웨어가 설치되어 내부와 외부 네트워크 사이에서 일종의 게이트 역할을 수행하는 호스트\n2. 배스천 호스트는 방화벽 시스템이 가지는 기능 중 가장 중요한 기능을 제공\n3. 배스천(Bastion)은 중세시대에 성 외곽을 보호하기 위해 돌출된 부분을 의미\n- 위 3개 지문은 모두 옳은 지문임.\n**답(AI답변):** 베스천 호스트는 외부망과 내부망 사이에서 보안 관문 역할을 하는 강화된 서버다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문은 '틀린 내용'을 묻지만 source_excerpt에 1~3번 지문이 모두 옳다고 적혀 있어 객관식 정답을 확정할 수 없었다.",
+      "proposed_row의 prompt에 마크다운 헤더와 번호가 남아 있었고, answer/explanation도 선택지 정답과 개념 설명이 뒤섞여 있었다.",
+      "keywords와 answer_guide가 현재 개념형 문항 기준으로 정리되지 않았다."
+    ],
+    "changes": [
+      "문항을 베스천 호스트의 정의와 역할을 묻는 short 개념문항으로 변환했다.",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 고치고 choices와 answer_index를 제거했다.",
+      "answer, explanation, topic, keywords, answer_guide를 베스천 호스트 개념에 맞게 간결하게 정리했다."
+    ]
+  }
+}

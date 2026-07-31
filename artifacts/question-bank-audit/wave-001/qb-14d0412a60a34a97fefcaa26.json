@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-14d0412a60a34a97fefcaa26",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-14d0412a60a34a97fefcaa26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 9. 정규 표현식 및 텍스트 마이닝",
+    "body": "### 1.\n\n정규 표현식(Regular Expression)은 특정한 규칙을 가진 문자열 집합을 표현하기 위해 사용되는 형식 언어다. 다음은 정규 표현식 규칙 중 일부분이다.\n\n#### 정규 표현식 규칙\n\n| 기호 | 의미 | 정규 표현식 예시 | 문자열 예시 | 결과 |\n|---|---|---|---|---|\n| `?` | 0회 또는 1회 표현 | `colou?r` | `colour` | 매칭 |\n| `?` | 0회 또는 1회 표현 | `colou?r` | `color` | 매칭 |\n| `?` | 0회 또는 1회 표현 | `colou?r` | `colur` | 매칭 안 됨 |\n| `*` | 0회 이상 반복 | `wo*w` | `ww` | 매칭 |\n| `*` | 0회 이상 반복 | `wo*w` | `wow` | 매칭 |\n| `*` | 0회 이상 반복 | `wo*w` | `wooow` | 매칭 |\n| `*` | 0회 이상 반복 | `wo*w` | `ow` | 매칭 안 됨 |\n| `+` | 1회 이상 반복 | `wo+w` | `ww` | 매칭 안 됨 |\n| `+` | 1회 이상 반복 | `wo+w` | `wow` | 매칭 |\n| `+` | 1회 이상 반복 | `wo+w` | `wooow` | 매칭 |\n| `+` | 1회 이상 반복 | `wo+w` | `wo` | 매칭 안 됨 |\n| `( )` | 그룹화 | `ba(na)+na` | `bana` | 매칭 안 됨 |\n| `( )` | 그룹화 | `ba(na)+na` | `banana` | 매칭 |\n| `( )` | 그룹화 | `ba(na)+na` | `banaana` | 매칭 안 됨 |\n\n이를 활용하여 (A)~(D)의 문자열이 아래에 제시된 정규 표현식에 매칭되는지를 각각 적으시오.\n\n| 정규 표현식 | 문자열 |\n|---|---|\n| `a?ab*c*ab+` | (A) `abcab` |\n| `a?ab*c*ab+` | (B) `aaab` |\n| `a?ab*c*ab+` | (C) `aabbccab` |\n| `a?ab*c*ab+` | (D) `abcbb` |\n\n### 2.\n\n전통적인 텍스트 마이닝(Text Mining) 기법에서 사용하는 Bag-of-Words(BoW)에 대한 개념을 서술하시오.\n\n### 3.\n\n최근 대규모 언어 모델(Large Language Model: LLM)을 사용함에 있어서 대두되고 있는 문제 중 하나로 환각현상(Hallucination)이 있고, 이를 해결하기 위해 제안된 방법의 하나로 검색증강생성(Retrieval Augmented Generation: RAG)이 있다. 환각현상과 검색증강생성에 대한 개념을 각각 서술하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "정규 표현식 및 텍스트 마이닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "정규 표현식 및 텍스트 마이닝",
+      "정규 표현식",
+      "텍스트 마이닝"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 9. 정규 표현식 및 텍스트 마이닝 · 9. 정규 표현식 및 텍스트 마이닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-14d0412a60a34a97fefcaa26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "검색증강생성(RAG)이 대규모 언어 모델의 환각현상을 완화하는 원리를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 9. 정규 표현식 및 텍스트 마이닝",
+    "answer": "환각현상은 대규모 언어 모델이 근거가 부족하거나 없는 내용을 사실처럼 생성하는 현상이며, RAG는 외부 문서 검색 결과를 프롬프트에 함께 제공해 모델이 검색된 근거를 바탕으로 답하도록 만들어 환각 가능성을 낮추는 방법이다.",
+    "explanation": "원문은 정규표현식 판별, BoW 설명, 환각현상·RAG 설명이 한 행에 함께 섞여 있어 단일 문항으로 바로 쓰기 어렵다. 그중 독립적으로 성립하는 개념형 요소를 추려 한 문제로 변환했다. RAG는 생성 이전에 관련 문서를 검색해 문맥으로 주입하므로 최신성·근거성이 높아지고, 모델 내부 파라미터만으로 추론할 때보다 허위 생성이 줄어든다. 다만 검색 품질이 낮거나 근거 문서 자체가 부정확하면 오류가 남을 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "정규 표현식 및 텍스트 마이닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "LLM",
+      "환각현상",
+      "RAG",
+      "검색증강생성",
+      "텍스트 마이닝"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 9. 정규 표현식 및 텍스트 마이닝 · 9. 정규 표현식 및 텍스트 마이닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트가 질문이 아니라 섹션 제목만 담고 있음",
+      "한 행에 서로 다른 3개 문항이 혼재해 단일 DB 문제로 사용하기 어려움",
+      "정답과 해설이 비어 있어 그대로는 학습용 문항으로 불완전함"
+    ],
+    "changes": [
+      "RAG와 환각현상 설명형 개념문제로 단일화함",
+      "공통 규칙에 따라 변환 메모와 원문 제목만 남긴 2줄 body로 정리함",
+      "정답·해설·키워드를 개념형 문항에 맞게 보완함"
+    ]
+  }
+}

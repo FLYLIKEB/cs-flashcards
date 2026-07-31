@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-07",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-07",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 212. 100ms 1.25배 개선, 60ms 2배 개선 어느게 더 우수한가에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 100ms 1.25배 개선, 60ms 2배 개선 어느게 더 우수한가",
+    "answer": "100ms를 1.25배 개선하면 80ms, 60ms를 2배 개선하면 30ms이므로 절대 개선폭은 후자가 더 크다.",
+    "explanation": "100ms를 1.25배 개선하면 80ms, 60ms를 2배 개선하면 30ms이므로 절대 개선폭은 후자가 더 크다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "100ms 1.25배 개선, 60ms 2배 개선 어느게 더 우수한가에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "100ms 1.25배 개선",
+      "60ms 2배 개선 어느게 더 우수한가"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 212. 100ms 1.25배 개선, 60ms 2배 개선 어느게 더 우수한가에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-07",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "응답시간 개선 효과를 비교할 때 배수 개선과 절대 시간 단축을 어떻게 해석해야 하는가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 212. 100ms 1.25배 개선, 60ms 2배 개선 어느게 더 우수한가에 대해 설명하시오.",
+    "answer": "배수 개선은 개선 후 시간을 원래 시간으로 나눈 비율로 해석해야 하므로 100ms를 1.25배 개선하면 80ms, 60ms를 2배 개선하면 30ms가 된다. 따라서 절대 단축폭은 각각 20ms와 30ms이므로 60ms를 2배 개선한 경우가 더 우수하다.",
+    "explanation": "성능 비교에서는 '몇 배 빨라졌는가'만 보지 말고 개선 후 응답시간과 실제 감소한 시간을 함께 계산해야 한다. 1.25배 개선은 시간을 1/1.25로 줄인 것이고 2배 개선은 시간을 1/2로 줄인 것이므로, 결과적으로 80ms와 30ms가 되어 후자의 절대 개선폭이 더 크다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "응답시간 성능 비교",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "응답시간",
+      "성능 개선",
+      "배수 비교",
+      "절대 개선폭"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 212. 100ms 1.25배 개선, 60ms 2배 개선 어느게 더 우수한가에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "개선 전후 응답시간 계산 → 절대 단축폭 비교 → 해석 순으로 설명",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 212. 100ms 1.25배 개선, 60ms 2배 개선 어느게 더 우수한가 (약술)\n**답(AI답변):** 100ms를 1.25배 개선하면 80ms, 60ms를 2배 개선하면 30ms이므로 절대 개선폭은 후자가 더 크다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있고 불완전한 실전형 문항을 그대로 유지하고 있었음",
+      "body의 변환 메모 문구가 공통 규칙과 다르고 원문 제목 보존 형식이 맞지 않았음",
+      "keywords와 topic이 긴 문장 형태라 검색성과 카드 정합성이 떨어졌음"
+    ],
+    "changes": [
+      "문항을 응답시간 성능 비교 개념문제로 명시적으로 재작성함",
+      "body를 규칙상 2줄 변환 메모 형식으로 고치고 원문 제목을 정리함",
+      "answer/explanation을 배수 개선과 절대 단축폭 계산 기준이 드러나도록 보강하고 topic·keywords·answer_guide를 정리함"
+    ]
+  }
+}

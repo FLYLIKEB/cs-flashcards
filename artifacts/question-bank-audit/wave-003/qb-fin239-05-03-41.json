@@ -1,0 +1,89 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-41",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-41",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 128. 개방 네트워크, 신용카드 사용을 위한 지불 프로토콜 SET의 용어로 알맞은 것은?",
+    "body": "보기 : 카드 소비자에게 신용카드 발급과 계정관리를 하는 금융기관",
+    "answer": "3번",
+    "explanation": "- Acquirer: 상인(merchant)와 계약을 맺고 결제를 처리하는 금융기관.\n- Cardholder: 신용카드 소유자.\n- Merchant: 상품이나 서비스를 판매하는 상인.\n- Payment Gateway: 온라인 결제 처리를 위한 시스템으로, 상인과 금융기관 사이에서 결제 정보를 중계함.",
+    "rubric": [],
+    "choices": [
+      "Acquier",
+      "Cardholder",
+      "Issuer",
+      "Merchant",
+      "Payment Gateway"
+    ],
+    "answer_index": 2,
+    "topic": "개방 네트워크, 신용카드 사용을 위한 지불 프로토콜 SET의 용어로 알맞은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "개방 네트워크",
+      "Issuer"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 128. 개방 네트워크, 신용카드 사용을 위한 지불 프로토콜 SET의 용어로 알맞은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-41",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "개방 네트워크에서 신용카드 결제를 위한 SET의 용어 중, 카드 소비자에게 신용카드를 발급하고 계정을 관리하는 금융기관은 무엇인가?",
+    "body": "카드 소비자에게 신용카드를 발급하고 계정을 관리하는 금융기관",
+    "answer": "Issuer",
+    "explanation": "SET에서 Issuer는 카드 소지자에게 신용카드를 발급하고 계정을 관리하는 금융기관이다. Acquirer는 가맹점과 계약해 결제를 처리하고, Cardholder는 카드 소지자, Merchant는 판매자, Payment Gateway는 결제 정보를 중계한다.",
+    "rubric": [],
+    "choices": [
+      "Acquirer",
+      "Cardholder",
+      "Issuer",
+      "Merchant",
+      "Payment Gateway"
+    ],
+    "answer_index": 2,
+    "topic": "개방 네트워크, 신용카드 사용을 위한 지불 프로토콜 SET의 용어로 알맞은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "SET",
+      "Issuer",
+      "신용카드 결제"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 128. 개방 네트워크, 신용카드 사용을 위한 지불 프로토콜 SET의 용어로 알맞은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 128. 개방 네트워크, 신용카드 사용을 위한 지불 프로토콜 SET의 용어로 알맞은 것은?\n\n  보기 : 카드 소비자에게 신용카드 발급과 계정관리를 하는 금융기관\n1. Acquier 2. Cardholder 3. Issuer 4. Merchant 5. Payment Gateway\n\n  **답:** 3번\n- Acquirer: 상인(merchant)와 계약을 맺고 결제를 처리하는 금융기관.\n- Cardholder: 신용카드 소유자.\n- Merchant: 상품이나 서비스를 판매하는 상인.\n- Payment Gateway: 온라인 결제 처리를 위한 시스템으로, 상인과 금융기관 사이에서 결제 정보를 중계함.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "answer가 번호형식이라 최종 정답 텍스트가 아니었음",
+      "choices에 오탈자(Acquier)가 있었고 explanation이 정답 근거 중심으로 정리되지 않았음",
+      "keywords가 SET 문맥을 충분히 반영하지 못했음"
+    ],
+    "changes": [
+      "prompt를 깨끗한 질문 문장으로 정리함",
+      "body를 풀이에 필요한 정의만 남기도록 다듬음",
+      "answer를 Issuer로 수정하고 choices의 Acquirer 오탈자를 바로잡음",
+      "explanation을 정답과 오답 구분이 드러나도록 재작성하고 keywords를 SET, Issuer, 신용카드 결제로 정리함"
+    ]
+  }
+}

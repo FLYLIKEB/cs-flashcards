@@ -1,0 +1,81 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-a81be06c297cc74f1746ec9c",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-a81be06c297cc74f1746ec9c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 3. 프로그래밍 언어",
+    "body": "### 1.\n\n다음 코드의 실행 결과에 대해 설명하시오.\n\n```c\nunsigned int i;\nfor (i = 100; i >= 0; )\n    printf(\"%u\\n\", --i);\n```\n\n### 2.\n\n파이썬(Python)의 자료구조 중 list, tuple, set의 차이점에 대하여 설명하시오.\n\n### 3.\n\n자바(Java)의 접근 제어자(Access Modifier)에는 default, private, protected, public이 있다. 각 접근 제어자에 대하여 설명하고 영향 범위가 넓은 순서대로 정렬하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로그래밍 언어",
+    "field_name": "컴퓨터공학 학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "프로그래밍 언어",
+      "Java"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 3. 프로그래밍 언어 · 3. 프로그래밍 언어",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-a81be06c297cc74f1746ec9c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "자바(Java)의 접근 제어자 default, private, protected, public을 각각 설명하고, 영향 범위를 넓은 순서대로 정렬하시오.",
+    "body": "",
+    "answer": "public > protected > default > private. public은 어디서나 접근 가능하고, protected는 같은 패키지와 하위 클래스에서 접근 가능하며, default는 같은 패키지 내부에서만 접근 가능하고, private는 같은 클래스 내부에서만 접근 가능하다.",
+    "explanation": "자바 접근 제어자는 가시성 범위에 따라 구분된다. public이 가장 넓고, protected는 패키지 내부와 상속 관계까지 허용한다. default는 접근 제어자를 생략한 경우로 같은 패키지에서만 접근 가능하다. private는 선언한 클래스 내부에서만 접근 가능하므로 범위가 가장 좁다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로그래밍 언어",
+    "field_name": "컴퓨터공학 학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "접근 제어자",
+      "Access Modifier",
+      "public",
+      "protected",
+      "default",
+      "private"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 3. 프로그래밍 언어 · 3. 프로그래밍 언어",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 3.\n\n자바(Java)의 접근 제어자(Access Modifier)에는 default, private, protected, public이 있다. 각 접근 제어자에 대하여 설명하고 영향 범위가 넓은 순서대로 정렬하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 문제 제목만 남아 있고 실제 문항이 body에 섞여 있었음",
+      "body에 다른 소문항 2개가 함께 포함되어 있었음",
+      "answer와 explanation이 비어 있었음",
+      "keywords가 실제 문항 개념을 충분히 반영하지 못했음"
+    ],
+    "changes": [
+      "자바 접근 제어자 문항만 남기도록 prompt를 정리함",
+      "무관한 다른 소문항을 제거하고 body를 비움",
+      "접근 범위 순서와 각 제어자 설명을 answer/explanation에 보강함",
+      "keywords를 접근 제어자 중심 용어로 정리함"
+    ]
+  }
+}

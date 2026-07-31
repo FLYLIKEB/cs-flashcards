@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-d75b217274e9fdd55bb6af51",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-d75b217274e9fdd55bb6af51",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 3. 소프트웨어 공학",
+    "body": "소프트웨어 공학과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n블랙박스 테스트 기법을 세 가지 이상 작성하시오.\n\n#### 2.\n\n테스트 오라클(Test Oracle)이 무엇인지 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "소프트웨어 공학",
+    "field_name": "컴퓨터공학 학술",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "소프트웨어 공학"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 3. 소프트웨어 공학",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-d75b217274e9fdd55bb6af51",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "블랙박스 테스트 기법을 세 가지 이상 제시하고, 테스트 오라클(Test Oracle)의 의미를 설명하시오.",
+    "body": "소프트웨어 공학",
+    "answer": "블랙박스 테스트 기법의 예로 동등 분할, 경계값 분석, 결정 테이블 테스트, 상태 전이 테스트, 원인-효과 그래프 기법 등이 있다. 테스트 오라클은 주어진 입력에 대해 소프트웨어의 기대 결과가 무엇인지 판단하여 실제 실행 결과의 정오를 판정하는 기준 또는 메커니즘이다.",
+    "explanation": "블랙박스 테스트는 내부 구현이 아니라 명세와 입출력을 기준으로 테스트 케이스를 설계한다. 따라서 대표 기법으로 입력 영역을 나누는 동등 분할, 경계 근처 오류를 찾는 경계값 분석, 조건 조합을 점검하는 결정 테이블 테스트 등을 제시할 수 있다. 테스트 오라클은 테스트 결과가 맞는지 비교·판정하는 참값 역할을 하며, 명세서·기존 시스템·수작업 계산 결과 등이 오라클이 될 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "소프트웨어 공학",
+    "field_name": "컴퓨터공학 학술",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "블랙박스 테스트",
+      "테스트 오라클",
+      "동등 분할",
+      "경계값 분석"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 3. 소프트웨어 공학",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 3. 소프트웨어 공학\n\n소프트웨어 공학과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n블랙박스 테스트 기법을 세 가지 이상 작성하시오.\n\n#### 2.\n\n테스트 오라클(Test Oracle)이 무엇인지 설명하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트가 제목 마크다운만 담고 있어 문제 의도가 드러나지 않음",
+      "정답과 해설이 비어 있어 학습용 문항으로 사용할 수 없음",
+      "키워드가 지나치게 포괄적임"
+    ],
+    "changes": [
+      "두 소문항을 합친 서술형 프롬프트로 정리",
+      "블랙박스 테스트 기법 예시와 테스트 오라클 정의를 정답·해설에 보강",
+      "키워드를 핵심 개념 중심으로 구체화"
+    ]
+  }
+}

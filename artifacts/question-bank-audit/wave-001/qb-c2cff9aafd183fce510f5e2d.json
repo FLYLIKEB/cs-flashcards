@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-c2cff9aafd183fce510f5e2d",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-c2cff9aafd183fce510f5e2d",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 2. 컴퓨터 네트워크",
+    "body": "컴퓨터 네트워크와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n**2-1 네트워크 설정 그림**\n\n![2-1 네트워크 설정 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.2019%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0003.bmp)\n\n다음 그림은 A과장의 네트워크 설정이다. 각 설정이 의미하는 바를 간략히 서술하시오.\n\n- IP 주소\n- 서브넷 마스크\n- 기본 게이트웨이\n- 기본 설정 DNS 서버\n- 보조 DNS 서버\n\n#### 2.\n\nDNS의 기능을 2가지 이상 서술하시오.\n\n#### 3.\n\n**2-3 Stop-And-Wait 프로토콜 그림**\n\n![2-3 Stop-And-Wait 프로토콜 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.2019%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0004.bmp)\n\n전송계층(transport layer)에서 데이터 전송 보장(reliable data transfer)을 위해 다양한 방식의 프로토콜을 사용하고 있다. 그 중 Stop-And-Wait 프로토콜이 가지고 있는 주요 문제점을 간략히 서술하고, 이를 보완한 Go-Back-N(GBN) 프로토콜과 Selective Repeat(SR) 프로토콜을 설명하시오.\n\n#### 4.\n\n라우팅 프로토콜(routing protocol) 중 Link-State(LS) 알고리즘과 Distance-Vector(DV) 알고리즘을 간략히 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터 네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "컴퓨터 네트워크",
+      "라우팅",
+      "DNS"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2019 컴퓨터공학 학술 파트 I · 2. 컴퓨터 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-c2cff9aafd183fce510f5e2d",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "컴퓨터 네트워크에서 DNS의 주요 기능을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 2. 컴퓨터 네트워크",
+    "answer": "DNS는 사람이 이해하기 쉬운 도메인 이름을 IP 주소로 변환하여 호스트를 찾게 하고, 반대로 IP 주소에 대응하는 도메인 이름을 조회하는 기능도 제공한다. 또한 계층적 분산 데이터베이스 구조를 통해 도메인 정보를 관리하고 메일 서버 조회(MX), 별칭 설정(CNAME) 등 다양한 이름 관련 서비스를 지원한다.",
+    "explanation": "원문은 네트워크 설정 그림, Stop-and-Wait 도식, 라우팅 비교 등 여러 서술형 문항이 한 행에 합쳐져 있고 필요한 그림도 포함되어 있어 단일 문제 행으로는 직접 출제하기 어렵다. 그중 그림 없이도 독립적으로 성립하는 DNS 기능 서술 문제로 변환했다. DNS의 핵심은 이름 해석과 분산형 도메인 정보 관리이며, 다양한 레코드를 통해 여러 네트워크 서비스를 연결한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터 네트워크",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "DNS",
+      "도메인 이름 해석",
+      "네임 서버"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2019 컴퓨터공학 학술 파트 I · 2. 컴퓨터 네트워크",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 2. 프로그래밍 언어\n\n프로그래밍 언어와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n객체지향언어가 지니는 장점에 대해 간략히 설명하시오.\n\n#### 2.\n\n객체지향언어 중 Java는 다중 상속이 불가하고 C++는 다중 상속이 가능하다. 상속(inheritance)에 있어서 단일 상속(single inheritance)과 다중 상속(multiple inheritance)의 차이를 설명하고, 다중 상속이 가지는 문제점을 서술하시오.\n\n#### 3.\n\n객체지향언어의 특성인 오버로딩(overloading)과 오버라이딩(overriding)에 대해 간략히 설명하시오.\n\n#### 4.\n\n##### 1. 다음 Java 코드의 실행 결과를 작성하시오.\n\n```java\nclass Parent{\n    Parent( ){\n        System.out.println(\"Parent 1\");\n    }\n    Parent(String str){\n        System.out.println(\"Parent 2\");\n    }\n}\n\nclass Child extends Parent{\n    Child( ){\n        System.out.println(\"Child 1\");\n    }\n    Child(String str){\n        System.out.println(\"Child 2\");\n    }\n}\n\nclass FamilyTest{\n    public static void main(String args[]){\n        Child c1 = new Child( );\n        Child c2 = new Child(\"a\");\n    }\n}\n```\n\n```text\n<실행결과>\n\n```\n\n##### 2. 다음 Java 코드에서 문제가 있는 부분 두 곳을 지적하고 그 이유를 설명하시오.\n\n```java\nclass Parent{\n    Parent( ){ }\n}\n\nclass Child extends Parent{\n    Child( ){ }\n    public void init( ){ }\n}\n\nclass FamilyTest{\n    public static void main(String args[]){\n        Parent p = null;\n        Child c1 = new Child( );\n        Child c2 = null;\n        p = c1;\n        p.init( );\n        c2 = p;\n    }\n}\n```\n\n```text\n<문제점>\n\n```\n\n##### 3. 재귀호출(recursive call) 방식을 이용하여 `x^n`을 구하는 함수를 Java 코드로 작성하시오.\n\n```java\nstatic long power(int x, int n){\n}\n```",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "여러 서술형 하위 문항과 그림 의존 정보가 한 행에 합쳐져 단일 문제로 사용하기 어려움",
+      "prompt에 마크다운 제목만 남아 있고 answer·explanation이 비어 있음",
+      "source_excerpt가 다른 과목 내용이라 원문 검증 정보도 불일치함"
+    ],
+    "changes": [
+      "DNS 기능을 묻는 독립적인 개념 서술형 문제로 변환함",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 정리함",
+      "정답·해설·키워드를 DNS 중심으로 보강하고 audit 상태를 converted로 갱신함"
+    ]
+  }
+}

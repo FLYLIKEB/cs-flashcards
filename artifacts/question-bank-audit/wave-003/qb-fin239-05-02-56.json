@@ -1,0 +1,81 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-56",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-56",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 86. CPU 스케줄링 문제. SJF 스케줄링 시 평균 대기시간은?",
+    "body": "프로세스                                       실행시간\nP1                                         6\nP2                                         2\nP3                                         4",
+    "answer": "2번",
+    "explanation": "2번",
+    "rubric": [],
+    "choices": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "answer_index": 1,
+    "topic": "CPU 스케줄링 문제. SJF 스케줄링 시 평균 대기시간은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "CPU",
+      "프로세스",
+      "스케줄링",
+      "SJF"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 86. CPU 스케줄링 문제. SJF 스케줄링 시 평균 대기시간은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-56",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "SJF 스케줄링에서 평균 대기시간을 계산하려면 어떤 정보가 필요하며, 계산은 어떤 순서로 하는가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 86. CPU 스케줄링 문제. SJF 스케줄링 시 평균 대기시간은?",
+    "answer": "각 프로세스의 도착시간과 실행시간이 필요하며, SJF 순서로 실행 대상을 정한 뒤 각 프로세스의 대기시간을 구해 평균내면 된다.",
+    "explanation": "원문에는 실행시간만 있고 도착시간 정보가 없어 평균 대기시간을 하나로 확정할 수 없다. SJF 평균 대기시간은 일반적으로 도착시간과 실행시간을 기준으로 실행 순서를 정하고, 각 프로세스의 시작 전 대기시간을 합산한 뒤 프로세스 수로 나누어 계산한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SJF 스케줄링",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "SJF",
+      "CPU 스케줄링",
+      "평균 대기시간",
+      "도착시간"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 86. CPU 스케줄링 문제. SJF 스케줄링 시 평균 대기시간은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 86. CPU 스케줄링 문제. SJF 스케줄링 시 평균 대기시간은?\n\n프로세스                                       실행시간\nP1                                         6\nP2                                         2\nP3                                         4\n1. 2\n2. 3\n3. 4\n4. 5\n\n**답:** 2번",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문 prompt에 마크다운 번호가 남아 있고, 정답과 해설이 모두 '2번'으로만 적혀 있었다.",
+      "평균 대기시간 계산에 필요한 도착시간 정보가 source_excerpt에 없어 실전형 객관식으로는 정답을 확정할 수 없었다."
+    ],
+    "changes": [
+      "불완전한 계산형 문제를 SJF 평균 대기시간 계산 개념을 묻는 단답형 문제로 변환했다.",
+      "choices와 answer_index를 비우고, 근거 있는 answer·explanation·topic·keywords로 정리했다."
+    ]
+  }
+}

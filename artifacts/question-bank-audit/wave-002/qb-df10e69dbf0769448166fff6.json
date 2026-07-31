@@ -1,0 +1,81 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-df10e69dbf0769448166fff6",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-df10e69dbf0769448166fff6",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 8. 운영체제",
+    "body": "운영체제와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n프로세스(Process)와 쓰레드(Thread)의 정의 및 차이점을 설명하시오.\n\n#### 2.\n\n멀티코어 시스템에서 임계구역을 보호하기 위한 대표적인 기법에는 바쁜 대기(Busy Waiting)를 하는 `스핀락(Spinlock)`과 기다리는 동안 프로세스가 수면상태로 들어갈 수 있는 `뮤텍스(Mutex)`가 있다. 다음 각 시나리오에 둘 중 어떤 기법을 적용하는 것이 가장 좋을지 답하시오.\n\n1. 임계구간이 짧고 경쟁 상황이 빈번하게 발생\n2. 임계구간이 길어 비교적 오래 락을 획득해야 하는 상황\n3. 다른 임계구간을 제어하는 스핀락을 획득한 상태\n\n#### 3.\n\n다음과 같은 리눅스 프로그램에서 표시된 부분의 실행 결과와 그 이유를 설명하시오.\n\n```c\n#include <sys/types.h>\n#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    pid_t pid;\n    pid = fork();\n    if (pid < 0) {\n        fprintf(stderr, \"Fork failed\");\n        return 1;\n    } else if (pid == 0) {\n        execlp(\"/bin/ls\", \"ls\", NULL);\n        printf(\"Hello World\");\n    } else {\n        wait(NULL);\n        printf(\"Child Complete\");\n    }\n    return 0;\n}\n```\n\n#### 4.\n\n문제 `3.`의 소스코드에서 `wait(NULL)` 코드의 역할과, 이 코드가 없는 경우 발생할 수 있는 문제점에 대해 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "운영체제",
+      "프로세스"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 8. 운영체제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-df10e69dbf0769448166fff6",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "운영체제 관련 각 물음에 답하시오.",
+    "body": "1. 프로세스(Process)와 스레드(Thread)의 정의 및 차이점을 설명하시오.\n\n2. 멀티코어 시스템에서 임계구역을 보호하기 위한 대표적인 기법에는 바쁜 대기(Busy Waiting)를 하는 스핀락(Spinlock)과 기다리는 동안 프로세스가 수면상태로 들어갈 수 있는 뮤텍스(Mutex)가 있다. 다음 각 시나리오에 둘 중 어떤 기법을 적용하는 것이 가장 좋을지 답하시오.\n- 임계구간이 짧고 경쟁 상황이 빈번하게 발생\n- 임계구간이 길어 비교적 오래 락을 획득해야 하는 상황\n- 다른 임계구간을 제어하는 스핀락을 획득한 상태\n\n3. 다음 리눅스 프로그램에서 자식 프로세스의 execlp(\"/bin/ls\", \"ls\", NULL) 호출 뒤와 부모 프로세스의 printf(\"Child Complete\") 실행 결과 및 그 이유를 설명하시오.\n\n```c\n#include <sys/types.h>\n#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    pid_t pid;\n    pid = fork();\n    if (pid < 0) {\n        fprintf(stderr, \"Fork failed\");\n        return 1;\n    } else if (pid == 0) {\n        execlp(\"/bin/ls\", \"ls\", NULL);\n        printf(\"Hello World\");\n    } else {\n        wait(NULL);\n        printf(\"Child Complete\");\n    }\n    return 0;\n}\n```\n\n4. 문제 3의 소스코드에서 wait(NULL)의 역할과, 이 코드가 없는 경우 발생할 수 있는 문제점을 설명하시오.",
+    "answer": "1. 프로세스는 실행 중인 프로그램으로 독립된 주소 공간과 자원을 가지며, 스레드는 프로세스 내부의 실행 흐름 단위로 코드·데이터·힙은 공유하고 스택과 레지스터 상태는 별도로 가진다. 프로세스 간 전환은 비용이 크고 격리가 강하며, 스레드는 생성·전환이 가볍지만 동기화 문제가 중요하다.\n\n2. 임계구간이 짧고 경쟁이 빈번하면 스핀락, 임계구간이 길면 뮤텍스, 다른 스핀락을 이미 쥔 상태에서는 잠자는 동안 락을 쥔 채 스케줄링 문제가 생길 수 있으므로 스핀락이 적합하다.\n\n3. 자식 프로세스에서 execlp가 성공하면 현재 프로세스 이미지가 /bin/ls로 대체되므로 Hello World는 출력되지 않고 ls의 실행 결과만 나온다. 부모는 wait(NULL)로 자식 종료를 기다린 뒤 Child Complete를 출력한다.\n\n4. wait(NULL)은 부모가 자식 종료를 회수(reap)하여 종료 순서를 보장하고 좀비 프로세스를 방지하게 한다. 이 호출이 없으면 부모와 자식의 출력 순서가 뒤섞일 수 있고, 부모가 자식 종료 상태를 회수하지 않아 일시적으로 좀비 프로세스가 남을 수 있다.",
+    "explanation": "원문은 운영체제 대문항 4개를 한 행에 담고 있으므로 prompt는 질문 지시문만 남기고 세부 문항과 코드만 body로 정리했다. 프로세스와 스레드 비교의 핵심은 자원/주소공간의 독립성, 실행 단위, 문맥교환 비용과 동기화 부담이다. 락 선택에서는 짧은 임계구역과 절전 불가 상황에서는 스핀락, 긴 대기에서는 CPU 낭비를 줄이는 뮤텍스가 적합하다. execlp가 성공하면 그 다음 문장은 실행되지 않으며, wait(NULL)은 부모가 자식 종료를 동기화하고 좀비를 방지한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제",
+    "field_name": "컴퓨터공학 학술",
+    "category": "운영체제",
+    "keywords": [
+      "운영체제",
+      "프로세스",
+      "스레드",
+      "스핀락",
+      "뮤텍스",
+      "fork",
+      "wait"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2024 컴퓨터공학 학술 파트 I · 8. 운영체제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 8. 운영체제\n\n운영체제와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n프로세스(Process)와 쓰레드(Thread)의 정의 및 차이점을 설명하시오.\n\n#### 2.\n\n멀티코어 시스템에서 임계구역을 보호하기 위한 대표적인 기법에는 바쁜 대기(Busy Waiting)를 하는 `스핀락(Spinlock)`과 기다리는 동안 프로세스가 수면상태로 들어갈 수 있는 `뮤텍스(Mutex)`가 있다. 다음 각 시나리오에 둘 중 어떤 기법을 적용하는 것이 가장 좋을지 답하시오.\n\n1. 임계구간이 짧고 경쟁 상황이 빈번하게 발생\n2. 임계구간이 길어 비교적 오래 락을 획득해야 하는 상황\n3. 다른 임계구간을 제어하는 스핀락을 획득한 상태\n\n#### 3.\n\n다음과 같은 리눅스 프로그램에서 표시된 부분의 실행 결과와 그 이유를 설명하시오.\n\n```c\n#include <sys/types.h>\n#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    pid_t pid;\n    pid = fork();\n    if (pid < 0) {\n        fprintf(stderr, \"Fork failed\");\n        return 1;\n    } else if (pid == 0) {\n        execlp(\"/bin/ls\", \"ls\", NULL);\n        printf(\"Hello World\");\n    } else {\n        wait(NULL);\n        printf(\"Child Complete\");\n    }\n    return 0;\n}\n```\n\n#### 4.\n\n문제 `3.`의 소스코드에서 `wait(NULL)` 코드의 역할과, 이 코드가 없는 경우 발생할 수 있는 문제점에 대해 설명하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트가 제목 마크다운만 포함함",
+      "정답과 해설이 비어 있음",
+      "body에 마크다운 헤딩/불필요한 표기 노이즈가 섞여 있음",
+      "키워드가 문항 범위를 충분히 반영하지 못함"
+    ],
+    "changes": [
+      "prompt를 실제 지시문으로 정리함",
+      "세부 문항과 코드를 body에 재구성하고 마크다운 노이즈를 제거함",
+      "4개 소문항에 대한 모범답안과 해설을 보강함",
+      "핵심 운영체제 용어 중심으로 keywords를 확장함"
+    ]
+  }
+}

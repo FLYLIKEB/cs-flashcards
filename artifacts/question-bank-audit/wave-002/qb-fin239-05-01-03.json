@@ -1,0 +1,73 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-03",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-03",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "### 3. 오픈마켓 뜻",
+    "body": "- 오픈마켓: 인터넷에서 판매자와 구매자를 직접 연결하여 자유롭게 물건을 사고팔 수 있는 곳",
+    "answer": "판매자와 구매자가 온라인 플랫폼에서 직접 거래하고 플랫폼은 중개 역할을 하는 전자상거래 시장이다.",
+    "explanation": "판매자와 구매자가 온라인 플랫폼에서 직접 거래하고 플랫폼은 중개 역할을 하는 전자상거래 시장이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "오픈마켓 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "오픈마켓"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 3. 오픈마켓 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-03",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "오픈마켓의 뜻을 설명하시오.",
+    "body": "",
+    "answer": "판매자와 구매자가 온라인 플랫폼에서 직접 거래하고 플랫폼은 중개 역할을 하는 전자상거래 시장이다.",
+    "explanation": "오픈마켓은 플랫폼이 직접 상품을 판매하기보다 다수의 판매자와 구매자를 연결해 거래를 중개하는 전자상거래 형태다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "오픈마켓 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "오픈마켓",
+      "전자상거래",
+      "온라인 플랫폼"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 3. 오픈마켓 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 3. 오픈마켓 뜻\n- 오픈마켓: 인터넷에서 판매자와 구매자를 직접 연결하여 자유롭게 물건을 사고팔 수 있는 곳\n**답(AI답변):** 판매자와 구매자가 온라인 플랫폼에서 직접 거래하고 플랫폼은 중개 역할을 하는 전자상거래 시장이다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 헤딩이 남아 있었음",
+      "body에 정답 정의가 노출되어 있었음"
+    ],
+    "changes": [
+      "prompt를 자연스러운 질문형 문장으로 정리함",
+      "body의 답안 누설 내용을 제거함",
+      "explanation과 keywords를 개념 중심으로 보강함"
+    ]
+  }
+}

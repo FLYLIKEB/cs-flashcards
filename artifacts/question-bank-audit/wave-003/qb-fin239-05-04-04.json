@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-04",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-04",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 133. 직원,부서 테이블에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 직원,부서 테이블 보여주고 관계 관련해서 물어보는 문제",
+    "answer": "직원-부서 관계는 보통 부서 1 : 직원 N 관계이며, 직원 테이블이 부서번호를 외래키로 가진다.",
+    "explanation": "직원-부서 관계는 보통 부서 1 : 직원 N 관계이며, 직원 테이블이 부서번호를 외래키로 가진다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "직원,부서 테이블에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "직원",
+      "부서 테이블"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 133. 직원,부서 테이블에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-04",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "직원 테이블과 부서 테이블의 관계를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 133. 직원,부서 테이블 보여주고 관계 관련해서 물어보는 문제",
+    "answer": "직원 테이블과 부서 테이블은 일반적으로 부서 1 : 직원 N의 관계이며, 직원 테이블이 부서번호를 외래키로 참조한다.",
+    "explanation": "원문은 실제 테이블 구조나 선택지가 없어 원래 형태로는 확정 풀이가 어려워 개념문제로 전환했다. 일반적인 데이터 모델에서는 하나의 부서에 여러 직원이 소속될 수 있으므로 부서와 직원은 1:N 관계이고, 직원 테이블의 부서번호 외래키로 참조 무결성을 유지한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "직원 테이블과 부서 테이블의 관계를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "직원 테이블",
+      "부서 테이블",
+      "외래키",
+      "1:N 관계"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 133. 직원 테이블과 부서 테이블의 관계를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 133. 직원,부서 테이블 보여주고 관계 관련해서 물어보는 문제\n**답(AI답변):** 직원-부서 관계는 보통 부서 1 : 직원 N 관계이며, 직원 테이블이 부서번호를 외래키로 가진다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 markdown heading 표식과 문항 번호가 남아 있었음",
+      "원문에 실제 테이블 구조나 선택지가 없어 원래 문제 형태로는 확정 풀이가 어려웠음",
+      "body의 변환 메모 문구가 공통 규칙 형식과 달랐고 원문 제목에서 번호가 빠져 있었음",
+      "category와 keywords가 데이터베이스 관계 모델 질문에 비해 지나치게 포괄적이었고 explanation이 answer와 중복되었음"
+    ],
+    "changes": [
+      "문항을 직원 테이블과 부서 테이블의 관계를 묻는 명시적 개념형 subjective 질문으로 정리함",
+      "body를 공통 규칙의 2줄 변환 형식으로 교체하고 원문 제목을 번호 포함 형태로 보존함",
+      "answer와 explanation을 1:N 관계, 외래키, 참조 무결성 중심으로 구체화함",
+      "category를 데이터베이스로 바로잡고 keywords와 source_location을 문제 의미에 맞게 정리함"
+    ]
+  }
+}

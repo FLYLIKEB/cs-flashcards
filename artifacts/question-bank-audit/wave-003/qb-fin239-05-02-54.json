@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-54",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-54",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 84. 역행렬에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 역행렬계산. 다음 행렬 A와 B에 대해 A×B의 결과로 옳은 것은?",
+    "answer": "역행렬의 핵심 개념과 대표 원리·판단 기준을 설명할 수 있어야 한다.",
+    "explanation": "역행렬의 핵심 개념과 대표 원리·판단 기준을 설명할 수 있어야 한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "역행렬에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "역행렬"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 84. 역행렬에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-54",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "역행렬이 무엇이며 어떤 조건에서 존재하는지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 84. 역행렬계산. 다음 행렬 A와 B에 대해 A×B의 결과로 옳은 것은?",
+    "answer": "역행렬은 정사각행렬 A에 대해 A×A⁻¹ = A⁻¹×A = I를 만족하는 행렬 A⁻¹이며, 행렬식이 0이 아닌 가역행렬에서만 유일하게 존재한다.",
+    "explanation": "역행렬은 어떤 행렬을 곱했을 때 단위행렬 I가 되도록 만드는 행렬이다. 따라서 역행렬이 존재하려면 행과 열의 수가 같은 정사각행렬이어야 하고, det(A) ≠ 0이어야 한다. 역행렬이 존재하면 선형방정식 Ax=b를 x=A⁻¹b 형태로 풀 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "역행렬",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "역행렬",
+      "가역행렬",
+      "단위행렬"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 84. 역행렬계산",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 존재 조건 → 핵심 성질/활용 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 84. 역행렬계산. 다음 행렬 A와 B에 대해 A×B의 결과로 옳은 것은?\n1. - 2. - 3. - 4. **답:** 1번",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문 선택지와 행렬 데이터가 없어 실전형 계산 문제로는 풀 수 없었다.",
+      "prompt에 마크다운 헤딩과 번호가 남아 있었고, answer/explanation이 실제 정답 설명이 아니라 일반 문구였다.",
+      "변환 메모 문구와 source_location이 원문 기준으로 정리되지 않았다."
+    ],
+    "changes": [
+      "불완전한 계산형 문항을 역행렬의 정의와 존재 조건을 묻는 개념형 주관식으로 변환했다.",
+      "prompt, body, answer, explanation을 규칙에 맞게 정리하고 topic, keywords, answer_guide를 구체화했다.",
+      "source_location을 원문 제목 기준으로 수정하고 audit 상태를 converted로 갱신했다."
+    ]
+  }
+}

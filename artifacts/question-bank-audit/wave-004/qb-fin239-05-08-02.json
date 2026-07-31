@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-02",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-02",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 207. 단일 프로세서 환경에서도 동기화 문제가 발생하는 이유를 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 단일 프로세서 동기화 문제 유무, 발생한다면 어떤 경우인가?",
+    "answer": "단일 프로세서에서도 인터럽트나 선점형 스케줄링으로 공유자원 접근이 교차되면 동기화 문제가 발생할 수 있다.",
+    "explanation": "단일 프로세서에서도 인터럽트나 선점형 스케줄링으로 공유자원 접근이 교차되면 동기화 문제가 발생할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "단일 프로세서 환경에서도 동기화 문제가 발생하는 이유를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "단일 프로세서 환경의 동기화"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 207. 단일 프로세서 환경에서도 동기화 문제가 발생하는 이유를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-02",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "단일 프로세서 환경에서도 동기화 문제가 발생할 수 있는 이유는 무엇인가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 207. 단일 프로세서 동기화 문제 유무, 발생한다면 어떤 경우인가?(서술)",
+    "answer": "단일 프로세서에서도 인터럽트나 선점형 스케줄링 때문에 임계구역 수행이 중간에 끊기면 공유 자원 접근 순서가 어긋나 동기화 문제가 발생할 수 있다.",
+    "explanation": "CPU가 하나여도 한 실행 흐름이 공유 자원을 다루는 도중 인터럽트 처리나 다른 태스크로의 선점이 일어나면 임계구역이 원자적으로 보장되지 않는다. 그 결과 갱신 순서가 뒤섞여 경쟁 상태가 생길 수 있으므로 락, 인터럽트 제어, 임계구역 보호 같은 동기화 기법이 필요하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로세스 동기화",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "프로세스 동기화",
+      "임계구역",
+      "선점형 스케줄링",
+      "인터럽트"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 207. 단일 프로세서 동기화 문제 유무, 발생한다면 어떤 경우인가?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 207. 단일 프로세서 동기화 문제 유무, 발생한다면 어떤 경우인가?(서술)\n**답(AI답변):** 단일 프로세서에서도 인터럽트나 선점형 스케줄링으로 공유자원 접근이 교차되면 동기화 문제가 발생할 수 있다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row.prompt에 마크다운 헤딩과 번호가 남아 있어 질문문만 남기지 못했다.",
+      "불완전 원문 변환 문제인데 body 문구가 공통 규칙의 정확한 2줄 형식과 다르다.",
+      "topic과 keywords가 문장형이라 카드/검색용 메타데이터로 쓰기 부정확하다.",
+      "source_location이 변환된 질문 문구를 따라가 원문 제목과 어긋난다."
+    ],
+    "changes": [
+      "prompt를 명시적 개념 질문으로 정리하고 incomplete-source 변환 규칙에 맞춰 body 2줄을 교체했다.",
+      "answer와 explanation을 임계구역, 인터럽트, 선점에 근거한 서술형 답안으로 보강했다.",
+      "topic을 프로세스 동기화로 정리하고 keywords를 핵심 용어 4개로 재구성했다.",
+      "source_location을 원문 제목 기준으로 바로잡고 audit 상태를 converted로 변경했다."
+    ]
+  }
+}

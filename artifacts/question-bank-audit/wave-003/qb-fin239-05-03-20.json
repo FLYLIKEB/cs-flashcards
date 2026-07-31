@@ -1,0 +1,79 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-20",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-20",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 107. 서버 가상화 기술에 대해 옳지 않은 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "해당 지문은 모두 옳은 선지임.",
+    "rubric": [],
+    "choices": [
+      "가상화 대상이 되는 컴퓨터 자원은 프로세서, 메모리, 스토리지, 네트워크를 포함한다",
+      "가상화 기술 종류는 서버가상화, 데스크톱 가상화, 애플리케이션 가상화이다",
+      "해당 지문은 모두 옳은 선지임."
+    ],
+    "answer_index": 2,
+    "topic": "서버 가상화 기술에 대해 옳지 않은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "서버 가상화 기술"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 107. 서버 가상화 기술에 대해 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-20",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "서버 가상화 기술에서 가상화의 대상 자원과 대표적인 가상화 유형을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 107. 서버 가상화 기술에 대해 옳지 않은 것은?",
+    "answer": "가상화는 프로세서, 메모리, 스토리지, 네트워크 같은 컴퓨터 자원을 논리적으로 분리·추상화하여 활용하는 기술이며, 대표적인 가상화 유형으로 서버 가상화, 데스크톱 가상화, 애플리케이션 가상화가 있다.",
+    "explanation": "원문에는 두 개의 진술과 정답 메모만 남아 있어 원래의 객관식 문제를 완전하게 복원할 수 없다. 따라서 남아 있는 근거를 바탕으로 가상화의 대상 자원과 대표 유형을 설명하는 개념형 문항으로 변환했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "서버 가상화 기술",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "서버 가상화",
+      "가상화",
+      "데스크톱 가상화",
+      "애플리케이션 가상화"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 107. 서버 가상화 기술에 대해 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "가상화 대상 자원과 대표 유형을 포함해 2~3문장으로 설명",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 107. 서버 가상화 기술에 대해 옳지 않은 것은?\n1. 가상화 대상이 되는 컴퓨터 자원은 프로세서, 메모리, 스토리지, 네트워크를 포함한다\n2. 가상화 기술 종류는 서버가상화, 데스크톱 가상화, 애플리케이션 가상화이다\n  **답:** 해당 지문은 모두 옳은 선지임.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "문항 제목에 마크다운 번호가 남아 있었고 객관식 본문이 비어 있었다.",
+      "선지가 2개뿐인데 해설 문장이 제3선지로 들어가 있어 객관식 구조가 성립하지 않았다.",
+      "source_excerpt에 정답 메모만 있어 원문 객관식을 완전하게 복원할 수 없었다."
+    ],
+    "changes": [
+      "불완전한 객관식을 가상화 대상 자원과 대표 유형을 묻는 개념형 서술 문제로 변환했다.",
+      "prompt, body, answer, explanation, question_type, choices, answer_index를 변환 규칙에 맞게 정리했다.",
+      "topic, keywords, answer_guide를 서버 가상화 개념 학습에 맞게 정비했다."
+    ]
+  }
+}

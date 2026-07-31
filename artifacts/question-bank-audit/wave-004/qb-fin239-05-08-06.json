@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-06",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-06",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 211. 리눅스 setuid 비트의 의미를 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: -rwsr-xr-x, s의 의미는?",
+    "answer": "s는 setuid 비트다. 실행 파일 실행 시 파일 소유자의 권한으로 실행됨을 의미한다.",
+    "explanation": "s는 setuid 비트다. 실행 파일 실행 시 파일 소유자의 권한으로 실행됨을 의미한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "리눅스 setuid 비트의 의미를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "setuid 비트"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 211. 리눅스 setuid 비트의 의미를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-06",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "리눅스에서 setuid 비트의 의미를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 211. -rwsr-xr-x, s의 의미는? (약술)",
+    "answer": "setuid 비트는 실행 파일을 실행한 사용자가 아니라 파일 소유자의 권한으로 그 프로그램이 실행되도록 하는 특수 권한 비트이다.",
+    "explanation": "리눅스 파일 권한 표시에서 소유자 실행 권한 위치에 s가 보이면 setuid가 설정된 것이다. 이 비트가 설정된 실행 파일은 실행한 계정이 아닌 파일 소유자 권한으로 동작하므로 passwd처럼 일시적으로 상위 권한이 필요한 프로그램에 사용된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "리눅스 파일 권한",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "setuid",
+      "리눅스 파일 권한",
+      "특수 권한 비트"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 211. 리눅스 setuid 비트의 의미를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 211. -rwsr-xr-x, s의 의미는? (약술)\n**답(AI답변):** s는 setuid 비트다. 실행 파일 실행 시 파일 소유자의 권한으로 실행됨을 의미한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호/헤딩 흔적이 남아 있었음",
+      "불완전 원문 변환 메모가 공통 규칙 문구와 일치하지 않았음",
+      "topic이 질문 문장 자체여서 메타데이터 정리가 필요했음",
+      "answer와 explanation이 동일해 설명 보강이 필요했음"
+    ],
+    "changes": [
+      "prompt를 명시적 개념 질문으로 정리함",
+      "body를 공통 규칙의 2줄 변환 형식으로 수정하고 원문 제목을 반영함",
+      "answer를 정답만 남기고 explanation에 setuid 동작 맥락을 보강함",
+      "topic과 keywords를 setuid 개념 중심으로 정리함"
+    ]
+  }
+}

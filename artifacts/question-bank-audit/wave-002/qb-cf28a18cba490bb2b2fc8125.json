@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-cf28a18cba490bb2b2fc8125",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-cf28a18cba490bb2b2fc8125",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 8. 컴퓨터구조: RAID",
+    "body": "컴퓨터구조와 관련하여 다음 물음에 답하시오.\n\n1. 다음은 여러 물리 디스크를 마치 하나의 논리 장치처럼 사용하는 RAID 기술의 일부를 나타낸 그림이다. **A 방식**과 **B 방식**은 각각 어떤 RAID 단계(RAID-n)인지 쓰고, A 방식 대비 B 방식의 장점을 서술하시오.\n\n   **A 방식**\n\n   | Disk1 | Disk2 | Disk3 | Disk4 |\n   |---|---|---|---|\n   | A1 | A2 | A3 | parity A |\n   | B1 | B2 | parity B | B3 |\n   | C1 | parity C | C2 | C3 |\n   | parity D | D1 | D2 | D3 |\n\n   **B 방식**\n\n   | Disk1 | Disk2 | Disk3 | Disk4 | Disk5 |\n   |---|---|---|---|---|\n   | A1 | A2 | A3 | parity 1 A | parity 2 A |\n   | B1 | B2 | parity 1 B | parity 2 B | B3 |\n   | C1 | parity 1 C | parity 2 C | C2 | C3 |\n   | parity 1 D | parity 2 D | D1 | D2 | D3 |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터구조: RAID",
+    "field_name": "컴퓨터공학 학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "컴퓨터구조",
+      "RAID"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 8. 컴퓨터구조: RAID · 8. 컴퓨터구조: RAID",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-cf28a18cba490bb2b2fc8125",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "A 방식과 B 방식이 각각 어떤 RAID 단계인지 쓰고, A 방식 대비 B 방식의 장점을 서술하시오.",
+    "body": "여러 물리 디스크를 하나의 논리 장치처럼 사용하는 RAID 기술의 일부를 나타낸다.\n\nA 방식\n| Disk1 | Disk2 | Disk3 | Disk4 |\n|---|---|---|---|\n| A1 | A2 | A3 | parity A |\n| B1 | B2 | parity B | B3 |\n| C1 | parity C | C2 | C3 |\n| parity D | D1 | D2 | D3 |\n\nB 방식\n| Disk1 | Disk2 | Disk3 | Disk4 | Disk5 |\n|---|---|---|---|---|\n| A1 | A2 | A3 | parity 1 A | parity 2 A |\n| B1 | B2 | parity 1 B | parity 2 B | B3 |\n| C1 | parity 1 C | parity 2 C | C2 | C3 |\n| parity 1 D | parity 2 D | D1 | D2 | D3 |",
+    "answer": "A 방식은 RAID 5이고 B 방식은 RAID 6이다. B 방식은 이중 분산 패리티를 사용하므로 동시에 2개의 디스크 장애까지 견딜 수 있어 RAID 5보다 내결함성과 가용성이 높다.",
+    "explanation": "A 방식은 데이터 블록과 단일 패리티가 여러 디스크에 분산되어 있어 RAID 5의 전형적인 형태이다. B 방식은 각 스트라이프마다 parity 1, parity 2의 두 패리티 블록이 분산되어 있어 RAID 6에 해당한다. 따라서 B 방식은 디스크 1개 고장만 허용하는 RAID 5보다 장애 허용 범위가 넓고, 재구성 중 추가 장애에도 더 안전하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "컴퓨터구조: RAID",
+    "field_name": "컴퓨터공학 학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "RAID",
+      "RAID 5",
+      "RAID 6",
+      "분산 패리티",
+      "이중 패리티"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 8. 컴퓨터구조: RAID · 8. 컴퓨터구조: RAID",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트가 마크다운 제목만 남아 문제 의도가 드러나지 않음",
+      "정답과 해설이 비어 있음",
+      "키워드가 지나치게 포괄적임"
+    ],
+    "changes": [
+      "프롬프트를 RAID 단계 식별 및 비교 질문으로 정리",
+      "RAID 5·RAID 6 정답과 장점 해설 보강",
+      "키워드를 RAID 5·RAID 6·패리티 중심으로 구체화"
+    ]
+  }
+}

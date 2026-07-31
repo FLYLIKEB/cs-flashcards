@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-d22b6dab0524882a4ba2c9e4",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-d22b6dab0524882a4ba2c9e4",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 3. 프로그래밍 언어: Java 코드 실행 결과",
+    "body": "프로그래밍 언어와 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n다음 프로그램의 실행 결과와 그 이유를 답하시오.\n\n```java\npublic static void main(String[] args){\n    String str1 = new String(\"한국은행\");\n    String str2 = new String(\"한국은행\");\n\n    if(str1 == str2)\n        System.out.println(\"일치\");\n    else\n        System.out.println(\"불일치\");\n}\n```\n\n#### 2.\n\n다음 프로그램의 실행 결과를 표 우측 빈 공간에 작성하시오.\n\n```java\nclass Parent{\n    Parent( ){\n        System.out.println(\"Parent 1\");\n    }\n    Parent(String str){\n        System.out.println(\"Parent 2\");\n    }\n}\n\nclass Child1 extends Parent{\n    Child1( ){\n        System.out.println(\"Child 1\");\n    }\n}\n\nclass Child2 extends Parent{\n    Child2(String str){\n        System.out.println(\"Child 2\");\n    }\n}\n\nclass FamilyTest{\n    public static void main(String[] args){\n        Child1 c1 = new Child1( );\n        Child2 c2 = new Child2(\"a\");\n    }\n}\n```\n\n**실행 결과 작성란**\n\n- 1행:\n- 2행:",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로그래밍 언어: Java 코드 실행 결과",
+    "field_name": "컴퓨터공학 학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "프로그래밍 언어",
+      "Java 코드 실행 결과",
+      "Java"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 3. 프로그래밍 언어: Java 코드 실행 결과 · 3. 프로그래밍 언어: Java 코드 실행 결과",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-d22b6dab0524882a4ba2c9e4",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "다음 두 Java 프로그램의 실행 결과를 쓰고, 1번 코드가 그렇게 출력되는 이유를 설명하시오.",
+    "body": "1) 다음 프로그램의 실행 결과와 그 이유를 답하시오.\n\n```java\npublic static void main(String[] args){\n    String str1 = new String(\"한국은행\");\n    String str2 = new String(\"한국은행\");\n\n    if(str1 == str2)\n        System.out.println(\"일치\");\n    else\n        System.out.println(\"불일치\");\n}\n```\n\n2) 다음 프로그램의 실행 결과를 순서대로 쓰시오.\n\n```java\nclass Parent{\n    Parent( ){\n        System.out.println(\"Parent 1\");\n    }\n    Parent(String str){\n        System.out.println(\"Parent 2\");\n    }\n}\n\nclass Child1 extends Parent{\n    Child1( ){\n        System.out.println(\"Child 1\");\n    }\n}\n\nclass Child2 extends Parent{\n    Child2(String str){\n        System.out.println(\"Child 2\");\n    }\n}\n\nclass FamilyTest{\n    public static void main(String[] args){\n        Child1 c1 = new Child1( );\n        Child2 c2 = new Child2(\"a\");\n    }\n}\n```",
+    "answer": "1) 불일치  2) Parent 1, Child 1, Parent 1, Child 2",
+    "explanation": "1) `new String()`으로 생성한 `str1`과 `str2`는 내용은 같아도 서로 다른 객체이므로 `==` 비교 결과가 거짓이어서 `불일치`가 출력된다. 2) `Child1()`과 `Child2(String)` 모두 생성자 첫 줄에서 명시적 `super(...)` 호출이 없으므로 부모의 기본 생성자 `Parent()`가 먼저 호출된다. 따라서 `Child1` 생성 시 `Parent 1` 후 `Child 1`이 출력되고, `Child2` 생성 시에도 `Parent 1` 후 `Child 2`가 출력된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로그래밍 언어: Java 코드 실행 결과",
+    "field_name": "컴퓨터공학 학술",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "문자열 비교",
+      "생성자 호출",
+      "상속"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 3. 프로그래밍 언어: Java 코드 실행 결과 · 3. 프로그래밍 언어: Java 코드 실행 결과",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "1번은 출력 결과와 `==` 비교 이유를, 2번은 각 줄의 출력 순서를 순서대로 쓰시오.",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 제목과 불필요한 형식 문구가 포함됨",
+      "정답·해설이 비어 있고 키워드와 답안 가이드가 부정확함"
+    ],
+    "changes": [
+      "프롬프트를 정리하고 본문을 실제 풀이용 코드만 남기도록 다듬음",
+      "두 문항의 정답과 해설을 채우고 키워드·답안 가이드를 문제 내용에 맞게 수정함"
+    ]
+  }
+}

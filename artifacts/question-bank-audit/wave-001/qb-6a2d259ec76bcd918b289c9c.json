@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-6a2d259ec76bcd918b289c9c",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-6a2d259ec76bcd918b289c9c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 2. 데이터베이스",
+    "body": "### 1.\n\n데이터베이스 장애가 일어났을 때 일관성을 유지하는 상태로 복원하는 리커버리(Recovery) 방법에는 Redo와 Undo가 있다. 이에 대하여 각각 어떤 방식으로 복원하는지 설명하시오.\n\n### 2.\n\n트리거(Trigger)는 데이터베이스에서 INSERT, UPDATE, DELETE와 같은 이벤트가 발생할 때 자동으로 실행되는 동작이다. 이러한 트리거를 사용할 때 주의해야 할 사항을 두 가지 서술하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터베이스",
+    "field_name": "컴퓨터공학 학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "데이터베이스"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 2. 데이터베이스 · 2. 데이터베이스",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-6a2d259ec76bcd918b289c9c",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "트리거(Trigger)를 사용할 때 주의해야 할 사항을 두 가지 서술하시오.",
+    "body": "트리거(Trigger)는 데이터베이스에서 INSERT, UPDATE, DELETE와 같은 이벤트가 발생할 때 자동으로 실행되는 동작이다.",
+    "answer": "트리거는 실행 시점과 순서가 복잡해 시스템 동작을 예측하기 어렵게 만들 수 있으므로 남용하지 않아야 하며, 본문 안의 추가 쿼리로 성능 저하나 연쇄 실행이 발생하지 않도록 주의해야 한다.",
+    "explanation": "트리거는 자동 실행되기 때문에 애플리케이션 로직이 데이터베이스 내부에 숨어 유지보수와 디버깅이 어려워질 수 있다. 또한 행 단위로 빈번히 실행되면 불필요한 I/O와 잠금이 늘고, 다른 트리거를 다시 유발해 성능 문제나 예상치 못한 부작용이 생길 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터베이스",
+    "field_name": "컴퓨터공학 학술",
+    "category": "데이터베이스",
+    "keywords": [
+      "트리거",
+      "데이터베이스",
+      "성능 저하",
+      "유지보수"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2026 컴퓨터공학 학술 2. 데이터베이스 · 2. 데이터베이스",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 2.\n\n트리거(Trigger)는 데이터베이스에서 INSERT, UPDATE, DELETE와 같은 이벤트가 발생할 때 자동으로 실행되는 동작이다. 이러한 트리거를 사용할 때 주의해야 할 사항을 두 가지 서술하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt가 섹션 제목만 남아 있어 문제 자체가 드러나지 않음",
+      "body에 서로 다른 두 문항이 함께 들어가 있어 단일 문제로 사용할 수 없음",
+      "answer와 explanation이 비어 있음"
+    ],
+    "changes": [
+      "source_excerpt에 맞춰 트리거 주의사항 문항만 남기고 prompt/body를 정리함",
+      "주관식 정답과 해설을 채워 실사용 가능하게 수정함",
+      "keywords를 트리거 관련 핵심 용어로 정리함"
+    ]
+  }
+}

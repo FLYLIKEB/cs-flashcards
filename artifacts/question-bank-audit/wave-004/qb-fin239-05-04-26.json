@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-26",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 154. 리눅스 권한 명령어에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 리눅스 권한 명령어 관련 문제(u(user), g(group), o(others)",
+    "answer": "u는 user, g는 group, o는 others를 뜻한다. chmod u+x처럼 권한을 부여/제거한다.",
+    "explanation": "u는 user, g는 group, o는 others를 뜻한다. chmod u+x처럼 권한을 부여/제거한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "리눅스 권한 명령어에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "리눅스 권한 명령어"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 154. 리눅스 권한 명령어에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "리눅스 파일 권한 지정에서 chmod 명령어와 u, g, o 표기의 의미를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 154. 리눅스 권한 명령어에 대해 설명하시오.",
+    "answer": "chmod는 파일이나 디렉터리의 접근 권한을 변경하는 명령어이며, u는 소유자(user), g는 그룹(group), o는 기타 사용자(others)를 뜻한다.",
+    "explanation": "리눅스 권한 변경은 보통 chmod로 수행하며, 대상 범위를 u·g·o로 구분한다. 예를 들어 chmod u+x file은 소유자에게 실행 권한을 추가하는 의미다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "리눅스 파일 권한",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "리눅스 파일 권한",
+      "chmod",
+      "user group others"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 154. 리눅스 권한 명령어에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 154. HTTP 오류 종류 중 틀린 것은?\n1. 1xx : 요청을 받았으며 프로세스를 계속한다.\n2. 2xx : 요청이 성공적으로 수신되고 처리되었다.\n3. 3xx : 클라이언트의 요청에 오류가 있어 서버가 요청을 처리할 수 없다.\n4. 4xx : 클라이언트 오류로 인해 요청을 완료할 수 없다.\n5. 5xx : 서버 오류로 인해 요청을 처리하지 못했다.\n\n  **답:** 3번\n- 3xx 상태 코드는 클라이언트의 요청에 추가 작업이 필요함을 의미하며, 클라이언트의 요청에 오류가\n           있는 경우는 4xx 상태 코드에 해당합니다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었고 body의 변환 메모 문구가 공통 규칙과 다름",
+      "source_excerpt가 다른 HTTP 문제여서 원문 기반 실전형 풀이가 불가능했음",
+      "answer·explanation이 지나치게 짧고 topic·category·keywords가 질문 의도에 비해 거칠었음"
+    ],
+    "changes": [
+      "문제를 chmod와 u·g·o 의미를 묻는 명시적 개념형 서술문제로 정리함",
+      "body를 규칙상 2줄 변환 메모 형식으로 교체하고 정답·해설을 권한 변경 개념 중심으로 보강함",
+      "topic을 리눅스 파일 권한으로 정리하고 category와 keywords를 내용에 맞게 정제함"
+    ]
+  }
+}

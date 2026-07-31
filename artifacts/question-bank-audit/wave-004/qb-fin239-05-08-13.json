@@ -1,0 +1,100 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-13",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-197",
+    "term": "페이징",
+    "english": "Paging",
+    "category": "운영체제",
+    "alphabet_index": "P",
+    "korean_initial": "ㅍ",
+    "definition": "페이징은 가상 주소 공간을 동일한 크기의 페이지로 분할하고, 각 페이지를 물리 메모리의 프레임에 매핑해 연속된 물리 메모리를 요구하지 않음으로써 외부 단편화를 제거하는 메모리 관리 기법입니다. 페이지 테이블을 통한 주소 변환과 페이지 교체 정책이 성능에 직접 영향을 줍니다.",
+    "detailed_explanation": "의미: 페이징은 프로세스의 논리 주소를 페이지 번호와 오프셋으로 나누고, 페이지 테이블을 통해 프레임 번호로 변환합니다. 고정 크기 단위라 연속된 물리 메모리가 필요 없지만 페이지 테이블 관리와 내부 단편화가 발생할 수 있습니다. 작은 책상 위에 필요한 책만 올리고 나머지는 책장에 두는 상황을 떠올리면 메모리 관리의 목적이 보입니다. 주소 변환, 페이지 교체, 지역성 판단이 맞물려 프로그램은 큰 메모리를 쓰는 듯 보이지만 실제 물리 자원은 제한됩니다. 활용: 페이징은 가상 메모리, 요구 페이징, 페이지 교체의 기반입니다. 세그멘테이션과 비교하면 프로그래머의 논리 단위보다 관리 효율을 우선합니다. 금융 시스템에서는 메모리 초과 시 디스크 스왑이 거래 지연으로 직결되므로 페이지 폴트율과 resident set 크기를 모니터링해야 합니다. 시험에서는 논리 주소와 물리 주소, 페이지와 프레임, 지역성과 교체 정책을 연결해 설명하면 좋습니다. 실무에서는 메모리 부족이 단순 용량 문제가 아니라 스래싱, 캐시 효율, 작업 집합 크기 문제로 나타날 수 있음을 모니터링해야 합니다.",
+    "related_concepts": "[[논리 주소]], [[물리 주소]], [[페이지]], [[프레임]], [[프로세스]]",
+    "source_files": "05-14-06-한국은행-2022-컴퓨터공학-학술-파트-I.md; 05-09-운영체제-기출-모음.md; 05-08-산업은행-기출.md",
+    "exam_note": "운영체제 문제에서는 페이징의 정의만 쓰지 말고 관련 개념(논리 주소, 물리 주소, 페이지)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-197-20260719-102245-2a0eafd5.png",
+    "concept_image_alt": "페이징(운영체제) 개념 참고 이미지",
+    "sort_order": 196,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-197-20260719-102245-2a0eafd5.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-13",
+    "card_id": "CS-197",
+    "question_type": "subjective",
+    "prompt": "### 218. TLB-Paging 하드웨어에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: TLB-Paging 하드웨어 문제",
+    "answer": "유효 접근시간(EAT)은 TLB hit/miss 비율을 가중평균해 계산한다. 일반식은 h×hit_time + (1-h)×miss_time 형태다.",
+    "explanation": "유효 접근시간(EAT)은 TLB hit/miss 비율을 가중평균해 계산한다. 일반식은 h×hit_time + (1-h)×miss_time 형태다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "TLB-Paging 하드웨어에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "페이징",
+      "Paging",
+      "TLB",
+      "TLB-Paging 하드웨어"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 218. TLB-Paging 하드웨어에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-13",
+    "card_id": "CS-197",
+    "question_type": "subjective",
+    "prompt": "페이징 시스템에서 TLB의 역할과 TLB-Paging 하드웨어의 주소 변환 과정을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 218. TLB-Paging 하드웨어에 대해 설명하시오.",
+    "answer": "TLB-Paging 하드웨어는 페이지 테이블의 일부를 TLB에 캐시해 논리 주소를 빠르게 물리 주소로 변환한다. CPU가 논리 주소를 내면 먼저 TLB를 조회하고, 적중하면 프레임 번호를 즉시 얻어 물리 주소를 만든다. 실패하면 페이지 테이블을 참조해 프레임 번호를 찾은 뒤 TLB를 갱신하므로 평균 메모리 접근 시간을 줄일 수 있다.",
+    "explanation": "원문은 계산에 필요한 수치나 선택지가 없어 실전형 풀이가 불가능하므로 개념형으로 바꾸는 것이 타당하다. TLB는 연관 메모리 기반의 고속 캐시로서 자주 쓰는 페이지 테이블 엔트리를 저장해 페이징의 주소 변환 비용을 줄인다. 설명 시 TLB hit 시 즉시 변환, miss 시 페이지 테이블 조회 후 TLB 갱신이라는 흐름과 성능상 이점을 함께 제시하면 된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "TLB와 페이징",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "페이징",
+      "Paging",
+      "TLB",
+      "주소 변환",
+      "페이지 테이블"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 218. TLB-Paging 하드웨어에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 218. TLB-Paging 하드웨어 문제\n**답(AI답변):** 유효 접근시간(EAT)은 TLB hit/miss 비율을 가중평균해 계산한다. 일반식은 h×hit_time + (1-h)×miss_time 형태다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문에 풀이 조건이 없어 실전형 문제로는 해결할 수 없는데 변환 메모 문구가 공통 규칙과 다름",
+      "prompt에 마크다운 헤딩이 남아 있고 answer/explanation이 TLB-Paging 설명이 아니라 EAT 공식으로 잘못 치우쳐 있음",
+      "topic과 keywords가 문제형 문구 중심이라 개념 정렬이 부족함"
+    ],
+    "changes": [
+      "공통 규칙에 맞는 2줄 변환 body와 명시적 개념형 prompt로 수정함",
+      "answer/explanation을 TLB의 역할, TLB hit/miss 기반 주소 변환 과정, 성능상 장점 중심으로 교체함",
+      "topic을 'TLB와 페이징'으로 정리하고 keywords를 카드 연계 용어와 핵심 개념어로 정제함"
+    ]
+  }
+}

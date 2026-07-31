@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-15",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-15",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 201. (약술) IPv4 vs IPv6 특징",
+    "body": "→ IPv4는 32비트의 주소체계를 가진 데이터를 교환하기 위한 네트워크 계층의 프로토콜\n\n  → IPv6는 IPv4가 가지고 있는 주소고갈, 보안성 등의 문제점을 해결하기 위해서 개발된 128비트 주소체계를\n갖는 차세대 인터넷 프로토콜",
+    "answer": "IPv4는 32비트 주소체계, IPv6는 128비트 주소체계다. IPv6는 주소 고갈 완화, 자동 설정, 확장 헤더, 보안성 개선 특징이 있다.",
+    "explanation": "IPv4는 32비트 주소체계, IPv6는 128비트 주소체계다. IPv6는 주소 고갈 완화, 자동 설정, 확장 헤더, 보안성 개선 특징이 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "(약술) IPv4 vs IPv6 특징",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "IPv4",
+      "IPv6",
+      "네트워크 계층",
+      "IPv4 vs IPv6"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 201. (약술) IPv4 vs IPv6 특징",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-15",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "IPv4와 IPv6의 주요 특징과 차이점을 설명하시오.",
+    "body": "",
+    "answer": "IPv4는 32비트 주소체계를 사용하는 네트워크 계층 프로토콜이고, IPv6는 주소 고갈과 보안성 한계를 보완하기 위해 개발된 128비트 주소체계의 차세대 인터넷 프로토콜이다.",
+    "explanation": "핵심 비교 포인트는 주소 길이와 설계 목적이다. IPv4는 32비트 주소를 사용해 주소 공간이 제한적이며, IPv6는 128비트 주소를 사용해 훨씬 넓은 주소 공간을 제공한다. 또한 IPv6는 주소 자동 설정, 확장 헤더, 보안 기능 강화 등 IPv4의 한계를 개선하도록 설계되었다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "(약술) IPv4 vs IPv6 특징",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "IPv4",
+      "IPv6",
+      "IP 주소체계",
+      "네트워크 계층"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 201. (약술) IPv4 vs IPv6 특징",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 201. (약술) IPv4 vs IPv6 특징\n\n  → IPv4는 32비트의 주소체계를 가진 데이터를 교환하기 위한 네트워크 계층의 프로토콜\n\n  → IPv6는 IPv4가 가지고 있는 주소고갈, 보안성 등의 문제점을 해결하기 위해서 개발된 128비트 주소체계를\n갖는 차세대 인터넷 프로토콜\n**답(AI답변):** IPv4는 32비트 주소체계, IPv6는 128비트 주소체계다. IPv6는 주소 고갈 완화, 자동 설정, 확장 헤더, 보안성 개선 특징이 있다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩이 남아 있었고 body에 화살표 서술과 정답성 내용이 포함되어 있었다.",
+      "answer와 explanation이 동일해 해설 구분이 없었고 keywords에 비교 구문 형태의 비정형 표현이 있었다."
+    ],
+    "changes": [
+      "prompt를 깔끔한 서술형 질문으로 정리하고 body의 정답 누출성 설명을 제거했다.",
+      "answer는 핵심 정의로 압축하고 explanation은 비교 근거 중심으로 재작성했으며 keywords를 간결한 도메인 용어로 정리했다."
+    ]
+  }
+}

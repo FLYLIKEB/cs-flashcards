@@ -1,0 +1,94 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-07",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-258",
+    "term": "RSA",
+    "english": "RSA",
+    "category": "보안",
+    "alphabet_index": "R",
+    "korean_initial": "R",
+    "definition": "RSA는 큰 수의 소인수분해 어려움에 기반한 공개키 알고리즘으로 암호화보다 키 교환·전자서명 검증에 많이 쓰이며, 최소 권한·검증·감사 관점에서 보호 대상과 실패 영향을 함께 판단해야 합니다.",
+    "detailed_explanation": "의미: RSA는 공개키와 개인키 쌍을 사용하는 대표적인 비대칭키 알고리즘입니다. 보안성은 충분히 큰 모듈러스와 안전한 패딩, 개인키 보호에 의존하며, 같은 보안 수준에서 AES 같은 대칭키보다 연산 비용이 큽니다. 활용: TLS의 과거 키 교환, 인증서 서명, 전자서명, 소량 데이터 암호화에 사용되었습니다. 현대 TLS에서는 순방향 비밀성을 위해 ECDHE 기반 키 교환과 RSA 서명 조합을 많이 사용합니다. RSA를 직접 원문에 적용하거나 오래된 PKCS#1 v1.5 패딩을 부주의하게 쓰면 취약합니다. 면접에서는 RSA는 알고리즘, PKI는 인증서 신뢰 체계, AES는 대칭키 암호라는 구분을 명확히 해야 합니다. 처음 학습할 때는 RSA을 단일 제품이 아니라 자산 식별, 정책 설정, 기술 통제, 로그 확인, 사고 대응이 이어지는 흐름으로 보면 이해가 쉽습니다. 실제 운영에서는 보안을 강화할수록 사용자 편의와 처리 속도가 영향을 받을 수 있으므로, 민감도와 업무 필요성을 기준으로 예외를 최소화하고 남긴 예외는 만료일과 책임자를 정해 점검해야 합니다.",
+    "related_concepts": "[[비대칭키 암호화]], [[AES]], [[SHA]], [[솔트]], [[인증]]",
+    "source_files": "05-03-대구은행-기출.md; 05-14-02-한국은행-2019-컴퓨터공학-학술-파트-II.md; 04-04-네트워크-프로토콜-보안.md",
+    "exam_note": "보안 문제에서는 RSA의 정의만 쓰지 말고 관련 개념(비대칭키 암호화, AES, SHA)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-258-20260720-052707-ec1cb830.png",
+    "concept_image_alt": "RSA(보안) 개념 참고 이미지",
+    "sort_order": 257,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-258-20260720-052707-ec1cb830.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-07",
+    "card_id": "CS-258",
+    "question_type": "subjective",
+    "prompt": "### 193. RSA에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: Rsa 문제",
+    "answer": "RSA는 큰 수의 소인수분해 어려움에 기반한 공개키 암호 알고리즘이다.",
+    "explanation": "RSA는 큰 수의 소인수분해 어려움에 기반한 공개키 암호 알고리즘이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "RSA에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "RSA"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 193. RSA에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-07",
+    "card_id": "CS-258",
+    "question_type": "subjective",
+    "prompt": "RSA란 무엇이며 어떤 원리에 기반한 공개키 암호 방식인지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 193. Rsa 문제",
+    "answer": "RSA는 공개키와 개인키를 사용하는 대표적인 비대칭키 암호 알고리즘으로, 큰 수의 소인수분해가 어렵다는 점에 보안성이 기반한다.",
+    "explanation": "원문에는 풀이에 필요한 선택지나 조건이 없어 개념형으로 전환했다. RSA의 핵심은 공개키로 암호화하거나 서명을 검증하고 개인키로 복호화하거나 서명하는 비대칭키 구조이며, 안전성은 큰 정수의 소인수분해 난이도에 의존한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "RSA",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "RSA",
+      "비대칭키 암호화",
+      "공개키 암호",
+      "소인수분해"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 193. RSA 문제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 193. Rsa 문제\n**답(AI답변):** RSA는 큰 수의 소인수분해 어려움에 기반한 공개키 암호 알고리즘이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 markdown heading이 남아 있었고 body의 변환 메모 문구가 공통 규칙과 일치하지 않았다.",
+      "source_excerpt가 불완전해 실전형 문제로는 풀 수 없는데 answer와 explanation이 단문 정의만 반복하고 있었다."
+    ],
+    "changes": [
+      "문항을 명시적 RSA 개념 설명형 질문으로 정리하고 body를 규칙에 맞는 두 줄 변환 메모로 교체했다.",
+      "answer와 explanation을 RSA의 비대칭키 구조와 소인수분해 기반 원리를 포함하도록 보강하고 topic, source_location, keywords를 정리했다."
+    ]
+  }
+}

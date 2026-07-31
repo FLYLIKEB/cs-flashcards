@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-01-20",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-01-20",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "### 20. 알트코인 뜻",
+    "body": "- 알트코인: 비트코인 이후에 등장한 모든 암호화폐를 지칭하는 용어",
+    "answer": "비트코인을 제외한 대체 암호화폐를 의미한다.",
+    "explanation": "비트코인을 제외한 대체 암호화폐를 의미한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "알트코인 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "알트코인",
+      "블록체인"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 20. 알트코인 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-01-20",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "알트코인의 뜻은 무엇인가?",
+    "body": "",
+    "answer": "비트코인을 제외한 대체 암호화폐를 의미한다.",
+    "explanation": "알트코인은 alternative coin의 줄임말로, 일반적으로 비트코인을 제외한 암호화폐를 가리킨다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "알트코인 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "알트코인",
+      "대체 암호화폐"
+    ],
+    "difficulty": "하",
+    "issuer": "우리은행",
+    "source_location": "우리은행 기출 · 20. 알트코인 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 20. 알트코인 뜻\n- 알트코인: 비트코인 이후에 등장한 모든 암호화폐를 지칭하는 용어\n**답(AI답변):** 비트코인을 제외한 대체 암호화폐를 의미한다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 제목 형식이 남아 있음",
+      "body에 정답 정의가 그대로 노출됨",
+      "키워드가 정답 핵심어와 덜 맞음"
+    ],
+    "changes": [
+      "프롬프트를 자연스러운 단답형 질문으로 정리",
+      "body의 정답 누설 문구를 제거",
+      "해설과 키워드를 알트코인 정의 중심으로 정리"
+    ]
+  }
+}

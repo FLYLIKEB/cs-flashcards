@@ -1,0 +1,70 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-03",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-03",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "### 33. 베타테스트 뜻",
+    "body": "- 베타테스트: 소프트웨어의 최종 출시 전에 실제 사용자가 테스트를 하는 과정",
+    "answer": "정식 출시 전 실제 사용자 환경에서 수행하는 최종 검증 테스트다.",
+    "explanation": "정식 출시 전 실제 사용자 환경에서 수행하는 최종 검증 테스트다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "베타테스트 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "베타테스트"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 33. 베타테스트 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-03",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "베타테스트의 뜻을 쓰시오.",
+    "body": "",
+    "answer": "정식 출시 전에 실제 사용자가 실제 환경에서 소프트웨어를 시험하는 테스트다.",
+    "explanation": "베타테스트는 개발자 내부가 아닌 실제 사용자에게 배포해 정식 출시 전 사용성·오류를 점검하는 단계다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "베타테스트 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "베타테스트"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 33. 베타테스트 뜻",
+    "section": "전공필기",
+    "points": 6,
+    "expected_time_seconds": 240,
+    "answer_guide": "핵심 용어/정답 1문장 + 필요한 경우 근거 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 33. 베타테스트 뜻\n- 베타테스트: 소프트웨어의 최종 출시 전에 실제 사용자가 테스트를 하는 과정\n**답(AI답변):** 정식 출시 전 실제 사용자 환경에서 수행하는 최종 검증 테스트다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목/문항 번호가 남아 있었음",
+      "body에 정답 정의가 그대로 노출되어 있었음"
+    ],
+    "changes": [
+      "prompt를 서술형 질문으로 정리함",
+      "body를 비우고 answer/explanation을 정제함"
+    ]
+  }
+}

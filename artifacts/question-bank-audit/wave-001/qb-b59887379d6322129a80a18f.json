@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-b59887379d6322129a80a18f",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-b59887379d6322129a80a18f",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 2. 다음은 컴퓨터의 레지스터와 메모리 상태를 나타낸 그림이다.",
+    "body": "**레지스터 상태**\n\n```text\nPC = 200\nR1 = 400\nXR = 100\nAC\n```\n\n**메모리 상태**\n\n| 주소 | 메모리 | 비고 |\n|---|---|---|\n| 200 | Load to AC | Mode |\n| 201 | 500 |  |\n| 202 | Next Instruction |  |\n| … | … |  |\n| 399 | 450 |  |\n| 400 | 700 |  |\n| … | … |  |\n| 500 | 800 |  |\n| … | … |  |\n| 600 | 900 |  |\n| … | … |  |\n| 702 | 325 |  |\n| … | … |  |\n| 800 | 300 |  |\n\n주) PC: Program Counter, R1: Register1, XR: Index Register, AC: Accumulator\n\n메모리의 주소 200과 201에 저장되어 있는 2-워드(Word) 명령을 실행시킬 때 각 주소 모드(Addressing Mode)에 따라 유효 주소(Effective Address)와 누산기(AC)에 저장되는 값을 다음의 표에 채우시오.\n\n| 주소 모드 | 유효 주소 | 누산기의 값 |\n|---|---|---|\n| 직접 주소 모드(Direct address) |  |  |\n| 직접 피연산자 모드(Immediate operand) | 201 | 500 |\n| 간접 주소 모드(Indirect address) |  |  |\n| 상대 주소 모드(Relative address) | 702 | 325 |\n| 인덱스 주소 모드(Indexed address) |  |  |\n| 레지스터 모드(Register) | - | 400 |\n| 레지스터 간접 모드(Register indirect) |  |  |\n| 자동 증가 모드(Autoincrement) | 400 | 700 |\n| 자동 감소 모드(Autodecrement) |  |  |\n\nHint) 자동 증가 모드의 경우는 레지스터를 참조한 후 값이 증가하고, 자동 감소 모드의 경우는 레지스터를 참조하기 전에 값이 감소한다.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "다음은 컴퓨터의 레지스터와 메모리 상태를 나타낸 그림이다.",
+    "field_name": "전산학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "컴퓨터구조"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2012 전산학술 발췌 · 2. 다음은 컴퓨터의 레지스터와 메모리 상태를 나타낸 그림이다.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-b59887379d6322129a80a18f",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "각 주소 모드에 따른 유효 주소와 AC 값을 구하시오.",
+    "body": "조건: 메모리 주소 200과 201에 저장된 2-word `Load to AC` 명령을 실행한다. 상대 주소 모드는 명령 인출 후 PC를 기준으로 하고, 자동 증가/감소 모드는 R1에 적용한다.\n\n**레지스터 상태**\n\n```text\nPC = 200\nR1 = 400\nXR = 100\nAC\n```\n\n**메모리 상태**\n\n| 주소 | 메모리 | 비고 |\n|---|---|---|\n| 200 | Load to AC | Mode |\n| 201 | 500 |  |\n| 202 | Next Instruction |  |\n| … | … |  |\n| 399 | 450 |  |\n| 400 | 700 |  |\n| … | … |  |\n| 500 | 800 |  |\n| … | … |  |\n| 600 | 900 |  |\n| … | … |  |\n| 702 | 325 |  |\n| … | … |  |\n| 800 | 300 |  |\n\n주) PC: Program Counter, R1: Register1, XR: Index Register, AC: Accumulator\n\n계산할 주소 모드: 직접 주소 모드, 직접 피연산자 모드, 간접 주소 모드, 상대 주소 모드, 인덱스 주소 모드, 레지스터 모드, 레지스터 간접 모드, 자동 증가 모드, 자동 감소 모드.\n\nHint) 자동 증가 모드의 경우는 레지스터를 참조한 후 값이 증가하고, 자동 감소 모드의 경우는 레지스터를 참조하기 전에 값이 감소한다.",
+    "answer": "| 주소 모드 | 유효 주소 | AC 값 |\n|---|---:|---:|\n| 직접 주소 모드 | 500 | 800 |\n| 직접 피연산자 모드 | 201 | 500 |\n| 간접 주소 모드 | 800 | 300 |\n| 상대 주소 모드 | 702 | 325 |\n| 인덱스 주소 모드 | 600 | 900 |\n| 레지스터 모드 | - | 400 |\n| 레지스터 간접 모드 | 400 | 700 |\n| 자동 증가 모드 | 400 | 700 |\n| 자동 감소 모드 | 399 | 450 |",
+    "explanation": "오퍼랜드 필드 값은 500이다. 직접 주소는 EA=500, 간접 주소는 EA=M[500]=800, 상대 주소는 2-word 명령 인출 후 PC=202이므로 EA=202+500=702, 인덱스 주소는 EA=500+XR(100)=600이다. 레지스터 모드는 R1 값 400을 그대로 사용하고, 레지스터 간접 모드는 EA=R1=400이다. 자동 증가 모드는 R1을 먼저 참조하므로 EA=400, 자동 감소 모드는 R1을 399로 줄인 뒤 참조하므로 EA=399이다. 각 AC 값은 해당 유효 주소의 메모리 값 또는 즉시값을 적으면 된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "주소 지정 방식",
+    "field_name": "전산학술",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "주소 지정 방식",
+      "유효 주소",
+      "누산기",
+      "간접 주소",
+      "인덱스 주소"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2012 전산학술 발췌 · 2. 다음은 컴퓨터의 레지스터와 메모리 상태를 나타낸 그림이다.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "각 주소 모드별 유효 주소와 AC 값을 표로 정확히 제시",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 2. 다음은 컴퓨터의 레지스터와 메모리 상태를 나타낸 그림이다.\n\n**레지스터 상태**\n\n```text\nPC = 200\nR1 = 400\nXR = 100\nAC\n```\n\n**메모리 상태**\n\n| 주소 | 메모리 | 비고 |\n|---|---|---|\n| 200 | Load to AC | Mode |\n| 201 | 500 |  |\n| 202 | Next Instruction |  |\n| … | … |  |\n| 399 | 450 |  |\n| 400 | 700 |  |\n| … | … |  |\n| 500 | 800 |  |\n| … | … |  |\n| 600 | 900 |  |\n| … | … |  |\n| 702 | 325 |  |\n| … | … |  |\n| 800 | 300 |  |\n\n주) PC: Program Counter, R1: Register1, XR: Index Register, AC: Accumulator\n\n메모리의 주소 200과 201에 저장되어 있는 2-워드(Word) 명령을 실행시킬 때 각 주소 모드(Addressing Mode)에 따라 유효 주소(Effective Address)와 누산기(AC)에 저장되는 값을 다음의 표에 채우시오.\n\n| 주소 모드 | 유효 주소 | 누산기의 값 |\n|---|---|---|\n| 직접 주소 모드(Direct address) |  |  |\n| 직접 피연산자 모드(Immediate operand) | 201 | 500 |\n| 간접 주소 모드(Indirect address) |  |  |\n| 상대 주소 모드(Relative address) | 702 | 325 |\n| 인덱스 주소 모드(Indexed address) |  |  |\n| 레지스터 모드(Register) | - | 400 |\n| 레지스터 간접 모드(Register indirect) |  |  |\n| 자동 증가 모드(Autoincrement) | 400 | 700 |\n| 자동 감소 모드(Autodecrement) |  |  |\n\nHint) 자동 증가 모드의 경우는 레지스터를 참조한 후 값이 증가하고, 자동 감소 모드의 경우는 레지스터를 참조하기 전에 값이 감소한다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 번호가 남아 있고 질문 줄거리가 불명확했습니다.",
+      "본문에 일부 정답이 미리 노출된 표가 포함되어 있었습니다.",
+      "정답·해설·주제·키워드·답안 가이드가 비어 있거나 문제와 맞지 않았습니다."
+    ],
+    "changes": [
+      "프롬프트를 정리하고 본문에서 정답 누출 표를 제거한 뒤 계산 조건만 남겼습니다.",
+      "각 주소 모드의 유효 주소와 AC 값을 정답 표로 채우고 계산 근거를 해설에 추가했습니다.",
+      "topic·keywords·answer_guide를 주소 지정 방식 문제에 맞게 정리했습니다."
+    ]
+  }
+}

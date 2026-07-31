@@ -1,0 +1,115 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-9537bfe59ea927b3b251d130",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-013",
+    "term": "ARP",
+    "english": "ARP",
+    "category": "네트워크",
+    "alphabet_index": "A",
+    "korean_initial": "A",
+    "definition": "ARP(Address Resolution Protocol)는 동일한 LAN(같은 링크) 내에서 목적지 IP 주소에 대응하는 MAC 주소를 질의·응답으로 찾아 이더넷 프레임을 전송하게 하는 프로토콜이며, 네트워크 계층과 데이터링크 계층의 책임을 연결해 실제 장애 지점을 구분하는 기준이 됩니다.",
+    "detailed_explanation": "의미: ARP는 IPv4 환경에서 목적지 IP가 같은 LAN에 있을 때 해당 장비의 MAC 주소를 질의·응답 방식으로 찾아내는 프로토콜입니다. IP는 네트워크 계층 주소이고 MAC은 데이터링크 계층 주소이므로, 실제 이더넷 프레임을 전송하기 전 이 둘을 연결해 주는 역할을 합니다.\n\n활용: 호스트는 ARP 응답을 ARP 캐시에 저장해 매번 브로드캐스트하지 않음으로써 효율을 높입니다. 하지만 ARP는 인증 기능이 약해 위조 응답(ARP 스푸핑)에 취약하며, 잘못된 게이트웨이 MAC을 학습하면 통신 장애나 중간자 공격(MITM)이 발생할 수 있습니다. 면접·시험에서는 RARP와의 방향 차이, IPv6의 Neighbor Discovery와의 차이, 그리고 대응책(정적 ARP 설정, 스위치 보안 설정, 탐지 로그 분석)을 함께 언급하면 좋습니다. 처음 공부할 때는 ARP가 통신 흐름의 어느 계층에서 동작하는지, 어떤 상태값(예: ARP 캐시)을 만들거나 갱신하는지, 장애가 나면 어떤 로그와 패킷(브로드캐스트 ARP 요청, 비정상 ARP 응답)을 확인할지 순서대로 생각해 보세요. 운영 환경에서는 성능과 안정성을 위해 주소 범위·포트·타임아웃·캐시 정책·재전송 기준 등을 서비스 특성에 맞춰 검토하는 것이 바람직합니다.",
+    "related_concepts": "[[이더넷]], [[MAC 주소]], [[RARP]], [[IP]], [[TCP]]",
+    "source_files": "05-14-10-한국은행-2024-컴퓨터공학-학술-파트-I.md; 04-04-네트워크-프로토콜-보안.md; 05-14-한국은행-기출.md",
+    "exam_note": "정의만 쓰지 말고 비교 중심으로 답변: RARP(역방향) vs ARP, IPv6의 Neighbor Discovery 차이, 이더넷(MAC) 관계, ARP 스푸핑 대응(정적 ARP·스위치 보안) 언급.",
+    "bok_appeared": "O",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-013-20260719-114157-63a24740.png",
+    "concept_image_alt": "ARP(네트워크) 개념 참고 이미지",
+    "sort_order": 12,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-013-20260719-114157-63a24740.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-9537bfe59ea927b3b251d130",
+    "card_id": "CS-013",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?](Address Resolution Protocol)는 같은 LAN(같은 링크) 내에서 목적지 IP 주소에 대응하는 MAC 주소를 질의·응답 방식으로 찾아 이더넷 프레임을 전송하게 하는 프로토콜입니다.",
+    "answer": "ARP",
+    "explanation": "ARP(Address Resolution Protocol)는 같은 LAN(같은 링크) 내에서 목적지 IP 주소에 대응하는 MAC 주소를 질의·응답 방식으로 찾아 이더넷 프레임을 전송하게 하는 프로토콜입니다. 네트워크 계층(IP)과 데이터링크 계층(MAC)을 연결해 실제 통신 경로와 장애 지점을 파악하는 기준이 됩니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "MAC 주소",
+      "ARP",
+      "IP",
+      "이더넷"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "ARP",
+      "이더넷",
+      "MAC 주소",
+      "RARP",
+      "IP",
+      "TCP"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-14-10-한국은행-2024-컴퓨터공학-학술-파트-I.md; 04-04-네트워크-프로토콜-보안.md; 05-14-한국은행-기출.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-9537bfe59ea927b3b251d130",
+    "card_id": "CS-013",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "같은 LAN(같은 링크) 내에서 목적지 IP 주소에 대응하는 MAC 주소를 질의·응답 방식으로 찾아 이더넷 프레임을 전송하게 하는 프로토콜입니다.",
+    "answer": "ARP",
+    "explanation": "ARP(Address Resolution Protocol)는 같은 LAN(같은 링크) 내에서 목적지 IP 주소에 대응하는 MAC 주소를 질의·응답 방식으로 찾아 이더넷 프레임을 전송하게 하는 프로토콜입니다. 네트워크 계층의 IP 주소와 데이터링크 계층의 MAC 주소를 연결해 실제 이더넷 통신이 가능하게 합니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "MAC 주소",
+      "ARP",
+      "IP",
+      "이더넷"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "ARP",
+      "Address Resolution Protocol",
+      "MAC 주소",
+      "IP 주소",
+      "이더넷"
+    ],
+    "difficulty": "중",
+    "issuer": "카드 생성",
+    "source_location": "05-14-10-한국은행-2024-컴퓨터공학-학술-파트-I.md; 04-04-네트워크-프로토콜-보안.md; 05-14-한국은행-기출.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 마크다운 플레이스홀더와 정답 유추를 쉽게 하는 영문 풀네임이 남아 있었음",
+      "category가 비어 있고 keywords에 관련성 낮은 용어가 섞여 있었음"
+    ],
+    "changes": [
+      "body에서 노이즈를 제거하고 ARP의 기능 설명만 남김",
+      "category를 네트워크로 보정하고 keywords를 핵심 용어로 정리함",
+      "explanation을 계층 간 주소 매핑 역할 중심으로 다듬음"
+    ]
+  }
+}

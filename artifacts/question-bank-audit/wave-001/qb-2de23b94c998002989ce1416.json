@@ -1,0 +1,79 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-2de23b94c998002989ce1416",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-2de23b94c998002989ce1416",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 10. 자료구조: 해시",
+    "body": "자료구조와 관련하여 다음 물음에 답하시오.\n\n1. 해시 함수에서 충돌이 발생하는 이유와 해결 방법인 **개방 주소법(Open Addressing)**과 **체이닝(Chaining)**에 대해 서술하시오.\n\n2. 아래 좌측은 해시 테이블에 데이터를 삽입하기 위한 프로그램이며, 우측의 해시 테이블은 `insertHash` 함수를 사용하여 18, 37, 25를 삽입한 결과이다. 22, 35, 50, 63을 순차적으로 `insertHash` 함수를 사용하여 삽입했을 때의 결과를 우측의 해시 테이블에 작성하고, 이 방법의 문제점에 대해 서술하시오.\n\n   ```c\n   #define SIZE 13\n\n   int hashTable[SIZE] = {};\n\n   int Hash(int key){\n       return key % SIZE;\n   }\n\n   void insertHash(int key){\n       int probe = Hash(key);\n       while(hashTable[probe] != NULL){\n           probe = (probe + 1) % SIZE;\n       }\n       hashTable[probe] = key;\n   }\n   ```\n\n   초기 해시 테이블:\n\n   | index | value |\n   |---:|---:|\n   | 0 |  |\n   | 1 |  |\n   | 2 |  |\n   | 3 |  |\n   | 4 |  |\n   | 5 | 18 |\n   | 6 |  |\n   | 7 |  |\n   | 8 |  |\n   | 9 |  |\n   | 10 |  |\n   | 11 | 37 |\n   | 12 | 25 |",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "자료구조: 해시",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "자료구조",
+      "해시"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 10. 자료구조: 해시 · 10. 자료구조: 해시",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-2de23b94c998002989ce1416",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "해시 함수 충돌의 원인과 해결 방법을 설명하고, 제시된 해시 테이블에 22·35·50·63을 순차 삽입한 결과와 이 방법의 문제점을 서술하시오.",
+    "body": "해시 함수의 충돌 해결 방법으로 개방 주소법(Open Addressing)과 체이닝(Chaining)을 설명하시오. 또한 아래 `insertHash` 함수와 초기 해시 테이블을 기준으로 22, 35, 50, 63을 순차적으로 삽입한 결과를 구하시오.\n\n```c\n#define SIZE 13\n\nint hashTable[SIZE] = {};\n\nint Hash(int key){\n    return key % SIZE;\n}\n\nvoid insertHash(int key){\n    int probe = Hash(key);\n    while(hashTable[probe] != NULL){\n        probe = (probe + 1) % SIZE;\n    }\n    hashTable[probe] = key;\n}\n```\n\n초기 해시 테이블:\n\n| index | value |\n|---:|---:|\n| 0 |  |\n| 1 |  |\n| 2 |  |\n| 3 |  |\n| 4 |  |\n| 5 | 18 |\n| 6 |  |\n| 7 |  |\n| 8 |  |\n| 9 |  |\n| 10 |  |\n| 11 | 37 |\n| 12 | 25 |",
+    "answer": "충돌은 서로 다른 키가 같은 해시값을 가질 때 발생한다. 개방 주소법은 충돌 시 다른 빈 슬롯을 탐사해 저장하고, 체이닝은 같은 버킷에 연결 리스트 등으로 묶어 저장한다. 제시된 선형 조사 삽입 결과는 index 0=50, 1=63, 5=18, 9=22, 10=35, 11=37, 12=25 이다. 이 방법의 문제점은 9→10→11→12→0→1처럼 군집이 커지는 1차 군집화가 발생해 탐사 길이가 길어지고 성능이 저하된다는 점이다.",
+    "explanation": "22는 22 % 13 = 9이므로 9번에 저장된다. 35는 9번이 이미 차 있어 10번에 저장된다. 50은 11번에서 시작하지만 11, 12가 차 있으므로 순환해 0번에 저장되고, 63은 11, 12, 0이 모두 차 있어 1번에 저장된다. 개방 주소법 중 이 구현은 선형 조사(linear probing)를 사용하므로 충돌 구간 주변에 원소가 연속적으로 몰리는 1차 군집화가 쉽게 발생한다. 반면 체이닝은 버킷 내부 연결 구조로 충돌을 처리한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "자료구조: 해시",
+    "field_name": "컴퓨터공학 학술",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "해시",
+      "해시 함수",
+      "충돌",
+      "개방 주소법",
+      "체이닝",
+      "선형 조사"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 10. 자료구조: 해시 · 10. 자료구조: 해시",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목만 있어 문제 진술이 불명확함",
+      "answer와 explanation이 비어 있어 학습용 정답 데이터로 사용할 수 없음",
+      "keywords가 지나치게 포괄적임"
+    ],
+    "changes": [
+      "prompt를 실제 서술형 문제 문장으로 정리함",
+      "body를 풀이에 필요한 설명·코드·표만 남기도록 정리함",
+      "정답·해설에 충돌 설명, 삽입 결과, 선형 조사의 문제점을 채움",
+      "keywords를 해시 충돌 해결 기법 중심으로 구체화함"
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-11",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-11",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 140. 버퍼 오버플로우에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 버퍼오버플로우 관련 문제",
+    "answer": "strcpy는 길이 제한이 없어 위험하고, strncpy는 복사 길이를 제한할 수 있어 상대적으로 안전하다.",
+    "explanation": "strcpy는 길이 제한이 없어 위험하고, strncpy는 복사 길이를 제한할 수 있어 상대적으로 안전하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "버퍼 오버플로우에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "버퍼 오버플로우"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 140. 버퍼 오버플로우에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-11",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "버퍼 오버플로우(buffer overflow)란 무엇이며 어떤 위험을 초래하는가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 140. 버퍼오버플로우 관련 문제",
+    "answer": "버퍼 오버플로우는 프로그램이 할당된 메모리 버퍼의 경계를 넘어 데이터를 기록하는 취약점이다. 이로 인해 인접 메모리가 손상되어 프로그램 오작동·비정상 종료가 발생할 수 있고, 공격자가 이를 악용하면 임의 코드 실행이나 권한 탈취로 이어질 수 있다.",
+    "explanation": "원문에는 strcpy와 strncpy의 차이만 단편적으로 남아 있어 원래 문제의 구체 조건을 복원하기 어렵다. 따라서 버퍼 오버플로우의 정의와 대표 위험을 묻는 개념형으로 정리하고, 길이 검사를 하지 않는 복사가 이런 취약점을 유발할 수 있다는 점을 답의 근거로 반영했다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "버퍼 오버플로우",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "버퍼 오버플로우",
+      "메모리 손상",
+      "경계 검사"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 140. 버퍼 오버플로우에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 140. 버퍼오버플로우 관련 문제\n\n   strncpy가 버퍼오버플로우 안나고 strcpy는 버퍼오버플로우 위험 있음\n**답(AI답변):** strcpy는 길이 제한이 없어 위험하고, strncpy는 복사 길이를 제한할 수 있어 상대적으로 안전하다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었고 source가 버퍼 오버플로우 설명 문제가 아니라 strcpy/strncpy 비교 단편만 남아 있어 원문 그대로는 풀이 조건이 불완전했음",
+      "answer와 explanation이 버퍼 오버플로우 자체 설명 없이 동일한 한 문장으로 중복되어 있었음"
+    ],
+    "changes": [
+      "불완전한 원문을 버퍼 오버플로우의 정의와 위험을 묻는 개념형 subjective 문항으로 정리함",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 교체하고 prompt·topic·keywords를 정리함",
+      "answer와 explanation을 개념에 맞게 분리해 재작성함"
+    ]
+  }
+}

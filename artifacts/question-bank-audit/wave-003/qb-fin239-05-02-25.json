@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-25",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-25",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 55. SQL 카운트해서 그 중 MAX값 찾는에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: SQL 카운트해서 그 중 MAX값 찾는 문제",
+    "answer": "집계 SQL에서는 GROUP BY로 그룹을 나눈 뒤 COUNT로 개수를 계산하고, 그 결과에서 MAX나 ORDER BY DESC LIMIT 같은 방식으로 최댓값을 구한다.",
+    "explanation": "집계 SQL에서는 GROUP BY로 그룹을 나눈 뒤 COUNT로 개수를 계산하고, 그 결과에서 MAX나 ORDER BY DESC LIMIT 같은 방식으로 최댓값을 구한다.\n\n실전에서는 서브쿼리, HAVING, ORDER BY를 조합해 그룹별 개수와 최댓값 조건을 함께 표현한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SQL 카운트해서 그 중 MAX값 찾는에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 55. SQL 카운트해서 그 중 MAX값 찾는에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-25",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "SQL에서 GROUP BY와 COUNT로 그룹별 개수를 구한 뒤 그중 최대값을 찾는 방법을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 55. SQL 카운트해서 그 중 MAX값 찾는 문제",
+    "answer": "GROUP BY로 그룹별 행 수를 COUNT한 뒤, 그 집계 결과를 서브쿼리나 ORDER BY DESC로 다시 조회하여 가장 큰 COUNT 값을 선택하면 된다.",
+    "explanation": "먼저 GROUP BY로 기준 컬럼별로 묶고 COUNT(*)로 각 그룹의 개수를 계산한다. 그다음 바깥 질의에서 MAX(cnt)를 구하거나 ORDER BY cnt DESC 후 상위 1건을 조회하면 최대 개수를 가진 그룹이나 최대 개수 자체를 찾을 수 있다. 상황에 따라 최대값만 구할지, 최대값을 가진 그룹까지 함께 구할지에 따라 MAX와 정렬 기반 조회를 구분한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SQL 집계 질의",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL",
+      "GROUP BY",
+      "COUNT",
+      "MAX",
+      "집계 질의"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 55. SQL 카운트해서 그 중 MAX값 찾는에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 55. SQL 카운트해서 그 중 MAX값 찾는 문제\n**답(AI답변):** 문제의 선지/도표가 원문에 충분히 남아 있지 않아 단정형 정답은 제한적이다. 해당 주제의 핵심 개념과 대표 공식·특징을 기준으로 풀이해야 한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문에 선지와 구체 조건이 없어 실전형 정답을 확정할 수 없는데도 변환 메모 문구가 공통 규칙과 다르고 프롬프트에 마크다운 헤더가 남아 있었다.",
+      "토픽과 키워드가 지나치게 거칠어 GROUP BY·COUNT·MAX 중심의 실제 개념을 충분히 드러내지 못했다."
+    ],
+    "changes": [
+      "불완전한 원문을 개념형 주관식으로 유지하되 프롬프트를 깨끗한 질문문으로 다시 쓰고 body를 공통 규칙의 정확한 2줄 변환 메모 형식으로 수정했다.",
+      "정답과 해설을 그룹별 COUNT 후 MAX 또는 정렬로 최대값을 찾는 절차 중심으로 구체화하고 topic·keywords를 집계 질의 맥락에 맞게 정리했다."
+    ]
+  }
+}

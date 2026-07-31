@@ -1,0 +1,88 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-01",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-01",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 88. 플립플롭에 대한 설명 중 옳은 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "- SR 플립플롭에서 S=0, R=0인 경우 Q는 유지됩니다.\n- D 플립플롭은 입력 D의 값을 그대로 출력으로 반영합니다.\n- T 플립플롭에서 T=0인 경우 출력 Q는 변화하지 않습니다. T=1인 경우에만 Q가 토글됩니다.",
+    "rubric": [],
+    "choices": [
+      "SR 플립플롭에서 S=0, R=0인 경우 Q는 무조건 1이 된다.",
+      "D 플립플롭은 입력 D와 상관없이 항상 동일한 출력을 유지한다.",
+      "JK 플립플롭에서 J=1, K=1인 경우 Q는 토글 상태가 된다.",
+      "T 플립플롭에서 T=0인 경우 Q는 1로 설정된다."
+    ],
+    "answer_index": 2,
+    "topic": "플립플롭에 대한 설명 중 옳은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "플립플롭"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 88. 플립플롭에 대한 설명 중 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-01",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "플립플롭에 대한 설명 중 옳은 것은?",
+    "body": "",
+    "answer": "JK 플립플롭에서 J=1, K=1인 경우 Q는 토글 상태가 된다.",
+    "explanation": "JK 플립플롭은 J=1, K=1일 때 현재 출력이 반전되어 토글된다. 반면 SR 플립플롭에서 S=0, R=0은 출력 유지 상태이고, D 플립플롭은 입력 D값을 저장하며, T 플립플롭은 T=0일 때 출력이 유지된다.",
+    "rubric": [],
+    "choices": [
+      "SR 플립플롭에서 S=0, R=0인 경우 Q는 무조건 1이 된다.",
+      "D 플립플롭은 입력 D와 상관없이 항상 동일한 출력을 유지한다.",
+      "JK 플립플롭에서 J=1, K=1인 경우 Q는 토글 상태가 된다.",
+      "T 플립플롭에서 T=0인 경우 Q는 1로 설정된다."
+    ],
+    "answer_index": 2,
+    "topic": "플립플롭에 대한 설명 중 옳은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "컴퓨터구조",
+    "keywords": [
+      "플립플롭",
+      "SR 플립플롭",
+      "D 플립플롭",
+      "JK 플립플롭",
+      "T 플립플롭"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 88. 플립플롭에 대한 설명 중 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 88. 플립플롭에 대한 설명 중 옳은 것은?\n1. SR 플립플롭에서 S=0, R=0인 경우 Q는 무조건 1이 된다.\n2. D 플립플롭은 입력 D와 상관없이 항상 동일한 출력을 유지한다.\n3. JK 플립플롭에서 J=1, K=1인 경우 Q는 토글 상태가 된다.\n4. T 플립플롭에서 T=0인 경우 Q는 1로 설정된다.\n\n  **답:** 3번\n- SR 플립플롭에서 S=0, R=0인 경우 Q는 유지됩니다.\n- D 플립플롭은 입력 D의 값을 그대로 출력으로 반영합니다.\n- T 플립플롭에서 T=0인 경우 출력 Q는 변화하지 않습니다. T=1인 경우에만 Q가 토글됩니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "answer가 선택지 번호만 있어 단독 활용성이 낮았음",
+      "explanation이 정답 근거보다 단편적 오답 설명 위주였음",
+      "keywords가 지나치게 포괄적이어서 선택지 핵심 용어를 충분히 반영하지 못했음"
+    ],
+    "changes": [
+      "prompt를 마크다운과 번호 없이 질문 문장만 남기도록 정리함",
+      "answer를 정답 선택지의 완전한 문장으로 교체함",
+      "explanation을 JK 플립플롭의 정답 근거와 다른 플립플롭과의 구분 포인트가 드러나도록 재작성함",
+      "keywords에 SR, D, JK, T 플립플롭 용어를 추가해 검색성과 카드 정합성을 높임"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fe42a6dfccf4277583315180",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fe42a6dfccf4277583315180",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 10. 웹 해킹 방법 중 XSS(Cross Site Scripting) 공격의 동작 원리를 설명하시오.",
+    "body": "",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "웹 해킹 방법 중 XSS(Cross Site Scripting) 공격의 동작 원리를 설명하시오.",
+    "field_name": "전산학술",
+    "category": "운영체제",
+    "keywords": [
+      "XSS"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 10. 웹 해킹 방법 중 XSS(Cross Site Scripting) 공격의 동작 원리를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fe42a6dfccf4277583315180",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "XSS(Cross Site Scripting) 공격의 동작 원리를 설명하시오.",
+    "body": "",
+    "answer": "XSS는 공격자가 게시글·입력창 등에 악성 스크립트를 삽입하고, 다른 사용자가 해당 페이지를 열 때 그 스크립트가 피해자 브라우저에서 정상 사이트의 권한으로 실행되도록 만드는 공격이다. 그 결과 세션 쿠키 탈취, 화면 변조, 사용자 가장 요청 등이 발생할 수 있다.",
+    "explanation": "서버가 사용자 입력을 충분히 검증·이스케이프하지 않으면 브라우저가 데이터를 코드로 해석해 스크립트를 실행한다. XSS는 저장형, 반사형, DOM 기반으로 나타날 수 있으며, 핵심 원리는 신뢰되지 않은 입력이 웹 페이지의 실행 문맥에 섞여 피해자 측에서 실행된다는 점이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "XSS 공격 원리",
+    "field_name": "전산학술",
+    "category": "보안",
+    "keywords": [
+      "XSS",
+      "Cross Site Scripting",
+      "웹 보안"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 10. 웹 해킹 방법 중 XSS(Cross Site Scripting) 공격의 동작 원리를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 10. 웹 해킹 방법 중 XSS(Cross Site Scripting) 공격의 동작 원리를 설명하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 헤딩과 번호가 남아 있었음",
+      "정답·해설이 비어 있었음",
+      "주제/분류가 XSS 보안 내용과 맞지 않았음"
+    ],
+    "changes": [
+      "프롬프트를 깨끗한 질문 문장으로 정리함",
+      "XSS 동작 원리에 맞는 정답과 해설을 작성함",
+      "topic·category·keywords를 보안 주제에 맞게 정렬함"
+    ]
+  }
+}

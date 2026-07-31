@@ -1,0 +1,73 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-14",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-14",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 44. Man Month에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "body": "변환 메모: 원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: Man Month 계산문제",
+    "answer": "투입 인원 수 × 투입 개월 수로 계산하는 작업량 단위다.",
+    "explanation": "투입 인원 수 × 투입 개월 수로 계산하는 작업량 단위다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Man Month에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "Man Month"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 44. Man Month에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-14",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "Man Month의 의미와 계산 기준을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: Man Month 계산문제",
+    "answer": "Man Month는 투입 인원 수와 투입 개월 수를 곱해 산정하는 작업량 단위다.",
+    "explanation": "프로젝트에 5명이 3개월 투입되면 15 Man Month처럼 인원 수 × 기간으로 계산한다. 이는 총 노력량을 나타내는 단위이며, 같은 Man Month라도 업무 분할 가능성에 따라 일정이 단순 비례해 단축되는 것은 아니다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Man Month",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "소프트웨어공학",
+    "keywords": [
+      "Man Month",
+      "작업량 산정"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 44. Man Month에 대해 핵심 원리와 풀이 기준을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 44. Man Month 계산문제\n**답(AI답변):** 투입 인원 수 × 투입 개월 수로 계산하는 작업량 단위다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문 풀이형 문제의 계산 조건이 누락됨",
+      "프롬프트에 마크다운 heading이 남아 있음",
+      "변환 메모 문구가 공통 규칙과 불일치함"
+    ],
+    "changes": [
+      "불완전한 원문을 Man Month 개념 설명형 문제로 정리함",
+      "프롬프트를 heading 없는 질문문으로 수정함",
+      "변환 메모와 답안·해설을 규칙에 맞게 보강함"
+    ]
+  }
+}

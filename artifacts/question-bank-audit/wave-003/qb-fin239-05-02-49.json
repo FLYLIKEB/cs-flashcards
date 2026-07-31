@@ -1,0 +1,109 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-49",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-128",
+    "term": "HTTP",
+    "english": "Hypertext Transfer Protocol",
+    "category": "네트워크",
+    "alphabet_index": "H",
+    "korean_initial": "H",
+    "definition": "HTTP는 클라이언트가 요청을 보내고 서버가 응답하는 무상태의 애플리케이션 계층 프로토콜로, 웹 문서와 API의 기본 통신 규약입니다. 요청-응답 구조(메서드·헤더·상태 코드·본문)를 이해하면 구현·디버깅·보안 설계에서 유리합니다.",
+    "detailed_explanation": "의미: HTTP는 URL, 메서드, 헤더, 상태 코드, 본문을 사용해 클라이언트와 서버가 자원을 주고받는 애플리케이션 계층 프로토콜입니다. 각 요청은 독립적(무상태)이므로 로그인 같은 연속된 상태는 쿠키·세션·토큰 등 별도 메커니즘으로 관리해야 합니다.\n활용: 웹 페이지, REST API, 파일 다운로드, 프록시와 캐시 동작의 기반으로 사용됩니다. 일반적으로 GET은 조회, POST는 처리/생성, PUT/PATCH는 갱신, DELETE는 삭제에 쓰지만 실제 의미와 멱등성 여부는 서버 구현에 따라 달라질 수 있습니다. 또한 HTTP 자체는 암호화를 제공하지 않으므로 HTTPS는 TLS를 결합한 형태라는 점을 기억해야 하며, HTTP/2·HTTP/3는 성능 및 전송 특성이 개선된 버전이지만 요청·응답의 기본 의미는 유지됩니다. 처음 배울 때는 HTTP가 어떤 계층에서 동작하는지, 어떤 요청이 어떤 상태를 생성·변경하는지, 장애가 발생하면 어떤 로그나 패킷을 보면 되는지를 순서대로 떠올리면 이해가 쉬워집니다. 실제 운영에서는 성능과 안정성을 위해 주소 범위, 포트, 타임아웃, 캐시 정책, 재전송 기준 등을 서비스 특성에 맞게 점검·조정해야 합니다.",
+    "related_concepts": "[[AIMD]], [[Slow Start]], [[HTTPS]], [[DNS]], [[TCP]]",
+    "source_files": "07-01-02-키와-무결성.md; 14-컴퓨터구조-심화.md; 04-IT-필기-핵심정리.md",
+    "exam_note": "정의만 적지 말고 AIMD·Slow Start·HTTPS 등과의 차이/관계를 간단히 비교해서 쓰라.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "하",
+    "concept_image_url": "/api/ai-images/CS-128-20260719-114309-21da053e.png",
+    "concept_image_alt": "HTTP(네트워크) 개념 참고 이미지",
+    "sort_order": 127,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-128-20260719-114309-21da053e.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-49",
+    "card_id": "CS-128",
+    "question_type": "multiple_choice",
+    "prompt": "### 79. HTTP 상태 코드 404의 의미로 옳은 것은?",
+    "body": "",
+    "answer": "3번",
+    "explanation": "3번",
+    "rubric": [],
+    "choices": [
+      "서버 내부 오류",
+      "요청 성공",
+      "리소스를 찾을 수 없음",
+      "권한 없음"
+    ],
+    "answer_index": 2,
+    "topic": "HTTP 상태 코드 404의 의미로 옳은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "HTTP",
+      "Hypertext Transfer Protocol",
+      "HTTP 상태 코드 404의 의미로",
+      "리소스를 찾을 수 없음"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 79. HTTP 상태 코드 404의 의미로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-49",
+    "card_id": "CS-128",
+    "question_type": "multiple_choice",
+    "prompt": "HTTP 상태 코드 404의 의미는 무엇인가?",
+    "body": "",
+    "answer": "리소스를 찾을 수 없음",
+    "explanation": "HTTP 404는 요청한 리소스를 서버에서 찾을 수 없음을 뜻한다. 500은 서버 내부 오류, 200은 요청 성공, 403은 권한 부족 또는 접근 금지에 해당한다.",
+    "rubric": [],
+    "choices": [
+      "서버 내부 오류",
+      "요청 성공",
+      "리소스를 찾을 수 없음",
+      "권한 없음"
+    ],
+    "answer_index": 2,
+    "topic": "HTTP 상태 코드",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "HTTP",
+      "Hypertext Transfer Protocol",
+      "HTTP 상태 코드",
+      "404 Not Found"
+    ],
+    "difficulty": "하",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 79. HTTP 상태 코드 404의 의미로 옳은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 79. HTTP 상태 코드 404의 의미로 옳은 것은?\n1. 서버 내부 오류\n2. 요청 성공\n3. 리소스를 찾을 수 없음\n4. 권한 없음\n\n**답:** 3번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 포함되어 있었음",
+      "answer와 explanation이 모두 '3번'으로만 되어 있어 정답 내용과 해설이 부실했음",
+      "keywords와 topic에 질문 문장 조각이 들어가 있어 검색용 메타데이터로 부적절했음"
+    ],
+    "changes": [
+      "prompt를 순수한 질문 문장으로 정리함",
+      "answer를 실제 정답 텍스트로 수정하고 explanation에 404의 의미와 오답 구분 근거를 보강함",
+      "topic과 keywords를 HTTP 상태 코드/404 Not Found 중심으로 정리함"
+    ]
+  }
+}

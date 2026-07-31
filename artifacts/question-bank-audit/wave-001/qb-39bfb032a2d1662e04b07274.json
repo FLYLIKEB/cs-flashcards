@@ -1,0 +1,116 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-39bfb032a2d1662e04b07274",
+  "wave": 1,
+  "linked_card": {
+    "card_id": "CS-030",
+    "term": "BGP",
+    "english": "BGP",
+    "category": "네트워크",
+    "alphabet_index": "B",
+    "korean_initial": "B",
+    "definition": "BGP는 자율 시스템(AS) 간에 IP 프리픽스와 경로 정보를 교환해 인터넷 전체의 라우팅 정책과 도달성을 결정하는 외부 게이트웨이 프로토콜로, 네트워크 간 책임 경계와 장애 지점 파악의 기준이 됩니다.",
+    "detailed_explanation": "의미: BGP는 경로 벡터(path-vector) 방식의 프로토콜로, 서로 다른 자율 시스템(AS)들 사이에서 IP 프리픽스와 경로 속성(예: AS_PATH)을 주고받아 어떤 경로로 트래픽을 보낼지 결정합니다. OSPF나 RIP 같은 IGP는 조직 내부의 최단 경로 계산을 목적을 하는 반면, BGP는 통신사·클라우드·대형 기관 등 네트워크 간에 정책(사업·운영 규칙)에 따라 경로를 선택하고 광고하는 역할을 합니다.\n활용: 실제 경로 선택은 AS_PATH, LOCAL_PREF, MED 등 여러 속성과 사업적 정책에 의해 결정되며, 단순한 최단 경로 알고리즘이 아닙니다. 잘못된 프리픽스 광고나 경로 하이재킹은 대규모 장애나 트래픽 우회로 이어지므로 RPKI, 프리픽스 필터링, 지속적인 모니터링으로 보호해야 합니다. BGP는 수렴 시간이 길 수 있으므로 장애 대응 시에는 어떤 상태값이 변하는지, 관련 로그와 패킷 증거를 순서대로 확인하는 것이 중요합니다. 운영에서는 기본 설정에만 의존하지 말고 주소 범위, 포트, 타임아웃, 캐시 및 재전송 정책 등을 서비스 특성에 맞춰 조정해 안정성과 성능을 확보해야 합니다.",
+    "related_concepts": "[[RIP]], [[OSPF]], [[NAT]], [[ICMP]], [[TCP]]",
+    "source_files": "08-04-라우팅과-서브넷.md",
+    "exam_note": "BGP 정의뿐 아니라 RIP/OSPF 등 IGP와의 차이(정책 기반 선택 vs 최단 경로)를 반드시 비교해 쓰세요.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "상",
+    "concept_image_url": "/api/ai-images/CS-030-20260719-114154-5663fc89.png",
+    "concept_image_alt": "BGP(네트워크) 개념 참고 이미지",
+    "sort_order": 29,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-030-20260719-114154-5663fc89.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-39bfb032a2d1662e04b07274",
+    "card_id": "CS-030",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "[?](Border Gateway Protocol)는 자율 시스템(AS)들 사이에서 IP 프리픽스와 경로 속성을 교환해 인터넷 전체의 라우팅 정책과 도달성을 결정하는 외부 게이트웨이 프로토콜입니다.",
+    "answer": "BGP",
+    "explanation": "BGP(Border Gateway Protocol)는 자율 시스템(AS)들 사이에서 IP 프리픽스와 경로 속성을 교환해 인터넷 전체의 라우팅 정책과 도달성을 결정하는 외부 게이트웨이 프로토콜입니다. 이를 통해 네트워크 간 트래픽 경로를 정책 기반으로 선택하고 장애나 책임 경계를 파악합니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "TCP",
+      "BGP",
+      "OSPF",
+      "NAT"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "",
+    "keywords": [
+      "BGP",
+      "RIP",
+      "OSPF",
+      "NAT",
+      "ICMP",
+      "TCP"
+    ],
+    "difficulty": "상",
+    "issuer": "카드 생성",
+    "source_location": "08-04-라우팅과-서브넷.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-39bfb032a2d1662e04b07274",
+    "card_id": "CS-030",
+    "question_type": "multiple_choice",
+    "prompt": "다음 설명에 해당하는 개념으로 가장 적절한 것을 고르시오.",
+    "body": "자율 시스템(AS)들 사이에서 IP 프리픽스와 경로 속성을 교환해 인터넷 전체의 라우팅 정책과 도달성을 결정하는 외부 게이트웨이 프로토콜입니다.",
+    "answer": "BGP",
+    "explanation": "BGP(Border Gateway Protocol)는 자율 시스템(AS)들 사이에서 IP 프리픽스와 경로 속성을 교환해 인터넷 전체의 라우팅 정책과 도달성을 결정하는 외부 게이트웨이 프로토콜입니다. 이를 통해 네트워크 간 트래픽 경로를 정책 기반으로 선택하고 장애나 책임 경계를 파악합니다.",
+    "rubric": [
+      "정답 개념과 오답 개념의 정의 차이를 구분한다."
+    ],
+    "choices": [
+      "TCP",
+      "BGP",
+      "OSPF",
+      "NAT"
+    ],
+    "answer_index": 1,
+    "topic": "네트워크",
+    "field_name": "",
+    "category": "네트워크",
+    "keywords": [
+      "BGP",
+      "Border Gateway Protocol",
+      "자율 시스템",
+      "AS",
+      "라우팅 정책"
+    ],
+    "difficulty": "상",
+    "issuer": "카드 생성",
+    "source_location": "08-04-라우팅과-서브넷.md",
+    "section": "",
+    "points": null,
+    "expected_time_seconds": null,
+    "answer_guide": "",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "body에 마크다운 플레이스홀더와 정답 단서가 섞여 있었음",
+      "category가 비어 있었음",
+      "keywords에 관련은 있지만 과도한 용어가 포함되어 있었음"
+    ],
+    "changes": [
+      "body에서 [?](Border Gateway Protocol) 표기와 직접 단서를 제거함",
+      "category를 네트워크로 보정함",
+      "keywords를 BGP 중심의 핵심 용어로 정리함"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-08",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-08",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 38. 프로시저 뜻",
+    "body": "- 프로시저: 데이터베이스 내에서 특정 작업을 수행하기 위해 작성된 SQL 코드의 집합",
+    "answer": "DB에 저장된 SQL 명령 집합으로, 반복 작업을 모듈화해 호출할 수 있다.",
+    "explanation": "DB에 저장된 SQL 명령 집합으로, 반복 작업을 모듈화해 호출할 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로시저 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "데이터베이스",
+      "SQL",
+      "프로시저"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 38. 프로시저 뜻",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-08",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "프로시저의 뜻을 설명하시오.",
+    "body": "",
+    "answer": "프로시저는 데이터베이스에 저장되어 특정 작업을 수행하도록 작성된 SQL 명령 집합이다.",
+    "explanation": "프로시저는 데이터베이스 서버에 저장한 뒤 이름으로 호출해 실행하는 SQL 절차로, 반복 업무를 재사용 가능하게 모듈화한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "프로시저 뜻",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "데이터베이스",
+      "SQL",
+      "프로시저"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 38. 프로시저 뜻",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 38. 프로시저 뜻\n- 프로시저: 데이터베이스 내에서 특정 작업을 수행하기 위해 작성된 SQL 코드의 집합\n**답(AI답변):** DB에 저장된 SQL 명령 집합으로, 반복 작업을 모듈화해 호출할 수 있다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트에 마크다운 제목 형식이 남아 있었음",
+      "body에 정답성 정의 문장이 들어 있어 문제 풀이 전 정보가 노출됐음"
+    ],
+    "changes": [
+      "프롬프트를 서술형 질문으로 정리함",
+      "body를 비우고 answer·explanation을 역할에 맞게 분리함"
+    ]
+  }
+}

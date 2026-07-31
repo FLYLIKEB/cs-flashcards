@@ -1,0 +1,90 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-38",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-38",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 125. 보기에서 설명하는 프로토콜은?",
+    "body": "보기\n- 인증, 접근제어, 보안 로그 등 네트워크 관리 정보에 보안 체계를 갖춘 프로토콜, OSI 참조 7계층\n      프로토콜을 사용하여 정보를 전송한다.\n- 이벤트 발생 기능을 지원하여 관리 프로세스가 관리 대상을 계속 모니터링 할 필요가 없다",
+    "answer": "4번",
+    "explanation": "- CMIP : OSI 모델 기반의 네트워크 관리 프로토콜로, 네트워크 장치의 상태를 모니터링하고 제어하는 데\n      사용됩니다.\n- IPX : Novell NetWare 환경에서 사용되는 네트워크 계층 프로토콜로, 데이터그램 전송을 위해\n      설계되었습니다.\n- TCP : 신뢰성 있는 데이터 전송을 제공하는 인터넷 프로토콜로, 데이터 전송 전에 연결을 설정하고\n      데이터의 순서 보장 및 오류 수정 기능을 제공합니다.\n- SPX : IPX와 함께 사용되는 연결 지향적 프로토콜로, Novell NetWare 환경에서 데이터 전송의 신뢰성을\n      보장합니다.",
+    "rubric": [],
+    "choices": [
+      "CMIP",
+      "IPX",
+      "TCP",
+      "SNMP",
+      "SPX"
+    ],
+    "answer_index": 3,
+    "topic": "보기에서 설명하는 프로토콜은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "프로세스",
+      "보기에서 설명하는 프로토콜은",
+      "SNMP",
+      "TCP"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 125. 보기에서 설명하는 프로토콜은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-38",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "보기에서 설명하는 프로토콜은?",
+    "body": "보기\n- 인증, 접근제어, 보안 로그 등 네트워크 관리 정보에 보안 체계를 갖춘 프로토콜이며, OSI 7계층 프로토콜을 사용해 정보를 전송한다.\n- 이벤트 발생 기능을 지원하여 관리 프로세스가 관리 대상을 계속 모니터링할 필요가 없다.",
+    "answer": "CMIP",
+    "explanation": "제시된 특징은 OSI 기반 네트워크 관리 프로토콜인 CMIP에 해당한다. CMIP는 보안 기능과 이벤트 보고 기능을 지원하며, SNMP와 달리 OSI 7계층 환경을 전제로 한 관리 프로토콜이다.",
+    "rubric": [],
+    "choices": [
+      "CMIP",
+      "IPX",
+      "TCP",
+      "SNMP",
+      "SPX"
+    ],
+    "answer_index": 0,
+    "topic": "보기에서 설명하는 프로토콜은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "CMIP",
+      "네트워크 관리 프로토콜",
+      "OSI 7계층",
+      "이벤트 보고"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 125. 보기에서 설명하는 프로토콜은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 125. 보기에서 설명하는 프로토콜은?\n\n보기\n- 인증, 접근제어, 보안 로그 등 네트워크 관리 정보에 보안 체계를 갖춘 프로토콜, OSI 참조 7계층\n      프로토콜을 사용하여 정보를 전송한다.\n- 이벤트 발생 기능을 지원하여 관리 프로세스가 관리 대상을 계속 모니터링 할 필요가 없다\n1. CMIP 2. IPX 3. TCP 4. SNMP 5. SPX\n\n  **답:** 4번\n- CMIP : OSI 모델 기반의 네트워크 관리 프로토콜로, 네트워크 장치의 상태를 모니터링하고 제어하는 데\n      사용됩니다.\n- IPX : Novell NetWare 환경에서 사용되는 네트워크 계층 프로토콜로, 데이터그램 전송을 위해\n      설계되었습니다.\n- TCP : 신뢰성 있는 데이터 전송을 제공하는 인터넷 프로토콜로, 데이터 전송 전에 연결을 설정하고\n      데이터의 순서 보장 및 오류 수정 기능을 제공합니다.\n- SPX : IPX와 함께 사용되는 연결 지향적 프로토콜로, Novell NetWare 환경에서 데이터 전송의 신뢰성을\n      보장합니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었고 body 문장이 줄바꿈으로 어색하게 분리되어 있었다.",
+      "source의 기존 정답 4번/SNMP는 제시문 설명(OSI 7계층, 보안 기능, 이벤트 보고)과 맞지 않아 answer와 answer_index가 잘못 매핑되어 있었다.",
+      "explanation이 오답 선택지 나열 중심이어서 정답 근거가 약했고 keywords에 일반 문구와 오답 키워드가 섞여 있었다."
+    ],
+    "changes": [
+      "prompt를 깨끗한 질문 문장으로 정리하고 body를 읽기 쉬운 두 줄 설명으로 다듬었다.",
+      "정답을 CMIP로 바로잡고 answer_index를 0으로 수정했으며, explanation에 CMIP와 SNMP의 구분 근거를 명시했다.",
+      "keywords를 CMIP, 네트워크 관리 프로토콜, OSI 7계층, 이벤트 보고로 정리했다."
+    ]
+  }
+}

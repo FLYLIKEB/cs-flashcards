@@ -1,0 +1,107 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-41",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-146",
+    "term": "Java",
+    "english": "Java",
+    "category": "프로그래밍 언어",
+    "alphabet_index": "J",
+    "korean_initial": "J",
+    "definition": "Java는 JVM 위에서 바이트코드를 실행해 플랫폼 독립성과 객체지향 설계를 제공하는 정적 타입 관리형 프로그래밍 언어입니다.",
+    "detailed_explanation": "의미: Java는 소스 코드를 바이트코드로 컴파일하고 JVM이 이를 해석하거나 JIT 컴파일해 실행합니다. 정적 타입, 클래스 기반 객체지향, 예외 처리, 가비지 컬렉션을 기본으로 제공해 메모리 안전성과 이식성을 높입니다. 이 영역은 사람이 쓴 코드가 실제 실행 형태로 바뀌는 길을 설명합니다. 소스 코드, 중간 표현, 기계어, 런타임 환경을 단계별로 나누어 보면 오류를 언제 발견하는지, 성능을 어디서 얻는지, 배포 파일이 왜 달라지는지 이해하기 쉽습니다. 활용: 금융권 백엔드, 대규모 서버, 안드로이드 생태계에서 표준적으로 쓰입니다. C보다 직접 메모리 제어는 약하지만 운영 안정성과 도구 생태계가 강하며, 성능 논의에서는 JVM 웜업, GC 지연, 스레드 모델 같은 런타임 특성을 함께 봐야 합니다. 개발과 운영에서는 빌드 단계, 실행 환경, 성능 튜닝 지점, 오류 메시지가 어느 계층에서 나오는지를 구분하는 데 도움이 됩니다. 단, 실제 런타임은 여러 방식을 섞는 경우가 많으므로 특정 언어를 한 단어로만 단정하지 말고 버전과 실행 환경을 확인해야 합니다.",
+    "related_concepts": "[[고차 함수]], [[불변성]], [[JVM]], [[바이트코드]], [[컴파일러]]",
+    "source_files": "05-08-산업은행-기출.md; 04-02-프로그래밍-SQL-분산-클라우드.md; 10-03-01-XSS-SQL-Injection.md",
+    "exam_note": "프로그래밍 언어 문제에서는 Java의 정의만 쓰지 말고 관련 개념(고차 함수, 불변성, JVM)과 비교·차이를 함께 쓰면 가점을 받기 쉽습니다.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-146-20260720-053946-34928e86.png",
+    "concept_image_alt": "Java(프로그래밍 언어) 개념 참고 이미지",
+    "sort_order": 145,
+    "updated_at": "2026-07-20T16:40:31+00:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-146-20260720-053946-34928e86.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-41",
+    "card_id": "CS-146",
+    "question_type": "multiple_choice",
+    "prompt": "### 71. 다음 JAVA코드의 실행 결과가 7이 되도록 빈칸에 들어갈 것을 고르시오.",
+    "body": "```java\nint n = 5;\nint result = ___n + 1;\nSystem.out.println(result);\n```",
+    "answer": "2번",
+    "explanation": "2번",
+    "rubric": [],
+    "choices": [
+      "n++",
+      "++n",
+      "n--",
+      "--n"
+    ],
+    "answer_index": 1,
+    "topic": "다음 JAVA코드의 실행 결과가 7이 되도록 빈칸에 들어갈 것을 고르시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "가 7이 되도록 빈칸에 들어갈 것을"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 71. 다음 JAVA코드의 실행 결과가 7이 되도록 빈칸에 들어갈 것을 고르시오.",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-41",
+    "card_id": "CS-146",
+    "question_type": "multiple_choice",
+    "prompt": "다음 Java 코드의 실행 결과가 7이 되도록 빈칸에 들어갈 것은?",
+    "body": "```java\nint n = 5;\nint result = ___n + 1;\nSystem.out.println(result);\n```",
+    "answer": "++n",
+    "explanation": "n이 5일 때 ++n은 먼저 n을 6으로 증가시킨 뒤 식에 사용하므로 result가 7이 된다. 반면 n++은 5를 먼저 사용해 6이 되고, n--와 --n은 각각 4 또는 5가 된다.",
+    "rubric": [],
+    "choices": [
+      "n++",
+      "++n",
+      "n--",
+      "--n"
+    ],
+    "answer_index": 1,
+    "topic": "다음 JAVA코드의 실행 결과가 7이 되도록 빈칸에 들어갈 것을 고르시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "증감 연산자",
+      "전위 증가",
+      "후위 증가"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 71. 다음 JAVA코드의 실행 결과가 7이 되도록 빈칸에 들어갈 것을 고르시오.",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "전위 증가와 후위 증가의 평가 순서를 구분해 정답 선지를 설명한다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 71. 다음 JAVA코드의 실행 결과가 7이 되도록 빈칸에 들어갈 것을 고르시오.\n\n```java\nint n = 5;\nint result = ___n + 1;\nSystem.out.println(result);\n```\n1. n++\n2. ++n\n3. n--\n4. --n\n\n**답:** 2번",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 헤딩과 문항 번호가 남아 있었다.",
+      "answer와 explanation이 모두 '2번'으로만 적혀 있어 실제 정답 내용과 풀이가 없었다.",
+      "keywords와 answer_guide에 문제 핵심인 증감 연산 개념이 반영되지 않았다."
+    ],
+    "changes": [
+      "prompt를 순수 질문 문장으로 정리했다.",
+      "answer를 실제 정답인 ++n으로 고치고 전위/후위 증가에 따른 계산 과정을 explanation에 작성했다.",
+      "keywords와 answer_guide를 증감 연산자 중심으로 정리했다."
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-14",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-14",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 200. AOE에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: AOE 유형 중 옳지 않은 것은?",
+    "answer": "AOE 네트워크는 작업을 간선으로 표현하고 이벤트를 정점으로 표현해 프로젝트 일정/임계경로를 분석한다.",
+    "explanation": "AOE 네트워크는 작업을 간선으로 표현하고 이벤트를 정점으로 표현해 프로젝트 일정/임계경로를 분석한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "AOE에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "AOE"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 200. AOE에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-14",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "AOE 네트워크의 개념과 특징을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 200. AOE 유형 중 옳지 않은 것은?",
+    "answer": "AOE 네트워크는 작업을 간선, 사건을 정점으로 표현하여 프로젝트 일정과 임계 경로를 분석하는 네트워크 기법이다.",
+    "explanation": "AOE(Activity On Edge)는 활동이 간선에 놓이는 표현 방식으로, 각 작업의 선후관계와 전체 소요 시간을 계산해 임계 경로를 찾는 데 사용된다. 정점을 사건으로 두는 점에서 활동을 정점으로 두는 AOV와 구별된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "AOE 네트워크",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "AOE 네트워크",
+      "임계 경로",
+      "프로젝트 일정 관리"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 200. AOE 유형 중 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 200. AOE 유형 중 옳지 않은 것은?\n**답(AI답변):** AOE 네트워크는 작업을 간선으로 표현하고 이벤트를 정점으로 표현해 프로젝트 일정/임계경로를 분석한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row.prompt에 마크다운 헤딩과 번호가 남아 있어 질문 문장만 분리되지 않았음",
+      "불완전 원문을 개념문제로 바꿨지만 body 문구가 공통 규칙의 정확한 변환 형식과 다름",
+      "topic·keywords·source_location이 변환된 개념문항과 원문 출처를 충분히 반영하지 못함"
+    ],
+    "changes": [
+      "prompt를 명시적 개념 설명형 질문으로 정리하고 body를 규칙상의 2줄 변환 메모 형식으로 수정함",
+      "answer와 explanation을 AOE 네트워크의 정의, 용도, AOV와의 구분이 드러나도록 보강함",
+      "topic·keywords·source_location을 AOE 네트워크 중심으로 정리하고 audit 상태를 converted로 갱신함"
+    ]
+  }
+}

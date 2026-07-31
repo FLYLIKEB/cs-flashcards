@@ -1,0 +1,84 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-42",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-42",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 129. IoT 설명 중 옳지 않은 것은?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "- IoT는 실시간 데이터 처리가 불가능하여 주로 비동기 방식으로 작동함",
+    "rubric": [],
+    "choices": [
+      "IoT는 다양한 사물들이 인터넷에 연결되어 데이터를 주고받는 기술임.",
+      "IoT는 실시간 데이터 처리가 불가능하여 주로 비동기 방식으로 작동함.",
+      "IoT는 원격 제어와 자동화 기능을 통해 효율성을 높일 수 있음.",
+      "IoT는 보안 문제와 프라이버시 침해 등의 단점이 있음."
+    ],
+    "answer_index": 1,
+    "topic": "IoT 설명 중 옳지 않은 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "IoT"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 129. IoT 설명 중 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-42",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "IoT 설명 중 옳지 않은 것은?",
+    "body": "",
+    "answer": "2번",
+    "explanation": "IoT는 사물 간 연결을 바탕으로 데이터를 수집·전송하고, 서비스에 따라 실시간 모니터링과 제어도 가능하므로 '실시간 데이터 처리가 불가능하다'는 2번 설명이 틀리다.",
+    "rubric": [],
+    "choices": [
+      "IoT는 다양한 사물들이 인터넷에 연결되어 데이터를 주고받는 기술임.",
+      "IoT는 실시간 데이터 처리가 불가능하여 주로 비동기 방식으로 작동함.",
+      "IoT는 원격 제어와 자동화 기능을 통해 효율성을 높일 수 있음.",
+      "IoT는 보안 문제와 프라이버시 침해 등의 단점이 있음."
+    ],
+    "answer_index": 1,
+    "topic": "IoT",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "IoT",
+      "사물인터넷",
+      "실시간 제어"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 129. IoT 설명 중 옳지 않은 것은?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 129. IoT 설명 중 옳지 않은 것은?\n1. IoT는 다양한 사물들이 인터넷에 연결되어 데이터를 주고받는 기술임.\n2. IoT는 실시간 데이터 처리가 불가능하여 주로 비동기 방식으로 작동함.\n3. IoT는 원격 제어와 자동화 기능을 통해 효율성을 높일 수 있음.\n4. IoT는 보안 문제와 프라이버시 침해 등의 단점이 있음.\n\n  **답:** 2번\n- IoT는 실시간 데이터 처리가 불가능하여 주로 비동기 방식으로 작동함\n\n## 약어 풀이\n\n- CMIP: Common Management Information Protocol, 공통 관리 정보 프로토콜\n- CPU: Central Processing Unit, 중앙처리장치\n- GAN: Global Area Network, 전역 통신망\n- IPX: Internetwork Packet Exchange, 노벨 계열 네트워크 계층 프로토콜\n- IT: Information Technology, 정보기술\n- LAN: Local Area Network, 근거리 통신망\n- NIC: Network Interface Card, 네트워크 인터페이스 카드\n- OSI: Open Systems Interconnection, 개방형 시스템 상호연결\n- SNMP: Simple Network Management Protocol, 단순 네트워크 관리 프로토콜\n- SPX: Sequenced Packet Exchange, 노벨 계열 전송 계층 프로토콜\n- TCP: Transmission Control Protocol, 전송 제어 프로토콜\n- VPN: Virtual Private Network, 가상 사설망\n- WAN: Wide Area Network, 광역 통신망",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "explanation이 정답 문장만 반복하고 오답 근거 설명이 부족했음",
+      "topic/category/keywords가 IoT 개념 문항에 비해 지나치게 거칠거나 부정확했음"
+    ],
+    "changes": [
+      "prompt를 질문 문장만 남기도록 정리함",
+      "2번 선지가 틀린 이유를 설명하는 해설로 보강함",
+      "topic을 IoT로 정리하고 category를 네트워크로 조정했으며 keywords를 사물인터넷 관련 핵심어로 정제함"
+    ]
+  }
+}

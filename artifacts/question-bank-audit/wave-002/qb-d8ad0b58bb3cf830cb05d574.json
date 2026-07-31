@@ -1,0 +1,79 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-d8ad0b58bb3cf830cb05d574",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-d8ad0b58bb3cf830cb05d574",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 5. 데이터 통신",
+    "body": "데이터 통신과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\n다음 표는 OSI 7 계층과 TCP/IP에 대한 구조를 나타내고 있다. 표에 나와 있는 각 계층에 다음 10개의 통신 프로토콜들을 채우시오.\n\n```text\nDNS, POP3, ICMP, IP, ARP, Ethernet, TCP, HTTP, FTP, UDP\n```\n\n| OSI 7 계층 | TCP/IP | 프로토콜(10개) |\n|---|---|---|\n| 어플리케이션 | 어플리케이션 |  |\n| 프리젠테이션 | 어플리케이션 |  |\n| 세션 | 어플리케이션 |  |\n| 트랜스포트 | 트랜스포트 |  |\n| 네트워크 | 네트워크 |  |\n| 데이터링크 | 데이터링크 |  |\n| 물리 | 물리 |  |\n\n#### 2.\n\nTCP와 UDP 프로토콜에 대해 서술하시오.\n\n#### 3.\n\nTCP의 3-way handshake에 대해 서술하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터 통신",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "데이터 통신",
+      "DNS",
+      "TCP",
+      "FTP"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 5. 데이터 통신 · 5. 데이터 통신",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-d8ad0b58bb3cf830cb05d574",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "OSI 7계층과 TCP/IP 계층별 프로토콜을 분류하고 TCP·UDP 및 TCP 3-way handshake를 설명하시오.",
+    "body": "1) 다음 프로토콜을 OSI 7계층과 TCP/IP 계층에 맞게 분류하시오: DNS, POP3, ICMP, IP, ARP, Ethernet, TCP, HTTP, FTP, UDP.\n\n| OSI 7 계층 | TCP/IP | 프로토콜(10개) |\n|---|---|---|\n| 어플리케이션 | 어플리케이션 |  |\n| 프리젠테이션 | 어플리케이션 |  |\n| 세션 | 어플리케이션 |  |\n| 트랜스포트 | 트랜스포트 |  |\n| 네트워크 | 인터넷 |  |\n| 데이터링크 | 네트워크 액세스 |  |\n| 물리 | 네트워크 액세스 |  |\n\n2) TCP와 UDP의 특성을 비교하시오.\n\n3) TCP의 3-way handshake 과정을 설명하시오.",
+    "answer": "1) 어플리케이션 계층(OSI 상위 3계층, TCP/IP 어플리케이션): DNS, POP3, HTTP, FTP / 트랜스포트 계층: TCP, UDP / 네트워크(인터넷) 계층: IP, ICMP / 데이터링크(네트워크 액세스) 계층: ARP, Ethernet. 2) TCP는 연결지향형으로 3-way handshake를 통해 연결을 설정하고 순서 보장, 오류·흐름·혼잡 제어 및 재전송을 제공해 신뢰성이 높다. UDP는 비연결형으로 연결 설정과 재전송이 없어 오버헤드와 지연이 작지만 전달 보장과 순서 보장은 없다. 3) TCP 3-way handshake는 클라이언트가 SYN을 보내고, 서버가 SYN+ACK로 응답한 뒤, 클라이언트가 ACK를 보내 연결을 확립하는 절차이다.",
+    "explanation": "OSI 7계층의 프리젠테이션·세션은 TCP/IP에서 별도 계층으로 나뉘지 않고 어플리케이션 계층에 포함된다. DNS, POP3, HTTP, FTP는 응용 서비스 프로토콜이고 TCP·UDP는 종단 간 전송을 담당한다. IP와 ICMP는 인터넷 계층에서 주소지정·라우팅·제어 메시지를 처리하며, ARP와 Ethernet은 링크 수준에서 주소 해석과 프레임 전송을 담당한다. TCP는 신뢰성과 순서 보장이 필요한 파일 전송·웹 트랜잭션 등에 적합하고, UDP는 실시간 스트리밍·음성·단순 질의처럼 지연이 중요한 경우에 적합하다. 3-way handshake는 양측의 송수신 가능 여부와 초기 순서번호를 동기화해 신뢰성 있는 연결의 시작 상태를 맞춘다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터 통신",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "OSI 7계층",
+      "TCP/IP",
+      "TCP",
+      "UDP",
+      "3-way handshake"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 5. 데이터 통신 · 5. 데이터 통신",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "프롬프트가 제목만 남아 있어 실제 질문이 드러나지 않음",
+      "정답과 해설이 비어 있음",
+      "키워드가 문제 핵심 개념을 충분히 반영하지 않음"
+    ],
+    "changes": [
+      "프롬프트를 실제 요구사항이 드러나는 질문형으로 정리",
+      "계층 분류·TCP/UDP 비교·3-way handshake 정답과 해설 보강",
+      "키워드를 OSI 7계층, TCP/IP, UDP 등 핵심 용어 중심으로 정리"
+    ]
+  }
+}

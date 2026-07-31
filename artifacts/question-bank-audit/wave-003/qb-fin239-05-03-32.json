@@ -1,0 +1,85 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-32",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-32",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "### 119. 아래 지문에 해당하는 용어는?",
+    "body": "지문\n- 고객이 창구 대신 첨단 IT기기를 활용하여 직접 금융 업무를 볼 수 있게 만든 금융 점포\n- IT기기의 활용이 익숙한 고객에게는 신속하고 편리하게 금융업무를 처리할 수 있도록 하는 것",
+    "answer": "1번",
+    "explanation": "- SOA (Service-Oriented Architecture): SOA는 소프트웨어 설계 원칙 중 하나로, 서로 다른 서비스를\n       결합하여 애플리케이션을 구성하는 방식을 의미합니다. 금융 점포와는 직접적인 관련이 없습니다.\n- MDM (Master Data Management): MDM은 조직의 주요 데이터를 관리하는 방법론입니다. 금융 점포와\n       직접적인 관련이 없습니다.\n- 펌뱅킹 (Firm Banking): 펌뱅킹은 기업이 인터넷을 통해 은행과 직접 연결되어 금융 업무를 처리하는\n       시스템입니다. 지문에서 설명하는 고객이 직접 IT기기를 활용하는 금융 점포와는 다릅니다.",
+    "rubric": [],
+    "choices": [
+      "스마트브랜치",
+      "SOA",
+      "MDM",
+      "펌뱅킹"
+    ],
+    "answer_index": 0,
+    "topic": "아래 지문에 해당하는 용어는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "스마트브랜치",
+      "SOA"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 119. 아래 지문에 해당하는 용어는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-32",
+    "card_id": "",
+    "question_type": "multiple_choice",
+    "prompt": "아래 지문에 해당하는 용어는?",
+    "body": "- 고객이 창구 대신 첨단 IT기기를 활용하여 직접 금융 업무를 처리할 수 있게 만든 금융 점포\n- IT기기 활용에 익숙한 고객이 신속하고 편리하게 금융업무를 처리할 수 있도록 한 점포 형태",
+    "answer": "스마트브랜치",
+    "explanation": "스마트브랜치는 고객이 창구 직원 대신 디지털 기기를 활용해 직접 금융 업무를 처리하는 금융 점포를 뜻한다. SOA는 서비스 지향 아키텍처, MDM은 기준정보 관리, 펌뱅킹은 기업과 은행 간 전산 연결 서비스이므로 지문의 점포 개념과 다르다.",
+    "rubric": [],
+    "choices": [
+      "스마트브랜치",
+      "SOA",
+      "MDM",
+      "펌뱅킹"
+    ],
+    "answer_index": 0,
+    "topic": "아래 지문에 해당하는 용어는?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "스마트브랜치",
+      "디지털 점포",
+      "셀프서비스 금융"
+    ],
+    "difficulty": "하",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 119. 아래 지문에 해당하는 용어는?",
+    "section": "전공필기",
+    "points": 4,
+    "expected_time_seconds": 90,
+    "answer_guide": "정답 선지 근거 1문장 + 오답 선지와 구분 포인트 1문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 119. 아래 지문에 해당하는 용어는?\n\n  지문\n- 고객이 창구 대신 첨단 IT기기를 활용하여 직접 금융 업무를 볼 수 있게 만든 금융 점포\n- IT기기의 활용이 익숙한 고객에게는 신속하고 편리하게 금융업무를 처리할 수 있도록 하는 것\n1. 스마트브랜치\n2. SOA\n3. MDM\n4. 펌뱅킹\n\n  **답:** 1번\n- SOA (Service-Oriented Architecture): SOA는 소프트웨어 설계 원칙 중 하나로, 서로 다른 서비스를\n       결합하여 애플리케이션을 구성하는 방식을 의미합니다. 금융 점포와는 직접적인 관련이 없습니다.\n- MDM (Master Data Management): MDM은 조직의 주요 데이터를 관리하는 방법론입니다. 금융 점포와\n       직접적인 관련이 없습니다.\n- 펌뱅킹 (Firm Banking): 펌뱅킹은 기업이 인터넷을 통해 은행과 직접 연결되어 금융 업무를 처리하는\n       시스템입니다. 지문에서 설명하는 고객이 직접 IT기기를 활용하는 금융 점포와는 다릅니다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호/헤딩 흔적이 남아 있었음",
+      "answer가 정답 용어 대신 '1번'으로 저장되어 있었음",
+      "explanation이 오답 설명 위주였고 category·keywords가 문제 내용과 덜 맞았음"
+    ],
+    "changes": [
+      "prompt와 body를 문제 풀이에 필요한 문장만 남기도록 정리함",
+      "answer를 '스마트브랜치'로 교체하고 explanation을 정답 중심으로 재작성함",
+      "category를 금융IT·신기술로 수정하고 keywords를 개념 중심으로 정리함"
+    ]
+  }
+}

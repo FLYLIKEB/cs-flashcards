@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-e731ef406113ed605ae3d667",
+  "wave": 2,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-e731ef406113ed605ae3d667",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 5. 데이터 통신",
+    "body": "데이터 통신과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\nTCP/IP 프로토콜 그룹에서 전송층(transport layer)의 대표적인 프로토콜로 UDP(User Datagram Protocol), TCP(Transmission Control Protocol)가 있다. 아래 서비스들을 구현하는 데 두 프로토콜 중 어떤 프로토콜을 사용하는 것이 적절한지 선택하고 그 근거를 설명하시오.\n\n1. 로그인 서비스\n2. 도메인 네임 서비스(DNS)\n3. 대량 파일 전송\n4. 화상회의 시스템\n5. 전자우편(e-mail)\n\n#### 2.\n\nIPv4 주소 고갈 문제를 해결한 IPv6 프로토콜이 개발되어 사용되고 있다. 하지만 기존 IPv4로 구성된 모든 네트워크를 한 번에 교체할 수 없으므로 IPv6로 점진적으로 옮겨가기 위한 전략이 필요하다. 그 중 대표적인 방안인 이중 스택(dual stack), 터널링(tunneling), 헤더 변환(header translation)에 대하여 설명하시오.\n\n#### 3.\n\n**5-2 공통 채널 디지털 신호 계산 그림**\n\n![5-2 공통 채널 디지털 신호 계산 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202021%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0009.bmp)\n\n매체 접근 제어(MAC) 기술 중 코드 분할 다중 접근 방식(CDMA, Code Division Multiple Access)은 주파수·시간 분할 없이 하나의 채널을 모든 노드가 공유할 수 있는 프로토콜이다. CDMA를 쓰는 네트워크에서 각 노드는 칩 순열(chips)이라 불리는 고유 코드를 할당받으며, 데이터 전송 시 데이터와 칩 순열의 내적(inner product) 연산을 통해 데이터를 부호화한다.\n\n- 비트 `0` 전송: `-1`\n- 비트 `1` 전송: `+1`\n- 아무 신호도 보내지 않음: `0`\n\n예를 들어 전송하고자 하는 비트가 `0`이고 칩 순열이 `(+1, -1, +1, -1)`이면 실제 생성되는 출력 신호는 `(-1, +1, -1, +1)`이 된다.\n\n다음 물음에 답하시오.\n\n1. 각 노드에서 생성된 출력 신호는 어떻게 되는가?\n2. 공통 채널의 디지털 신호는 어떻게 되는가?\n3. 휴지(idle) 상태였던 노드3에서 노드2의 칩 순열을 사용하여 노드2가 송신한 비트 `0`을 수신하고자 한다. 공통 채널의 디지털 신호를 노드3에서 어떻게 복호화하는지 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터 통신",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "데이터 통신",
+      "DNS",
+      "TCP",
+      "IPv4",
+      "스택"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2021 컴퓨터공학 학술 파트 I · 5. 데이터 통신",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-e731ef406113ed605ae3d667",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "IPv6로 점진적으로 전환하기 위한 대표적 전략인 이중 스택, 터널링, 헤더 변환을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 5. 데이터 통신",
+    "answer": "이중 스택은 장비와 호스트가 IPv4와 IPv6를 동시에 지원해 상황에 따라 두 프로토콜을 병행 사용하는 방식이다. 터널링은 IPv6 패킷을 IPv4 패킷 내부에 캡슐화해 IPv4 구간을 통과시키는 방식이다. 헤더 변환은 IPv4와 IPv6 사이에서 패킷 헤더를 변환해 서로 다른 프로토콜 환경의 통신을 가능하게 하는 방식이다.",
+    "explanation": "원문은 IPv4 기반 네트워크를 한 번에 교체할 수 없으므로 IPv6로 점진적으로 이전하는 방안을 설명하라고 요구한다. 이중 스택은 양쪽 프로토콜을 함께 운영하는 직접적 전환 방식이고, 터널링은 기존 IPv4 인프라를 경유해 IPv6 트래픽을 전달하는 방식이며, 헤더 변환은 IPv4/IPv6 이기종 구간의 상호운용성을 확보하는 방식이라는 점을 구분하면 된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터 통신",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "IPv6",
+      "이중 스택",
+      "터널링",
+      "헤더 변환",
+      "전환 전략"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2021 컴퓨터공학 학술 파트 I · 5. 데이터 통신",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 5. 데이터 통신\n\n데이터 통신과 관련하여 다음 물음에 답하시오.\n\n#### 1.\n\nTCP/IP 프로토콜 그룹에서 전송층(transport layer)의 대표적인 프로토콜로 UDP(User Datagram Protocol), TCP(Transmission Control Protocol)가 있다. 아래 서비스들을 구현하는 데 두 프로토콜 중 어떤 프로토콜을 사용하는 것이 적절한지 선택하고 그 근거를 설명하시오.\n\n1. 로그인 서비스\n2. 도메인 네임 서비스(DNS)\n3. 대량 파일 전송\n4. 화상회의 시스템\n5. 전자우편(e-mail)\n\n#### 2.\n\nIPv4 주소 고갈 문제를 해결한 IPv6 프로토콜이 개발되어 사용되고 있다. 하지만 기존 IPv4로 구성된 모든 네트워크를 한 번에 교체할 수 없으므로 IPv6로 점진적으로 옮겨가기 위한 전략이 필요하다. 그 중 대표적인 방안인 이중 스택(dual stack), 터널링(tunneling), 헤더 변환(header translation)에 대하여 설명하시오.\n\n#### 3.\n\n**5-2 공통 채널 디지털 신호 계산 그림**\n\n![5-2 공통 채널 디지털 신호 계산 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202021%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%28%EA%B3%B5%EA%B0%9C%29.html/bindata/BIN0009.bmp)\n\n매체 접근 제어(MAC) 기술 중 코드 분할 다중 접근 방식(CDMA, Code Division Multiple Access)은 주파수·시간 분할 없이 하나의 채널을 모든 노드가 공유할 수 있는 프로토콜이다. CDMA를 쓰는 네트워크에서 각 노드는 칩 순열(chips)이라 불리는 고유 코드를 할당받으며, 데이터 전송 시 데이터와 칩 순열의 내적(inner product) 연산을 통해 데이터를 부호화한다.\n\n- 비트 `0` 전송: `-1`\n- 비트 `1` 전송: `+1`\n- 아무 신호도 보내지 않음: `0`\n\n예를 들어 전송하고자 하는 비트가 `0`이고 칩 순열이 `(+1, -1, +1, -1)`이면 실제 생성되는 출력 신호는 `(-1, +1, -1, +1)`이 된다.\n\n다음 물음에 답하시오.\n\n1. 각 노드에서 생성된 출력 신호는 어떻게 되는가?\n2. 공통 채널의 디지털 신호는 어떻게 되는가?\n3. 휴지(idle) 상태였던 노드3에서 노드2의 칩 순열을 사용하여 노드2가 송신한 비트 `0`을 수신하고자 한다. 공통 채널의 디지털 신호를 노드3에서 어떻게 복호화하는지 설명하시오.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "섹션 제목만 prompt에 남아 있어 단일 문항으로 사용할 수 없음",
+      "여러 소문항이 한 행에 합쳐져 있고 CDMA 계산에 필요한 그림 정보가 누락됨"
+    ],
+    "changes": [
+      "IPv6 전환 전략을 묻는 개념형 주관식으로 변환",
+      "변환 메모와 원문 제목을 body 두 줄로 정리하고 정답·해설·키워드를 보강"
+    ]
+  }
+}

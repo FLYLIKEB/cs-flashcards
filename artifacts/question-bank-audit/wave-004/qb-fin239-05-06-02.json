@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-06-02",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-06-02",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 166. 2PL에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 2PL 문제",
+    "answer": "2PL은 확장 단계에서 잠금 획득만, 축소 단계에서 잠금 해제만 허용해 직렬 가능성을 보장한다.",
+    "explanation": "2PL은 확장 단계에서 잠금 획득만, 축소 단계에서 잠금 해제만 허용해 직렬 가능성을 보장한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "2PL에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "2PL"
+    ],
+    "difficulty": "중",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 166. 2PL에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-06-02",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "2단계 락킹 규약(2PL)의 개념과 핵심 단계를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 166. 2PL 문제",
+    "answer": "2단계 락킹 규약(2PL)은 트랜잭션을 락을 획득만 하는 확장 단계와 락을 해제만 하는 축소 단계로 나누어, 한 번 락을 해제한 뒤에는 새로운 락을 획득하지 못하게 함으로써 충돌 직렬 가능성을 보장하는 동시성 제어 기법이다.",
+    "explanation": "2PL의 핵심은 락 획득 구간과 락 해제 구간을 분리하는 것이다. 확장 단계에서는 필요한 공유 락·배타 락을 확보하고, 첫 해제 이후인 축소 단계에서는 추가 락 획득 없이 해제만 수행한다. 이 제약 덕분에 병행 실행 결과를 직렬 실행과 동등하게 만들 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "트랜잭션 동시성 제어",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "2PL",
+      "2단계 락킹",
+      "동시성 제어",
+      "직렬 가능성"
+    ],
+    "difficulty": "중",
+    "issuer": "예탁결제원",
+    "source_location": "예탁결제원 기출 · 166. 2PL 문제",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 166. 2PL 문제\n**답(AI답변):** 2PL은 확장 단계에서 잠금 획득만, 축소 단계에서 잠금 해제만 허용해 직렬 가능성을 보장한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 헤딩과 문항 번호가 남아 있었음",
+      "불완전 원문인데 body의 변환 메모 문구가 공통 규칙과 다르고 원문 제목도 불명확했음",
+      "answer와 explanation이 동일한 한 줄로만 작성되어 2PL의 단계와 의미 설명이 부족했음",
+      "topic, keywords, source_location이 문제 문장을 그대로 반복하거나 지나치게 축약되어 있었음"
+    ],
+    "changes": [
+      "불완전 출처 규칙에 맞춰 개념형 prompt와 body 2줄을 정리함",
+      "2PL의 확장 단계·축소 단계·충돌 직렬 가능성을 반영해 answer와 explanation을 보강함",
+      "topic을 트랜잭션 동시성 제어로 정리하고 keywords를 2단계 락킹 관련 핵심 용어로 보정함",
+      "source_location을 source_excerpt와 일치하도록 2PL 문제 기준으로 정리함"
+    ]
+  }
+}

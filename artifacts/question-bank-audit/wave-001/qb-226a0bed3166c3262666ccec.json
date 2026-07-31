@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-226a0bed3166c3262666ccec",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-226a0bed3166c3262666ccec",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 14. 머신러닝",
+    "body": "머신러닝과 관련하여 다음 물음에 답하시오.\n\n1. 인공신경망(ANN, Artificial Neural Network)을 학습시키기 위한 **역전파(Backpropagation)** 알고리즘에 대하여 설명하시오.\n\n2. **2-1 RNN 구조 그림**\n\n   ![2-1 RNN 구조 그림](https://raw.githubusercontent.com/FLYLIKEB/finance-public-corp-prep-materials/main/%EC%A4%80%EB%B9%84%EC%9E%90%EB%A3%8C/%ED%95%9C%EA%B5%AD%EC%9D%80%ED%96%89%20%EA%B8%B0%EC%B6%9C/pdf/html/5.%202025%EB%85%84%EB%8F%84%20%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%20%ED%95%99%EC%88%A0%EA%B3%B5%EA%B0%9C%20%281%29.html/bindata/BIN000C.bmp)\n\n   아래와 같은 순환신경망(RNN, Recurrent Neural Network)을 학습하는 과정에서 발생할 수 있는 **기울기 소실(Vanishing Gradients)** 문제를 정의하고 발생하는 이유를 서술하시오.  \n   동 순환신경망은 활성화 함수(Activation Function)로 시그모이드(Sigmoid) 함수를 사용한다고 가정.\n\n   ```text\n   출력\n   y_{t-1}         y_t           y_{t+1}\n      ↑             ↑               ↑\n      │             │               │\n   ... ──W──> RNN(h_{t-1}) ──W──> RNN(h_t) ──W──> RNN(h_{t+1}) ──W──> ...\n                  ↑               ↑                 ↑\n                  │               │                 │\n                  U               U                 U\n                  │               │                 │\n               x_{t-1}           x_t             x_{t+1}\n               Input            Input            Input\n   ```",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "머신러닝"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 14. 머신러닝 · 14. 머신러닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-226a0bed3166c3262666ccec",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "역전파 알고리즘을 설명하고, 시그모이드 함수를 사용하는 RNN에서 기울기 소실 문제가 무엇이며 왜 발생하는지 서술하시오.",
+    "body": "RNN 부분은 아래 구조를 가정한다.\n\n```text\n출력\ny_{t-1}         y_t           y_{t+1}\n   ↑             ↑               ↑\n   │             │               │\n... ──W──> RNN(h_{t-1}) ──W──> RNN(h_t) ──W──> RNN(h_{t+1}) ──W──> ...\n               ↑               ↑                 ↑\n               │               │                 │\n               U               U                 U\n               │               │                 │\n            x_{t-1}           x_t             x_{t+1}\n            Input            Input            Input\n```\n\nRNN의 활성화 함수는 시그모이드 함수라고 가정한다.",
+    "answer": "역전파는 출력 오차를 손실 함수로 계산한 뒤 연쇄법칙을 이용해 각 층의 가중치 기울기를 출력층에서 입력층 방향으로 전파하여 가중치를 갱신하는 학습 알고리즘이다. RNN의 기울기 소실은 시점이 멀어질수록 오차 기울기가 매우 작아져 장기 의존성을 학습하지 못하는 현상이며, 시간축으로 펼친 역전파에서 가중치와 시그모이드 미분값(최대 0.25)이 반복적으로 곱해져 기울기가 지수적으로 감소하기 때문에 발생한다.",
+    "explanation": "역전파는 순전파로 예측값을 구한 뒤 실제값과의 오차를 계산하고, 그 오차를 각 뉴런의 편미분으로 분해하여 가중치별 기울기를 구하는 방법이다. 이렇게 계산한 기울기로 경사하강법을 적용해 가중치를 갱신한다. RNN에서는 동일한 가중치가 여러 시점에 걸쳐 반복 사용되므로 역전파가 시간축으로 길게 연결된다. 이때 시그모이드의 미분값이 작고 동일 가중치가 반복 곱해지면 초기 시점으로 갈수록 기울기가 거의 0에 수렴해 먼 과거 정보가 학습되지 않는다. 그래서 장기 의존성 학습이 어려워지고, 이를 완화하기 위해 LSTM이나 GRU 같은 구조를 사용한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "머신러닝",
+    "field_name": "컴퓨터공학 학술",
+    "category": "인공지능·데이터",
+    "keywords": [
+      "역전파",
+      "RNN",
+      "기울기 소실",
+      "시그모이드"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 14. 머신러닝 · 14. 머신러닝",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt가 제목만 남아 있어 실제 질문이 드러나지 않음",
+      "body에 질문 문장과 이미지 마크다운이 섞여 있어 앱 표시용으로 부적절함",
+      "answer와 explanation이 비어 있어 풀이 데이터가 없음"
+    ],
+    "changes": [
+      "prompt를 역전파와 RNN 기울기 소실을 함께 묻는 서술형 질문으로 정리함",
+      "body를 RNN 구조와 시그모이드 가정만 남기는 문제 맥락으로 정리함",
+      "정답·해설·핵심 keywords를 보강해 단일 주관식 문항으로 정비함"
+    ]
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-17",
+  "wave": 3,
+  "linked_card": {
+    "card_id": "CS-139",
+    "term": "무결성",
+    "english": "Integrity",
+    "category": "데이터베이스",
+    "alphabet_index": "I",
+    "korean_initial": "ㅁ",
+    "definition": "무결성은 데이터가 정의된 규칙과 제약을 항상 만족하여 일관성과 정확성을 유지하는 상태입니다. 이는 올바른 거래 처리와 신뢰할 수 있는 보고를 보장하는 데이터의 핵심 속성입니다.",
+    "detailed_explanation": "의미: 무결성은 데이터가 정확하고 일관되며 허용된 규칙(제약조건)을 위반하지 않는 상태를 말합니다. 개체 무결성은 기본키의 유일성과 NOT NULL 제약을 지키는 것이고, 참조 무결성은 외래키를 통한 테이블 간 관계의 일관성을 유지하는 것이며, 도메인 무결성은 값의 형식·범위·타입이 허용된 범위 안에 있는지를 보장합니다. 예를 들어 계좌이체는 출금과 입금이 함께 성공해야 하므로 무결성이 특히 중요합니다. 내부적으로는 잠금(lock), 트랜잭션 로그, 버전 관리, 체크포인트 같은 기법들이 실패나 동시 실행으로 인한 불일치를 차단합니다.\n활용: 금융권 등에서는 잘못된 계좌 참조, 중복 고객, 음수 금액 입력 등이 감사·정산 오류로 직결되므로 무결성이 필수적입니다. 애플리케이션 레벨의 검증만으로는 완전하지 않아 기본키·외래키·UNIQUE·CHECK 같은 제약과 트랜잭션을 함께 사용해 무결성을 보장합니다. 성능 때문에 제약을 생략할 때는 별도의 보완 통제를 도입해야 하고, 실무에서는 ACID 특성, 고립성 수준, 회복 기법, 교착상태 등을 함께 검토해 실패 시나리오를 고려한 설계·운영을 해야 합니다.",
+    "related_concepts": "[[외래키]], [[복합키]], [[개체 무결성]], [[참조 무결성]], [[SQL]]",
+    "source_files": "07-01-02-키와-무결성.md; 19-4-예탁결제원-자소서.md; 05-04-금융결제원-기출.md",
+    "exam_note": "정의만 쓰지 말고 외래키·복합키·개체 무결성·참조 무결성의 차이를 비교해 설명하세요.",
+    "bok_appeared": "",
+    "importance": "상",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-139-20260719-123144-f2b58171.png",
+    "concept_image_alt": "무결성(데이터베이스) 개념 참고 이미지",
+    "sort_order": 138,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-139-20260719-123144-f2b58171.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-17",
+    "card_id": "CS-139",
+    "question_type": "subjective",
+    "prompt": "### 146. 데이터베이스 관리자 역할은?",
+    "body": "",
+    "answer": "DBA는 DB 설계, 권한 관리, 백업/복구, 무결성·보안·성능 관리 역할을 한다.",
+    "explanation": "DBA는 DB 설계, 권한 관리, 백업/복구, 무결성·보안·성능 관리 역할을 한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터베이스 관리자 역할은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "무결성",
+      "Integrity",
+      "데이터베이스",
+      "데이터베이스 관리자 역할은"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 146. 데이터베이스 관리자 역할은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-17",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "데이터베이스 관리자(DBA)의 역할을 설명하시오.",
+    "body": "",
+    "answer": "DBA는 데이터베이스의 설계·운영을 총괄하며 사용자 권한 관리, 백업과 복구, 무결성·보안 유지, 성능 최적화를 담당한다.",
+    "explanation": "DBA는 데이터베이스를 안정적으로 운영하기 위해 스키마와 저장 구조를 관리하고, 접근 권한을 통제하며, 장애에 대비한 백업·복구 체계를 유지한다. 또한 데이터 무결성과 보안을 보장하고 성능 저하를 모니터링·튜닝하는 것이 핵심 역할이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "데이터베이스 관리자 역할",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "DBA",
+      "데이터베이스 관리자",
+      "권한 관리",
+      "백업 복구",
+      "성능 관리"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 146. 데이터베이스 관리자 역할은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 146. 데이터베이스 관리자 역할은?\n**답(AI답변):** DBA는 DB 설계, 권한 관리, 백업/복구, 무결성·보안·성능 관리 역할을 한다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호와 heading 기호가 남아 있어 문제 문장이 불필요하게 오염되어 있었다.",
+      "linked_card의 무결성 개념과 문제 내용인 DBA 역할이 맞지 않아 card_id와 keywords가 잘못 정렬되어 있었다.",
+      "answer와 explanation이 동일 문장으로만 되어 있어 서술형 해설로 쓰기에는 근거가 부족했다.",
+      "keywords에 문장형 표현이 포함되어 검색용 키워드로 부적절했다."
+    ],
+    "changes": [
+      "prompt를 깨끗한 서술형 질문으로 정리했다.",
+      "card_id를 빈 문자열로 비우고 DBA 역할에 맞는 키워드로 교체했다.",
+      "answer를 간결한 정답 문장으로 다듬고 explanation에 운영·권한·백업·무결성·성능 관점의 근거를 보강했다.",
+      "topic을 문장형 질문 대신 핵심 주제로 정리했다."
+    ]
+  }
+}

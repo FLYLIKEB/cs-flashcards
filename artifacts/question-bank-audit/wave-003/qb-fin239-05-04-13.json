@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-13",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-13",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 142. 다음 정렬알고리즘 중 평균이 다른 것을 고르시오",
+    "body": "",
+    "answer": "퀵/병합/힙은 평균 O(nlogn), 버블/선택/삽입은 평균 O(n²)이므로 다른 복잡도를 고르면 된다.",
+    "explanation": "퀵/병합/힙은 평균 O(nlogn), 버블/선택/삽입은 평균 O(n²)이므로 다른 복잡도를 고르면 된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "다음 정렬알고리즘 중 평균이 다른 것을 고르시오",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "평균 시간 복잡도"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 142. 다음 정렬알고리즘 중 평균이 다른 것을 고르시오",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-13",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "정렬 알고리즘들의 평균 시간 복잡도를 비교해 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 142. 다음 정렬알고리즘 중 평균이 다른 것을 고르시오",
+    "answer": "퀵 정렬·병합 정렬·힙 정렬의 평균 시간 복잡도는 O(n log n)이고, 버블 정렬·선택 정렬·삽입 정렬의 평균 시간 복잡도는 O(n²)이다.",
+    "explanation": "원문은 '평균이 다른 것'을 고르는 문제였지만 보기 목록이 없어 그대로는 정답을 특정할 수 없다. 따라서 대표 정렬 알고리즘들을 평균 시간 복잡도 기준으로 비교하는 개념문제로 바꾸는 것이 타당하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "정렬 알고리즘 평균 시간 복잡도",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "정렬 알고리즘",
+      "평균 시간 복잡도",
+      "퀵 정렬",
+      "병합 정렬",
+      "힙 정렬"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 142. 다음 정렬알고리즘 중 평균이 다른 것을 고르시오",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정렬 알고리즘별 평균 시간 복잡도를 비교해 핵심 차이를 설명한다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 142. 다음 정렬알고리즘 중 평균이 다른 것을 고르시오\n**답(AI답변):** 퀵/병합/힙은 평균 O(nlogn), 버블/선택/삽입은 평균 O(n²)이므로 다른 복잡도를 고르면 된다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문이 객관식 선택형 문장인데 보기와 정답 대상이 없어 실제로는 풀 수 없었다.",
+      "prompt에 마크다운 제목 표시가 남아 있었고 answer/explanation이 AI답변 문구를 거의 그대로 복제하고 있었다.",
+      "topic과 keywords가 지나치게 모호해 정렬 알고리즘 비교 주제를 충분히 드러내지 못했다."
+    ],
+    "changes": [
+      "불완전한 선택형 문항을 정렬 알고리즘 평균 시간 복잡도를 설명하는 개념형 subjective 문항으로 변환했다.",
+      "prompt/body/answer/explanation을 정리하고 body에는 규칙에 맞는 2줄 변환 메모만 남겼다.",
+      "topic, keywords, answer_guide를 정렬 알고리즘 평균 시간 복잡도 비교에 맞게 구체화했다."
+    ]
+  }
+}

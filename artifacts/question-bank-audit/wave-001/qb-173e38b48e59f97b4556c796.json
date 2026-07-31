@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-173e38b48e59f97b4556c796",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-173e38b48e59f97b4556c796",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 9. SOA와 웹 2.0을 비교하시오.",
+    "body": "",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SOA와 웹 2.0을 비교하시오.",
+    "field_name": "전산학술",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "SOA",
+      "웹 2.0"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 9. SOA와 웹 2.0을 비교하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-173e38b48e59f97b4556c796",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "SOA와 웹 2.0을 비교하시오.",
+    "body": "",
+    "answer": "SOA는 기업 내부·기관 간 업무 기능을 표준화된 서비스로 분해하고 재사용·조합해 시스템 통합을 높이는 아키텍처이고, 웹 2.0은 웹 사용자의 참여·공유·개방을 통해 집단지성과 상호작용을 강화하는 웹 활용 패러다임이다. SOA가 서비스 인터페이스, 느슨한 결합, 프로세스 통합에 초점을 두는 반면 웹 2.0은 사용자 생성 콘텐츠, 협업, 개방형 API를 중시한다. 따라서 SOA는 백엔드 통합과 업무 유연성에, 웹 2.0은 프런트엔드 참여와 서비스 확산에 강점이 있으며, 둘은 표준 기반 서비스와 개방형 웹 기술을 결합해 함께 활용될 수 있다.",
+    "explanation": "원문은 별도 사례나 선택지가 없는 서술형 비교 문제이므로 문제 자체는 유지하되, 마크다운 번호만 제거해 질문을 정리했다. 답안은 각 개념의 정의, 핵심 초점, 주요 특징, 활용 관점을 대비해 직접 비교하도록 구성해야 한다. SOA의 핵심은 재사용 가능한 서비스, 표준 인터페이스, 느슨한 결합, 업무 프로세스 통합이고, 웹 2.0의 핵심은 참여, 공유, 개방, 사용자 생성 콘텐츠, 협업이다. 실무적으로는 SOA가 기업 시스템 통합의 기반을 제공하고 웹 2.0이 사용자 접점과 개방형 서비스 확장을 강화한다는 점을 함께 언급하면 충분하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SOA와 웹 2.0",
+    "field_name": "전산학술",
+    "category": "클라우드·분산시스템",
+    "keywords": [
+      "SOA",
+      "웹 2.0",
+      "서비스 지향 아키텍처",
+      "사용자 참여",
+      "개방형 API"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2009 전산학술 발췌 · 9. SOA와 웹 2.0을 비교하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "### 9. SOA와 웹 2.0을 비교하시오.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었음",
+      "answer와 explanation이 비어 있었음",
+      "topic이 질문 문장 전체로 저장되어 있었음"
+    ],
+    "changes": [
+      "prompt를 정리된 질문 문장으로 수정",
+      "SOA와 웹 2.0의 비교 답안과 해설 보강",
+      "topic과 keywords를 개념 중심으로 정리"
+    ]
+  }
+}

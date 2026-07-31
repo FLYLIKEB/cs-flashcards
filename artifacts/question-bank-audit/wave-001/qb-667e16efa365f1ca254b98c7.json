@@ -1,0 +1,73 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-667e16efa365f1ca254b98c7",
+  "wave": 1,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-667e16efa365f1ca254b98c7",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "## 7. 네트워크 보안",
+    "body": "네트워크 보안과 관련하여 다음의 물음에 답하시오.\n\n#### 1.\n\nHTTP와 HTTPS의 차이점을 설명하시오.\n\n#### 2.\n\n가상사설망(VPN, Virtual Private Network)과 IPSec에 대해 설명하시오.\n\n#### 3.\n\nDoS(Denial-of-Service)와 DDoS(Distributed Denial-of-Service) 공격에 대해 설명하시오.",
+    "answer": "",
+    "explanation": "",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크 보안",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "네트워크 보안"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 7. 네트워크 보안 · 7. 네트워크 보안",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-667e16efa365f1ca254b98c7",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "HTTP와 HTTPS의 차이점을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 7. 네트워크 보안",
+    "answer": "HTTP는 암호화 없이 하이퍼텍스트를 전송하는 프로토콜이고, HTTPS는 HTTP에 TLS/SSL을 적용해 통신 내용을 암호화하고 서버 인증 및 데이터 무결성을 제공하는 보안 프로토콜이다.",
+    "explanation": "원문 행은 HTTP/HTTPS, VPN/IPSec, DoS/DDoS처럼 서로 다른 3개 서술형 하위 문항이 한 행에 합쳐져 있어 단일 문제로 사용하기 어렵고 정답·해설도 비어 있었다. 따라서 첫 하위 문항을 기준으로 단일 개념형 주관식으로 변환했다. 핵심 차이는 HTTPS가 HTTP 위에 TLS/SSL을 적용해 기밀성, 무결성, 인증을 강화한다는 점이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "네트워크 보안",
+    "field_name": "컴퓨터공학 학술",
+    "category": "네트워크",
+    "keywords": [
+      "HTTP",
+      "HTTPS",
+      "TLS",
+      "웹 보안"
+    ],
+    "difficulty": "",
+    "issuer": "한국은행",
+    "source_location": "한국은행 2025 컴퓨터공학 학술 7. 네트워크 보안 · 7. 네트워크 보안",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 720,
+    "answer_guide": "정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장",
+    "session_mode": "bok"
+  },
+  "source_excerpt": "",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "프롬프트가 섹션 제목만 담고 있어 질문으로 성립하지 않음",
+      "서로 다른 3개 서술형 하위 문항이 한 행에 합쳐져 있고 정답·해설이 비어 있음"
+    ],
+    "changes": [
+      "HTTP와 HTTPS의 차이를 묻는 단일 개념형 주관식으로 변환",
+      "body를 변환 메모 2줄로 정리하고 정답·해설·키워드를 보강"
+    ]
+  }
+}

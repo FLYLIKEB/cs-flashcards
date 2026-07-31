@@ -1,0 +1,75 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-03-11",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-03-11",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 98. 여려 사용자들이 CPU를 나눠사용하여 CPU 효율화하는 것은?",
+    "body": "",
+    "answer": "시분할시스템",
+    "explanation": "시분할시스템",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "여려 사용자들이 CPU를 나눠사용하여 CPU 효율화하는 것은?",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "CPU",
+      "시분할시스템"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 98. 여려 사용자들이 CPU를 나눠사용하여 CPU 효율화하는 것은?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-03-11",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "여러 사용자가 CPU를 나누어 사용해 활용률을 높이는 운영체제 방식은 무엇인가?",
+    "body": "",
+    "answer": "시분할 시스템",
+    "explanation": "시분할 시스템은 여러 사용자가 CPU 시간을 매우 짧은 단위로 번갈아 할당받는 방식이다. 각 사용자는 동시에 사용하는 것처럼 느끼고, 시스템은 CPU 활용률과 응답성을 높일 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "시분할 시스템",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "시분할 시스템",
+      "CPU 스케줄링",
+      "다중 사용자"
+    ],
+    "difficulty": "중",
+    "issuer": "대구은행",
+    "source_location": "대구은행 기출 · 98. 여러 사용자가 CPU를 나누어 사용해 활용률을 높이는 운영체제 방식은 무엇인가?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "핵심 용어를 정확히 쓰면 정답으로 인정한다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 98. 여려 사용자들이 CPU를 나눠사용하여 CPU 효율화하는 것은?\n\n  **답:** 시분할시스템",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row의 prompt와 source_location에 마크다운 제목 표식과 오탈자(여려)가 남아 있었다.",
+      "question_type이 subjective였지만 실제로는 용어 하나를 답하는 단답형 문제였다.",
+      "answer와 explanation이 동일한 한 단어뿐이라 학습용 해설로 부족했고, topic과 keywords도 질문 문장 복제·비정규 표기 상태였다."
+    ],
+    "changes": [
+      "prompt를 자연스러운 질문형 문장으로 정리하고 오탈자를 수정했다.",
+      "question_type을 short로 바꾸고 answer를 정규 표기인 '시분할 시스템'으로 수정했다.",
+      "explanation, topic, keywords, source_location, answer_guide를 정리해 운영체제 개념 문제로 바로 사용 가능하게 했다."
+    ]
+  }
+}

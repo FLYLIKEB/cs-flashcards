@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-07-03",
+  "wave": 4,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-07-03",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 189. 선택암호문에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 선택암호문 문제",
+    "answer": "선택암호문 공격(CCA)은 공격자가 선택한 암호문에 대한 복호 결과를 이용해 비밀키/평문 정보를 추론하는 공격이다.",
+    "explanation": "선택암호문 공격(CCA)은 공격자가 선택한 암호문에 대한 복호 결과를 이용해 비밀키/평문 정보를 추론하는 공격이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "선택암호문에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "선택암호문"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 189. 선택암호문에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-07-03",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "선택암호문 공격(CCA)이 무엇인지 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 189. 선택암호문 문제",
+    "answer": "선택암호문 공격(CCA)은 공격자가 임의로 고른 암호문을 복호화하게 한 뒤 그 결과를 이용해 평문이나 비밀키 관련 정보를 추론하는 공격이다.",
+    "explanation": "선택암호문 공격은 복호 오라클에 접근할 수 있다는 점이 핵심이며, 단순 암호문 관찰보다 강한 공격 모델이다. 따라서 공개키 암호나 패딩 방식은 CCA에 안전하도록 설계되어야 한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "선택암호문 공격",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "선택암호문 공격",
+      "CCA",
+      "복호 오라클"
+    ],
+    "difficulty": "중",
+    "issuer": "금융감독원",
+    "source_location": "금융감독원 기출 · 189. 선택암호문에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 189. 선택암호문 문제\n**답(AI답변):** 선택암호문 공격(CCA)은 공격자가 선택한 암호문에 대한 복호 결과를 이용해 비밀키/평문 정보를 추론하는 공격이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "prompt에 마크다운 번호가 남아 있었고 개념문제로 변환된 body 문구가 공통 규칙과 달랐다.",
+      "explanation이 answer와 중복되어 보충 설명 역할을 하지 못했다.",
+      "topic과 keywords가 질문형 표현 중심이라 학습용 메타데이터로 덜 적합했다."
+    ],
+    "changes": [
+      "불완전한 원문을 명시적 개념 질문으로 정리하고 prompt에서 마크다운 표기를 제거했다.",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 수정했다.",
+      "answer와 explanation을 각각 정의와 보충 설명으로 분리하고 topic 및 keywords를 선택암호문 공격 중심으로 정리했다."
+    ]
+  }
+}

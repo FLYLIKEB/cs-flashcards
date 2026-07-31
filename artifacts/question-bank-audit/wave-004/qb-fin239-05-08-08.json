@@ -1,0 +1,101 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-08-08",
+  "wave": 4,
+  "linked_card": {
+    "card_id": "CS-039",
+    "term": "후보키",
+    "english": "Candidate Key",
+    "category": "데이터베이스",
+    "alphabet_index": "C",
+    "korean_initial": "ㅎ",
+    "definition": "후보키는 릴레이션의 튜플을 유일하게 식별할 수 있으면서 불필요한 속성이 하나도 없는 최소 속성 집합으로, 이들 중 하나를 기본키로 선택할 수 있습니다. 즉 슈퍼키를 최소화한 형태로서 어떤 속성이라도 제거하면 식별 능력을 잃습니다.",
+    "detailed_explanation": "의미: 후보키는 데이터베이스에서 '값으로 각 행을 정확히 구분할 수 있는 최소한의 속성 묶음'을 말합니다. 여기서 두 가지 조건이 있어야 합니다 — 유일성(같은 값을 가진 튜플이 없어야 함)과 최소성(속성 하나라도 제거하면 더 이상 유일하지 않음). 슈퍼키는 유일성만 만족하면 되기 때문에 불필요한 속성을 포함할 수 있지만, 후보키는 그런 여분이 없어야 합니다. 예를 들어 학생 목록에서 학번, 이메일, 주민번호 중 각각이 사람을 구분할 수 있으면 각각 후보키가 되고, 이들 중 하나를 기본키로 택하면 나머지는 대체키가 됩니다.\n활용: 설계 시에는 변경 가능성이 적고 보안상 안전한 속성을 후보키로 선정하는 것이 중요합니다. 계좌 테이블의 계좌번호나 카드 테이블의 카드번호처럼 안정적인 값이 후보키가 되기 적합합니다. 반면 업무 의미가 있더라도 개인정보이거나 변경될 가능성이 크면 대리키(대체키/서로게이트 키)를 기본키로 두고, 원래 값들은 후보키로서 유니크 제약으로 관리하는 방식이 흔합니다. 실무에서는 후보키를 정할 때 값의 변경 비용과 노출 위험을 꼭 고려하세요.",
+    "related_concepts": "[[키]], [[슈퍼키]], [[기본키]], [[대체키]], [[SQL]]",
+    "source_files": "07-01-02-키와-무결성.md; 05-08-산업은행-기출.md; 07-02-00-정규화.md",
+    "exam_note": "정의만 쓰지 말고 슈퍼키·기본키와의 차이(유일성 vs 최소성)를 간단히 비교해 쓰세요.",
+    "bok_appeared": "",
+    "importance": "중",
+    "difficulty": "중",
+    "concept_image_url": "/api/ai-images/CS-039-20260719-122934-b9454c5f.png",
+    "concept_image_alt": "후보키(데이터베이스) 개념 참고 이미지",
+    "sort_order": 38,
+    "updated_at": "2026-07-21T01:55:22+09:00",
+    "concept_media_type": "image",
+    "concept_media_payload": "/api/ai-images/CS-039-20260719-122934-b9454c5f.png"
+  },
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-08-08",
+    "card_id": "CS-039",
+    "question_type": "subjective",
+    "prompt": "### 213. A → B , B → A, AC → DE, 후보키의 의미를 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: A → B , B → A, AC → DE, 후보키는 무엇인가?",
+    "answer": "A와 B가 서로 결정되며 AC가 DE를 결정한다. 전체 속성이 A,B,C,D,E라면 후보키는 AC 또는 BC로 볼 수 있다.",
+    "explanation": "A와 B가 서로 결정되며 AC가 DE를 결정한다. 전체 속성이 A,B,C,D,E라면 후보키는 AC 또는 BC로 볼 수 있다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "A → B , B → A, AC → DE, 후보키의 의미를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "후보키",
+      "Candidate Key",
+      "A → B",
+      "B → A",
+      "AC → DE"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 213. A → B , B → A, AC → DE, 후보키의 의미를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-08-08",
+    "card_id": "CS-039",
+    "question_type": "short",
+    "prompt": "주어진 함수적 종속 A→B, B→A, AC→DE에서 전체 속성 집합이 A, B, C, D, E일 때 후보키를 구하시오.",
+    "body": "A → B\nB → A\nAC → DE",
+    "answer": "AC, BC",
+    "explanation": "A와 B가 서로 결정되므로 A와 B는 서로 대체 가능하다. AC의 폐포는 A, B, C, D, E 전체가 되고, 같은 이유로 BC의 폐포도 전체 속성을 포함한다. A만으로는 C를 결정할 수 없고 C만으로도 A 또는 B를 결정할 수 없으므로 최소성을 만족하는 후보키는 AC와 BC이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "후보키",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "후보키",
+      "Candidate Key",
+      "함수적 종속",
+      "속성 폐포",
+      "최소성"
+    ],
+    "difficulty": "중",
+    "issuer": "산업은행",
+    "source_location": "산업은행 기출 · 213. A → B, B → A, AC → DE, 후보키는 무엇인가?",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "후보키 도출 시 전체 속성을 결정하는지와 최소성을 함께 확인한다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 213. A → B , B → A, AC → DE, 후보키는 무엇인가? (약술)\n**답(AI답변):** A와 B가 서로 결정되며 AC가 DE를 결정한다. 전체 속성이 A,B,C,D,E라면 후보키는 AC 또는 BC로 볼 수 있다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "proposed_row의 prompt에 마크다운 헤더가 남아 있고 질문이 카드 개념 설명형으로 잘못 바뀌어 있었다.",
+      "body가 변환 메모 형태여서 실제 풀이 조건인 함수적 종속 관계를 직접 제시하지 못했다.",
+      "answer와 explanation이 동일했고, keywords와 topic도 문제 풀이형 문항에 비해 정제되지 않았다."
+    ],
+    "changes": [
+      "함수적 종속 조건을 body로 옮기고 prompt를 후보키를 구하는 명시적 단답형 질문으로 정리했다.",
+      "정답을 AC, BC로 간결화하고 explanation에 폐포와 최소성 근거를 분리해 적었다.",
+      "topic, keywords, source_location, answer_guide를 후보키 문항에 맞게 정리했다."
+    ]
+  }
+}

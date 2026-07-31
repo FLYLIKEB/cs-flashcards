@@ -1,0 +1,78 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-50",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-50",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 80. Transport 계층의 전송 단위(PDU)의 의미를 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: OSI 7계층에서 Transport 계층의 전송 단위(PDU)는 무엇인가?",
+    "answer": "Transport 계층의 PDU는 TCP에서는 세그먼트(segment), UDP에서는 데이터그램(datagram)이다.",
+    "explanation": "Transport 계층의 PDU는 TCP에서는 세그먼트(segment), UDP에서는 데이터그램(datagram)이다.\n\nPDU는 각 계층에서 전달되는 데이터 단위를 뜻하며, 네트워크 계층은 packet, 데이터 링크 계층은 frame, 물리 계층은 bit로 구분한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Transport 계층의 전송 단위(PDU)의 의미를 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "OSI 7계층",
+      "Transport 계층의 전송 단위",
+      "PDU",
+      "Transport 계층의 전송 단위(PDU)"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 80. Transport 계층의 전송 단위(PDU)의 의미를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-50",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "Transport 계층의 전송 단위(PDU)는 무엇인가?",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 80. OSI 7계층에서 Transport 계층의 전송 단위(PDU)는 무엇인가?",
+    "answer": "Transport 계층의 PDU는 TCP에서는 세그먼트(segment), UDP에서는 데이터그램(datagram)이다.",
+    "explanation": "PDU는 각 계층에서 주고받는 데이터 단위를 뜻한다. Transport 계층에서는 사용하는 프로토콜에 따라 TCP는 세그먼트, UDP는 데이터그램이라는 전송 단위를 사용한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "Transport 계층",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "네트워크",
+    "keywords": [
+      "Transport 계층",
+      "PDU",
+      "세그먼트",
+      "데이터그램"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 80. Transport 계층의 전송 단위(PDU)의 의미를 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "Transport 계층의 PDU 명칭을 TCP와 UDP로 구분해 정확히 쓰면 된다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 80. OSI 7계층에서 Transport 계층의 전송 단위(PDU)는 무엇인가?\n1. 서버 내부 오류\n2. 요청 성공\n3. 리소스를 찾을 수 없음\n4. 권한 없음\n\n**답:** 4번",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "source_excerpt의 선택지와 정답이 Transport 계층 PDU 문항과 무관해 원문형 문제로는 정상적으로 풀 수 없었다.",
+      "proposed_row의 prompt에 마크다운 제목 표식이 남아 있었고, 변환 메모 문구도 공통 규칙과 정확히 일치하지 않았다.",
+      "keywords와 topic이 장문·중복 표현 위주라 카드 검색용 메타데이터로 부적절했다."
+    ],
+    "changes": [
+      "문항을 명시적 개념형 short 질문으로 정리하고 prompt에서 마크다운 표식을 제거했다.",
+      "body를 공통 규칙의 2줄 변환 형식으로 고치고 원문 제목을 보존했다.",
+      "answer, explanation, topic, keywords, answer_guide를 Transport 계층 PDU 개념에 맞게 간결하게 정리했다."
+    ]
+  }
+}

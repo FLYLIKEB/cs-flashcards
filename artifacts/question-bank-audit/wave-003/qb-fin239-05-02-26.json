@@ -1,0 +1,74 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-26",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 56. 다음 중 DDL이 아닌 것은에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 다음 중 DDL이 아닌 것은?",
+    "answer": "DDL은 CREATE, ALTER, DROP, TRUNCATE 등이다. SELECT/INSERT/UPDATE/DELETE는 DML이다.",
+    "explanation": "DDL은 CREATE, ALTER, DROP, TRUNCATE 등이다. SELECT/INSERT/UPDATE/DELETE는 DML이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "다음 중 DDL이 아닌 것은에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "DDL"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 56. 다음 중 DDL이 아닌 것은에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-26",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "DDL과 DML의 차이를 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 56. 다음 중 DDL이 아닌 것은?",
+    "answer": "DDL이 아닌 것은 DML이며, 대표 명령어는 SELECT, INSERT, UPDATE, DELETE이다.",
+    "explanation": "DDL은 CREATE, ALTER, DROP, TRUNCATE처럼 데이터베이스 객체의 구조를 정의·변경·삭제하는 명령어다. 반면 DML은 테이블의 데이터를 조회·삽입·수정·삭제하는 명령어 집합이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "DDL과 DML",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "DDL",
+      "DML",
+      "SQL 명령어"
+    ],
+    "difficulty": "중",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 56. 다음 중 DDL이 아닌 것은에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 56. 다음 중 DDL이 아닌 것은?\n**답(AI답변):** DDL은 CREATE, ALTER, DROP, TRUNCATE 등이다. SELECT/INSERT/UPDATE/DELETE는 DML이다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문에 선택지가 없어 '다음 중 DDL이 아닌 것은' 형태의 문제를 실제로 풀 수 없었다.",
+      "proposed_row의 prompt에 마크다운 헤딩과 부자연스러운 문구가 남아 있었다.",
+      "변환 메모 문구가 공통 규칙의 고정 형식과 달랐고 keywords가 지나치게 좁았다."
+    ],
+    "changes": [
+      "문제를 'DDL과 DML의 차이'를 묻는 개념형 subjective 문항으로 재작성했다.",
+      "body를 공통 규칙의 2줄 변환 메모 형식으로 수정하고 원문 제목을 정리했다.",
+      "answer/explanation을 DDL과 DML의 구분에 맞게 분리하고 topic·keywords를 정합적으로 보정했다."
+    ]
+  }
+}

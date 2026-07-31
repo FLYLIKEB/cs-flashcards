@@ -1,0 +1,77 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-24",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-24",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 153. C 언어 파일 입출력의 핵심 개념과 주의점을 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: C언어 파일입출력 틀린 개수 고르기",
+    "answer": "C 파일 입출력은 fopen, fclose, fscanf/fprintf, fread/fwrite 등을 사용하며 파일 포인터와 모드 지정이 필요하다.",
+    "explanation": "C 파일 입출력은 fopen, fclose, fscanf/fprintf, fread/fwrite 등을 사용하며 파일 포인터와 모드 지정이 필요하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "C 언어 파일 입출력의 핵심 개념과 주의점을 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "C 언어 파일 입출력"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 153. C 언어 파일 입출력의 핵심 개념과 주의점을 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-24",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "C 언어의 파일 입출력에서 사용하는 주요 함수와 파일 처리 시 주의점을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 153. C언어 파일입출력 틀린 개수 고르기",
+    "answer": "C 언어의 파일 입출력은 fopen으로 파일을 열고 fclose로 닫으며, 텍스트 처리는 fscanf·fprintf, 바이너리 처리는 fread·fwrite로 수행한다. 이때 파일 포인터와 열기 모드를 올바르게 지정하고, 파일 열기 실패 여부와 EOF·오류 처리를 반드시 확인해야 한다.",
+    "explanation": "원문은 선택지와 세부 조건이 없어 정답을 판별하는 실전형 문제로 복원하기 어렵다. 따라서 파일 입출력의 핵심 개념을 묻는 개념문제로 변환했다. C에서는 파일을 FILE 포인터로 다루고, 읽기·쓰기·추가 여부에 따라 적절한 모드를 사용해야 하며, 작업 후 fclose로 자원을 해제해야 한다. 또한 fopen 반환값이 NULL인지 확인하고, 텍스트 함수와 바이너리 함수의 용도를 구분하는 것이 중요하다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "C 언어 파일 입출력",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "C 언어",
+      "파일 입출력",
+      "fopen",
+      "fclose",
+      "fread",
+      "fwrite"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 153. C언어 파일입출력 틀린 개수 고르기",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 153. C언어 파일입출력 틀린 개수 고르기\n**답(AI답변):** C 파일 입출력은 fopen, fclose, fscanf/fprintf, fread/fwrite 등을 사용하며 파일 포인터와 모드 지정이 필요하다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문에 선택지와 판별 조건이 없어 기존 문제 형태로는 현실적으로 풀이가 불가능했다.",
+      "proposed_row의 prompt에 마크다운 제목 표식이 남아 있었고 body의 변환 메모 문구가 공통 규칙과 달랐다.",
+      "answer와 explanation이 동일한 한 문장으로 너무 축약되어 있어 개념문제 답안으로 불충분했다."
+    ],
+    "changes": [
+      "문제를 C 언어 파일 입출력의 주요 함수와 주의점을 묻는 주관식 개념문제로 정리했다.",
+      "body를 공통 규칙의 두 줄 변환 메모 형식으로 수정하고 source 기반 원문 제목을 명시했다.",
+      "answer, explanation, topic, keywords, source_location을 정리해 파일 입출력 핵심 개념과 실제 원문 정보를 반영했다."
+    ]
+  }
+}

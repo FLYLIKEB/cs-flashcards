@@ -1,0 +1,80 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-07",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-07",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 136. (x != 2) && (x != 3)과 동치인것 고르기!",
+    "body": "",
+    "answer": "드모르간 법칙에 의해 !(x == 2 || x == 3)와 동치다.",
+    "explanation": "드모르간 법칙에 의해 !(x == 2 || x == 3)와 동치다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "(x != 2) && (x != 3)과 동치인것 고르기!",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "&& 과 동치인것 고르기!",
+      "x != 2",
+      "x != 3",
+      "동치인것 고르기!"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 136. (x != 2) && (x != 3)과 동치인것 고르기!",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-07",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "(x != 2) && (x != 3)와 동치인 논리식을 쓰시오.",
+    "body": "",
+    "answer": "!(x == 2 || x == 3)",
+    "explanation": "드모르간 법칙에 따라 (x != 2) && (x != 3)는 !(x == 2 || x == 3)와 동치이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "논리식 동치",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "금융IT·신기술",
+    "keywords": [
+      "드모르간 법칙",
+      "논리식 동치",
+      "논리 연산자",
+      "부정"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 136. (x != 2) && (x != 3)과 동치인것 고르기!",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 60,
+    "answer_guide": "동치인 논리식을 정확히 쓰면 된다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 136. (x != 2) && (x != 3)과 동치인것 고르기!\n**답(AI답변):** 드모르간 법칙에 의해 !(x == 2 || x == 3)와 동치다.",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목과 구어체 표현이 남아 있었고 문제 형태가 short/subjective와 맞지 않았음",
+      "answer가 설명형 문장이라 최종 정답만 남기는 형식이 아니었음",
+      "keywords와 topic에 문제 문구 조각이 들어 있어 검색용 메타데이터로 부적절했음",
+      "answer_guide와 풀이 시간이 짧은 논리식 변환 문제와 맞지 않았음"
+    ],
+    "changes": [
+      "prompt를 깔끔한 서술형 문항으로 정리하고 question_type을 short로 맞춤",
+      "answer를 동치 논리식 자체만 남기고 explanation을 근거 설명으로 분리함",
+      "topic, keywords를 드모르간 법칙과 논리식 동치 중심으로 정리함",
+      "answer_guide와 expected_time_seconds를 간단한 식 변환 문제에 맞게 조정함"
+    ]
+  }
+}

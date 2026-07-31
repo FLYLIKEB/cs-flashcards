@@ -1,0 +1,76 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-04-20",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-04-20",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 149. 운영체제 기능에 대해 설명하시오.",
+    "body": "변환 메모: 원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함.\n원문 제목: 운영체제 기능 문제",
+    "answer": "운영체제는 프로세스, 메모리, 파일, 입출력, 장치, 보안, 사용자 인터페이스를 관리한다.",
+    "explanation": "운영체제는 프로세스, 메모리, 파일, 입출력, 장치, 보안, 사용자 인터페이스를 관리한다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제 기능에 대해 설명하시오.",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "보안",
+    "keywords": [
+      "운영체제",
+      "운영체제 기능"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 149. 운영체제 기능에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-04-20",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "운영체제의 주요 기능을 설명하시오.",
+    "body": "변환 메모: 원문 정보가 불완전하여 실전형 문제 대신 개념문제로 변환함.\n원문 제목: 149. 운영체제 기능 문제",
+    "answer": "운영체제의 주요 기능은 프로세스 관리, 메모리 관리, 파일 시스템 관리, 입출력 및 장치 관리, 보안과 사용자 인터페이스 제공이다.",
+    "explanation": "운영체제는 하드웨어와 응용프로그램 사이에서 자원을 효율적으로 배분하고 시스템 동작을 통제하는 핵심 소프트웨어다. 따라서 CPU와 프로세스 스케줄링, 주기억장치 할당과 보호, 파일·디렉터리 관리, 입출력 장치 제어, 접근 제어와 같은 보안 기능, 사용자와 시스템을 연결하는 인터페이스 제공이 대표 기능으로 정리된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "운영체제",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "운영체제",
+    "keywords": [
+      "운영체제",
+      "프로세스 관리",
+      "메모리 관리",
+      "파일 시스템"
+    ],
+    "difficulty": "중",
+    "issuer": "금융결제원",
+    "source_location": "금융결제원 기출 · 149. 운영체제 기능에 대해 설명하시오.",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 149. 운영체제 기능 문제\n**답(AI답변):** 운영체제는 프로세스, 메모리, 파일, 입출력, 장치, 보안, 사용자 인터페이스를 관리한다.",
+  "audit": {
+    "status": "converted",
+    "issues": [
+      "원문은 제목과 AI답변만 남아 있어 실전형 문제로 풀기 위한 선택지나 세부 조건이 부족했다.",
+      "proposed_row의 prompt에 마크다운 헤더가 남아 있었고 body의 변환 메모 문구도 공통 규칙과 일치하지 않았다.",
+      "category가 보안으로 잘못 분류되어 있었고 keywords도 운영체제 핵심 기능을 충분히 반영하지 못했다."
+    ],
+    "changes": [
+      "불완전한 원문을 운영체제 주요 기능을 묻는 개념형 subjective 문항으로 정리했다.",
+      "prompt/body를 공통 규칙에 맞게 정리하고 answer/explanation을 운영체제의 대표 기능 중심으로 보강했다.",
+      "topic/category/keywords를 운영체제 문맥에 맞게 정비했다."
+    ]
+  }
+}

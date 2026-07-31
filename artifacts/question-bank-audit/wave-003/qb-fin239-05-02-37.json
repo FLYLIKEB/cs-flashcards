@@ -1,0 +1,86 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-37",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-37",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 67. SQL AVG() 결과 값 빈칸에 넣기(주관식)",
+    "body": "다음 두 테이블이 존재한다\n\n<EMP>\n\n name                                                        salary\n\n A                                                           100\n\n B                                                           200\n\n C                                                           NULL\n\n D                                                           300\n\n<EMP>\n\n name                                                        dept\n\n A                                                           IT\n\n B                                                           IT\n\n C                                                           IT\n\n D                                                           HR\n\n다음 SQL의 실행 결과를 작성하시오.\n\n SELECT d.dept, AVG(IFNULL(e.salary, 0))\n\n FROM emp e\n\n JOIN dept d ON e.name = d.name\n\n WHERE d.dept = 'IT'\n\n GROUP BY d.dept;",
+    "answer": "IT 100",
+    "explanation": "IT 100",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SQL AVG() 결과 값 빈칸에 넣기",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "GROUP BY",
+      "JOIN",
+      "SELECT",
+      "SQL",
+      "WHERE",
+      "SQL AVG() 결"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 67. SQL AVG() 결과 값 빈칸에 넣기(주관식)",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-37",
+    "card_id": "",
+    "question_type": "short",
+    "prompt": "다음 SQL 문의 실행 결과를 작성하시오.",
+    "body": "다음 두 테이블이 존재한다.\n\n<EMP>\nname | salary\nA | 100\nB | 200\nC | NULL\nD | 300\n\n<DEPT>\nname | dept\nA | IT\nB | IT\nC | IT\nD | HR\n\nSELECT d.dept, AVG(IFNULL(e.salary, 0))\nFROM emp e\nJOIN dept d ON e.name = d.name\nWHERE d.dept = 'IT'\nGROUP BY d.dept;",
+    "answer": "IT 100",
+    "explanation": "IT 부서에 해당하는 A, B, C의 급여는 각각 100, 200, NULL이다. IFNULL(e.salary, 0) 때문에 NULL은 0으로 치환되므로 평균은 (100 + 200 + 0) / 3 = 100이며, 그룹 결과는 IT 한 행만 출력된다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "SQL AVG() 결과 값 빈칸에 넣기",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "데이터베이스",
+    "keywords": [
+      "SQL",
+      "AVG",
+      "IFNULL",
+      "JOIN",
+      "GROUP BY",
+      "NULL 처리"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 67. SQL AVG() 결과 값 빈칸에 넣기(주관식)",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "부서명과 평균값을 공백으로 구분해 작성",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 67. SQL AVG() 결과 값 빈칸에 넣기(주관식)\n\n다음 두 테이블이 존재한다\n\n<EMP>\n\n name                                                        salary\n\n A                                                           100\n\n B                                                           200\n\n C                                                           NULL\n\n D                                                           300\n\n<EMP>\n\n name                                                        dept\n\n A                                                           IT\n\n B                                                           IT\n\n C                                                           IT\n\n D                                                           HR\n\n다음 SQL의 실행 결과를 작성하시오.\n\n SELECT d.dept, AVG(IFNULL(e.salary, 0))\n\n FROM emp e\n\n JOIN dept d ON e.name = d.name\n\n WHERE d.dept = 'IT'\n\n GROUP BY d.dept;\n\n**답:** IT 100",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목과 번호가 남아 있어 질문 문장만 남기지 못함",
+      "body에 문제 지시문이 섞여 있고 두 번째 테이블명이 잘못 표기되어 문맥이 지저분함",
+      "explanation이 정답만 반복해 풀이 역할을 하지 못함",
+      "keywords에 잘린 항목이 있고 핵심 SQL 개념어 구성이 부정확함",
+      "question_type과 answer_guide가 실제 단답형 결과 작성 문제와 맞지 않음"
+    ],
+    "changes": [
+      "prompt를 실행 결과를 묻는 깔끔한 질문 문장으로 정리함",
+      "body를 표와 SQL문만 남기도록 정리하고 두 번째 테이블명을 DEPT로 바로잡음",
+      "question_type을 short로 바꾸고 단답형에 맞는 answer_guide로 수정함",
+      "정답은 유지하면서 AVG와 IFNULL 계산 과정을 설명에 추가함",
+      "keywords를 SQL, AVG, IFNULL, JOIN, GROUP BY, NULL 처리로 정리함"
+    ]
+  }
+}

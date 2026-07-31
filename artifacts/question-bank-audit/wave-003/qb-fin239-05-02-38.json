@@ -1,0 +1,83 @@
+{
+  "bundle_version": 1,
+  "qid": "qb-fin239-05-02-38",
+  "wave": 3,
+  "linked_card": {},
+  "current_row": {
+    "question_bank_id": "qb-fin239-05-02-38",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "### 68. 자바 알고리즘과 결과값 선택(주관식)",
+    "body": "다음 Java 코드를 보고, 1) 사용된 알고리즘의 이름과 2) 실행 결과를 작성하시오.\n\n```java\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Queue<Integer> q = new LinkedList<>();\n        q.offer(1);\n        q.offer(2);\n        q.offer(3);\n        q.poll();\n        q.offer(4);\n        q.poll();\n        q.offer(5);\n        System.out.println(q);\n    }\n}\n```",
+    "answer": "FIFO, [3,4,5]",
+    "explanation": "FIFO, [3,4,5]",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "자바 알고리즘과 결과값 선택",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "프로그래밍 언어",
+    "keywords": [
+      "Java",
+      "연결 리스트",
+      "자바 알고리즘과 결과값",
+      "자바 알고리즘",
+      "FIFO",
+      "[3"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 68. 자바 알고리즘과 결과값 선택(주관식)",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "정의 → 핵심 원리 → 비교/주의점 → 금융IT 예시 순으로 3~5문장",
+    "session_mode": "practice"
+  },
+  "proposed_row": {
+    "question_bank_id": "qb-fin239-05-02-38",
+    "card_id": "",
+    "question_type": "subjective",
+    "prompt": "다음 Java 코드에서 사용된 처리 방식의 이름과 최종 출력 결과를 작성하시오.",
+    "body": "```java\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Queue<Integer> q = new LinkedList<>();\n        q.offer(1);\n        q.offer(2);\n        q.offer(3);\n        q.poll();\n        q.offer(4);\n        q.poll();\n        q.offer(5);\n        System.out.println(q);\n    }\n}\n```",
+    "answer": "FIFO, [3, 4, 5]",
+    "explanation": "Queue는 먼저 들어온 원소가 먼저 나가는 FIFO(First In, First Out) 방식이다. 코드 실행 순서는 [1, 2, 3]에서 poll()로 1 제거, 4 추가 후 [2, 3, 4], 다시 poll()로 2 제거, 5 추가가 되어 최종 출력은 [3, 4, 5]이다.",
+    "rubric": [],
+    "choices": [],
+    "answer_index": null,
+    "topic": "자바 알고리즘과 결과값 선택",
+    "field_name": "금융공기업 IT 필기 239제",
+    "category": "자료구조·알고리즘",
+    "keywords": [
+      "Java",
+      "큐",
+      "Queue",
+      "FIFO",
+      "선입선출"
+    ],
+    "difficulty": "상",
+    "issuer": "기업은행",
+    "source_location": "기업은행 기출 · 68. 자바 알고리즘과 결과값 선택(주관식)",
+    "section": "전공필기",
+    "points": 10,
+    "expected_time_seconds": 480,
+    "answer_guide": "큐의 FIFO 특성과 최종 출력값을 함께 쓰면 된다.",
+    "session_mode": "practice"
+  },
+  "source_excerpt": "### 68. 자바 알고리즘과 결과값 선택(주관식)\n\n다음 Java 코드를 보고, 1) 사용된 알고리즘의 이름과 2) 실행 결과를 작성하시오.\n\n```java\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Queue<Integer> q = new LinkedList<>();\n        q.offer(1);\n        q.offer(2);\n        q.offer(3);\n        q.poll();\n        q.offer(4);\n        q.poll();\n        q.offer(5);\n        System.out.println(q);\n    }\n}\n```\n\n**답:** FIFO, [3,4,5]",
+  "audit": {
+    "status": "fixed",
+    "issues": [
+      "prompt에 마크다운 제목이 그대로 남아 있어 질문 문장만 분리되지 않았음",
+      "answer와 explanation이 동일한 단답형이라 풀이 근거가 없었음",
+      "category와 keywords에 자료구조 핵심 개념보다 잡음 표현과 깨진 토큰이 포함되어 있었음",
+      "answer_guide가 일반 서술형 템플릿이라 실제 채점 기준과 맞지 않았음"
+    ],
+    "changes": [
+      "prompt를 질문 문장만 남도록 정리하고 body는 코드만 유지함",
+      "정답 표기를 FIFO와 [3, 4, 5]로 정리하고 큐 연산 과정을 explanation에 보강함",
+      "category를 자료구조·알고리즘으로 수정하고 keywords를 큐·Queue·FIFO 중심으로 정제함",
+      "answer_guide를 FIFO와 최종 출력값을 함께 쓰는 형태로 구체화함"
+    ]
+  }
+}
