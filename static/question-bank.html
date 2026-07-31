@@ -32,11 +32,11 @@
               <p class="question-bank-section-kicker">Overview</p>
               <h2 class="cs-table-title">문제은행에서 고르고, 바로 풉니다</h2>
               <p id="bankPageSummary" class="cs-table-summary">문제은행을 불러오는 중입니다.</p>
-              <p class="cs-table-hint">검색·필터·선택·풀이가 한 흐름으로 이어지도록 정리한 화면입니다.</p>
+              <p class="cs-table-hint">검색·선택·풀이 흐름을 같은 화면에서 끊기지 않게 정리했습니다.</p>
             </div>
             <div class="cs-table-toolbar question-bank-primary-actions">
               <button id="bankPageRefreshBtn" class="cs-table-button" type="button">새로 고침</button>
-              <button id="bankPageLaunchBtn" class="cs-table-button cs-table-button-primary" type="button">현재 목록 전체 풀이</button>
+              <button id="bankPageLaunchBtn" class="cs-table-button" type="button">첫 문제부터 시작</button>
             </div>
           </div>
           <div id="bankPageOverviewCards" class="question-bank-overview-grid" aria-live="polite"></div>
@@ -47,7 +47,7 @@
             <div>
               <p class="question-bank-section-kicker">Filter</p>
               <h2 class="cs-table-title">원하는 문제만 빠르게 좁히기</h2>
-              <p class="cs-table-hint">검색어는 바로 반영되고, 선택형 필터는 바꾸는 즉시 다시 조회됩니다.</p>
+              <p class="cs-table-hint">각 필드는 이름이 고정으로 보이고, 선택된 필터는 바로 제거할 수 있습니다.</p>
             </div>
             <div class="cs-table-toolbar question-bank-filter-actions">
               <button id="bankPageResetFiltersBtn" class="cs-table-button" type="button">필터 초기화</button>
@@ -55,48 +55,60 @@
           </div>
 
           <div class="cs-table-filter-grid">
-            <input id="bankPageQueryInput" class="cs-table-control" type="search" placeholder="문제/정답/키워드 검색" />
-            <input id="bankPageTopicInput" class="cs-table-control" type="search" placeholder="문제유형(예: 데이터베이스)" />
-            <input id="bankPageFieldInput" class="cs-table-control" type="search" placeholder="분야(예: 전산학술)" />
-            <select id="bankPageCategoryInput" class="cs-table-control" aria-label="카테고리">
-              <option value="">카테고리 *</option>
-            </select>
-            <select id="bankPageIssuerInput" class="cs-table-control" aria-label="출제기관">
-              <option value="">출제기관 *</option>
-            </select>
-            <input id="bankPageSourceInput" class="cs-table-control" type="search" placeholder="출제위치(예: 2013년 학술파트 1)" />
-            <select id="bankPageDifficultySelect" class="cs-table-control">
-              <option value="">난이도 *</option>
-              <option value="상">상</option>
-              <option value="중">중</option>
-              <option value="하">하</option>
-            </select>
-            <select id="bankPageTypeSelect" class="cs-table-control">
-              <option value="">형식 *</option>
-              <option value="short">주관식</option>
-              <option value="subjective">서술형</option>
-              <option value="multiple_choice">객관식</option>
-              <option value="essay">논술형</option>
-            </select>
-            <input id="bankPageSectionInput" class="cs-table-control" type="search" placeholder="섹션(예: 전공필기)" />
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">통합 검색</span>
+              <input id="bankPageQueryInput" class="cs-table-control" type="search" placeholder="문제/정답/키워드 검색" />
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">문제유형</span>
+              <input id="bankPageTopicInput" class="cs-table-control" type="search" placeholder="예: 데이터베이스" />
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">분야</span>
+              <input id="bankPageFieldInput" class="cs-table-control" type="search" placeholder="예: 전산학술" />
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">카테고리</span>
+              <select id="bankPageCategoryInput" class="cs-table-control" aria-label="카테고리">
+                <option value="">카테고리 *</option>
+              </select>
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">출제기관</span>
+              <select id="bankPageIssuerInput" class="cs-table-control" aria-label="출제기관">
+                <option value="">출제기관 *</option>
+              </select>
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">출제위치</span>
+              <input id="bankPageSourceInput" class="cs-table-control" type="search" placeholder="예: 2013년 학술파트 1" />
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">난이도</span>
+              <select id="bankPageDifficultySelect" class="cs-table-control">
+                <option value="">난이도 *</option>
+                <option value="상">상</option>
+                <option value="중">중</option>
+                <option value="하">하</option>
+              </select>
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">형식</span>
+              <select id="bankPageTypeSelect" class="cs-table-control">
+                <option value="">형식 *</option>
+                <option value="short">주관식</option>
+                <option value="subjective">서술형</option>
+                <option value="multiple_choice">객관식</option>
+                <option value="essay">논술형</option>
+              </select>
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">섹션</span>
+              <input id="bankPageSectionInput" class="cs-table-control" type="search" placeholder="예: 전공필기" />
+            </label>
           </div>
 
           <div id="bankPageActiveFilters" class="question-bank-active-filters" aria-live="polite"></div>
-        </div>
-
-        <div class="question-bank-shell-card question-bank-selection-card">
-          <div class="question-bank-card-head">
-            <div>
-              <p class="question-bank-section-kicker">Selection</p>
-              <h2 class="cs-table-title">현재 선택</h2>
-              <p class="cs-table-hint">표에서 고른 문제를 오른쪽 풀이 패널과 바로 연결합니다.</p>
-            </div>
-            <div class="cs-table-toolbar question-bank-selection-actions">
-              <button id="bankPageLaunchSelectedBtn" class="cs-table-button cs-table-button-primary" type="button">선택 문제부터 풀이</button>
-              <button id="bankPageTogglePracticeBtn" class="cs-table-button" type="button" aria-expanded="true">풀이 패널 숨기기</button>
-            </div>
-          </div>
-          <div id="bankPageSelectionSummary" class="question-bank-selection-summary" aria-live="polite">문제은행 목록을 불러오고 있습니다.</div>
         </div>
 
         <div class="question-bank-shell-card question-bank-table-card">
@@ -104,10 +116,25 @@
             <div>
               <p class="question-bank-section-kicker">Table</p>
               <h2 class="cs-table-title">문제 목록</h2>
-              <p class="cs-table-hint">행을 클릭하면 선택 상태가 바뀌고 풀이 패널이 해당 문제부터 시작됩니다.</p>
+              <p class="cs-table-hint">행을 클릭하면 선택 상태가 더 강하게 표시되고 풀이 패널이 그 문제부터 이어집니다.</p>
             </div>
           </div>
           <div id="bankPageList"></div>
+        </div>
+
+        <div class="question-bank-shell-card question-bank-selection-card">
+          <div class="question-bank-card-head">
+            <div>
+              <p class="question-bank-section-kicker">Selection</p>
+              <h2 class="cs-table-title">현재 선택</h2>
+              <p class="cs-table-hint">지금 고른 문제의 핵심 정보만 요약해 두고, 여기서 바로 이어서 풀 수 있습니다.</p>
+            </div>
+            <div class="cs-table-toolbar question-bank-selection-actions">
+              <button id="bankPageLaunchSelectedBtn" class="cs-table-button cs-table-button-primary" type="button">선택 문제 이어서 풀이</button>
+              <button id="bankPageTogglePracticeBtn" class="cs-table-button" type="button" aria-expanded="true">풀이 패널 숨기기</button>
+            </div>
+          </div>
+          <div id="bankPageSelectionSummary" class="question-bank-selection-summary" aria-live="polite">문제은행 목록을 불러오고 있습니다.</div>
         </div>
 
         <p id="bankPageError" class="cs-table-error" role="status"></p>
@@ -124,7 +151,7 @@
             </div>
           </div>
           <div id="bankPagePracticeStatus" class="question-bank-practice-status" aria-live="polite"></div>
-          <div id="bankPagePracticePlaceholder" class="question-bank-practice-placeholder">왼쪽 문제은행 표에서 행을 클릭하거나 현재 목록 전체 풀이를 누르면 문제 풀이가 이 영역에 열립니다.</div>
+          <div id="bankPagePracticePlaceholder" class="question-bank-practice-placeholder">왼쪽 문제은행 표에서 행을 클릭하거나 첫 문제/선택 문제 시작 버튼을 누르면 문제 풀이가 이 영역에 열립니다.</div>
           <iframe id="bankPagePracticeFrame" class="question-bank-practice-frame" title="문제 풀이" hidden></iframe>
         </div>
       </section>

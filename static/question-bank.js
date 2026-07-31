@@ -72,16 +72,21 @@ function keywordCardQueryUrl(keyword) {
   return `/?card_query=${encodeURIComponent(text)}&side=back`;
 }
 
-function renderQuestionKeywordLinks(keywords) {
+function renderQuestionKeywordLinks(keywords, {limit = Number.POSITIVE_INFINITY} = {}) {
   const items = normalizeQuestionKeywords(keywords);
   if (!items.length) return '—';
-  return items.map((keyword) => {
+  const limitedItems = Number.isFinite(limit) ? items.slice(0, limit) : items;
+  const parts = limitedItems.map((keyword) => {
     const url = keywordCardQueryUrl(keyword);
     const text = escapeHtml(keyword);
     return url
       ? `<a class="question-keyword-link" href="${url}" title="${text} 카드 보기">${text}</a>`
       : `<span class="question-keyword-text">${text}</span>`;
-  }).join('<span class="question-keyword-sep"> · </span>');
+  });
+  if (items.length > limitedItems.length) {
+    parts.push(`<span class="question-keyword-more">+${items.length - limitedItems.length}</span>`);
+  }
+  return parts.join('<span class="question-keyword-sep"> · </span>');
 }
 
 function questionTypeLabel(item) {
@@ -149,6 +154,23 @@ function selectedPrompt(item, fallback = '문제를 선택하세요.') {
 function activeFilterEntries() {
   const values = filterValues();
   return FILTER_FIELDS.map((field) => ({...field, value: String(values[field.key] || '').trim()})).filter((field) => field.value);
+}
+
+function fieldByKey(key) {
+  return FILTER_FIELDS.find((field) => field.key === key) || null;
+}
+
+function setFilterValue(key, value = '') {
+  const field = fieldByKey(key);
+  if (!field) return;
+  const node = $(field.id);
+  if (!node) return;
+  node.value = value;
+}
+
+function clearFilterField(key) {
+  setFilterValue(key, '');
+  loadQuestionBankPage().catch(() => {});
 }
 
 function renderPracticeToggle() {
@@ -258,15 +280,7 @@ async function fetchEntries() {
 }
 
 function resetFilters() {
-  FILTER_FIELDS.forEach(({id}) => {
-    const node = $(id);
-    if (!node) return;
-    if (node.tagName === 'SELECT') {
-      node.value = '';
-      return;
-    }
-    node.value = '';
-  });
+  FILTER_FIELDS.forEach(({key}) => setFilterValue(key, ''));
   loadQuestionBankPage().catch(() => {});
 }
 
@@ -275,6 +289,12 @@ function scheduleLoad() {
   pendingLoadTimer = window.setTimeout(() => {
     loadQuestionBankPage().catch(() => {});
   }, 220);
+}
+
+function bindHeaderChipActions() {
+  const toggle = $('bankPageHeaderPracticeToggle');
+  if (!toggle) return;
+  toggle.addEventListener('click', togglePracticeCollapsed);
 }
 
 function renderHeader() {
@@ -294,15 +314,17 @@ function renderHeader() {
     }
   }
   if (chips) {
-    const practiceLabel = bankState.practiceCollapsed ? '풀이 패널 숨김' : (bankState.practiceLoaded ? '풀이 패널 연결됨' : '풀이 대기');
+    const practiceLabel = bankState.practiceCollapsed ? '풀이 패널 보기' : '풀이 패널 숨기기';
     chips.innerHTML = [
       `<span class="question-bank-header-chip">표시 ${escapeHtml(String(returned || 0))}</span>`,
       `<span class="question-bank-header-chip">필터 ${escapeHtml(String(filterCount))}</span>`,
-      `<span class="question-bank-header-chip">${escapeHtml(practiceLabel)}</span>`,
+      `<button type="button" id="bankPageHeaderPracticeToggle" class="question-bank-header-chip question-bank-header-chip-button${bankState.practiceCollapsed ? ' is-collapsed' : ''}">${escapeHtml(practiceLabel)}</button>`,
       item ? `<span class="question-bank-header-chip question-bank-header-chip-strong">선택 ${escapeHtml(`${selectedIndex(bankState.practiceStartIndex) + 1}번`)}</span>` : '',
     ].join('');
+    bindHeaderChipActions();
   }
 }
+
 
 function renderOverviewCards() {
   const mount = $('bankPageOverviewCards');
@@ -311,13 +333,22 @@ function renderOverviewCards() {
   const returned = Number(bankState.summary?.returned || bankState.items.length || 0);
   const filterCount = activeFilterEntries().length;
   const item = selectedItem();
+  const selectedLabel = item ? `${selectedIndex(bankState.practiceStartIndex) + 1}번` : '없음';
   const practiceState = bankState.practiceCollapsed ? '숨김' : (bankState.practiceLoaded ? '연결됨' : '대기');
   mount.innerHTML = [
     metricCard('표시 목록', `${returned}문항`, total ? `전체 ${total}문항 중 현재 보이는 범위` : '목록을 불러오고 있습니다.', 'is-primary'),
-    metricCard('현재 선택', item ? `${selectedIndex(bankState.practiceStartIndex) + 1}번` : '없음', item ? selectedPrompt(item, '선택된 문제가 없습니다.') : '표에서 문제를 고르면 여기서 강조됩니다.'),
-    metricCard('적용 필터', `${filterCount}개`, filterCount ? '필터 칩에서 현재 조건을 다시 확인할 수 있습니다.' : '지금은 전체 흐름을 넓게 훑는 상태입니다.'),
+    metricCard('현재 선택', selectedLabel, item ? '아래 현재 선택 카드에서 문제 요약과 시작 지점을 바로 확인합니다.' : '문제를 고르면 바로 선택 상태가 연결됩니다.'),
+    metricCard('적용 필터', `${filterCount}개`, filterCount ? '활성 필터 칩을 눌러 개별 조건을 바로 제거할 수 있습니다.' : '지금은 전체 흐름을 넓게 훑는 상태입니다.'),
     metricCard('풀이 패널', practiceState, bankState.practiceCollapsed ? '표에 집중하도록 오른쪽 패널을 접어 둔 상태입니다.' : '오른쪽에서 같은 문제 세트를 이어서 풉니다.'),
   ].join('');
+}
+
+function bindActiveFilterChipActions() {
+  const mount = $('bankPageActiveFilters');
+  if (!mount) return;
+  mount.querySelectorAll('[data-filter-key]').forEach((button) => {
+    button.addEventListener('click', () => clearFilterField(button.dataset.filterKey || ''));
+  });
 }
 
 function renderActiveFilters() {
@@ -332,8 +363,9 @@ function renderActiveFilters() {
     const displayValue = entry.key === 'question_type'
       ? (QUESTION_TYPE_LABELS[entry.value] || entry.value)
       : entry.value;
-    return `<span class="question-bank-filter-chip"><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(displayValue)}</span></span>`;
+    return `<button type="button" class="question-bank-filter-chip" data-filter-key="${escapeHtml(entry.key)}" aria-label="${escapeHtml(entry.label)} 필터 제거"><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(displayValue)}</span><span class="question-bank-filter-chip-remove">지우기</span></button>`;
   }).join('');
+  bindActiveFilterChipActions();
 }
 
 function renderSelectionSummary() {
@@ -344,8 +376,8 @@ function renderSelectionSummary() {
     mount.innerHTML = '<div class="question-bank-selection-empty">문제를 불러오면 여기에서 현재 선택과 풀이 시작점을 요약합니다.</div>';
     return;
   }
-  const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 180);
-  const keywords = renderQuestionKeywordLinks(item.keywords);
+  const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 140);
+  const keywords = renderQuestionKeywordLinks(item.keywords, {limit: 5});
   mount.innerHTML = `
     <article class="question-bank-selection-card-body">
       <div class="question-bank-selection-copy">
@@ -364,23 +396,18 @@ function tableRows() {
     const active = bankState.selectedId && bankState.selectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
     const typeLabel = questionTypeLabel(item);
-    const topic = renderQuestionKeywordLinks(item.keywords);
+    const topic = renderQuestionKeywordLinks(item.keywords, {limit: 4});
     const issuer = escapeHtml(item.issuer || '—');
     const difficulty = escapeHtml(item.difficulty || '—');
     const source = escapeHtml(item.source_location || '—');
-    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 110);
-    const metaBits = [
-      `<span class="question-bank-inline-pill ${pillTone('type', item.question_type)}">${escapeHtml(typeLabel || '문제')}</span>`,
-      item.difficulty ? `<span class="question-bank-inline-pill ${pillTone('difficulty', item.difficulty)}">난이도 ${escapeHtml(item.difficulty)}</span>` : '',
-      item.issuer ? `<span class="question-bank-inline-pill">${escapeHtml(item.issuer)}</span>` : '',
-    ].filter(Boolean).join('');
+    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 96);
     return {
       id: String(item.question_bank_id || index + 1),
       className: active ? 'current-row active' : '',
       attributes: {'aria-current': active ? 'true' : 'false'},
       cells: {
         index: `<span class="question-bank-row-number">${index + 1}</span>`,
-        prompt: `<div class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span><span class="question-bank-item-meta">${metaBits}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</div>`,
+        prompt: `<div class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</div>`,
         type: `<span class="question-bank-type-pill ${pillTone('type', item.question_type)}">${escapeHtml(typeLabel || '문제')}</span>`,
         topic: `<div class="question-bank-keyword-list">${topic}</div>`,
         issuer,
@@ -457,6 +484,13 @@ function renderTable() {
   });
 }
 
+function ensureSelectedRowVisible() {
+  const row = document.querySelector('#bankPageList [aria-current="true"]');
+  if (!row || typeof row.scrollIntoView !== 'function') return;
+  row.scrollIntoView({block: 'nearest', inline: 'nearest'});
+}
+
+
 function launch(startIndex = 0, {reveal = true} = {}) {
   if (!bankState.items.length) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
@@ -472,6 +506,7 @@ function launch(startIndex = 0, {reveal = true} = {}) {
   if (reveal) setPracticeCollapsed(false);
   renderTable();
   renderPracticePane();
+  ensureSelectedRowVisible();
   try {
     window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY, JSON.stringify({
       items: bankState.items,
@@ -527,7 +562,7 @@ renderPracticePane();
 loadQuestionBankPage().catch(() => {});
 
 $('bankPageRefreshBtn')?.addEventListener('click', () => loadQuestionBankPage().catch(() => {}));
-$('bankPageLaunchBtn')?.addEventListener('click', () => launch(selectedIndex()));
+$('bankPageLaunchBtn')?.addEventListener('click', () => launch(0));
 $('bankPageLaunchSelectedBtn')?.addEventListener('click', () => launch(selectedIndex(bankState.practiceStartIndex)));
 $('bankPageTogglePracticeBtn')?.addEventListener('click', togglePracticeCollapsed);
 $('bankPageResetFiltersBtn')?.addEventListener('click', resetFilters);

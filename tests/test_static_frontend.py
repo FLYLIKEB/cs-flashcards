@@ -328,6 +328,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="bankPageResetFiltersBtn"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageSelectionSummary"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticeStatus"', QUESTION_BANK_HTML)
+        self.assertIn('bankPageHeaderPracticeToggle', QUESTION_BANK_JS)
         self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
@@ -343,6 +344,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('function renderActiveFilters()', QUESTION_BANK_JS)
         self.assertIn('function renderSelectionSummary()', QUESTION_BANK_JS)
         self.assertIn('function resetFilters()', QUESTION_BANK_JS)
+        self.assertIn('function bindHeaderChipActions()', QUESTION_BANK_JS)
+        self.assertIn('function ensureSelectedRowVisible()', QUESTION_BANK_JS)
         self.assertIn('function scheduleLoad()', QUESTION_BANK_JS)
 
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
@@ -711,6 +714,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-bank-practice-status', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-header-chip', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-filter-chip', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-header-chip-button', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-shell-header-chips', TABLE_SHELL_CSS)
 
 
