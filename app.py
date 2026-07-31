@@ -2718,6 +2718,54 @@ FIN_CORP_FORCE_CONCEPT_TITLES = {
     "SQL문 약술",
     "C언어 파일입출력 틀린 개수 고르기",
 }
+FIN_CORP_SUBJECT_OVERRIDES = {
+    "다음 중 스크립트 언어로 올바은 것은?": "스크립트 언어",
+    "다음중 DDL에 해당하지 않은 것은?": "DDL과 DML",
+    "딥웹, 다크웹에 대한 설명으로 옳지 않은 것은?": "딥웹과 다크웹",
+    "블록체인 합의 알고리즘에 대해서 옳지 않은 것은?": "블록체인 합의 알고리즘",
+    "핀테크에 관한 설명 중 옳지 않은 것은?": "핀테크",
+    "인공지능에 대한 설명으로 적절한 것은?": "인공지능",
+    "보기와 연관지을 수 있는 IT기술 용어는 무엇인가?": "IT 기술 용어",
+    "빅데이터 3V 중에 아닌 것은?": "빅데이터 3V",
+    "정렬 알고리즘 별 시간복잡도": "정렬 알고리즘 시간 복잡도",
+    "다음 중 에러가 발생하지 않는 것은?": "SQL 문법 오류",
+    "행렬계산. 다음 행렬 A와 B에 대해 A×B의 결과로 옳은 것은?": "행렬 곱셈",
+    "역행렬계산. 다음 행렬 A와 B에 대해 A×B의 결과로 옳은 것은?": "역행렬",
+    "다음 중 올바르게 연결된 것은?": "OSI 7계층 PDU",
+    "어떤 값보다 큰 가장 작은 정수를 구하는 C언어 함수는?": "ceil 함수",
+    "다음 중 정렬알고리즘이 최악인 것을 고르시오": "정렬 알고리즘 시간 복잡도",
+    "다음 정렬알고리즘 중 평균이 다른 것을 고르시오": "평균 시간 복잡도",
+    "순수 관계 연산자에서 릴레이션의 일부 속성만 추출하여 중복되는 튜플은 제거한 후 새로운 릴레이션을 생성하는 연산자는 무엇인가?": "PROJECT 연산",
+    "리눅스 권한 명령어 관련 문제(u(user), g(group), o(others)": "리눅스 권한 명령어",
+    "Redo, undo 관련 트랜잭션문제": "Redo와 Undo",
+    "SSH Handshake 전송순서": "SSH Handshake",
+    "FP기능점수 계산": "기능 점수",
+    "CPM최단경로 구하기": "CPM 최단 경로",
+    "스머프어택 뜻": "스머프 공격",
+    "AOE 유형 중 옳지 않은 것은?": "AOE",
+    "C코드의 결과값(전역변수, static 변수) (약술)": "C 언어의 전역 변수와 static 변수",
+    "터널링, vpn 약술": "터널링과 VPN",
+    "JVM설명 약술": "JVM",
+    "DFS와 BFS와 그래프 경로&개념": "DFS와 BFS와 그래프 경로 탐색",
+    "SQL문 약술": "SQL",
+    "C언어 파일입출력 틀린 개수 고르기": "C 언어 파일 입출력",
+    "(주관식)SQL 문제 약술 - REVOKE, GRANT": "REVOKE와 GRANT",
+    "-rwsr-xr-x, s의 의미는?": "setuid 비트",
+    "단일 프로세서 동기화 문제 유무, 발생한다면 어떤 경우인가?": "단일 프로세서 환경의 동기화",
+}
+FIN_CORP_CONVERTED_PROMPT_OVERRIDES = {
+    "스크립트 언어": "스크립트 언어의 개념과 대표 예시를 설명하시오.",
+    "DDL과 DML": "DDL과 DML의 차이를 설명하시오.",
+    "REVOKE와 GRANT": "REVOKE와 GRANT의 역할을 설명하시오.",
+    "DFS와 BFS와 그래프 경로 탐색": "DFS와 BFS의 개념과 그래프 경로 탐색 방법을 설명하시오.",
+    "Redo와 Undo": "Redo와 Undo의 역할과 차이를 설명하시오.",
+    "setuid 비트": "리눅스 setuid 비트의 의미를 설명하시오.",
+    "기능 점수": "기능 점수(Function Point)의 개념과 계산 기준을 설명하시오.",
+    "C 언어의 전역 변수와 static 변수": "C 언어의 전역 변수와 static 변수의 동작 차이를 설명하시오.",
+    "터널링과 VPN": "터널링과 VPN의 개념과 차이를 설명하시오.",
+    "C 언어 파일 입출력": "C 언어 파일 입출력의 핵심 개념과 주의점을 설명하시오.",
+    "단일 프로세서 환경의 동기화": "단일 프로세서 환경에서도 동기화 문제가 발생하는 이유를 설명하시오.",
+}
 FIN_CORP_LIMITED_SOURCE_ANSWER = "문제의 선지/도표가 원문에 충분히 남아 있지 않아 단정형 정답은 제한적이다. 해당 주제의 핵심 개념과 대표 공식·특징을 기준으로 풀이해야 한다."
 FIN_CORP_KEYWORD_DROP_TOKENS = (
     "문제",
@@ -3085,16 +3133,31 @@ def fin_corp_question_bank_contains_hint(text: str, hint: str) -> bool:
 
 
 def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = None) -> str:
-    subject = fin_corp_question_bank_topic(title)
+    topic = fin_corp_question_bank_topic(title)
+    subject = next((key for key, prompt in FIN_CORP_CONVERTED_PROMPT_OVERRIDES.items() if topic == prompt), "")
+    if not subject:
+        subject = FIN_CORP_SUBJECT_OVERRIDES.get(topic, topic)
     subject = re.sub(r"^\d+\.\s*", "", subject)
     subject = re.sub(r"^\[[^\]]+\]\s*", "", subject)
     subject = re.sub(r"^\((?:약술|서술|논술|주관식)\)\s*", "", subject, flags=re.IGNORECASE)
+    subject = subject.rstrip(".?")
     extraction_patterns = (
         (r"^다음\s+중\s+(.+?)에서\s+없는\s+함수는\??$", r"\1"),
         (r"^다음\s+중\s+(.+?)인\s+것(?:은)?\??$", r"\1"),
+        (r"^다음\s+중\s+(.+?)로\s+올바[른은].*$", r"\1"),
+        (r"^다음중\s+(.+?)에\s+해당하지\s+않은\s+것은\??$", r"\1"),
         (r"^다음\s+(.+?)\s+코드(?:의)?\s*(?:실행)?\s*결과.*$", r"\1"),
         (r"^(.+?)에서\s+문자열을\s+비교하는\s+함수는\??$", r"\1"),
+        (r"^.+?에서\s+(.+?)는\s+무엇인가\??$", r"\1"),
+        (r"^(.+?)는\s+무엇인가\??$", r"\1"),
         (r"^(.+?)\s*특징으로\s+.*$", r"\1"),
+        (r"^(.+?)\s*(?:의)?\s*의미는\??$", r"\1"),
+        (r"^(.+?)\s*뜻$", r"\1"),
+        (r"^(.+?)\s+분류\s+및\s+특징.*$", r"\1"),
+        (r"^(.+?)\s+관련\s+트랜잭션.*$", r"\1"),
+        (r"^SQL\s+문제\s+약술\s*-\s*(.+)$", r"\1"),
+        (r"^.*서브넷\s+마스크.*$", "서브넷 마스크"),
+        (r"^IP\s+주소\s+.+서브넷을\s+설계하시오.*$", "서브넷 설계"),
     )
     changed = True
     while changed:
@@ -3114,6 +3177,7 @@ def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = 
         r"\s*(?:옳지 않은 것은|옳은 것은|적절한 것은|알맞은 것은|바른 설명은|해당하는 용어는|고르시오|선택하라는.*|선택.*|무엇인가\??).*$",
         r"\s*(?:계산문제|출력결과|트리그리기|손코딩|빈칸 채우기|코드(?:\s*문제)?|관련 서술식|관련 문제|문제 약술|객관식 문제|주관식 문제|문제)\s*$",
         r"\s*(?:뜻|의미|특징(?:으로)?|개념|약술|서술식|서술|설명)\s*$",
+        r"\s*(?:의\s+개념과\s+차이를\s+설명하시오|의\s+의미를\s+(?:쓰시오|설명하시오)|의\s+특징을\s+설명하시오|의\s+역할(?:과\s+차이)?를\s+설명하시오|의\s+동작\s+차이를\s+설명하시오|에\s+대해\s+핵심\s+원리와\s+풀이\s+기준을\s+설명하시오|에\s+대해\s+설명하시오|를\s+간단히\s+설명하시오)\s*$",
     )
     changed = True
     while changed:
@@ -3132,6 +3196,10 @@ def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = 
         "버퍼오버플로우": "버퍼 오버플로우",
         "페이지폴트": "페이지 폴트",
         "가상메모리": "가상 메모리",
+        "C언어": "C 언어",
+        "JAVA": "Java",
+        "Rsa": "RSA",
+        "vpn": "VPN",
     }
     for before, after in replacements.items():
         subject = subject.replace(before, after)
@@ -3140,7 +3208,7 @@ def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = 
         return subject
     if isinstance(card, dict) and card.get("term"):
         return str(card.get("term") or "").strip()
-    return fin_corp_question_bank_topic(title)
+    return topic
 
 
 def fin_corp_question_bank_needs_concept_conversion(
@@ -3160,6 +3228,8 @@ def fin_corp_question_bank_needs_concept_conversion(
             or ("transport 계층의 전송 단위(pdu)" in str(title or "").casefold() and "서버 내부 오류" in str(body or ""))
         ):
             return False
+        if "transport 계층의 전송 단위(pdu)" in str(title or "").casefold() and "서버 내부 오류" in str(body or ""):
+            return True
     elif normalized_body and topic not in FIN_CORP_FORCE_CONCEPT_TITLES:
         return False
     if topic in FIN_CORP_FORCE_CONCEPT_TITLES:
@@ -3186,7 +3256,6 @@ def fin_corp_question_bank_needs_concept_conversion(
     return not normalized_body and "문제" in lowered
 
 
-
 def fin_corp_question_bank_converted_prompt(
     title: str,
     *,
@@ -3196,20 +3265,24 @@ def fin_corp_question_bank_converted_prompt(
     subject = fin_corp_question_bank_subject(title, card=card)
     lowered = str(title or "").casefold()
     number_match = re.match(r"^\s*(\d+\.)\s*", str(title or ""))
-    if any(token in lowered for token in ("비교", "차이", "장단점")):
-        prompt = f"{subject}의 개념과 차이를 설명하시오."
-    elif any(token in lowered for token in ("뜻", "의미", "약어")):
-        prompt = f"{subject}의 의미를 {'쓰시오' if question_type == 'short' else '설명하시오'}."
-    elif "특징" in lowered:
-        prompt = f"{subject}의 특징을 설명하시오."
-    elif any(token in lowered for token in ("계산문제", "출력결과", "구하기", "손코딩", "트리그리기", "코드")):
-        prompt = f"{subject}에 대해 핵심 원리와 풀이 기준을 설명하시오."
-    elif any(token in lowered for token in ("약술", "서술", "설명", "개념")):
-        prompt = f"{subject}에 대해 설명하시오."
-    elif question_type == "short":
-        prompt = f"{subject}를 간단히 설명하시오."
-    else:
-        prompt = f"{subject}에 대해 설명하시오."
+    prompt = FIN_CORP_CONVERTED_PROMPT_OVERRIDES.get(subject, "")
+    if not prompt:
+        if "무엇인가" in lowered:
+            prompt = f"{subject}의 의미를 설명하시오."
+        elif any(token in lowered for token in ("비교", "차이", "장단점")):
+            prompt = f"{subject}의 개념과 차이를 설명하시오."
+        elif any(token in lowered for token in ("뜻", "의미", "약어")):
+            prompt = f"{subject}의 의미를 {'쓰시오' if question_type == 'short' else '설명하시오'}."
+        elif "특징" in lowered:
+            prompt = f"{subject}의 특징을 설명하시오."
+        elif any(token in lowered for token in ("계산문제", "출력결과", "구하기", "손코딩", "트리그리기", "코드")):
+            prompt = f"{subject}에 대해 핵심 원리와 풀이 기준을 설명하시오."
+        elif any(token in lowered for token in ("약술", "서술", "설명", "개념")):
+            prompt = f"{subject}에 대해 설명하시오."
+        elif question_type == "short":
+            prompt = f"{subject}를 간단히 설명하시오."
+        else:
+            prompt = f"{subject}에 대해 설명하시오."
     prompt = re.sub(r"\s+", " ", prompt).strip()
     if number_match:
         prompt = f"{number_match.group(1)} {prompt}"
@@ -3226,7 +3299,6 @@ def fin_corp_question_bank_topic_particle(value: str) -> str:
     return "은" if (ord(last) - ord('가')) % 28 else "는"
 
 
-
 def fin_corp_question_bank_conversion_note(title: str) -> str:
     original_title = fin_corp_question_bank_topic(title)
     lowered = original_title.casefold()
@@ -3234,8 +3306,41 @@ def fin_corp_question_bank_conversion_note(title: str) -> str:
         reason = "원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함."
     else:
         reason = "원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함."
-    return f"> {reason}\n> 원문 제목: {original_title}"
+    return f"변환 메모: {reason}\n원문 제목: {original_title}"
 
+
+def fin_corp_question_bank_answer_is_meaningful(answer: str) -> bool:
+    text = normalize_question_bank_text(answer, limit=500)
+    if not text or text in {"*", "-"}:
+        return False
+    if re.fullmatch(r"\d+번", text):
+        return False
+    return True
+
+
+def fin_corp_question_bank_should_prefer_card_answer(
+    title: str,
+    answer: str,
+    *,
+    question_type: str = "",
+    card: dict[str, Any] | None = None,
+) -> bool:
+    if not isinstance(card, dict) or not card:
+        return False
+    if FIN_CORP_LIMITED_SOURCE_ANSWER in str(answer or "") or not fin_corp_question_bank_answer_is_meaningful(answer):
+        return True
+    lowered = str(title or "").casefold()
+    subject_tokens = fin_corp_question_bank_tokens(fin_corp_question_bank_subject(title, card=card))
+    answer_tokens = fin_corp_question_bank_tokens(answer)
+    if any(token in lowered for token in ("옳지 않은 것은", "옳은 것은", "적절한 것은", "알맞은 것은", "바른 설명은", "무엇인가")):
+        if subject_tokens and not (subject_tokens & answer_tokens):
+            return True
+        if len(normalize_question_bank_text(answer, limit=200)) < 40:
+            return True
+    if question_type != "multiple_choice" and any(token in lowered for token in ("계산문제", "출력결과", "구하기", "손코딩", "트리그리기", "코드")):
+        if len(normalize_question_bank_text(answer, limit=200)) < 24:
+            return True
+    return False
 
 
 def fin_corp_question_bank_converted_answer(
@@ -3247,13 +3352,17 @@ def fin_corp_question_bank_converted_answer(
     card: dict[str, Any] | None = None,
     prefer_card_answer: bool = False,
 ) -> tuple[str, str]:
+    lowered = str(title or "").casefold()
+    if "transport 계층" in lowered and "pdu" in lowered:
+        converted_answer = "Transport 계층의 PDU는 TCP에서는 세그먼트(segment), UDP에서는 데이터그램(datagram)이다."
+        converted_explanation = converted_answer + "\n\nPDU는 각 계층에서 전달되는 데이터 단위를 뜻하며, 네트워크 계층은 packet, 데이터 링크 계층은 frame, 물리 계층은 bit로 구분한다."
+        return converted_answer, converted_explanation
     if isinstance(card, dict) and card and (prefer_card_answer or FIN_CORP_LIMITED_SOURCE_ANSWER in str(answer or "")):
         grounded_answer, grounded_explanation = fin_corp_question_bank_grounded_card_answer(card)
         if grounded_answer:
             return grounded_answer, grounded_explanation
-    if FIN_CORP_LIMITED_SOURCE_ANSWER not in str(answer or "") and not prefer_card_answer:
+    if fin_corp_question_bank_answer_is_meaningful(answer) and not prefer_card_answer and FIN_CORP_LIMITED_SOURCE_ANSWER not in str(answer or ""):
         return answer, explanation
-    lowered = str(title or "").casefold()
     subject = fin_corp_question_bank_subject(title, card=card)
     if "sql" in lowered:
         converted_answer = "집계 SQL에서는 GROUP BY로 그룹을 나눈 뒤 COUNT로 개수를 계산하고, 그 결과에서 MAX나 ORDER BY DESC LIMIT 같은 방식으로 최댓값을 구한다."
@@ -3271,7 +3380,6 @@ def fin_corp_question_bank_converted_answer(
     converted_answer = f"{subject}의 핵심 개념과 대표 원리·판단 기준을 설명할 수 있어야 한다."
     converted_explanation = converted_answer
     return converted_answer, converted_explanation
-
 
 
 def fin_corp_question_bank_convert_incomplete_row(
@@ -3294,17 +3402,20 @@ def fin_corp_question_bank_convert_incomplete_row(
         explanation,
         category=category,
         card=card,
-        prefer_card_answer=True,
+        prefer_card_answer=fin_corp_question_bank_should_prefer_card_answer(title, answer, question_type=question_type, card=card),
     )
     return converted_title, converted_body, converted_answer, converted_explanation
-
 
 
 def fin_corp_question_bank_keyword_noise(value: str) -> bool:
     text = normalize_question_bank_text(value, limit=80)
     if not text:
         return True
+    if text in {"*", "-"} or len(text) <= 1:
+        return True
     if text.endswith("번") and re.fullmatch(r"\d+번", text):
+        return True
+    if re.fullmatch(r"[0-9,./%\- ]+[A-Za-z가-힣]{0,3}", text):
         return True
     if any(token in text for token in FIN_CORP_KEYWORD_DROP_TOKENS):
         return True
@@ -3317,11 +3428,26 @@ def fin_corp_question_bank_keyword_noise(value: str) -> bool:
     return False
 
 
+def fin_corp_question_bank_answer_can_seed_keywords(answer: str) -> bool:
+    text = normalize_question_bank_text(answer, limit=120)
+    if not fin_corp_question_bank_answer_is_meaningful(text):
+        return False
+    if len(text) > 40 or text.count(" ") >= 4:
+        return False
+    if text.endswith((".", "다")):
+        return False
+    if any(token in text for token in (":", ";", "```", "=", "(")):
+        return False
+    if text[0].isdigit():
+        return False
+    return True
+
 
 def fin_corp_question_bank_keyword_candidates(
     title: str,
     answer: str,
     *,
+    body: str = "",
     card: dict[str, Any] | None = None,
 ) -> list[str]:
     subject = fin_corp_question_bank_subject(title, card=card)
@@ -3329,10 +3455,10 @@ def fin_corp_question_bank_keyword_candidates(
     if isinstance(card, dict) and card:
         candidates.extend([str(card.get("term") or ""), str(card.get("english") or "")])
     candidates.extend(bok_topic_keyword_candidates(subject))
-    if answer and len(answer) <= 80:
+    candidates.extend(re.findall(r"[A-Za-z]{2,}(?:\d+)?", subject))
+    if not str(body or "").startswith("변환 메모:") and fin_corp_question_bank_answer_can_seed_keywords(answer):
         candidates.extend(bok_topic_keyword_candidates(answer))
     return normalize_question_bank_list(candidates, item_limit=255)
-
 
 
 def fin_corp_question_bank_category(
@@ -3365,7 +3491,6 @@ def fin_corp_question_bank_category(
     return card_category or "금융IT·신기술"
 
 
-
 def fin_corp_question_bank_keywords(
     title: str,
     body: str,
@@ -3376,9 +3501,10 @@ def fin_corp_question_bank_keywords(
 ) -> list[str]:
     ordered: list[str] = []
     seen: set[str] = set()
-    candidates = list(fin_corp_question_bank_keyword_candidates(title, answer, card=card))
+    candidates = list(fin_corp_question_bank_keyword_candidates(title, answer, body=body, card=card))
     if not isinstance(card, dict) or not card:
-        candidates.extend(bok_detect_keyword_matches(title, body, answer, explanation))
+        if not str(body or "").startswith("변환 메모:") or not candidates:
+            candidates.extend(bok_detect_keyword_matches(title, body, answer, explanation))
     for candidate in candidates:
         normalized = bok_normalize_keyword_fragment(candidate)
         key = normalize_question_bank_match_text(normalized) or normalized.casefold()
@@ -3403,7 +3529,6 @@ def fin_corp_question_bank_card_is_grounded(
     if not isinstance(card, dict) or not card:
         return False
     title_key = normalize_question_bank_match_text(title)
-    answer_key = normalize_question_bank_match_text(answer)
     candidate_keys = fin_corp_question_bank_candidate_keys(title, body, answer, explanation)
     for raw_value in (card.get("term"), card.get("english")):
         key = normalize_question_bank_match_text(raw_value)
@@ -3411,15 +3536,15 @@ def fin_corp_question_bank_card_is_grounded(
             continue
         if key in candidate_keys:
             return True
-        if len(key) >= 4 and (key in title_key or key in answer_key):
+        if len(key) >= 4 and key in title_key:
             return True
     return False
 
 
-
 def fin_corp_question_bank_candidate_keys(title: str, body: str, answer: str, explanation: str) -> set[str]:
     subject = fin_corp_question_bank_subject(title)
-    short_answer = answer if len(answer) <= 120 else ""
+    include_answer = not str(body or "").startswith("변환 메모:")
+    short_answer = answer if include_answer and len(answer) <= 120 else ""
     candidate_terms = normalize_question_bank_list([
         fin_corp_question_bank_topic(title),
         subject,
@@ -3508,6 +3633,17 @@ def fin_corp_question_bank_grounded_card_answer(card: dict[str, Any]) -> tuple[s
 
 
 
+def fin_corp_question_bank_salvage_answer_from_explanation(answer: str, explanation: str) -> str:
+    if fin_corp_question_bank_answer_is_meaningful(answer):
+        return answer
+    for raw_line in str(explanation or "").splitlines():
+        cleaned = re.sub(r"^[#>*\-\s]+", "", raw_line).strip()
+        normalized = normalize_question_bank_text(cleaned, limit=500)
+        if normalized and len(normalized) >= 4:
+            return normalized
+    return answer
+
+
 def fin_corp_question_bank_repair_answer(
     title: str,
     body: str,
@@ -3522,7 +3658,12 @@ def fin_corp_question_bank_repair_answer(
         repaired_answer = "ㄱ = max(dfs(i - 1), dfs(i - 2) + arr[i]), ㄴ = max(dp2[i - 1], dp2[i - 2] + arr[i])"
         repaired_explanation = "동적 계획법 점화식이다. 인접한 두 원소를 동시에 선택하지 않는 최대합을 구하므로 직전 값과 두 칸 전 값에 현재 값을 더한 경우를 비교한다.\n\n- Top-down: dp[i] = max(dfs(i - 1), dfs(i - 2) + arr[i])\n- Bottom-up: dp2[i] = max(dp2[i - 1], dp2[i - 2] + arr[i])"
         return repaired_answer, repaired_explanation
-    if not ai_only or question_type == "multiple_choice" or not isinstance(card, dict) or not card:
+    if question_type == "multiple_choice":
+        return answer, explanation
+    salvaged_answer = fin_corp_question_bank_salvage_answer_from_explanation(answer, explanation)
+    if salvaged_answer != answer:
+        return salvaged_answer, explanation
+    if not ai_only or not isinstance(card, dict) or not card:
         return answer, explanation
     if answer != explanation:
         return answer, explanation
@@ -3626,6 +3767,9 @@ def parse_fin_corp_question_bank_entries(
                 category=provisional_category,
                 card=card,
             )
+            body = fin_corp_question_bank_normalize_body(body)
+            choices = fin_corp_question_bank_choices(body)
+            question_type = fin_corp_question_bank_type(title, body, answer, explanation, choices)
             provisional_category = fin_corp_question_bank_category(
                 title,
                 body,

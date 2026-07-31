@@ -1365,7 +1365,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIn('메모이제이션', repaired['explanation'])
             self.assertEqual(repaired['category'], '자료구조·알고리즘')
 
-            sql_short = by_prompt['### 238. SQL문에 대해 설명하시오.']
+            sql_short = by_prompt['### 238. SQL에 대해 설명하시오.']
             self.assertEqual(sql_short['card_id'], '')
             self.assertEqual(sql_short['category'], '데이터베이스')
 
@@ -1454,11 +1454,10 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIn('원문 제목: 퍼블릭 블록체인 특징으로 옳지 않은 것은?', public_blockchain['body'])
             self.assertEqual(public_blockchain['card_id'], 'CS-219')
             self.assertEqual(public_blockchain['category'], '금융IT·신기술')
-            self.assertIn('퍼블릭 블록체인', public_blockchain['keywords'])
-            self.assertNotIn('퍼블릭 클라우드', public_blockchain['keywords'])
+            self.assertEqual(public_blockchain['keywords'], ['퍼블릭 블록체인', 'Public Blockchain'])
 
             c_output = by_id['qb-fin239-05-04-01']
-            self.assertEqual(c_output['prompt'], '### 155. C언어에 대해 핵심 원리와 풀이 기준을 설명하시오.')
+            self.assertEqual(c_output['prompt'], '### 155. C 언어에 대해 핵심 원리와 풀이 기준을 설명하시오.')
             self.assertEqual(c_output['card_id'], 'CS-036')
             self.assertEqual(c_output['category'], '프로그래밍 언어')
             self.assertIn('C 언어', c_output['keywords'])
