@@ -77,8 +77,10 @@
             <button class="panel-tab-button" type="button" data-quick-panel="watch">기관 현황</button>
             <button class="panel-tab-button" type="button" data-quick-panel="subscribe">구독</button>
           </div>
+        </div>
 
         <article class="calendar-panel calendar-panel--calendar">
+
           <div class="panel-heading">
             <div>
               <p class="section-label">월간 보기</p>
@@ -179,25 +181,53 @@
               <p class="section-label">필터</p>
               <h2>정리</h2>
             </div>
-            <button id="resetFiltersBtn" class="drawer-link-button" type="button">초기화</button>
           </div>
-          <p id="activeFilterSummary" class="panel-caption panel-caption--body">전체 보기</p>
-          <div>
-            <p class="section-label">기관</p>
-            <div id="institutionFilters" class="filter-chip-group"></div>
+          <div class="filter-summary-row">
+            <p id="activeFilterSummary" class="panel-caption panel-caption--body">전체 보기</p>
+            <button id="resetFiltersBtn" class="drawer-link-button" type="button">전체 초기화</button>
           </div>
-          <div>
-            <p class="section-label">유형</p>
-            <div id="eventTypeFilters" class="filter-chip-group"></div>
-          </div>
-          <div>
-            <p class="section-label">상태</p>
-            <div id="statusFilters" class="filter-chip-group"></div>
-          </div>
-          <label class="calendar-toggle">
+          <div id="activeFilterTags" class="filter-active-tags" aria-live="polite"></div>
+          <section class="filter-section">
+            <div class="filter-section__head">
+              <div>
+                <p class="section-label">기관</p>
+                <p class="panel-caption panel-caption--body">복수 선택 가능</p>
+              </div>
+              <button id="resetInstitutionFiltersBtn" class="filter-link-button" type="button">전체</button>
+            </div>
+            <div id="institutionFilters" class="filter-option-grid" role="group" aria-label="기관 필터"></div>
+          </section>
+          <section class="filter-section">
+            <div class="filter-section__head">
+              <div>
+                <p class="section-label">유형</p>
+                <p class="panel-caption panel-caption--body">지원 · 시험 · 발표 구분</p>
+              </div>
+              <button id="resetEventTypeFiltersBtn" class="filter-link-button" type="button">전체</button>
+            </div>
+            <div id="eventTypeFilters" class="filter-option-grid" role="group" aria-label="유형 필터"></div>
+          </section>
+          <section class="filter-section">
+            <div class="filter-section__head">
+              <div>
+                <p class="section-label">상태</p>
+                <p class="panel-caption panel-caption--body">진행 중인지 예정인지 빠르게 좁히기</p>
+              </div>
+              <button id="resetStatusFiltersBtn" class="filter-link-button" type="button">전체</button>
+            </div>
+            <div id="statusFilters" class="filter-option-grid" role="group" aria-label="상태 필터"></div>
+          </section>
+          <label class="filter-switch-row">
+            <span>
+              <strong>예정 월/전후 일정 숨기기</strong>
+              <span class="panel-caption panel-caption--body">정확한 날짜가 잡힌 일정만 본다.</span>
+            </span>
             <input id="hideApproximateToggle" type="checkbox" />
-            예정 월/전후 일정 숨기기
           </label>
+          <div class="filter-result-bar">
+            <strong id="filterResultCount">0건 표시</strong>
+            <button id="filterDoneBtn" class="quick-action" type="button">완료</button>
+          </div>
         </article>
 
         <article class="calendar-panel" data-sidebar-panel="watch" hidden>

@@ -159,6 +159,7 @@ function setActiveSidebarPanel(panelId, { openSidebar = true, closeMenu = true, 
   calendarState.lastUtilityPanel = panelId;
   saveLastUtilityPanel();
   applyActiveSidebarPanel();
+  closeDetailDrawer();
   if (openSidebar && !calendarState.sidebarOpen) {
     toggleCalendarSidebar(true);
   }
@@ -173,6 +174,7 @@ function setActiveSidebarPanel(panelId, { openSidebar = true, closeMenu = true, 
     panel?.scrollIntoView({ block: 'nearest' });
   }
 }
+
 
 function openLastUtilityPanel() {
   if (calendarState.sidebarOpen) {
@@ -194,6 +196,7 @@ function closeDetailDrawer() {
 
 function openDetailDrawer() {
   calendarState.detailOpen = true;
+  toggleCalendarSidebar(false);
   const detailDrawer = $('calendarDetailDrawer');
   if (detailDrawer) {
     detailDrawer.hidden = false;
@@ -285,25 +288,25 @@ function nextUpcomingEvent(events, { exactOnly = false } = {}) {
   return sorted.find((event) => eventTimestamp(event, 'end') >= now) || sorted[0] || null;
 }
 
-function toggleSetValue(targetSet, value, fallbackValues) {
-  if (targetSet.has(value)) {
-    targetSet.delete(value);
-  } else {
-    targetSet.add(value);
-  }
-  const fallbackItems = typeof fallbackValues === 'function' ? fallbackValues() : fallbackValues;
-  if (!targetSet.size) {
-    (fallbackItems || []).forEach((item) => targetSet.add(item));
-  }
-}
 
-function renderFilterChips(containerId, items, selectedSet, key, labelKey) {
+function renderFilterOptions(containerId, items, selectedSet, key, labelKey, metaKey = '') {
   const container = $(containerId);
   if (!container) return;
   container.innerHTML = items.map((item) => {
     const value = item[key];
-    const active = selectedSet.has(value);
-    return `<button class="filter-chip${active ? ' active' : ''}" type="button" data-filter-value="${escapeHtml(value)}">${escapeHtml(item[labelKey])}</button>`;
+    const checked = selectedSet.has(value);
+    const label = String(item[labelKey] || '').trim();
+    const meta = metaKey ? String(item[metaKey] || '').trim() : '';
+    const showMeta = meta && meta !== label;
+    return `
+      <label class="filter-option">
+        <input type="checkbox" data-filter-value="${escapeHtml(value)}" aria-label="${escapeHtml(label)}" ${checked ? 'checked' : ''} />
+        <span>
+          <span class="filter-option__label">${escapeHtml(label)}</span>
+          ${showMeta ? `<span class="filter-option__meta">${escapeHtml(meta)}</span>` : ''}
+        </span>
+      </label>
+    `;
   }).join('');
 }
 
@@ -317,6 +320,18 @@ function allEventTypes() {
 
 function allStatuses() {
   return uniqueValues(calendarState.payload?.events || [], 'status');
+}
+
+function resetFilterGroup(group) {
+  if (group === 'institution') {
+    calendarState.selectedInstitutions = new Set(allInstitutions());
+  } else if (group === 'eventType') {
+    calendarState.selectedEventTypes = new Set(allEventTypes());
+  } else if (group === 'status') {
+    calendarState.selectedStatuses = new Set(allStatuses());
+  }
+  initializeFilterChips();
+  rerenderCalendar();
 }
 
 function resetFilters() {
@@ -669,6 +684,7 @@ function rerenderCalendar() {
     calendarState.calendar.removeAllEvents();
     calendarState.calendar.addEventSource(events);
   }
+  renderActiveFilterSummary();
   renderQuickBar(events);
   renderOverview(events);
   renderCounts();
@@ -690,20 +706,25 @@ function rerenderCalendar() {
 }
 
 function renderActiveFilterSummary() {
-  const parts = [];
-  if (calendarState.selectedInstitutions.size !== allInstitutions().length) parts.push(`기관 ${calendarState.selectedInstitutions.size}`);
-  if (calendarState.selectedEventTypes.size !== allEventTypes().length) parts.push(`유형 ${calendarState.selectedEventTypes.size}`);
-  if (calendarState.selectedStatuses.size !== allStatuses().length) parts.push(`상태 ${calendarState.selectedStatuses.size}`);
-  if (calendarState.hideApproximate) parts.push('예정 숨김');
-  $('activeFilterSummary').textContent = parts.length ? parts.join(' · ') : '전체 보기';
+  const tags = [];
+  const visibleCount = filteredEvents().length;
+  if (calendarState.selectedInstitutions.size !== allInstitutions().length) tags.push(`기관 ${calendarState.selectedInstitutions.size}개 선택`);
+  if (calendarState.selectedEventTypes.size !== allEventTypes().length) tags.push(`유형 ${calendarState.selectedEventTypes.size}개 선택`);
+  if (calendarState.selectedStatuses.size !== allStatuses().length) tags.push(`상태 ${calendarState.selectedStatuses.size}개 선택`);
+  if (calendarState.hideApproximate) tags.push('예정 숨김');
+  $('activeFilterSummary').textContent = tags.length ? `필터 적용 중 · ${visibleCount}건 표시` : '전체 보기';
+  $('activeFilterTags').innerHTML = (tags.length ? tags : ['전체']).map((label) => `<span class="filter-tag">${escapeHtml(label)}</span>`).join('');
+  $('filterResultCount').textContent = `${visibleCount}건 표시`;
 }
 
-function bindFilterGroup(containerId, selectedSet, allValues) {
-  $(containerId)?.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-filter-value]');
-    if (!button) return;
-    toggleSetValue(selectedSet, button.dataset.filterValue || '', allValues);
-    initializeFilterChips();
+function bindFilterGroup(containerId, selectedSet) {
+  $(containerId)?.addEventListener('change', (event) => {
+    const input = event.target.closest('input[data-filter-value]');
+    if (!input) return;
+    selectedSet.clear();
+    $(containerId).querySelectorAll('input[data-filter-value]:checked').forEach((checkbox) => {
+      selectedSet.add(checkbox.dataset.filterValue || '');
+    });
     rerenderCalendar();
   });
 }
@@ -711,15 +732,15 @@ function bindFilterGroup(containerId, selectedSet, allValues) {
 function initializeFilterChips() {
   const payload = calendarState.payload;
   if (!payload) return;
-  renderFilterChips('institutionFilters', payload.institutions, calendarState.selectedInstitutions, 'id', 'short_name');
-  renderFilterChips(
+  renderFilterOptions('institutionFilters', payload.institutions, calendarState.selectedInstitutions, 'id', 'short_name', 'name');
+  renderFilterOptions(
     'eventTypeFilters',
     uniqueValues(payload.events, 'event_type').map((eventType) => ({ event_type: eventType, event_type_label: payload.events.find((item) => item.event_type === eventType)?.event_type_label || eventType })),
     calendarState.selectedEventTypes,
     'event_type',
     'event_type_label',
   );
-  renderFilterChips(
+  renderFilterOptions(
     'statusFilters',
     uniqueValues(payload.events, 'status').map((status) => ({ status, status_label: payload.events.find((item) => item.status === status)?.status_label || status })),
     calendarState.selectedStatuses,
@@ -834,8 +855,13 @@ $('calendarDrawerBackdrop')?.addEventListener('click', () => {
 });
 $('copyIcsLinkBtn')?.addEventListener('click', copyIcsLink);
 $('resetFiltersBtn')?.addEventListener('click', resetFilters);
+$('resetInstitutionFiltersBtn')?.addEventListener('click', () => resetFilterGroup('institution'));
+$('resetEventTypeFiltersBtn')?.addEventListener('click', () => resetFilterGroup('eventType'));
+$('resetStatusFiltersBtn')?.addEventListener('click', () => resetFilterGroup('status'));
+$('filterDoneBtn')?.addEventListener('click', () => toggleCalendarSidebar(false));
 $('quickFilterBtn')?.addEventListener('click', () => setActiveSidebarPanel('filters', { openSidebar: true, closeMenu: true, scroll: false }));
 $('quickListBtn')?.addEventListener('click', () => setActiveSidebarPanel('events', { openSidebar: true, closeMenu: true, scroll: false }));
+
 document.querySelectorAll('[data-quick-panel]').forEach((button) => {
   button.addEventListener('click', () => {
     const panelId = button.dataset.quickPanel || 'overview';
@@ -871,9 +897,9 @@ document.addEventListener('keydown', (event) => {
     toggleCalendarSidebar(false);
   }
 });
-bindFilterGroup('institutionFilters', calendarState.selectedInstitutions, () => allInstitutions());
-bindFilterGroup('eventTypeFilters', calendarState.selectedEventTypes, () => allEventTypes());
-bindFilterGroup('statusFilters', calendarState.selectedStatuses, () => allStatuses());
+bindFilterGroup('institutionFilters', calendarState.selectedInstitutions);
+bindFilterGroup('eventTypeFilters', calendarState.selectedEventTypes);
+bindFilterGroup('statusFilters', calendarState.selectedStatuses);
 
 loadCalendar().catch((error) => {
   $('calendarIntro').textContent = error instanceof Error ? error.message : '캘린더를 불러오지 못했다.';
