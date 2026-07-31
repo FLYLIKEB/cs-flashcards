@@ -7224,6 +7224,21 @@ body.question-bank-embed .question-explanation-markdown {
   line-height: 1.78;
 }
 
+body.question-bank-embed .question-prompt .question-markdown > :first-child {
+  color: #111111;
+}
+
+body.question-bank-embed .question-prompt .question-markdown h1,
+body.question-bank-embed .question-prompt .question-markdown h2,
+body.question-bank-embed .question-prompt .question-markdown h3,
+body.question-bank-embed .question-prompt .question-markdown h4,
+body.question-bank-embed .question-prompt .question-markdown h5,
+body.question-bank-embed .question-prompt .question-markdown h6,
+body.question-bank-embed .question-prompt .question-markdown strong {
+  color: #111111;
+  font-weight: 700;
+}
+
 body.question-bank-embed .question-markdown h1,
 body.question-bank-embed .question-markdown h2,
 body.question-bank-embed .question-markdown h3,
