@@ -7042,19 +7042,17 @@ body.question-bank-embed #questionBankBrowser {
 }
 
 body.question-bank-embed .question-panel {
-  min-height: 100vh;
-  height: 100vh;
-  margin: 0;
+  width: min(960px, calc(100vw - 40px));
+  min-height: calc(100vh - 28px);
+  height: calc(100vh - 28px);
+  margin: 14px auto;
   padding: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
   overscroll-behavior: contain;
-  border-radius: 0;
-  border-top: 0;
-  border-right: 0;
-  border-bottom: 0;
-  border-left: 0;
+  border: 1px solid #e2e2e2;
+  border-radius: 16px;
   background: #ffffff;
   box-shadow: none;
 }
