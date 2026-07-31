@@ -1281,6 +1281,171 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertTrue(all(item['source_location'] for item in listed['items']))
             self.assertTrue(all(item['answer_guide'] for item in listed['items']))
 
+    def test_parse_fin_corp_question_bank_entries_fixes_wrapped_titles_inline_choices_and_ai_misanswers(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+
+            with csv_path.open('w', encoding='utf-8-sig', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=BASE_FIELDS)
+                writer.writeheader()
+                for row in [
+                    {
+                        'id': 'CS-101',
+                        'term': '동적 계획법',
+                        'english': 'Dynamic Programming',
+                        'category': '자료구조·알고리즘',
+                        'definition': '중복되는 부분 문제의 답을 저장해 전체 문제를 푸는 알고리즘 기법이다.',
+                        'detailed_explanation': '최적 부분 구조와 중복 부분 문제를 활용하며 Top-down 메모이제이션과 Bottom-up 테이블 방식으로 구현한다.',
+                        'related_concepts': '[[메모이제이션]], [[탭퓰레이션]]',
+                        'source_files': 'pages/05-08-산업은행-기출.md',
+                        'exam_note': '점화식을 세우고 기저 사례를 먼저 확인한다.',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '상',
+                    },
+                    {
+                        'id': 'CS-201',
+                        'term': 'ACID',
+                        'english': '',
+                        'category': '데이터베이스',
+                        'definition': '원자성, 일관성, 고립성, 지속성을 뜻한다.',
+                        'detailed_explanation': '트랜잭션의 신뢰성을 보장하는 성질이다.',
+                        'related_concepts': '[[트랜잭션]], [[일관성]]',
+                        'source_files': 'pages/05-08-산업은행-기출.md',
+                        'exam_note': '',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '중',
+                    },
+                ]:
+                    writer.writerow(row)
+            bootstrap_runtime_db(csv_path, db_path)
+
+            (pages / '05-08-산업은행-기출.md').write_text(
+                '# 05-08. 산업은행 기출\n\n'
+                '### 2. 빅데이터 3V 중에 아닌 것은?\n'
+                '1. Volume 2.Veracity 3.Variety 4.Vividity\n\n'
+                '**답:** 4번\n\n'
+                '### 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는\n'
+                '경우 발생하는 문제는?\n'
+                '1. Dirty Read\n'
+                '2. Lost Update\n'
+                '3. Phantom Read\n'
+                '4. Non Repeatable Read\n\n'
+                '**답:** 1번\n\n'
+                '### 91. 베스천 호스트(Bastion Host)에 관해 틀린 내용은?\n'
+                '1. 침입 차단 소프트웨어가 설치되어 내부와 외부 네트워크 사이에서 일종의 게이트 역할을 수행하는 호스트\n'
+                '2. 배스천 호스트는 방화벽 시스템이 가지는 기능 중 가장 중요한 기능을 제공\n'
+                '3. 배스천(Bastion)은 중세시대에 성 외곽을 보호하기 위해 돌출된 부분을 의미\n'
+                '- 위 3개 지문은 모두 옳은 지문임.\n'
+                '**답(AI답변):** 베스천 호스트는 외부망과 내부망 사이에서 보안 관문 역할을 하는 강화된 서버다.\n\n'
+                '### 107. 서버 가상화 기술에 대해 옳지 않은 것은?\n'
+                '1. 가상화 대상이 되는 컴퓨터 자원은 프로세서, 메모리, 스토리지, 네트워크를 포함한다\n'
+                '2. 가상화 기술 종류는 서버가상화, 데스크톱 가상화, 애플리케이션 가상화이다\n'
+                '**답:** 해당 지문은 모두 옳은 선지임.\n\n'
+                '### 161. 클래스 설계원칙에 대한 바른 설명은?\n'
+                '1. 단일 책임 원칙: 하나의 클래스는 오직 하나의 책임만 가져야 한다.\n'
+                '2. 개방-폐쇄 원칙: 클래스는 확장에는 열려 있어야 하며, 변경에는 닫혀 있어야 한다.\n'
+                '3. 리스코프 교체 원칙: 서브타입은 언제나 자신의 기반 타입으로 교체할 수 있어야 한다.\n'
+                '4. 의존성 역전 원칙: 고수준 모듈은 저수준 모듈에 의존해서는 안 되며, 둘 다 추상화에 의존해야 한다.\n\n'
+                '**답:** 모든선지가 맞음\n\n'
+                '### 132. GPU 특징\n'
+                '**답(AI답변):** GPU는 많은 코어로 병렬 연산에 특화되어 그래픽 처리, AI 학습, 행렬 연산 등에 강하다.\n\n'
+                '### 236. 다음은 동적 계획법(Dynamic Programming)을 이용하여 어떤 값을 계산하는 함수이다. 빈칸 ㄱ, ㄴ에\n\n'
+                '들어갈 코드를 작성하시오.\n\n'
+                '```\n'
+                'def solve(n, arr):\n'
+                '    dp =[-1] * n\n'
+                '```\n\n'
+                '```\n'
+                'def dfs(i):\n'
+                '    if i < 0:\n'
+                '        return 0\n'
+                '    if i == 0:\n'
+                '        return arr[0]\n'
+                '    if dp[i] != -1:\n'
+                '        return dp[i]\n'
+                '```\n\n'
+                '```\n'
+                '    dp[i] = ㄱ\n'
+                '    return dp[i]\n'
+                '```\n\n'
+                '```\n'
+                '# Bottom-up 방식\n'
+                'dp2 =[0] * n\n'
+                'dp2[0] = arr[0]\n'
+                'dp2[1] = max(arr[0], arr[1])\n'
+                '```\n\n'
+                '```\n'
+                'for i in range(2, n):\n'
+                '    dp2[i] = ㄴ\n'
+                '```\n\n'
+                '```\n'
+                'return dp2[n-1]\n'
+                '```\n'
+                '**답(AI답변):** DP는 중복 부분문제와 최적 부분구조를 이용해 결과를 저장하며 푸는 기법이다. Top-down은 재귀+메모이제이션, Bottom-up은 반복문 테이블 채움 방식이다.\n\n'
+                '### 237. 동적 계획법(Dynamic Programming)의 개념과 Top-down, Bottom-up 방식의 차이를 설명하시오.\n'
+                '**답(AI답변):** 인터넷망을 통해 방송·영상 콘텐츠를 제공하는 서비스로 Netflix, YouTube 등이 예시다.\n\n'
+                '### 238. SQL문 약술\n'
+                '**답(AI답변):** SQL은 데이터를 정의하고 조작하는 언어다.\n',
+                encoding='utf-8',
+            )
+
+            entries = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            by_prompt = {item['prompt']: item for item in entries}
+
+            inline = by_prompt['### 2. 빅데이터 3V 중에 아닌 것은?']
+            self.assertEqual(inline['choices'], ['Volume', 'Veracity', 'Variety', 'Vividity'])
+            self.assertEqual(inline['answer_index'], 3)
+            self.assertEqual(inline['body'].splitlines()[:4], ['1. Volume', '2. Veracity', '3. Variety', '4. Vividity'])
+
+            wrapped = by_prompt['### 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?']
+            self.assertEqual(wrapped['source_location'], '산업은행 기출 · 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?')
+            self.assertEqual(wrapped['answer_index'], 0)
+
+            gpu = by_prompt['### 132. GPU 특징']
+            self.assertEqual(gpu['category'], '컴퓨터구조')
+
+            all_true = by_prompt['### 91. 베스천 호스트(Bastion Host)에 관해 틀린 내용은?']
+            self.assertEqual(all_true['choices'][-1], '위 3개 지문은 모두 옳은 지문임.')
+            self.assertEqual(all_true['answer_index'], 3)
+            self.assertEqual(all_true['answer'], '4번')
+
+            all_true_answer = by_prompt['### 107. 서버 가상화 기술에 대해 옳지 않은 것은?']
+            self.assertEqual(all_true_answer['choices'][-1], '해당 지문은 모두 옳은 선지임.')
+            self.assertEqual(all_true_answer['answer'], '3번')
+            self.assertEqual(all_true_answer['answer_index'], 2)
+
+            all_true_direct = by_prompt['### 161. 클래스 설계원칙에 대한 바른 설명은?']
+            self.assertEqual(all_true_direct['choices'][-1], '모든선지가 맞음')
+            self.assertEqual(all_true_direct['answer'], '5번')
+            self.assertEqual(all_true_direct['answer_index'], 4)
+
+            coding = by_prompt['### 236. 다음은 동적 계획법(Dynamic Programming)을 이용하여 어떤 값을 계산하는 함수이다. 빈칸 ㄱ, ㄴ에 들어갈 코드를 작성하시오.']
+            self.assertEqual(coding['card_id'], 'CS-101')
+            self.assertEqual(coding['body'].count('```'), 2)
+            self.assertIn('dp[i] = ㄱ', coding['body'])
+            self.assertIn('dp2[i] = ㄴ', coding['body'])
+            self.assertIn('dfs(i - 1)', coding['answer'])
+            self.assertIn('dp2[i - 2] + arr[i]', coding['answer'])
+            self.assertEqual(coding['category'], '자료구조·알고리즘')
+
+            repaired = by_prompt['### 237. 동적 계획법(Dynamic Programming)의 개념과 Top-down, Bottom-up 방식의 차이를 설명하시오.']
+            self.assertEqual(repaired['card_id'], 'CS-101')
+            self.assertNotIn('Netflix', repaired['answer'])
+            self.assertIn('중복되는 부분 문제', repaired['answer'])
+            self.assertIn('메모이제이션', repaired['explanation'])
+            self.assertEqual(repaired['category'], '자료구조·알고리즘')
+
+            sql_short = by_prompt['### 238. SQL문 약술']
+            self.assertEqual(sql_short['card_id'], '')
+            self.assertEqual(sql_short['category'], '데이터베이스')
+
     def test_parse_bok_question_bank_entries_splits_and_preserves_markdown(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -1594,6 +1759,61 @@ class FlashcardProgressTests(unittest.TestCase):
 
 
 
+
+class RecruitmentCalendarTests(unittest.TestCase):
+    def test_build_recruitment_calendar_payload_exposes_subscription_metadata(self):
+        payload = flashcard_app.build_recruitment_calendar_payload(base_url='https://example.com')
+        self.assertEqual(payload['calendar']['calendar_url'], 'https://example.com/calendar')
+        self.assertEqual(payload['calendar']['ics_url'], 'https://example.com/api/calendar/recruitment.ics')
+        self.assertGreater(payload['counts']['total_events'], 0)
+        self.assertTrue(any(event['google_calendar_url'].startswith('https://calendar.google.com/calendar/render?') for event in payload['events']))
+        self.assertTrue(any(event['url'].startswith('https://') for event in payload['events']))
+        self.assertTrue(any(event['institution']['name'] == '한국주택금융공사' for event in payload['events']))
+        bok_apply = next(event for event in payload['events'] if event['id'] == 'bok-2027-apply')
+        self.assertFalse(bok_apply['allDay'])
+        self.assertEqual(bok_apply['start'], '2026-07-23T10:00:00+09:00')
+        self.assertEqual(bok_apply['end'], '2026-08-05T17:00:00+09:00')
+        self.assertEqual(bok_apply['extendedProps']['start_time'], '10:00')
+        self.assertIn('ctz=Asia%2FSeoul', bok_apply['google_calendar_url'])
+
+    def test_build_recruitment_calendar_ics_contains_expected_fields(self):
+        content = flashcard_app.build_recruitment_calendar_ics(base_url='https://example.com')
+        self.assertIn('BEGIN:VCALENDAR', content)
+        self.assertIn('UID:bok-2027-apply@cs-flashcards', content)
+        self.assertIn('DTSTART:20260723T010000Z', content)
+        self.assertIn('DTEND:20260805T080000Z', content)
+        self.assertIn('X-WR-CALNAME:2026 금융공기업 IT 채용 캘린더', content)
+        self.assertIn('api/calendar/recruitment.ics', content)
+
+    def test_read_wiki_page_hydrates_recruitment_schedule_sections(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = Path(td) / 'wikidocs-ebook'
+            pages = book / 'pages'
+            pages.mkdir(parents=True, exist_ok=True)
+            (book / 'README.md').write_text('# 금공 IT 위키\n\n- [기본 전제와 일정](pages/02-01-기본-전제와-일정.md)\n', encoding='utf-8')
+            (book / 'TOC.md').write_text('# 목차\n\n- [기본 전제와 일정](pages/02-01-기본-전제와-일정.md)\n', encoding='utf-8')
+            (pages / '02-01-기본-전제와-일정.md').write_text(
+                '# 1. 기본 전제\n\n'
+                '## 2. 현재 기준 일정\n\n'
+                '기존 섹션\n\n'
+                '## 3. 전체 시간 배분\n\n'
+                '유지\n\n'
+                '## 5. 기관별 채용 일정 대시보드\n\n'
+                '기존 대시보드\n\n'
+                '## 약어 풀이\n\n'
+                '- 테스트\n',
+                encoding='utf-8',
+            )
+            mocked_schedule = json.loads(json.dumps(flashcard_app.load_recruitment_schedule()))
+            mocked_schedule['last_updated'] = '2026-08-01'
+
+            with mock.patch.object(flashcard_app, 'load_recruitment_schedule', return_value=mocked_schedule):
+                page = flashcard_app.read_wiki_page('02-01-기본-전제와-일정', book)
+            self.assertIn('/calendar', page['html'])
+            self.assertIn('/api/calendar/recruitment.ics', page['html'])
+            self.assertIn('한국주택금융공사', page['html'])
+            self.assertIn('Google Calendar', page['html'])
+            self.assertIn('2026.08.01 현재 상태', page['html'])
 
 class WikiBookTests(unittest.TestCase):
     def test_read_wiki_index_and_page_render_internal_links(self):

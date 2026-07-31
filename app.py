@@ -13,8 +13,9 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import sqlite3
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
+from zoneinfo import ZoneInfo
 from uuid import uuid4
 
 from urllib.error import HTTPError, URLError
@@ -98,6 +99,563 @@ IMAGE_SIZE = str(os.environ.get("CS_FLASHCARDS_IMAGE_SIZE", "1024x1024")).strip(
 IMAGE_QUALITY = str(os.environ.get("CS_FLASHCARDS_IMAGE_QUALITY", "low")).strip() or "low"
 AI_IMAGE_DIR = Path(os.environ.get("CS_FLASHCARDS_AI_IMAGE_DIR", ROOT / "state" / "ai_images")).expanduser().resolve()
 AI_IMAGE_PREVIEW_DIR = Path(os.environ.get("CS_FLASHCARDS_AI_IMAGE_PREVIEW_DIR", ROOT / "state" / "ai_image_previews")).expanduser().resolve()
+DEFAULT_RECRUITMENT_SCHEDULE_PATH = ROOT / "data" / "recruitment_schedule_2026.json"
+RECRUITMENT_SCHEDULE_PATH = Path(
+    os.environ.get("CS_FLASHCARDS_RECRUITMENT_SCHEDULE", DEFAULT_RECRUITMENT_SCHEDULE_PATH)
+).expanduser().resolve()
+RECRUITMENT_CALENDAR_PATH = "/calendar"
+RECRUITMENT_CALENDAR_API_PATH = "/api/calendar/recruitment"
+RECRUITMENT_CALENDAR_ICS_PATH = "/api/calendar/recruitment.ics"
+RECRUITMENT_SCHEDULE_PAGE_SLUG = "02-01-기본-전제와-일정"
+RECRUITMENT_EVENT_TYPE_LABELS = {
+    "announcement": "발표",
+    "apply": "접수",
+    "coding": "코딩시험",
+    "exam": "필기",
+    "interview": "면접",
+    "onboarding": "임용",
+    "plan": "계획",
+    "result": "발표",
+}
+RECRUITMENT_EVENT_STATUS_LABELS = {
+    "open": "진행 중",
+    "planned": "예정",
+    "scheduled": "확정",
+}
+
+
+def parse_iso_date(value: str, *, field_name: str) -> date:
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError(f"Recruitment schedule {field_name} is required")
+    try:
+        return date.fromisoformat(text)
+    except ValueError as exc:
+        raise ValueError(f"Invalid recruitment schedule {field_name}: {text}") from exc
+
+
+
+def date_to_compact(value: date) -> str:
+    return value.strftime("%Y%m%d")
+
+
+
+def absolute_url(base_url: str, value: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*://", text):
+        return text
+    base = str(base_url or "").rstrip("/")
+    if not base:
+        return text
+    return f"{base}{text if text.startswith('/') else '/' + text}"
+
+
+
+def google_calendar_template_url(
+    *,
+    title: str,
+    details: str,
+    start: date,
+    end: date,
+    start_time: str = "",
+    end_time: str = "",
+    timezone_name: str = "Asia/Seoul",
+) -> str:
+    start_time_text = str(start_time or "").strip()
+    end_time_text = str(end_time or "").strip()
+    params = {
+        "action": "TEMPLATE",
+        "text": title,
+        "details": details,
+    }
+    if start_time_text and end_time_text:
+        start_dt = combine_event_datetime(start, start_time_text, timezone_name)
+        end_dt = combine_event_datetime(end, end_time_text, timezone_name)
+        params["dates"] = f"{datetime_to_compact(start_dt)}/{datetime_to_compact(end_dt)}"
+        params["ctz"] = timezone_name
+    else:
+        end_exclusive = end + timedelta(days=1)
+        params["dates"] = f"{date_to_compact(start)}/{date_to_compact(end_exclusive)}"
+    return f"https://calendar.google.com/calendar/render?{urlencode(params)}"
+
+
+
+def ics_escape(text: str) -> str:
+    value = str(text or "")
+    return value.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
+
+
+
+def fold_ics_line(line: str, limit: int = 75) -> list[str]:
+    encoded = line.encode("utf-8")
+    if len(encoded) <= limit:
+        return [line]
+    parts: list[str] = []
+    current = ""
+    for char in line:
+        candidate = current + char
+        prefix = " " if parts else ""
+        if len((prefix + candidate).encode("utf-8")) > limit and current:
+            parts.append((" " if parts else "") + current)
+            current = char
+        else:
+            current = candidate
+    parts.append((" " if parts else "") + current)
+    return parts
+
+
+def combine_event_datetime(day: date, time_text: str, timezone_name: str) -> datetime:
+    clock = datetime.strptime(str(time_text or "").strip(), "%H:%M").time()
+    return datetime.combine(day, clock, tzinfo=ZoneInfo(timezone_name))
+
+
+def datetime_to_compact(value: datetime) -> str:
+    return value.strftime("%Y%m%dT%H%M%S")
+
+
+def datetime_to_ics_utc(value: datetime) -> str:
+    return value.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+
+def format_markdown_links(links: list[dict[str, Any]]) -> str:
+    items: list[str] = []
+    for raw in links:
+        label = str(raw.get("label") or "").strip()
+        url = str(raw.get("url") or "").strip()
+        if label and url:
+            items.append(f"[{label}]({url})")
+    return ", ".join(items)
+
+
+
+def format_recruitment_event_date(event: dict[str, Any]) -> str:
+    start = parse_iso_date(event.get("start_date", ""), field_name=f"{event.get('id', 'event')} start_date")
+    end = parse_iso_date(event.get("end_date", ""), field_name=f"{event.get('id', 'event')} end_date")
+    if end < start:
+        raise ValueError(f"Recruitment schedule end_date precedes start_date: {event.get('id', '')}")
+    precision = str(event.get("date_precision") or "day").strip() or "day"
+    start_text = f"{start.month:02d}.{start.day:02d}"
+    end_text = f"{end.month:02d}.{end.day:02d}"
+    if precision == "month":
+        return f"{start.month:02d}월 예정"
+    if precision == "window":
+        return f"{start.month:02d}~{end.month:02d}월 예정"
+    if precision == "approximate_day":
+        return f"{start.month:02d}.{start.day:02d} 전후"
+    if precision == "range":
+        base = f"{start_text} ~ {end_text}"
+    else:
+        base = start_text
+    start_time = str(event.get("start_time") or "").strip()
+    end_time = str(event.get("end_time") or "").strip()
+    if start_time and end_time:
+        if precision == "range":
+            return f"{base} ({start_time} ~ {end_time})"
+        return f"{base} {start_time} ~ {end_time}"
+    return base
+
+
+
+def load_recruitment_schedule(path: Path | None = None) -> dict[str, Any]:
+    target = Path(path or RECRUITMENT_SCHEDULE_PATH).expanduser().resolve()
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    if int(payload.get("schema_version") or 0) != 1:
+        raise ValueError(f"Unsupported recruitment schedule schema version: {payload.get('schema_version')}")
+
+    institutions: list[dict[str, Any]] = []
+    institutions_by_id: dict[str, dict[str, Any]] = {}
+    for raw in payload.get("institutions") or []:
+        item = {
+            "id": str(raw.get("id") or "").strip(),
+            "name": str(raw.get("name") or "").strip(),
+            "short_name": str(raw.get("short_name") or raw.get("name") or "").strip(),
+            "color": str(raw.get("color") or "#334155").strip() or "#334155",
+        }
+        if not item["id"] or not item["name"]:
+            raise ValueError("Recruitment schedule institutions require id and name")
+        institutions.append(item)
+        institutions_by_id[item["id"]] = item
+
+    def normalize_entry(raw: dict[str, Any]) -> dict[str, Any]:
+        institution_id = str(raw.get("institution_id") or "").strip()
+        institution = institutions_by_id.get(institution_id)
+        if not institution:
+            raise ValueError(f"Unknown recruitment schedule institution_id: {institution_id}")
+        return {
+            **raw,
+            "institution_id": institution_id,
+            "institution_name": institution["name"],
+            "institution_short_name": institution["short_name"],
+            "institution_color": institution["color"],
+        }
+
+    timeline = [dict(item) for item in payload.get("timeline") or []]
+    dashboard_open = [normalize_entry(dict(item)) for item in payload.get("dashboard_open") or []]
+    dashboard_watch = [normalize_entry(dict(item)) for item in payload.get("dashboard_watch") or []]
+
+    priorities: list[dict[str, Any]] = []
+    for raw in payload.get("priorities") or []:
+        item = dict(raw)
+        institution_id = str(item.get("institution_id") or "").strip()
+        if institution_id:
+            institution = institutions_by_id.get(institution_id)
+            if not institution:
+                raise ValueError(f"Unknown recruitment schedule priority institution_id: {institution_id}")
+            item["institution_name"] = institution["name"]
+        priorities.append(item)
+
+    events: list[dict[str, Any]] = []
+    for raw in payload.get("events") or []:
+        event = normalize_entry(dict(raw))
+        start = parse_iso_date(event.get("start_date", ""), field_name=f"{event.get('id', 'event')} start_date")
+        end = parse_iso_date(event.get("end_date", ""), field_name=f"{event.get('id', 'event')} end_date")
+        if end < start:
+            raise ValueError(f"Recruitment schedule end_date precedes start_date: {event.get('id', '')}")
+        event["start_date"] = start.isoformat()
+        event["end_date"] = end.isoformat()
+        event["date_display"] = format_recruitment_event_date(event)
+        event["event_type_label"] = RECRUITMENT_EVENT_TYPE_LABELS.get(str(event.get("event_type") or "").strip(), "일정")
+        event["status_label"] = RECRUITMENT_EVENT_STATUS_LABELS.get(str(event.get("status") or "").strip(), "확인 필요")
+        event["date_precision"] = str(event.get("date_precision") or "day").strip() or "day"
+        event["display_label"] = str(event.get("display_label") or event["event_type_label"]).strip() or event["event_type_label"]
+        events.append(event)
+    events.sort(key=lambda item: (item["start_date"], item["end_date"], str(item.get("title") or "")))
+
+    return {
+        "schema_version": 1,
+        "title": str(payload.get("title") or "2026 금융공기업 IT 채용 캘린더").strip(),
+        "timezone": str(payload.get("timezone") or "Asia/Seoul").strip() or "Asia/Seoul",
+        "last_updated": str(payload.get("last_updated") or "").strip(),
+        "description": str(payload.get("description") or "").strip(),
+        "calendar_intro": str(payload.get("calendar_intro") or "").strip(),
+        "calendar_notes": [str(item).strip() for item in payload.get("calendar_notes") or [] if str(item).strip()],
+        "institutions": institutions,
+        "timeline": timeline,
+        "dashboard_open": dashboard_open,
+        "dashboard_watch": dashboard_watch,
+        "priorities": priorities,
+        "events": events,
+    }
+
+
+
+def recruitment_event_details(event: dict[str, Any], *, base_url: str = "") -> str:
+    details = [
+        f"기관: {event['institution_name']}",
+        f"일정: {event['date_display']}",
+        f"유형: {event['event_type_label']}",
+        f"상태: {event['status_label']}",
+    ]
+    summary = str(event.get("summary") or "").strip()
+    if summary:
+        details.append(f"공고: {summary}")
+    description = str(event.get("description") or "").strip()
+    if description:
+        details.append(description)
+    url = absolute_url(base_url, str(event.get("url") or "").strip())
+    if url:
+        details.append(f"공고 링크: {url}")
+    ics_url = absolute_url(base_url, RECRUITMENT_CALENDAR_ICS_PATH)
+    if ics_url:
+        details.append(f"전체 ICS 피드: {ics_url}")
+    return "\n".join(details)
+
+
+
+def build_recruitment_calendar_payload(*, base_url: str = "") -> dict[str, Any]:
+    schedule = load_recruitment_schedule()
+    open_count = 0
+    exact_count = 0
+    planned_count = 0
+    timezone_name = schedule["timezone"]
+    events: list[dict[str, Any]] = []
+    for event in schedule["events"]:
+        start = parse_iso_date(event["start_date"], field_name=f"{event['id']} start_date")
+        end = parse_iso_date(event["end_date"], field_name=f"{event['id']} end_date")
+        start_time = str(event.get("start_time") or "").strip()
+        end_time = str(event.get("end_time") or "").strip()
+        has_time = bool(start_time and end_time)
+        if has_time:
+            start_value = combine_event_datetime(start, start_time, timezone_name).isoformat()
+            end_value = combine_event_datetime(end, end_time, timezone_name).isoformat()
+        else:
+            start_value = start.isoformat()
+            end_value = (end + timedelta(days=1)).isoformat()
+        if event["status"] == "open":
+            open_count += 1
+        if event["status"] == "planned":
+            planned_count += 1
+        if event["date_precision"] in {"day", "range"}:
+            exact_count += 1
+        details = recruitment_event_details(event, base_url=base_url)
+        calendar_title = f"{event['institution_name']} · {event['display_label']}"
+        events.append(
+            {
+                "id": event["id"],
+                "title": calendar_title,
+                "list_title": str(event.get("title") or calendar_title),
+                "summary": str(event.get("summary") or "").strip(),
+                "display_label": str(event.get("display_label") or event["event_type_label"]),
+                "event_type": event["event_type"],
+                "event_type_label": event["event_type_label"],
+                "status": event["status"],
+                "status_label": event["status_label"],
+                "date_precision": event["date_precision"],
+                "date_display": event["date_display"],
+                "start": start_value,
+                "end": end_value,
+                "start_inclusive": start.isoformat(),
+                "end_inclusive": end.isoformat(),
+                "start_time": start_time,
+                "end_time": end_time,
+                "allDay": not has_time,
+                "description": str(event.get("description") or "").strip(),
+                "details": details,
+                "url": absolute_url(base_url, str(event.get("url") or "").strip()),
+                "source_label": str(event.get("source_label") or "").strip(),
+                "is_approximate": event["date_precision"] in {"approximate_day", "month", "window"},
+                "google_calendar_url": google_calendar_template_url(
+                    title=calendar_title,
+                    details=details,
+                    start=start,
+                    end=end,
+                    start_time=start_time,
+                    end_time=end_time,
+                    timezone_name=timezone_name,
+                ),
+                "institution": {
+                    "id": event["institution_id"],
+                    "name": event["institution_name"],
+                    "short_name": event["institution_short_name"],
+                    "color": event["institution_color"],
+                },
+                "backgroundColor": event["institution_color"],
+                "borderColor": event["institution_color"],
+                "textColor": "#0f172a",
+                "extendedProps": {
+                    "status": event["status"],
+                    "status_label": event["status_label"],
+                    "date_precision": event["date_precision"],
+                    "event_type": event["event_type"],
+                    "event_type_label": event["event_type_label"],
+                    "institution_id": event["institution_id"],
+                    "institution_name": event["institution_name"],
+                    "institution_short_name": event["institution_short_name"],
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "url": absolute_url(base_url, str(event.get("url") or "").strip()),
+                    "details": details,
+                },
+            }
+        )
+
+    def normalize_dashboard(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        normalized: list[dict[str, Any]] = []
+        for raw in items:
+            normalized.append(
+                {
+                    "institution": {
+                        "id": raw["institution_id"],
+                        "name": raw["institution_name"],
+                        "short_name": raw["institution_short_name"],
+                        "color": raw["institution_color"],
+                    },
+                    "status": str(raw.get("status") or "").strip(),
+                    "schedule_summary": str(raw.get("schedule_summary") or "").strip(),
+                    "links": [
+                        {"label": str(link.get("label") or "").strip(), "url": absolute_url(base_url, str(link.get("url") or "").strip())}
+                        for link in raw.get("links") or []
+                        if str(link.get("label") or "").strip() and str(link.get("url") or "").strip()
+                    ],
+                    "note": str(raw.get("note") or "").strip(),
+                }
+            )
+        return normalized
+
+    return {
+        "calendar": {
+            "title": schedule["title"],
+            "description": schedule["description"],
+            "last_updated": schedule["last_updated"],
+            "timezone": schedule["timezone"],
+            "calendar_path": RECRUITMENT_CALENDAR_PATH,
+            "api_path": RECRUITMENT_CALENDAR_API_PATH,
+            "ics_path": RECRUITMENT_CALENDAR_ICS_PATH,
+            "ics_url": absolute_url(base_url, RECRUITMENT_CALENDAR_ICS_PATH),
+            "calendar_url": absolute_url(base_url, RECRUITMENT_CALENDAR_PATH),
+            "notes": schedule["calendar_notes"],
+            "intro": schedule["calendar_intro"],
+        },
+        "counts": {
+            "total_events": len(events),
+            "open_events": open_count,
+            "exact_events": exact_count,
+            "planned_events": planned_count,
+            "watch_only_institutions": len(schedule["dashboard_watch"]),
+        },
+        "institutions": schedule["institutions"],
+        "timeline": schedule["timeline"],
+        "dashboard": {
+            "open": normalize_dashboard(schedule["dashboard_open"]),
+            "watch": normalize_dashboard(schedule["dashboard_watch"]),
+            "priorities": schedule["priorities"],
+        },
+        "events": events,
+    }
+
+
+
+def build_recruitment_calendar_ics(*, base_url: str = "") -> str:
+    schedule = load_recruitment_schedule()
+    now = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    timezone_name = schedule["timezone"]
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//CS Flashcards//Recruitment Calendar//KO",
+        "CALSCALE:GREGORIAN",
+        f"X-WR-CALNAME:{ics_escape(schedule['title'])}",
+        f"X-WR-CALDESC:{ics_escape(schedule['description'])}",
+    ]
+    for event in schedule["events"]:
+        start = parse_iso_date(event["start_date"], field_name=f"{event['id']} start_date")
+        end = parse_iso_date(event["end_date"], field_name=f"{event['id']} end_date")
+        start_time = str(event.get("start_time") or "").strip()
+        end_time = str(event.get("end_time") or "").strip()
+        details = recruitment_event_details(event, base_url=base_url)
+        body = [
+            "BEGIN:VEVENT",
+            f"UID:{ics_escape(event['id'])}@cs-flashcards",
+            f"DTSTAMP:{now}",
+        ]
+        if start_time and end_time:
+            body.extend(
+                [
+                    f"DTSTART:{datetime_to_ics_utc(combine_event_datetime(start, start_time, timezone_name))}",
+                    f"DTEND:{datetime_to_ics_utc(combine_event_datetime(end, end_time, timezone_name))}",
+                ]
+            )
+        else:
+            body.extend(
+                [
+                    f"DTSTART;VALUE=DATE:{date_to_compact(start)}",
+                    f"DTEND;VALUE=DATE:{date_to_compact(end + timedelta(days=1))}",
+                ]
+            )
+        body.extend(
+            [
+                f"SUMMARY:{ics_escape(event['institution_name'] + ' · ' + str(event.get('display_label') or event['event_type_label']))}",
+                f"DESCRIPTION:{ics_escape(details)}",
+                f"STATUS:{'TENTATIVE' if event['status'] == 'planned' or event['date_precision'] in {'approximate_day', 'month', 'window'} else 'CONFIRMED'}",
+            ]
+        )
+        url = absolute_url(base_url, str(event.get("url") or "").strip())
+        if url:
+            body.append(f"URL:{ics_escape(url)}")
+        body.append("END:VEVENT")
+        for line in body:
+            lines.extend(fold_ics_line(line))
+    lines.append("END:VCALENDAR")
+    return "\r\n".join(lines) + "\r\n"
+
+
+
+def render_recruitment_schedule_section_two(schedule: dict[str, Any]) -> str:
+    lines = [
+        "## 2. 현재 기준 일정",
+        "",
+        f"> [채용 캘린더 보기]({RECRUITMENT_CALENDAR_PATH}) · [ICS 피드]({RECRUITMENT_CALENDAR_ICS_PATH}) · Google Calendar는 ICS URL을 \"URL로 추가\"해서 구독",
+        "",
+        "| 시기 | 현재 확정/공개 상태 | 준비 초점 |",
+        "|---|---|---|",
+    ]
+    for item in schedule["timeline"]:
+        lines.append(f"| {item['period']} | {item['headline']} | {item['focus']} |")
+    return "\n".join(lines)
+
+
+
+def render_recruitment_schedule_section_five(schedule: dict[str, Any]) -> str:
+    lines = [
+        "## 5. 기관별 채용 일정 대시보드",
+        "",
+        f"> 마지막 업데이트: {schedule['last_updated']}. 현재 살아 있는 2026년 기준 공고·예비공고·채용계획·공식 채용페이지만 남겼다.",
+        "",
+        "### 5-1. 현재 열려 있거나 일정이 공개된 공고",
+        "",
+        "| 기관 | 현재 상태 | 2026 일정 | 공고 링크 | 비고 |",
+        "|---|---|---|---|---|",
+    ]
+    for item in schedule["dashboard_open"]:
+        lines.append(
+            f"| **{item['institution_name']}** | **{item.get('status', '')}** | {item.get('schedule_summary', '')} | {format_markdown_links(item.get('links') or [])} | {item.get('note', '')} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### 5-2. 2026 하반기 신입공고 아직 미확인인 기관",
+            "",
+            f"| 기관 | {schedule['last_updated'].replace('-', '.')} 현재 상태 | 확인 링크 | 메모 |",
+            "|---|---|---|---|",
+        ]
+    )
+    for item in schedule["dashboard_watch"]:
+        lines.append(
+            f"| **{item['institution_name']}** | {item.get('status', '')} | {format_markdown_links(item.get('links') or [])} | {item.get('note', '')} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### 5-3. 지금 우선순위 한눈에 보기",
+            "",
+            "| 우선순위 | 기관 | 이유 |",
+            "|---:|---|---|",
+        ]
+    )
+    for item in schedule["priorities"]:
+        label = str(item.get("institution_name") or item.get("institution_group") or "").strip()
+        lines.append(f"| {int(item.get('rank') or 0)} | **{label}** | {item.get('reason', '')} |")
+    lines.extend(
+        [
+            "",
+            "### 5-4. 캘린더/구독 링크",
+            "",
+            f"- [앱 내부 채용 캘린더 열기]({RECRUITMENT_CALENDAR_PATH})",
+            f"- [ICS 피드 열기]({RECRUITMENT_CALENDAR_ICS_PATH})",
+            "- Google Calendar에서는 `다른 캘린더 추가 → URL로 추가`에 ICS 링크를 넣어 구독하면 된다.",
+        ]
+    )
+    return "\n".join(lines)
+
+
+
+def replace_markdown_section(markdown_text: str, start_heading: str, next_heading: str, replacement: str) -> str:
+    pattern = re.compile(rf"{re.escape(start_heading)}\n.*?(?=\n{re.escape(next_heading)}\n)", re.S)
+    updated, count = pattern.subn(replacement.rstrip(), str(markdown_text or ""), count=1)
+    if count != 1:
+        raise ValueError(f"Failed to replace markdown section: {start_heading}")
+    return updated
+
+
+
+def render_recruitment_schedule_wiki_page(markdown_text: str) -> str:
+    schedule = load_recruitment_schedule()
+    updated = replace_markdown_section(
+        markdown_text,
+        "## 2. 현재 기준 일정",
+        "## 3. 전체 시간 배분",
+        render_recruitment_schedule_section_two(schedule),
+    )
+    updated = replace_markdown_section(
+        updated,
+        "## 5. 기관별 채용 일정 대시보드",
+        "## 약어 풀이",
+        render_recruitment_schedule_section_five(schedule),
+    )
+    return updated
 
 
 
@@ -2153,9 +2711,22 @@ def attach_generated_question_bank_ids(
 FIN_CORP_QUESTION_BANK_PAGE_GLOB = "05-0[1-8]-*.md"
 FIN_CORP_QUESTION_HEADING_RE = re.compile(r"^###\s+(\d+)\.\s+(.+?)\s*$", re.MULTILINE)
 FIN_CORP_TITLE_PREFIX_RE = re.compile(r"^\d{2}-\d{2}\.\s*")
-FIN_CORP_CHOICE_LINE_RE = re.compile(r"^\s*(\d+|[A-Ea-e])\.\s+(.+?)\s*$")
-FIN_CORP_INLINE_CHOICE_RE = re.compile(r"(\d+)\.\s*(.+?)(?=(?:\s+\d+\.)|$)")
-FIN_CORP_ANSWER_LINE_RE = re.compile(r"^(?P<prefix>.*?)(?P<marker>(?:정)?\*{0,2}답(?:\(AI답변\))?:?\*{0,2}\s*:?\s*)(?P<answer>.+?)\s*$")
+FIN_CORP_CHOICE_LINE_RE = re.compile(r"^\s*(\d+|[A-Ea-e])\.\s*(.+?)\s*$")
+FIN_CORP_INLINE_CHOICE_RE = re.compile(r"(?:^|\s)(\d+)\.\s*([^.\n].*?)(?=(?:\s+\d+\.\s*)|$)")
+FIN_CORP_ANSWER_LINE_PATTERNS = (
+    re.compile(r"^(?P<prefix>.*?)(?P<marker>\*\*답(?:\(AI답변\))?:?\*{0,2}\s*:?\s*)(?P<answer>.+?)\s*$"),
+    re.compile(r"^(?P<prefix>.*?)(?P<marker>정\*\*답(?:\(AI답변\))?:?\*{0,2}\s*:?\s*)(?P<answer>.+?)\s*$"),
+    re.compile(r"^(?P<prefix>(?:[-*]\s*)?)(?P<marker>(?:정답|답)(?:\(AI답변\))?\s*:\s*)(?P<answer>.+?)\s*$"),
+)
+
+
+def fin_corp_question_bank_answer_match(line: str) -> re.Match[str] | None:
+    stripped = str(line or "").strip()
+    for pattern in FIN_CORP_ANSWER_LINE_PATTERNS:
+        match = pattern.match(stripped)
+        if match:
+            return match
+    return None
 FIN_CORP_FIELD_NAME = "금융공기업 IT 필기 239제"
 FIN_CORP_SECTION = "전공필기"
 FIN_CORP_SESSION_MODE = "practice"
@@ -2180,11 +2751,35 @@ FIN_CORP_SHORT_HINTS = (
     "의미",
     "약어",
 )
+FIN_CORP_TITLE_CONTINUATION_SUFFIXES = (
+    "에",
+    "에서",
+    "에게",
+    "의",
+    "를",
+    "을",
+    "는",
+    "은",
+    "이",
+    "가",
+    "와",
+    "과",
+    "및",
+    "읽는",
+    "달라지는",
+)
+FIN_CORP_CATEGORY_OVERRIDE_HINTS: dict[str, tuple[str, ...]] = {
+    "데이터베이스": ("sql문", "sql ddl", "sql dml", "sql dcl", "sql tcl", "dense rank", "2pl", "2단계 잠금", "릴레이션", "후보키", "정규화", "트랜잭션"),
+    "컴퓨터구조": ("gpu", "petabyte", "flip-flop", "플립플롭", "daisy chain", "alu", "raid", "rom", "ram", "파이프라인"),
+    "자료구조·알고리즘": ("동적 계획법", "dynamic programming", "행렬", "역행렬", "연결리스트", "b-tree", "b+tree", "dfs", "bfs", "피보나치"),
+    "클라우드·분산시스템": ("분산처리 시스템", "서버 가상화", "server virtualization", "virtualization", "하이브리드 클라우드", "커뮤니티 클라우드"),
+    "프로그래밍 언어": ("python", "java", "jvm", "바인딩", "오버로딩", "instance of", "재귀함수"),
+}
 FIN_CORP_FALLBACK_CATEGORY_HINTS: dict[str, tuple[str, ...]] = {
     "금융IT·신기술": ("오픈마켓", "ott", "메타버스", "디지털트윈", "크라우드 펀딩", "프롭테크", "알트코인", "핀테크", "블록체인", "약인공지능"),
     "네트워크": ("http", "ssl", "tls", "vpn", "ssh", "x.25", "nic", "tcp", "udp", "라우팅", "lan", "wan", "dns"),
     "데이터베이스": ("dba", "procedure", "dense rank", "grant", "revoke", "2pl", "schema", "트랜잭션", "정규화"),
-    "보안": ("xss", "sql injection", "공인인증서", "다크웹", "랜섬웨어", "ddos", "중간자 공격", "rsa", "전자서명", "syn flood", "daisy chain", "권한"),
+    "보안": ("xss", "sql injection", "공인인증서", "다크웹", "랜섬웨어", "ddos", "중간자 공격", "rsa", "전자서명", "syn flood", "권한"),
     "소프트웨어공학": ("man month", "cocomo", "형상관리", "애자일", "스크럼", "인수테스트", "베타테스트", "결합도", "응집도", "fp기능점수", "cpm"),
     "운영체제": ("hrn", "페이지 폴트", "redo", "undo", "tlb", "페이징", "세그먼트", "동기화", "프로세서", "시분할시스템"),
     "인공지능·데이터": ("빅데이터", "튜링테스트", "드릴다운", "정형데이터", "gpu", "머신러닝", "하둡"),
@@ -2252,18 +2847,148 @@ def normalize_question_bank_match_text(value: Any) -> str:
 
 
 
+def fin_corp_question_bank_title_needs_continuation(title: str) -> bool:
+    stripped = str(title or "").strip()
+    if not stripped:
+        return False
+    if re.search(r"[?!.!…]$|[)）\]】]$|[\"'”]$", stripped):
+        return False
+    if stripped.count("(") > stripped.count(")"):
+        return True
+    if stripped.count("“") > stripped.count("”"):
+        return True
+    return any(stripped.endswith(suffix) for suffix in FIN_CORP_TITLE_CONTINUATION_SUFFIXES)
+
+
+
+def fin_corp_question_bank_is_structural_line(line: str) -> bool:
+    stripped = str(line or "").strip()
+    if not stripped:
+        return False
+    if stripped == "보기":
+        return True
+    if stripped.startswith(("```", "|", "- ", "* ")):
+        return True
+    if fin_corp_question_bank_answer_match(stripped):
+        return True
+    if len(FIN_CORP_INLINE_CHOICE_RE.findall(stripped)) >= 2:
+        return True
+    return bool(FIN_CORP_CHOICE_LINE_RE.match(stripped))
+
+
+
+def fin_corp_question_bank_promote_title_continuation(title: str, markdown_text: str) -> tuple[str, str]:
+    content = str(markdown_text or "")
+    if not fin_corp_question_bank_title_needs_continuation(title):
+        return title.strip(), content.strip()
+    lines = content.splitlines()
+    start = 0
+    while start < len(lines) and not lines[start].strip():
+        start += 1
+    if start >= len(lines) or fin_corp_question_bank_is_structural_line(lines[start]):
+        return title.strip(), content.strip()
+    continuation: list[str] = []
+    index = start
+    while index < len(lines):
+        stripped = lines[index].strip()
+        if not stripped:
+            if continuation:
+                index += 1
+                break
+            index += 1
+            continue
+        if continuation and fin_corp_question_bank_is_structural_line(stripped):
+            break
+        if fin_corp_question_bank_is_structural_line(stripped):
+            break
+        continuation.append(stripped)
+        index += 1
+    if not continuation:
+        return title.strip(), content.strip()
+    merged_title = f"{title.rstrip()} {' '.join(continuation)}".strip()
+    remainder = "\n".join(lines[index:]).strip()
+    return merged_title, remainder
+
+
+
+def fin_corp_question_bank_inline_choices(line: str) -> list[str]:
+    matches = [(number.strip(), text.strip()) for number, text in FIN_CORP_INLINE_CHOICE_RE.findall(str(line or "").strip())]
+    if len(matches) < 2:
+        return []
+    return [f"{number}. {text}" for number, text in matches if text]
+
+
+
+def fin_corp_question_bank_merge_code_fences(markdown_text: str) -> str:
+    lines = str(markdown_text or "").splitlines()
+    if not lines:
+        return ""
+    blocks: list[tuple[str, Any, Any]] = []
+    index = 0
+    while index < len(lines):
+        if lines[index].strip().startswith("```"):
+            fence = lines[index].strip() or "```"
+            index += 1
+            code_lines: list[str] = []
+            while index < len(lines) and not lines[index].strip().startswith("```"):
+                code_lines.append(lines[index].rstrip())
+                index += 1
+            if index < len(lines) and lines[index].strip().startswith("```"):
+                index += 1
+            blocks.append(("code", fence, code_lines))
+            continue
+        prose_lines: list[str] = []
+        while index < len(lines) and not lines[index].strip().startswith("```"):
+            prose_lines.append(lines[index].rstrip())
+            index += 1
+        blocks.append(("prose", prose_lines, None))
+    merged_blocks: list[tuple[str, Any, Any]] = []
+    index = 0
+    while index < len(blocks):
+        kind, first, second = blocks[index]
+        if kind != "code":
+            merged_blocks.append(blocks[index])
+            index += 1
+            continue
+        fence = str(first)
+        code_lines = list(second or [])
+        next_index = index + 1
+        while (
+            next_index + 1 < len(blocks)
+            and blocks[next_index][0] == "prose"
+            and all(not str(line).strip() for line in (blocks[next_index][1] or []))
+            and blocks[next_index + 1][0] == "code"
+        ):
+            if code_lines and code_lines[-1] != "":
+                code_lines.append("")
+            code_lines.extend(list(blocks[next_index + 1][2] or []))
+            next_index += 2
+        merged_blocks.append(("code", fence, code_lines))
+        index = next_index
+    rendered: list[str] = []
+    for kind, first, second in merged_blocks:
+        if kind == "prose":
+            rendered.extend(list(first or []))
+            continue
+        rendered.append(str(first))
+        rendered.extend(list(second or []))
+        rendered.append("```")
+    return "\n".join(rendered).strip()
+
+
+
 def fin_corp_question_bank_choices(markdown_text: str) -> list[str]:
     choices: list[str] = []
     for line in str(markdown_text or "").splitlines():
         stripped = line.strip()
         if not stripped:
             continue
+        inline_choices = fin_corp_question_bank_inline_choices(stripped)
+        if inline_choices:
+            choices.extend(item.split(". ", 1)[1] for item in inline_choices)
+            continue
         if match := FIN_CORP_CHOICE_LINE_RE.match(stripped):
             choices.append(match.group(2).strip())
-            continue
-        inline = [item[1].strip() for item in FIN_CORP_INLINE_CHOICE_RE.findall(stripped)]
-        if len(inline) >= 2:
-            choices.extend(inline)
     return normalize_question_bank_list(choices, item_limit=2000)
 
 
@@ -2276,7 +3001,7 @@ def fin_corp_question_bank_answer_parts(markdown_text: str) -> tuple[str, str, s
     seen_answer = False
     for raw_line in str(markdown_text or "").splitlines():
         stripped = raw_line.strip()
-        answer_match = FIN_CORP_ANSWER_LINE_RE.match(stripped)
+        answer_match = fin_corp_question_bank_answer_match(stripped)
         if answer_match:
             seen_answer = True
             prefix = answer_match.group("prefix").strip()
@@ -2304,6 +3029,70 @@ def fin_corp_question_bank_answer_parts(markdown_text: str) -> tuple[str, str, s
     if not explanation and answer:
         explanation = answer
     return body, answer, explanation
+
+
+
+def fin_corp_question_bank_has_ai_only_answer(markdown_text: str) -> bool:
+    saw_ai = False
+    saw_direct = False
+    for raw_line in str(markdown_text or "").splitlines():
+        answer_match = fin_corp_question_bank_answer_match(raw_line.strip())
+        if not answer_match:
+            continue
+        if "AI답변" in answer_match.group("marker"):
+            saw_ai = True
+        else:
+            saw_direct = True
+    return saw_ai and not saw_direct
+
+
+
+def fin_corp_question_bank_normalize_body(markdown_text: str) -> str:
+    normalized_lines: list[str] = []
+    in_code = False
+    choice_count = 0
+    for raw_line in str(markdown_text or "").splitlines():
+        stripped = raw_line.strip()
+        if stripped.startswith("```"):
+            in_code = not in_code
+            normalized_lines.append(raw_line.rstrip())
+            continue
+        if in_code:
+            normalized_lines.append(raw_line.rstrip())
+            continue
+        inline_choices = fin_corp_question_bank_inline_choices(stripped)
+        if inline_choices:
+            normalized_lines.extend(inline_choices)
+            choice_count += len(inline_choices)
+            continue
+        if FIN_CORP_CHOICE_LINE_RE.match(stripped):
+            normalized_lines.append(raw_line.rstrip())
+            choice_count += 1
+            continue
+        if choice_count and stripped.startswith(("-", "*")) and any(token in stripped for token in ("모두 옳", "모든 선지", "모든 지문")):
+            special_choice = stripped.lstrip("-* ").strip()
+            normalized_lines.append(f"{choice_count + 1}. {special_choice}")
+            choice_count += 1
+            continue
+        normalized_lines.append(raw_line.rstrip())
+    return fin_corp_question_bank_merge_code_fences("\n".join(normalized_lines).strip())
+
+
+def fin_corp_question_bank_all_true_choice_index(choices: list[str]) -> int | None:
+    for index, choice in enumerate(choices):
+        if any(token in str(choice or "") for token in ("모두 옳", "모든 선지", "모든 지문")):
+            return index
+    return None
+
+
+def fin_corp_question_bank_is_all_true_answer(text: str) -> bool:
+    normalized = normalize_question_bank_markdown(text, limit=20000)
+    return any(token in normalized for token in ("모든선지", "모든 선지", "모든 지문", "모두 옳은", "모두 옳음", "전부 옳"))
+
+
+
+def fin_corp_question_bank_all_true_choice(text: str) -> str:
+    return normalize_question_bank_markdown(text, limit=20000)
 
 
 
@@ -2360,6 +3149,25 @@ def fin_corp_question_bank_answer_guide(question_type: str) -> str:
 
 
 
+def fin_corp_question_bank_override_category(title: str, body: str, answer: str, explanation: str) -> str:
+    combined = "\n".join(part for part in (title, body, answer, explanation) if part)
+    for category, hints in FIN_CORP_CATEGORY_OVERRIDE_HINTS.items():
+        if any(fin_corp_question_bank_contains_hint(combined, hint) for hint in hints):
+            return category
+    return ""
+
+
+def fin_corp_question_bank_contains_hint(text: str, hint: str) -> bool:
+    haystack = str(text or "").casefold()
+    needle = str(hint or "").casefold().strip()
+    if not haystack or not needle:
+        return False
+    if re.fullmatch(r"[0-9a-z .+#/-]+", needle):
+        return re.search(rf"(?<![0-9a-z]){re.escape(needle)}(?![0-9a-z])", haystack) is not None
+    return needle in haystack
+
+
+
 def fin_corp_question_bank_category(
     title: str,
     body: str,
@@ -2370,6 +3178,9 @@ def fin_corp_question_bank_category(
     csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> str:
+    override = fin_corp_question_bank_override_category(title, body, answer, explanation)
+    if override:
+        return override
     combined_body = "\n\n".join(part for part in (body, answer, explanation) if part)
     category = infer_question_bank_category(
         card_category,
@@ -2382,9 +3193,9 @@ def fin_corp_question_bank_category(
     )
     if category:
         return category
-    combined = "\n".join(part for part in (title, body, answer, explanation) if part).casefold()
+    combined = "\n".join(part for part in (title, body, answer, explanation) if part)
     for fallback_category, hints in FIN_CORP_FALLBACK_CATEGORY_HINTS.items():
-        if any(hint.casefold() in combined for hint in hints):
+        if any(fin_corp_question_bank_contains_hint(combined, hint) for hint in hints):
             return fallback_category
     return card_category or "금융IT·신기술"
 
@@ -2400,7 +3211,7 @@ def fin_corp_question_bank_keywords(
 ) -> list[str]:
     candidates: list[str] = []
     if isinstance(card, dict) and card:
-        candidates.extend(question_bank_keywords_for_card(card))
+        candidates.extend([str(card.get("term") or ""), str(card.get("english") or "")])
     topic = fin_corp_question_bank_topic(title)
     candidates.extend(bok_topic_keyword_candidates(topic))
     candidates.extend(bok_detect_keyword_matches(topic, body, answer, explanation))
@@ -2409,6 +3220,16 @@ def fin_corp_question_bank_keywords(
     if not candidates and topic:
         candidates.append(topic)
     return normalize_question_bank_list(candidates, item_limit=255)[:6]
+
+
+
+def fin_corp_question_bank_candidate_keys(title: str, body: str, answer: str, explanation: str) -> set[str]:
+    candidate_terms = normalize_question_bank_list([
+        fin_corp_question_bank_topic(title),
+        answer if len(answer) <= 120 else "",
+        *bok_detect_keyword_matches(title, body, answer, explanation),
+    ], item_limit=255)
+    return {normalize_question_bank_match_text(item) for item in candidate_terms if normalize_question_bank_match_text(item)}
 
 
 
@@ -2425,40 +3246,100 @@ def fin_corp_question_bank_card(
     match_text = normalize_question_bank_match_text(combined)
     if not match_text:
         return {}
-    candidate_terms = normalize_question_bank_list([
-        fin_corp_question_bank_topic(title),
-        answer if len(answer) <= 120 else "",
-        *bok_detect_keyword_matches(title, body, answer, explanation),
-    ], item_limit=255)
-    candidate_keys = {normalize_question_bank_match_text(item) for item in candidate_terms if normalize_question_bank_match_text(item)}
+    candidate_keys = fin_corp_question_bank_candidate_keys(title, body, answer, explanation)
+    topic_key = normalize_question_bank_match_text(fin_corp_question_bank_topic(title))
+    answer_key = normalize_question_bank_match_text(answer)
     best_score = 0
     best_card: dict[str, Any] = {}
     for row in rows:
         row_score = 0
+        direct_hit = False
         term_key = normalize_question_bank_match_text(row.get("term"))
         english_key = normalize_question_bank_match_text(row.get("english"))
-        for keyword in question_bank_keywords_for_card(row):
-            keyword_key = normalize_question_bank_match_text(keyword)
-            if len(keyword_key) < 2:
+        direct_keys = tuple(key for key in (term_key, english_key) if key)
+        for direct_key in direct_keys:
+            if direct_key in candidate_keys:
+                row_score = max(row_score, 640 + len(direct_key))
+                direct_hit = True
+            elif len(direct_key) >= 4 and direct_key in match_text:
+                row_score = max(row_score, 420 + len(direct_key))
+                direct_hit = True
+        if not direct_hit:
+            related_hits = 0
+            for keyword in question_bank_keywords_for_card(row):
+                keyword_key = normalize_question_bank_match_text(keyword)
+                if len(keyword_key) < 4 or keyword_key in direct_keys:
+                    continue
+                if keyword_key in candidate_keys:
+                    related_hits += 1
+                    row_score = max(row_score, 300 + related_hits * 40 + len(keyword_key))
+            if related_hits < 2:
                 continue
-            if keyword_key in candidate_keys:
-                row_score = max(row_score, 520 + len(keyword_key))
-            elif keyword_key in match_text:
-                row_score = max(row_score, 320 + len(keyword_key))
-        if not row_score:
-            continue
         if category and row.get("category") == category:
             row_score += 40
-        if term_key and term_key == normalize_question_bank_match_text(fin_corp_question_bank_topic(title)):
+        if term_key and term_key == topic_key:
             row_score += 80
-        if answer and term_key and term_key == normalize_question_bank_match_text(answer):
+        if answer_key and term_key and term_key == answer_key:
             row_score += 120
-        if answer and english_key and english_key == normalize_question_bank_match_text(answer):
+        if answer_key and english_key and english_key == answer_key:
             row_score += 120
         if row_score > best_score:
             best_score = row_score
             best_card = row
+    if best_score < 400:
+        return {}
     return best_card
+
+
+
+def fin_corp_question_bank_tokens(value: str) -> set[str]:
+    return {token.casefold() for token in re.findall(r"[0-9A-Za-z가-힣]{2,}", str(value or ""))}
+
+
+
+def fin_corp_question_bank_grounded_card_answer(card: dict[str, Any]) -> tuple[str, str]:
+    parts: list[str] = []
+    for raw_value in (card.get("definition"), card.get("detailed_explanation"), card.get("exam_note")):
+        normalized = normalize_question_bank_markdown(raw_value, limit=20000)
+        if normalized and normalized not in parts:
+            parts.append(normalized)
+    if not parts:
+        fallback = normalize_question_bank_markdown(card.get("term"), limit=20000)
+        return fallback, fallback
+    return parts[0], "\n\n".join(parts)
+
+
+
+def fin_corp_question_bank_repair_answer(
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    card: dict[str, Any] | None = None,
+    question_type: str = "",
+    ai_only: bool = False,
+) -> tuple[str, str]:
+    if "dp[i] = ㄱ" in body and "dp2[i] = ㄴ" in body:
+        repaired_answer = "ㄱ = max(dfs(i - 1), dfs(i - 2) + arr[i]), ㄴ = max(dp2[i - 1], dp2[i - 2] + arr[i])"
+        repaired_explanation = "동적 계획법 점화식이다. 인접한 두 원소를 동시에 선택하지 않는 최대합을 구하므로 직전 값과 두 칸 전 값에 현재 값을 더한 경우를 비교한다.\n\n- Top-down: dp[i] = max(dfs(i - 1), dfs(i - 2) + arr[i])\n- Bottom-up: dp2[i] = max(dp2[i - 1], dp2[i - 2] + arr[i])"
+        return repaired_answer, repaired_explanation
+    if not ai_only or question_type == "multiple_choice" or not isinstance(card, dict) or not card:
+        return answer, explanation
+    if answer != explanation:
+        return answer, explanation
+    topic_key = normalize_question_bank_match_text(fin_corp_question_bank_topic(title))
+    term_key = normalize_question_bank_match_text(card.get("term"))
+    english_key = normalize_question_bank_match_text(card.get("english"))
+    if not ((term_key and term_key in topic_key) or (english_key and english_key in topic_key)):
+        return answer, explanation
+    answer_key = normalize_question_bank_match_text(answer)
+    if (term_key and term_key in answer_key) or (english_key and english_key in answer_key):
+        return answer, explanation
+    if fin_corp_question_bank_tokens(fin_corp_question_bank_topic(title)) & fin_corp_question_bank_tokens(answer):
+        return answer, explanation
+    grounded_answer, grounded_explanation = fin_corp_question_bank_grounded_card_answer(card)
+    return grounded_answer or answer, grounded_explanation or explanation
 
 
 
@@ -2509,7 +3390,9 @@ def parse_fin_corp_question_bank_entries(
             start = match.end()
             end = matches[offset].start() if offset < len(matches) else len(text)
             content = text[start:end].strip()
+            title, content = fin_corp_question_bank_promote_title_continuation(title, content)
             body, answer, explanation = fin_corp_question_bank_answer_parts(content)
+            body = fin_corp_question_bank_normalize_body(body)
             choices = fin_corp_question_bank_choices(body)
             question_type = fin_corp_question_bank_type(title, body, answer, explanation, choices)
             provisional_category = fin_corp_question_bank_category(
@@ -2521,6 +3404,15 @@ def parse_fin_corp_question_bank_entries(
                 progress_db_path=progress_db_path,
             )
             card = fin_corp_question_bank_card(rows, title, body, answer, explanation, category=provisional_category)
+            answer, explanation = fin_corp_question_bank_repair_answer(
+                title,
+                body,
+                answer,
+                explanation,
+                card=card,
+                question_type=question_type,
+                ai_only=fin_corp_question_bank_has_ai_only_answer(content),
+            )
             category = fin_corp_question_bank_category(
                 title,
                 body,
@@ -2544,6 +3436,30 @@ def parse_fin_corp_question_bank_entries(
                         if choice_key and (choice_key == answer_key or choice_key in answer_key or answer_key in choice_key):
                             answer_index = index
                             break
+                if answer_index is None:
+                    special_index = fin_corp_question_bank_all_true_choice_index(choices)
+                    if special_index is not None and fin_corp_question_bank_has_ai_only_answer(content):
+                        original_answer = answer
+                        answer = f"{special_index + 1}번"
+                        answer_index = special_index
+                        special_choice = choices[special_index]
+                        explanation_parts = [special_choice]
+                        if original_answer and original_answer not in explanation_parts:
+                            explanation_parts.append(original_answer)
+                        if explanation and explanation not in explanation_parts:
+                            explanation_parts.append(explanation)
+                        explanation = "\n\n".join(part for part in explanation_parts if part)
+                    elif fin_corp_question_bank_is_all_true_answer(answer):
+                        special_choice = fin_corp_question_bank_all_true_choice(answer)
+                        if special_choice and special_choice not in choices:
+                            choices.append(special_choice)
+                        if special_choice:
+                            answer_index = choices.index(special_choice)
+                            answer = f"{answer_index + 1}번"
+                            if explanation and special_choice not in explanation:
+                                explanation = "\n\n".join(part for part in (special_choice, explanation) if part)
+                            elif not explanation:
+                                explanation = special_choice
             entries.append({
                 "question_bank_id": f"qb-fin239-{page_code}-{offset:02d}",
                 "card_id": str(card.get("id") or ""),
@@ -4225,6 +5141,8 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     if not source_path:
         raise FileNotFoundError(f"Wiki page not found: {slug}")
     markdown_text = source_path.read_text(encoding="utf-8")
+    if slug == RECRUITMENT_SCHEDULE_PAGE_SLUG:
+        markdown_text = render_recruitment_schedule_wiki_page(markdown_text)
     source_relative = str(source_path.relative_to(repo)).replace(os.sep, "/")
     page_meta = index["pages"].get(slug, {})
     title = page_meta.get("title") or extract_markdown_title(markdown_text, source_path.stem)
@@ -4253,6 +5171,23 @@ def question_bank_shell() -> FileResponse:
     return FileResponse(STATIC_DIR / "question-bank.html")
 
 
+@app.get(RECRUITMENT_CALENDAR_PATH)
+def recruitment_calendar_shell() -> FileResponse:
+    return FileResponse(STATIC_DIR / "calendar.html")
+
+
+@app.get(RECRUITMENT_CALENDAR_API_PATH)
+def api_recruitment_calendar(request: Request) -> dict[str, Any]:
+    return build_recruitment_calendar_payload(base_url=str(request.base_url).rstrip("/"))
+
+
+@app.get(RECRUITMENT_CALENDAR_ICS_PATH)
+def api_recruitment_calendar_ics(request: Request) -> Response:
+    return Response(
+        build_recruitment_calendar_ics(base_url=str(request.base_url).rstrip("/")),
+        media_type="text/calendar; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="recruitment-calendar-2026.ics"'},
+    )
 @app.get("/wiki")
 def wiki_shell() -> FileResponse:
     return FileResponse(STATIC_DIR / "wiki.html")
