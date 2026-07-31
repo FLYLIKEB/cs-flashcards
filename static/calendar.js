@@ -76,18 +76,16 @@ function toggleSetValue(targetSet, value, fallbackValues) {
   }
 }
 
-function renderFilterChips(containerId, items, selectedSet, key, labelKey, colorKey = '') {
+function renderFilterChips(containerId, items, selectedSet, key, labelKey) {
   const container = $(containerId);
   if (!container) return;
   container.innerHTML = items.map((item) => {
     const value = item[key];
     const active = selectedSet.has(value);
-    const style = colorKey && item[colorKey]
-      ? ` style="border-color:${escapeHtml(item[colorKey])};${active ? `background:${escapeHtml(item[colorKey])};color:#fff;` : ''}"`
-      : '';
-    return `<button class="filter-chip${active ? ' active' : ''}" type="button" data-filter-value="${escapeHtml(value)}"${style}>${escapeHtml(item[labelKey])}</button>`;
+    return `<button class="filter-chip${active ? ' active' : ''}" type="button" data-filter-value="${escapeHtml(value)}">${escapeHtml(item[labelKey])}</button>`;
   }).join('');
 }
+
 
 function nextUpcomingEvent(events, { exactOnly = false } = {}) {
   const now = Date.now();
@@ -250,7 +248,7 @@ function renderEventList(events = filteredEvents()) {
   container.innerHTML = events.map((event) => `
     <button class="event-card${event.id === calendarState.selectedEventId ? ' is-selected' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">
       <div class="event-card__top">
-        <span class="institution-pill" style="background:${escapeHtml(event.institution.color)}">${escapeHtml(event.institution.short_name)}</span>
+        <span class="institution-pill">${escapeHtml(event.institution.short_name)}</span>
         <span class="event-badge">${escapeHtml(event.status_label)}</span>
       </div>
       <h3>${escapeHtml(event.list_title || event.title)}</h3>
@@ -262,6 +260,7 @@ function renderEventList(events = filteredEvents()) {
       </div>
     </button>
   `).join('');
+
   container.querySelectorAll('[data-event-id]').forEach((element) => {
     element.addEventListener('click', () => selectEvent(element.dataset.eventId || ''));
   });
@@ -279,8 +278,9 @@ function renderSelectedEvent(event) {
   }
   badge.hidden = false;
   badge.textContent = event.institution.short_name;
-  badge.style.background = `${event.institution.color}22`;
-  badge.style.color = event.institution.color;
+  badge.style.background = '';
+  badge.style.color = '';
+
   detail.className = '';
   detail.innerHTML = `
     <h3>${escapeHtml(event.list_title || event.title)}</h3>
@@ -347,7 +347,7 @@ function bindFilterGroup(containerId, selectedSet, allValues) {
 function initializeFilterChips() {
   const payload = calendarState.payload;
   if (!payload) return;
-  renderFilterChips('institutionFilters', payload.institutions, calendarState.selectedInstitutions, 'id', 'short_name', 'color');
+  renderFilterChips('institutionFilters', payload.institutions, calendarState.selectedInstitutions, 'id', 'short_name');
   renderFilterChips(
     'eventTypeFilters',
     uniqueValues(payload.events, 'event_type').map((eventType) => ({ event_type: eventType, event_type_label: payload.events.find((item) => item.event_type === eventType)?.event_type_label || eventType })),
