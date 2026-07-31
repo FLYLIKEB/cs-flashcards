@@ -7045,10 +7045,399 @@ body.question-bank-embed .question-panel {
   min-height: 100vh;
   height: 100vh;
   margin: 0;
-  overflow: auto;
+  padding: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
   overscroll-behavior: contain;
   border-radius: 0;
-  border-left: 0;
+  border-top: 0;
   border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  background: #ffffff;
   box-shadow: none;
+}
+
+body.question-bank-embed .question-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  padding: .6rem .9rem;
+  border-bottom: 1px solid #e2e2e2;
+  background: rgba(255, 255, 255, .96);
+}
+
+body.question-bank-embed .question-toolbar-main {
+  gap: .14rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.question-bank-embed .question-toolbar strong {
+  font-size: .92rem;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+body.question-bank-embed .question-toolbar-eyebrow,
+body.question-bank-embed .question-type-row,
+body.question-bank-embed .question-toolbar-group-config,
+body.question-bank-embed .question-toolbar-group-primary,
+body.question-bank-embed #openAiQuizSearchBtn,
+body.question-bank-embed #questionHistoryBtn,
+body.question-bank-embed #openQuestionCardBtn,
+body.question-bank-embed #questionSessionReview,
+body.question-bank-embed .question-meta,
+body.question-bank-embed .question-session-meta,
+body.question-bank-embed .question-side-stack,
+body.question-bank-embed .question-answer-guide,
+body.question-bank-embed .question-review-box {
+  display: none !important;
+}
+
+body.question-bank-embed .question-summary {
+  color: #666666;
+  font-size: .74rem;
+  line-height: 1.35;
+}
+
+body.question-bank-embed .question-toolbar-actions,
+body.question-bank-embed .question-toolbar-group-secondary {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+body.question-bank-embed .question-toolbar-group-secondary {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.question-bank-embed #finishQuestionSessionBtn {
+  min-height: 2rem;
+  padding: 0 .7rem;
+  border-radius: 999px;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: none;
+}
+
+body.question-bank-embed .question-stage {
+  gap: 0;
+  min-height: 0;
+  overflow: auto;
+  align-content: stretch;
+}
+
+body.question-bank-embed .question-card,
+body.question-bank-embed .question-card-shell,
+body.question-bank-embed .question-surface,
+body.question-bank-embed .question-answer,
+body.question-bank-embed .question-session-lock,
+body.question-bank-embed .question-session-summary {
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+body.question-bank-embed .question-card {
+  min-height: 100%;
+}
+
+body.question-bank-embed .question-card-shell {
+  min-height: 100%;
+  padding: .42rem .72rem .56rem;
+  display: grid;
+}
+
+body.question-bank-embed .question-card-progress {
+  height: 1px;
+  background: #e2e2e2;
+}
+
+body.question-bank-embed .question-card-progress span {
+  background: #111111;
+}
+
+body.question-bank-embed .question-card-head {
+  margin-top: .65rem;
+  padding-bottom: .65rem;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+body.question-bank-embed .question-card-kicker {
+  color: #666666;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+
+body.question-bank-embed .question-card-title {
+  font-size: .96rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -.02em;
+}
+
+body.question-bank-embed .question-card-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin-top: .2rem;
+  min-height: 100%;
+}
+
+body.question-bank-embed .question-main-stack {
+  gap: .46rem;
+  min-height: 100%;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+body.question-bank-embed .question-prompt,
+body.question-bank-embed .question-body,
+body.question-bank-embed .question-answer-draft,
+body.question-bank-embed .question-answer {
+  padding: 0;
+}
+
+body.question-bank-embed .question-answer-draft {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+}
+
+body.question-bank-embed .question-prompt .question-markdown,
+body.question-bank-embed .question-body .question-markdown,
+body.question-bank-embed .question-answer-markdown,
+body.question-bank-embed .question-explanation-markdown {
+  color: #111111;
+  font-size: .9rem;
+  line-height: 1.78;
+}
+
+body.question-bank-embed .question-markdown h1,
+body.question-bank-embed .question-markdown h2,
+body.question-bank-embed .question-markdown h3,
+body.question-bank-embed .question-markdown h4,
+body.question-bank-embed .question-markdown h5,
+body.question-bank-embed .question-markdown h6 {
+  margin: .5rem 0 .24rem;
+  font-size: .92rem;
+  font-weight: 600;
+}
+
+body.question-bank-embed .question-markdown p,
+body.question-bank-embed .question-markdown ul,
+body.question-bank-embed .question-markdown ol,
+body.question-bank-embed .question-markdown blockquote,
+body.question-bank-embed .question-markdown pre {
+  margin: .45rem 0;
+}
+
+body.question-bank-embed .question-md-pre,
+body.question-bank-embed .question-markdown blockquote,
+body.question-bank-embed .question-md-table th,
+body.question-bank-embed .question-md-table td,
+body.question-bank-embed .question-markdown code {
+  background: #f5f5f5;
+  color: #111111;
+  border-color: #e2e2e2;
+}
+
+body.question-bank-embed .question-answer-input,
+body.question-bank-embed .question-wrong-note {
+  min-height: 6.8rem;
+  height: 100%;
+  padding: .75rem .82rem;
+  border: 1px solid #cfcfcf;
+  border-radius: 0;
+  background: #ffffff;
+  color: #111111;
+  font-size: .88rem;
+  line-height: 1.72;
+}
+
+body.question-bank-embed .question-answer-label,
+body.question-bank-embed .question-review-label,
+body.question-bank-embed .question-side-note-label {
+  color: #666666;
+  font-size: .68rem;
+  letter-spacing: .08em;
+}
+
+body.question-bank-embed .question-choice {
+  min-height: 0;
+  padding: .55rem .62rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 0;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: none;
+}
+
+body.question-bank-embed .question-choice:hover,
+body.question-bank-embed .question-choice:focus-visible {
+  background: #f5f5f5;
+  border-color: #111111;
+  transform: none;
+}
+
+body.question-bank-embed .question-choice.selected,
+body.question-bank-embed .question-choice.answer {
+  background: #efefef;
+  border-color: #111111;
+  color: #111111;
+}
+
+body.question-bank-embed .question-rubric,
+body.question-bank-embed .question-grade-row,
+body.question-bank-embed .question-wrong-note-box {
+  margin-top: .8rem;
+  padding-top: .72rem;
+  border-top: 1px solid #e2e2e2;
+}
+
+body.question-bank-embed .question-grade-button,
+body.question-bank-embed .question-action-button {
+  min-height: 2.05rem;
+  border: 1px solid #cfcfcf;
+  border-radius: 0;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: none;
+}
+
+body.question-bank-embed .question-grade-button:hover,
+body.question-bank-embed .question-action-button:hover,
+body.question-bank-embed .question-grade-button:focus-visible,
+body.question-bank-embed .question-action-button:focus-visible {
+  border-color: #111111;
+  background: #f5f5f5;
+  transform: none;
+}
+
+body.question-bank-embed .question-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: .35rem;
+  padding: .55rem .9rem .65rem;
+  border-top: 1px solid #e2e2e2;
+  background: rgba(255, 255, 255, .96);
+}
+
+body.question-bank-embed .question-action-button {
+  min-height: 1.9rem;
+  padding: .34rem .4rem;
+  font-size: .78rem;
+}
+
+body.question-bank-embed .question-action-wide {
+  min-width: 0;
+}
+
+body.question-bank-embed .question-toolbar,
+body.question-bank-embed .question-toolbar-main {
+  display: none !important;
+}
+
+body.question-bank-embed .question-toolbar-actions {
+  margin-left: auto;
+}
+
+body.question-bank-embed .question-card-progress,
+body.question-bank-embed .question-card-head {
+  display: none;
+}
+
+body.question-bank-embed .question-card-shell {
+  min-height: 100%;
+  padding: .42rem .72rem .56rem;
+  display: grid;
+}
+
+body.question-bank-embed .question-main-stack {
+  gap: .46rem;
+  min-height: 100%;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+body.question-bank-embed .question-prompt .question-markdown,
+body.question-bank-embed .question-body .question-markdown,
+body.question-bank-embed .question-answer-markdown,
+body.question-bank-embed .question-explanation-markdown {
+  font-size: .84rem;
+  line-height: 1.7;
+}
+
+body.question-bank-embed .question-answer-input,
+body.question-bank-embed .question-wrong-note {
+  min-height: 6.8rem;
+  height: 100%;
+}
+
+body.question-bank-embed #openQuestionCardBtn {
+  display: none !important;
+}
+
+body.question-bank-embed .question-actions {
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: .26rem;
+  padding: .32rem .42rem calc(.32rem + env(safe-area-inset-bottom));
+  align-self: end;
+}
+
+body.question-bank-embed {
+  --accent: #111111;
+  --accent-soft: #f5f5f5;
+  --known: #111111;
+  --known-soft: #efefef;
+  --unknown: #111111;
+  --unknown-soft: #efefef;
+}
+
+body.question-bank-embed .question-panel,
+body.question-bank-embed .question-toolbar,
+body.question-bank-embed .question-card-shell,
+body.question-bank-embed .question-actions,
+body.question-bank-embed .question-choice,
+body.question-bank-embed .question-grade-button,
+body.question-bank-embed .question-answer-input,
+body.question-bank-embed .question-wrong-note,
+body.question-bank-embed .question-session-lock,
+body.question-bank-embed .question-session-summary {
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.question-bank-embed .question-grade-button.active.correct,
+body.question-bank-embed .question-grade-button.active.ambiguous,
+body.question-bank-embed .question-grade-button.active.wrong,
+body.question-bank-embed .question-grade-button.active.unknown,
+body.question-bank-embed .question-grade-button.wrong-note-save,
+body.question-bank-embed .question-grade-status.correct,
+body.question-bank-embed .question-grade-status.ambiguous,
+body.question-bank-embed .question-grade-status.wrong,
+body.question-bank-embed .question-grade-status.unknown {
+  background: #efefef;
+  color: #111111;
+  border-color: #111111;
+}
+
+body.question-bank-embed .question-session-lock {
+  background: #f5f5f5 !important;
+  border-color: #e2e2e2 !important;
 }
