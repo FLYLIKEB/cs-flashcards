@@ -258,6 +258,19 @@ body.cs-table-page {
   align-items: start;
 }
 
+.question-bank-table-selection {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid rgba(226, 232, 240, .92);
+  border-radius: 20px;
+  background: rgba(248, 250, 252, .72);
+}
+
+.question-bank-table-selection-head {
+  margin-bottom: 0;
+}
 .question-bank-shell-pane {
   min-width: 0;
   display: grid;

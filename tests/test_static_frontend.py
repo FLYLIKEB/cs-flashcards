@@ -328,6 +328,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="bankPageResetFiltersBtn"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageSelectionSummary"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticeStatus"', QUESTION_BANK_HTML)
+        self.assertIn('question-bank-table-selection', QUESTION_BANK_HTML)
         self.assertIn('bankPageHeaderPracticeToggle', QUESTION_BANK_JS)
         self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
@@ -715,6 +716,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-bank-header-chip', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-filter-chip', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-header-chip-button', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-table-selection', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-shell-header-chips', TABLE_SHELL_CSS)
 
 
