@@ -713,9 +713,11 @@ $('summaryDeadlineBtn')?.addEventListener('click', () => {
   if (event) selectEvent(event.id, { openDetail: true });
 });
 $('summaryOpenBtn')?.addEventListener('click', () => {
+  calendarState.selectedStatuses = new Set(['open']);
+  initializeFilterOptions();
   calendarState.eventListMode = 'all';
   setMainTab('list');
-  renderEventList();
+  rerenderCalendar();
 });
 $('summaryNextBtn')?.addEventListener('click', () => setMainTab('institutions'));
 $('summaryFilterBtn')?.addEventListener('click', () => setMainTab('filters'));

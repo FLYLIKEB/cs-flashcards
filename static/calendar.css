@@ -81,6 +81,7 @@ button {
 .detail-grid dt,
 .summary-card__label,
 .summary-card__meta,
+.summary-card__action,
 .table-note,
 .compact-table thead th,
 .compact-table tbody th {
@@ -188,6 +189,10 @@ button {
 
 .summary-card--button {
   text-align: left;
+}
+
+.summary-card__action {
+  font-size: 0.76rem;
 }
 
 .calendar-main-tabs {
