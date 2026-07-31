@@ -39,28 +39,28 @@
           </div>
           <div id="calendar"></div>
         </article>
+      </section>
 
-        <div class="calendar-summary-grid">
-          <article class="calendar-panel calendar-hero">
-            <div class="calendar-hero__copy">
-              <p class="hero-kicker">이번 시즌 포커스</p>
-              <h2 id="overviewHeadline">핵심 일정 불러오는 중...</h2>
-              <p id="overviewFocus" class="hero-description">핵심 일정과 우선순위를 계산하는 중...</p>
-            </div>
-            <div id="overviewHighlights" class="overview-highlights" aria-live="polite"></div>
-          </article>
+      <aside class="calendar-sidebar">
+        <article class="calendar-panel calendar-hero">
+          <div class="calendar-hero__copy">
+            <p class="hero-kicker">이번 시즌 포커스</p>
+            <h2 id="overviewHeadline">핵심 일정 불러오는 중...</h2>
+            <p id="overviewFocus" class="hero-description">핵심 일정과 우선순위를 계산하는 중...</p>
+          </div>
+          <div id="overviewHighlights" class="overview-highlights" aria-live="polite"></div>
+        </article>
 
-          <article class="calendar-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="section-label">숫자 기준</p>
-                <h2>요약</h2>
-              </div>
-              <span class="panel-caption">전체 데이터</span>
+        <article class="calendar-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-label">숫자 기준</p>
+              <h2>요약</h2>
             </div>
-            <dl id="calendarCounts" class="calendar-counts"></dl>
-          </article>
-        </div>
+            <span class="panel-caption">전체 데이터</span>
+          </div>
+          <dl id="calendarCounts" class="calendar-counts"></dl>
+        </article>
 
         <article class="calendar-panel">
           <div class="panel-heading">
@@ -68,37 +68,32 @@
               <p class="section-label">지원 → 필기 → 면접</p>
               <h2>타임라인</h2>
             </div>
-            <span class="panel-caption">지금 필요한 흐름만</span>
           </div>
           <div id="timelineHighlights" class="timeline-strip"></div>
         </article>
 
-        <div class="calendar-main-grid">
-          <article class="calendar-panel">
-            <div class="event-list-header">
-              <div>
-                <p class="section-label">선택 가능한 일정</p>
-                <h2>일정 목록</h2>
-              </div>
-              <span id="eventListCount" class="event-list-count"></span>
+        <article class="calendar-panel">
+          <div class="event-list-header">
+            <div>
+              <p class="section-label">선택한 일정</p>
+              <h2>상세</h2>
             </div>
-            <div id="eventList" class="event-list"></div>
-          </article>
+            <span id="selectedEventBadge" class="event-pill" hidden></span>
+          </div>
+          <div id="selectedEventDetail" class="event-detail-empty">달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.</div>
+        </article>
 
-          <article class="calendar-panel event-detail-panel">
-            <div class="event-list-header">
-              <div>
-                <p class="section-label">선택한 일정</p>
-                <h2>상세</h2>
-              </div>
-              <span id="selectedEventBadge" class="event-pill" hidden></span>
+        <article class="calendar-panel">
+          <div class="event-list-header">
+            <div>
+              <p class="section-label">선택 가능한 일정</p>
+              <h2>일정 목록</h2>
             </div>
-            <div id="selectedEventDetail" class="event-detail-empty">달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.</div>
-          </article>
-        </div>
-      </section>
+            <span id="eventListCount" class="event-list-count"></span>
+          </div>
+          <div id="eventList" class="event-list"></div>
+        </article>
 
-      <aside class="calendar-sidebar">
         <article class="calendar-panel">
           <div class="panel-heading panel-heading--stacked">
             <div>
