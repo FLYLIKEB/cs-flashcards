@@ -11,81 +11,161 @@
 </head>
 <body>
   <header class="calendar-topbar">
-    <div>
+    <div class="calendar-topbar__copy">
       <p class="eyebrow">2026 금융공기업 IT 일정</p>
       <h1>채용 캘린더</h1>
       <p id="calendarUpdatedAt" class="calendar-subtitle">일정 불러오는 중...</p>
     </div>
-    <nav class="calendar-top-links" aria-label="페이지 링크">
-      <a href="/wiki/page/02-01-%EA%B8%B0%EB%B3%B8-%EC%A0%84%EC%A0%9C%EC%99%80-%EC%9D%BC%EC%A0%95" target="_blank" rel="noopener noreferrer">위키 일정 문서</a>
-      <a href="/">플래시카드</a>
-      <a id="icsFeedLink" href="/api/calendar/recruitment.ics" target="_blank" rel="noopener noreferrer">ICS 피드</a>
-    </nav>
+    <div class="calendar-topbar__actions">
+      <nav class="calendar-top-links" aria-label="페이지 링크">
+        <a href="/wiki/page/02-01-%EA%B8%B0%EB%B3%B8-%EC%A0%84%EC%A0%9C%EC%99%80-%EC%9D%BC%EC%A0%95" target="_blank" rel="noopener noreferrer">위키 일정 문서</a>
+        <a href="/">플래시카드</a>
+        <a id="icsFeedLink" href="/api/calendar/recruitment.ics" target="_blank" rel="noopener noreferrer">ICS 피드</a>
+      </nav>
+      <p class="calendar-topbar__hint">반폭 화면과 모바일에서는 일정 보기가 자동으로 더 읽기 쉬운 목록형으로 전환된다.</p>
+    </div>
   </header>
 
-  <main class="calendar-layout">
-    <section class="calendar-sidebar">
-      <article class="calendar-panel">
-        <h2>구독</h2>
-        <p id="calendarIntro">캘린더 설명 불러오는 중...</p>
-        <div class="subscription-actions">
-          <a id="icsSubscribeLink" class="primary-link" href="/api/calendar/recruitment.ics" target="_blank" rel="noopener noreferrer">ICS 열기</a>
-          <button id="copyIcsLinkBtn" type="button">ICS 링크 복사</button>
-        </div>
-        <ol id="calendarNotes" class="calendar-notes"></ol>
-      </article>
+  <main class="calendar-shell">
+    <section class="calendar-layout">
+      <aside class="calendar-sidebar">
+        <article class="calendar-panel calendar-panel--accent">
+          <div class="panel-heading panel-heading--stacked">
+            <div>
+              <p class="section-label">캘린더 구독</p>
+              <h2>놓치지 않게 연결</h2>
+            </div>
+            <p id="calendarIntro" class="panel-caption panel-caption--body">캘린더 설명 불러오는 중...</p>
+          </div>
+          <div class="subscription-actions">
+            <a id="icsSubscribeLink" class="primary-link" href="/api/calendar/recruitment.ics" target="_blank" rel="noopener noreferrer">ICS 열기</a>
+            <button id="copyIcsLinkBtn" type="button">ICS 링크 복사</button>
+          </div>
+          <ol id="calendarNotes" class="calendar-notes"></ol>
+        </article>
 
-      <article class="calendar-panel">
-        <h2>필터</h2>
-        <div>
-          <p class="section-label">기관</p>
-          <div id="institutionFilters" class="filter-chip-group"></div>
-        </div>
-        <div>
-          <p class="section-label">유형</p>
-          <div id="eventTypeFilters" class="filter-chip-group"></div>
-        </div>
-        <div>
-          <p class="section-label">상태</p>
-          <div id="statusFilters" class="filter-chip-group"></div>
-        </div>
-        <label class="calendar-toggle">
-          <input id="hideApproximateToggle" type="checkbox" />
-          예정 월/전후 일정 숨기기
-        </label>
-      </article>
+        <article class="calendar-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-label">지금 볼 것만</p>
+              <h2>우선순위</h2>
+            </div>
+            <span class="panel-caption">공부 흐름 유지용</span>
+          </div>
+          <div id="priorityList" class="priority-list"></div>
+        </article>
 
-      <article class="calendar-panel">
-        <h2>요약</h2>
-        <dl id="calendarCounts" class="calendar-counts"></dl>
-      </article>
+        <article class="calendar-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-label">필터</p>
+              <h2>한눈에 정리</h2>
+            </div>
+          </div>
+          <div>
+            <p class="section-label">기관</p>
+            <div id="institutionFilters" class="filter-chip-group"></div>
+          </div>
+          <div>
+            <p class="section-label">유형</p>
+            <div id="eventTypeFilters" class="filter-chip-group"></div>
+          </div>
+          <div>
+            <p class="section-label">상태</p>
+            <div id="statusFilters" class="filter-chip-group"></div>
+          </div>
+          <label class="calendar-toggle">
+            <input id="hideApproximateToggle" type="checkbox" />
+            예정 월/전후 일정 숨기기
+          </label>
+        </article>
 
-      <article class="calendar-panel">
-        <h2>기관별 현황</h2>
-        <div id="dashboardOpen" class="dashboard-list"></div>
-        <h3>공고 미확인 기관</h3>
-        <div id="dashboardWatch" class="dashboard-list"></div>
-      </article>
-    </section>
+        <article class="calendar-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-label">기관 모니터링</p>
+              <h2>현황 보드</h2>
+            </div>
+            <span class="panel-caption">공고 있음 / 체크 대기</span>
+          </div>
+          <section class="dashboard-section">
+            <h3>공개 일정 있음</h3>
+            <div id="dashboardOpen" class="dashboard-list"></div>
+          </section>
+          <section class="dashboard-section">
+            <h3>공고 미확인 기관</h3>
+            <div id="dashboardWatch" class="dashboard-list"></div>
+          </section>
+        </article>
+      </aside>
 
-    <section class="calendar-main">
-      <article class="calendar-panel">
-        <div id="calendar"></div>
-      </article>
-      <article class="calendar-panel">
-        <div class="event-list-header">
-          <h2>일정 목록</h2>
-          <span id="eventListCount" class="event-list-count"></span>
+      <section class="calendar-main">
+        <article class="calendar-panel calendar-hero">
+          <div class="calendar-hero__copy">
+            <p class="hero-kicker">이번 시즌 포커스</p>
+            <h2 id="overviewHeadline">핵심 일정 불러오는 중...</h2>
+            <p id="overviewFocus" class="hero-description">핵심 일정과 우선순위를 계산하는 중...</p>
+          </div>
+          <div id="overviewHighlights" class="overview-highlights" aria-live="polite"></div>
+        </article>
+
+        <article class="calendar-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-label">지원 → 필기 → 면접</p>
+              <h2>타임라인</h2>
+            </div>
+            <span class="panel-caption">이번 시즌 흐름만 압축</span>
+          </div>
+          <div id="timelineHighlights" class="timeline-strip"></div>
+        </article>
+
+        <article class="calendar-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-label">숫자 기준</p>
+              <h2>요약</h2>
+            </div>
+            <span class="panel-caption">전체 데이터 기준</span>
+          </div>
+          <dl id="calendarCounts" class="calendar-counts"></dl>
+        </article>
+
+        <div class="calendar-main-grid">
+          <article class="calendar-panel calendar-panel--calendar">
+            <div class="panel-heading">
+              <div>
+                <p class="section-label">월간 보기</p>
+                <h2>캘린더</h2>
+              </div>
+              <span class="panel-caption">반폭 화면에서는 자동 목록형</span>
+            </div>
+            <div id="calendar"></div>
+          </article>
+
+          <article class="calendar-panel event-detail-panel">
+            <div class="event-list-header">
+              <div>
+                <p class="section-label">선택한 일정</p>
+                <h2>상세</h2>
+              </div>
+              <span id="selectedEventBadge" class="event-pill" hidden></span>
+            </div>
+            <div id="selectedEventDetail" class="event-detail-empty">달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.</div>
+          </article>
         </div>
-        <div id="eventList" class="event-list"></div>
-      </article>
-      <article class="calendar-panel event-detail-panel">
-        <div class="event-list-header">
-          <h2>선택한 일정</h2>
-          <span id="selectedEventBadge" class="event-pill" hidden></span>
-        </div>
-        <div id="selectedEventDetail" class="event-detail-empty">달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.</div>
-      </article>
+
+        <article class="calendar-panel">
+          <div class="event-list-header">
+            <div>
+              <p class="section-label">선택 가능한 일정</p>
+              <h2>일정 목록</h2>
+            </div>
+            <span id="eventListCount" class="event-list-count"></span>
+          </div>
+          <div id="eventList" class="event-list"></div>
+        </article>
+      </section>
     </section>
   </main>
 

@@ -1,4 +1,6 @@
 const CALENDAR_API_PATH = '/api/calendar/recruitment';
+const COMPACT_CALENDAR_MEDIA = '(max-width: 760px)';
+const EMPTY_SELECTION_TEXT = '달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.';
 
 const calendarState = {
   payload: null,
@@ -25,6 +27,31 @@ function uniqueValues(items, key) {
   return [...new Set((items || []).map((item) => item[key]).filter(Boolean))];
 }
 
+function compactCalendarView() {
+  return window.matchMedia ? window.matchMedia(COMPACT_CALENDAR_MEDIA).matches : window.innerWidth <= 760;
+}
+
+function preferredCalendarView() {
+  return compactCalendarView() ? 'listMonth' : 'dayGridMonth';
+}
+
+function eventTimestamp(event, field = 'start') {
+  const value = field === 'end' ? (event.end || event.end_inclusive || event.start) : (event.start || event.start_inclusive);
+  return Date.parse(value || '') || 0;
+}
+
+function sortEventsByStart(items) {
+  return [...(items || [])].sort((left, right) => {
+    const delta = eventTimestamp(left) - eventTimestamp(right);
+    if (delta) return delta;
+    return String(left.list_title || left.title || '').localeCompare(String(right.list_title || right.title || ''), 'ko');
+  });
+}
+
+function priorityLabel(item) {
+  return String(item?.institution_name || item?.institution_group || '').trim();
+}
+
 function matchesFilters(event) {
   if (!calendarState.selectedInstitutions.has(event.institution.id)) return false;
   if (!calendarState.selectedEventTypes.has(event.event_type)) return false;
@@ -34,7 +61,7 @@ function matchesFilters(event) {
 }
 
 function filteredEvents() {
-  return (calendarState.payload?.events || []).filter(matchesFilters);
+  return sortEventsByStart((calendarState.payload?.events || []).filter(matchesFilters));
 }
 
 function toggleSetValue(targetSet, value, fallbackValues) {
@@ -55,9 +82,112 @@ function renderFilterChips(containerId, items, selectedSet, key, labelKey, color
   container.innerHTML = items.map((item) => {
     const value = item[key];
     const active = selectedSet.has(value);
-    const style = colorKey && item[colorKey] ? ` style="border-color:${escapeHtml(item[colorKey])};${active ? `background:${escapeHtml(item[colorKey])};color:#fff;` : ''}"` : '';
+    const style = colorKey && item[colorKey]
+      ? ` style="border-color:${escapeHtml(item[colorKey])};${active ? `background:${escapeHtml(item[colorKey])};color:#fff;` : ''}"`
+      : '';
     return `<button class="filter-chip${active ? ' active' : ''}" type="button" data-filter-value="${escapeHtml(value)}"${style}>${escapeHtml(item[labelKey])}</button>`;
   }).join('');
+}
+
+function nextUpcomingEvent(events, { exactOnly = false } = {}) {
+  const now = Date.now();
+  const sorted = sortEventsByStart(events).filter((event) => !exactOnly || !event.is_approximate);
+  return sorted.find((event) => eventTimestamp(event, 'end') >= now) || sorted[0] || null;
+}
+
+function renderOverview(events = filteredEvents()) {
+  const payload = calendarState.payload;
+  if (!payload) return;
+  const openEvents = events.filter((event) => event.status === 'open');
+  const nextExactEvent = nextUpcomingEvent(events, { exactOnly: true });
+  const timelineLead = payload.timeline?.[0] || null;
+  const priorities = payload.dashboard?.priorities || payload.priorities || [];
+  const topPriority = priorities[0] || null;
+
+  let headline = timelineLead?.headline || '지금 봐야 할 채용 일정만 압축했다.';
+  let focus = timelineLead?.focus || payload.calendar.description || '';
+
+  if (openEvents.length) {
+    const leadOpen = openEvents[0];
+    headline = `${leadOpen.institution.name} ${leadOpen.display_label} 진행 중`;
+    focus = `${leadOpen.date_display} · ${leadOpen.summary || leadOpen.description || '지금 바로 대응해야 하는 일정'}`;
+  } else if (nextExactEvent) {
+    headline = `${nextExactEvent.institution.name} ${nextExactEvent.display_label}`;
+    focus = `${nextExactEvent.date_display} · ${nextExactEvent.summary || nextExactEvent.description || '다음 확정 일정'}`;
+  } else if (topPriority) {
+    focus = `${priorityLabel(topPriority)} 우선 · ${topPriority.reason}`;
+  }
+
+  $('overviewHeadline').textContent = headline;
+  $('overviewFocus').textContent = focus || '업데이트된 일정과 우선순위를 한 화면에 보여준다.';
+
+  const cards = [
+    {
+      label: '현재 보이는 일정',
+      value: `${events.length}건`,
+      note: calendarState.hideApproximate ? '예정 월/전후 숨김 적용' : '필터 기준으로 계산',
+    },
+    {
+      label: '진행 중',
+      value: `${openEvents.length}건`,
+      note: openEvents[0] ? openEvents[0].date_display : '열린 접수 일정 없음',
+    },
+    {
+      label: '다음 확정 일정',
+      value: nextExactEvent ? nextExactEvent.display_label : '대기 중',
+      note: nextExactEvent ? `${nextExactEvent.institution.short_name} · ${nextExactEvent.date_display}` : '확정 일정이 더 필요함',
+    },
+    {
+      label: '체크 대기 기관',
+      value: `${payload.dashboard.watch.length}곳`,
+      note: topPriority ? `${priorityLabel(topPriority)}부터 확인` : '링크만 짧게 확인',
+    },
+  ];
+
+  $('overviewHighlights').innerHTML = cards.map((item) => `
+    <article class="overview-card">
+      <span>${escapeHtml(item.label)}</span>
+      <strong>${escapeHtml(item.value)}</strong>
+      <p>${escapeHtml(item.note)}</p>
+    </article>
+  `).join('');
+}
+
+function renderTimeline() {
+  const container = $('timelineHighlights');
+  const timeline = calendarState.payload?.timeline || [];
+  if (!container) return;
+  if (!timeline.length) {
+    container.innerHTML = '<p class="event-detail-empty">표시할 타임라인이 없다.</p>';
+    return;
+  }
+  container.innerHTML = timeline.map((item) => `
+    <article class="timeline-card">
+      <p class="timeline-period">${escapeHtml(item.period || '')}</p>
+      <h3>${escapeHtml(item.headline || '')}</h3>
+      <p>${escapeHtml(item.focus || '')}</p>
+    </article>
+  `).join('');
+}
+
+function renderPriorityList() {
+  const container = $('priorityList');
+  const priorities = calendarState.payload?.dashboard?.priorities || calendarState.payload?.priorities || [];
+  if (!container) return;
+  if (!priorities.length) {
+    container.innerHTML = '<p class="event-detail-empty">표시할 우선순위가 없다.</p>';
+    return;
+  }
+  container.innerHTML = priorities.map((item) => `
+    <article class="priority-item">
+      <div class="priority-rank">${escapeHtml(item.rank)}</div>
+      <div class="priority-body">
+        <span class="priority-rank-label">우선순위 ${escapeHtml(item.rank)}</span>
+        <h3>${escapeHtml(priorityLabel(item))}</h3>
+        <p>${escapeHtml(item.reason || '')}</p>
+      </div>
+    </article>
+  `).join('');
 }
 
 function renderCounts() {
@@ -65,12 +195,19 @@ function renderCounts() {
   const container = $('calendarCounts');
   if (!counts || !container) return;
   const items = [
-    ['전체 일정', counts.total_events],
-    ['진행 중', counts.open_events],
-    ['정확한 날짜', counts.exact_events],
-    ['미확인 기관', counts.watch_only_institutions],
+    ['전체 일정', counts.total_events, '공고 + 예비공고 + 연간 계획', ''],
+    ['진행 중', counts.open_events, '지금 바로 대응 가능한 일정', 'open'],
+    ['확정 날짜', counts.exact_events, '일 단위가 확정된 일정', ''],
+    ['예정/관측', counts.planned_events, '월 단위·전후 일정 포함', 'planned'],
+    ['체크 대기 기관', counts.watch_only_institutions, '짧게 확인만 해도 되는 곳', 'watch'],
   ];
-  container.innerHTML = items.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('');
+  container.innerHTML = items.map(([label, value, note, tone]) => `
+    <div class="metric-card${tone ? ` metric-card--${tone}` : ''}">
+      <dt>${escapeHtml(label)}</dt>
+      <dd><strong>${escapeHtml(value)}</strong></dd>
+      <p>${escapeHtml(note)}</p>
+    </div>
+  `).join('');
 }
 
 function renderDashboardList(containerId, items, emptyText) {
@@ -82,8 +219,10 @@ function renderDashboardList(containerId, items, emptyText) {
   }
   container.innerHTML = items.map((item) => `
     <article class="dashboard-card">
-      <h4>${escapeHtml(item.institution.name)}</h4>
-      <p><strong>${escapeHtml(item.status)}</strong></p>
+      <div class="event-card__top">
+        <h4>${escapeHtml(item.institution.name)}</h4>
+        <span class="event-badge">${escapeHtml(item.status)}</span>
+      </div>
       <p>${escapeHtml(item.schedule_summary || item.note || '')}</p>
       <div class="dashboard-links">
         ${(item.links || []).map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link.label)}</a>`).join('')}
@@ -93,8 +232,13 @@ function renderDashboardList(containerId, items, emptyText) {
   `).join('');
 }
 
-function renderEventList() {
-  const events = filteredEvents();
+function syncSelectedEventCard() {
+  $('eventList')?.querySelectorAll('[data-event-id]').forEach((element) => {
+    element.classList.toggle('is-selected', element.dataset.eventId === calendarState.selectedEventId);
+  });
+}
+
+function renderEventList(events = filteredEvents()) {
   const container = $('eventList');
   const count = $('eventListCount');
   if (count) count.textContent = `${events.length}건`;
@@ -104,15 +248,19 @@ function renderEventList() {
     return;
   }
   container.innerHTML = events.map((event) => `
-    <article class="event-card" data-event-id="${escapeHtml(event.id)}">
-      <h3>${escapeHtml(event.title)}</h3>
-      <p>${escapeHtml(event.summary || event.description || '')}</p>
-      <p class="event-meta">
-        <span>${escapeHtml(event.date_display)}</span>
-        <span>${escapeHtml(event.event_type_label)}</span>
-        <span>${escapeHtml(event.status_label)}</span>
-      </p>
-    </article>
+    <button class="event-card${event.id === calendarState.selectedEventId ? ' is-selected' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">
+      <div class="event-card__top">
+        <span class="institution-pill" style="background:${escapeHtml(event.institution.color)}">${escapeHtml(event.institution.short_name)}</span>
+        <span class="event-badge">${escapeHtml(event.status_label)}</span>
+      </div>
+      <h3>${escapeHtml(event.list_title || event.title)}</h3>
+      <p class="event-card__summary">${escapeHtml(event.summary || event.description || event.display_label || '')}</p>
+      <div class="event-badges">
+        <span class="event-badge">${escapeHtml(event.date_display)}</span>
+        <span class="event-badge">${escapeHtml(event.event_type_label)}</span>
+        ${event.is_approximate ? '<span class="event-badge">예정</span>' : ''}
+      </div>
+    </button>
   `).join('');
   container.querySelectorAll('[data-event-id]').forEach((element) => {
     element.addEventListener('click', () => selectEvent(element.dataset.eventId || ''));
@@ -126,7 +274,7 @@ function renderSelectedEvent(event) {
   if (!event) {
     badge.hidden = true;
     detail.className = 'event-detail-empty';
-    detail.textContent = '달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.';
+    detail.textContent = EMPTY_SELECTION_TEXT;
     return;
   }
   badge.hidden = false;
@@ -135,15 +283,31 @@ function renderSelectedEvent(event) {
   badge.style.color = event.institution.color;
   detail.className = '';
   detail.innerHTML = `
-    <h3>${escapeHtml(event.title)}</h3>
-    <p>${escapeHtml(event.summary || '')}</p>
-    <ul>
-      <li>일정: ${escapeHtml(event.date_display)}</li>
-      <li>유형: ${escapeHtml(event.event_type_label)}</li>
-      <li>상태: ${escapeHtml(event.status_label)}</li>
-      ${event.source_label ? `<li>출처: ${escapeHtml(event.source_label)}</li>` : ''}
-    </ul>
+    <h3>${escapeHtml(event.list_title || event.title)}</h3>
+    <p>${escapeHtml(event.summary || event.description || '')}</p>
+    <dl class="detail-grid">
+      <div>
+        <dt>기관</dt>
+        <dd>${escapeHtml(event.institution.name)}</dd>
+      </div>
+      <div>
+        <dt>일정</dt>
+        <dd>${escapeHtml(event.date_display)}</dd>
+      </div>
+      <div>
+        <dt>유형</dt>
+        <dd>${escapeHtml(event.event_type_label)}</dd>
+      </div>
+      <div>
+        <dt>상태</dt>
+        <dd>${escapeHtml(event.status_label)}</dd>
+      </div>
+    </dl>
     ${event.description ? `<p>${escapeHtml(event.description)}</p>` : ''}
+    <ul>
+      ${event.source_label ? `<li>출처: ${escapeHtml(event.source_label)}</li>` : ''}
+      ${event.details ? `<li>${escapeHtml(event.details)}</li>` : ''}
+    </ul>
     <div class="event-actions">
       ${event.url ? `<a class="primary-link" href="${escapeHtml(event.url)}" target="_blank" rel="noopener noreferrer">공고 열기</a>` : ''}
       <a href="${escapeHtml(event.google_calendar_url)}" target="_blank" rel="noopener noreferrer">Google Calendar에 추가</a>
@@ -155,15 +319,18 @@ function selectEvent(eventId) {
   calendarState.selectedEventId = eventId;
   const event = filteredEvents().find((item) => item.id === eventId) || null;
   renderSelectedEvent(event);
+  syncSelectedEventCard();
 }
 
 function rerenderCalendar() {
+  const events = filteredEvents();
   if (calendarState.calendar) {
     calendarState.calendar.removeAllEvents();
-    calendarState.calendar.addEventSource(filteredEvents());
+    calendarState.calendar.addEventSource(events);
   }
-  renderEventList();
-  const nextSelected = filteredEvents().find((item) => item.id === calendarState.selectedEventId) || filteredEvents()[0] || null;
+  renderOverview(events);
+  renderEventList(events);
+  const nextSelected = events.find((item) => item.id === calendarState.selectedEventId) || events[0] || null;
   selectEvent(nextSelected?.id || '');
 }
 
@@ -197,12 +364,20 @@ function initializeFilterChips() {
   );
 }
 
+function applyResponsiveCalendarView(force = false) {
+  if (!calendarState.calendar) return;
+  const targetView = preferredCalendarView();
+  if (force || calendarState.calendar.view.type !== targetView) {
+    calendarState.calendar.changeView(targetView);
+  }
+}
+
 function initializeCalendar() {
   const element = $('calendar');
   if (!element || !calendarState.payload) return;
   calendarState.calendar = new window.FullCalendar.Calendar(element, {
     locale: 'ko',
-    initialView: 'dayGridMonth',
+    initialView: preferredCalendarView(),
     height: 'auto',
     headerToolbar: {
       left: 'prev,next today',
@@ -221,6 +396,7 @@ function initializeCalendar() {
     },
   });
   calendarState.calendar.render();
+  applyResponsiveCalendarView(true);
 }
 
 async function copyIcsLink() {
@@ -255,6 +431,8 @@ async function loadCalendar() {
     notes.innerHTML = (payload.calendar.notes || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
   }
 
+  renderTimeline();
+  renderPriorityList();
   renderCounts();
   renderDashboardList('dashboardOpen', payload.dashboard.open, '현재 공개된 일정이 없다.');
   renderDashboardList('dashboardWatch', payload.dashboard.watch, '미확인 기관이 없다.');
@@ -268,10 +446,13 @@ $('hideApproximateToggle')?.addEventListener('change', (event) => {
   calendarState.hideApproximate = Boolean(event.target.checked);
   rerenderCalendar();
 });
+window.matchMedia?.(COMPACT_CALENDAR_MEDIA).addEventListener?.('change', () => applyResponsiveCalendarView());
 bindFilterGroup('institutionFilters', calendarState.selectedInstitutions, () => (calendarState.payload?.institutions || []).map((item) => item.id));
 bindFilterGroup('eventTypeFilters', calendarState.selectedEventTypes, () => uniqueValues(calendarState.payload?.events || [], 'event_type'));
 bindFilterGroup('statusFilters', calendarState.selectedStatuses, () => uniqueValues(calendarState.payload?.events || [], 'status'));
 
 loadCalendar().catch((error) => {
   $('calendarIntro').textContent = error instanceof Error ? error.message : '캘린더를 불러오지 못했다.';
+  $('overviewHeadline').textContent = '일정을 불러오지 못했다.';
+  $('overviewFocus').textContent = '잠시 후 다시 시도해 달라.';
 });
