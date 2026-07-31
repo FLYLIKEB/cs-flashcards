@@ -2,6 +2,18 @@ const CALENDAR_API_PATH = '/api/calendar/recruitment';
 const COMPACT_CALENDAR_MEDIA = '(max-width: 760px)';
 const EMPTY_SELECTION_TEXT = '달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.';
 const CALENDAR_SIDEBAR_STATE_KEY = 'csFlashcardsCalendarSidebar:v1';
+const CALENDAR_LAST_PANEL_KEY = 'csFlashcardsCalendarLastPanel:v1';
+
+const PANEL_TITLES = {
+  overview: '포커스',
+  summary: '요약',
+  timeline: '타임라인',
+  events: '일정 목록',
+  subscribe: '캘린더 구독',
+  priorities: '우선순위',
+  filters: '필터',
+  watch: '기관 현황',
+};
 
 const calendarState = {
   payload: null,
@@ -11,12 +23,14 @@ const calendarState = {
   selectedStatuses: new Set(),
   hideApproximate: false,
   selectedEventId: '',
-  sidebarOpen: true,
+  selectedDateKey: '',
+  sidebarOpen: false,
   sidebarMenuOpen: false,
+  detailOpen: false,
   activeSidebarPanel: 'overview',
+  lastUtilityPanel: 'overview',
+  eventListMode: 'selected',
 };
-
-
 
 const $ = (id) => document.getElementById(id);
 
@@ -64,15 +78,41 @@ function saveCalendarSidebarState() {
   }
 }
 
-function applyCalendarSidebarState({persist = true} = {}) {
+function readSavedLastUtilityPanel() {
+  try {
+    const saved = window.localStorage.getItem(CALENDAR_LAST_PANEL_KEY);
+    if (saved && PANEL_TITLES[saved]) return saved;
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+  return 'overview';
+}
+
+function saveLastUtilityPanel() {
+  try {
+    window.localStorage.setItem(CALENDAR_LAST_PANEL_KEY, calendarState.lastUtilityPanel);
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+}
+
+function syncBackdrop() {
+  const visible = calendarState.sidebarOpen || calendarState.detailOpen;
+  $('calendarDrawerBackdrop').hidden = !visible;
+  document.body.classList.toggle('calendar-overlay-open', visible);
+}
+
+function applyCalendarSidebarState({ persist = true } = {}) {
+  const sidebar = $('calendarSidebar');
   document.body.classList.toggle('calendar-sidebar-collapsed', !calendarState.sidebarOpen);
-  $('calendarSidebar')?.setAttribute('aria-hidden', String(!calendarState.sidebarOpen));
-  if ($('calendarSidebar')) {
-    $('calendarSidebar').hidden = !calendarState.sidebarOpen;
+  if (sidebar) {
+    sidebar.hidden = !calendarState.sidebarOpen;
+    sidebar.setAttribute('aria-hidden', String(!calendarState.sidebarOpen));
   }
   if (!calendarState.sidebarOpen) {
     toggleCalendarSidebarMenu(false);
   }
+  syncBackdrop();
   if (persist) saveCalendarSidebarState();
 }
 
@@ -81,18 +121,11 @@ function toggleCalendarSidebar(force = !calendarState.sidebarOpen) {
   applyCalendarSidebarState();
 }
 
-
 function applyCalendarSidebarMenuState() {
   const menu = $('calendarSidebarMenu');
-  const toggleBtn = $('calendarSidebarToggleBtn');
-  if (menu) {
-    menu.hidden = !calendarState.sidebarMenuOpen;
-  }
-  if (toggleBtn) {
-    toggleBtn.setAttribute('aria-expanded', String(calendarState.sidebarMenuOpen));
-    toggleBtn.setAttribute('aria-label', calendarState.sidebarMenuOpen ? '기능 목록 닫기' : '기능 목록 열기');
-    toggleBtn.setAttribute('title', calendarState.sidebarMenuOpen ? '기능 목록 닫기' : '기능 목록 열기');
-  }
+  const featureBtn = $('calendarFeatureMenuBtn');
+  if (menu) menu.hidden = !calendarState.sidebarMenuOpen;
+  if (featureBtn) featureBtn.setAttribute('aria-expanded', String(calendarState.sidebarMenuOpen));
 }
 
 function toggleCalendarSidebarMenu(force = !calendarState.sidebarMenuOpen) {
@@ -100,41 +133,84 @@ function toggleCalendarSidebarMenu(force = !calendarState.sidebarMenuOpen) {
   applyCalendarSidebarMenuState();
 }
 
+function renderSidebarTitle() {
+  const title = $('calendarSidebarTitle');
+  if (title) title.textContent = PANEL_TITLES[calendarState.activeSidebarPanel] || '보조 패널';
+}
+
 function applyActiveSidebarPanel() {
   document.querySelectorAll('[data-sidebar-panel]').forEach((element) => {
     const active = element.dataset.sidebarPanel === calendarState.activeSidebarPanel;
-    element.classList.toggle('is-active', active);
     element.hidden = !active;
+    element.classList.toggle('is-active', active);
   });
   document.querySelectorAll('[data-sidebar-panel-target]').forEach((button) => {
     button.classList.toggle('active', button.dataset.sidebarPanelTarget === calendarState.activeSidebarPanel);
   });
+  renderSidebarTitle();
 }
 
-function setActiveSidebarPanel(panelId, {openSidebar = true, closeMenu = true, scroll = true} = {}) {
-  if (!panelId) return;
+function setActiveSidebarPanel(panelId, { openSidebar = true, closeMenu = true, scroll = false } = {}) {
+  if (!PANEL_TITLES[panelId]) return;
   calendarState.activeSidebarPanel = panelId;
-  if (openSidebar && !calendarState.sidebarOpen) {
-    calendarState.sidebarOpen = true;
-    applyCalendarSidebarState();
-  }
+  calendarState.lastUtilityPanel = panelId;
+  saveLastUtilityPanel();
   applyActiveSidebarPanel();
+  if (openSidebar && !calendarState.sidebarOpen) {
+    toggleCalendarSidebar(true);
+  }
   if (closeMenu) {
     toggleCalendarSidebarMenu(false);
   }
+  if (panelId === 'events') {
+    renderEventList();
+  }
   if (scroll) {
     const panel = document.querySelector(`[data-sidebar-panel="${panelId}"]`);
-    panel?.scrollIntoView({block: 'nearest'});
+    panel?.scrollIntoView({ block: 'nearest' });
   }
+}
+
+function openLastUtilityPanel() {
+  if (calendarState.sidebarOpen) {
+    toggleCalendarSidebar(false);
+    return;
+  }
+  setActiveSidebarPanel(calendarState.lastUtilityPanel || 'overview', { openSidebar: true, closeMenu: true, scroll: false });
+}
+
+function closeDetailDrawer() {
+  calendarState.detailOpen = false;
+  const detailDrawer = $('calendarDetailDrawer');
+  if (detailDrawer) {
+    detailDrawer.hidden = true;
+    detailDrawer.setAttribute('aria-hidden', 'true');
+  }
+  syncBackdrop();
+}
+
+function openDetailDrawer() {
+  calendarState.detailOpen = true;
+  const detailDrawer = $('calendarDetailDrawer');
+  if (detailDrawer) {
+    detailDrawer.hidden = false;
+    detailDrawer.setAttribute('aria-hidden', 'false');
+  }
+  syncBackdrop();
 }
 
 function openSidebarPanelFromMenu(panelId) {
   if (panelId === 'close') {
-    toggleCalendarSidebarMenu(false);
     toggleCalendarSidebar(false);
+    toggleCalendarSidebarMenu(false);
     return;
   }
-  setActiveSidebarPanel(panelId, {openSidebar: true, closeMenu: true, scroll: true});
+  if (panelId === 'detail') {
+    toggleCalendarSidebarMenu(false);
+    openDetailDrawerFromSelection();
+    return;
+  }
+  setActiveSidebarPanel(panelId, { openSidebar: true, closeMenu: true, scroll: true });
 }
 
 function eventTimestamp(event, field = 'start') {
@@ -196,6 +272,16 @@ function filteredEvents() {
   return sortEventsByStart((calendarState.payload?.events || []).filter(matchesFilters));
 }
 
+function eventDateKey(event) {
+  return String(event?.start_inclusive || event?.start || '').slice(0, 10);
+}
+
+function nextUpcomingEvent(events, { exactOnly = false } = {}) {
+  const now = Date.now();
+  const sorted = sortEventsByStart(events).filter((event) => !exactOnly || !event.is_approximate);
+  return sorted.find((event) => eventTimestamp(event, 'end') >= now) || sorted[0] || null;
+}
+
 function toggleSetValue(targetSet, value, fallbackValues) {
   if (targetSet.has(value)) {
     targetSet.delete(value);
@@ -218,11 +304,53 @@ function renderFilterChips(containerId, items, selectedSet, key, labelKey) {
   }).join('');
 }
 
+function allInstitutions() {
+  return (calendarState.payload?.institutions || []).map((item) => item.id);
+}
 
-function nextUpcomingEvent(events, { exactOnly = false } = {}) {
-  const now = Date.now();
-  const sorted = sortEventsByStart(events).filter((event) => !exactOnly || !event.is_approximate);
-  return sorted.find((event) => eventTimestamp(event, 'end') >= now) || sorted[0] || null;
+function allEventTypes() {
+  return uniqueValues(calendarState.payload?.events || [], 'event_type');
+}
+
+function allStatuses() {
+  return uniqueValues(calendarState.payload?.events || [], 'status');
+}
+
+function resetFilters() {
+  calendarState.selectedInstitutions = new Set(allInstitutions());
+  calendarState.selectedEventTypes = new Set(allEventTypes());
+  calendarState.selectedStatuses = new Set(allStatuses());
+  calendarState.hideApproximate = false;
+  if ($('hideApproximateToggle')) $('hideApproximateToggle').checked = false;
+  initializeFilterChips();
+  rerenderCalendar();
+}
+
+function renderQuickBar(events = filteredEvents()) {
+  const payload = calendarState.payload;
+  if (!payload) return;
+  const openEvents = events.filter((event) => event.status === 'open');
+  const nextExactEvent = nextUpcomingEvent(events, { exactOnly: true });
+  const restrictedGroups = [
+    calendarState.selectedInstitutions.size !== allInstitutions().length,
+    calendarState.selectedEventTypes.size !== allEventTypes().length,
+    calendarState.selectedStatuses.size !== allStatuses().length,
+    calendarState.hideApproximate,
+  ].filter(Boolean).length;
+
+  $('quickOpenCount').textContent = `${openEvents.length}건`;
+  $('quickWatchCount').textContent = `${payload.dashboard.watch.length}곳`;
+  $('quickFilterState').textContent = restrictedGroups ? `${restrictedGroups}개 조건` : '전체';
+
+  const title = $('quickNextEventTitle');
+  const meta = $('quickNextEventMeta');
+  if (nextExactEvent) {
+    title.textContent = `${nextExactEvent.institution.short_name} ${nextExactEvent.display_label}`;
+    meta.textContent = nextExactEvent.date_display;
+  } else {
+    title.textContent = '확정 일정 없음';
+    meta.textContent = '예정 일정만 남아 있다.';
+  }
 }
 
 function renderOverview(events = filteredEvents()) {
@@ -275,7 +403,6 @@ function renderOverview(events = filteredEvents()) {
   `;
 }
 
-
 function renderTimeline() {
   const container = $('timelineHighlights');
   const timeline = calendarState.payload?.timeline || [];
@@ -304,7 +431,6 @@ function renderTimeline() {
   `;
 }
 
-
 function renderPriorityList() {
   const container = $('priorityList');
   const priorities = calendarState.payload?.dashboard?.priorities || calendarState.payload?.priorities || [];
@@ -330,7 +456,6 @@ function renderPriorityList() {
     </table>
   `;
 }
-
 
 function renderCounts() {
   const counts = calendarState.payload?.counts;
@@ -359,7 +484,6 @@ function renderCounts() {
     </table>
   `;
 }
-
 
 function renderDashboardList(containerId, items, emptyText) {
   const container = $(containerId);
@@ -390,28 +514,54 @@ function renderDashboardList(containerId, items, emptyText) {
   `;
 }
 
-function syncSelectedEventCard() {
-  $('eventList')?.querySelectorAll('[data-event-id]').forEach((element) => {
-    element.classList.toggle('is-selected', element.dataset.eventId === calendarState.selectedEventId);
-  });
+function selectedDateEvents(events) {
+  const source = sortEventsByStart(events);
+  if (!source.length) return [];
+  const activeDateKey = calendarState.selectedDateKey || eventDateKey(nextUpcomingEvent(source) || source[0]);
+  calendarState.selectedDateKey = activeDateKey;
+  return source.filter((event) => eventDateKey(event) === activeDateKey);
+}
+
+function renderEventListModeButtons() {
+  $('eventListModeSelectedBtn')?.classList.toggle('active', calendarState.eventListMode === 'selected');
+  $('eventListModeAllBtn')?.classList.toggle('active', calendarState.eventListMode === 'all');
+}
+
+function setEventListMode(mode) {
+  calendarState.eventListMode = mode === 'all' ? 'all' : 'selected';
+  renderEventList();
 }
 
 function renderEventList(events = filteredEvents()) {
   const container = $('eventList');
   const count = $('eventListCount');
-  if (count) count.textContent = `${events.length}건`;
   if (!container) return;
-  if (!events.length) {
-    container.innerHTML = '<p class="event-detail-empty">현재 필터에 맞는 일정이 없다.</p>';
+
+  let listEvents = sortEventsByStart(events);
+  let contextText = '필터 기준 전체 일정';
+
+  if (calendarState.eventListMode === 'selected') {
+    listEvents = selectedDateEvents(events);
+    const lead = listEvents[0] || null;
+    contextText = lead ? `${lead.date_display} 일정만 표시` : '선택한 날짜 일정이 없다.';
+  }
+
+  renderEventListModeButtons();
+  if (count) count.textContent = `${listEvents.length}건`;
+  $('eventListContext').textContent = contextText;
+
+  if (!listEvents.length) {
+    container.innerHTML = '<p class="event-detail-empty">현재 조건에 맞는 일정이 없다.</p>';
     return;
   }
+
   container.innerHTML = `
     <table class="compact-table compact-table--events">
       <thead>
         <tr><th>날짜</th><th>일정</th><th>상태</th></tr>
       </thead>
       <tbody>
-        ${events.map((event) => `
+        ${listEvents.map((event) => `
           <tr>
             <td>${escapeHtml(event.date_display)}</td>
             <td>
@@ -424,8 +574,9 @@ function renderEventList(events = filteredEvents()) {
       </tbody>
     </table>
   `;
+
   container.querySelectorAll('[data-event-id]').forEach((element) => {
-    element.addEventListener('click', () => selectEvent(element.dataset.eventId || '', {revealSidebar: true, panelId: 'detail'}));
+    element.addEventListener('click', () => selectEvent(element.dataset.eventId || '', { openDetail: true }));
   });
 }
 
@@ -441,9 +592,6 @@ function renderSelectedEvent(event) {
   }
   badge.hidden = false;
   badge.textContent = event.institution.short_name;
-  badge.style.background = '';
-  badge.style.color = '';
-
   detail.className = '';
   detail.innerHTML = `
     <h3>${escapeHtml(event.list_title || event.title)}</h3>
@@ -478,21 +626,39 @@ function renderSelectedEvent(event) {
   `;
 }
 
-function selectEvent(eventId, {revealSidebar = false, panelId = ''} = {}) {
-  calendarState.selectedEventId = eventId;
-  const event = filteredEvents().find((item) => item.id === eventId) || null;
-  if (event && revealSidebar) {
-    if (panelId) {
-      setActiveSidebarPanel(panelId, {openSidebar: true, closeMenu: true, scroll: true});
-    } else if (!calendarState.sidebarOpen) {
-      toggleCalendarSidebar(true);
-    }
-  }
-  renderSelectedEvent(event);
-  syncSelectedEventCard();
+function syncSelectedEventCard() {
+  $('eventList')?.querySelectorAll('[data-event-id]').forEach((element) => {
+    element.classList.toggle('is-selected', element.dataset.eventId === calendarState.selectedEventId);
+  });
 }
 
+function selectEvent(eventId, { openDetail = false } = {}) {
+  calendarState.selectedEventId = eventId;
+  const event = filteredEvents().find((item) => item.id === eventId) || null;
+  if (!event) {
+    renderSelectedEvent(null);
+    syncSelectedEventCard();
+    closeDetailDrawer();
+    return;
+  }
+  calendarState.selectedDateKey = eventDateKey(event);
+  renderSelectedEvent(event);
+  renderEventList();
+  syncSelectedEventCard();
+  if (openDetail) {
+    openDetailDrawer();
+  }
+}
 
+function openDetailDrawerFromSelection() {
+  const events = filteredEvents();
+  const selected = events.find((item) => item.id === calendarState.selectedEventId) || events[0] || null;
+  if (!selected) {
+    renderSelectedEvent(null);
+    return;
+  }
+  selectEvent(selected.id, { openDetail: true });
+}
 
 function rerenderCalendar() {
   const events = filteredEvents();
@@ -500,10 +666,33 @@ function rerenderCalendar() {
     calendarState.calendar.removeAllEvents();
     calendarState.calendar.addEventSource(events);
   }
+  renderQuickBar(events);
   renderOverview(events);
+  renderCounts();
+  renderTimeline();
+  renderPriorityList();
+  renderDashboardList('dashboardOpen', calendarState.payload?.dashboard?.open || [], '현재 공개된 일정이 없다.');
+  renderDashboardList('dashboardWatch', calendarState.payload?.dashboard?.watch || [], '미확인 기관이 없다.');
   renderEventList(events);
+
   const nextSelected = events.find((item) => item.id === calendarState.selectedEventId) || events[0] || null;
-  selectEvent(nextSelected?.id || '');
+  if (nextSelected) {
+    selectEvent(nextSelected.id);
+  } else {
+    calendarState.selectedEventId = '';
+    renderSelectedEvent(null);
+    syncSelectedEventCard();
+    closeDetailDrawer();
+  }
+}
+
+function renderActiveFilterSummary() {
+  const parts = [];
+  if (calendarState.selectedInstitutions.size !== allInstitutions().length) parts.push(`기관 ${calendarState.selectedInstitutions.size}`);
+  if (calendarState.selectedEventTypes.size !== allEventTypes().length) parts.push(`유형 ${calendarState.selectedEventTypes.size}`);
+  if (calendarState.selectedStatuses.size !== allStatuses().length) parts.push(`상태 ${calendarState.selectedStatuses.size}`);
+  if (calendarState.hideApproximate) parts.push('예정 숨김');
+  $('activeFilterSummary').textContent = parts.length ? parts.join(' · ') : '전체 보기';
 }
 
 function bindFilterGroup(containerId, selectedSet, allValues) {
@@ -534,14 +723,7 @@ function initializeFilterChips() {
     'status',
     'status_label',
   );
-}
-
-function applyResponsiveCalendarView(force = false) {
-  if (!calendarState.calendar) return;
-  const targetView = preferredCalendarView();
-  if (force || calendarState.calendar.view.type !== targetView) {
-    calendarState.calendar.changeView(targetView);
-  }
+  renderActiveFilterSummary();
 }
 
 function initializeCalendar() {
@@ -564,16 +746,22 @@ function initializeCalendar() {
     events: filteredEvents(),
     eventClick(info) {
       info.jsEvent.preventDefault();
-      selectEvent(info.event.id, {revealSidebar: true, panelId: 'detail'});
+      selectEvent(info.event.id, { openDetail: true });
     },
     eventDidMount(info) {
       applyCalendarEventTone(info);
     },
-
-
   });
   calendarState.calendar.render();
   applyResponsiveCalendarView(true);
+}
+
+function applyResponsiveCalendarView(force = false) {
+  if (!calendarState.calendar) return;
+  const targetView = preferredCalendarView();
+  if (force || calendarState.calendar.view.type !== targetView) {
+    calendarState.calendar.changeView(targetView);
+  }
 }
 
 async function copyIcsLink() {
@@ -595,9 +783,10 @@ async function loadCalendar() {
   if (!response.ok) throw new Error('캘린더 데이터를 불러오지 못했다.');
   calendarState.payload = await response.json();
   const payload = calendarState.payload;
+
   payload.institutions.forEach((item) => calendarState.selectedInstitutions.add(item.id));
-  uniqueValues(payload.events, 'event_type').forEach((item) => calendarState.selectedEventTypes.add(item));
-  uniqueValues(payload.events, 'status').forEach((item) => calendarState.selectedStatuses.add(item));
+  allEventTypes().forEach((item) => calendarState.selectedEventTypes.add(item));
+  allStatuses().forEach((item) => calendarState.selectedStatuses.add(item));
 
   $('calendarUpdatedAt').textContent = `마지막 업데이트 ${payload.calendar.last_updated} · 총 ${payload.counts.total_events}개 일정`;
   $('calendarIntro').textContent = payload.calendar.intro || payload.calendar.description || '';
@@ -608,22 +797,25 @@ async function loadCalendar() {
     notes.innerHTML = (payload.calendar.notes || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
   }
 
-  renderTimeline();
-  renderPriorityList();
-  renderCounts();
-  renderDashboardList('dashboardOpen', payload.dashboard.open, '현재 공개된 일정이 없다.');
-  renderDashboardList('dashboardWatch', payload.dashboard.watch, '미확인 기관이 없다.');
   initializeFilterChips();
   initializeCalendar();
   rerenderCalendar();
+  applyActiveSidebarPanel();
 }
 
 calendarState.sidebarOpen = readSavedCalendarSidebarState();
-applyCalendarSidebarState({persist: false});
+calendarState.lastUtilityPanel = readSavedLastUtilityPanel();
+calendarState.activeSidebarPanel = calendarState.lastUtilityPanel;
+applyCalendarSidebarState({ persist: false });
 applyCalendarSidebarMenuState();
 applyActiveSidebarPanel();
 
 $('calendarSidebarToggleBtn')?.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  openLastUtilityPanel();
+});
+$('calendarFeatureMenuBtn')?.addEventListener('click', (event) => {
   event.preventDefault();
   event.stopPropagation();
   toggleCalendarSidebarMenu();
@@ -631,18 +823,44 @@ $('calendarSidebarToggleBtn')?.addEventListener('click', (event) => {
 document.querySelectorAll('[data-sidebar-panel-target]').forEach((button) => {
   button.addEventListener('click', () => openSidebarPanelFromMenu(button.dataset.sidebarPanelTarget || ''));
 });
+$('calendarSidebarCloseBtn')?.addEventListener('click', () => toggleCalendarSidebar(false));
+$('calendarDetailCloseBtn')?.addEventListener('click', closeDetailDrawer);
+$('calendarDrawerBackdrop')?.addEventListener('click', () => {
+  toggleCalendarSidebar(false);
+  closeDetailDrawer();
+});
 $('copyIcsLinkBtn')?.addEventListener('click', copyIcsLink);
+$('resetFiltersBtn')?.addEventListener('click', resetFilters);
+$('quickFilterBtn')?.addEventListener('click', () => setActiveSidebarPanel('filters', { openSidebar: true, closeMenu: true, scroll: false }));
+$('quickListBtn')?.addEventListener('click', () => setActiveSidebarPanel('events', { openSidebar: true, closeMenu: true, scroll: false }));
+$('quickNextEventBtn')?.addEventListener('click', () => {
+  const nextExactEvent = nextUpcomingEvent(filteredEvents(), { exactOnly: true });
+  if (nextExactEvent) {
+    selectEvent(nextExactEvent.id, { openDetail: true });
+  }
+});
+$('eventListModeSelectedBtn')?.addEventListener('click', () => setEventListMode('selected'));
+$('eventListModeAllBtn')?.addEventListener('click', () => setEventListMode('all'));
 $('hideApproximateToggle')?.addEventListener('change', (event) => {
   calendarState.hideApproximate = Boolean(event.target.checked);
   rerenderCalendar();
 });
 window.matchMedia?.(COMPACT_CALENDAR_MEDIA).addEventListener?.('change', () => applyResponsiveCalendarView());
 document.addEventListener('click', (event) => {
-  if (calendarState.sidebarMenuOpen && !event.target.closest('.calendar-sidebar-menu-wrap')) toggleCalendarSidebarMenu(false);
+  if (calendarState.sidebarMenuOpen && !event.target.closest('.calendar-feature-menu-wrap')) {
+    toggleCalendarSidebarMenu(false);
+  }
 });
-bindFilterGroup('institutionFilters', calendarState.selectedInstitutions, () => (calendarState.payload?.institutions || []).map((item) => item.id));
-bindFilterGroup('eventTypeFilters', calendarState.selectedEventTypes, () => uniqueValues(calendarState.payload?.events || [], 'event_type'));
-bindFilterGroup('statusFilters', calendarState.selectedStatuses, () => uniqueValues(calendarState.payload?.events || [], 'status'));
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    toggleCalendarSidebarMenu(false);
+    closeDetailDrawer();
+    toggleCalendarSidebar(false);
+  }
+});
+bindFilterGroup('institutionFilters', calendarState.selectedInstitutions, () => allInstitutions());
+bindFilterGroup('eventTypeFilters', calendarState.selectedEventTypes, () => allEventTypes());
+bindFilterGroup('statusFilters', calendarState.selectedStatuses, () => allStatuses());
 
 loadCalendar().catch((error) => {
   $('calendarIntro').textContent = error instanceof Error ? error.message : '캘린더를 불러오지 못했다.';
