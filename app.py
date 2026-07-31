@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import csv
 import html
 import hashlib
 import json
@@ -30,8 +29,10 @@ from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions, nor
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_CSV_PATH = ROOT / "data" / "CS_encyclopedia_300plus.csv"
+DEFAULT_CARDS_SEED_DB_PATH = ROOT / "data" / "cards.sqlite"
 DEFAULT_PROGRESS_DB_PATH = ROOT / "state" / "progress.sqlite"
 CSV_PATH = Path(os.environ.get("CS_FLASHCARD_CSV", DEFAULT_CSV_PATH)).expanduser().resolve()
+CARDS_SEED_DB_PATH = Path(os.environ.get("CS_FLASHCARDS_SEED_DB", DEFAULT_CARDS_SEED_DB_PATH)).expanduser().resolve()
 PROGRESS_DB_PATH = Path(os.environ.get("CS_FLASHCARD_PROGRESS_DB", DEFAULT_PROGRESS_DB_PATH)).expanduser().resolve()
 BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).expanduser().resolve()
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -884,40 +885,28 @@ def progress_db_for(csv_path: Path | None = None, progress_db_path: Path | None 
 
 
 
-def read_csv_cards(csv_path: Path = CSV_PATH, *, keep_csv_progress: bool = False) -> tuple[list[dict[str, str]], list[str]]:
-    if not csv_path.exists():
-        raise FileNotFoundError(f"CSV file not found: {csv_path}")
-    with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
-        reader = csv.DictReader(f)
-        fieldnames = ensure_review_columns(reader.fieldnames)
-        rows: list[dict[str, str]] = []
-        for row in reader:
-            normalized = {field: (row.get(field) or "") for field in fieldnames}
-            if normalized.get("known_status") not in VALID_STATUSES:
-                normalized["known_status"] = ""
-            normalized["review_count"] = normalized_review_count(normalized.get("review_count"))
-            if not keep_csv_progress:
-                normalized["known_status"] = ""
-                normalized["last_reviewed"] = ""
-                normalized["review_count"] = "0"
-            rows.append(normalized)
-    return rows, fieldnames
-
-
-def seed_rows_from_csv(csv_path: Path = CSV_PATH) -> list[dict[str, str]] | None:
-    if not csv_path.exists():
+def read_seed_card_rows(seed_db_path: Path | None = None) -> list[dict[str, Any]] | None:
+    target = Path(seed_db_path or CARDS_SEED_DB_PATH).expanduser().resolve()
+    if not target.exists():
         return None
-    rows, _ = read_csv_cards(csv_path, keep_csv_progress=True)
-    return rows
-
-def bootstrap_cards_from_csv(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> int:
-    seed_rows = seed_rows_from_csv(csv_path)
-    if not seed_rows:
-        return 0
-    db_path = progress_db_for(None, progress_db_path)
-    ensure_progress_db(db_path, seed_rows)
-    sync_legacy_ai_progress_to_db(db_path)
-    return len(seed_rows)
+    with closing(sqlite3.connect(target)) as conn:
+        conn.row_factory = sqlite3.Row
+        card_columns = {str(row["name"] or "") for row in conn.execute("PRAGMA table_info(cards)").fetchall()}
+        if not card_columns:
+            raise RuntimeError(f"Seed database is missing cards table: {target}")
+        select_fields = ["card_id", *[field for field in CARD_CONTENT_DB_COLUMNS if field in card_columns]]
+        if "sort_order" in card_columns:
+            select_fields.append("sort_order")
+        rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM cards").fetchall()
+    seed_rows: list[dict[str, Any]] = []
+    for row in rows:
+        item: dict[str, Any] = {"id": row["card_id"]}
+        for field in CARD_CONTENT_DB_COLUMNS:
+            item[field] = str(row[field] or "") if field in row.keys() else ""
+        item["sort_order"] = int(row["sort_order"] if "sort_order" in row.keys() and row["sort_order"] is not None else len(seed_rows))
+        seed_rows.append(item)
+    seed_rows.sort(key=lambda item: (int(item.get("sort_order") or 0), str(item.get("id") or "")))
+    return seed_rows
 
 
 
@@ -951,8 +940,7 @@ def connect_progress_db(progress_db_path: Path) -> sqlite3.Connection:
     return conn
 
 
-def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] | None = None) -> None:
-    existed = progress_db_path.exists()
+def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] | None = None) -> None:
     with closing(connect_progress_db(progress_db_path)) as conn:
         conn.execute(
             """
@@ -1169,7 +1157,14 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
 
-        if seed_rows:
+        bootstrap_rows = seed_rows
+        if bootstrap_rows is None:
+            cards_count = int(conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0] or 0)
+            bootstrap_rows = read_seed_card_rows() if cards_count == 0 else []
+        if bootstrap_rows is None:
+            bootstrap_rows = []
+
+        if bootstrap_rows:
             now = utc_now_iso()
             conn.executemany(
                 """
@@ -1199,14 +1194,14 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                         row.get("concept_image_alt") or "",
                         row.get("concept_media_type") or "",
                         row.get("concept_media_payload") or "",
-                        index,
+                        int(row.get("sort_order") if row.get("sort_order") is not None else index),
                         now,
                     )
-                    for index, row in enumerate(seed_rows)
+                    for index, row in enumerate(bootstrap_rows)
                     if row.get("id")
                 ],
             )
-        if seed_rows:
+        if bootstrap_rows:
             now = utc_now_iso()
             conn.executemany(
                 """
@@ -1225,7 +1220,7 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, str]] |
                         row.get("memo_updated_at") or (now if (row.get("memo") or "").strip() else ""),
                         now,
                     )
-                    for row in seed_rows
+                    for row in bootstrap_rows
                     if row.get("id") and progress_row_is_meaningful(row)
                 ],
             )
@@ -2819,6 +2814,39 @@ FIN_CORP_MID_DIFFICULTY_HINTS = (
     "클라우드",
     "보안",
 )
+FIN_CORP_CONCEPT_CONVERSION_MARKERS = (
+    "계산문제",
+    "출력결과",
+    "트리그리기",
+    "손코딩",
+    "코드 문제",
+    "코드 출력",
+    "코드 주면서",
+    "빈칸 채우기",
+    "관련 서술식",
+    "관련 문제",
+    "보여주고",
+    "객관식",
+    "주관식",
+)
+FIN_CORP_LIMITED_SOURCE_ANSWER = "문제의 선지/도표가 원문에 충분히 남아 있지 않아 단정형 정답은 제한적이다. 해당 주제의 핵심 개념과 대표 공식·특징을 기준으로 풀이해야 한다."
+FIN_CORP_KEYWORD_DROP_TOKENS = (
+    "문제",
+    "객관식",
+    "주관식",
+    "설명하시오",
+    "기술하시오",
+    "작성하시오",
+    "답하시오",
+    "구하시오",
+    "옳지 않은 것은",
+    "옳은 것은",
+    "적절한 것은",
+    "알맞은 것은",
+    "바른 설명은",
+    "해당하는 용어",
+    "관련 설명",
+)
 
 
 def clean_fin_corp_question_bank_title(value: str) -> str:
@@ -3167,6 +3195,210 @@ def fin_corp_question_bank_contains_hint(text: str, hint: str) -> bool:
     return needle in haystack
 
 
+def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = None) -> str:
+    subject = fin_corp_question_bank_topic(title)
+    subject = re.sub(r"^\[[^\]]+\]\s*", "", subject)
+    subject = re.sub(r"^\((?:약술|서술|논술|주관식)\)\s*", "", subject, flags=re.IGNORECASE)
+    cleanup_patterns = (
+        r"\s*보여주고.*$",
+        r"\s*주면서.*$",
+        r"\s*에\s+대한\s+.*$",
+        r"\s*에\s+관한\s+.*$",
+        r"\s*에\s+대해\s+.*$",
+        r"\s*관련(?:하여)?\s+.*$",
+        r"\s*(?:옳지 않은 것은|옳은 것은|적절한 것은|알맞은 것은|바른 설명은|해당하는 용어는|고르시오|선택하라는.*|선택.*|무엇인가\??).*$",
+        r"\s*(?:계산문제|출력결과|트리그리기|손코딩|빈칸 채우기|코드(?:\s*문제)?|관련 서술식|관련 문제|문제 약술|객관식 문제|주관식 문제|문제)\s*$",
+        r"\s*(?:뜻|의미|특징|개념|약술|서술식|서술|설명)\s*$",
+    )
+    changed = True
+    while changed:
+        changed = False
+        for pattern in cleanup_patterns:
+            updated = re.sub(pattern, "", subject, flags=re.IGNORECASE).strip()
+            if updated and updated != subject:
+                subject = updated
+                changed = True
+    replacements = {
+        "시간복잡도": "시간 복잡도",
+        "공간복잡도": "공간 복잡도",
+        "최대힙": "최대 힙",
+        "연결리스트": "연결 리스트",
+        "이진트리": "이진 트리",
+        "버퍼오버플로우": "버퍼 오버플로우",
+        "페이지폴트": "페이지 폴트",
+        "가상메모리": "가상 메모리",
+    }
+    for before, after in replacements.items():
+        subject = subject.replace(before, after)
+    subject = re.sub(r"\s+", " ", subject).strip(" -,:·/[]")
+    if subject:
+        return subject
+    if isinstance(card, dict) and card.get("term"):
+        return str(card.get("term") or "").strip()
+    return fin_corp_question_bank_topic(title)
+
+
+
+def fin_corp_question_bank_needs_concept_conversion(
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    question_type: str = "",
+) -> bool:
+    if question_type == "multiple_choice" or str(body or "").strip():
+        return False
+    if FIN_CORP_LIMITED_SOURCE_ANSWER in str(answer or ""):
+        return True
+    lowered = str(title or "").casefold()
+    if any(marker.casefold() in lowered for marker in FIN_CORP_CONCEPT_CONVERSION_MARKERS):
+        return True
+    return bool(re.search(r"\b문제\s*$", str(title or "")))
+
+
+
+def fin_corp_question_bank_converted_prompt(
+    title: str,
+    *,
+    question_type: str = "",
+    card: dict[str, Any] | None = None,
+) -> str:
+    subject = fin_corp_question_bank_subject(title, card=card)
+    lowered = str(title or "").casefold()
+    if any(token in lowered for token in ("비교", "차이", "장단점")):
+        prompt = f"{subject}의 개념과 차이를 설명하시오."
+    elif any(token in lowered for token in ("뜻", "의미", "약어")):
+        prompt = f"{subject}의 의미를 {'쓰시오' if question_type == 'short' else '설명하시오'}."
+    elif "특징" in lowered:
+        prompt = f"{subject}의 특징을 설명하시오."
+    elif any(token in lowered for token in ("계산문제", "출력결과", "구하기", "손코딩", "트리그리기", "코드")):
+        prompt = f"{subject}에 대해 핵심 원리와 풀이 기준을 설명하시오."
+    elif any(token in lowered for token in ("약술", "서술", "설명", "개념")):
+        prompt = f"{subject}에 대해 설명하시오."
+    elif question_type == "short":
+        prompt = f"{subject}를 간단히 설명하시오."
+    else:
+        prompt = f"{subject}에 대해 설명하시오."
+    return re.sub(r"\s+", " ", prompt).strip()
+
+
+def fin_corp_question_bank_topic_particle(value: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return "는"
+    last = text[-1]
+    if not ('가' <= last <= '힣'):
+        return "는"
+    return "은" if (ord(last) - ord('가')) % 28 else "는"
+
+
+
+def fin_corp_question_bank_conversion_note(title: str) -> str:
+    original_title = fin_corp_question_bank_topic(title)
+    lowered = original_title.casefold()
+    if any(token in lowered for token in ("계산문제", "출력결과", "구하기", "손코딩", "트리그리기", "코드")):
+        reason = "원문에 계산/코드/입력 조건이 충분히 남아 있지 않아 개념문제로 변환함."
+    else:
+        reason = "원문에 선택지/세부 조건이 충분히 남아 있지 않아 개념문제로 변환함."
+    return f"> {reason}\n> 원문 제목: {original_title}"
+
+
+
+def fin_corp_question_bank_converted_answer(
+    title: str,
+    answer: str,
+    explanation: str,
+    *,
+    category: str = "",
+    card: dict[str, Any] | None = None,
+) -> tuple[str, str]:
+    if FIN_CORP_LIMITED_SOURCE_ANSWER not in str(answer or ""):
+        return answer, explanation
+    if isinstance(card, dict) and card:
+        grounded_answer, grounded_explanation = fin_corp_question_bank_grounded_card_answer(card)
+        if grounded_answer:
+            return grounded_answer, grounded_explanation
+    lowered = str(title or "").casefold()
+    subject = fin_corp_question_bank_subject(title, card=card)
+    if "sql" in lowered:
+        converted_answer = "집계 SQL에서는 GROUP BY로 그룹을 나눈 뒤 COUNT로 개수를 계산하고, 그 결과에서 MAX나 ORDER BY DESC LIMIT 같은 방식으로 최댓값을 구한다."
+        converted_explanation = converted_answer + "\n\n실전에서는 서브쿼리, HAVING, ORDER BY를 조합해 그룹별 개수와 최댓값 조건을 함께 표현한다."
+        return converted_answer, converted_explanation
+    if any(token in lowered for token in ("python", "java", "c언어", "코드", "출력결과")):
+        converted_answer = "코드 실행 결과를 해석할 때는 변수 초기화, 연산자 우선순위, 조건 분기, 반복문, 함수 호출 순서, 참조 공유 여부를 단계적으로 추적해야 한다."
+        converted_explanation = converted_answer + "\n\n전역/static 변수, 증감 연산, 배열·리스트 변경, 값 전달과 참조 전달 차이를 먼저 확인하면 대부분의 출력 결과 문제를 구조적으로 풀 수 있다."
+        return converted_answer, converted_explanation
+    if any(token in lowered for token in ("공개키", "rsa", "전자서명")) or category == "보안":
+        particle = fin_corp_question_bank_topic_particle(subject)
+        converted_answer = f"{subject}{particle} 보안에서 자주 쓰이는 핵심 개념으로, 기본 원리와 활용 목적을 함께 설명할 수 있어야 한다."
+        converted_explanation = converted_answer + "\n\n대표 예시, 적용 위치, 장단점 또는 관련 공격/대응 방식까지 함께 정리하면 서술형 대비에 도움이 된다."
+        return converted_answer, converted_explanation
+    converted_answer = f"{subject}의 핵심 개념과 대표 원리·판단 기준을 설명할 수 있어야 한다."
+    converted_explanation = converted_answer
+    return converted_answer, converted_explanation
+
+
+
+def fin_corp_question_bank_convert_incomplete_row(
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    question_type: str = "",
+    category: str = "",
+    card: dict[str, Any] | None = None,
+) -> tuple[str, str, str, str]:
+    if not fin_corp_question_bank_needs_concept_conversion(title, body, answer, explanation, question_type=question_type):
+        return title, body, answer, explanation
+    converted_title = fin_corp_question_bank_converted_prompt(title, question_type=question_type, card=card)
+    converted_body = fin_corp_question_bank_conversion_note(title)
+    converted_answer, converted_explanation = fin_corp_question_bank_converted_answer(
+        title,
+        answer,
+        explanation,
+        category=category,
+        card=card,
+    )
+    return converted_title, converted_body, converted_answer, converted_explanation
+
+
+
+def fin_corp_question_bank_keyword_noise(value: str) -> bool:
+    text = normalize_question_bank_text(value, limit=80)
+    if not text:
+        return True
+    if text.endswith("번") and re.fullmatch(r"\d+번", text):
+        return True
+    if any(token in text for token in FIN_CORP_KEYWORD_DROP_TOKENS):
+        return True
+    if len(text) > 28 and text.count(" ") >= 2:
+        return True
+    if text.count(" ") >= 4:
+        return True
+    if text.endswith(("이다.", "한다.", "있다.")):
+        return True
+    return False
+
+
+
+def fin_corp_question_bank_keyword_candidates(
+    title: str,
+    answer: str,
+    *,
+    card: dict[str, Any] | None = None,
+) -> list[str]:
+    subject = fin_corp_question_bank_subject(title, card=card)
+    candidates: list[str] = []
+    if isinstance(card, dict) and card:
+        candidates.extend([str(card.get("term") or ""), str(card.get("english") or "")])
+    candidates.extend(bok_topic_keyword_candidates(subject))
+    if answer and len(answer) <= 80:
+        candidates.extend(bok_topic_keyword_candidates(answer))
+    return normalize_question_bank_list(candidates, item_limit=255)
+
+
 
 def fin_corp_question_bank_category(
     title: str,
@@ -3209,24 +3441,57 @@ def fin_corp_question_bank_keywords(
     *,
     card: dict[str, Any] | None = None,
 ) -> list[str]:
-    candidates: list[str] = []
-    if isinstance(card, dict) and card:
-        candidates.extend([str(card.get("term") or ""), str(card.get("english") or "")])
-    topic = fin_corp_question_bank_topic(title)
-    candidates.extend(bok_topic_keyword_candidates(topic))
-    candidates.extend(bok_detect_keyword_matches(topic, body, answer, explanation))
-    if answer and len(answer) <= 80:
-        candidates.extend(bok_topic_keyword_candidates(answer))
-    if not candidates and topic:
-        candidates.append(topic)
-    return normalize_question_bank_list(candidates, item_limit=255)[:6]
+    ordered: list[str] = []
+    seen: set[str] = set()
+    for candidate in [
+        *fin_corp_question_bank_keyword_candidates(title, answer, card=card),
+        *bok_detect_keyword_matches(fin_corp_question_bank_subject(title, card=card), answer, explanation),
+    ]:
+        normalized = bok_normalize_keyword_fragment(candidate)
+        key = normalized.casefold()
+        if not normalized or key in seen or fin_corp_question_bank_keyword_noise(normalized):
+            continue
+        seen.add(key)
+        ordered.append(normalized)
+    if not ordered:
+        subject = bok_normalize_keyword_fragment(fin_corp_question_bank_subject(title, card=card))
+        if subject and not fin_corp_question_bank_keyword_noise(subject):
+            ordered.append(subject)
+    return ordered[:6]
+
+
+def fin_corp_question_bank_card_is_grounded(
+    card: dict[str, Any] | None,
+    title: str,
+    body: str,
+    answer: str,
+    explanation: str,
+) -> bool:
+    if not isinstance(card, dict) or not card:
+        return False
+    title_key = normalize_question_bank_match_text(title)
+    answer_key = normalize_question_bank_match_text(answer)
+    candidate_keys = fin_corp_question_bank_candidate_keys(title, body, answer, explanation)
+    for raw_value in (card.get("term"), card.get("english")):
+        key = normalize_question_bank_match_text(raw_value)
+        if not key:
+            continue
+        if key in candidate_keys:
+            return True
+        if len(key) >= 4 and (key in title_key or key in answer_key):
+            return True
+    return False
 
 
 
 def fin_corp_question_bank_candidate_keys(title: str, body: str, answer: str, explanation: str) -> set[str]:
+    subject = fin_corp_question_bank_subject(title)
     candidate_terms = normalize_question_bank_list([
         fin_corp_question_bank_topic(title),
+        subject,
+        *bok_topic_keyword_candidates(subject),
         answer if len(answer) <= 120 else "",
+        *bok_topic_keyword_candidates(answer if len(answer) <= 120 else ""),
         *bok_detect_keyword_matches(title, body, answer, explanation),
     ], item_limit=255)
     return {normalize_question_bank_match_text(item) for item in candidate_terms if normalize_question_bank_match_text(item)}
@@ -3404,6 +3669,8 @@ def parse_fin_corp_question_bank_entries(
                 progress_db_path=progress_db_path,
             )
             card = fin_corp_question_bank_card(rows, title, body, answer, explanation, category=provisional_category)
+            if not fin_corp_question_bank_card_is_grounded(card, title, body, answer, explanation):
+                card = {}
             answer, explanation = fin_corp_question_bank_repair_answer(
                 title,
                 body,
@@ -3413,6 +3680,26 @@ def parse_fin_corp_question_bank_entries(
                 question_type=question_type,
                 ai_only=fin_corp_question_bank_has_ai_only_answer(content),
             )
+            title, body, answer, explanation = fin_corp_question_bank_convert_incomplete_row(
+                title,
+                body,
+                answer,
+                explanation,
+                question_type=question_type,
+                category=provisional_category,
+                card=card,
+            )
+            provisional_category = fin_corp_question_bank_category(
+                title,
+                body,
+                answer,
+                explanation,
+                csv_path=csv_path,
+                progress_db_path=progress_db_path,
+            )
+            card = fin_corp_question_bank_card(rows, title, body, answer, explanation, category=provisional_category)
+            if not fin_corp_question_bank_card_is_grounded(card, title, body, answer, explanation):
+                card = {}
             category = fin_corp_question_bank_category(
                 title,
                 body,
@@ -5649,6 +5936,8 @@ def health() -> dict[str, Any]:
         "content_db_exists": PROGRESS_DB_PATH.exists(),
         "progress_db_path": str(PROGRESS_DB_PATH),
         "progress_db_exists": PROGRESS_DB_PATH.exists(),
+        "cards_seed_db_path": str(CARDS_SEED_DB_PATH),
+        "cards_seed_db_exists": CARDS_SEED_DB_PATH.exists(),
         "legacy_bootstrap_csv_path": str(CSV_PATH),
         "legacy_bootstrap_csv_exists": CSV_PATH.exists(),
         "wiki_book_dir": str(resolved_wiki_book_dir),

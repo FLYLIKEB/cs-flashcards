@@ -112,7 +112,7 @@ TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
 mkdir -p "$TMP_STAGE/data"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
-cp -R data/. "$TMP_STAGE/data/"
+cp data/cards.sqlite data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
 if [[ -d "$WIKI_BOOK_SRC" ]]; then
   echo "위키 문서 포함: $WIKI_BOOK_SRC"
   mkdir -p "$TMP_STAGE/wiki_book"
@@ -166,106 +166,6 @@ sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot pytho
 
 mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
 
-# Preserve learning progress and legacy card-content overlays before deployment replaces the bootstrap CSV.
-# The new code flushes these legacy card-content columns into the canonical SQLite cards table after unpack.
-
-python3 - "$REMOTE_DIR/data/CS_encyclopedia_300plus.csv" "$REMOTE_DIR/state/progress.sqlite" <<'PY'
-from __future__ import annotations
-import csv
-import sqlite3
-import sys
-from datetime import datetime, timezone
-from pathlib import Path
-
-csv_path = Path(sys.argv[1])
-db_path = Path(sys.argv[2])
-valid = {"O", "X", ""}
-
-def review_count(value: str | None) -> int:
-    try:
-        return max(0, int(value or "0"))
-    except ValueError:
-        return 0
-
-if csv_path.exists():
-    db_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(db_path)
-    try:
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS card_progress (
-                card_id TEXT PRIMARY KEY,
-                known_status TEXT NOT NULL DEFAULT '' CHECK (known_status IN ('O', 'X', '')),
-                last_reviewed TEXT NOT NULL DEFAULT '',
-                review_count INTEGER NOT NULL DEFAULT 0 CHECK (review_count >= 0),
-                definition TEXT NOT NULL DEFAULT '',
-                detailed_explanation TEXT NOT NULL DEFAULT '',
-                exam_note TEXT NOT NULL DEFAULT '',
-                concept_image_url TEXT NOT NULL DEFAULT '',
-                concept_image_alt TEXT NOT NULL DEFAULT '',
-                updated_at TEXT NOT NULL
-            )
-            """
-        )
-        columns = {row[1] for row in conn.execute("PRAGMA table_info(card_progress)").fetchall()}
-        for field in ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt"):
-            if field not in columns:
-                conn.execute(f"ALTER TABLE card_progress ADD COLUMN {field} TEXT NOT NULL DEFAULT ''")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
-        now = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
-        imported = 0
-        migrated_card_content = 0
-        with csv_path.open(encoding="utf-8-sig", newline="") as f:
-            for row in csv.DictReader(f):
-                card_id = row.get("id") or ""
-                status = row.get("known_status") or ""
-                if status not in valid:
-                    status = ""
-                last_reviewed = row.get("last_reviewed") or ""
-                count = review_count(row.get("review_count"))
-                definition = (row.get("definition") or "").strip()
-                detailed = (row.get("detailed_explanation") or "").strip()
-                exam_note = (row.get("exam_note") or "").strip()
-                image_url = (row.get("concept_image_url") or "").strip()
-                image_alt = (row.get("concept_image_alt") or "").strip()
-                has_progress = bool(status or last_reviewed or count > 0)
-                has_card_content = bool(definition or detailed or exam_note or image_url or image_alt)
-                if not card_id or not (has_progress or has_card_content):
-                    continue
-                before = conn.total_changes
-                conn.execute(
-                    """
-                    INSERT INTO card_progress
-                        (card_id, known_status, last_reviewed, review_count, definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(card_id) DO UPDATE SET
-                        known_status=CASE WHEN card_progress.known_status='' THEN excluded.known_status ELSE card_progress.known_status END,
-                        last_reviewed=CASE WHEN card_progress.last_reviewed='' THEN excluded.last_reviewed ELSE card_progress.last_reviewed END,
-                        review_count=CASE WHEN card_progress.review_count=0 THEN excluded.review_count ELSE card_progress.review_count END,
-                        definition=CASE WHEN card_progress.definition='' THEN excluded.definition ELSE card_progress.definition END,
-                        detailed_explanation=CASE WHEN card_progress.detailed_explanation='' THEN excluded.detailed_explanation ELSE card_progress.detailed_explanation END,
-                        exam_note=CASE WHEN card_progress.exam_note='' THEN excluded.exam_note ELSE card_progress.exam_note END,
-                        concept_image_url=CASE WHEN card_progress.concept_image_url='' THEN excluded.concept_image_url ELSE card_progress.concept_image_url END,
-                        concept_image_alt=CASE WHEN card_progress.concept_image_alt='' THEN excluded.concept_image_alt ELSE card_progress.concept_image_alt END,
-                        updated_at=CASE WHEN card_progress.updated_at='' THEN excluded.updated_at ELSE card_progress.updated_at END
-                    """,
-                    (card_id, status, last_reviewed, count, definition, detailed, exam_note, image_url, image_alt, now),
-                )
-                delta = conn.total_changes - before
-                if has_progress:
-                    imported += delta
-                if has_card_content:
-                    migrated_card_content += delta
-        conn.commit()
-        print(f"progress migration: imported {imported} row(s) from existing remote CSV; preserved {migrated_card_content} legacy card-content row(s)")
-
-    finally:
-        conn.close()
-else:
-    print("progress migration: no existing remote CSV")
-PY
-
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
 tar -xzf /tmp/cs-flashcards.tar.gz -C "$REMOTE_DIR"
@@ -278,10 +178,9 @@ python3 -m venv .venv
 .venv/bin/python - <<'PY'
 import json
 import app
-count = app.bootstrap_cards_from_csv(app.CSV_PATH, app.PROGRESS_DB_PATH)
 cards, _ = app.read_card_content(app.PROGRESS_DB_PATH)
-print("SQLite card bootstrap:", json.dumps({
-    "imported_from_csv": count,
+print("SQLite card seed:", json.dumps({
+    "seed_db_exists": app.CARDS_SEED_DB_PATH.exists(),
     "count": len(cards),
 }, ensure_ascii=False))
 PY

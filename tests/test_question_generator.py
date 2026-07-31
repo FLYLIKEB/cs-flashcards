@@ -81,6 +81,31 @@ def write_cards(path: Path):
         writer.writerows(sample_cards())
 
 
+def write_seed_db_from_cards_csv(csv_path: Path, seed_db_path: Path) -> None:
+    if seed_db_path.exists():
+        seed_db_path.unlink()
+    rows = []
+    fieldnames = flashcard_app.content_fieldnames()
+    with csv_path.open(encoding='utf-8-sig', newline='') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            normalized = {field: (row.get(field) or '') for field in fieldnames}
+            if normalized.get('known_status') not in flashcard_app.VALID_STATUSES:
+                normalized['known_status'] = ''
+            normalized['review_count'] = flashcard_app.normalized_review_count(normalized.get('review_count'))
+            rows.append(normalized)
+    flashcard_app.ensure_progress_db(seed_db_path, rows)
+
+
+def with_seed_db(seed_db_path: Path, callback):
+    original_seed = flashcard_app.CARDS_SEED_DB_PATH
+    try:
+        flashcard_app.CARDS_SEED_DB_PATH = seed_db_path
+        return callback()
+    finally:
+        flashcard_app.CARDS_SEED_DB_PATH = original_seed
+
+
 class QuestionGeneratorTests(unittest.TestCase):
     def test_normalize_question_types_accepts_korean_aliases(self):
         self.assertEqual(normalize_question_types(['객관식', '논술형']), ['multiple_choice', 'essay'])
@@ -140,7 +165,9 @@ class QuestionGeneratorTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             missing_csv = root / 'missing.csv'
             write_cards(csv_path)
-            flashcard_app.bootstrap_cards_from_csv(csv_path, db_path)
+            seed_db_path = root / 'cards-seed.sqlite'
+            write_seed_db_from_cards_csv(csv_path, seed_db_path)
+            with_seed_db(seed_db_path, lambda: flashcard_app.ensure_progress_db(db_path))
             original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:

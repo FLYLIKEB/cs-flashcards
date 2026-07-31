@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest import mock
 
 import app as flashcard_app
-from app import mark_card, read_cards, read_csv_cards, save_memo, save_question_attempt, set_bookmark, summarize
+from app import mark_card, read_cards, save_memo, save_question_attempt, set_bookmark, summarize
 
 
 
@@ -82,9 +82,41 @@ def sqlite_card_status(path: Path, card_id: str = 'CS-001') -> dict[str, str]:
         row = conn.execute('SELECT * FROM cards WHERE card_id=?', (card_id,)).fetchone()
     return dict(row) if row else {}
 
+
+def seed_rows_from_csv(path: Path) -> list[dict[str, str]]:
+    fieldnames = flashcard_app.content_fieldnames()
+    with path.open(encoding='utf-8-sig', newline='') as f:
+        reader = csv.DictReader(f)
+        rows: list[dict[str, str]] = []
+        for row in reader:
+            normalized = {field: (row.get(field) or '') for field in fieldnames}
+            if normalized.get('known_status') not in flashcard_app.VALID_STATUSES:
+                normalized['known_status'] = ''
+            normalized['review_count'] = flashcard_app.normalized_review_count(normalized.get('review_count'))
+            rows.append(normalized)
+    return rows
+
+
+def write_seed_db_from_csv(csv_path: Path, seed_db_path: Path) -> None:
+    if seed_db_path.exists():
+        seed_db_path.unlink()
+    flashcard_app.ensure_progress_db(seed_db_path, seed_rows_from_csv(csv_path))
+
+
+def with_seed_db(seed_db_path: Path, callback):
+    original_seed = flashcard_app.CARDS_SEED_DB_PATH
+    try:
+        flashcard_app.CARDS_SEED_DB_PATH = seed_db_path
+        return callback()
+    finally:
+        flashcard_app.CARDS_SEED_DB_PATH = original_seed
+
+
 def bootstrap_runtime_db(csv_path: Path | None, db_path: Path) -> None:
     if csv_path is not None and not db_path.exists():
-        flashcard_app.bootstrap_cards_from_csv(csv_path, db_path)
+        seed_db_path = db_path.with_name('cards-seed.sqlite')
+        write_seed_db_from_csv(csv_path, seed_db_path)
+        with_seed_db(seed_db_path, lambda: flashcard_app.ensure_progress_db(db_path))
 
 
 def read_cards(csv_path: Path | None, progress_db_path: Path):
@@ -204,21 +236,20 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['concept_media_type'], 'mermaid')
             self.assertEqual(rows[0]['concept_media_payload'], 'graph TD\n  A[테스트] --> B[흐름]')
 
-    def test_read_cards_migrates_existing_csv_progress_once(self):
+    def test_read_cards_ignores_csv_progress_columns(self):
         with tempfile.TemporaryDirectory() as td:
             csv_path = Path(td) / 'cards.csv'
             db_path = Path(td) / 'progress.sqlite'
             write_sample(csv_path, include_review=True, status='O', count='4')
 
             rows, _ = read_cards(csv_path, db_path)
-            self.assertEqual(rows[0]['known_status'], 'O')
-            self.assertEqual(rows[0]['review_count'], '4')
+            self.assertEqual(rows[0]['known_status'], '')
+            self.assertEqual(rows[0]['review_count'], '0')
 
-            # After the DB exists, CSV progress is ignored so future content deploys cannot reapply stale O/X.
             write_sample(csv_path, include_review=True, status='X', count='99')
             rows, _ = read_cards(csv_path, db_path)
-            self.assertEqual(rows[0]['known_status'], 'O')
-            self.assertEqual(rows[0]['review_count'], '4')
+            self.assertEqual(rows[0]['known_status'], '')
+            self.assertEqual(rows[0]['review_count'], '0')
 
     def test_read_cards_flushes_legacy_ai_overrides_into_sqlite(self):
         with tempfile.TemporaryDirectory() as td:
@@ -451,7 +482,7 @@ class FlashcardProgressTests(unittest.TestCase):
                     'SELECT definition, detailed_explanation, exam_note, concept_image_alt FROM card_progress WHERE card_id=?',
                     ('CS-001',),
                 ).fetchone()
-            self.assertEqual(legacy, ('', '', '', ''))
+            self.assertTrue(legacy is None or tuple(legacy) == ('', '', '', ''))
 
     def test_update_card_concept_media_updates_sqlite_content(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1679,7 +1710,9 @@ class FlashcardProgressTests(unittest.TestCase):
                 conn.execute('INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, updated_at) VALUES (?, ?, ?, ?, ?)', ('CS-001', 'X', '2026-07-08T12:00:00+09:00', 2, '2026-07-08T12:00:00+09:00'))
                 conn.commit()
 
-            flashcard_app.bootstrap_cards_from_csv(csv_path, db_path)
+            seed_db_path = root / 'cards-seed.sqlite'
+            write_seed_db_from_csv(csv_path, seed_db_path)
+            with_seed_db(seed_db_path, lambda: flashcard_app.ensure_progress_db(db_path))
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['known_status'], 'X')
             self.assertEqual(rows[0]['bookmarked'], '0')
@@ -1708,14 +1741,20 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(summary['unknown'], 0)
             self.assertEqual(summary['unreviewed'], 1)
 
-    def test_read_csv_cards_can_view_raw_csv_progress_for_migration(self):
+    def test_runtime_db_can_auto_seed_from_sqlite_asset(self):
         with tempfile.TemporaryDirectory() as td:
-            csv_path = Path(td) / 'cards.csv'
-            write_sample(csv_path, include_review=True, status='O', count='2')
-            raw, _ = read_csv_cards(csv_path, keep_csv_progress=True)
-            clean, _ = read_csv_cards(csv_path, keep_csv_progress=False)
-            self.assertEqual(raw[0]['known_status'], 'O')
-            self.assertEqual(clean[0]['known_status'], '')
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            seed_db_path = root / 'cards-seed.sqlite'
+            runtime_db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True, include_media=True)
+            write_seed_db_from_csv(csv_path, seed_db_path)
+
+            rows, _ = with_seed_db(seed_db_path, lambda: flashcard_app.read_cards(None, runtime_db_path))
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]['term'], '테스트')
+            self.assertEqual(rows[0]['concept_image_url'], 'https://example.com/test-concept.png')
+            self.assertEqual(rows[0]['concept_media_type'], 'mermaid')
 
     def test_optional_basic_auth_helper(self):
         original_user = flashcard_app.PUBLIC_USERNAME

@@ -3,7 +3,7 @@
 SQLite `state/progress.sqlite`를 카드 콘텐츠와 학습 상태의 단일 저장소로 쓰는 웹앱입니다.
 
 - 카드 콘텐츠/학습 DB: `state/progress.sqlite` 또는 배포 서버의 `/home/ubuntu/cs-flashcards/state/progress.sqlite`
-- 레거시 부트스트랩 CSV: `data/CS_encyclopedia_300plus.csv`
+- 카드 시드 DB: `data/cards.sqlite` (`cards` 테이블만 담은 읽기 전용 번들)
 
 - 공개 주소: https://cs.chamung.com
 
@@ -56,10 +56,10 @@ http://127.0.0.1:8000
 | --- | --- | --- | --- | --- |
 | 카드 콘텐츠 | `state/progress.sqlite`의 `cards` 테이블 | X | X | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트, 이미지 URL/alt, 한국은행 출제 여부, 중요도, 난이도 |
 | 학습 진행상태 | `state/progress.sqlite`의 `card_progress` 테이블 | X | X | O/X, 마지막 학습 시각, 복습 횟수, 북마크, 메모, 문제풀이 기록 |
-| 레거시 부트스트랩 | `data/CS_encyclopedia_300plus.csv` | O | O | 구형 배포나 빈 SQLite를 한 번 채울 때만 쓰는 보조 원본 |
+| 카드 시드 번들 | `data/cards.sqlite` | O | O | 빈 런타임 SQLite가 처음 만들어질 때 `cards` 테이블만 채우는 읽기 전용 시드 |
 
 
-앱은 `/api/cards`를 호출할 때 SQLite의 `cards` 테이블을 카드 콘텐츠 정본(source of truth)으로 읽고, 같은 DB의 진행상태·문제풀이 통계를 합쳐 반환합니다. 예전 배포에서 `card_progress`에 남아 있던 AI 설명/이미지 오버레이는 서버 시작 시 `cards` 테이블로 자동 이관한 뒤 비웁니다.
+앱은 `/api/cards`를 호출할 때 SQLite의 `cards` 테이블을 카드 콘텐츠 정본(source of truth)으로 읽고, 같은 DB의 진행상태·문제풀이 통계를 합쳐 반환합니다. 빈 런타임 DB가 처음 만들어지면 `data/cards.sqlite`의 카드 콘텐츠만 자동으로 복사해 채우고, 예전 배포에서 `card_progress`에 남아 있던 AI 설명/이미지 오버레이는 서버 시작 시 `cards` 테이블로 자동 이관한 뒤 비웁니다.
 
 
 
@@ -94,17 +94,17 @@ CREATE TABLE card_progress (
 | 필터 | 기준 |
 | --- | --- |
 | 검색창 | ID, 용어, 영어명, 카테고리, 설명, 상세설명, 관련개념, 시험포인트, 중요도, 난이도, 한국은행 표시 검색어 |
-| 카테고리 | CSV의 `category` |
-| 중요도 | CSV의 `importance` (`⭐⭐⭐`/`⭐⭐`/`⭐`) |
-| 난이도 | CSV의 `difficulty` (`▲▲▲`/`▲▲`/`▲`) |
-| 한은 | CSV의 `bok_appeared`가 `O`인지 여부 |
+| 카테고리 | `cards` 테이블의 `category` |
+| 중요도 | `cards` 테이블의 `importance` (`⭐⭐⭐`/`⭐⭐`/`⭐`) |
+| 난이도 | `cards` 테이블의 `difficulty` (`▲▲▲`/`▲▲`/`▲`) |
+| 한은 | `cards` 테이블의 `bok_appeared`가 `O`인지 여부 |
 | O/X/미학습 | SQLite 진행상태의 `known_status` |
 
-헤더의 `전체`, `O`, `X`, `-` 숫자는 전체 CSV 기준이 아니라 현재 적용된 필터 결과 기준으로 표시됩니다. 예를 들어 `한은 O`와 `⭐⭐⭐`를 같이 고르면, 헤더 숫자도 “한국은행 기출 표시가 있고 중요도 상인 카드들”만 대상으로 다시 계산됩니다.
+헤더의 `전체`, `O`, `X`, `-` 숫자는 전체 카드 기준이 아니라 현재 적용된 필터 결과 기준으로 표시됩니다. 예를 들어 `한은 O`와 `⭐⭐⭐`를 같이 고르면, 헤더 숫자도 “한국은행 기출 표시가 있고 중요도 상인 카드들”만 대상으로 다시 계산됩니다.
 
 ## 중요도/난이도 컬럼
 
-CSV에는 각 개념별 복습 우선순위를 돕기 위해 아래 콘텐츠 컬럼이 있습니다.
+`cards` 테이블과 `data/cards.sqlite` 시드에는 각 개념별 복습 우선순위를 돕기 위해 아래 콘텐츠 컬럼이 있습니다.
 
 | 컬럼 | 값 | 의미 |
 | --- | --- | --- |
@@ -207,13 +207,13 @@ python3 scripts/generate_concept_images.py --write-csv
 
 ## 내용을 수정하고 반영하기
 
-카드의 용어, 요약, 상세설명, 한국은행 출제 여부, 중요도, 난이도 같은 콘텐츠는 운영 중에는 SQLite `cards` 테이블에서만 읽습니다. `data/CS_encyclopedia_300plus.csv`는 레거시 부트스트랩/마이그레이션 용도로만 남아 있고, O/X·마지막 학습 시각·복습 횟수는 `card_progress`에 따로 저장됩니다.
+카드의 용어, 요약, 상세설명, 한국은행 출제 여부, 중요도, 난이도 같은 콘텐츠는 운영 중에는 SQLite `cards` 테이블에서만 읽습니다. `data/cards.sqlite`는 새 런타임 DB를 위한 읽기 전용 시드 번들이고, O/X·마지막 학습 시각·복습 횟수는 `card_progress`에 따로 저장됩니다.
 
 ```text
 state/progress.sqlite
 ```
 
-수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 기존 원격 SQLite 카드 콘텐츠와 학습 진행상태를 보존하고, 번들 CSV는 새 카드 부트스트랩에만 사용합니다.
+수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 기존 원격 SQLite 카드 콘텐츠와 학습 진행상태를 보존하고, 번들 `data/cards.sqlite`는 빈 런타임 DB에만 자동 적용됩니다.
 브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
@@ -234,39 +234,14 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 
 ### 새 개념 추가
 
-CSV에 새 행을 추가하고, 기존에 사용하지 않은 새 `id`를 부여합니다.
-
-```csv
-id,term,english,category,alphabet_index,korean_initial,definition,detailed_explanation,related_concepts,source_files,exam_note,bok_appeared,importance,difficulty,concept_image_url,concept_image_alt,concept_media_type,concept_media_payload,known_status,last_reviewed,review_count
-CS-617,새 개념,New Concept,운영체제,#,ㅅ,요약...,의미: ... 활용: ...,"[[관련 개념]]",보강 개념(페이지 직접 언급 없음),시험 포인트...,,중,중,https://example.com/concept.png,새 개념 이미지,, ,,,0
-```
+런타임 카드 콘텐츠의 정본은 SQLite `cards` 테이블입니다. 새 개념을 추가하거나 삭제해야 할 때는 `state/progress.sqlite`의 `cards` 테이블과, 빈 서버 초기화를 위한 `data/cards.sqlite` 시드 번들을 함께 갱신합니다.
 
 권장 사항:
 
 - 새 개념은 마지막 번호 다음 `CS-xxx`를 사용합니다.
-- 새 행의 `known_status`, `last_reviewed`, `review_count`는 비워 두거나 `review_count`만 `0`으로 둡니다.
-- 원격 SQLite에 해당 `card_id`가 없으면 앱에서 자동으로 미학습 상태로 보입니다.
-- 카드 순서나 카테고리는 자유롭게 바꿔도 됩니다. 진행상태는 행 번호가 아니라 `id`에 연결됩니다.
-
-### 기존 개념 수정
-
-기존 개념의 설명, 상세설명, 관련개념, 카테고리, 영어명은 수정해도 됩니다.
-
-중요 규칙:
-
-- 기존 개념의 `id`는 유지합니다.
-- `id`를 유지하면 O/X 상태도 그대로 유지됩니다.
-- 예: `CS-001`의 용어명이나 설명을 바꿔도 SQLite의 `CS-001` 진행상태가 계속 붙습니다.
-
-### 개념 삭제
-
-CSV에서 행을 삭제하면 화면/API에는 더 이상 보이지 않습니다.
-
-주의 사항:
-
-- SQLite에는 삭제된 `card_id`의 진행상태가 남을 수 있습니다.
-- 남아 있어도 앱에는 표시되지 않으므로 일반 운영에는 문제가 없습니다.
-- 나중에 필요하면 CSV에 없는 `card_id`를 SQLite에서 정리하는 별도 스크립트를 만들면 됩니다.
+- `card_progress`의 `known_status`, `last_reviewed`, `review_count`는 콘텐츠 DB가 아니라 학습 진행상태이므로 직접 덮어쓰지 않습니다.
+- 기존 개념의 `id`를 유지하면 O/X 상태와 북마크/메모도 그대로 유지됩니다.
+- 개념을 삭제하면 SQLite에 남은 진행상태가 고아 데이터가 될 수 있으니, 필요하면 같은 `card_id`의 `card_progress`/`question_attempts`도 함께 정리합니다.
 
 ### 개념 ID 변경 또는 재사용 금지
 
@@ -291,7 +266,7 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
   "content_db_exists": true,
   "progress_db_exists": true,
   "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite",
-  "bootstrap_csv_exists": true,
+  "cards_seed_db_exists": true,
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
   "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book",
@@ -312,6 +287,6 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/cards
 - [ ] 기존 개념의 `id`를 바꾸지 않는다.
 - [ ] 삭제한 `id`를 새 개념에 재사용하지 않는다.
 - [ ] 새 개념에는 새 `CS-xxx`를 부여한다.
-- [ ] CSV의 `known_status`, `last_reviewed`, `review_count`를 직접 관리하지 않는다.
+- [ ] `card_progress`의 `known_status`, `last_reviewed`, `review_count`를 콘텐츠 수정용으로 직접 관리하지 않는다.
 - [ ] `state/progress.sqlite`는 Git에 커밋하지 않는다.
 - [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`를 확인한다.
