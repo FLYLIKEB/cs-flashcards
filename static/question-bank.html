@@ -42,31 +42,6 @@
           <div id="bankPageOverviewCards" class="question-bank-overview-grid" aria-live="polite"></div>
         </div>
 
-        <div class="question-bank-shell-card question-bank-table-card">
-          <div class="question-bank-card-head question-bank-table-head">
-            <div>
-              <p class="question-bank-section-kicker">Table</p>
-              <h2 class="cs-table-title">문제 목록</h2>
-              <p class="cs-table-hint">밀도 높은 목록으로 바로 고르고 풉니다.</p>
-            </div>
-          </div>
-          <div class="question-bank-table-selection">
-            <div class="question-bank-card-head question-bank-table-selection-head">
-              <div>
-                <p class="question-bank-section-kicker">Selection</p>
-                <h2 class="cs-table-title">현재 선택</h2>
-                <p class="cs-table-hint">지금 고른 문제만 짧게 확인합니다.</p>
-              </div>
-              <div class="cs-table-toolbar question-bank-selection-actions">
-                <button id="bankPageLaunchSelectedBtn" class="cs-table-button cs-table-button-primary" type="button">선택 문제 이어서 풀이</button>
-                <button id="bankPageTogglePracticeBtn" class="cs-table-button" type="button" aria-expanded="true">풀이 패널 숨기기</button>
-              </div>
-            </div>
-            <div id="bankPageSelectionSummary" class="question-bank-selection-summary" aria-live="polite">문제은행 목록을 불러오고 있습니다.</div>
-          </div>
-          <div id="bankPageList"></div>
-        </div>
-
         <div class="question-bank-shell-card question-bank-filter-card">
           <div class="question-bank-card-head">
             <div>
@@ -139,6 +114,31 @@
           </div>
 
           <div id="bankPageActiveFilters" class="question-bank-active-filters" aria-live="polite"></div>
+        </div>
+
+        <div class="question-bank-shell-card question-bank-table-card">
+          <div class="question-bank-card-head question-bank-table-head">
+            <div>
+              <p class="question-bank-section-kicker">Table</p>
+              <h2 class="cs-table-title">문제 목록</h2>
+              <p class="cs-table-hint">밀도 높은 목록으로 바로 고르고 풉니다.</p>
+            </div>
+          </div>
+          <div class="question-bank-table-selection">
+            <div class="question-bank-card-head question-bank-table-selection-head">
+              <div>
+                <p class="question-bank-section-kicker">Selection</p>
+                <h2 class="cs-table-title">현재 선택</h2>
+                <p class="cs-table-hint">지금 고른 문제만 짧게 확인합니다.</p>
+              </div>
+              <div class="cs-table-toolbar question-bank-selection-actions">
+                <button id="bankPageLaunchSelectedBtn" class="cs-table-button cs-table-button-primary" type="button">선택 문제 이어서 풀이</button>
+                <button id="bankPageTogglePracticeBtn" class="cs-table-button" type="button" aria-expanded="true">풀이 패널 숨기기</button>
+              </div>
+            </div>
+            <div id="bankPageSelectionSummary" class="question-bank-selection-summary" aria-live="polite">문제은행 목록을 불러오고 있습니다.</div>
+          </div>
+          <div id="bankPageList"></div>
         </div>
 
         <p id="bankPageError" class="cs-table-error" role="status"></p>
