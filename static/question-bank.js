@@ -4,12 +4,12 @@ const QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_BANK_COLUMNS = [
   {key: 'index', label: '#', width: '56px'},
-  {key: 'prompt', label: '문제', width: '40rem', cellClassName: 'term-cell'},
-  {key: 'type', label: '형식', width: '7rem'},
-  {key: 'topic', label: '키워드', width: '13rem'},
-  {key: 'issuer', label: '기관', width: '8rem'},
-  {key: 'difficulty', label: '난이도', width: '6rem'},
-  {key: 'source', label: '출처', width: '12rem'},
+  {key: 'prompt', label: '문제', width: '36rem', cellClassName: 'term-cell'},
+  {key: 'type', label: '형식', width: '6.5rem'},
+  {key: 'topic', label: '키워드', width: '10.5rem'},
+  {key: 'issuer', label: '기관', width: '7rem'},
+  {key: 'difficulty', label: '난이도', width: '5.5rem'},
+  {key: 'source', label: '출처', width: '8rem'},
 ];
 const FILTER_FIELDS = [
   {key: 'q', id: 'bankPageQueryInput', label: '통합 검색'},
@@ -34,6 +34,7 @@ const bankState = {
   practiceStartIndex: 0,
   practiceNonce: 0,
   practiceCollapsed: true,
+  filtersCollapsed: true,
 };
 
 let pendingLoadTimer = 0;
@@ -109,6 +110,10 @@ function persistedPracticeCollapsed() {
   return true;
 }
 
+function persistedFiltersCollapsed() {
+  return true;
+}
+
 function pillTone(prefix, rawValue) {
   const value = String(rawValue || '').trim();
   if (!value) return `${prefix}-default`;
@@ -126,8 +131,8 @@ function pillTone(prefix, rawValue) {
   return `${prefix}-default`;
 }
 
-function metricCard(label, value, detail, tone = '') {
-  return `<article class="question-bank-metric-card${tone ? ` ${tone}` : ''}"><span class="question-bank-metric-label">${escapeHtml(label)}</span><strong class="question-bank-metric-value">${escapeHtml(value)}</strong><p class="question-bank-metric-detail">${escapeHtml(detail)}</p></article>`;
+function metricCard(label, value, detail = '', tone = '') {
+  return `<article class="question-bank-metric-card${tone ? ` ${tone}` : ''}"><span class="question-bank-metric-label">${escapeHtml(label)}</span><strong class="question-bank-metric-value">${escapeHtml(value)}</strong>${detail ? `<p class="question-bank-metric-detail">${escapeHtml(detail)}</p>` : ''}</article>`;
 }
 
 function summaryBits(item) {
@@ -169,6 +174,30 @@ function applyPracticeViewState() {
   const practiceFocus = bankState.practiceLoaded && !bankState.practiceCollapsed;
   document.body.classList.toggle('question-bank-practice-collapsed', !practiceFocus);
   document.body.classList.toggle('question-bank-practice-focus', practiceFocus);
+}
+
+function applyFilterViewState() {
+  document.body.classList.toggle('question-bank-filters-collapsed', bankState.filtersCollapsed);
+}
+
+function renderFilterToggle() {
+  const toggleButton = $('bankPageToggleFiltersBtn');
+  if (!toggleButton) return;
+  const count = activeFilterEntries().length;
+  toggleButton.textContent = bankState.filtersCollapsed
+    ? `필터 열기${count ? ` (${count})` : ''}`
+    : '필터 숨기기';
+  toggleButton.setAttribute('aria-expanded', String(!bankState.filtersCollapsed));
+}
+
+function setFiltersCollapsed(collapsed) {
+  bankState.filtersCollapsed = Boolean(collapsed);
+  applyFilterViewState();
+  renderFilterToggle();
+}
+
+function toggleFiltersCollapsed() {
+  setFiltersCollapsed(!bankState.filtersCollapsed);
 }
 
 function renderPracticeToggle() {
@@ -231,7 +260,7 @@ function populateIssuerOptions(issuers, selected = '') {
   const select = $('bankPageIssuerInput');
   if (!select) return;
   const selectedValue = String(selected || select.value || new URLSearchParams(window.location.search).get('issuer') || '').trim();
-  const options = ['<option value="">출제기관 *</option>'];
+  const options = ['<option value="">출제기관</option>'];
   (Array.isArray(issuers) ? issuers : []).forEach((issuer) => {
     const value = String(issuer || '').trim();
     if (!value) return;
@@ -245,7 +274,7 @@ function populateCategoryOptions(categories, selected = '') {
   const select = $('bankPageCategoryInput');
   if (!select) return;
   const selectedValue = String(selected || select.value || new URLSearchParams(window.location.search).get('category') || '').trim();
-  const options = ['<option value="">카테고리 *</option>'];
+  const options = ['<option value="">카테고리</option>'];
   (Array.isArray(categories) ? categories : []).forEach((category) => {
     const value = String(category || '').trim();
     if (!value) return;
@@ -311,7 +340,7 @@ function renderHeader() {
     } else if (showingPractice) {
       summary.textContent = `${current}번 문제 풀이 화면`;
     } else {
-      summary.textContent = `총 ${total}문항 중 ${returned}문항을 보고 있고, 선택한 문제로 실전형 풀이 화면을 바로 엽니다.`;
+      summary.textContent = `총 ${total}문항 · 현재 ${returned}문항 · 선택 문제 바로 풀이`;
     }
   }
   if (!chips) return;
@@ -341,10 +370,10 @@ function renderOverviewCards() {
   const selectedLabel = bankState.items.length ? `${selectedIndex(bankState.practiceStartIndex) + 1}번` : '없음';
   const practiceState = bankState.practiceLoaded ? (bankState.practiceCollapsed ? '대기' : '풀이 중') : '미시작';
   mount.innerHTML = [
-    metricCard('표시 목록', `${returned}문항`, total ? `전체 ${total}문항 중 현재 범위` : '목록을 불러오는 중입니다.'),
-    metricCard('현재 선택', selectedLabel, '표 바로 위 선택 요약에서 즉시 풀이를 시작합니다.'),
-    metricCard('적용 필터', `${filterCount}개`, filterCount ? '칩을 눌러 개별 조건을 제거할 수 있습니다.' : '전체 흐름을 보고 있습니다.'),
-    metricCard('풀이 상태', practiceState, bankState.practiceLoaded ? '문제은행 보기/문제 풀이 보기로 전환합니다.' : '문제를 고르면 풀이 화면으로 전환됩니다.'),
+    metricCard('표시', `${returned}${total ? ` / ${total}` : ''}`),
+    metricCard('선택', selectedLabel),
+    metricCard('필터', filterCount ? `${filterCount}개` : '숨김'),
+    metricCard('풀이', practiceState),
   ].join('');
 }
 
@@ -361,14 +390,16 @@ function renderActiveFilters() {
   if (!mount) return;
   const entries = activeFilterEntries();
   if (!entries.length) {
-    mount.innerHTML = '<span class="question-bank-filter-empty">필터 없이 전체 흐름을 보고 있습니다.</span>';
+    mount.innerHTML = '<span class="question-bank-filter-empty">필터 없음</span>';
+    renderFilterToggle();
     return;
   }
   mount.innerHTML = entries.map((entry) => {
     const displayValue = entry.key === 'question_type' ? (QUESTION_TYPE_LABELS[entry.value] || entry.value) : entry.value;
-    return `<button type="button" class="question-bank-filter-chip" data-filter-key="${escapeHtml(entry.key)}" aria-label="${escapeHtml(entry.label)} 필터 제거"><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(displayValue)}</span><span class="question-bank-filter-chip-remove">해제</span></button>`;
+    return `<button type="button" class="question-bank-filter-chip" data-filter-key="${escapeHtml(entry.key)}" aria-label="${escapeHtml(entry.label)} 필터 제거"><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(displayValue)}</span><span class="question-bank-filter-chip-remove">×</span></button>`;
   }).join('');
   bindActiveFilterChipActions();
+  renderFilterToggle();
 }
 
 function renderSelectionSummary() {
@@ -376,20 +407,18 @@ function renderSelectionSummary() {
   if (!mount) return;
   const item = selectedItem();
   if (!item) {
-    mount.innerHTML = '<div class="question-bank-selection-empty">표에서 문제를 고르면 여기서 바로 풀이 시작점을 확인합니다.</div>';
+    mount.innerHTML = '<div class="question-bank-selection-empty">표에서 문제를 고르면 바로 이어서 풀 수 있습니다.</div>';
     return;
   }
-  const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 120);
-  const keywords = renderQuestionKeywordLinks(item.keywords, {limit: 4});
+  const keywords = renderQuestionKeywordLinks(item.keywords, {limit: 2});
   mount.innerHTML = `
     <article class="question-bank-selection-card-body">
       <div class="question-bank-selection-copy">
-        <p class="question-bank-selection-index">현재 ${escapeHtml(String(selectedIndex(bankState.practiceStartIndex) + 1))}번 · ${escapeHtml(String(bankState.items.length))}문항 중</p>
+        <p class="question-bank-selection-index">선택 ${escapeHtml(String(selectedIndex(bankState.practiceStartIndex) + 1))} / ${escapeHtml(String(bankState.items.length))}</p>
         <h3 class="question-bank-selection-title">${escapeHtml(selectedPrompt(item, '선택된 문제가 없습니다.'))}</h3>
-        <p class="question-bank-selection-preview">${escapeHtml(preview || '문제 핵심만 빠르게 보고 바로 풀이를 시작합니다.')}</p>
       </div>
       <div class="question-bank-selection-meta">${summaryBits(item).join('')}</div>
-      <div class="question-bank-selection-keywords">${keywords === '—' ? '<span class="question-bank-selection-keywords-empty">연결 키워드가 없습니다.</span>' : keywords}</div>
+      ${keywords === '—' ? '' : `<div class="question-bank-selection-keywords">${keywords}</div>`}
     </article>
   `;
 }
@@ -398,7 +427,7 @@ function tableRows() {
   return bankState.items.map((item, index) => {
     const active = bankState.selectedId && bankState.selectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
-    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 84);
+    const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 44);
     return {
       id: String(item.question_bank_id || index + 1),
       className: active ? 'current-row active' : '',
@@ -407,10 +436,10 @@ function tableRows() {
         index: `<span class="question-bank-row-number">${index + 1}</span>`,
         prompt: `<div class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</div>`,
         type: `<span class="question-bank-type-pill ${pillTone('type', item.question_type)}">${escapeHtml(questionTypeLabel(item) || '문제')}</span>`,
-        topic: `<div class="question-bank-keyword-list">${renderQuestionKeywordLinks(item.keywords, {limit: 3})}</div>`,
-        issuer: escapeHtml(item.issuer || '—'),
+        topic: `<div class="question-bank-keyword-list">${renderQuestionKeywordLinks(item.keywords, {limit: 2})}</div>`,
+        issuer: `<span class="question-bank-issuer-text">${escapeHtml(item.issuer || '—')}</span>`,
         difficulty: `<span class="question-bank-difficulty-pill ${pillTone('difficulty', item.difficulty)}">${escapeHtml(item.difficulty || '—')}</span>`,
-        source: escapeHtml(item.source_location || '—'),
+        source: `<span class="question-bank-source-text">${escapeHtml(item.source_location || '—')}</span>`,
       },
     };
   });
@@ -452,22 +481,20 @@ function renderTable() {
   const total = Number(bankState.summary?.total || 0);
   const returned = Number(bankState.summary?.returned || bankState.items.length || 0);
   const filterCount = activeFilterEntries().length;
-  const practiceText = bankState.practiceLoaded && !bankState.practiceCollapsed
-    ? '실전형 풀이 화면으로 전환됩니다.'
-    : '문제를 고르면 풀이 화면만 보이도록 전환됩니다.';
   summary.textContent = bankState.loading
     ? '문제은행을 불러오는 중입니다.'
-    : `총 ${total}문항 · 현재 ${returned}문항 · 필터 ${filterCount}개 · ${practiceText}`;
+    : `총 ${total}문항 · 현재 ${returned}문항 · 필터 ${filterCount}개`;
   error.textContent = bankState.error || '';
   renderHeader();
   renderOverviewCards();
   renderActiveFilters();
   renderSelectionSummary();
+  renderFilterToggle();
   window.CSTableShell.renderTable(mount, {
     columns: QUESTION_BANK_COLUMNS,
     rows: tableRows(),
     storageKey: QUESTION_BANK_COLUMN_ORDER_KEY,
-    tableMinWidth: '1100px',
+    tableMinWidth: '920px',
     emptyText: '조건에 맞는 문제가 없습니다.',
     onRowActivate: (_row, index) => {
       bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
@@ -551,6 +578,7 @@ async function loadQuestionBankPage() {
 
 applyFiltersFromUrl();
 setPracticeCollapsed(persistedPracticeCollapsed(), {persist: false});
+setFiltersCollapsed(persistedFiltersCollapsed());
 renderTable();
 renderPracticePane();
 loadQuestionBankPage().catch(() => {});
@@ -559,6 +587,7 @@ $('bankPageRefreshBtn')?.addEventListener('click', () => loadQuestionBankPage().
 $('bankPageLaunchBtn')?.addEventListener('click', () => launch(0));
 $('bankPageLaunchSelectedBtn')?.addEventListener('click', () => launch(selectedIndex(bankState.practiceStartIndex)));
 $('bankPageTogglePracticeBtn')?.addEventListener('click', togglePracticeCollapsed);
+$('bankPageToggleFiltersBtn')?.addEventListener('click', toggleFiltersCollapsed);
 $('bankPageResetFiltersBtn')?.addEventListener('click', resetFilters);
 $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollapsed(true));
 
