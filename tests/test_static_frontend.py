@@ -35,10 +35,12 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="priorityList"', CALENDAR_HTML)
         self.assertIn("const CALENDAR_API_PATH = '/api/calendar/recruitment';", CALENDAR_JS)
         self.assertIn('function preferredCalendarView()', CALENDAR_JS)
+        self.assertIn('function applyCalendarEventTone(info)', CALENDAR_JS)
         self.assertIn('Google Calendar에 추가', CALENDAR_JS)
         self.assertIn("bindFilterGroup('institutionFilters'", CALENDAR_JS)
         self.assertIn('.calendar-layout', CALENDAR_CSS)
         self.assertIn('.calendar-hero', CALENDAR_CSS)
+        self.assertIn('.fc .fc-event-toned', CALENDAR_CSS)
         self.assertIn('.filter-chip.active', CALENDAR_CSS)
     def test_frontend_normalizes_legacy_ai_image_urls(self):
         self.assertIn('function normalizedConceptMediaUrl(value)', APP_JS)

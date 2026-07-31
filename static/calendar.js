@@ -52,6 +52,36 @@ function priorityLabel(item) {
   return String(item?.institution_name || item?.institution_group || '').trim();
 }
 
+function hexToRgb(value) {
+  const normalized = String(value || '').trim().replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null;
+  return {
+    r: Number.parseInt(normalized.slice(0, 2), 16),
+    g: Number.parseInt(normalized.slice(2, 4), 16),
+    b: Number.parseInt(normalized.slice(4, 6), 16),
+  };
+}
+
+function tintColor(value, alpha) {
+  const rgb = hexToRgb(value);
+  if (!rgb) return '';
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+}
+
+function applyCalendarEventTone(info) {
+  const color = info.event.backgroundColor || info.event.borderColor || '';
+  const tint = tintColor(color, 0.14);
+  const border = tintColor(color, 0.28);
+  if (!tint || !border) return;
+  info.el.style.setProperty('--event-tint', tint);
+  info.el.style.setProperty('--event-border', border);
+  info.el.style.setProperty('--event-solid', color);
+  info.el.classList.add('fc-event-toned');
+  if (info.view.type.startsWith('list')) {
+    info.el.classList.add('fc-list-event-toned');
+  }
+}
+
 function matchesFilters(event) {
   if (!calendarState.selectedInstitutions.has(event.institution.id)) return false;
   if (!calendarState.selectedEventTypes.has(event.event_type)) return false;
@@ -393,6 +423,9 @@ function initializeCalendar() {
     eventClick(info) {
       info.jsEvent.preventDefault();
       selectEvent(info.event.id);
+    },
+    eventDidMount(info) {
+      applyCalendarEventTone(info);
     },
   });
   calendarState.calendar.render();

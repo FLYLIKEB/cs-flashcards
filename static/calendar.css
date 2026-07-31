@@ -494,14 +494,33 @@ a {
 
 .fc .fc-daygrid-event,
 .fc .fc-h-event {
-  border: 0 !important;
-  background: transparent !important;
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--text) !important;
-  padding: 0 1px;
+  padding: 0 3px;
+  border-radius: 4px;
+}
+
+.fc .fc-event-toned {
+  background: var(--event-tint) !important;
+  border-color: var(--event-border) !important;
+}
+
+.fc .fc-event-toned .fc-event-title,
+.fc .fc-event-toned .fc-event-time {
+  color: var(--text);
 }
 
 .fc .fc-daygrid-event-dot {
   border-color: var(--text) !important;
+}
+
+.fc .fc-list-event-toned td {
+  background: var(--event-tint);
+}
+
+.fc .fc-list-event-toned .fc-list-event-dot {
+  border-color: var(--event-solid) !important;
 }
 
 .fc .fc-list-event:hover td {
