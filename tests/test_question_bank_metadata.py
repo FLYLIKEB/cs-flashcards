@@ -10,24 +10,36 @@ QUESTION_BANK_JS = (ROOT / 'static' / 'question-bank.js').read_text(encoding='ut
 
 class QuestionBankMetadataTests(unittest.TestCase):
     def test_question_bank_pages_use_category_and_issuer_selects(self):
+        self.assertIn('<select id="bankPageTopicInput"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="bankPageFieldInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageCategoryInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="questionBankTopicInput"', INDEX_HTML)
+        self.assertIn('<select id="questionBankFieldInput"', INDEX_HTML)
         self.assertIn('<select id="questionBankCategoryInput"', INDEX_HTML)
         self.assertIn('<select id="questionBankIssuerInput"', INDEX_HTML)
 
     def test_question_bank_scripts_populate_category_and_issuer_options_and_keywords(self):
+        self.assertIn('function populateTopicOptions(', QUESTION_BANK_JS)
+        self.assertIn('function populateFieldNameOptions(', QUESTION_BANK_JS)
         self.assertIn('function populateIssuerOptions(', QUESTION_BANK_JS)
         self.assertIn('function populateCategoryOptions(', QUESTION_BANK_JS)
         self.assertIn('function normalizeQuestionKeywords(', QUESTION_BANK_JS)
         self.assertIn('function renderQuestionKeywordLinks(', QUESTION_BANK_JS)
         self.assertIn('card_query=', QUESTION_BANK_JS)
+        self.assertIn('available_topics', QUESTION_BANK_JS)
+        self.assertIn('available_field_names', QUESTION_BANK_JS)
         self.assertIn('available_issuers', QUESTION_BANK_JS)
         self.assertIn('available_categories', QUESTION_BANK_JS)
+        self.assertIn('function populateQuestionBankTopicOptions(', APP_JS)
+        self.assertIn('function populateQuestionBankFieldNameOptions(', APP_JS)
         self.assertIn('function populateQuestionBankIssuerOptions(', APP_JS)
         self.assertIn('function populateQuestionBankCategoryOptions(', APP_JS)
         self.assertIn('function findCardByKeyword(', APP_JS)
         self.assertIn('function renderQuestionKeywordLinks(', APP_JS)
         self.assertIn('function goToQuestionKeyword(', APP_JS)
+        self.assertIn('available_topics', APP_JS)
+        self.assertIn('available_field_names', APP_JS)
         self.assertIn('available_issuers', APP_JS)
         self.assertIn('available_categories', APP_JS)
 

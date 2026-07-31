@@ -2489,6 +2489,12 @@ def read_question_bank_entries(
         category_rows = conn.execute(
             "SELECT DISTINCT category FROM question_bank WHERE TRIM(category) <> '' ORDER BY category COLLATE NOCASE ASC"
         ).fetchall()
+        topic_rows = conn.execute(
+            "SELECT DISTINCT topic FROM question_bank WHERE TRIM(topic) <> '' ORDER BY topic COLLATE NOCASE ASC"
+        ).fetchall()
+        field_name_rows = conn.execute(
+            "SELECT DISTINCT field_name FROM question_bank WHERE TRIM(field_name) <> '' ORDER BY field_name COLLATE NOCASE ASC"
+        ).fetchall()
         query_rows = conn.execute(
             f"""
             SELECT id, card_id, question_type, prompt, body, answer, explanation,
@@ -2519,6 +2525,8 @@ def read_question_bank_entries(
             "limit": safe_limit,
             "available_issuers": [str(row[0] or "").strip() for row in issuer_rows if str(row[0] or "").strip()],
             "available_categories": [str(row[0] or "").strip() for row in category_rows if str(row[0] or "").strip()],
+            "available_topics": [str(row[0] or "").strip() for row in topic_rows if str(row[0] or "").strip()],
+            "available_field_names": [str(row[0] or "").strip() for row in field_name_rows if str(row[0] or "").strip()],
             **filters,
         },
     }

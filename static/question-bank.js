@@ -284,6 +284,34 @@ function populateCategoryOptions(categories, selected = '') {
   select.value = (Array.isArray(categories) && categories.includes(selectedValue)) ? selectedValue : '';
 }
 
+function populateTopicOptions(topics, selected = '') {
+  const select = $('bankPageTopicInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || new URLSearchParams(window.location.search).get('topic') || '').trim();
+  const options = ['<option value="">문제유형</option>'];
+  (Array.isArray(topics) ? topics : []).forEach((topic) => {
+    const value = String(topic || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(topics) && topics.includes(selectedValue)) ? selectedValue : '';
+}
+
+function populateFieldNameOptions(fieldNames, selected = '') {
+  const select = $('bankPageFieldInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || new URLSearchParams(window.location.search).get('field_name') || '').trim();
+  const options = ['<option value="">분야</option>'];
+  (Array.isArray(fieldNames) ? fieldNames : []).forEach((fieldName) => {
+    const value = String(fieldName || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(fieldNames) && fieldNames.includes(selectedValue)) ? selectedValue : '';
+}
+
 function queryString() {
   const params = new URLSearchParams();
   Object.entries(filterValues()).forEach(([key, value]) => {
@@ -555,6 +583,8 @@ async function loadQuestionBankPage() {
     const previousSelectedId = bankState.selectedId;
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
+    populateTopicOptions(bankState.summary?.available_topics || [], filterValues().topic);
+    populateFieldNameOptions(bankState.summary?.available_field_names || [], filterValues().field_name);
     populateIssuerOptions(bankState.summary?.available_issuers || [], filterValues().issuer);
     populateCategoryOptions(bankState.summary?.available_categories || [], filterValues().category);
     const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
@@ -564,6 +594,8 @@ async function loadQuestionBankPage() {
   } catch (error) {
     bankState.items = [];
     bankState.summary = {total: 0, returned: 0};
+    populateTopicOptions([], filterValues().topic);
+    populateFieldNameOptions([], filterValues().field_name);
     populateIssuerOptions([], filterValues().issuer);
     populateCategoryOptions([], filterValues().category);
     bankState.error = error.message || String(error);
@@ -591,7 +623,7 @@ $('bankPageToggleFiltersBtn')?.addEventListener('click', toggleFiltersCollapsed)
 $('bankPageResetFiltersBtn')?.addEventListener('click', resetFilters);
 $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollapsed(true));
 
-['bankPageQueryInput', 'bankPageTopicInput', 'bankPageFieldInput', 'bankPageSourceInput', 'bankPageSectionInput'].forEach((id) => {
+['bankPageQueryInput', 'bankPageSourceInput', 'bankPageSectionInput'].forEach((id) => {
   $(id)?.addEventListener('input', scheduleLoad);
   $(id)?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
@@ -602,6 +634,6 @@ $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollaps
   });
 });
 
-['bankPageCategoryInput', 'bankPageIssuerInput', 'bankPageDifficultySelect', 'bankPageTypeSelect'].forEach((id) => {
+['bankPageTopicInput', 'bankPageFieldInput', 'bankPageCategoryInput', 'bankPageIssuerInput', 'bankPageDifficultySelect', 'bankPageTypeSelect'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankPage().catch(() => {}));
 });

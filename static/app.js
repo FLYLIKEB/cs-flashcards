@@ -4942,6 +4942,34 @@ function populateQuestionBankCategoryOptions(categories, selected = '') {
   select.value = (Array.isArray(categories) && categories.includes(selectedValue)) ? selectedValue : '';
 }
 
+function populateQuestionBankTopicOptions(topics, selected = '') {
+  const select = $('questionBankTopicInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || '').trim();
+  const options = ['<option value="">문제유형 *</option>'];
+  (Array.isArray(topics) ? topics : []).forEach((topic) => {
+    const value = String(topic || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(topics) && topics.includes(selectedValue)) ? selectedValue : '';
+}
+
+function populateQuestionBankFieldNameOptions(fieldNames, selected = '') {
+  const select = $('questionBankFieldInput');
+  if (!select) return;
+  const selectedValue = String(selected || select.value || '').trim();
+  const options = ['<option value="">분야 *</option>'];
+  (Array.isArray(fieldNames) ? fieldNames : []).forEach((fieldName) => {
+    const value = String(fieldName || '').trim();
+    if (!value) return;
+    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
+  });
+  select.innerHTML = options.join('');
+  select.value = (Array.isArray(fieldNames) && fieldNames.includes(selectedValue)) ? selectedValue : '';
+}
+
 
 function questionBankItemToQuestion(item, index) {
   return hydrateQuestionState({
@@ -5048,6 +5076,8 @@ async function loadQuestionBankBrowser() {
     const data = await fetchQuestionBankEntries();
     state.questionBankItems = Array.isArray(data.items) ? data.items : [];
     state.questionBankSummary = data.summary || {total: state.questionBankItems.length, returned: state.questionBankItems.length};
+    populateQuestionBankTopicOptions(state.questionBankSummary?.available_topics || [], questionBankFilterValues().topic);
+    populateQuestionBankFieldNameOptions(state.questionBankSummary?.available_field_names || [], questionBankFilterValues().field_name);
     populateQuestionBankIssuerOptions(state.questionBankSummary?.available_issuers || [], questionBankFilterValues().issuer);
     populateQuestionBankCategoryOptions(state.questionBankSummary?.available_categories || [], questionBankFilterValues().category);
 
@@ -5057,6 +5087,8 @@ async function loadQuestionBankBrowser() {
   } catch (error) {
     state.questionBankItems = [];
     state.questionBankSummary = {total: 0, returned: 0};
+    populateQuestionBankTopicOptions([], questionBankFilterValues().topic);
+    populateQuestionBankFieldNameOptions([], questionBankFilterValues().field_name);
     populateQuestionBankIssuerOptions([], questionBankFilterValues().issuer);
     populateQuestionBankCategoryOptions([], questionBankFilterValues().category);
     state.questionBankError = error.message || String(error);

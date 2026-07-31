@@ -326,6 +326,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="bankPageTopicInput"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="bankPageFieldInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageCategoryInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
 
@@ -342,8 +344,12 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
         self.assertIn('QUESTION_BANK_PRACTICE_COLLAPSED_KEY', QUESTION_BANK_JS)
+        self.assertIn('function populateTopicOptions(', QUESTION_BANK_JS)
+        self.assertIn('function populateFieldNameOptions(', QUESTION_BANK_JS)
         self.assertIn('function populateIssuerOptions(', QUESTION_BANK_JS)
         self.assertIn('function populateCategoryOptions(', QUESTION_BANK_JS)
+        self.assertIn('available_topics', QUESTION_BANK_JS)
+        self.assertIn('available_field_names', QUESTION_BANK_JS)
         self.assertIn('available_issuers', QUESTION_BANK_JS)
         self.assertIn('available_categories', QUESTION_BANK_JS)
         self.assertIn('question-keyword-link', QUESTION_BANK_JS)
@@ -574,7 +580,9 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionBankBrowser"',
             'id="questionBankQueryInput"',
             'id="questionBankTopicInput"',
+            '<select id="questionBankTopicInput"',
             'id="questionBankFieldInput"',
+            '<select id="questionBankFieldInput"',
             'id="questionBankCategoryInput"',
             '<select id="questionBankCategoryInput"',
             'id="questionBankIssuerInput"',
