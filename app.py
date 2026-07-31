@@ -32,6 +32,11 @@ DEFAULT_PROGRESS_DB_PATH = ROOT / "state" / "progress.sqlite"
 PROGRESS_DB_PATH = Path(os.environ.get("CS_FLASHCARD_PROGRESS_DB", DEFAULT_PROGRESS_DB_PATH)).expanduser().resolve()
 BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).expanduser().resolve()
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+PUBLIC_WIKI_ASSET_DIR = STATIC_DIR / "wiki-assets"
+PUBLIC_WIKI_ASSET_DIR.mkdir(parents=True, exist_ok=True)
+PUBLIC_AUTH_BYPASS_PREFIXES = (
+    "/public/wiki-assets",
+)
 DEFAULT_WIKI_BOOK_DIR = ROOT / "wiki_book"
 LEGACY_WIKI_BOOK_DIR = ROOT.parent / "wikidocs-ebook"
 WIKI_BOOK_DIR = Path(os.environ.get("CS_FLASHCARDS_WIKI_BOOK_DIR", DEFAULT_WIKI_BOOK_DIR)).expanduser().resolve()
@@ -75,6 +80,12 @@ QUESTION_ATTEMPT_JUDGMENT_LABELS = {
 PUBLIC_USERNAME = os.environ.get("CS_FLASHCARDS_USERNAME", "cs")
 PUBLIC_PASSWORD = os.environ.get("CS_FLASHCARDS_PASSWORD", "")
 AUTH_COOKIE_NAME = "cs_flashcards_auth"
+
+def is_public_auth_bypass_path(path: str | None) -> bool:
+    raw = str(path or "").strip()
+    if not raw:
+        return False
+    return any(raw == prefix or raw.startswith(f"{prefix}/") for prefix in PUBLIC_AUTH_BYPASS_PREFIXES)
 WIKI_GITHUB_REPO = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_REPO", "")).strip()
 WIKI_GITHUB_BRANCH = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_BRANCH", "main")).strip() or "main"
 WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).strip()
@@ -662,6 +673,7 @@ def render_recruitment_schedule_wiki_page(markdown_text: str) -> str:
 
 app = FastAPI(title="CS Encyclopedia Flashcards", version="1.0.0")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/public/wiki-assets", StaticFiles(directory=PUBLIC_WIKI_ASSET_DIR), name="public-wiki-assets")
 
 
 class MarkRequest(BaseModel):
@@ -820,6 +832,8 @@ def is_authorized_request(authorization: str | None, cookie_value: str | None) -
 
 @app.middleware("http")
 async def optional_basic_auth(request: Request, call_next):
+    if is_public_auth_bypass_path(request.url.path):
+        return await call_next(request)
     authorization = request.headers.get("authorization")
     cookie_value = request.cookies.get(AUTH_COOKIE_NAME)
     if is_authorized_request(authorization, cookie_value):
@@ -3043,6 +3057,30 @@ def fin_corp_question_bank_normalize_body(markdown_text: str) -> str:
     return fin_corp_question_bank_merge_code_fences("\n".join(normalized_lines).strip())
 
 
+def fin_corp_question_bank_strip_duplicate_choices(markdown_text: str, *, question_type: str = "") -> str:
+    body = str(markdown_text or "").strip()
+    if question_type != "multiple_choice" or not body:
+        return body
+    sanitized_lines: list[str] = []
+    in_code = False
+    for raw_line in body.splitlines():
+        stripped = raw_line.strip()
+        if stripped.startswith("```"):
+            in_code = not in_code
+            sanitized_lines.append(raw_line.rstrip())
+            continue
+        if in_code:
+            sanitized_lines.append(raw_line.rstrip())
+            continue
+        if FIN_CORP_CHOICE_LINE_RE.match(stripped):
+            continue
+        sanitized_lines.append(raw_line.rstrip())
+    sanitized = "\n".join(sanitized_lines)
+    sanitized = re.sub(r"\n{3,}", "\n\n", sanitized).strip()
+    if sanitized in {"보기", "보기:", "보기 :"}:
+        return ""
+    return sanitized
+
 def fin_corp_question_bank_all_true_choice_index(choices: list[str]) -> int | None:
     for index, choice in enumerate(choices):
         if any(token in str(choice or "") for token in ("모두 옳", "모든 선지", "모든 지문")):
@@ -3826,12 +3864,13 @@ def parse_fin_corp_question_bank_entries(
                                 explanation = "\n\n".join(part for part in (special_choice, explanation) if part)
                             elif not explanation:
                                 explanation = special_choice
+            stored_body = fin_corp_question_bank_strip_duplicate_choices(body, question_type=question_type)
             entries.append({
                 "question_bank_id": f"qb-fin239-{page_code}-{offset:02d}",
                 "card_id": str(card.get("id") or ""),
                 "question_type": question_type,
                 "prompt": f"### {question_number}. {title}",
-                "body": body,
+                "body": stored_body,
                 "answer": answer,
                 "explanation": explanation,
                 "rubric": [],
@@ -3840,8 +3879,8 @@ def parse_fin_corp_question_bank_entries(
                 "topic": fin_corp_question_bank_topic(title),
                 "field_name": FIN_CORP_FIELD_NAME,
                 "category": category,
-                "keywords": fin_corp_question_bank_keywords(title, body, answer, explanation, card=card),
-                "difficulty": fin_corp_question_bank_difficulty(question_type, title, body, answer, explanation, card=card),
+                "keywords": fin_corp_question_bank_keywords(title, stored_body, answer, explanation, card=card),
+                "difficulty": fin_corp_question_bank_difficulty(question_type, title, stored_body, answer, explanation, card=card),
                 "issuer": issuer,
                 "source_location": f"{page_title} · {question_number}. {title}",
                 "section": FIN_CORP_SECTION,

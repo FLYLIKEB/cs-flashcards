@@ -1124,6 +1124,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertTrue(multiple_choice['answer_guide'])
             self.assertEqual(multiple_choice['issuer'], '우리은행')
             self.assertIn('프라이빗 블록체인', multiple_choice['keywords'])
+            self.assertEqual(multiple_choice['body'], '')
 
             short = entries[1]
             self.assertEqual(short['question_type'], 'short')
@@ -1325,7 +1326,7 @@ class FlashcardProgressTests(unittest.TestCase):
             inline = by_prompt['### 2. 빅데이터 3V 중에 아닌 것은?']
             self.assertEqual(inline['choices'], ['Volume', 'Veracity', 'Variety', 'Vividity'])
             self.assertEqual(inline['answer_index'], 3)
-            self.assertEqual(inline['body'].splitlines()[:4], ['1. Volume', '2. Veracity', '3. Variety', '4. Vividity'])
+            self.assertEqual(inline['body'], '')
 
             wrapped = by_prompt['### 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?']
             self.assertEqual(wrapped['source_location'], '산업은행 기출 · 74. 두 트랜잭션이 동시에 실행될 때, 한 트랜잭션이 아직 commit되지 않은 데이터를 다른 트랜잭션이 읽는 경우 발생하는 문제는?')
@@ -1348,6 +1349,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(all_true_direct['choices'][-1], '모든선지가 맞음')
             self.assertEqual(all_true_direct['answer'], '5번')
             self.assertEqual(all_true_direct['answer_index'], 4)
+            self.assertEqual(all_true_direct['body'], '')
 
             coding = by_prompt['### 236. 다음은 동적 계획법(Dynamic Programming)을 이용하여 어떤 값을 계산하는 함수이다. 빈칸 ㄱ, ㄴ에 들어갈 코드를 작성하시오.']
             self.assertEqual(coding['card_id'], 'CS-101')
@@ -1368,6 +1370,61 @@ class FlashcardProgressTests(unittest.TestCase):
             sql_short = by_prompt['### 238. SQL에 대해 설명하시오.']
             self.assertEqual(sql_short['card_id'], '')
             self.assertEqual(sql_short['category'], '데이터베이스')
+
+    def test_parse_fin_corp_question_bank_entries_preserves_context_and_strips_duplicate_choices(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+
+            flashcard_app.ensure_progress_db(
+                db_path,
+                seed_rows=[
+                    {
+                        'id': 'CS-900',
+                        'term': '리스트 append',
+                        'english': 'List Append',
+                        'category': '프로그래밍 언어',
+                        'definition': '파이썬 리스트 끝에 원소를 추가하는 메서드다.',
+                        'detailed_explanation': 'append는 리스트 자체를 수정하고 새 길이를 반환하지 않는다.',
+                        'related_concepts': '[[리스트]], [[Python]]',
+                        'source_files': 'pages/05-02-IBK기업은행-기출.md',
+                        'exam_note': '',
+                        'bok_appeared': '',
+                        'importance': '하',
+                        'difficulty': '하',
+                    },
+                ],
+            )
+            (pages / '05-02-IBK기업은행-기출.md').write_text(
+                '# 05-02. IBK기업은행 기출\n\n'
+                '### 56. 다음 코드의 실행 결과는?\n'
+                '```python\n'
+                'values = [1, 2]\n'
+                'values.append(3)\n'
+                'print(values)\n'
+                '```\n'
+                '1. [1, 2]\n'
+                '2. [1, 2, 3]\n'
+                '3. [3, 2, 1]\n'
+                '4. 오류 발생\n\n'
+                '**답:** 2번\n',
+                encoding='utf-8',
+            )
+
+            entry = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, db_path)[0]
+
+            self.assertEqual(entry['question_type'], 'multiple_choice')
+            self.assertEqual(entry['choices'], ['[1, 2]', '[1, 2, 3]', '[3, 2, 1]', '오류 발생'])
+            self.assertEqual(entry['answer_index'], 1)
+            self.assertIn('```python', entry['body'])
+            self.assertIn('values.append(3)', entry['body'])
+            self.assertNotIn('1. [1, 2]', entry['body'])
+            self.assertNotIn('2. [1, 2, 3]', entry['body'])
+            self.assertNotIn('3. [3, 2, 1]', entry['body'])
+            self.assertNotIn('4. 오류 발생', entry['body'])
 
     def test_parse_fin_corp_question_bank_entries_converts_incomplete_rows_and_cleans_keywords(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1759,6 +1816,9 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertTrue(flashcard_app.is_authorized_request(None, cookie_value))
             self.assertTrue(flashcard_app.is_authorized_request(header, None))
             self.assertFalse(flashcard_app.is_authorized_request(None, None))
+            self.assertTrue(flashcard_app.is_public_auth_bypass_path('/public/wiki-assets/07-database-overview-ai.png'))
+            self.assertTrue(flashcard_app.is_public_auth_bypass_path('/public/wiki-assets'))
+            self.assertFalse(flashcard_app.is_public_auth_bypass_path('/static/favicon.svg'))
         finally:
             flashcard_app.PUBLIC_USERNAME = original_user
             flashcard_app.PUBLIC_PASSWORD = original_password
