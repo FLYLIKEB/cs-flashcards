@@ -281,6 +281,7 @@ class StaticFrontendTests(unittest.TestCase):
         menu_popover = INDEX_HTML.split('id="menuPopover"', 1)[1].split('</div>', 1)[0]
         self.assertIn('id="wikiHomeLink"', menu_popover)
         self.assertIn('id="questionBankPageLink"', menu_popover)
+        self.assertIn('id="calendarPageLink"', menu_popover)
         self.assertIn('id="mindMapBtn"', menu_popover)
         self.assertNotIn('id="questionPracticeBtn"', menu_popover)
         self.assertIn('function renderSourceLinks(sourceFiles)', APP_JS)
