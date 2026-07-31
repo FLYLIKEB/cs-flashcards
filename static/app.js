@@ -2002,11 +2002,7 @@ function normalizedConceptMediaType(value) {
 }
 
 function normalizedConceptMediaUrl(value) {
-  const url = String(value || '').trim();
-  if (!url) return '';
-  if (url.startsWith('/static/generated/')) return `/api/ai-images/${url.slice('/static/generated/'.length).replace(/^\/+/, '')}`;
-  if (url.startsWith('/api/concept-images/')) return `/api/ai-images/${url.slice('/api/concept-images/'.length).replace(/^\/+/, '')}`;
-  return url;
+  return String(value || '').trim();
 }
 function conceptImageUrl(card) {
   return normalizedConceptMediaUrl(card?.concept_image_url || card?.image_url || '');
@@ -2055,13 +2051,13 @@ function conceptMediaDisplayState(card) {
       hasMedia: true,
     };
   }
-  const legacyUrl = conceptImageUrl(card);
+  const imageUrl = conceptImageUrl(card);
   return {
     previewActive: false,
-    mediaType: legacyUrl && /\.gif(?:$|[?#])/i.test(legacyUrl) ? 'gif' : 'image',
-    payload: legacyUrl,
+    mediaType: imageUrl && /\.gif(?:$|[?#])/i.test(imageUrl) ? 'gif' : 'image',
+    payload: imageUrl,
     alt: conceptImageAlt(card),
-    hasMedia: Boolean(legacyUrl),
+    hasMedia: Boolean(imageUrl),
   };
 }
 

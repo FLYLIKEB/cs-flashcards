@@ -81,29 +81,6 @@ def write_cards(path: Path):
         writer.writerows(sample_cards())
 
 
-def write_seed_db_from_cards_csv(csv_path: Path, seed_db_path: Path) -> None:
-    if seed_db_path.exists():
-        seed_db_path.unlink()
-    rows = []
-    fieldnames = flashcard_app.content_fieldnames()
-    with csv_path.open(encoding='utf-8-sig', newline='') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            normalized = {field: (row.get(field) or '') for field in fieldnames}
-            if normalized.get('known_status') not in flashcard_app.VALID_STATUSES:
-                normalized['known_status'] = ''
-            normalized['review_count'] = flashcard_app.normalized_review_count(normalized.get('review_count'))
-            rows.append(normalized)
-    flashcard_app.ensure_progress_db(seed_db_path, rows)
-
-
-def with_seed_db(seed_db_path: Path, callback):
-    original_seed = flashcard_app.CARDS_SEED_DB_PATH
-    try:
-        flashcard_app.CARDS_SEED_DB_PATH = seed_db_path
-        return callback()
-    finally:
-        flashcard_app.CARDS_SEED_DB_PATH = original_seed
 
 
 class QuestionGeneratorTests(unittest.TestCase):
@@ -161,17 +138,13 @@ class QuestionGeneratorTests(unittest.TestCase):
     def test_api_generate_questions_reads_runtime_sqlite_when_csv_missing(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
-            missing_csv = root / 'missing.csv'
-            write_cards(csv_path)
-            seed_db_path = root / 'cards-seed.sqlite'
-            write_seed_db_from_cards_csv(csv_path, seed_db_path)
-            with_seed_db(seed_db_path, lambda: flashcard_app.ensure_progress_db(db_path))
-            original_csv = flashcard_app.CSV_PATH
+            flashcard_app.ensure_progress_db(db_path, [
+                {**row, 'known_status': '', 'last_reviewed': '', 'review_count': '0'}
+                for row in sample_cards()
+            ])
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
-                flashcard_app.CSV_PATH = missing_csv
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 data = flashcard_app.api_generate_questions(flashcard_app.QuestionGenerateRequest(
                     card_ids=['CS-001'],
@@ -183,7 +156,6 @@ class QuestionGeneratorTests(unittest.TestCase):
                 self.assertEqual(data['summary']['available_cards'], 1)
                 self.assertTrue(all(q['card_id'] == 'CS-001' for q in data['questions']))
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
 
 

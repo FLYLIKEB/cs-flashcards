@@ -3,7 +3,6 @@
 SQLite `state/progress.sqlite`를 카드 콘텐츠와 학습 상태의 단일 저장소로 쓰는 웹앱입니다.
 
 - 카드 콘텐츠/학습 DB: `state/progress.sqlite` 또는 배포 서버의 `/home/ubuntu/cs-flashcards/state/progress.sqlite`
-- 카드 시드 DB: `data/cards.sqlite` (`cards` 테이블만 담은 읽기 전용 번들)
 
 - 공개 주소: https://cs.chamung.com
 
@@ -54,12 +53,10 @@ http://127.0.0.1:8000
 
 | 구분 | 저장 위치 | Git 관리 | 배포 시 덮어쓰기 | 용도 |
 | --- | --- | --- | --- | --- |
-| 카드 콘텐츠 | `state/progress.sqlite`의 `cards` 테이블 | X | X | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트, 이미지 URL/alt, 한국은행 출제 여부, 중요도, 난이도 |
-| 학습 진행상태 | `state/progress.sqlite`의 `card_progress` 테이블 | X | X | O/X, 마지막 학습 시각, 복습 횟수, 북마크, 메모, 문제풀이 기록 |
-| 카드 시드 번들 | `data/cards.sqlite` | O | O | 빈 런타임 SQLite가 처음 만들어질 때 `cards` 테이블만 채우는 읽기 전용 시드 |
+| 카드 콘텐츠 | `state/progress.sqlite`의 `cards` 테이블 | O | O | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트, 이미지 URL/alt, 한국은행 출제 여부, 중요도, 난이도 |
+| 학습 진행상태 | `state/progress.sqlite`의 `card_progress` 테이블 | O | O | O/X, 마지막 학습 시각, 복습 횟수, 북마크, 메모, 문제풀이 기록 |
 
-
-앱은 `/api/cards`를 호출할 때 SQLite의 `cards` 테이블을 카드 콘텐츠 정본(source of truth)으로 읽고, 같은 DB의 진행상태·문제풀이 통계를 합쳐 반환합니다. 빈 런타임 DB가 처음 만들어지면 `data/cards.sqlite`의 카드 콘텐츠만 자동으로 복사해 채우고, 예전 배포에서 `card_progress`에 남아 있던 AI 설명/이미지 오버레이는 서버 시작 시 `cards` 테이블로 자동 이관한 뒤 비웁니다.
+앱은 `/api/cards`를 호출할 때 SQLite의 `cards` 테이블을 카드 콘텐츠 정본(source of truth)으로 읽고, 같은 DB의 진행상태·문제풀이 통계를 합쳐 반환합니다. 예전 배포에서 `card_progress`에 남아 있던 AI 설명/이미지 오버레이는 서버 시작 시 `cards` 테이블로 자동 이관한 뒤 비웁니다.
 
 
 
@@ -104,7 +101,7 @@ CREATE TABLE card_progress (
 
 ## 중요도/난이도 컬럼
 
-`cards` 테이블과 `data/cards.sqlite` 시드에는 각 개념별 복습 우선순위를 돕기 위해 아래 콘텐츠 컬럼이 있습니다.
+`cards` 테이블에는 각 개념별 복습 우선순위를 돕기 위해 아래 콘텐츠 컬럼이 있습니다.
 
 | 컬럼 | 값 | 의미 |
 | --- | --- | --- |
@@ -135,28 +132,10 @@ CREATE TABLE card_progress (
 - `html`은 메인 페이지에 직접 삽입하지 않고 sandbox iframe 안에서만 실행됩니다.
 - 브라우저의 작은 `AI` 버튼으로 새 이미지를 만들면 결과는 SQLite `cards` 테이블에 기록되고, 최종 PNG는 서버 `state/ai_images/` 아래에 보관됩니다. AI가 저장한 이미지는 `concept_media_type=image`, `concept_media_payload=/api/ai-images/...`로도 함께 기록됩니다.
 - 생성 중 이미지는 서버에서 처리되고, 완료되면 현재 화면 메시지와 브라우저 알림으로 알려줍니다.
-- 예전 SQLite에 남아 있던 AI 설명/이미지 값은 서버 시작 시 SQLite `cards` 테이블로 자동 이관합니다.
-
+- 이미지 URL과 동적 미디어 설정은 모두 SQLite `cards` 테이블 정본을 직접 수정합니다.
+- 배포 시에는 `state/progress.sqlite`와 필요한 `state/ai_images/` 파일을 함께 반영해야 합니다.
 - 프롬프트 입력 UI는 없고, 서버에 고정된 교육용 개념 이미지 프롬프트를 사용합니다.
 - AI 이미지 생성에는 서버 환경변수 `OPENAI_API_KEY`가 필요합니다.
-
-
-기존 배치 스크립트로 로컬 경로 이미지를 재생성해 CSV를 갱신하는 흐름도 계속 쓸 수 있습니다:
-
-```bash
-python3 scripts/generate_concept_images.py --write-csv
-```
-
-S3에 업로드하고 CSV를 원격 이미지 URL로 갱신:
-
-```bash
-CS_FLASHCARD_IMAGE_S3_BUCKET="버킷명" \
-CS_FLASHCARD_IMAGE_S3_PREFIX="cs-flashcards/concepts" \
-CS_FLASHCARD_IMAGE_PUBLIC_BASE_URL="https://이미지-도메인/선택경로" \
-python3 scripts/generate_concept_images.py --write-csv
-```
-
-`CS_FLASHCARD_IMAGE_PUBLIC_BASE_URL`을 생략하면 스크립트는 `https://<bucket>.s3.<region>.amazonaws.com/<prefix>` 형식의 URL을 사용합니다. GitHub Actions 배포에서도 같은 이름의 secret/variable을 설정하면 배포 전 이미지 생성·S3 업로드·CSV URL 갱신을 자동 수행합니다.
 
 
 ## 문제 풀이 모드
@@ -207,13 +186,13 @@ python3 scripts/generate_concept_images.py --write-csv
 
 ## 내용을 수정하고 반영하기
 
-카드의 용어, 요약, 상세설명, 한국은행 출제 여부, 중요도, 난이도 같은 콘텐츠는 운영 중에는 SQLite `cards` 테이블에서만 읽습니다. `data/cards.sqlite`는 새 런타임 DB를 위한 읽기 전용 시드 번들이고, O/X·마지막 학습 시각·복습 횟수는 `card_progress`에 따로 저장됩니다.
+카드의 용어, 요약, 상세설명, 한국은행 출제 여부, 중요도, 난이도 같은 콘텐츠는 운영 중에는 SQLite `cards` 테이블에서만 읽습니다. `card_progress`는 학습 진행상태 전용입니다.
 
 ```text
 state/progress.sqlite
 ```
 
-수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 기존 원격 SQLite 카드 콘텐츠와 학습 진행상태를 보존하고, 번들 `data/cards.sqlite`는 빈 런타임 DB에만 자동 적용됩니다.
+수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 저장소의 `state/progress.sqlite`를 서버에 그대로 반영합니다.
 브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
@@ -234,7 +213,7 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 
 ### 새 개념 추가
 
-런타임 카드 콘텐츠의 정본은 SQLite `cards` 테이블입니다. 새 개념을 추가하거나 삭제해야 할 때는 `state/progress.sqlite`의 `cards` 테이블과, 빈 서버 초기화를 위한 `data/cards.sqlite` 시드 번들을 함께 갱신합니다.
+런타임 카드 콘텐츠의 정본은 SQLite `cards` 테이블입니다. 새 개념을 추가하거나 삭제해야 할 때는 `state/progress.sqlite`의 관련 테이블을 직접 갱신합니다.
 
 권장 사항:
 
@@ -266,7 +245,7 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
   "content_db_exists": true,
   "progress_db_exists": true,
   "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite",
-  "cards_seed_db_exists": true,
+  "wiki_book_exists": true,
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
   "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book",

@@ -109,10 +109,11 @@ fi
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
-mkdir -p "$TMP_STAGE/data"
+mkdir -p "$TMP_STAGE/data" "$TMP_STAGE/state"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
-cp data/cards.sqlite data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
+cp data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
+cp state/progress.sqlite "$TMP_STAGE/state/"
 if [[ -d "$WIKI_BOOK_SRC" ]]; then
   echo "위키 문서 포함: $WIKI_BOOK_SRC"
   mkdir -p "$TMP_STAGE/wiki_book"
@@ -179,22 +180,22 @@ python3 -m venv .venv
 import json
 import app
 cards, _ = app.read_card_content(app.PROGRESS_DB_PATH)
-print("SQLite card seed:", json.dumps({
-    "seed_db_exists": app.CARDS_SEED_DB_PATH.exists(),
+print("SQLite card db:", json.dumps({
     "count": len(cards),
+    "path": str(app.PROGRESS_DB_PATH),
 }, ensure_ascii=False))
 PY
 if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then
   .venv/bin/python - <<'PY'
 import json
 import app
-fin_corp = app.sync_fin_corp_question_bank_entries(app.wiki_book_dir(), app.CSV_PATH, app.PROGRESS_DB_PATH)
+fin_corp = app.sync_fin_corp_question_bank_entries(app.wiki_book_dir(), app.PROGRESS_DB_PATH)
 print("239 question-bank sync:", json.dumps({
     "pages": fin_corp.get("pages", 0),
     "cleared": fin_corp.get("cleared", 0),
     "count": fin_corp.get("count", 0),
 }, ensure_ascii=False))
-bok = app.sync_bok_question_bank_entries(app.wiki_book_dir(), app.CSV_PATH, app.PROGRESS_DB_PATH)
+bok = app.sync_bok_question_bank_entries(app.wiki_book_dir(), app.PROGRESS_DB_PATH)
 print("BOK question-bank sync:", json.dumps({
     "pages": bok.get("pages", 0),
     "cleared": bok.get("cleared", 0),

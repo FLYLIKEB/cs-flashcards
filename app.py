@@ -28,11 +28,7 @@ from pydantic import BaseModel, Field
 from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions, normalize_card_ids
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_CSV_PATH = ROOT / "data" / "CS_encyclopedia_300plus.csv"
-DEFAULT_CARDS_SEED_DB_PATH = ROOT / "data" / "cards.sqlite"
 DEFAULT_PROGRESS_DB_PATH = ROOT / "state" / "progress.sqlite"
-CSV_PATH = Path(os.environ.get("CS_FLASHCARD_CSV", DEFAULT_CSV_PATH)).expanduser().resolve()
-CARDS_SEED_DB_PATH = Path(os.environ.get("CS_FLASHCARDS_SEED_DB", DEFAULT_CARDS_SEED_DB_PATH)).expanduser().resolve()
 PROGRESS_DB_PATH = Path(os.environ.get("CS_FLASHCARD_PROGRESS_DB", DEFAULT_PROGRESS_DB_PATH)).expanduser().resolve()
 BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).expanduser().resolve()
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -85,11 +81,7 @@ WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).s
 WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX", "")).strip().strip("/")
 WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
 CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_alt")
-# Legacy-only SQLite columns that older deployments may still carry until they
-# are flushed into the canonical card-content rows.
-AI_PROGRESS_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_url", "concept_image_alt")
 CONCEPT_MEDIA_TYPES = {"", "image", "gif", "video", "mermaid", "html"}
-LEGACY_CONCEPT_MEDIA_PREFIXES = ("/static/generated/", "/api/concept-images/")
 
 
 OPENAI_API_KEY = str(os.environ.get("OPENAI_API_KEY") or os.environ.get("CS_FLASHCARDS_OPENAI_API_KEY") or "").strip()
@@ -100,6 +92,12 @@ IMAGE_SIZE = str(os.environ.get("CS_FLASHCARDS_IMAGE_SIZE", "1024x1024")).strip(
 IMAGE_QUALITY = str(os.environ.get("CS_FLASHCARDS_IMAGE_QUALITY", "low")).strip() or "low"
 AI_IMAGE_DIR = Path(os.environ.get("CS_FLASHCARDS_AI_IMAGE_DIR", ROOT / "state" / "ai_images")).expanduser().resolve()
 AI_IMAGE_PREVIEW_DIR = Path(os.environ.get("CS_FLASHCARDS_AI_IMAGE_PREVIEW_DIR", ROOT / "state" / "ai_image_previews")).expanduser().resolve()
+AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
+AI_IMAGE_ARTIFACT_RE = re.compile(
+    r"^(?P<card_id>.+)-(?P<stamp>\d{8}-\d{6})-(?P<token>[0-9a-f]{8})\.(?P<ext>png|jpg|jpeg|webp|gif)$",
+    re.IGNORECASE,
+)
+
 DEFAULT_RECRUITMENT_SCHEDULE_PATH = ROOT / "data" / "recruitment_schedule_2026.json"
 RECRUITMENT_SCHEDULE_PATH = Path(
     os.environ.get("CS_FLASHCARDS_RECRUITMENT_SCHEDULE", DEFAULT_RECRUITMENT_SCHEDULE_PATH)
@@ -877,36 +875,13 @@ def normalized_bookmarked(value: Any) -> str:
     return "1" if str(value or "").strip().lower() in {"1", "true", "yes", "y", "o", "on"} else "0"
 
 
-def progress_db_for(csv_path: Path | None = None, progress_db_path: Path | None = None) -> Path:
-    del csv_path  # Legacy bootstrap path no longer participates in runtime card reads.
+def progress_db_for(progress_db_path: Path | None = None) -> Path:
     if progress_db_path is not None:
         return progress_db_path.expanduser().resolve()
     return PROGRESS_DB_PATH
 
 
 
-def read_seed_card_rows(seed_db_path: Path | None = None) -> list[dict[str, Any]] | None:
-    target = Path(seed_db_path or CARDS_SEED_DB_PATH).expanduser().resolve()
-    if not target.exists():
-        return None
-    with closing(sqlite3.connect(target)) as conn:
-        conn.row_factory = sqlite3.Row
-        card_columns = {str(row["name"] or "") for row in conn.execute("PRAGMA table_info(cards)").fetchall()}
-        if not card_columns:
-            raise RuntimeError(f"Seed database is missing cards table: {target}")
-        select_fields = ["card_id", *[field for field in CARD_CONTENT_DB_COLUMNS if field in card_columns]]
-        if "sort_order" in card_columns:
-            select_fields.append("sort_order")
-        rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM cards").fetchall()
-    seed_rows: list[dict[str, Any]] = []
-    for row in rows:
-        item: dict[str, Any] = {"id": row["card_id"]}
-        for field in CARD_CONTENT_DB_COLUMNS:
-            item[field] = str(row[field] or "") if field in row.keys() else ""
-        item["sort_order"] = int(row["sort_order"] if "sort_order" in row.keys() and row["sort_order"] is not None else len(seed_rows))
-        seed_rows.append(item)
-    seed_rows.sort(key=lambda item: (int(item.get("sort_order") or 0), str(item.get("id") or "")))
-    return seed_rows
 
 
 
@@ -920,14 +895,13 @@ def progress_row_is_meaningful(row: dict[str, str]) -> bool:
     )
 
 def normalized_runtime_media_url(value: Any) -> str:
-    url = str(value or "").strip()
-    if not url:
-        return ""
-    for prefix in LEGACY_CONCEPT_MEDIA_PREFIXES:
-        if url.startswith(prefix):
-            tail = url[len(prefix):].lstrip("/")
-            return f"/api/ai-images/{tail}" if tail else ""
-    return url
+    return str(value or "").strip()
+
+def normalized_concept_media_type(value: Any) -> str:
+    media_type = str(value or "").strip().lower()
+    if media_type not in CONCEPT_MEDIA_TYPES:
+        raise ValueError("지원하지 않는 개념 미디어 형식입니다.")
+    return media_type
 
 
 
@@ -1004,11 +978,6 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
                 bookmarked INTEGER NOT NULL DEFAULT 0 CHECK (bookmarked IN (0, 1)),
                 memo TEXT NOT NULL DEFAULT '',
                 memo_updated_at TEXT NOT NULL DEFAULT '',
-                definition TEXT NOT NULL DEFAULT '',
-                detailed_explanation TEXT NOT NULL DEFAULT '',
-                exam_note TEXT NOT NULL DEFAULT '',
-                concept_image_url TEXT NOT NULL DEFAULT '',
-                concept_image_alt TEXT NOT NULL DEFAULT '',
                 updated_at TEXT NOT NULL
             )
             """
@@ -1020,9 +989,6 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
             conn.execute("ALTER TABLE card_progress ADD COLUMN memo TEXT NOT NULL DEFAULT ''")
         if "memo_updated_at" not in columns:
             conn.execute("ALTER TABLE card_progress ADD COLUMN memo_updated_at TEXT NOT NULL DEFAULT ''")
-        for field in AI_PROGRESS_FIELDS:
-            if field not in columns:
-                conn.execute(f"ALTER TABLE card_progress ADD COLUMN {field} TEXT NOT NULL DEFAULT ''")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_status ON card_progress(known_status)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_card_progress_bookmarked ON card_progress(bookmarked)")
         conn.execute(
@@ -1157,14 +1123,9 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
 
-        bootstrap_rows = seed_rows
-        if bootstrap_rows is None:
-            cards_count = int(conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0] or 0)
-            bootstrap_rows = read_seed_card_rows() if cards_count == 0 else []
-        if bootstrap_rows is None:
-            bootstrap_rows = []
+        initial_rows = seed_rows or []
 
-        if bootstrap_rows:
+        if initial_rows:
             now = utc_now_iso()
             conn.executemany(
                 """
@@ -1197,11 +1158,11 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
                         int(row.get("sort_order") if row.get("sort_order") is not None else index),
                         now,
                     )
-                    for index, row in enumerate(bootstrap_rows)
+                    for index, row in enumerate(initial_rows)
                     if row.get("id")
                 ],
             )
-        if bootstrap_rows:
+        if initial_rows:
             now = utc_now_iso()
             conn.executemany(
                 """
@@ -1220,7 +1181,7 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
                         row.get("memo_updated_at") or (now if (row.get("memo") or "").strip() else ""),
                         now,
                     )
-                    for row in bootstrap_rows
+                    for row in initial_rows
                     if row.get("id") and progress_row_is_meaningful(row)
                 ],
             )
@@ -1267,73 +1228,6 @@ def read_card_content(progress_db_path: Path) -> tuple[list[dict[str, str]], lis
     return cards, content_fieldnames()
 
 
-def read_legacy_ai_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
-    ensure_progress_db(progress_db_path)
-    select_fields = ["card_id", *AI_PROGRESS_FIELDS]
-    with closing(connect_progress_db(progress_db_path)) as conn:
-        rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM card_progress").fetchall()
-    legacy: dict[str, dict[str, str]] = {}
-    for row in rows:
-        updates = {}
-        for field in AI_PROGRESS_FIELDS:
-            value = str(row[field] or "").strip()
-            if value:
-                updates[field] = value
-        if updates:
-            legacy[row["card_id"]] = updates
-    return legacy
-
-
-def clear_legacy_ai_progress(progress_db_path: Path, card_ids: list[str]) -> int:
-    normalized_ids = [str(card_id or "").strip() for card_id in card_ids if str(card_id or "").strip()]
-    if not normalized_ids:
-        return 0
-    ensure_progress_db(progress_db_path)
-    assignments = ", ".join(f"{field}=''" for field in AI_PROGRESS_FIELDS)
-    placeholders = ", ".join("?" for _ in normalized_ids)
-    with closing(connect_progress_db(progress_db_path)) as conn:
-        before = conn.total_changes
-        conn.execute(
-            f"UPDATE card_progress SET {assignments} WHERE card_id IN ({placeholders})",
-            normalized_ids,
-        )
-        conn.commit()
-        return conn.total_changes - before
-
-
-def sync_legacy_ai_progress_to_db(progress_db_path: Path) -> bool:
-    legacy = read_legacy_ai_progress(progress_db_path)
-    if not legacy:
-        return False
-    ensure_progress_db(progress_db_path)
-    migrated_ids: list[str] = []
-    changed = False
-    with closing(connect_progress_db(progress_db_path)) as conn:
-        for card_id, updates in legacy.items():
-            current = conn.execute(
-                "SELECT definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt FROM cards WHERE card_id=?",
-                (card_id,),
-            ).fetchone()
-            if current is None:
-                continue
-            normalized_updates = {
-                field: normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
-                for field, value in updates.items()
-            }
-            if any(str(current[field] or "") != value for field, value in normalized_updates.items()):
-                assignments = ", ".join(f"{field}=?" for field in normalized_updates)
-                conn.execute(
-                    f"UPDATE cards SET {assignments}, updated_at=? WHERE card_id=?",
-                    [*normalized_updates.values(), utc_now_iso(), card_id],
-                )
-                changed = True
-            migrated_ids.append(card_id)
-        conn.commit()
-    if migrated_ids:
-        clear_legacy_ai_progress(progress_db_path, migrated_ids)
-    return changed
-
-
 def merge_progress(
     rows: list[dict[str, str]],
     progress: dict[str, dict[str, str]],
@@ -1368,11 +1262,9 @@ def merge_progress(
     return merged
 
 
-def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
-    del csv_path  # Runtime card reads are SQLite-only.
-    db_path = progress_db_for(None, progress_db_path)
+def read_cards(progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
-    sync_legacy_ai_progress_to_db(db_path)
     sync_ai_image_files_to_db(db_path)
     card_rows, fieldnames = read_card_content(db_path)
     if not card_rows:
@@ -1380,21 +1272,73 @@ def read_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) 
     rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
 
+def runtime_ai_image_url(name: str) -> str:
+    return f"/api/ai-images/{validated_ai_image_name(name)}"
 
 
+def latest_ai_image_urls_by_card_id(image_dir: Path | None = None) -> dict[str, str]:
+    root = image_dir or AI_IMAGE_DIR
+    if not root.exists() or not root.is_dir():
+        return {}
+    latest: dict[str, tuple[str, str]] = {}
+    for path in root.iterdir():
+        if not path.is_file():
+            continue
+        match = AI_IMAGE_ARTIFACT_RE.fullmatch(path.name)
+        if not match:
+            continue
+        card_id = str(match.group("card_id") or "").strip()
+        stamp = str(match.group("stamp") or "")
+        previous = latest.get(card_id)
+        if previous is None or (stamp, path.name) > previous:
+            latest[card_id] = (stamp, path.name)
+    return {
+        card_id: runtime_ai_image_url(name)
+        for card_id, (_stamp, name) in latest.items()
+    }
 
+
+def sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = None) -> bool:
+    recovered_urls = latest_ai_image_urls_by_card_id(image_dir)
+    if not recovered_urls:
+        return False
+    ensure_progress_db(progress_db_path)
+    changed = False
+    with closing(connect_progress_db(progress_db_path)) as conn:
+        rows = conn.execute(
+            "SELECT card_id, concept_image_url, concept_media_type, concept_media_payload FROM cards"
+        ).fetchall()
+        for row in rows:
+            card_id = str(row["card_id"] or "").strip()
+            recovered_url = recovered_urls.get(card_id)
+            if not recovered_url:
+                continue
+            media_type = normalized_concept_media_type(row["concept_media_type"]) if row["concept_media_type"] else ""
+            if media_type in {"gif", "video", "mermaid", "html"}:
+                continue
+            current_url = normalized_runtime_media_url(row["concept_image_url"])
+            current_payload = str(row["concept_media_payload"] or "")
+            if media_type in {"image", "gif", "video"}:
+                current_payload = normalized_runtime_media_url(current_payload)
+            if current_url == recovered_url and media_type == "image" and current_payload == recovered_url:
+                continue
+            conn.execute(
+                "UPDATE cards SET concept_image_url=?, concept_media_type='image', concept_media_payload=?, updated_at=? WHERE card_id=?",
+                (recovered_url, recovered_url, utc_now_iso(), card_id),
+            )
+            changed = True
+        conn.commit()
+    return changed
 
 
 def update_card_content_fields(
     card_id: str,
     updates: dict[str, str],
-    csv_path: Path = CSV_PATH,
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
-    db_path = progress_db_for(None, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
-    sync_legacy_ai_progress_to_db(db_path)
     sync_ai_image_files_to_db(db_path)
 
     rows, _ = read_card_content(db_path)
@@ -1433,19 +1377,18 @@ def backup_progress_db(progress_db_path: Path = PROGRESS_DB_PATH, backup_dir: Pa
 def mark_card(
     card_id: str,
     status: str,
-    csv_path: Path = CSV_PATH,
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> dict[str, str]:
-    del backup_dir  # Progress is stored in SQLite; CSV backup is kept only for backwards-compatible signature.
+    del backup_dir
     if status not in VALID_STATUSES:
         raise ValueError("known_status must be O, X, or empty")
 
-    rows, _ = read_cards(csv_path, progress_db_path)
+    rows, _ = read_cards(progress_db_path)
     if not any(row.get("id") == card_id for row in rows):
         raise KeyError(card_id)
 
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
         existing = conn.execute(
@@ -1474,15 +1417,15 @@ def mark_card(
         )
         conn.commit()
 
-    updated_rows, _ = read_cards(csv_path, db_path)
+    updated_rows, _ = read_cards(db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
             return row
     raise KeyError(card_id)
 
 
-def _ensure_card_exists(card_id: str, csv_path: Path, progress_db_path: Path | None = None) -> None:
-    rows, _ = read_cards(csv_path, progress_db_path)
+def _ensure_card_exists(card_id: str, progress_db_path: Path | None = None) -> None:
+    rows, _ = read_cards(progress_db_path)
     if not any(row.get("id") == card_id for row in rows):
         raise KeyError(card_id)
 
@@ -1490,11 +1433,10 @@ def _ensure_card_exists(card_id: str, csv_path: Path, progress_db_path: Path | N
 def set_bookmark(
     card_id: str,
     bookmarked: bool,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> dict[str, str]:
-    _ensure_card_exists(card_id, csv_path, progress_db_path)
-    db_path = progress_db_for(csv_path, progress_db_path)
+    _ensure_card_exists(card_id, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
@@ -1509,7 +1451,7 @@ def set_bookmark(
         )
         conn.commit()
 
-    updated_rows, _ = read_cards(csv_path, db_path)
+    updated_rows, _ = read_cards(db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
             return row
@@ -1519,13 +1461,12 @@ def set_bookmark(
 def save_memo(
     card_id: str,
     memo: str,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> dict[str, str]:
-    _ensure_card_exists(card_id, csv_path, progress_db_path)
+    _ensure_card_exists(card_id, progress_db_path)
     normalized_memo = str(memo or "")[:20000]
     memo_updated_at = utc_now_iso() if normalized_memo.strip() else ""
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
@@ -1541,11 +1482,13 @@ def save_memo(
         )
         conn.commit()
 
-    updated_rows, _ = read_cards(csv_path, db_path)
+    updated_rows, _ = read_cards(db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
             return row
     raise KeyError(card_id)
+
+
 AI_REWRITE_FIELD_LIMITS = {
     "definition": 12000,
     "detailed_explanation": 50000,
@@ -1563,13 +1506,6 @@ AI_CARD_FIELD_LIMITS = {
 def normalized_card_text(value: Any, *, limit: int) -> str:
     text = str(value or "").replace("\r\n", "\n").replace("\r", "\n").strip()
     return text[:limit]
-
-
-def normalized_concept_media_type(value: Any) -> str:
-    media_type = str(value or "").strip().lower()
-    if media_type not in CONCEPT_MEDIA_TYPES:
-        raise ValueError("지원하지 않는 개념 미디어 형식입니다.")
-    return media_type
 
 
 def extract_json_object_text(value: str) -> str:
@@ -1737,16 +1673,14 @@ def rewrite_wiki_markdown_with_codex(source_path: str, content: str, instruction
         raise RuntimeError("Codex 응답에서 위키 Markdown 초안을 찾지 못했습니다.")
     return rewritten.replace("\r\n", "\n")[:2_000_000]
 
-
 def update_card_ai_content(
     card_id: str,
     payload: CardAiApplyRequest,
-    csv_path: Path = CSV_PATH,
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
-    db_path = progress_db_for(csv_path, progress_db_path)
-    rows, _ = read_cards(csv_path, db_path)
+    db_path = progress_db_for(progress_db_path)
+    rows, _ = read_cards(db_path)
     target = next((row for row in rows if row.get("id") == card_id), None)
     if target is None:
         raise KeyError(card_id)
@@ -1765,9 +1699,8 @@ def update_card_ai_content(
             changed_updates[field] = normalized
     if not changed_updates:
         return target, None
-    updated_row, backup_path = update_card_content_fields(card_id, changed_updates, csv_path, backup_dir, db_path)
-    clear_legacy_ai_progress(db_path, [card_id])
-    updated_rows, _ = read_cards(csv_path, db_path)
+    updated_row, backup_path = update_card_content_fields(card_id, changed_updates, backup_dir, db_path)
+    updated_rows, _ = read_cards(db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
             return row, backup_path
@@ -1777,7 +1710,6 @@ def update_card_ai_content(
 def update_card_concept_media(
     card_id: str,
     payload: CardConceptMediaRequest,
-    csv_path: Path = CSV_PATH,
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
@@ -1795,77 +1727,12 @@ def update_card_concept_media(
         updates["concept_image_alt"] = normalized_card_text(payload.concept_image_alt, limit=AI_REWRITE_FIELD_LIMITS["concept_image_alt"])
     if media_type in {"image", "gif"} and media_payload:
         updates["concept_image_url"] = media_payload
-    updated_row, backup_path = update_card_content_fields(card_id, updates, csv_path, backup_dir, progress_db_path)
-    refreshed_rows, _ = read_cards(csv_path, progress_db_for(csv_path, progress_db_path))
+    updated_row, backup_path = update_card_content_fields(card_id, updates, backup_dir, progress_db_path)
+    refreshed_rows, _ = read_cards(progress_db_for(progress_db_path))
     for row in refreshed_rows:
         if row.get("id") == card_id:
             return row, backup_path
     return updated_row, backup_path
-
-AI_IMAGE_FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{3,254}$")
-AI_IMAGE_ARTIFACT_RE = re.compile(
-    r"^(?P<card_id>.+)-(?P<stamp>\d{8}-\d{6})-(?P<token>[0-9a-f]{8})\.(?P<ext>png|jpg|jpeg|webp|gif)$",
-    re.IGNORECASE,
-)
-
-
-def runtime_ai_image_url(name: str) -> str:
-    return f"/api/ai-images/{validated_ai_image_name(name)}"
-
-
-def latest_ai_image_urls_by_card_id(image_dir: Path | None = None) -> dict[str, str]:
-    root = image_dir or AI_IMAGE_DIR
-    if not root.exists() or not root.is_dir():
-        return {}
-    latest: dict[str, tuple[str, str]] = {}
-    for path in root.iterdir():
-        if not path.is_file():
-            continue
-        match = AI_IMAGE_ARTIFACT_RE.fullmatch(path.name)
-        if not match:
-            continue
-        card_id = str(match.group("card_id") or "").strip()
-        stamp = str(match.group("stamp") or "")
-        previous = latest.get(card_id)
-        if previous is None or (stamp, path.name) > previous:
-            latest[card_id] = (stamp, path.name)
-    return {
-        card_id: runtime_ai_image_url(name)
-        for card_id, (_stamp, name) in latest.items()
-    }
-
-
-def sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = None) -> bool:
-    recovered_urls = latest_ai_image_urls_by_card_id(image_dir)
-    if not recovered_urls:
-        return False
-    ensure_progress_db(progress_db_path)
-    changed = False
-    with closing(connect_progress_db(progress_db_path)) as conn:
-        rows = conn.execute(
-            "SELECT card_id, concept_image_url, concept_media_type, concept_media_payload FROM cards"
-        ).fetchall()
-        for row in rows:
-            card_id = str(row["card_id"] or "").strip()
-            recovered_url = recovered_urls.get(card_id)
-            if not recovered_url:
-                continue
-            media_type = normalized_concept_media_type(row["concept_media_type"]) if row["concept_media_type"] else ""
-            if media_type in {"gif", "video", "mermaid", "html"}:
-                continue
-            current_url = normalized_runtime_media_url(row["concept_image_url"])
-            current_payload = str(row["concept_media_payload"] or "")
-            if media_type in {"image", "gif", "video"}:
-                current_payload = normalized_runtime_media_url(current_payload)
-            if current_url == recovered_url and media_type == "image" and current_payload == recovered_url:
-                continue
-            conn.execute(
-                "UPDATE cards SET concept_image_url=?, concept_media_type='image', concept_media_payload=?, updated_at=? WHERE card_id=?",
-                (recovered_url, recovered_url, utc_now_iso(), card_id),
-            )
-            changed = True
-        conn.commit()
-    return changed
 
 
 
@@ -2015,14 +1882,13 @@ def read_ai_image_preview(preview_name: str, *, preview_dir: Path = AI_IMAGE_PRE
 def apply_ai_concept_image(
     card_id: str,
     payload: CardAiImageApplyRequest,
-    csv_path: Path = CSV_PATH,
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
     image_dir: Path = AI_IMAGE_DIR,
     preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
 ) -> tuple[dict[str, str], Path | None, str]:
-    db_path = progress_db_for(csv_path, progress_db_path)
-    rows, _ = read_cards(csv_path, db_path)
+    db_path = progress_db_for(progress_db_path)
+    rows, _ = read_cards(db_path)
     target = next((row for row in rows if row.get("id") == card_id), None)
     if target is None:
         raise KeyError(card_id)
@@ -2039,11 +1905,9 @@ def apply_ai_concept_image(
     updated_row, backup_path = update_card_content_fields(
         card_id,
         {"concept_image_url": next_url, "concept_image_alt": next_alt, "concept_media_type": "image", "concept_media_payload": next_url},
-        csv_path,
         backup_dir,
         db_path,
     )
-    clear_legacy_ai_progress(db_path, [card_id])
     try:
         preview_path.unlink(missing_ok=True)
         preview_path.with_suffix(".json").unlink(missing_ok=True)
@@ -2054,7 +1918,7 @@ def apply_ai_concept_image(
         meta_path = preview_path.with_suffix(".json")
         if meta_path.exists():
             meta_path.unlink()
-    updated_rows, _ = read_cards(csv_path, db_path)
+    updated_rows, _ = read_cards(db_path)
     for row in updated_rows:
         if row.get("id") == card_id:
             return row, backup_path, next_url
@@ -2216,8 +2080,8 @@ QUESTION_BANK_CATEGORY_HINTS: dict[str, tuple[str, ...]] = {
 
 
 
-def question_bank_categories_from_cards(csv_path: Path = CSV_PATH, progress_db_path: Path | None = None) -> list[str]:
-    rows, _ = read_cards(csv_path, progress_db_path)
+def question_bank_categories_from_cards(progress_db_path: Path | None = None) -> list[str]:
+    rows, _ = read_cards(progress_db_path)
     seen: set[str] = set()
     categories: list[str] = []
     for category in QUESTION_BANK_CATEGORIES:
@@ -2246,10 +2110,9 @@ def infer_question_bank_category(
     topic: Any = "",
     prompt: Any = "",
     body: Any = "",
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> str:
-    allowed_categories = question_bank_categories_from_cards(csv_path, progress_db_path)
+    allowed_categories = question_bank_categories_from_cards(progress_db_path)
     allowed_lookup = {item.casefold(): item for item in allowed_categories}
     for candidate in (raw_category, card_category):
         normalized = normalize_question_bank_text(candidate, limit=128)
@@ -2300,7 +2163,6 @@ def question_bank_fingerprint(entry: dict[str, Any]) -> str:
 
 def normalize_question_bank_entry(
     payload: QuestionBankEntryRequest | dict[str, Any],
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> dict[str, Any]:
     raw = payload.model_dump() if isinstance(payload, BaseModel) else dict(payload or {})
@@ -2313,8 +2175,8 @@ def normalize_question_bank_entry(
     card_id = normalize_question_bank_text(raw.get("card_id"), limit=255)
     card: dict[str, Any] = {}
     if card_id:
-        _ensure_card_exists(card_id, csv_path, progress_db_path)
-        rows, _ = read_cards(csv_path, progress_db_path)
+        _ensure_card_exists(card_id, progress_db_path)
+        rows, _ = read_cards(progress_db_path)
         card = next((row for row in rows if str(row.get("id") or "").strip() == card_id), {})
     choices = normalize_question_bank_list(raw.get("choices"), item_limit=2000)
     answer_index = raw.get("answer_index")
@@ -2345,8 +2207,7 @@ def normalize_question_bank_entry(
             topic=topic,
             prompt=prompt,
             body=body,
-            csv_path=csv_path,
-            progress_db_path=progress_db_path,
+                progress_db_path=progress_db_path,
         ),
         "keywords": normalize_question_bank_list(raw.get("keywords"), item_limit=255),
         "difficulty": normalize_question_bank_text(raw.get("difficulty"), limit=64),
@@ -2398,11 +2259,10 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
 
 def upsert_question_bank_entries(
     entries: list[QuestionBankEntryRequest | dict[str, Any]],
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> dict[str, Any]:
-    normalized_entries = [normalize_question_bank_entry(entry, csv_path, progress_db_path) for entry in entries]
-    db_path = progress_db_for(csv_path, progress_db_path)
+    normalized_entries = [normalize_question_bank_entry(entry, progress_db_path) for entry in entries]
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     saved_items: list[dict[str, Any]] = []
     with closing(connect_progress_db(db_path)) as conn:
@@ -2503,16 +2363,15 @@ def upsert_question_bank_entries(
 
 
 def seed_demo_question_bank_entries(
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> None:
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
         existing_count = int(conn.execute("SELECT COUNT(*) FROM question_bank").fetchone()[0] or 0)
     if existing_count:
         return
-    rows, _ = read_cards(csv_path, db_path)
+    rows, _ = read_cards(db_path)
     if not rows:
         return
     sample = rows[0]
@@ -2539,13 +2398,11 @@ def seed_demo_question_bank_entries(
                 "session_mode": "practice",
             }
         ],
-        csv_path,
         db_path,
     )
 
 
 def read_question_bank_entries(
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
     *,
     card_id: str = "",
@@ -2560,9 +2417,9 @@ def read_question_bank_entries(
     query: str = "",
     limit: int = 200,
 ) -> dict[str, Any]:
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
-    seed_demo_question_bank_entries(csv_path, db_path)
+    seed_demo_question_bank_entries(db_path)
     safe_limit = max(1, min(int(limit or 200), 500))
     filters = {
         "card_id": normalize_question_bank_text(card_id, limit=255),
@@ -2605,7 +2462,7 @@ def read_question_bank_entries(
         needle = f"%{filters['query'].lower()}%"
         params.extend([needle] * 10)
     where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
-    rows, _ = read_cards(csv_path, db_path)
+    rows, _ = read_cards(db_path)
     card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
     with closing(connect_progress_db(db_path)) as conn:
         total_row = conn.execute(
@@ -2682,7 +2539,6 @@ def generated_question_bank_entry(question: dict[str, Any], card: dict[str, Any]
 def attach_generated_question_bank_ids(
     payload: dict[str, Any],
     rows: list[dict[str, Any]],
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> dict[str, Any]:
     questions = list(payload.get("questions") or [])
@@ -2690,7 +2546,7 @@ def attach_generated_question_bank_ids(
         return payload
     card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
     bank_payloads = [generated_question_bank_entry(question, card_map.get(str(question.get("card_id") or ""), {})) for question in questions]
-    saved = upsert_question_bank_entries(bank_payloads, csv_path, progress_db_path)
+    saved = upsert_question_bank_entries(bank_payloads, progress_db_path)
     for question, stored in zip(questions, saved.get("items") or []):
         question["question_bank_id"] = stored.get("question_bank_id") or ""
         question["topic"] = stored.get("topic") or question.get("topic") or ""
@@ -2764,24 +2620,28 @@ FIN_CORP_TITLE_CONTINUATION_SUFFIXES = (
     "달라지는",
 )
 FIN_CORP_CATEGORY_OVERRIDE_HINTS: dict[str, tuple[str, ...]] = {
-    "데이터베이스": ("sql문", "sql ddl", "sql dml", "sql dcl", "sql tcl", "dense rank", "2pl", "2단계 잠금", "릴레이션", "후보키", "정규화", "트랜잭션"),
+    "데이터베이스": ("sql문", "sql ddl", "sql dml", "sql dcl", "sql tcl", "dense rank", "2pl", "2단계 잠금", "릴레이션", "후보키", "정규화", "트랜잭션", "group by", "having", "select "),
     "컴퓨터구조": ("gpu", "petabyte", "flip-flop", "플립플롭", "daisy chain", "alu", "raid", "rom", "ram", "파이프라인"),
-    "자료구조·알고리즘": ("동적 계획법", "dynamic programming", "행렬", "역행렬", "연결리스트", "b-tree", "b+tree", "dfs", "bfs", "피보나치"),
+    "자료구조·알고리즘": ("동적 계획법", "dynamic programming", "행렬", "역행렬", "연결리스트", "b-tree", "b+tree", "dfs", "bfs", "피보나치", "정렬 시간 복잡도", "시간복잡도", "정렬"),
     "클라우드·분산시스템": ("분산처리 시스템", "서버 가상화", "server virtualization", "virtualization", "하이브리드 클라우드", "커뮤니티 클라우드"),
-    "프로그래밍 언어": ("python", "java", "jvm", "바인딩", "오버로딩", "instance of", "재귀함수"),
+    "프로그래밍 언어": ("python", "파이썬", "java", "c 언어", "c언어", "jvm", "바인딩", "오버로딩", "instance of", "재귀함수"),
+    "금융IT·신기술": ("퍼블릭 블록체인", "public blockchain"),
+    "운영체제": ("round robin", "sjf", "fcfs", "cpu 스케줄링", "페이지 교체", "lru"),
+    "네트워크": ("osi", "pdu", "transport 계층", "https", "packet", "frame"),
+    "인공지능·데이터": ("튜링테스트", "튜링 테스트"),
 }
 FIN_CORP_FALLBACK_CATEGORY_HINTS: dict[str, tuple[str, ...]] = {
-    "금융IT·신기술": ("오픈마켓", "ott", "메타버스", "디지털트윈", "크라우드 펀딩", "프롭테크", "알트코인", "핀테크", "블록체인", "약인공지능"),
-    "네트워크": ("http", "ssl", "tls", "vpn", "ssh", "x.25", "nic", "tcp", "udp", "라우팅", "lan", "wan", "dns"),
-    "데이터베이스": ("dba", "procedure", "dense rank", "grant", "revoke", "2pl", "schema", "트랜잭션", "정규화"),
+    "금융IT·신기술": ("오픈마켓", "ott", "메타버스", "디지털트윈", "크라우드 펀딩", "프롭테크", "알트코인", "핀테크", "블록체인", "퍼블릭 블록체인", "public blockchain", "약인공지능"),
+    "네트워크": ("http", "https", "ssl", "tls", "vpn", "ssh", "x.25", "nic", "tcp", "udp", "라우팅", "lan", "wan", "dns", "osi", "pdu", "packet", "frame"),
+    "데이터베이스": ("dba", "procedure", "dense rank", "grant", "revoke", "2pl", "schema", "트랜잭션", "정규화", "group by", "having", "select "),
     "보안": ("xss", "sql injection", "공인인증서", "다크웹", "랜섬웨어", "ddos", "중간자 공격", "rsa", "전자서명", "syn flood", "권한"),
     "소프트웨어공학": ("man month", "cocomo", "형상관리", "애자일", "스크럼", "인수테스트", "베타테스트", "결합도", "응집도", "fp기능점수", "cpm"),
-    "운영체제": ("hrn", "페이지 폴트", "redo", "undo", "tlb", "페이징", "세그먼트", "동기화", "프로세서", "시분할시스템"),
-    "인공지능·데이터": ("빅데이터", "튜링테스트", "드릴다운", "정형데이터", "gpu", "머신러닝", "하둡"),
-    "자료구조·알고리즘": ("quick sort", "정렬", "하노이탑", "bst", "heap", "b-tree", "b+tree", "dfs", "bfs", "피보나치", "연결리스트", "인접행렬", "동적 계획법", "플립플롭"),
-    "컴퓨터구조": ("petabyte", "raid", "rom", "ram", "gpu", "flip-flop", "daisy chain", "alu", "캐시", "가상화", "server virtualization"),
+    "운영체제": ("hrn", "페이지 폴트", "redo", "undo", "tlb", "페이징", "세그먼트", "동기화", "프로세서", "시분할시스템", "round robin", "sjf", "fcfs", "cpu 스케줄링", "lru"),
+    "인공지능·데이터": ("빅데이터", "튜링테스트", "튜링 테스트", "드릴다운", "정형데이터", "gpu", "머신러닝", "하둡"),
+    "자료구조·알고리즘": ("quick sort", "정렬", "시간 복잡도", "하노이탑", "bst", "heap", "b-tree", "b+tree", "dfs", "bfs", "피보나치", "연결리스트", "인접행렬", "동적 계획법", "플립플롭"),
+    "컴퓨터구조": ("petabyte", "raid", "rom", "ram", "gpu", "flip-flop", "플립플롭", "daisy chain", "alu", "캐시", "가상화", "server virtualization"),
     "클라우드·분산시스템": ("분산처리 시스템", "서버 가상화", "하이브리드 클라우드", "커뮤니티 클라우드", "클라우드", "virtualization"),
-    "프로그래밍 언어": ("python", "java", "jvm", "바인딩", "오버로딩", "재귀함수", "c언어", "instance of"),
+    "프로그래밍 언어": ("python", "파이썬", "java", "c 언어", "c언어", "jvm", "바인딩", "오버로딩", "재귀함수", "instance of"),
 }
 FIN_CORP_HIGH_DIFFICULTY_HINTS = (
     "계산",
@@ -2828,7 +2688,36 @@ FIN_CORP_CONCEPT_CONVERSION_MARKERS = (
     "보여주고",
     "객관식",
     "주관식",
+    "전송순서",
+    "약술",
+    "뜻",
+    "구하기",
 )
+FIN_CORP_FORCE_CONCEPT_TITLES = {
+    "다음 중 스크립트 언어로 올바은 것은?",
+    "다음중 DDL에 해당하지 않은 것은?",
+    "딥웹, 다크웹에 대한 설명으로 옳지 않은 것은?",
+    "블록체인 합의 알고리즘에 대해서 옳지 않은 것은?",
+    "핀테크에 관한 설명 중 옳지 않은 것은?",
+    "JAVA 상속코드 주면서 출력결과 쓰라는 문제",
+    "인공지능에 대한 설명으로 적절한 것은?",
+    "보기와 연관지을 수 있는 IT기술 용어는 무엇인가?",
+    "버퍼오버플로우 관련 문제",
+    "리눅스 권한 명령어 관련 문제(u(user), g(group), o(others)",
+    "단일 프로세서 동기화 문제 유무, 발생한다면 어떤 경우인가?(서술)",
+    "Redo, undo 관련 트랜잭션문제",
+    "SSH Handshake 전송순서",
+    "FP기능점수 계산",
+    "CPM최단경로 구하기",
+    "스머프어택 뜻",
+    "AOE 유형 중 옳지 않은 것은?",
+    "C코드의 결과값(전역변수, static 변수) (약술)",
+    "터널링, vpn 약술",
+    "JVM설명 약술",
+    "DFS와 BFS와 그래프 경로&개념",
+    "SQL문 약술",
+    "C언어 파일입출력 틀린 개수 고르기",
+}
 FIN_CORP_LIMITED_SOURCE_ANSWER = "문제의 선지/도표가 원문에 충분히 남아 있지 않아 단정형 정답은 제한적이다. 해당 주제의 핵심 개념과 대표 공식·특징을 기준으로 풀이해야 한다."
 FIN_CORP_KEYWORD_DROP_TOKENS = (
     "문제",
@@ -3197,8 +3086,24 @@ def fin_corp_question_bank_contains_hint(text: str, hint: str) -> bool:
 
 def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = None) -> str:
     subject = fin_corp_question_bank_topic(title)
+    subject = re.sub(r"^\d+\.\s*", "", subject)
     subject = re.sub(r"^\[[^\]]+\]\s*", "", subject)
     subject = re.sub(r"^\((?:약술|서술|논술|주관식)\)\s*", "", subject, flags=re.IGNORECASE)
+    extraction_patterns = (
+        (r"^다음\s+중\s+(.+?)에서\s+없는\s+함수는\??$", r"\1"),
+        (r"^다음\s+중\s+(.+?)인\s+것(?:은)?\??$", r"\1"),
+        (r"^다음\s+(.+?)\s+코드(?:의)?\s*(?:실행)?\s*결과.*$", r"\1"),
+        (r"^(.+?)에서\s+문자열을\s+비교하는\s+함수는\??$", r"\1"),
+        (r"^(.+?)\s*특징으로\s+.*$", r"\1"),
+    )
+    changed = True
+    while changed:
+        changed = False
+        for pattern, replacement in extraction_patterns:
+            updated = re.sub(pattern, replacement, subject, flags=re.IGNORECASE).strip()
+            if updated and updated != subject:
+                subject = updated
+                changed = True
     cleanup_patterns = (
         r"\s*보여주고.*$",
         r"\s*주면서.*$",
@@ -3208,7 +3113,7 @@ def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = 
         r"\s*관련(?:하여)?\s+.*$",
         r"\s*(?:옳지 않은 것은|옳은 것은|적절한 것은|알맞은 것은|바른 설명은|해당하는 용어는|고르시오|선택하라는.*|선택.*|무엇인가\??).*$",
         r"\s*(?:계산문제|출력결과|트리그리기|손코딩|빈칸 채우기|코드(?:\s*문제)?|관련 서술식|관련 문제|문제 약술|객관식 문제|주관식 문제|문제)\s*$",
-        r"\s*(?:뜻|의미|특징|개념|약술|서술식|서술|설명)\s*$",
+        r"\s*(?:뜻|의미|특징(?:으로)?|개념|약술|서술식|서술|설명)\s*$",
     )
     changed = True
     while changed:
@@ -3238,7 +3143,6 @@ def fin_corp_question_bank_subject(title: str, *, card: dict[str, Any] | None = 
     return fin_corp_question_bank_topic(title)
 
 
-
 def fin_corp_question_bank_needs_concept_conversion(
     title: str,
     body: str,
@@ -3247,14 +3151,39 @@ def fin_corp_question_bank_needs_concept_conversion(
     *,
     question_type: str = "",
 ) -> bool:
-    if question_type == "multiple_choice" or str(body or "").strip():
+    normalized_body = str(body or "").strip()
+    topic = fin_corp_question_bank_topic(title)
+    choices = fin_corp_question_bank_choices(body)
+    if question_type == "multiple_choice":
+        if len(choices) >= 2 and not (
+            all(normalize_question_bank_text(choice, limit=20) in {"-", ""} for choice in choices)
+            or ("transport 계층의 전송 단위(pdu)" in str(title or "").casefold() and "서버 내부 오류" in str(body or ""))
+        ):
+            return False
+    elif normalized_body and topic not in FIN_CORP_FORCE_CONCEPT_TITLES:
         return False
+    if topic in FIN_CORP_FORCE_CONCEPT_TITLES:
+        return True
     if FIN_CORP_LIMITED_SOURCE_ANSWER in str(answer or ""):
         return True
     lowered = str(title or "").casefold()
+    if question_type == "multiple_choice" and len(choices) < 2:
+        return True
+    if any(token in lowered for token in (
+        "옳지 않은 것은",
+        "옳은 것은",
+        "적절한 것은",
+        "알맞은 것은",
+        "바른 설명은",
+        "해당하는 용어는",
+        "무엇인가",
+    )) and len(choices) < 2:
+        return True
+    if not normalized_body and (lowered.startswith("다음 중") or lowered.startswith("다음중")):
+        return True
     if any(marker.casefold() in lowered for marker in FIN_CORP_CONCEPT_CONVERSION_MARKERS):
         return True
-    return bool(re.search(r"\b문제\s*$", str(title or "")))
+    return not normalized_body and "문제" in lowered
 
 
 
@@ -3266,6 +3195,7 @@ def fin_corp_question_bank_converted_prompt(
 ) -> str:
     subject = fin_corp_question_bank_subject(title, card=card)
     lowered = str(title or "").casefold()
+    number_match = re.match(r"^\s*(\d+\.)\s*", str(title or ""))
     if any(token in lowered for token in ("비교", "차이", "장단점")):
         prompt = f"{subject}의 개념과 차이를 설명하시오."
     elif any(token in lowered for token in ("뜻", "의미", "약어")):
@@ -3280,7 +3210,10 @@ def fin_corp_question_bank_converted_prompt(
         prompt = f"{subject}를 간단히 설명하시오."
     else:
         prompt = f"{subject}에 대해 설명하시오."
-    return re.sub(r"\s+", " ", prompt).strip()
+    prompt = re.sub(r"\s+", " ", prompt).strip()
+    if number_match:
+        prompt = f"{number_match.group(1)} {prompt}"
+    return prompt
 
 
 def fin_corp_question_bank_topic_particle(value: str) -> str:
@@ -3312,13 +3245,14 @@ def fin_corp_question_bank_converted_answer(
     *,
     category: str = "",
     card: dict[str, Any] | None = None,
+    prefer_card_answer: bool = False,
 ) -> tuple[str, str]:
-    if FIN_CORP_LIMITED_SOURCE_ANSWER not in str(answer or ""):
-        return answer, explanation
-    if isinstance(card, dict) and card:
+    if isinstance(card, dict) and card and (prefer_card_answer or FIN_CORP_LIMITED_SOURCE_ANSWER in str(answer or "")):
         grounded_answer, grounded_explanation = fin_corp_question_bank_grounded_card_answer(card)
         if grounded_answer:
             return grounded_answer, grounded_explanation
+    if FIN_CORP_LIMITED_SOURCE_ANSWER not in str(answer or "") and not prefer_card_answer:
+        return answer, explanation
     lowered = str(title or "").casefold()
     subject = fin_corp_question_bank_subject(title, card=card)
     if "sql" in lowered:
@@ -3360,6 +3294,7 @@ def fin_corp_question_bank_convert_incomplete_row(
         explanation,
         category=category,
         card=card,
+        prefer_card_answer=True,
     )
     return converted_title, converted_body, converted_answer, converted_explanation
 
@@ -3407,7 +3342,6 @@ def fin_corp_question_bank_category(
     explanation: str,
     *,
     card_category: str = "",
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> str:
     override = fin_corp_question_bank_override_category(title, body, answer, explanation)
@@ -3417,10 +3351,9 @@ def fin_corp_question_bank_category(
     category = infer_question_bank_category(
         card_category,
         card_category=card_category,
-        topic=fin_corp_question_bank_topic(title),
+        topic=fin_corp_question_bank_subject(title),
         prompt=f"### {title}",
         body=combined_body,
-        csv_path=csv_path,
         progress_db_path=progress_db_path,
     )
     if category:
@@ -3443,12 +3376,12 @@ def fin_corp_question_bank_keywords(
 ) -> list[str]:
     ordered: list[str] = []
     seen: set[str] = set()
-    for candidate in [
-        *fin_corp_question_bank_keyword_candidates(title, answer, card=card),
-        *bok_detect_keyword_matches(fin_corp_question_bank_subject(title, card=card), answer, explanation),
-    ]:
+    candidates = list(fin_corp_question_bank_keyword_candidates(title, answer, card=card))
+    if not isinstance(card, dict) or not card:
+        candidates.extend(bok_detect_keyword_matches(title, body, answer, explanation))
+    for candidate in candidates:
         normalized = bok_normalize_keyword_fragment(candidate)
-        key = normalized.casefold()
+        key = normalize_question_bank_match_text(normalized) or normalized.casefold()
         if not normalized or key in seen or fin_corp_question_bank_keyword_noise(normalized):
             continue
         seen.add(key)
@@ -3486,13 +3419,13 @@ def fin_corp_question_bank_card_is_grounded(
 
 def fin_corp_question_bank_candidate_keys(title: str, body: str, answer: str, explanation: str) -> set[str]:
     subject = fin_corp_question_bank_subject(title)
+    short_answer = answer if len(answer) <= 120 else ""
     candidate_terms = normalize_question_bank_list([
         fin_corp_question_bank_topic(title),
         subject,
         *bok_topic_keyword_candidates(subject),
-        answer if len(answer) <= 120 else "",
-        *bok_topic_keyword_candidates(answer if len(answer) <= 120 else ""),
-        *bok_detect_keyword_matches(title, body, answer, explanation),
+        short_answer,
+        *bok_topic_keyword_candidates(short_answer),
     ], item_limit=255)
     return {normalize_question_bank_match_text(item) for item in candidate_terms if normalize_question_bank_match_text(item)}
 
@@ -3638,10 +3571,9 @@ def fin_corp_question_bank_difficulty(
 
 def parse_fin_corp_question_bank_entries(
     repo_dir: Path | None = None,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> list[dict[str, Any]]:
-    rows, _ = read_cards(csv_path, progress_db_path)
+    rows, _ = read_cards(progress_db_path)
     entries: list[dict[str, Any]] = []
     for source_path in fin_corp_question_bank_source_pages(repo_dir):
         text = source_path.read_text(encoding="utf-8")
@@ -3653,7 +3585,13 @@ def parse_fin_corp_question_bank_entries(
             question_number = int(match.group(1))
             title = match.group(2).strip()
             start = match.end()
-            end = matches[offset].start() if offset < len(matches) else len(text)
+            next_question_start = matches[offset].start() if offset < len(matches) else len(text)
+            remaining = text[start:next_question_start]
+            section_match = re.search(r"^##\s+", remaining, re.MULTILINE)
+            if section_match:
+                end = start + section_match.start()
+            else:
+                end = next_question_start
             content = text[start:end].strip()
             title, content = fin_corp_question_bank_promote_title_continuation(title, content)
             body, answer, explanation = fin_corp_question_bank_answer_parts(content)
@@ -3665,8 +3603,7 @@ def parse_fin_corp_question_bank_entries(
                 body,
                 answer,
                 explanation,
-                csv_path=csv_path,
-                progress_db_path=progress_db_path,
+                        progress_db_path=progress_db_path,
             )
             card = fin_corp_question_bank_card(rows, title, body, answer, explanation, category=provisional_category)
             if not fin_corp_question_bank_card_is_grounded(card, title, body, answer, explanation):
@@ -3694,8 +3631,7 @@ def parse_fin_corp_question_bank_entries(
                 body,
                 answer,
                 explanation,
-                csv_path=csv_path,
-                progress_db_path=progress_db_path,
+                        progress_db_path=progress_db_path,
             )
             card = fin_corp_question_bank_card(rows, title, body, answer, explanation, category=provisional_category)
             if not fin_corp_question_bank_card_is_grounded(card, title, body, answer, explanation):
@@ -3706,8 +3642,7 @@ def parse_fin_corp_question_bank_entries(
                 answer,
                 explanation,
                 card_category=str(card.get("category") or provisional_category),
-                csv_path=csv_path,
-                progress_db_path=progress_db_path,
+                        progress_db_path=progress_db_path,
             )
             answer_index = None
             if question_type == "multiple_choice":
@@ -3776,10 +3711,9 @@ def parse_fin_corp_question_bank_entries(
 
 
 def clear_fin_corp_question_bank_entries(
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> int:
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
         count = int(conn.execute(
@@ -3797,12 +3731,11 @@ def clear_fin_corp_question_bank_entries(
 
 def sync_fin_corp_question_bank_entries(
     repo_dir: Path | None = None,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
-    entries = parse_fin_corp_question_bank_entries(repo_dir, csv_path=csv_path, progress_db_path=progress_db_path)
-    cleared = clear_fin_corp_question_bank_entries(csv_path, progress_db_path)
-    saved = upsert_question_bank_entries(entries, csv_path, progress_db_path)
+    entries = parse_fin_corp_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    cleared = clear_fin_corp_question_bank_entries(progress_db_path)
+    saved = upsert_question_bank_entries(entries, progress_db_path)
     return {
         "pages": len(fin_corp_question_bank_source_pages(repo_dir)),
         "cleared": cleared,
@@ -4133,7 +4066,6 @@ def bok_question_bank_keywords(
 
 def parse_bok_question_bank_entries(
     repo_dir: Path | None = None,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> list[dict[str, Any]]:
     entries: list[dict[str, Any]] = []
@@ -4165,8 +4097,7 @@ def parse_bok_question_bank_entries(
                     topic=topic,
                     prompt=" ".join(part for part in (page_title, *context_headings, prompt) if part).strip(),
                     body="",
-                    csv_path=csv_path,
-                    progress_db_path=progress_db_path,
+                                progress_db_path=progress_db_path,
                 )
                 if not category:
                     category = infer_question_bank_category(
@@ -4174,8 +4105,7 @@ def parse_bok_question_bank_entries(
                         topic=topic,
                         prompt=" ".join(part for part in (page_title, *context_headings, prompt) if part).strip(),
                         body=body,
-                        csv_path=csv_path,
-                        progress_db_path=progress_db_path,
+                                        progress_db_path=progress_db_path,
                     )
                 entries.append({
                     "question_type": question_type,
@@ -4217,8 +4147,7 @@ def parse_bok_question_bank_entries(
             topic=fallback_topic,
             prompt=f"{page_title} ### 1. {fallback_topic}",
             body="",
-            csv_path=csv_path,
-            progress_db_path=progress_db_path,
+                progress_db_path=progress_db_path,
         )
         if not category:
             category = infer_question_bank_category(
@@ -4226,8 +4155,7 @@ def parse_bok_question_bank_entries(
                 topic=fallback_topic,
                 prompt=f"{page_title} ### 1. {fallback_topic}",
                 body=body,
-                csv_path=csv_path,
-                progress_db_path=progress_db_path,
+                        progress_db_path=progress_db_path,
             )
         entries.append({
             "question_type": question_type,
@@ -4263,10 +4191,9 @@ def parse_bok_question_bank_entries(
 
 
 def clear_bok_question_bank_entries(
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> int:
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
         count = int(conn.execute(
@@ -4283,12 +4210,11 @@ def clear_bok_question_bank_entries(
 
 def sync_bok_question_bank_entries(
     repo_dir: Path | None = None,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
-    entries = parse_bok_question_bank_entries(repo_dir, csv_path=csv_path, progress_db_path=progress_db_path)
-    cleared = clear_bok_question_bank_entries(csv_path, progress_db_path)
-    saved = upsert_question_bank_entries(entries, csv_path, progress_db_path)
+    entries = parse_bok_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    cleared = clear_bok_question_bank_entries(progress_db_path)
+    saved = upsert_question_bank_entries(entries, progress_db_path)
     return {
         "pages": len(bok_question_bank_source_pages(repo_dir)),
         "cleared": cleared,
@@ -4366,7 +4292,6 @@ def normalize_question_attempt_result(value: str | None) -> str:
 
 
 def read_question_attempts(
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
     *,
     card_ids: list[str] | None = None,
@@ -4376,9 +4301,9 @@ def read_question_attempts(
     normalized_result = normalize_question_attempt_result(result)
     selected_ids = sorted(normalize_card_ids(card_ids) or [])
     safe_limit = max(1, min(int(limit or 200), 500))
-    rows, _ = read_cards(csv_path, progress_db_path)
+    rows, _ = read_cards(progress_db_path)
     card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
 
     where_clauses: list[str] = []
@@ -4508,10 +4433,9 @@ def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, A
 
 def save_question_attempt(
     payload: QuestionAttemptRequest,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
 ) -> dict[str, Any]:
-    _ensure_card_exists(payload.card_id, csv_path, progress_db_path)
+    _ensure_card_exists(payload.card_id, progress_db_path)
     question_type = str(payload.question_type or "").strip().lower()
     if question_type not in SUPPORTED_QUESTION_TYPES:
         raise ValueError(f"Unsupported question type: {payload.question_type}")
@@ -4525,7 +4449,7 @@ def save_question_attempt(
     wrong_note = str(payload.wrong_note or "")[:20000]
     if is_correct_value == 1:
         wrong_note = ""
-    db_path = progress_db_for(csv_path, progress_db_path)
+    db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     now = utc_now_iso()
     answered_at = str(payload.answered_at or now)[:64]
@@ -4634,7 +4558,7 @@ def save_question_attempt(
             (question_id,),
         ).fetchone()
 
-    updated_rows, _ = read_cards(csv_path, db_path)
+    updated_rows, _ = read_cards(db_path)
     updated_card = next((row for row in updated_rows if row.get("id") == payload.card_id), None)
     if updated_card is None:
         raise KeyError(payload.card_id)
@@ -5372,11 +5296,10 @@ def linked_cards_for_wiki_page(
     title: str,
     source_relative: str,
     *,
-    csv_path: Path = CSV_PATH,
     progress_db_path: Path | None = None,
     limit: int = 12,
 ) -> list[dict[str, Any]]:
-    rows, _ = read_cards(csv_path, progress_db_path)
+    rows, _ = read_cards(progress_db_path)
     title_key = normalized_lookup_text(title)
     slug_key = normalized_lookup_text(page_slug.replace("/", " ").replace("-", " "))
     page_sources = wiki_source_variants(source_relative) | wiki_source_variants(page_slug) | wiki_source_variants(f"pages/{page_slug}.md")
@@ -5433,7 +5356,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     source_relative = str(source_path.relative_to(repo)).replace(os.sep, "/")
     page_meta = index["pages"].get(slug, {})
     title = page_meta.get("title") or extract_markdown_title(markdown_text, source_path.stem)
-    linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+    linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, progress_db_path=PROGRESS_DB_PATH)
 
     return {
         "slug": slug,
@@ -5595,7 +5518,7 @@ def api_wiki_raw(relative_path: str) -> FileResponse:
 @app.get("/api/cards")
 def api_cards() -> dict[str, Any]:
     try:
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
     except FileNotFoundError as exc:
@@ -5608,8 +5531,8 @@ def api_cards() -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/mark")
 def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
     try:
-        card = mark_card(card_id, payload.known_status, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        card = mark_card(card_id, payload.known_status, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
     except KeyError as exc:
@@ -5622,8 +5545,8 @@ def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/bookmark")
 def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
     try:
-        card = set_bookmark(card_id, payload.bookmarked, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        card = set_bookmark(card_id, payload.bookmarked, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
     except KeyError as exc:
@@ -5636,8 +5559,8 @@ def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/memo")
 def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
     try:
-        card = save_memo(card_id, payload.memo, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        card = save_memo(card_id, payload.memo, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
     except KeyError as exc:
@@ -5648,7 +5571,7 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/ai-rewrite/preview")
 def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
         current = next((row for row in rows if row.get("id") == card_id), None)
@@ -5671,8 +5594,8 @@ def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> 
 @app.post("/api/cards/{card_id}/ai-rewrite/apply")
 def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict[str, Any]:
     try:
-        card, backup_path = update_card_ai_content(card_id, payload, csv_path=None, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        card, backup_path = update_card_ai_content(card_id, payload, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
     except KeyError as exc:
@@ -5691,8 +5614,8 @@ def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict
 @app.post("/api/cards/{card_id}/concept-media")
 def api_card_concept_media(card_id: str, payload: CardConceptMediaRequest) -> dict[str, Any]:
     try:
-        card, backup_path = update_card_concept_media(card_id, payload, csv_path=None, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        card, backup_path = update_card_concept_media(card_id, payload, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -5734,15 +5657,12 @@ def api_ai_image_file(image_name: str) -> FileResponse:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return FileResponse(image_path)
 
-@app.get("/api/concept-images/{image_name}")
-def api_legacy_concept_image_file(image_name: str) -> FileResponse:
-    return api_ai_image_file(image_name)
 
 
 @app.post("/api/cards/{card_id}/ai-image/preview")
 def api_card_ai_image_preview(card_id: str) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
         current = next((row for row in rows if row.get("id") == card_id), None)
@@ -5783,13 +5703,12 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
         card, backup_path, image_url = apply_ai_concept_image(
             card_id,
             payload,
-            csv_path=None,
             backup_dir=BACKUP_DIR,
             progress_db_path=PROGRESS_DB_PATH,
             image_dir=AI_IMAGE_DIR,
             preview_dir=AI_IMAGE_PREVIEW_DIR,
         )
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
 
 
     except KeyError as exc:
@@ -5812,7 +5731,7 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
 @app.post("/api/questions/generate")
 def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
         generated = generate_questions(
             rows,
             card_ids=payload.card_ids,
@@ -5820,7 +5739,7 @@ def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
             count=payload.count,
             seed=payload.seed,
         )
-        return attach_generated_question_bank_ids(generated, rows, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        return attach_generated_question_bank_ids(generated, rows, progress_db_path=PROGRESS_DB_PATH)
 
 
     except KeyError as exc:
@@ -5834,7 +5753,7 @@ def api_generate_questions(payload: QuestionGenerateRequest) -> dict[str, Any]:
 @app.post("/api/question-bank")
 def api_question_bank_upsert(payload: QuestionBankUpsertRequest) -> dict[str, Any]:
     try:
-        return upsert_question_bank_entries(payload.questions, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        return upsert_question_bank_entries(payload.questions, progress_db_path=PROGRESS_DB_PATH)
 
 
     except KeyError as exc:
@@ -5854,7 +5773,6 @@ def api_question_bank(request: Request) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=f"Invalid limit: {raw_limit}") from exc
     try:
         return read_question_bank_entries(
-            csv_path=None,
             progress_db_path=PROGRESS_DB_PATH,
             card_id=request.query_params.get("card_id", ""),
             question_type=request.query_params.get("question_type", ""),
@@ -5878,7 +5796,7 @@ def api_question_bank(request: Request) -> dict[str, Any]:
 @app.post("/api/questions/attempt")
 def api_question_attempt(payload: QuestionAttemptRequest) -> dict[str, Any]:
     try:
-        return save_question_attempt(payload, csv_path=None, progress_db_path=PROGRESS_DB_PATH)
+        return save_question_attempt(payload, progress_db_path=PROGRESS_DB_PATH)
 
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {payload.card_id}") from exc
@@ -5897,7 +5815,6 @@ def api_question_attempts(request: Request) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=f"Invalid limit: {raw_limit}") from exc
     try:
         return read_question_attempts(
-            csv_path=None,
             progress_db_path=PROGRESS_DB_PATH,
             card_ids=request.query_params.getlist("card_id"),
             result=request.query_params.get("result", "all"),
@@ -5936,10 +5853,6 @@ def health() -> dict[str, Any]:
         "content_db_exists": PROGRESS_DB_PATH.exists(),
         "progress_db_path": str(PROGRESS_DB_PATH),
         "progress_db_exists": PROGRESS_DB_PATH.exists(),
-        "cards_seed_db_path": str(CARDS_SEED_DB_PATH),
-        "cards_seed_db_exists": CARDS_SEED_DB_PATH.exists(),
-        "legacy_bootstrap_csv_path": str(CSV_PATH),
-        "legacy_bootstrap_csv_exists": CSV_PATH.exists(),
         "wiki_book_dir": str(resolved_wiki_book_dir),
         "wiki_book_exists": wiki_book_exists,
         "wiki_book_configured_dir": str(WIKI_BOOK_DIR),

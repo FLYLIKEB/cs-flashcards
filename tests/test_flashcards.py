@@ -97,51 +97,46 @@ def seed_rows_from_csv(path: Path) -> list[dict[str, str]]:
     return rows
 
 
-def write_seed_db_from_csv(csv_path: Path, seed_db_path: Path) -> None:
-    if seed_db_path.exists():
-        seed_db_path.unlink()
-    flashcard_app.ensure_progress_db(seed_db_path, seed_rows_from_csv(csv_path))
-
-
-def with_seed_db(seed_db_path: Path, callback):
-    original_seed = flashcard_app.CARDS_SEED_DB_PATH
-    try:
-        flashcard_app.CARDS_SEED_DB_PATH = seed_db_path
-        return callback()
-    finally:
-        flashcard_app.CARDS_SEED_DB_PATH = original_seed
-
-
-def bootstrap_runtime_db(csv_path: Path | None, db_path: Path) -> None:
+def seed_runtime_db(csv_path: Path | None, db_path: Path) -> None:
     if csv_path is not None and not db_path.exists():
-        seed_db_path = db_path.with_name('cards-seed.sqlite')
-        write_seed_db_from_csv(csv_path, seed_db_path)
-        with_seed_db(seed_db_path, lambda: flashcard_app.ensure_progress_db(db_path))
+        flashcard_app.ensure_progress_db(
+            db_path,
+            [
+                {**row, 'known_status': '', 'last_reviewed': '', 'review_count': '0'}
+                for row in seed_rows_from_csv(csv_path)
+            ],
+        )
 
 
 def read_cards(csv_path: Path | None, progress_db_path: Path):
-    bootstrap_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.read_cards(None, progress_db_path)
+    seed_runtime_db(csv_path, progress_db_path)
+    return flashcard_app.read_cards(progress_db_path)
 
 
 def mark_card(card_id: str, status: str, csv_path: Path | None, backup_dir: Path, progress_db_path: Path):
-    bootstrap_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.mark_card(card_id, status, None, backup_dir, progress_db_path)
+    seed_runtime_db(csv_path, progress_db_path)
+    return flashcard_app.mark_card(card_id, status, backup_dir, progress_db_path)
 
 
 def set_bookmark(card_id: str, bookmarked: bool, csv_path: Path | None, progress_db_path: Path):
-    bootstrap_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.set_bookmark(card_id, bookmarked, None, progress_db_path)
+    seed_runtime_db(csv_path, progress_db_path)
+    return flashcard_app.set_bookmark(card_id, bookmarked, progress_db_path)
 
 
 def save_memo(card_id: str, memo: str, csv_path: Path | None, progress_db_path: Path):
-    bootstrap_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.save_memo(card_id, memo, None, progress_db_path)
+    seed_runtime_db(csv_path, progress_db_path)
+    return flashcard_app.save_memo(card_id, memo, progress_db_path)
 
 
-def save_question_attempt(payload, csv_path: Path | None, progress_db_path: Path):
-    bootstrap_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.save_question_attempt(payload, None, progress_db_path)
+def save_question_attempt(payload, csv_path_or_progress_db: Path, progress_db_path: Path | None = None):
+    if progress_db_path is None:
+        progress_db_path = csv_path_or_progress_db
+        sibling_csv_path = progress_db_path.with_name('cards.csv')
+        csv_path = sibling_csv_path if sibling_csv_path.exists() else None
+    else:
+        csv_path = csv_path_or_progress_db
+    seed_runtime_db(csv_path, progress_db_path)
+    return flashcard_app.save_question_attempt(payload, progress_db_path)
 
 
 
@@ -251,69 +246,6 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['known_status'], '')
             self.assertEqual(rows[0]['review_count'], '0')
 
-    def test_read_cards_flushes_legacy_ai_overrides_into_sqlite(self):
-        with tempfile.TemporaryDirectory() as td:
-            csv_path = Path(td) / 'cards.csv'
-            db_path = Path(td) / 'progress.sqlite'
-            write_sample(csv_path, include_image=True)
-            read_cards(csv_path, db_path)
-
-            with closing(sqlite3.connect(db_path)) as conn:
-                conn.execute(
-                    """
-                    INSERT INTO card_progress (card_id, definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(card_id) DO UPDATE SET
-                        definition=excluded.definition,
-                        detailed_explanation=excluded.detailed_explanation,
-                        exam_note=excluded.exam_note,
-                        concept_image_url=excluded.concept_image_url,
-                        concept_image_alt=excluded.concept_image_alt,
-                        updated_at=excluded.updated_at
-                    """,
-                    (
-                        'CS-001',
-                        '레거시 정의',
-                        '의미: 레거시 상세. 활용: 레거시 예시.',
-                        '레거시 포인트',
-                        '/api/ai-images/legacy.png',
-                        '레거시 이미지 설명',
-                        '2026-07-20T00:00:00+09:00',
-                    ),
-                )
-                conn.commit()
-
-            rows, _ = read_cards(csv_path, db_path)
-            self.assertEqual(rows[0]['definition'], '레거시 정의')
-            saved = sqlite_card_status(db_path)
-            self.assertEqual(saved['definition'], '레거시 정의')
-            self.assertEqual(saved['concept_image_url'], '/api/ai-images/legacy.png')
-            csv_path.unlink()
-            rows, _ = read_cards(csv_path, db_path)
-            self.assertEqual(rows[0]['definition'], '레거시 정의')
-            with closing(sqlite3.connect(db_path)) as conn:
-                legacy = conn.execute(
-                    'SELECT definition, detailed_explanation, exam_note, concept_image_url, concept_image_alt FROM card_progress WHERE card_id=?',
-                    ('CS-001',),
-                ).fetchone()
-            self.assertEqual(legacy, ('', '', '', '', ''))
-
-    def test_read_cards_normalizes_legacy_concept_image_urls(self):
-        with tempfile.TemporaryDirectory() as td:
-            csv_path = Path(td) / 'cards.csv'
-            db_path = Path(td) / 'progress.sqlite'
-            write_sample(csv_path, include_image=True)
-            read_cards(csv_path, db_path)
-
-            with closing(sqlite3.connect(db_path)) as conn:
-                conn.execute(
-                    "UPDATE cards SET concept_image_url=?, concept_media_type='', concept_media_payload='' WHERE card_id=?",
-                    ('/api/concept-images/legacy.png', 'CS-001'),
-                )
-                conn.commit()
-
-            rows, _ = read_cards(None, db_path)
-            self.assertEqual(rows[0]['concept_image_url'], '/api/ai-images/legacy.png')
 
     def test_read_cards_recovers_saved_ai_image_files(self):
         with tempfile.TemporaryDirectory() as td:
@@ -321,7 +253,7 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = Path(td) / 'progress.sqlite'
             image_dir = Path(td) / 'ai_images'
             write_sample(csv_path, include_image=True)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
             image_dir.mkdir(parents=True, exist_ok=True)
             image_name = 'CS-001-20260720-223000-deadbeef.png'
             (image_dir / image_name).write_bytes(b'\x89PNG\r\n\x1a\nrestored')
@@ -348,15 +280,11 @@ class FlashcardProgressTests(unittest.TestCase):
             missing_csv = root / 'missing.csv'
             write_sample(csv_path, include_image=True)
             read_cards(csv_path, db_path)
-
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
-                flashcard_app.CSV_PATH = missing_csv
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 data = flashcard_app.api_cards()
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
 
             self.assertEqual(len(data['cards']), 1)
@@ -448,7 +376,7 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             backup_dir = root / 'backups'
             write_sample(csv_path, include_image=True, include_review=True, status='O', count='2')
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
 
             updated, backup_path = flashcard_app.update_card_ai_content(
@@ -459,7 +387,6 @@ class FlashcardProgressTests(unittest.TestCase):
                     exam_note='비교 포인트까지 함께 말합니다.',
                     concept_image_alt='새 학습 이미지 설명',
                 ),
-                csv_path,
                 backup_dir,
                 db_path,
             )
@@ -477,12 +404,6 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path.unlink()
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['definition'], '새 정의')
-            with closing(sqlite3.connect(db_path)) as conn:
-                legacy = conn.execute(
-                    'SELECT definition, detailed_explanation, exam_note, concept_image_alt FROM card_progress WHERE card_id=?',
-                    ('CS-001',),
-                ).fetchone()
-            self.assertTrue(legacy is None or tuple(legacy) == ('', '', '', ''))
 
     def test_update_card_concept_media_updates_sqlite_content(self):
         with tempfile.TemporaryDirectory() as td:
@@ -491,7 +412,7 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             backup_dir = root / 'backups'
             write_sample(csv_path, include_image=True)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
 
             updated, backup_path = flashcard_app.update_card_concept_media(
@@ -501,7 +422,6 @@ class FlashcardProgressTests(unittest.TestCase):
                     concept_media_payload='<div class="demo">flow</div><script>document.body.dataset.ready = "1";</script>',
                     concept_image_alt='동적 개념 위젯',
                 ),
-                csv_path,
                 backup_dir,
                 db_path,
             )
@@ -553,12 +473,9 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             write_sample(csv_path, include_image=True)
             read_cards(csv_path, db_path)
-
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_key = flashcard_app.OPENAI_API_KEY
             try:
-                flashcard_app.CSV_PATH = csv_path
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 flashcard_app.OPENAI_API_KEY = 'test-key'
                 with mock.patch.object(
@@ -577,7 +494,6 @@ class FlashcardProgressTests(unittest.TestCase):
                 self.assertEqual(data['card_id'], 'CS-001')
                 self.assertEqual(data['proposal']['definition'], '면접형 정의')
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.OPENAI_API_KEY = original_key
 
@@ -588,11 +504,9 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             write_sample(csv_path, include_image=True)
             read_cards(csv_path, db_path)
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_backup = flashcard_app.BACKUP_DIR
             try:
-                flashcard_app.CSV_PATH = csv_path
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 flashcard_app.BACKUP_DIR = root / 'backups'
                 data = flashcard_app.api_card_ai_rewrite_apply(
@@ -611,7 +525,6 @@ class FlashcardProgressTests(unittest.TestCase):
                 rows, _ = read_cards(csv_path, db_path)
                 self.assertEqual(rows[0]['exam_note'], '적용 포인트')
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.BACKUP_DIR = original_backup
 
@@ -658,7 +571,7 @@ class FlashcardProgressTests(unittest.TestCase):
             preview_dir = root / 'previews'
             backup_dir = root / 'backups'
             write_sample(csv_path, include_image=True)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
             preview_dir.mkdir(parents=True, exist_ok=True)
             preview_name = 'preview-test.png'
@@ -671,7 +584,6 @@ class FlashcardProgressTests(unittest.TestCase):
             updated, backup_path, image_url = flashcard_app.apply_ai_concept_image(
                 'CS-001',
                 flashcard_app.CardAiImageApplyRequest(preview_name=preview_name),
-                csv_path,
                 backup_dir,
                 db_path,
                 image_dir,
@@ -705,15 +617,12 @@ class FlashcardProgressTests(unittest.TestCase):
             backup_dir = root / 'backups'
             write_sample(csv_path, include_image=True)
             read_cards(csv_path, db_path)
-
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_backup = flashcard_app.BACKUP_DIR
             original_image_dir = flashcard_app.AI_IMAGE_DIR
             original_preview_dir = flashcard_app.AI_IMAGE_PREVIEW_DIR
             original_key = flashcard_app.OPENAI_API_KEY
             try:
-                flashcard_app.CSV_PATH = csv_path
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 flashcard_app.BACKUP_DIR = backup_dir
                 flashcard_app.AI_IMAGE_DIR = image_dir
@@ -743,7 +652,6 @@ class FlashcardProgressTests(unittest.TestCase):
                 served_final = flashcard_app.api_ai_image_file(Path(applied['image_url']).name)
                 self.assertTrue(str(served_final.path).endswith('.png'))
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.BACKUP_DIR = original_backup
                 flashcard_app.AI_IMAGE_DIR = original_image_dir
@@ -758,12 +666,9 @@ class FlashcardProgressTests(unittest.TestCase):
             backup_dir = root / 'backups'
             write_sample(csv_path, include_image=True)
             read_cards(csv_path, db_path)
-
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_backup = flashcard_app.BACKUP_DIR
             try:
-                flashcard_app.CSV_PATH = csv_path
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 flashcard_app.BACKUP_DIR = backup_dir
                 payload = flashcard_app.CardConceptMediaRequest(
@@ -778,7 +683,6 @@ class FlashcardProgressTests(unittest.TestCase):
                 saved = sqlite_card_status(db_path)
                 self.assertEqual(saved['concept_media_type'], 'mermaid')
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.BACKUP_DIR = original_backup
 
@@ -790,13 +694,10 @@ class FlashcardProgressTests(unittest.TestCase):
             preview_dir = root / 'previews'
             write_sample(csv_path, include_image=True)
             read_cards(csv_path, db_path)
-
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_preview_dir = flashcard_app.AI_IMAGE_PREVIEW_DIR
             original_key = flashcard_app.OPENAI_API_KEY
             try:
-                flashcard_app.CSV_PATH = csv_path
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 flashcard_app.AI_IMAGE_PREVIEW_DIR = preview_dir
                 flashcard_app.OPENAI_API_KEY = 'test-key'
@@ -818,7 +719,6 @@ class FlashcardProgressTests(unittest.TestCase):
                 self.assertFalse((preview_dir / preview['preview_name']).exists())
                 self.assertFalse((preview_dir / f"{Path(preview['preview_name']).stem}.json").exists())
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.AI_IMAGE_PREVIEW_DIR = original_preview_dir
                 flashcard_app.OPENAI_API_KEY = original_key
@@ -854,7 +754,6 @@ class FlashcardProgressTests(unittest.TestCase):
                     question_started_at='2026-07-19T09:00:00+09:00',
                     answered_at='2026-07-19T09:00:48+09:00',
                 ),
-                csv_path,
                 db_path,
             )
             self.assertFalse(first['attempt']['is_correct'])
@@ -893,7 +792,6 @@ class FlashcardProgressTests(unittest.TestCase):
                     session_elapsed_seconds=70,
                     time_limit_seconds=5400,
                 ),
-                csv_path,
                 db_path,
             )
             self.assertTrue(second['attempt']['is_correct'])
@@ -922,7 +820,6 @@ class FlashcardProgressTests(unittest.TestCase):
                     session_elapsed_seconds=165,
                     time_limit_seconds=5400,
                 ),
-                csv_path,
                 db_path,
             )
             self.assertFalse(third['attempt']['is_correct'])
@@ -941,20 +838,20 @@ class FlashcardProgressTests(unittest.TestCase):
                 ).fetchone()
             self.assertEqual(saved, (3, 2))
 
-            history_all = flashcard_app.read_question_attempts(csv_path, db_path, card_ids=['CS-001'], result='all', limit=10)
+            history_all = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], result='all', limit=10)
             self.assertEqual(history_all['summary']['total'], 3)
             self.assertEqual(history_all['summary']['correct'], 1)
             self.assertEqual(history_all['summary']['ambiguous'], 1)
             self.assertEqual(history_all['summary']['wrong'], 1)
             self.assertEqual(history_all['items'][0]['card_id'], 'CS-001')
 
-            history_wrong = flashcard_app.read_question_attempts(csv_path, db_path, card_ids=['CS-001'], result='wrong', limit=10)
+            history_wrong = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], result='wrong', limit=10)
             self.assertEqual(history_wrong['summary']['wrong'], 1)
             self.assertEqual(len(history_wrong['items']), 1)
             self.assertFalse(history_wrong['items'][0]['is_correct'])
             self.assertEqual(history_wrong['items'][0]['wrong_note'], '정의와 용어를 혼동함')
 
-            history_ambiguous = flashcard_app.read_question_attempts(csv_path, db_path, card_ids=['CS-001'], result='ambiguous', limit=10)
+            history_ambiguous = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], result='ambiguous', limit=10)
             self.assertEqual(history_ambiguous['summary']['ambiguous'], 1)
             self.assertEqual(len(history_ambiguous['items']), 1)
             self.assertEqual(history_ambiguous['items'][0]['judgment'], 'ambiguous')
@@ -983,7 +880,7 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
 
             saved = flashcard_app.upsert_question_bank_entries(
@@ -1013,7 +910,6 @@ class FlashcardProgressTests(unittest.TestCase):
 
                     }
                 ],
-                csv_path,
                 db_path,
             )
             self.assertEqual(saved['count'], 1)
@@ -1054,7 +950,6 @@ class FlashcardProgressTests(unittest.TestCase):
 
                     }
                 ],
-                csv_path,
                 db_path,
             )
             self.assertEqual(saved_again['count'], 1)
@@ -1076,13 +971,11 @@ class FlashcardProgressTests(unittest.TestCase):
                     is_correct=True,
                     judgment='correct',
                 ),
-                csv_path,
                 db_path,
             )
             self.assertEqual(attempt['attempt']['question_bank_id'], item['question_bank_id'])
 
             listed = flashcard_app.read_question_bank_entries(
-                csv_path,
                 db_path,
                 topic='데이터베이스',
                 issuer='한국은행',
@@ -1099,7 +992,7 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
 
             prompt = '## 제목\n\n다음 그림을 보고 답하시오.\n\n![문제 그림](/static/favicon.svg)'
@@ -1126,7 +1019,6 @@ class FlashcardProgressTests(unittest.TestCase):
                         'answer_guide': answer_guide,
                     }
                 ],
-                csv_path,
                 db_path,
             )
             item = saved['items'][0]
@@ -1136,7 +1028,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(item['explanation'], explanation)
             self.assertEqual(item['answer_guide'], answer_guide)
 
-            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, issuer='한국은행', limit=10)
+            listed = flashcard_app.read_question_bank_entries(db_path, issuer='한국은행', limit=10)
             self.assertEqual(listed['summary']['total'], 1)
             listed_item = listed['items'][0]
             self.assertEqual(listed_item['prompt'], prompt)
@@ -1187,7 +1079,7 @@ class FlashcardProgressTests(unittest.TestCase):
                     },
                 ]:
                     writer.writerow(row)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
             (pages / '05-01-우리은행-기출.md').write_text(
                 '# 05-01. 우리은행 기출\n\n'
@@ -1208,7 +1100,7 @@ class FlashcardProgressTests(unittest.TestCase):
                 encoding='utf-8',
             )
 
-            entries = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            entries = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, db_path)
             self.assertEqual(len(entries), 3)
 
             multiple_choice = entries[0]
@@ -1276,7 +1168,7 @@ class FlashcardProgressTests(unittest.TestCase):
                     'importance': '상',
                     'difficulty': '중',
                 })
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
             (pages / '05-01-우리은행-기출.md').write_text(
                 '# 05-01. 우리은행 기출\n\n'
@@ -1296,14 +1188,14 @@ class FlashcardProgressTests(unittest.TestCase):
                 encoding='utf-8',
             )
 
-            saved = flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            saved = flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, db_path)
             self.assertEqual(saved['pages'], 2)
             self.assertEqual(saved['count'], 3)
 
-            saved_again = flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            saved_again = flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, db_path)
             self.assertEqual(saved_again['count'], 3)
 
-            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, field_name=flashcard_app.FIN_CORP_FIELD_NAME, limit=10)
+            listed = flashcard_app.read_question_bank_entries(db_path, field_name=flashcard_app.FIN_CORP_FIELD_NAME, limit=10)
             self.assertEqual(listed['summary']['total'], 3)
             self.assertEqual({item['issuer'] for item in listed['items']}, {'우리은행', '금융결제원'})
             self.assertTrue(all(item['question_bank_id'].startswith('qb-fin239-') for item in listed['items']))
@@ -1355,7 +1247,7 @@ class FlashcardProgressTests(unittest.TestCase):
                     },
                 ]:
                     writer.writerow(row)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
             (pages / '05-08-산업은행-기출.md').write_text(
                 '# 05-08. 산업은행 기출\n\n'
@@ -1427,7 +1319,7 @@ class FlashcardProgressTests(unittest.TestCase):
                 encoding='utf-8',
             )
 
-            entries = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, csv_path, db_path)
+            entries = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, db_path)
             by_prompt = {item['prompt']: item for item in entries}
 
             inline = by_prompt['### 2. 빅데이터 3V 중에 아닌 것은?']
@@ -1473,9 +1365,110 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIn('메모이제이션', repaired['explanation'])
             self.assertEqual(repaired['category'], '자료구조·알고리즘')
 
-            sql_short = by_prompt['### 238. SQL문 약술']
+            sql_short = by_prompt['### 238. SQL문에 대해 설명하시오.']
             self.assertEqual(sql_short['card_id'], '')
             self.assertEqual(sql_short['category'], '데이터베이스')
+
+    def test_parse_fin_corp_question_bank_entries_converts_incomplete_rows_and_cleans_keywords(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'unused.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+
+            flashcard_app.ensure_progress_db(
+                db_path,
+                seed_rows=[
+                    {
+                        'id': 'CS-036',
+                        'term': 'C 언어',
+                        'english': 'C Programming Language',
+                        'category': '프로그래밍 언어',
+                        'definition': 'C 언어는 하드웨어에 가까운 메모리 제어와 이식 가능한 절차적 문법을 제공하는 컴파일 언어다.',
+                        'detailed_explanation': '포인터, 배열, 함수 호출, 메모리 배치를 직접 다루며 시스템 소프트웨어와 임베디드 구현에 널리 쓰인다.',
+                        'related_concepts': '[[포인터]], [[전역 변수]], [[static 변수]]',
+                        'source_files': 'pages/05-04-금융결제원-기출.md',
+                        'exam_note': '',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '중',
+                    },
+                    {
+                        'id': 'CS-161',
+                        'term': 'LRU',
+                        'english': 'LRU',
+                        'category': '운영체제',
+                        'definition': 'LRU는 가장 오래 사용되지 않은 페이지를 교체 대상으로 삼는 페이지 교체 정책이다.',
+                        'detailed_explanation': '최근 사용 이력이 가까운 미래의 재사용 가능성을 나타낸다고 보고 가장 오래 참조되지 않은 항목을 제거한다.',
+                        'related_concepts': '[[가상 메모리]], [[페이지 폴트]]',
+                        'source_files': 'pages/05-07-금융감독원-기출.md',
+                        'exam_note': '',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '중',
+                    },
+                    {
+                        'id': 'CS-219',
+                        'term': '퍼블릭 블록체인',
+                        'english': 'Public Blockchain',
+                        'category': '금융IT·신기술',
+                        'definition': '퍼블릭 블록체인은 누구나 참여하고 검증할 수 있는 공개형 블록체인이다.',
+                        'detailed_explanation': '개방성과 투명성은 높지만 성능과 규제 통제, 개인정보 보호 측면의 한계가 있다.',
+                        'related_concepts': '[[프라이빗 블록체인]], [[합의 알고리즘]]',
+                        'source_files': 'pages/05-03-대구은행-기출.md',
+                        'exam_note': '',
+                        'bok_appeared': '',
+                        'importance': '상',
+                        'difficulty': '중',
+                    },
+                ],
+            )
+
+            (pages / '05-03-대구은행-기출.md').write_text(
+                '# 05-03. 대구은행 기출\n\n'
+                '### 121. 퍼블릭 블록체인 특징으로 옳지 않은 것은?\n\n'
+                '**답:** 중앙시스템 제어가 필요한 금융서비스에 부적합함.\n',
+                encoding='utf-8',
+            )
+            (pages / '05-04-금융결제원-기출.md').write_text(
+                '# 05-04. 금융결제원 기출\n\n'
+                '### 155. (주관식)C언어 코드 출력결과\n'
+                '**답(AI답변):** 문제의 선지/도표가 원문에 충분히 남아 있지 않아 단정형 정답은 제한적이다. 해당 주제의 핵심 개념과 대표 공식·특징을 기준으로 풀이해야 한다.\n',
+                encoding='utf-8',
+            )
+            (pages / '05-07-금융감독원-기출.md').write_text(
+                '# 05-07. 금융감독원 기출\n\n'
+                '### 195. LRU 계산문제 문제\n'
+                '**답(AI답변):** LRU는 가장 오랫동안 사용되지 않은 페이지를 교체한다.\n',
+                encoding='utf-8',
+            )
+
+            entries = flashcard_app.parse_fin_corp_question_bank_entries(wiki_root, db_path)
+            by_id = {item['question_bank_id']: item for item in entries}
+
+            public_blockchain = by_id['qb-fin239-05-03-01']
+            self.assertEqual(public_blockchain['prompt'], '### 121. 퍼블릭 블록체인의 특징을 설명하시오.')
+            self.assertIn('개념문제로 변환함', public_blockchain['body'])
+            self.assertIn('원문 제목: 퍼블릭 블록체인 특징으로 옳지 않은 것은?', public_blockchain['body'])
+            self.assertEqual(public_blockchain['card_id'], 'CS-219')
+            self.assertEqual(public_blockchain['category'], '금융IT·신기술')
+            self.assertIn('퍼블릭 블록체인', public_blockchain['keywords'])
+            self.assertNotIn('퍼블릭 클라우드', public_blockchain['keywords'])
+
+            c_output = by_id['qb-fin239-05-04-01']
+            self.assertEqual(c_output['prompt'], '### 155. C언어에 대해 핵심 원리와 풀이 기준을 설명하시오.')
+            self.assertEqual(c_output['card_id'], 'CS-036')
+            self.assertEqual(c_output['category'], '프로그래밍 언어')
+            self.assertIn('C 언어', c_output['keywords'])
+            self.assertNotIn('Java', c_output['keywords'])
+
+            lru = by_id['qb-fin239-05-07-01']
+            self.assertEqual(lru['prompt'], '### 195. LRU에 대해 핵심 원리와 풀이 기준을 설명하시오.')
+            self.assertEqual(lru['card_id'], 'CS-161')
+            self.assertEqual(lru['category'], '운영체제')
+            self.assertEqual(lru['keywords'], ['LRU'])
 
     def test_parse_bok_question_bank_entries_splits_and_preserves_markdown(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1595,7 +1588,7 @@ class FlashcardProgressTests(unittest.TestCase):
             pages = wiki_root / 'pages'
             pages.mkdir(parents=True)
             write_sample(csv_path)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
             (pages / '05-14-01-한국은행-2021-컴퓨터공학-학술-파트-I.md').write_text(
                 '# 05-14-01. 한국은행 2021 컴퓨터공학 학술 파트 I\n\n'
@@ -1616,14 +1609,14 @@ class FlashcardProgressTests(unittest.TestCase):
                 encoding='utf-8',
             )
 
-            saved = flashcard_app.sync_bok_question_bank_entries(wiki_root, csv_path, db_path)
+            saved = flashcard_app.sync_bok_question_bank_entries(wiki_root, db_path)
             self.assertEqual(saved['pages'], 2)
             self.assertEqual(saved['count'], 3)
 
-            saved_again = flashcard_app.sync_bok_question_bank_entries(wiki_root, csv_path, db_path)
+            saved_again = flashcard_app.sync_bok_question_bank_entries(wiki_root, db_path)
             self.assertEqual(saved_again['count'], 3)
 
-            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, issuer='한국은행', limit=10)
+            listed = flashcard_app.read_question_bank_entries(db_path, issuer='한국은행', limit=10)
             self.assertEqual(listed['summary']['total'], 3)
             self.assertTrue(all(item['answer'] == '' for item in listed['items']))
             self.assertTrue(all(item['session_mode'] == 'bok' for item in listed['items']))
@@ -1641,16 +1634,12 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             write_sample(csv_path)
             read_cards(csv_path, db_path)
-
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
-                flashcard_app.CSV_PATH = csv_path
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 payload = flashcard_app.QuestionGenerateRequest(card_ids=['CS-001'], types=['short'], count=1, seed=7)
                 generated = flashcard_app.api_generate_questions(payload)
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
 
             self.assertEqual(len(generated['questions']), 1)
@@ -1661,7 +1650,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(question['issuer'], '카드 생성')
             self.assertEqual(question['source_location'], 'sample.md')
 
-            listed = flashcard_app.read_question_bank_entries(csv_path, db_path, card_id='CS-001', limit=10)
+            listed = flashcard_app.read_question_bank_entries(db_path, card_id='CS-001', limit=10)
             self.assertEqual(listed['summary']['total'], 1)
             self.assertEqual(listed['items'][0]['question_bank_id'], question['question_bank_id'])
 
@@ -1671,17 +1660,16 @@ class FlashcardProgressTests(unittest.TestCase):
             csv_path = root / 'cards.csv'
             db_path = root / 'progress.sqlite'
             write_sample(csv_path)
-            bootstrap_runtime_db(csv_path, db_path)
+            seed_runtime_db(csv_path, db_path)
 
 
-            seeded = flashcard_app.read_question_bank_entries(csv_path, db_path, limit=10)
+            seeded = flashcard_app.read_question_bank_entries(db_path, limit=10)
             self.assertEqual(seeded['summary']['total'], 1)
             self.assertEqual(seeded['items'][0]['issuer'], '샘플')
             self.assertEqual(seeded['items'][0]['topic'], '데이터베이스')
             self.assertIn('/static/favicon.svg', seeded['items'][0]['body'])
 
             filtered = flashcard_app.read_question_bank_entries(
-                csv_path,
                 db_path,
                 issuer='샘플',
                 difficulty='중',
@@ -1710,9 +1698,7 @@ class FlashcardProgressTests(unittest.TestCase):
                 conn.execute('INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, updated_at) VALUES (?, ?, ?, ?, ?)', ('CS-001', 'X', '2026-07-08T12:00:00+09:00', 2, '2026-07-08T12:00:00+09:00'))
                 conn.commit()
 
-            seed_db_path = root / 'cards-seed.sqlite'
-            write_seed_db_from_csv(csv_path, seed_db_path)
-            with_seed_db(seed_db_path, lambda: flashcard_app.ensure_progress_db(db_path))
+            flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['known_status'], 'X')
             self.assertEqual(rows[0]['bookmarked'], '0')
@@ -1741,16 +1727,15 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(summary['unknown'], 0)
             self.assertEqual(summary['unreviewed'], 1)
 
-    def test_runtime_db_can_auto_seed_from_sqlite_asset(self):
+    def test_runtime_db_can_seed_from_explicit_rows(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
-            seed_db_path = root / 'cards-seed.sqlite'
             runtime_db_path = root / 'progress.sqlite'
             write_sample(csv_path, include_image=True, include_media=True)
-            write_seed_db_from_csv(csv_path, seed_db_path)
+            flashcard_app.ensure_progress_db(runtime_db_path, seed_rows_from_csv(csv_path))
 
-            rows, _ = with_seed_db(seed_db_path, lambda: flashcard_app.read_cards(None, runtime_db_path))
+            rows, _ = flashcard_app.read_cards(runtime_db_path)
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0]['term'], '테스트')
             self.assertEqual(rows[0]['concept_image_url'], 'https://example.com/test-concept.png')
@@ -1880,17 +1865,14 @@ class WikiBookTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             write_sample(csv_path, term='소개 문서', english='Intro Document', source_files='pages/intro.md;pages/child.md')
             read_cards(csv_path, db_path)
-            original_csv = flashcard_app.CSV_PATH
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
-                flashcard_app.CSV_PATH = csv_path
                 flashcard_app.PROGRESS_DB_PATH = db_path
                 page = flashcard_app.read_wiki_page('intro', book)
                 self.assertEqual(page['primary_card']['id'], 'CS-001')
                 self.assertTrue(page['primary_card']['card_url'].startswith('/?card=CS-001'))
                 self.assertEqual(page['linked_cards'][0]['term'], '소개 문서')
             finally:
-                flashcard_app.CSV_PATH = original_csv
                 flashcard_app.PROGRESS_DB_PATH = original_db
 
     def test_update_wiki_checklist_item_updates_local_markdown(self):

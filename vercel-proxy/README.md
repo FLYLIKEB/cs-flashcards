@@ -4,7 +4,7 @@
 
 - 공개 도메인: `cs.chamung.com` -> Vercel `A 76.76.21.21`
 - 원본 도메인: `cs-origin.chamung.com` -> Lightsail `A 3.39.48.139`
-- 원본 서버 카드 시드: `/home/ubuntu/cs-flashcards/data/cards.sqlite`
+- 원본 서버 카드 DB: `/home/ubuntu/cs-flashcards/state/progress.sqlite`
 
 재배포:
 
