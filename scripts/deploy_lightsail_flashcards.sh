@@ -169,6 +169,13 @@ fi
 if [[ "$OPENAI_API_KEY_VALUE" == "__EMPTY__" ]]; then
   OPENAI_API_KEY_VALUE=""
 fi
+if [[ -z "$WIKI_GITHUB_TOKEN" && -f /etc/systemd/system/cs-flashcards.service ]]; then
+  EXISTING_WIKI_GITHUB_TOKEN="$(sudo awk -F= '/^Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=/{sub(/^Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=/, ""); print; exit}' /etc/systemd/system/cs-flashcards.service || true)"
+  if [[ -n "$EXISTING_WIKI_GITHUB_TOKEN" ]]; then
+    WIKI_GITHUB_TOKEN="$EXISTING_WIKI_GITHUB_TOKEN"
+    echo "위키 GitHub 토큰 보존: 기존 systemd 설정값을 유지합니다."
+  fi
+fi
 
 
 export DEBIAN_FRONTEND=noninteractive

@@ -14,14 +14,18 @@ REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:-/home/ubuntu/cs-flashcards}"
 REMOTE_DB="${CS_FLASHCARDS_REMOTE_DB_PATH:-$REMOTE_DIR/state/progress.sqlite}"
 LOCAL_TARGET=""
 KEY_COLUMN=""
+COLUMN_SPEC=""
+DELETE_MODE=0
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/sync_remote_sqlite_rows.sh [--local-db PATH] [--remote-db PATH] [--key COLUMN] [--local-target PATH] <table> <row-id> [<row-id>...]
+Usage: ./scripts/sync_remote_sqlite_rows.sh [--local-db PATH] [--remote-db PATH] [--key COLUMN] [--columns col1,col2] [--delete] [--local-target PATH] <table> <row-id> [<row-id>...]
 
 Examples:
   ./scripts/sync_remote_sqlite_rows.sh question_bank qb-011b1c688f53bb3974beb2e3
+  ./scripts/sync_remote_sqlite_rows.sh --columns answer,explanation,answer_guide question_bank qb-011b1c688f53bb3974beb2e3
   ./scripts/sync_remote_sqlite_rows.sh cards CS-001 CS-002
+  ./scripts/sync_remote_sqlite_rows.sh --delete question_bank qb-sample-001
   ./scripts/sync_remote_sqlite_rows.sh --local-target /tmp/remote.sqlite question_bank qb-011b1c688f53bb3974beb2e3
 EOF
 }
@@ -39,6 +43,14 @@ while [[ $# -gt 0 ]]; do
     --key)
       KEY_COLUMN="$2"
       shift 2
+      ;;
+    --columns)
+      COLUMN_SPEC="${COLUMN_SPEC:+$COLUMN_SPEC,}$2"
+      shift 2
+      ;;
+    --delete)
+      DELETE_MODE=1
+      shift
       ;;
     --local-target)
       LOCAL_TARGET="$2"
@@ -90,7 +102,12 @@ if [[ -z "$KEY_COLUMN" ]]; then
   esac
 fi
 
-if [[ ! -f "$LOCAL_DB" ]]; then
+if [[ "$DELETE_MODE" == "1" && -n "$COLUMN_SPEC" ]]; then
+  echo "--delete 와 --columns 는 함께 사용할 수 없습니다." >&2
+  exit 1
+fi
+
+if [[ "$DELETE_MODE" != "1" && ! -f "$LOCAL_DB" ]]; then
   echo "로컬 SQLite 파일을 찾을 수 없습니다: $LOCAL_DB" >&2
   exit 1
 fi
@@ -102,30 +119,66 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python3 - <<'PY' "$LOCAL_DB" "$TABLE" "$KEY_COLUMN" "$PAYLOAD_FILE" "${IDS[@]}"
+python3 - <<'PY' "$DELETE_MODE" "$LOCAL_DB" "$TABLE" "$KEY_COLUMN" "$PAYLOAD_FILE" "$COLUMN_SPEC" "${IDS[@]}"
 import json
 import re
 import sqlite3
 import sys
 from pathlib import Path
 
+
 def valid_identifier(value: str) -> bool:
     return bool(re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', value))
 
-db_path = Path(sys.argv[1])
-table = sys.argv[2]
-key_column = sys.argv[3]
-payload_path = Path(sys.argv[4])
-ids = []
-seen = set()
-for raw in sys.argv[5:]:
-    if raw not in seen:
+
+def parse_column_spec(raw: str, *, key_column: str, available_columns: list[str]) -> list[str]:
+    if not raw.strip():
+        return list(available_columns)
+    requested: list[str] = []
+    seen: set[str] = set()
+    for piece in re.split(r'[\s,]+', raw.strip()):
+        column = piece.strip()
+        if not column:
+            continue
+        if not valid_identifier(column):
+            raise SystemExit(f'안전하지 않은 컬럼명이 포함되어 있습니다: {column}')
+        if column not in available_columns:
+            raise SystemExit(f'로컬 테이블에 없는 컬럼: {column}')
+        if column in seen:
+            continue
+        seen.add(column)
+        requested.append(column)
+    if not requested:
+        raise SystemExit('--columns 에 최소 1개 컬럼이 필요합니다.')
+    return [key_column] + [column for column in requested if column != key_column]
+
+
+delete_mode = sys.argv[1] == '1'
+db_path = Path(sys.argv[2])
+table = sys.argv[3]
+key_column = sys.argv[4]
+payload_path = Path(sys.argv[5])
+column_spec = sys.argv[6]
+ids: list[str] = []
+seen_ids: set[str] = set()
+for raw in sys.argv[7:]:
+    if raw not in seen_ids:
         ids.append(raw)
-        seen.add(raw)
+        seen_ids.add(raw)
 if not ids:
-    raise SystemExit('동기화할 row id가 필요합니다.')
+    raise SystemExit('대상 row id가 필요합니다.')
 if not valid_identifier(table) or not valid_identifier(key_column):
     raise SystemExit('테이블명/키 컬럼명은 안전한 식별자여야 합니다.')
+if delete_mode:
+    payload = {
+        'mode': 'delete',
+        'table': table,
+        'key_column': key_column,
+        'ids': ids,
+    }
+    payload_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(json.dumps({'mode': 'delete', 'table': table, 'key_column': key_column, 'rows': len(ids), 'payload_path': str(payload_path)}, ensure_ascii=False))
+    raise SystemExit(0)
 conn = sqlite3.connect(db_path)
 conn.row_factory = sqlite3.Row
 columns = [row[1] for row in conn.execute(f'PRAGMA table_info({table})').fetchall()]
@@ -133,21 +186,23 @@ if not columns:
     raise SystemExit(f'테이블이 없습니다: {table}')
 if key_column not in columns:
     raise SystemExit(f'키 컬럼이 없습니다: {table}.{key_column}')
+selected_columns = parse_column_spec(column_spec, key_column=key_column, available_columns=columns)
 qmarks = ','.join('?' for _ in ids)
 rows = conn.execute(f'SELECT * FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchall()
-row_map = {str(row[key_column]): {column: row[column] for column in columns} for row in rows}
+row_map = {str(row[key_column]): {column: row[column] for column in selected_columns} for row in rows}
 missing = [row_id for row_id in ids if row_id not in row_map]
 if missing:
     raise SystemExit('로컬 DB에 없는 row id: ' + ', '.join(missing))
 payload = {
+    'mode': 'upsert',
     'table': table,
     'key_column': key_column,
-    'columns': columns,
+    'columns': selected_columns,
     'ids': ids,
     'rows': [row_map[row_id] for row_id in ids],
 }
 payload_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
-print(json.dumps({'table': table, 'key_column': key_column, 'rows': len(ids), 'payload_path': str(payload_path)}, ensure_ascii=False))
+print(json.dumps({'mode': 'upsert', 'table': table, 'key_column': key_column, 'columns': selected_columns, 'rows': len(ids), 'payload_path': str(payload_path)}, ensure_ascii=False))
 conn.close()
 PY
 
@@ -158,67 +213,39 @@ import sqlite3
 import sys
 from pathlib import Path
 
-def valid_identifier(value: str) -> bool:
-    return bool(re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', value))
-
-db_path = Path(sys.argv[1])
-payload_path = Path(sys.argv[2])
-payload = json.loads(payload_path.read_text(encoding='utf-8'))
-table = payload['table']
-key_column = payload['key_column']
-columns = payload['columns']
-ids = payload['ids']
-rows = payload['rows']
-if not valid_identifier(table) or not valid_identifier(key_column) or any(not valid_identifier(column) for column in columns):
-    raise SystemExit('안전하지 않은 식별자가 포함되어 있습니다.')
-conn = sqlite3.connect(db_path)
-remote_columns = [row[1] for row in conn.execute(f'PRAGMA table_info({table})').fetchall()]
-if not remote_columns:
-    raise SystemExit(f'원격 테이블이 없습니다: {table}')
-missing_columns = [column for column in columns if column not in remote_columns]
-if missing_columns:
-    raise SystemExit(f'원격 테이블에 없는 컬럼: {", ".join(missing_columns)}')
-placeholders = ', '.join('?' for _ in columns)
-assignments = [f'{column}=excluded.{column}' for column in columns if column != key_column]
-if assignments:
-    on_conflict = f'ON CONFLICT({key_column}) DO UPDATE SET ' + ', '.join(assignments)
-else:
-    on_conflict = f'ON CONFLICT({key_column}) DO NOTHING'
-sql = f'INSERT INTO {table} ({", ".join(columns)}) VALUES ({placeholders}) {on_conflict}'
-conn.executemany(sql, [[row.get(column) for column in columns] for row in rows])
-conn.commit()
-qmarks = ','.join('?' for _ in ids)
-matched = conn.execute(f'SELECT COUNT(*) FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchone()[0]
-conn.close()
-print(json.dumps({'db_path': str(db_path), 'table': table, 'key_column': key_column, 'rows_upserted': len(rows), 'matched_after': matched, 'ids': ids}, ensure_ascii=False, indent=2))
-PY
-)
-
-if [[ -n "$LOCAL_TARGET" ]]; then
-  python3 - <<'PY' "$LOCAL_TARGET" "$PAYLOAD_FILE"
-import json
-import re
-import sqlite3
-import sys
-from pathlib import Path
 
 def valid_identifier(value: str) -> bool:
     return bool(re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', value))
 
+
 db_path = Path(sys.argv[1])
 payload_path = Path(sys.argv[2])
 payload = json.loads(payload_path.read_text(encoding='utf-8'))
+mode = payload.get('mode', 'upsert')
 table = payload['table']
 key_column = payload['key_column']
-columns = payload['columns']
 ids = payload['ids']
-rows = payload['rows']
-if not valid_identifier(table) or not valid_identifier(key_column) or any(not valid_identifier(column) for column in columns):
+if not valid_identifier(table) or not valid_identifier(key_column):
     raise SystemExit('안전하지 않은 식별자가 포함되어 있습니다.')
 conn = sqlite3.connect(db_path)
 remote_columns = [row[1] for row in conn.execute(f'PRAGMA table_info({table})').fetchall()]
 if not remote_columns:
     raise SystemExit(f'대상 테이블이 없습니다: {table}')
+if key_column not in remote_columns:
+    raise SystemExit(f'대상 키 컬럼이 없습니다: {table}.{key_column}')
+qmarks = ','.join('?' for _ in ids)
+if mode == 'delete':
+    before = conn.execute(f'SELECT COUNT(*) FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchone()[0]
+    conn.execute(f'DELETE FROM {table} WHERE {key_column} IN ({qmarks})', ids)
+    conn.commit()
+    matched = conn.execute(f'SELECT COUNT(*) FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchone()[0]
+    conn.close()
+    print(json.dumps({'db_path': str(db_path), 'mode': mode, 'table': table, 'key_column': key_column, 'rows_requested': len(ids), 'rows_deleted': before - matched, 'matched_after': matched, 'ids': ids}, ensure_ascii=False, indent=2))
+    raise SystemExit(0)
+columns = payload['columns']
+rows = payload['rows']
+if any(not valid_identifier(column) for column in columns):
+    raise SystemExit('안전하지 않은 식별자가 포함되어 있습니다.')
 missing_columns = [column for column in columns if column not in remote_columns]
 if missing_columns:
     raise SystemExit(f'대상 테이블에 없는 컬럼: {", ".join(missing_columns)}')
@@ -231,10 +258,15 @@ else:
 sql = f'INSERT INTO {table} ({", ".join(columns)}) VALUES ({placeholders}) {on_conflict}'
 conn.executemany(sql, [[row.get(column) for column in columns] for row in rows])
 conn.commit()
-qmarks = ','.join('?' for _ in ids)
 matched = conn.execute(f'SELECT COUNT(*) FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchone()[0]
 conn.close()
-print(json.dumps({'db_path': str(db_path), 'table': table, 'key_column': key_column, 'rows_upserted': len(rows), 'matched_after': matched, 'ids': ids}, ensure_ascii=False, indent=2))
+print(json.dumps({'db_path': str(db_path), 'mode': mode, 'table': table, 'key_column': key_column, 'columns': columns, 'rows_upserted': len(rows), 'matched_after': matched, 'ids': ids}, ensure_ascii=False, indent=2))
+PY
+)
+
+if [[ -n "$LOCAL_TARGET" ]]; then
+  python3 - "$LOCAL_TARGET" "$PAYLOAD_FILE" <<PY
+$APPLY_PY
 PY
   exit 0
 fi
@@ -261,6 +293,6 @@ SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChe
 "${SCP[@]}" "$PAYLOAD_FILE" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PAYLOAD"
 "${SSH[@]}" "set -euo pipefail
 trap 'rm -f '\''$REMOTE_PAYLOAD'\''' EXIT
-python3 - '$REMOTE_DB' '$REMOTE_PAYLOAD' <<'PY'
+python3 - '$REMOTE_DB' '$REMOTE_PAYLOAD' <<PY
 $APPLY_PY
 PY"
