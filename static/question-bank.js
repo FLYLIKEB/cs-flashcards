@@ -200,9 +200,12 @@ function persistedPracticeCollapsed() {
 function isReloadNavigation() {
   return window.performance?.getEntriesByType?.('navigation')?.[0]?.type === 'reload';
 }
+function persistedPracticeRestoreState() {
+  return persistedFilterState()?.practice || null;
+}
 
 let restorePracticePaneOnReload = isReloadNavigation() && !persistedPracticeCollapsed();
-
+let restoredPracticeState = restorePracticePaneOnReload ? persistedPracticeRestoreState() : null;
 function persistedFilterState() {
   try {
     const raw = window.localStorage.getItem(QUESTION_BANK_FILTER_STATE_KEY);
@@ -523,6 +526,10 @@ function persistFilterState() {
     window.localStorage.setItem(QUESTION_BANK_FILTER_STATE_KEY, JSON.stringify({
       filters: filterValues(),
       filtersCollapsed: bankState.filtersCollapsed,
+      practice: {
+        selectedId: String(bankState.practiceActiveId || bankState.selectedId || ''),
+        startIndex: bankState.practiceLoaded ? practiceActiveIndex() : bankState.practiceStartIndex,
+      },
     }));
   } catch (_error) {
     // Ignore storage failures.
@@ -933,6 +940,7 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
   bankState.practiceLoaded = true;
   bankState.practiceStartIndex = safeStart;
   if (reveal) setPracticeCollapsed(false);
+  persistFilterState();
   renderTable();
   renderPracticePane();
   ensureSelectedRowVisible();
@@ -979,6 +987,7 @@ async function loadQuestionBankPage() {
   questionBankLoadAbortController = controller;
   const selectedIdBeforeRequest = String(bankState.selectedId || '');
   const practiceActiveIdBeforeRequest = String(bankState.practiceActiveId || '');
+  const restoredPracticeSelectedId = String(restoredPracticeState?.selectedId || '');
   bankState.loading = true;
   bankState.error = '';
   syncUrl();
@@ -988,7 +997,7 @@ async function loadQuestionBankPage() {
     const data = await fetchEntries({signal: controller?.signal});
     if (requestId !== activeQuestionBankLoadRequest) return;
     const currentSelectedId = String(bankState.selectedId || '');
-    const targetSelectedId = currentSelectedId || selectedIdBeforeRequest;
+    const targetSelectedId = currentSelectedId || selectedIdBeforeRequest || restoredPracticeSelectedId;
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
     populateTopicOptions(bankState.summary?.available_topics || [], filterValues().topic);
@@ -1002,6 +1011,7 @@ async function loadQuestionBankPage() {
     if (!bankState.items.length) {
       pendingPracticeLaunch = null;
       restorePracticePaneOnReload = false;
+      restoredPracticeState = null;
       if (!preservingHiddenPractice) {
         bankState.practiceLoaded = false;
         bankState.practiceActiveId = '';
@@ -1010,10 +1020,15 @@ async function loadQuestionBankPage() {
       const launchRequest = pendingPracticeLaunch;
       pendingPracticeLaunch = null;
       restorePracticePaneOnReload = false;
+      restoredPracticeState = null;
       applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal});
     } else if (restorePracticePaneOnReload && !bankState.practiceLoaded) {
+      const restoreIndex = nextIndex >= 0
+        ? nextIndex
+        : Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(restoredPracticeState?.startIndex) ? restoredPracticeState.startIndex : bankState.practiceStartIndex));
       restorePracticePaneOnReload = false;
-      applyPracticeLaunch(bankState.practiceStartIndex, {reveal: true});
+      restoredPracticeState = null;
+      applyPracticeLaunch(restoreIndex, {reveal: true});
     } else if (bankState.practiceLoaded && nextIndex < 0) {
       if (preservingHiddenPractice) {
         bankState.practiceActiveId = practiceActiveIdBeforeRequest;

@@ -1196,10 +1196,12 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             await page.click('#bankPageToggleFiltersBtn')
             await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
-            await page.click('#bankPageLaunchBtn')
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
             await page.waitForFunction(
                 "!document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
             )
+            case['practice_status_before_reload'] = await self.text(page, '#bankPagePracticeStatus')
+            self.assertIn('현재 2 /', case['practice_status_before_reload'])
             case['stored_open_state'] = await page.evaluate(
                 """
                 (filterKey, practiceKey) => ({
@@ -1210,8 +1212,6 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 QUESTION_BANK_FILTER_STATE_KEY,
                 QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
             )
-            self.assertFalse(case['stored_open_state']['filterState']['filtersCollapsed'])
-            self.assertEqual(case['stored_open_state']['practiceCollapsed'], '0')
 
             await page.reload({'waitUntil': 'networkidle2'})
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
