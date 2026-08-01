@@ -4593,7 +4593,8 @@ async function loadQuestionHistory() {
   }
 }
 
-function openQuestionHistory(event = null) {
+function openQuestionHistory() {
+  const event = arguments[0] || null;
   toggleMenu(false);
   state.questionHistoryOpen = true;
   renderQuestionHistoryDialog();
@@ -4719,7 +4720,8 @@ function setQuestionImportError(message = '') {
   if (errorEl) errorEl.textContent = String(message || '').trim();
 }
 
-function openQuestionImportDialog(event = null) {
+function openQuestionImportDialog() {
+  const event = arguments[0] || null;
   toggleMenu(false);
   setQuestionImportError('');
   openModalDialog('questionImportDialog', {focusTarget: $('questionImportInput') || questionImportDialog(), opener: event?.currentTarget || document.activeElement});
@@ -5130,7 +5132,8 @@ function questionBankQueryString(filters = questionBankFilterValues()) {
   return params.toString();
 }
 
-async function fetchQuestionBankEntries({filters = questionBankFilterValues(), signal} = {}) {
+async function fetchQuestionBankEntries() {
+  const {filters = questionBankFilterValues(), signal} = arguments[0] || {};
   const params = new URLSearchParams(questionBankQueryString(filters));
   params.set('__ts', String(Date.now()));
   const qs = params.toString();
@@ -5308,14 +5311,14 @@ async function loadQuestionBankBrowser() {
   try {
     const data = await fetchQuestionBankEntries({filters, signal: controller?.signal});
     if (requestId !== questionBankLoadRequest) return;
-    const previousSelectedId = state.questionBankSelectedId;
+    const currentSelectedId = String(state.questionBankSelectedId || '');
     state.questionBankItems = Array.isArray(data.items) ? data.items : [];
     state.questionBankSummary = data.summary || {total: state.questionBankItems.length, returned: state.questionBankItems.length};
     populateQuestionBankTopicOptions(state.questionBankSummary?.available_topics || [], filters.topic);
     populateQuestionBankFieldNameOptions(state.questionBankSummary?.available_field_names || [], filters.field_name);
     populateQuestionBankIssuerOptions(state.questionBankSummary?.available_issuers || [], filters.issuer);
     populateQuestionBankCategoryOptions(state.questionBankSummary?.available_categories || [], filters.category);
-    const nextIndex = state.questionBankItems.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
+    const nextIndex = state.questionBankItems.findIndex((item) => String(item?.question_bank_id || '') === currentSelectedId);
     state.questionBankSelectedId = String(state.questionBankItems[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
   } catch (error) {
     if (error?.name === 'AbortError' || requestId !== questionBankLoadRequest) return;
@@ -6223,7 +6226,8 @@ function toggleQuestionMode(force = !state.questionMode) {
   setMessage(state.questionMode ? (state.questions.length ? '모의 세트를 다시 열었습니다.' : '문제 풀이를 열었습니다. 생성 버튼, 가져오기, 또는 문제은행을 사용하세요.') : '문제 풀이를 닫았습니다.');
 }
 
-function openQuestionPracticeFromMenu(event = null) {
+function openQuestionPracticeFromMenu() {
+  const event = arguments[0] || null;
   toggleMenu(false);
   rememberQuestionModeOpener(event?.currentTarget || $('questionPracticeBtn') || document.activeElement);
   toggleQuestionMode(true);

@@ -860,14 +860,14 @@ async function loadQuestionBankPage() {
   try {
     const data = await fetchEntries({signal: controller?.signal});
     if (requestId !== activeQuestionBankLoadRequest) return;
-    const previousSelectedId = bankState.selectedId;
+    const currentSelectedId = String(bankState.selectedId || '');
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
     populateTopicOptions(bankState.summary?.available_topics || [], filterValues().topic);
     populateFieldNameOptions(bankState.summary?.available_field_names || [], filterValues().field_name);
     populateIssuerOptions(bankState.summary?.available_issuers || [], filterValues().issuer);
     populateCategoryOptions(bankState.summary?.available_categories || [], filterValues().category);
-    const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
+    const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === currentSelectedId);
     bankState.selectedId = String(bankState.items[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
     bankState.practiceStartIndex = nextIndex >= 0 ? nextIndex : 0;
     if (!bankState.items.length) {
