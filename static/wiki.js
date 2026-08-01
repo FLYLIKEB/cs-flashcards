@@ -281,6 +281,81 @@ function wikiSelectedBatchSourcePaths() {
     .map(([sourcePath]) => sourcePath);
 }
 
+function wikiBatchPageMetaBySourcePath(sourcePath) {
+  const normalized = String(sourcePath || '').trim();
+  if (!normalized) return null;
+  const items = Array.isArray(wikiState.index?.flat) ? wikiState.index.flat : [];
+  return items.find((item) => String(item?.source_path || '').trim() === normalized) || null;
+}
+
+async function wikiLoadBatchPageBySourcePath(sourcePath) {
+  const normalized = String(sourcePath || '').trim();
+  if (!normalized) throw new Error('문서 경로를 찾지 못했습니다.');
+  if (normalized === String(wikiState.page?.source_path || '').trim() && wikiState.page) return wikiState.page;
+  const pageMeta = wikiBatchPageMetaBySourcePath(normalized);
+  const slug = String(pageMeta?.slug || '').trim();
+  if (!slug) throw new Error(`문서를 찾지 못했습니다: ${normalized}`);
+  return wikiFetchJson(wikiApiUrl(`/api/wiki/page/${encodeURIComponent(slug).replace(/%2F/g, '/')}`));
+}
+
+function wikiBatchSectionTargets(page = wikiState.page) {
+  const sections = Array.isArray(page?.sections) ? page.sections : [];
+  const subheadings = sections.filter((section) => Number(section?.level || 0) >= 2);
+  return subheadings.length ? subheadings : sections.filter((section) => Number(section?.level || 0) >= 1);
+}
+
+function wikiIsGeneratedSectionImage(image = {}) {
+  const href = String(image?.source_href || image?.src || '').trim().toLowerCase();
+  return /-section-\d+\.(png|svg|gif)(?:$|[?#])/.test(href);
+}
+
+function wikiBatchImageTargets(page = wikiState.page) {
+  const images = Array.isArray(page?.images) ? page.images : [];
+  return images.filter((image) => !wikiIsGeneratedSectionImage(image));
+}
+
+function wikiPageAiJobSpecs(page = wikiState.page, format = 'png', {includeExistingImages = true, includeSections = true} = {}) {
+  const normalizedFormat = String(format || 'png').trim().toLowerCase() || 'png';
+  const specs = [];
+  if (includeSections) {
+    for (const section of wikiBatchSectionTargets(page)) {
+      const sectionIndex = Number(section?.index);
+      if (!Number.isInteger(sectionIndex) || sectionIndex < 0) continue;
+      specs.push({
+        payload: {
+          source_paths: [page.source_path],
+          format: normalizedFormat,
+          prompt_template: wikiImagePromptFor(page, section, normalizedFormat),
+          include_existing_images: false,
+          include_sections: true,
+          target: 'single_section',
+          section_index: sectionIndex,
+        },
+        label: `${section?.title || page?.title || '섹션'} ${normalizedFormat.toUpperCase()} AI`,
+      });
+    }
+  }
+  if (includeExistingImages) {
+    for (const image of wikiBatchImageTargets(page)) {
+      const imageIndex = Number(image?.index);
+      if (!Number.isInteger(imageIndex) || imageIndex < 0) continue;
+      specs.push({
+        payload: {
+          source_paths: [page.source_path],
+          format: normalizedFormat,
+          prompt_template: wikiImagePromptFor(page, image, normalizedFormat),
+          include_existing_images: true,
+          include_sections: false,
+          target: 'single_image',
+          image_index: imageIndex,
+        },
+        label: `${image?.alt || page?.title || '이미지'} ${normalizedFormat.toUpperCase()} AI`,
+      });
+    }
+  }
+  return specs;
+}
+
 function wikiUpdateBatchAiHint() {
   const el = wiki$('wikiBatchAiHint');
   if (!el) return;
@@ -331,7 +406,7 @@ function wikiTrackAiJob(job, label) {
   }
 }
 
-async function wikiQueueAiJob(payload, label) {
+async function wikiQueueAiJob(payload, label, {showStatus = true} = {}) {
   wikiRequestAiNotificationPermission();
   const job = wikiAiTools?.postJson
     ? await wikiAiTools.postJson(wikiApiUrl('/api/wiki/ai-jobs'), payload)
@@ -341,8 +416,33 @@ async function wikiQueueAiJob(payload, label) {
         body: JSON.stringify(payload),
       });
   wikiTrackAiJob(job, label);
-  wikiStatus(`${label} 요청됨. 백그라운드에서 처리합니다.`);
+  if (showStatus) wikiStatus(`${label} 요청됨. 백그라운드에서 처리합니다.`);
   return job;
+}
+
+async function wikiQueueAiJobs(jobSpecs, label) {
+  const specs = Array.isArray(jobSpecs) ? jobSpecs.filter(Boolean) : [];
+  if (!specs.length) {
+    wikiStatus(`${label} 요청할 이미지가 없습니다.`, true);
+    return [];
+  }
+  const jobs = [];
+  const failures = [];
+  for (const spec of specs) {
+    try {
+      jobs.push(await wikiQueueAiJob(spec.payload, spec.label, {showStatus: false}));
+    } catch (error) {
+      failures.push(`${spec.label}: ${error.message || error}`);
+    }
+  }
+  if (jobs.length && !failures.length) {
+    wikiStatus(`${label} ${jobs.length}건 요청됨. 백그라운드에서 처리합니다.`);
+  } else if (jobs.length) {
+    wikiStatus(`${label} ${jobs.length}건 요청됨, ${failures.length}건 실패: ${failures[0]}`, true);
+  } else {
+    wikiStatus(`${label} 요청 실패: ${failures[0] || '요청할 항목이 없습니다.'}`, true);
+  }
+  return jobs;
 }
 
 function wikiFilteredTree(items, query) {
@@ -1148,14 +1248,10 @@ async function wikiQueueCurrentPageAi() {
   if (!page?.source_path) return;
   const format = String(wiki$('wikiBatchAiFormat')?.value || 'png').trim().toLowerCase() || 'png';
   try {
-    await wikiQueueAiJob({
-      source_paths: [page.source_path],
-      format,
-      prompt_template: String(wikiImagePromptTemplate(format)?.instruction || ''),
-      include_existing_images: true,
-      include_sections: true,
-      target: 'page_batch',
-    }, `${page?.title || '현재 문서'} 일괄 AI`);
+    await wikiQueueAiJobs(
+      wikiPageAiJobSpecs(page, format, {includeExistingImages: true, includeSections: true}),
+      `${page?.title || '현재 문서'} 일괄 AI`,
+    );
   } catch (error) {
     wikiStatus(`현재 문서 AI 요청 실패: ${error.message || error}`, true);
   }
@@ -1168,15 +1264,13 @@ async function wikiQueueSelectedDocsAi() {
     return;
   }
   const format = String(wiki$('wikiBatchAiFormat')?.value || 'png').trim().toLowerCase() || 'png';
+  const jobSpecs = [];
   try {
-    await wikiQueueAiJob({
-      source_paths: sourcePaths,
-      format,
-      prompt_template: String(wikiImagePromptTemplate(format)?.instruction || ''),
-      include_existing_images: true,
-      include_sections: true,
-      target: 'page_batch',
-    }, `선택 문서 ${sourcePaths.length}개 일괄 AI`);
+    for (const sourcePath of sourcePaths) {
+      const page = await wikiLoadBatchPageBySourcePath(sourcePath);
+      jobSpecs.push(...wikiPageAiJobSpecs(page, format, {includeExistingImages: true, includeSections: true}));
+    }
+    await wikiQueueAiJobs(jobSpecs, `선택 문서 ${sourcePaths.length}개 일괄 AI`);
   } catch (error) {
     wikiStatus(`선택 문서 AI 요청 실패: ${error.message || error}`, true);
   }
