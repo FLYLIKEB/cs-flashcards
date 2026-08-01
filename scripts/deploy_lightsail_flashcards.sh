@@ -120,6 +120,33 @@ if [[ -n "$WIKI_GITHUB_REPO" && -n "$WIKI_GITHUB_TOKEN" ]]; then
 else
   echo "위키 GitHub 수동 보관 버튼: 비활성"
 fi
+ensure_stage_has_no_sqlite_payload() {
+  local stage_dir="$1"
+  local archive_path="$2"
+  local archive_listing
+  local -a staged_sqlite_files=()
+
+  if [[ -e "$stage_dir/state" ]]; then
+    echo "배포 스테이지에 state 디렉터리가 포함되면 원격 SQLite를 덮어쓸 수 있으므로 중단합니다: $stage_dir/state" >&2
+    exit 1
+  fi
+
+  while IFS= read -r staged_file; do
+    staged_sqlite_files+=("$staged_file")
+  done < <(find "$stage_dir" -type f \( -name '*.sqlite' -o -name '*.sqlite-*' -o -name '*.db' -o -name '*.db-*' \) | sort)
+  if (( ${#staged_sqlite_files[@]} > 0 )); then
+    printf '배포 스테이지에 SQLite payload가 감지되면 중단합니다:\n' >&2
+    printf ' - %s\n' "${staged_sqlite_files[@]}" >&2
+    exit 1
+  fi
+
+  archive_listing="$(tar -tzf "$archive_path")"
+  if grep -Eq '(^|/)(state/|[^/]+\.(sqlite|sqlite-[^/]+|db|db-[^/]+))$' <<<"$archive_listing"; then
+    printf '배포 아카이브에 SQLite/state payload가 감지되면 중단합니다:\n%s\n' "$archive_listing" >&2
+    exit 1
+  fi
+}
+
 
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
@@ -161,6 +188,7 @@ else
   echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 시드 없이 배포합니다: $WIKI_PACKAGE_SRC"
 fi
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" -C "$TMP_STAGE" .
+ensure_stage_has_no_sqlite_payload "$TMP_STAGE" "$TMP_ARCHIVE"
 
 "${SSH[@]}" "mkdir -p '$REMOTE_DIR' '$REMOTE_DIR/backups'"
 "${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_ARCHIVE"
