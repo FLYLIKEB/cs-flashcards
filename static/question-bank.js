@@ -78,6 +78,7 @@ function categoryGuideFocusableElements(dialog) {
 }
 let activeQuestionBankLoadRequest = 0;
 let questionBankLoadAbortController = null;
+let pendingPracticeLaunch = null;
 
 function escapeHtml(value) {
   return window.CSTableShell?.escapeHtml ? window.CSTableShell.escapeHtml(value) : String(value ?? '');
@@ -885,14 +886,14 @@ function ensureSelectedRowVisible() {
   row.scrollIntoView({block: 'nearest', inline: 'nearest'});
 }
 
-function launch(startIndex = 0, {reveal = true} = {}) {
+function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
   if (!bankState.items.length) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
     renderTable();
     renderPracticePane();
     return;
   }
-  const safeStart = selectedIndex(startIndex);
+  const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
   const frame = $('bankPagePracticeFrame');
   bankState.selectedId = String(bankState.items[safeStart]?.question_bank_id || '');
   bankState.practiceLoaded = true;
@@ -911,6 +912,13 @@ function launch(startIndex = 0, {reveal = true} = {}) {
   }
   bankState.practiceNonce += 1;
   if (frame) frame.src = practiceFrameUrl();
+}
+
+function launch(startIndex = 0, {reveal = true} = {}) {
+  pendingPracticeLaunch = bankState.loading
+    ? {startIndex: Number.isInteger(startIndex) ? startIndex : 0, reveal}
+    : null;
+  applyPracticeLaunch(startIndex, {reveal});
 }
 
 async function loadQuestionBankPage() {
@@ -942,10 +950,17 @@ async function loadQuestionBankPage() {
     bankState.selectedId = String(bankState.items[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
     bankState.practiceStartIndex = nextIndex >= 0 ? nextIndex : 0;
     if (!bankState.items.length) {
+      pendingPracticeLaunch = null;
       bankState.practiceLoaded = false;
+    } else if (pendingPracticeLaunch) {
+      const launchRequest = pendingPracticeLaunch;
+      pendingPracticeLaunch = null;
+      applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal});
     } else if (bankState.practiceLoaded && nextIndex < 0) {
       bankState.practiceLoaded = false;
       bankState.practiceCollapsed = true;
+    } else {
+      pendingPracticeLaunch = null;
     }
   } catch (error) {
     if (error?.name === 'AbortError' || requestId !== activeQuestionBankLoadRequest) return;
@@ -956,6 +971,7 @@ async function loadQuestionBankPage() {
     populateIssuerOptions([], filterValues().issuer);
     populateCategoryOptions([], filterValues().category);
     bankState.error = error.message || String(error);
+    pendingPracticeLaunch = null;
     bankState.practiceLoaded = false;
   } finally {
     if (requestId !== activeQuestionBankLoadRequest) return;
