@@ -272,28 +272,39 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             {'selector': selector, 'value': value, 'submit': submit},
         )
 
-    def question_bank_payload(self, label: str) -> dict[str, object]:
+    def question_bank_item(self, label: str, *, status: str = 'unseen') -> dict[str, object]:
+        status_labels = {'unseen': '안푼', 'wrong': '틀린', 'correct': '맞은'}
         return {
-            'items': [
-                {
-                    'question_bank_id': f'{label}-1',
-                    'prompt': f'{label} prompt',
-                    'body': f'{label} body',
-                    'answer': f'{label} answer',
-                    'explanation': f'{label} explanation',
-                    'question_type': 'subjective',
-                    'keywords': [label],
-                    'difficulty': '중',
-                    'issuer': '테스트기관',
-                    'source_location': '테스트출처',
-                    'category': '테스트',
-                    'field_name': '테스트분야',
-                }
-            ],
+            'question_bank_id': f'{label}-1',
+            'prompt': f'{label} prompt',
+            'body': f'{label} body',
+            'answer': f'{label} answer',
+            'explanation': f'{label} explanation',
+            'question_type': 'subjective',
+            'keywords': [label],
+            'difficulty': '중',
+            'issuer': '테스트기관',
+            'source_location': '테스트출처',
+            'category': '테스트',
+            'field_name': '테스트분야',
+            'question_attempt_status': status,
+            'question_attempt_status_label': status_labels[status],
+        }
+
+    def question_bank_payload(self, label: str, *, items: list[dict[str, object]] | None = None) -> dict[str, object]:
+        payload_items = list(items) if items is not None else [self.question_bank_item(label)]
+        available_topics: list[str] = []
+        for item in payload_items:
+            for keyword in item.get('keywords') or []:
+                text = str(keyword or '').strip()
+                if text and text not in available_topics:
+                    available_topics.append(text)
+        return {
+            'items': payload_items,
             'summary': {
-                'total': 1,
-                'returned': 1,
-                'available_topics': [label],
+                'total': len(payload_items),
+                'returned': len(payload_items),
+                'available_topics': available_topics or [label],
                 'available_field_names': ['테스트분야'],
                 'available_issuers': ['테스트기관'],
                 'available_categories': ['테스트'],
@@ -383,6 +394,101 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_status_column_tracks_saved_attempt_state_across_filters_and_refresh(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        unseen_item = self.question_bank_item('안푼 문항', status='unseen')
+        wrong_item = self.question_bank_item('틀린 문항', status='wrong')
+        correct_item = self.question_bank_item('맞은 문항', status='correct')
+        initial_payload = self.question_bank_payload('status-initial', items=[unseen_item, wrong_item, correct_item])
+        reordered_payload = self.question_bank_payload('status-reordered', items=[correct_item, unseen_item, wrong_item])
+        filtered_payload = self.question_bank_payload('status-filtered', items=[correct_item])
+        table_snapshot = """
+            () => {
+              const headers = [...document.querySelectorAll('#bankPageList thead th')].map((node) => (node.textContent || '').trim());
+              const statusIndex = headers.indexOf('풀이상태');
+              const promptIndex = headers.indexOf('문제');
+              return [...document.querySelectorAll('#bankPageList tbody tr')].map((row) => {
+                const cells = [...row.querySelectorAll('td')].map((node) => (node.textContent || '').replace(/\\s+/g, ' ').trim());
+                return {
+                  prompt: promptIndex >= 0 ? (cells[promptIndex] || '') : '',
+                  status: statusIndex >= 0 ? (cells[statusIndex] || '') : '',
+                };
+              });
+            }
+        """
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ initialPayload, reorderedPayload, filteredPayload }) => {
+                  const originalFetch = window.fetch.bind(window);
+                  const queues = {
+                    '': [initialPayload, reorderedPayload, reorderedPayload],
+                    correct: [filteredPayload],
+                  };
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname !== '/api/question-bank') return originalFetch(input, init);
+                    const key = parsed.searchParams.get('attempt_status') || '';
+                    const queue = queues[key];
+                    if (!queue || !queue.length) return originalFetch(input, init);
+                    const payload = queue.shift();
+                    return Promise.resolve(new Response(JSON.stringify(payload), {
+                      status: 200,
+                      headers: {'Content-Type': 'application/json'},
+                    }));
+                  };
+                }
+                """,
+                {
+                    'initialPayload': initial_payload,
+                    'reorderedPayload': reordered_payload,
+                    'filteredPayload': filtered_payload,
+                },
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList tbody tr').length === 3")
+            case['headers'] = await page.evaluate("() => [...document.querySelectorAll('#bankPageList thead th')].map((node) => (node.textContent || '').trim())")
+            self.assertIn('풀이상태', case['headers'])
+            case['initial_rows'] = await page.evaluate(table_snapshot)
+            self.assertEqual([row['status'] for row in case['initial_rows']], ['안푼', '틀린', '맞은'])
+            self.assertTrue(case['initial_rows'][0]['prompt'].startswith('안푼 문항 prompt'))
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await page.select('#bankPageAttemptStatusSelect', 'correct')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList tbody tr').length === 1")
+            case['filtered_rows'] = await page.evaluate(table_snapshot)
+            self.assertEqual([row['status'] for row in case['filtered_rows']], ['맞은'])
+            self.assertTrue(case['filtered_rows'][0]['prompt'].startswith('맞은 문항 prompt'))
+            await page.select('#bankPageAttemptStatusSelect', '')
+            await page.waitForFunction(
+                """
+                () => {
+                  const titles = [...document.querySelectorAll('#bankPageList tbody tr .question-bank-item-title')].map((node) => (node.textContent || '').trim());
+                  return titles.length === 3 && titles[0] === '맞은 문항 prompt';
+                }
+                """
+            )
+            case['reloaded_rows'] = await page.evaluate(table_snapshot)
+            self.assertEqual([row['status'] for row in case['reloaded_rows']], ['맞은', '안푼', '틀린'])
+            await page.click('#bankPageRefreshBtn')
+            await page.waitForFunction(
+                """
+                () => {
+                  const titles = [...document.querySelectorAll('#bankPageList tbody tr .question-bank-item-title')].map((node) => (node.textContent || '').trim());
+                  return titles.length === 3 && titles[0] === '맞은 문항 prompt';
+                }
+                """
+            )
+            case['refreshed_rows'] = await page.evaluate(table_snapshot)
+            self.assertEqual(case['refreshed_rows'], case['reloaded_rows'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-status-column', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_page_rejects_stale_query_responses(self):

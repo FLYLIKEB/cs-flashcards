@@ -5,6 +5,7 @@ const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multi
 const QUESTION_BANK_ATTEMPT_STATUS_LABELS = {unseen: '안푼', wrong: '틀린', correct: '맞은'};
 const QUESTION_BANK_COLUMNS = [
   {key: 'index', label: '#', width: '56px'},
+  {key: 'attempt_status', label: '풀이상태', width: '6rem'},
   {key: 'prompt', label: '문제', width: '24rem', cellClassName: 'term-cell'},
   {key: 'type', label: '형식', width: '6rem'},
   {key: 'topic', label: '키워드', width: '8.5rem'},
@@ -96,6 +97,16 @@ function renderQuestionKeywordLinks(keywords, {limit = Number.POSITIVE_INFINITY}
 
 function questionTypeLabel(item) {
   return QUESTION_TYPE_LABELS[String(item?.question_type || '').trim()] || String(item?.question_type || '문제');
+}
+
+function questionAttemptStatusKey(item) {
+  const value = String(item?.question_attempt_status || '').trim();
+  return Object.prototype.hasOwnProperty.call(QUESTION_BANK_ATTEMPT_STATUS_LABELS, value) ? value : 'unseen';
+}
+
+function questionAttemptStatusLabel(item) {
+  const explicit = String(item?.question_attempt_status_label || '').trim();
+  return explicit || QUESTION_BANK_ATTEMPT_STATUS_LABELS[questionAttemptStatusKey(item)] || QUESTION_BANK_ATTEMPT_STATUS_LABELS.unseen;
 }
 
 function selectedIndex(fallback = 0) {
@@ -663,6 +674,7 @@ function tableRows() {
       attributes: {'aria-current': active ? 'true' : 'false'},
       cells: {
         index: `<span class="question-bank-row-number">${index + 1}</span>`,
+        attempt_status: `<span class="question-bank-summary-pill">${escapeHtml(questionAttemptStatusLabel(item))}</span>`,
         prompt: `<div class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</div>`,
         type: `<span class="question-bank-type-pill ${pillTone('type', item.question_type)}">${escapeHtml(questionTypeLabel(item) || '문제')}</span>`,
         topic: `<div class="question-bank-keyword-list">${renderQuestionKeywordLinks(item.keywords, {limit: 2})}</div>`,
