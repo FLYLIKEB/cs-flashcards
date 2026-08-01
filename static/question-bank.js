@@ -157,6 +157,28 @@ function practiceFrameUrl() {
   return `/?question-bank-embed=1&question-bank-run=${Date.now()}-${bankState.practiceNonce}`;
 }
 
+function practiceFrameDocument() {
+  const frame = $('bankPagePracticeFrame');
+  if (!frame || frame.hidden) return null;
+  try {
+    return frame.contentWindow?.document || null;
+  } catch (_error) {
+    return null;
+  }
+}
+
+function embeddedPracticeHasUnsavedState() {
+  if (!bankState.practiceLoaded) return false;
+  const doc = practiceFrameDocument();
+  if (!doc) return false;
+  return Boolean(
+    String(doc.getElementById('questionAnswerInput')?.value || '').trim()
+    || String(doc.getElementById('questionWrongNoteInput')?.value || '').trim()
+    || doc.querySelector('.question-choice.selected')
+    || doc.querySelector('.question-answer')
+  );
+}
+
 function persistedPracticeCollapsed() {
   try {
     return window.localStorage.getItem(QUESTION_BANK_PRACTICE_COLLAPSED_KEY) !== '0';
@@ -866,13 +888,9 @@ function renderTable() {
     storageKey: QUESTION_BANK_COLUMN_ORDER_KEY,
     tableMinWidth: '960px',
     emptyText: '조건에 맞는 문제가 없습니다.',
-    onRowActivate: (_row, index) => {
-      bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
-      bankState.practiceStartIndex = index;
-      renderTable();
-      renderPracticePane();
-      launch(index);
-    },
+onRowActivate: (_row, index) => {
+  launch(index);
+},
     onColumnMove: (sourceKey, targetKey) => {
       window.CSTableShell.moveColumnOrder(QUESTION_BANK_COLUMN_ORDER_KEY, QUESTION_BANK_COLUMNS.map((column) => column.key), sourceKey, targetKey);
       renderTable();
@@ -891,7 +909,7 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
     renderTable();
     renderPracticePane();
-    return;
+    return false;
   }
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
   const frame = $('bankPagePracticeFrame');
@@ -908,17 +926,31 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
     bankState.error = error.message || String(error);
     renderTable();
     renderPracticePane();
-    return;
+    return false;
   }
   bankState.practiceNonce += 1;
   if (frame) frame.src = practiceFrameUrl();
+  return true;
 }
 
 function launch(startIndex = 0, {reveal = true} = {}) {
+  const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
+  const targetId = String(bankState.items[safeStart]?.question_bank_id || '');
+  const currentId = String(bankState.selectedId || '');
+  if (bankState.practiceLoaded && targetId && targetId === currentId) {
+    if (reveal) setPracticeCollapsed(false);
+    ensureSelectedRowVisible();
+    renderPracticePane();
+    return false;
+  }
+  if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState()) {
+    const confirmed = window.confirm('현재 풀이 중인 답안이나 오답노트가 초기화될 수 있습니다. 다른 문제로 이동할까요?');
+    if (!confirmed) return false;
+  }
   pendingPracticeLaunch = bankState.loading
-    ? {startIndex: Number.isInteger(startIndex) ? startIndex : 0, reveal}
+    ? {startIndex: safeStart, reveal}
     : null;
-  applyPracticeLaunch(startIndex, {reveal});
+  return applyPracticeLaunch(safeStart, {reveal});
 }
 
 async function loadQuestionBankPage() {
