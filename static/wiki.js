@@ -24,6 +24,11 @@ const wikiState = {
   imagePromptEditorIndex: -1,
   imagePromptStatus: '',
   imagePromptStatusError: false,
+  sectionAiLoadingIndex: -1,
+  sectionFormatSelections: {},
+  sectionPromptEditorIndex: -1,
+  sectionPromptStatus: '',
+  sectionPromptStatusError: false,
 };
 
 const wiki$ = (id) => document.getElementById(id);
@@ -821,7 +826,11 @@ function wikiResetImagePromptTemplate(format) {
 }
 
 function wikiImageSelectionKey(page = wikiState.page, imageIndex = -1) {
-  return `${page?.source_path || wikiState.currentSlug || 'page'}::${imageIndex}`;
+  return `${page?.source_path || wikiState.currentSlug || 'page'}::image::${imageIndex}`;
+}
+
+function wikiSectionSelectionKey(page = wikiState.page, sectionIndex = -1) {
+  return `${page?.source_path || wikiState.currentSlug || 'page'}::section::${sectionIndex}`;
 }
 
 function wikiSelectedImageFormat(imageIndex, item = null, page = wikiState.page) {
@@ -835,6 +844,20 @@ function wikiSetSelectedImageFormat(imageIndex, format, page = wikiState.page) {
   wikiState.imageFormatSelections = {
     ...wikiState.imageFormatSelections,
     [wikiImageSelectionKey(page, imageIndex)]: normalized,
+  };
+}
+
+function wikiSelectedSectionFormat(sectionIndex, section = null, page = wikiState.page) {
+  const saved = wikiState.sectionFormatSelections[wikiSectionSelectionKey(page, sectionIndex)];
+  const fallback = String(section?.format || 'png').trim().toLowerCase() || 'png';
+  return ['png', 'svg', 'gif'].includes(saved) ? saved : fallback;
+}
+
+function wikiSetSelectedSectionFormat(sectionIndex, format, page = wikiState.page) {
+  const normalized = String(format || 'png').trim().toLowerCase() || 'png';
+  wikiState.sectionFormatSelections = {
+    ...wikiState.sectionFormatSelections,
+    [wikiSectionSelectionKey(page, sectionIndex)]: normalized,
   };
 }
 
@@ -871,6 +894,13 @@ function wikiToggleImagePromptEditor(imageIndex) {
   wikiState.imagePromptStatus = '';
   wikiState.imagePromptStatusError = false;
   wikiEnhanceInlineImages(wikiState.page);
+}
+
+function wikiToggleSectionPromptEditor(sectionIndex) {
+  wikiState.sectionPromptEditorIndex = wikiState.sectionPromptEditorIndex === sectionIndex ? -1 : sectionIndex;
+  wikiState.sectionPromptStatus = '';
+  wikiState.sectionPromptStatusError = false;
+  wikiEnhanceSectionHeadings(wikiState.page);
 }
 
 function wikiEnhanceInlineImages(page = wikiState.page) {
@@ -1003,7 +1033,7 @@ function wikiEnhanceInlineImages(page = wikiState.page) {
 
 async function wikiRegenerateInlineImage(imageIndex) {
   const page = wikiState.page;
-  if (!page?.source_path || wikiState.imageAiLoadingIndex >= 0) return;
+  if (!page?.source_path || wikiState.imageAiLoadingIndex >= 0 || wikiState.sectionAiLoadingIndex >= 0) return;
   const image = Array.isArray(page?.images) ? page.images[imageIndex] : null;
   if (!image) return;
   const select = document.querySelector(`.wiki-inline-image-format[data-wiki-image-index="${imageIndex}"]`);
@@ -1044,6 +1074,171 @@ async function wikiRegenerateInlineImage(imageIndex) {
   }
 }
 
+function wikiEnhanceSectionHeadings(page = wikiState.page) {
+  const article = wiki$('wikiArticle');
+  if (!article) return;
+  article.querySelectorAll('.wiki-section-ai, .wiki-section-prompt-editor').forEach((node) => node.remove());
+  const sections = Array.isArray(page?.sections) ? page.sections : [];
+  const headings = article.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  headings.forEach((heading, index) => {
+    const section = sections[index];
+    if (!section) return;
+    const anyBusy = wikiState.imageAiLoadingIndex >= 0 || wikiState.sectionAiLoadingIndex >= 0;
+    const activeBusy = wikiState.sectionAiLoadingIndex === index;
+    const controls = document.createElement('span');
+    controls.className = 'wiki-section-ai';
+    const select = document.createElement('select');
+    select.className = 'wiki-inline-image-format wiki-section-format';
+    select.dataset.wikiSectionIndex = String(index);
+    select.setAttribute('aria-label', `${section?.title || heading.textContent || '섹션'} 파일 포맷`);
+    ['png', 'svg', 'gif'].forEach((format) => {
+      const option = document.createElement('option');
+      option.value = format;
+      option.textContent = format;
+      select.appendChild(option);
+    });
+    select.value = wikiSelectedSectionFormat(index, section, page);
+    select.disabled = anyBusy;
+    select.addEventListener('change', () => {
+      wikiSetSelectedSectionFormat(index, select.value, page);
+      if (wikiState.sectionPromptEditorIndex === index) wikiEnhanceSectionHeadings(page);
+    });
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'inline-ai-btn has-tip wiki-section-ai-btn';
+    button.dataset.tip = '섹션 AI';
+    button.textContent = 'AI';
+    button.title = '섹션 AI 이미지 생성';
+    if (wikiAiTools?.setButtonBusy) {
+      wikiAiTools.setButtonBusy(button, {
+        busy: activeBusy,
+        disabled: anyBusy,
+        idleLabel: 'AI',
+        busyLabel: '…',
+        idleTitle: '섹션 AI 이미지 생성',
+        busyTitle: 'AI 이미지 생성 중',
+      });
+    } else {
+      button.disabled = anyBusy;
+      if (activeBusy) button.textContent = '…';
+    }
+    button.addEventListener('click', () => {
+      wikiGenerateSectionImage(index);
+    });
+    const editButton = document.createElement('button');
+    editButton.type = 'button';
+    editButton.className = 'inline-ai-btn has-tip wiki-section-edit-btn';
+    editButton.dataset.tip = '프롬프트 수정';
+    editButton.textContent = '✎';
+    editButton.title = `${select.value.toUpperCase()} 프롬프트 수정`;
+    editButton.disabled = anyBusy;
+    editButton.addEventListener('click', () => {
+      wikiToggleSectionPromptEditor(index);
+    });
+    controls.append(select, button, editButton);
+    heading.appendChild(controls);
+    if (wikiState.sectionPromptEditorIndex === index) {
+      const editor = document.createElement('div');
+      editor.className = 'wiki-inline-image-prompt-editor wiki-section-prompt-editor';
+      const promptFormat = wikiSelectedSectionFormat(index, section, page);
+      const template = wikiImagePromptTemplate(promptFormat);
+      const label = document.createElement('label');
+      label.className = 'wiki-inline-image-prompt-label';
+      label.textContent = `${promptFormat.toUpperCase()} 프롬프트`;
+      const textarea = document.createElement('textarea');
+      textarea.className = 'wiki-inline-image-prompt-textarea';
+      textarea.rows = 10;
+      textarea.value = String(template?.instruction || '');
+      const hint = document.createElement('p');
+      hint.className = 'wiki-inline-image-prompt-hint';
+      hint.textContent = '사용 가능 변수: {{focus_subject}}, {{page_title}}, {{section_title}}, {{alt}}, {{caption}}, {{context_excerpt}}, {{source_note}}';
+      const actions = document.createElement('div');
+      actions.className = 'wiki-inline-image-prompt-actions';
+      const saveBtn = document.createElement('button');
+      saveBtn.type = 'button';
+      saveBtn.className = 'header-link';
+      saveBtn.textContent = '저장';
+      saveBtn.addEventListener('click', () => {
+        wikiUpdateImagePromptTemplate(promptFormat, textarea.value);
+        wikiState.sectionPromptStatus = `${promptFormat.toUpperCase()} 프롬프트 저장 완료`;
+        wikiState.sectionPromptStatusError = false;
+        wikiEnhanceSectionHeadings(page);
+      });
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'header-link';
+      resetBtn.textContent = '기본값';
+      resetBtn.addEventListener('click', () => {
+        wikiResetImagePromptTemplate(promptFormat);
+        wikiState.sectionPromptStatus = `${promptFormat.toUpperCase()} 프롬프트 기본값 복원`;
+        wikiState.sectionPromptStatusError = false;
+        wikiEnhanceSectionHeadings(page);
+      });
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'header-link';
+      closeBtn.textContent = '닫기';
+      closeBtn.addEventListener('click', () => {
+        wikiState.sectionPromptEditorIndex = -1;
+        wikiState.sectionPromptStatus = '';
+        wikiState.sectionPromptStatusError = false;
+        wikiEnhanceSectionHeadings(page);
+      });
+      actions.append(saveBtn, resetBtn, closeBtn);
+      editor.append(label, textarea, hint, actions);
+      if (wikiState.sectionPromptStatus) {
+        const status = document.createElement('p');
+        status.className = `wiki-inline-image-prompt-status${wikiState.sectionPromptStatusError ? ' error-text' : ''}`;
+        status.textContent = wikiState.sectionPromptStatus;
+        editor.appendChild(status);
+      }
+      heading.insertAdjacentElement('afterend', editor);
+    }
+  });
+}
+
+async function wikiGenerateSectionImage(sectionIndex) {
+  const page = wikiState.page;
+  if (!page?.source_path || wikiState.imageAiLoadingIndex >= 0 || wikiState.sectionAiLoadingIndex >= 0) return;
+  const section = Array.isArray(page?.sections) ? page.sections[sectionIndex] : null;
+  if (!section) return;
+  const format = wikiSelectedSectionFormat(sectionIndex, section, page);
+  const promptOverride = wikiImagePromptFor(page, section, format);
+  const startedAt = Date.now();
+  const minBusyMs = 900;
+  wikiState.sectionAiLoadingIndex = sectionIndex;
+  wikiStatus(`${section?.title || page?.title || '섹션'} ${format.toUpperCase()} AI 생성 중…`);
+  wikiEnhanceSectionHeadings(page);
+  try {
+    const response = wikiAiTools?.postJson
+      ? await wikiAiTools.postJson(wikiApiUrl('/api/wiki/section-image/generate'), {
+          source_path: page.source_path,
+          section_index: sectionIndex,
+          format,
+          prompt_override: promptOverride,
+        })
+      : await wikiFetchJson(wikiApiUrl('/api/wiki/section-image/generate'), {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            source_path: page.source_path,
+            section_index: sectionIndex,
+            format,
+            prompt_override: promptOverride,
+          }),
+        });
+    wikiApplyPage(response?.page || null);
+    wikiStatus(`${section?.title || page?.title || '섹션'} ${format.toUpperCase()} AI 저장 완료`);
+  } catch (error) {
+    wikiStatus(`섹션 AI 이미지 생성 실패: ${error.message || error}`, true);
+  } finally {
+    const remaining = minBusyMs - (Date.now() - startedAt);
+    if (remaining > 0) await new Promise((resolve) => window.setTimeout(resolve, remaining));
+    wikiState.sectionAiLoadingIndex = -1;
+    wikiEnhanceSectionHeadings(wikiState.page);
+  }
+}
+
 function wikiApplyPage(page) {
   wikiState.page = page || null;
   wikiState.currentSlug = page?.slug || '';
@@ -1051,8 +1246,13 @@ function wikiApplyPage(page) {
   wikiState.imagePromptEditorIndex = -1;
   wikiState.imagePromptStatus = '';
   wikiState.imagePromptStatusError = false;
+  wikiState.sectionFormatSelections = {};
+  wikiState.sectionPromptEditorIndex = -1;
+  wikiState.sectionPromptStatus = '';
+  wikiState.sectionPromptStatusError = false;
   wiki$('wikiArticle').innerHTML = page?.html || '<p class="muted">문서가 비어 있습니다.</p>';
   wikiEnhanceInlineImages(page);
+  wikiEnhanceSectionHeadings(page);
   wiki$('wikiRawLink').href = page?.raw_url || '#';
   document.title = `${page?.title || '문서'} · ${wikiState.index?.book?.title || 'CS 학습 위키'}`;
   wikiRenderBreadcrumbs(page);

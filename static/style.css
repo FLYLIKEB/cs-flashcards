@@ -6779,6 +6779,27 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   line-height: 1.2;
 }
 
+.wiki-section-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: .28rem;
+  margin-left: .55rem;
+  vertical-align: middle;
+}
+
+.wiki-section-format {
+  min-width: 3.2rem;
+}
+
+.wiki-section-ai-btn,
+.wiki-section-edit-btn {
+  flex: 0 0 auto;
+}
+
+.wiki-section-prompt-editor {
+  margin: .45rem 0 1rem .15rem;
+}
+
 .wiki-inline-image-prompt-editor {
   margin-top: .45rem;
   display: grid;

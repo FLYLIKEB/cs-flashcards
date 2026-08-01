@@ -789,6 +789,13 @@ class WikiImageRegenerateRequest(BaseModel):
     prompt_override: str = Field(default="", max_length=20000)
 
 
+class WikiSectionImageGenerateRequest(BaseModel):
+    source_path: str = Field(min_length=1, max_length=4096)
+    section_index: int = Field(ge=0, le=20000)
+    format: str = Field(default="png", max_length=16)
+    prompt_override: str = Field(default="", max_length=20000)
+
+
 class CardAiRewriteRequest(BaseModel):
     instruction: str = Field(default="", max_length=4000)
 
@@ -5521,14 +5528,10 @@ def wiki_markdown_image_format(href: str) -> str:
 
 
 
-def wiki_image_context_excerpt(lines: list[str], line_number: int, *, window: int = 6) -> str:
+def normalized_markdown_excerpt(lines: list[str], *, limit: int = 1200) -> str:
     parts: list[str] = []
-    start = max(0, line_number - 1 - window)
-    end = min(len(lines), line_number + 2 + window)
-    for index in range(start, end):
-        if index in {line_number - 1, line_number, line_number + 1}:
-            continue
-        stripped = lines[index].strip()
+    for line in lines:
+        stripped = line.strip()
         if not stripped:
             continue
         if stripped.startswith('![') or stripped.startswith('> 그림:') or stripped.startswith('> 출처:'):
@@ -5541,7 +5544,15 @@ def wiki_image_context_excerpt(lines: list[str], line_number: int, *, window: in
         stripped = re.sub(r'\s+', ' ', stripped).strip()
         if stripped:
             parts.append(stripped)
-    return normalized_card_text(' '.join(parts), limit=1200)
+    return normalized_card_text(' '.join(parts), limit=limit)
+
+
+
+def wiki_image_context_excerpt(lines: list[str], line_number: int, *, window: int = 6) -> str:
+    start = max(0, line_number - 1 - window)
+    end = min(len(lines), line_number + 2 + window)
+    excerpt_lines = [lines[index] for index in range(start, end) if index not in {line_number - 1, line_number, line_number + 1}]
+    return normalized_markdown_excerpt(excerpt_lines, limit=1200)
 
 
 
@@ -5584,6 +5595,78 @@ def parse_wiki_markdown_images(markdown_text: str, repo_dir: Path, current_sourc
 
 
 
+def wiki_generated_section_asset_prefix(source_relative: str, section_index: int) -> str:
+    base_name = re.sub(r"[^A-Za-z0-9._-]+", "-", PurePosixPath(source_relative).stem).strip("-") or "wiki"
+    token = hashlib.sha1(str(source_relative).encode("utf-8")).hexdigest()[:8]
+    return (WIKI_GENERATED_ASSET_DIR / f"{base_name}-{token}-section-{section_index + 1:02d}").as_posix()
+
+
+
+def wiki_generated_section_asset_relative_path(source_relative: str, section_index: int, image_format: str) -> str:
+    normalized_format = normalized_wiki_image_format(image_format)
+    return f"{wiki_generated_section_asset_prefix(source_relative, section_index)}.{normalized_format}"
+
+
+
+def find_generated_wiki_section_image_href(lines: list[str], source_relative: str, section_index: int, start_line_number: int, end_line_number: int) -> str:
+    prefix = wiki_generated_section_asset_prefix(source_relative, section_index)
+    for index in range(max(0, start_line_number - 1), min(len(lines), end_line_number)):
+        match = WIKI_MARKDOWN_IMAGE_RE.match(lines[index].strip())
+        if not match:
+            continue
+        href = match.group("href").strip()
+        if href.startswith(prefix):
+            return href
+    return ""
+
+
+
+def parse_wiki_markdown_sections(markdown_text: str, repo_dir: Path, current_source: Path) -> list[dict[str, Any]]:
+    lines = markdown_text.splitlines()
+    source_relative = str(current_source.relative_to(repo_dir)).replace(os.sep, "/")
+    headings: list[dict[str, Any]] = []
+    for line_number, line in enumerate(lines, start=1):
+        heading = WIKI_HEADING_RE.match(line.strip())
+        if not heading:
+            continue
+        title = heading.group(2).strip()
+        headings.append({
+            "index": len(headings),
+            "line_number": line_number,
+            "level": len(heading.group(1)),
+            "title": title,
+            "heading_id": wiki_heading_id(title),
+        })
+    sections: list[dict[str, Any]] = []
+    for offset, heading in enumerate(headings):
+        end_line_number = len(lines)
+        for candidate in headings[offset + 1 :]:
+            if int(candidate["level"]) <= int(heading["level"]):
+                end_line_number = int(candidate["line_number"]) - 1
+                break
+        content_start_line = int(heading["line_number"]) + 1
+        content_lines = lines[content_start_line - 1 : end_line_number]
+        generated_href = find_generated_wiki_section_image_href(
+            lines,
+            source_relative,
+            int(heading["index"]),
+            content_start_line,
+            end_line_number,
+        )
+        sections.append({
+            **heading,
+            "section_title": heading["title"],
+            "alt": heading["title"],
+            "caption": "",
+            "source_note": "",
+            "context_excerpt": normalized_markdown_excerpt(content_lines, limit=4000),
+            "generated_image_href": generated_href,
+            "format": wiki_markdown_image_format(generated_href) if generated_href else "png",
+        })
+    return sections
+
+
+
 def replace_nth_markdown_image_href(markdown_text: str, image_index: int, next_href: str) -> tuple[str, dict[str, Any]]:
     matches = list(WIKI_MARKDOWN_IMAGE_RE.finditer(markdown_text))
     if image_index < 0 or image_index >= len(matches):
@@ -5604,6 +5687,61 @@ def wiki_generated_image_asset_relative_path(source_relative: str, image_index: 
     base_name = re.sub(r"[^A-Za-z0-9._-]+", "-", PurePosixPath(source_relative).stem).strip("-") or "wiki"
     token = hashlib.sha1(str(source_relative).encode("utf-8")).hexdigest()[:8]
     return (WIKI_GENERATED_ASSET_DIR / f"{base_name}-{token}-image-{image_index + 1:02d}.{normalized_format}").as_posix()
+
+
+
+def upsert_wiki_section_image_markdown(
+    markdown_text: str,
+    source_relative: str,
+    section: dict[str, Any],
+    next_href: str,
+) -> tuple[str, dict[str, Any]]:
+    lines = markdown_text.splitlines()
+    keep_trailing_newline = markdown_text.endswith("\n")
+    section_index = int(section.get("index") or 0)
+    title = str(section.get("title") or section.get("section_title") or "섹션").strip() or "섹션"
+    heading_line_number = int(section.get("line_number") or 1)
+    level = int(section.get("level") or 1)
+    prefix = wiki_generated_section_asset_prefix(source_relative, section_index)
+    end_line_number = len(lines)
+    for line_number in range(heading_line_number + 1, len(lines) + 1):
+        match = WIKI_HEADING_RE.match(lines[line_number - 1].strip())
+        if match and len(match.group(1)) <= level:
+            end_line_number = line_number - 1
+            break
+    image_line_index: int | None = None
+    previous_href = ""
+    for index in range(max(0, heading_line_number), min(len(lines), end_line_number)):
+        match = WIKI_MARKDOWN_IMAGE_RE.match(lines[index].strip())
+        if not match:
+            continue
+        href = match.group("href").strip()
+        if href.startswith(prefix):
+            image_line_index = index
+            previous_href = href
+            break
+    alt = normalized_card_text(f"{title} AI 이미지", limit=400)
+    next_line = f"![{alt}]({next_href})"
+    inserted = image_line_index is None
+    if image_line_index is None:
+        insert_at = min(len(lines), heading_line_number)
+        insertion = [next_line]
+        if insert_at >= len(lines) or lines[insert_at].strip():
+            insertion.append("")
+        lines[insert_at:insert_at] = insertion
+    else:
+        lines[image_line_index] = next_line
+    updated = "\n".join(lines)
+    if keep_trailing_newline:
+        updated += "\n"
+    return updated, {
+        "section_index": section_index,
+        "title": title,
+        "line_number": heading_line_number,
+        "previous_href": previous_href,
+        "next_href": next_href,
+        "inserted": inserted,
+    }
 
 
 
@@ -5879,6 +6017,74 @@ def regenerate_wiki_image_asset(
 
 
 
+def generate_wiki_section_image_asset(
+    payload: WikiSectionImageGenerateRequest,
+    repo_dir: Path | None = None,
+) -> dict[str, Any]:
+    repo, target, source_relative, local_content = resolve_wiki_markdown_source(payload.source_path, repo_dir)
+    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
+        source_relative,
+        local_content,
+        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 섹션 이미지 생성을 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
+    )
+    sections = parse_wiki_markdown_sections(current_content, repo, target)
+    if payload.section_index >= len(sections):
+        raise ValueError(f"위키 섹션 인덱스를 찾지 못했습니다: {payload.section_index}")
+    section = sections[payload.section_index]
+    section_subject = {
+        "section_title": section.get("section_title") or section.get("title") or target.stem,
+        "alt": section.get("alt") or section.get("title") or target.stem,
+        "caption": section.get("caption") or "",
+        "source_note": section.get("source_note") or "",
+        "context_excerpt": section.get("context_excerpt") or "",
+    }
+    image_format = normalized_wiki_image_format(payload.format)
+    prompt_override = normalized_card_text(payload.prompt_override, limit=20000)
+    page_title = extract_markdown_title(current_content, target.stem)
+    if image_format == "svg":
+        asset_bytes = generate_wiki_svg_markup(page_title, section_subject, prompt_override=prompt_override).encode("utf-8")
+    elif image_format == "gif":
+        asset_bytes = subtle_loop_gif_from_png(request_openai_generated_image_bytes(prompt_override or wiki_gif_image_prompt(page_title, section_subject)))
+    else:
+        asset_bytes = request_openai_generated_image_bytes(prompt_override or wiki_png_image_prompt(page_title, section_subject))
+    asset_relative_path = wiki_generated_section_asset_relative_path(source_relative, payload.section_index, image_format)
+    asset_saved = upsert_wiki_binary_asset(
+        asset_relative_path,
+        asset_bytes,
+        message=f"Generate wiki section image: {asset_relative_path}",
+        repo_dir=repo,
+    )
+    updated_content, section_update = upsert_wiki_section_image_markdown(current_content, source_relative, section, asset_relative_path)
+    changed = updated_content != current_content
+    if sync_target == "github" and changed and remote_sha:
+        github_update_wiki_source(
+            source_relative,
+            updated_content,
+            remote_sha,
+            f"Generate wiki section image: {source_relative}#section-{payload.section_index + 1}",
+        )
+    if updated_content != local_content:
+        target.write_text(updated_content, encoding="utf-8")
+    page_slug = wiki_slug_for_source(repo, target)
+    return {
+        "page": read_wiki_page(page_slug, repo),
+        "updated": {
+            "source_path": source_relative,
+            "page_slug": page_slug,
+            "sync_target": sync_target,
+            "changed": changed,
+            "format": image_format,
+            "section_index": payload.section_index,
+            "heading_id": section.get("heading_id") or "",
+            "title": section.get("title") or "",
+            "asset_relative_path": asset_saved["relative_path"],
+            "asset_url": asset_saved["url"],
+            **section_update,
+        },
+    }
+
+
+
 def read_wiki_index(repo_dir: Path | None = None) -> dict[str, Any]:
     repo = wiki_book_dir(repo_dir)
     toc = wiki_toc_path(repo)
@@ -6054,6 +6260,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, progress_db_path=PROGRESS_DB_PATH)
     last_modified_at, last_modified_label = wiki_last_modified_metadata(source_path)
     images = parse_wiki_markdown_images(markdown_text, repo, source_path)
+    sections = parse_wiki_markdown_sections(markdown_text, repo, source_path)
 
     return {
         "slug": slug,
@@ -6064,6 +6271,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
         "breadcrumbs": index["breadcrumbs"].get(slug, [{"title": title, "slug": slug, "url": wiki_page_url(slug)}]),
         "html": render_markdown_page(markdown_text, repo, source_path),
         "images": images,
+        "sections": sections,
         "last_modified_at": last_modified_at,
         "last_modified_label": last_modified_label,
         "primary_card": linked_cards[0] if linked_cards else None,
@@ -6158,6 +6366,20 @@ def api_wiki_ai_rewrite_preview(payload: WikiAiRewriteRequest) -> dict[str, Any]
 def api_wiki_image_regenerate(payload: WikiImageRegenerateRequest) -> dict[str, Any]:
     try:
         return regenerate_wiki_image_asset(payload)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/wiki/section-image/generate")
+def api_wiki_section_image_generate(payload: WikiSectionImageGenerateRequest) -> dict[str, Any]:
+    try:
+        return generate_wiki_section_image_asset(payload)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:

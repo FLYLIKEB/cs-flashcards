@@ -40,7 +40,11 @@ def write_wiki_book(root: Path) -> Path:
         '![기존 그림](https://example.com/old.png)\n'
         '> 그림: 큐 처리 흐름을 간단히 보여준다.\n'
         '> 출처: 예시 출처\n\n'
-        'enqueue 후 dequeue 순서를 단계별로 확인한다.\n',
+        'enqueue 후 dequeue 순서를 단계별로 확인한다.\n\n'
+        '## 큐 연산\n\n'
+        'dequeue는 맨 앞 원소를 제거한다.\n\n'
+        '### 큐 예시\n\n'
+        'FIFO 순서를 유지한다.\n',
         encoding='utf-8',
     )
     return book
@@ -107,6 +111,15 @@ class WikiAiRewriteTests(unittest.TestCase):
             self.assertEqual(page['images'][0]['format'], 'png')
             self.assertIn('https://example.com/old.png', page['images'][0]['src'])
             self.assertIn('먼저 들어온 데이터', page['images'][0]['context_excerpt'])
+
+    def test_read_wiki_page_returns_section_metadata(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            page = flashcard_app.read_wiki_page('intro', book)
+            self.assertEqual([section['title'] for section in page['sections'][:3]], ['소개 문서', '큐 연산', '큐 예시'])
+            self.assertIn('FIFO 순서를 유지한다.', page['sections'][0]['context_excerpt'])
+            self.assertIn('FIFO 순서를 유지한다.', page['sections'][1]['context_excerpt'])
+            self.assertEqual(page['sections'][2]['heading_id'], flashcard_app.wiki_heading_id('큐 예시'))
 
     def test_wiki_gif_image_prompt_uses_skill_style_and_context(self):
         prompt = flashcard_app.wiki_gif_image_prompt('소개 문서', {
@@ -179,6 +192,69 @@ class WikiAiRewriteTests(unittest.TestCase):
                     )
                 payload = json.loads(urlopen_mock.call_args.args[0].data.decode('utf-8'))
                 self.assertEqual(payload['prompt'], 'CUSTOM PNG PROMPT')
+            finally:
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
+                flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_api_wiki_section_image_generate_inserts_asset_below_heading(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                png_bytes = b'\x89PNG\r\n\x1a\npng-preview'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'data': [{'b64_json': base64.b64encode(png_bytes).decode('ascii')}],
+                    }),
+                ):
+                    data = flashcard_app.api_wiki_section_image_generate(
+                        flashcard_app.WikiSectionImageGenerateRequest(
+                            source_path='pages/intro.md',
+                            section_index=1,
+                            format='png',
+                        )
+                    )
+                updated_text = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                self.assertIn(data['updated']['asset_relative_path'], updated_text)
+                self.assertIn('## 큐 연산\n![큐 연산 AI 이미지](', updated_text)
+                asset_path = book / data['updated']['asset_relative_path']
+                self.assertEqual(asset_path.read_bytes(), png_bytes)
+                self.assertEqual(data['updated']['title'], '큐 연산')
+            finally:
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
+                flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_api_wiki_section_image_generate_uses_prompt_override(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                png_bytes = b'\x89PNG\r\n\x1a\npng-preview'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'data': [{'b64_json': base64.b64encode(png_bytes).decode('ascii')}],
+                    }),
+                ) as urlopen_mock:
+                    flashcard_app.api_wiki_section_image_generate(
+                        flashcard_app.WikiSectionImageGenerateRequest(
+                            source_path='pages/intro.md',
+                            section_index=1,
+                            format='png',
+                            prompt_override='CUSTOM SECTION PROMPT',
+                        )
+                    )
+                payload = json.loads(urlopen_mock.call_args.args[0].data.decode('utf-8'))
+                self.assertEqual(payload['prompt'], 'CUSTOM SECTION PROMPT')
             finally:
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
                 flashcard_app.OPENAI_API_KEY = original_key
