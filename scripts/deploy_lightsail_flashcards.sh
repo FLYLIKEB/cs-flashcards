@@ -109,6 +109,7 @@ else
 fi
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
+REMOTE_ARCHIVE="/tmp/cs-flashcards-$(date +%Y%m%dT%H%M%S)-$$.tar.gz"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
 mkdir -p "$TMP_STAGE/data" "$TMP_STAGE/state"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
@@ -139,27 +140,27 @@ rm -rf "$TMP_STAGE"
 
 
 "${SSH[@]}" "mkdir -p '$REMOTE_DIR' '$REMOTE_DIR/backups'"
-"${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards.tar.gz"
+"${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_ARCHIVE"
 rm -f "$TMP_ARCHIVE"
 WIKI_GITHUB_PATH_PREFIX_ARG="${WIKI_GITHUB_PATH_PREFIX:-__EMPTY__}"
 WIKI_GITHUB_TOKEN_ARG="${WIKI_GITHUB_TOKEN:-__EMPTY__}"
 
 OPENAI_API_KEY_ARG="${OPENAI_API_KEY_VALUE:-__EMPTY__}"
 
-
-"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN_ARG" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$OPENAI_API_KEY_ARG" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_ARCHIVE" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN_ARG" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$OPENAI_API_KEY_ARG" <<'REMOTE'
 set -euo pipefail
 REMOTE_DIR="$1"
-REMOTE_PORT="$2"
-DOMAIN="$3"
-ORIGIN_DOMAIN="$4"
-USERNAME="$5"
-PASSWORD="$6"
-WIKI_GITHUB_REPO="${7-}"
-WIKI_GITHUB_BRANCH="${8-}"
-WIKI_GITHUB_TOKEN="${9-}"
-WIKI_GITHUB_PATH_PREFIX="${10-}"
-OPENAI_API_KEY_VALUE="${11-}"
+REMOTE_ARCHIVE="$2"
+REMOTE_PORT="$3"
+DOMAIN="$4"
+ORIGIN_DOMAIN="$5"
+USERNAME="$6"
+PASSWORD="$7"
+WIKI_GITHUB_REPO="${8-}"
+WIKI_GITHUB_BRANCH="${9-}"
+WIKI_GITHUB_TOKEN="${10-}"
+WIKI_GITHUB_PATH_PREFIX="${11-}"
+OPENAI_API_KEY_VALUE="${12-}"
 if [[ "$WIKI_GITHUB_TOKEN" == "__EMPTY__" ]]; then
   WIKI_GITHUB_TOKEN=""
 fi
@@ -186,8 +187,8 @@ mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
 
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
-tar -xzf /tmp/cs-flashcards.tar.gz -C "$REMOTE_DIR"
-rm -f /tmp/cs-flashcards.tar.gz
+tar -xzf "$REMOTE_ARCHIVE" -C "$REMOTE_DIR"
+rm -f "$REMOTE_ARCHIVE"
 rm -rf "$REMOTE_DIR/static/generated"
 if [[ -d "$REMOTE_DIR/wiki_book_seed/pages" ]]; then
   if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then
