@@ -91,6 +91,5 @@ if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없습니다: $REMOTE_DB_PATH" >&2
   exit 1
 fi
-printf '%s
-' "$SQL_TEXT" | sqlite3 "$REMOTE_DB_PATH"
+printf 'BEGIN IMMEDIATE;\n%s\nCOMMIT;\n' "$SQL_TEXT" | sqlite3 -bail "$REMOTE_DB_PATH"
 REMOTE
