@@ -430,12 +430,12 @@ class FlashcardProgressTests(unittest.TestCase):
             )
 
             self.assertEqual(updated['concept_media_type'], 'html')
-            self.assertIn('document.body.dataset.ready', updated['concept_media_payload'])
+            self.assertEqual(updated['concept_media_payload'], '<div class="demo">flow</div><script>document.body.dataset.ready = "1";</script>')
             self.assertEqual(updated['concept_image_alt'], '동적 개념 위젯')
             self.assertIsNotNone(backup_path)
             saved = sqlite_card_status(db_path)
             self.assertEqual(saved['concept_media_type'], 'html')
-            self.assertIn('document.body.dataset.ready', saved['concept_media_payload'])
+            self.assertEqual(saved['concept_media_payload'], '<div class="demo">flow</div><script>document.body.dataset.ready = "1";</script>')
             self.assertEqual(saved['concept_image_alt'], '동적 개념 위젯')
             self.assertEqual(saved['concept_image_url'], 'https://example.com/test-concept.png')
 
@@ -2126,6 +2126,21 @@ class WikiBookTests(unittest.TestCase):
             self.assertIn('data-wiki-task-line="3"', page['html'])
             self.assertIn('<table>', page['html'])
             self.assertIn('<pre><code class="language-text">hello</code></pre>', page['html'])
+
+    def test_read_wiki_page_escapes_raw_html_before_frontend_trusts_it(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            intro_path = book / 'pages' / 'intro.md'
+            intro_path.write_text(
+                '# 소개 문서\n\n<script>window.bad = 1</script>\n\n<div>safe?</div>\n',
+                encoding='utf-8',
+            )
+
+            page = flashcard_app.read_wiki_page('intro', book)
+            self.assertNotIn('<script>', page['html'])
+            self.assertNotIn('<div>safe?</div>', page['html'])
+            self.assertIn('&lt;script&gt;window.bad = 1&lt;/script&gt;', page['html'])
+            self.assertIn('&lt;div&gt;safe?&lt;/div&gt;', page['html'])
 
 
     def test_read_wiki_page_includes_linked_flashcards(self):

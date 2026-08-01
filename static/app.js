@@ -2035,6 +2035,24 @@ function conceptImageAlt(card) {
   return `${term}${category} 이해를 돕는 학습용 개념 이미지`;
 }
 
+const TRUSTED_CONCEPT_WIDGET_HTML_KIND = 'concept-widget';
+
+function trustedConceptWidgetHtml(payload) {
+  return Object.freeze({
+    __csTrustedHtml: true,
+    kind: TRUSTED_CONCEPT_WIDGET_HTML_KIND,
+    html: String(payload || ''),
+  });
+}
+
+function isTrustedConceptWidgetHtml(value) {
+  return Boolean(value?.__csTrustedHtml) && value.kind === TRUSTED_CONCEPT_WIDGET_HTML_KIND && typeof value.html === 'string';
+}
+
+function conceptWidgetPayloadValue(payload) {
+  return isTrustedConceptWidgetHtml(payload) ? payload.html : String(payload || '');
+}
+
 function conceptMediaDisplayState(card) {
   const previewActive = conceptImagePreviewActive(card);
   if (previewActive) {
@@ -2048,14 +2066,19 @@ function conceptMediaDisplayState(card) {
   }
   const mediaType = normalizedConceptMediaType(card?.concept_media_type);
   const rawPayload = String(card?.concept_media_payload || '').trim();
-  const payload = ['image', 'gif', 'video'].includes(mediaType) ? normalizedConceptMediaUrl(rawPayload) : rawPayload;
-  if (mediaType && payload) {
+  const payload = mediaType === 'html'
+    ? trustedConceptWidgetHtml(rawPayload)
+    : ['image', 'gif', 'video'].includes(mediaType)
+      ? normalizedConceptMediaUrl(rawPayload)
+      : rawPayload;
+  const hasMedia = mediaType === 'html' ? Boolean(payload.html) : Boolean(payload);
+  if (mediaType && hasMedia) {
     return {
       previewActive: false,
       mediaType,
       payload,
       alt: conceptImageAlt(card),
-      hasMedia: true,
+      hasMedia,
     };
   }
   const imageUrl = conceptImageUrl(card);
@@ -2140,7 +2163,8 @@ function bindConceptMediaFrameResize() {
 }
 
 function conceptMediaIframeSrcdoc(payload, alt = '') {
-  const encodedPayload = JSON.stringify(String(payload || '')).replace(/</g, '\\u003c');
+  if (!isTrustedConceptWidgetHtml(payload)) throw new Error('Trusted concept HTML payload required.');
+  const encodedPayload = JSON.stringify(payload.html).replace(/</g, '\\u003c');
   const encodedAlt = JSON.stringify(String(alt || '개념 동적 시각화')).replace(/</g, '\\u003c');
   return `<!doctype html>
 <html lang="ko">
@@ -2295,6 +2319,8 @@ async function renderConceptImageDialogContent(card) {
     frame.sandbox = 'allow-scripts';
     frame.referrerPolicy = 'no-referrer';
     frame.title = alt || '개념 동적 시각화';
+    frame.dataset.payload = conceptWidgetPayloadValue(payload);
+    frame.dataset.alt = alt;
     frame.srcdoc = conceptMediaIframeSrcdoc(payload, alt);
     stage.appendChild(frame);
     return true;
@@ -2426,7 +2452,7 @@ function updateConceptMediaDialogPlaceholder() {
     gif: 'https://... GIF URL',
     video: 'https://... mp4/webm URL',
     mermaid: 'graph TD\n  A[개념] --> B[핵심 동작]',
-    html: '<div>...</div><script>...</script>',
+    html: '<div>...</div><script>...</script> (sandbox iframe 전용)',
   };
   payloadInput.placeholder = placeholders[mediaType] || placeholders.html;
 }
@@ -2549,7 +2575,7 @@ function renderConceptImage(card) {
       placeholder.hidden = true;
       video.play().catch(() => {});
     } else if (mediaType === 'html') {
-      frame.dataset.payload = payload;
+      frame.dataset.payload = conceptWidgetPayloadValue(payload);
       frame.dataset.alt = alt;
       frame.title = alt || `${card.term} 개념 위젯`;
       frame.srcdoc = conceptMediaIframeSrcdoc(payload, alt);

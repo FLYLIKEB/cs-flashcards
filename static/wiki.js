@@ -740,8 +740,41 @@ function wikiFocusEditor() {
   wiki$('wikiEditorTextarea')?.focus({preventScroll: true});
 }
 
+const WIKI_TRUSTED_RENDERED_HTML_KIND = 'wiki-rendered';
+
+function wikiTrustedRenderedHtml(html) {
+  return Object.freeze({
+    __csTrustedHtml: true,
+    kind: WIKI_TRUSTED_RENDERED_HTML_KIND,
+    html: String(html || ''),
+  });
+}
+
+function isWikiTrustedRenderedHtml(value) {
+  return Boolean(value?.__csTrustedHtml) && value.kind === WIKI_TRUSTED_RENDERED_HTML_KIND && typeof value.html === 'string';
+}
+
+function wikiRenderMessage(element, text, className = '') {
+  if (!element) return;
+  const message = document.createElement('p');
+  if (className) message.className = className;
+  message.textContent = String(text || '');
+  element.replaceChildren(message);
+}
+
+function wikiApplyTrustedHtml(element, trustedHtml, {emptyText = '', emptyClassName = 'muted'} = {}) {
+  if (!element) return;
+  if (!isWikiTrustedRenderedHtml(trustedHtml)) throw new Error('Trusted wiki HTML required.');
+  if (!trustedHtml.html) {
+    if (emptyText) wikiRenderMessage(element, emptyText, emptyClassName);
+    else element.replaceChildren();
+    return;
+  }
+  element.innerHTML = trustedHtml.html;
+}
+
 function wikiEditorPreviewPlaceholder(text = '미리보기를 불러오는 중입니다.') {
-  return `<p class="wiki-editor-preview-loading">${wikiEscapeHtml(text)}</p>`;
+  return String(text || '');
 }
 
 function wikiEditorPreviewSourcePath() {
@@ -786,21 +819,21 @@ function wikiEnsureMarkdownEditor() {
       const preview = previewEl || null;
       const sourcePath = wikiEditorPreviewSourcePath();
       const token = ++wikiPreviewRequestToken;
-      const loadingHtml = wikiEditorPreviewPlaceholder();
-      if (!preview) return loadingHtml;
-      preview.innerHTML = loadingHtml;
+      const loadingText = wikiEditorPreviewPlaceholder();
+      if (!preview) return loadingText;
+      wikiRenderMessage(preview, loadingText, 'wiki-editor-preview-loading');
       if (!sourcePath) {
-        preview.innerHTML = wikiEditorPreviewPlaceholder('미리보기에 필요한 원본 경로를 찾지 못했습니다.');
-        return loadingHtml;
+        wikiRenderMessage(preview, '미리보기에 필요한 원본 경로를 찾지 못했습니다.', 'error-text');
+        return loadingText;
       }
       wikiRenderPreviewMarkdown(sourcePath, plainText).then((data) => {
         if (token !== wikiPreviewRequestToken || !preview.isConnected) return;
-        preview.innerHTML = data?.html || '<p class="muted">미리보기 결과가 비어 있습니다.</p>';
+        wikiApplyTrustedHtml(preview, wikiTrustedRenderedHtml(data?.html || ''), {emptyText: '미리보기 결과가 비어 있습니다.'});
       }).catch((error) => {
         if (token !== wikiPreviewRequestToken || !preview.isConnected) return;
-        preview.innerHTML = `<p class="error-text">${wikiEscapeHtml(error.message || error)}</p>`;
+        wikiRenderMessage(preview, error.message || error, 'error-text');
       });
-      return loadingHtml;
+      return loadingText;
     },
     sideBySideFullscreen: false,
     spellChecker: false,
@@ -1531,7 +1564,7 @@ function wikiApplyPage(page) {
   wikiState.sectionPromptEditorIndex = -1;
   wikiState.sectionPromptStatus = '';
   wikiState.sectionPromptStatusError = false;
-  wiki$('wikiArticle').innerHTML = page?.html || '<p class="muted">문서가 비어 있습니다.</p>';
+  wikiApplyTrustedHtml(wiki$('wikiArticle'), wikiTrustedRenderedHtml(page?.html || ''), {emptyText: '문서가 비어 있습니다.'});
   wikiEnhanceInlineImages(page);
   wikiEnhanceSectionHeadings(page);
   wiki$('wikiRawLink').href = page?.raw_url || '#';
@@ -1757,7 +1790,7 @@ async function wikiInit() {
     await wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || wikiState.index.book?.slug || '_book', {scrollToTop: true});
   } catch (error) {
     wikiStatus(`위키 로딩 실패: ${error.message || error}`, true);
-    wiki$('wikiArticle').innerHTML = `<p class="error-text">${wikiEscapeHtml(error.message || error)}</p>`;
+    wikiRenderMessage(wiki$('wikiArticle'), error.message || error, 'error-text');
   }
 }
 
