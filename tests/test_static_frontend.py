@@ -101,7 +101,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function launch(startIndex = 0, {reveal = true} = {})', QUESTION_BANK_JS)
         self.assertIn('window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
         self.assertIn('question-bank-filters-collapsed', QUESTION_BANK_JS)
-        self.assertIn('let restorePracticePaneOnReload = Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();', QUESTION_BANK_JS)
+        self.assertIn('let restorePracticePaneOnReload = isReloadNavigation() && Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();', QUESTION_BANK_JS)
         self.assertIn('loaded: bankState.practiceLoaded,', QUESTION_BANK_JS)
     def test_calendar_js_smoke_keeps_tab_and_drawer_focus_handlers(self):
         self.assertIn('function setMainTab(tabId)', CALENDAR_JS)

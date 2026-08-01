@@ -1278,9 +1278,20 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 })
                 """
             )
+            case['active_row_after_collapsed_reload'] = await page.evaluate(
+                "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
+            )
             self.assertTrue(case['closed_state_after_reload']['filtersCollapsed'])
             self.assertTrue(case['closed_state_after_reload']['practiceCollapsed'])
             self.assertTrue(case['closed_state_after_reload']['practiceFrameHidden'])
+            self.assertEqual(case['active_row_after_collapsed_reload'], case['active_row_before_reload'])
+            await page.click('#bankPageLaunchSelectedBtn')
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            reopened_embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            case['practice_prompt_after_collapsed_reopen'] = await reopened_embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertEqual(case['practice_prompt_after_collapsed_reopen'], case['practice_prompt_before_reload'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-pane-state-reload', status=status, observations=case)

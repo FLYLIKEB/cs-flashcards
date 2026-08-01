@@ -204,8 +204,8 @@ function persistedPracticeRestoreState() {
   return persistedFilterState()?.practice || null;
 }
 
-let restoredPracticeState = isReloadNavigation() ? persistedPracticeRestoreState() : null;
-let restorePracticePaneOnReload = Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();
+let restoredPracticeState = persistedPracticeRestoreState();
+let restorePracticePaneOnReload = isReloadNavigation() && Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();
 
 function persistedFilterState() {
   try {
@@ -539,11 +539,11 @@ function persistFilterState() {
   }
 }
 
-function setFiltersCollapsed(collapsed) {
+function setFiltersCollapsed(collapsed, {persist = true} = {}) {
   bankState.filtersCollapsed = Boolean(collapsed);
   applyFilterViewState();
   renderFilterToggle();
-  persistFilterState();
+  if (persist) persistFilterState();
 }
 
 function toggleFiltersCollapsed() {
@@ -1072,7 +1072,7 @@ async function loadQuestionBankPage() {
 
 restoreFilterState();
 setPracticeCollapsed(persistedPracticeCollapsed(), {persist: false});
-setFiltersCollapsed(persistedFiltersCollapsed());
+setFiltersCollapsed(persistedFiltersCollapsed(), {persist: false});
 renderTable();
 renderPracticePane();
 loadQuestionBankPage().catch(() => {});
