@@ -79,6 +79,7 @@ function categoryGuideFocusableElements(dialog) {
 }
 let activeQuestionBankLoadRequest = 0;
 let questionBankLoadAbortController = null;
+let pendingPracticeLaunch = null;
 
 function escapeHtml(value) {
   return window.CSTableShell?.escapeHtml ? window.CSTableShell.escapeHtml(value) : String(value ?? '');
