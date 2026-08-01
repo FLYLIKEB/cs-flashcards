@@ -742,6 +742,8 @@ class StaticFrontendTests(unittest.TestCase):
             'questionAnswerRefineInstruction',
             'function refineCurrentQuestionAnswer()',
             '/ai-refine-answer',
+            'data-question-finish-session',
+            '제출하고 정답 보기',
             'question-review-box',
             'question-review-actions',
             "markQuestionSourceCard('O')",

@@ -5740,6 +5740,12 @@ function renderQuestionPanel() {
       <strong>한은 모드</strong>
       <p>세트 종료 전까지 정답과 해설이 잠겨 있습니다. 전 문항을 먼저 풀고 제출한 뒤 문항별로 회고하세요.</p>
     </div>` : '';
+  const lockActionHtml = revealLocked ? `
+    <div class="question-lock-action question-surface">
+      <strong>정답 확인하려면 제출</strong>
+      <p>현재 문항만이 아니라 세트 전체 정답 잠금이 걸려 있습니다. 제출하면 문항별 정답/해설을 바로 확인할 수 있습니다.</p>
+      <button class="question-toolbar-button is-primary" type="button" data-question-finish-session="1" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !total ? 'disabled' : ''}>제출하고 정답 보기</button>
+    </div>` : '';
   const sideStateHtml = revealLocked
     ? lockNoticeHtml
     : `<div class="question-side-note">
@@ -5789,6 +5795,7 @@ function renderQuestionPanel() {
           ${bodyHtml}
           ${choiceHtml}
           ${draftHtml}
+          ${lockActionHtml}
           ${answer}
         </div>
         <aside class="question-side-stack">
@@ -5799,6 +5806,7 @@ function renderQuestionPanel() {
       </div>
     </div>
   `;
+
   $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex <= 0;
   $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex >= total - 1;
   $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !question || revealLocked;
@@ -6581,6 +6589,10 @@ $('questionCard')?.addEventListener('click', (event) => {
   }
   if (event.target.closest('[data-question-answer-refine="1"]')) {
     refineCurrentQuestionAnswer();
+    return;
+  }
+  if (event.target.closest('[data-question-finish-session="1"]')) {
+    finishQuestionSession();
     return;
   }
   if (event.target.closest('[data-question-wrong-note-save="1"]')) {

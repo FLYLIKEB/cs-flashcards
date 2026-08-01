@@ -5379,6 +5379,14 @@ select,
   font-size: .82rem;
   line-height: 1.5;
 }
+.question-lock-action {
+  margin-top: .9rem;
+}
+.question-lock-action p {
+  margin: .45rem 0 .7rem;
+  color: #516071;
+  line-height: 1.55;
+}
 
 .question-answer-input,
 .question-wrong-note {
