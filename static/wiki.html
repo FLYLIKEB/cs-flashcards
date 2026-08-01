@@ -55,12 +55,12 @@
           </div>
           <p id="wikiBatchAiHint" class="small muted">선택 문서 0개</p>
         </div>
-        <p id="wikiStatus" class="small muted">목차를 불러오는 중...</p>
       </div>
       <nav id="wikiToc" class="wiki-toc" aria-label="위키 목차"></nav>
     </aside>
 
     <section class="wiki-main panel">
+      <p id="wikiStatus" class="small muted" role="status" aria-live="polite" aria-atomic="true">목차를 불러오는 중...</p>
       <div class="wiki-meta-row">
         <p id="wikiBreadcrumbs" class="small muted"></p>
         <p id="wikiUpdatedAt" class="small muted" hidden></p>
@@ -98,7 +98,7 @@
           <button id="wikiEditorSaveBtn" class="header-link" type="button">저장</button>
         </div>
       </section>
-      <article id="wikiArticle" class="wiki-article" aria-live="polite"></article>
+      <article id="wikiArticle" class="wiki-article"></article>
       <nav id="wikiPageNav" class="wiki-page-nav" aria-label="문서 이동" hidden></nav>
       <div class="wiki-page-footer">
         <div class="wiki-page-actions">

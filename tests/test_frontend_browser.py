@@ -612,7 +612,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_wiki_sidebar_state_restores_and_status_updates(self):
         case = {'path': '/wiki'}
-        page = await self.new_page(viewport={'width': 640, 'height': 960})
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
         status = 'failed'
         try:
             await page.goto(f'{self.base_url}/wiki', waitUntil='networkidle2')
@@ -623,10 +623,10 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             )
             await page.reload({'waitUntil': 'networkidle2'})
             await page.waitForFunction("document.querySelectorAll('#wikiToc .wiki-toc-link').length > 0")
-            case['sidebar_initially_open'] = await page.evaluate(
-                "document.querySelector('#wikiSidebarToggleBtn').getAttribute('aria-expanded') === 'true'"
+            case['sidebar_closed_after_reload'] = await page.evaluate(
+                "document.querySelector('#wikiSidebarToggleBtn').getAttribute('aria-expanded') === 'false'"
             )
-            self.assertFalse(case['sidebar_initially_open'])
+            self.assertTrue(case['sidebar_closed_after_reload'])
             await page.click('#wikiSidebarToggleBtn')
             await page.waitForFunction("document.querySelector('#wikiSidebarToggleBtn').getAttribute('aria-expanded') === 'true'")
             await page.reload({'waitUntil': 'networkidle2'})
@@ -640,7 +640,15 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.keyboard.press('Enter')
             await page.waitForFunction("document.querySelector('#wikiStatus').textContent.includes('일치하는 문서가 없습니다.')")
             case['wiki_status'] = await self.text(page, '#wikiStatus')
+            case['wiki_status_role'] = await page.Jeval('#wikiStatus', '(node) => node.getAttribute("role") || ""')
+            case['wiki_status_live'] = await page.Jeval('#wikiStatus', '(node) => node.getAttribute("aria-live") || ""')
+            case['wiki_status_atomic'] = await page.Jeval('#wikiStatus', '(node) => node.getAttribute("aria-atomic") || ""')
+            case['wiki_article_live'] = await page.Jeval('#wikiArticle', '(node) => node.getAttribute("aria-live") || ""')
             self.assertIn('일치하는 문서가 없습니다.', case['wiki_status'])
+            self.assertEqual(case['wiki_status_role'], 'status')
+            self.assertEqual(case['wiki_status_live'], 'polite')
+            self.assertEqual(case['wiki_status_atomic'], 'true')
+            self.assertEqual(case['wiki_article_live'], '')
             status = 'passed'
         finally:
             self.record_case(case_id='wiki-sidebar-status', status=status, observations=case)
