@@ -22,14 +22,9 @@ WIKI_GITHUB_TOKEN="${CS_FLASHCARDS_WIKI_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN
 WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
 WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-}"
 WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
-WIKI_SYNC_INTERVAL_MINUTES="${CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES:-5}"
 FORCE_DB_REPLACE="${CS_FLASHCARDS_FORCE_DB_REPLACE:-0}"
 OPENAI_API_KEY_VALUE="${OPENAI_API_KEY:-${CS_FLASHCARDS_OPENAI_API_KEY:-}}"
 
-if ! [[ "$WIKI_SYNC_INTERVAL_MINUTES" =~ ^[1-9][0-9]*$ ]]; then
-  echo "CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES 는 1 이상의 정수여야 합니다: $WIKI_SYNC_INTERVAL_MINUTES" >&2
-  exit 1
-fi
 
 if ! [[ "$FORCE_DB_REPLACE" =~ ^(0|1)$ ]]; then
   echo "CS_FLASHCARDS_FORCE_DB_REPLACE 는 0 또는 1 이어야 합니다: $FORCE_DB_REPLACE" >&2
@@ -79,10 +74,7 @@ WIKI_GITHUB_BRANCH="${WIKI_GITHUB_BRANCH:-main}"
 if [[ -n "$WIKI_GITHUB_REPO" && -z "$WIKI_GITHUB_TOKEN" ]] && command -v gh >/dev/null 2>&1; then
   WIKI_GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
 fi
-if [[ -n "$WIKI_GITHUB_REPO" && -z "$WIKI_GITHUB_TOKEN" ]]; then
-  echo "CS_FLASHCARDS_WIKI_GITHUB_REPO 가 설정된 배포는 CS_FLASHCARDS_WIKI_GITHUB_TOKEN 또는 gh auth token 이 필요합니다." >&2
-  exit 1
-fi
+
 
 if [[ ! -f "${SSH_KEY:-}" && -f "/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem" ]]; then
   SSH_KEY="/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem"
@@ -109,15 +101,11 @@ SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChe
 
 echo "배포 대상: $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR"
 echo "도메인: http://$DOMAIN (443 개방 시 https://$DOMAIN)"
-if [[ -n "$WIKI_GITHUB_REPO" ]]; then
-  echo "위키 원본 GitHub 자동 동기화: $WIKI_GITHUB_REPO@$WIKI_GITHUB_BRANCH (${WIKI_SYNC_INTERVAL_MINUTES}분 주기)"
+echo "원격 wiki_book 권한: 서버 로컬 원본 유지 (일반 배포에서 덮어쓰지 않음)"
+if [[ -n "$WIKI_GITHUB_REPO" && -n "$WIKI_GITHUB_TOKEN" ]]; then
+  echo "위키 GitHub 수동 보관 버튼: $WIKI_GITHUB_REPO@$WIKI_GITHUB_BRANCH"
 else
-  echo "위키 원본 GitHub 자동 동기화: 비활성"
-fi
-if [[ -n "$WIKI_GITHUB_TOKEN" && -n "$WIKI_GITHUB_REPO" ]]; then
-  echo "위키 체크리스트 GitHub 동기화: 활성"
-else
-  echo "위키 체크리스트 GitHub 동기화: 비활성"
+  echo "위키 GitHub 수동 보관 버튼: 비활성"
 fi
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
@@ -133,27 +121,18 @@ else
   echo "원격 state/progress.sqlite 보존: 일반 배포에서는 런타임 DB 전체 파일을 덮어쓰지 않습니다."
 fi
 WIKI_PACKAGE_SRC="$WIKI_BOOK_SRC"
-if [[ -n "$WIKI_GITHUB_REPO" ]]; then
-  WIKI_CLONE_DIR="$TMP_STAGE/.wiki-source"
-  WIKI_AUTH_URL="https://x-access-token:${WIKI_GITHUB_TOKEN}@github.com/${WIKI_GITHUB_REPO}.git"
-  echo "위키 문서 포함: GitHub ${WIKI_GITHUB_REPO}@${WIKI_GITHUB_BRANCH}"
-  git clone --depth 1 --branch "$WIKI_GITHUB_BRANCH" "$WIKI_AUTH_URL" "$WIKI_CLONE_DIR" >/dev/null
-  WIKI_PACKAGE_SRC="$WIKI_CLONE_DIR"
-  if [[ -n "$WIKI_GITHUB_PATH_PREFIX" ]]; then
-    WIKI_PACKAGE_SRC="$WIKI_CLONE_DIR/$WIKI_GITHUB_PATH_PREFIX"
-  fi
-fi
 if [[ -d "$WIKI_PACKAGE_SRC" ]]; then
   if [[ ! -f "$WIKI_PACKAGE_SRC/README.md" || ! -f "$WIKI_PACKAGE_SRC/TOC.md" || ! -d "$WIKI_PACKAGE_SRC/pages" ]]; then
     echo "위키 문서 디렉터리 구조가 올바르지 않습니다: $WIKI_PACKAGE_SRC" >&2
     exit 1
   fi
-  mkdir -p "$TMP_STAGE/wiki_book"
-  cp "$WIKI_PACKAGE_SRC/README.md" "$TMP_STAGE/wiki_book/README.md"
-  cp "$WIKI_PACKAGE_SRC/TOC.md" "$TMP_STAGE/wiki_book/TOC.md"
-  cp -R "$WIKI_PACKAGE_SRC/pages" "$TMP_STAGE/wiki_book/"
+  echo "위키 시드 포함: $WIKI_PACKAGE_SRC"
+  mkdir -p "$TMP_STAGE/wiki_book_seed"
+  cp "$WIKI_PACKAGE_SRC/README.md" "$TMP_STAGE/wiki_book_seed/README.md"
+  cp "$WIKI_PACKAGE_SRC/TOC.md" "$TMP_STAGE/wiki_book_seed/TOC.md"
+  cp -R "$WIKI_PACKAGE_SRC/pages" "$TMP_STAGE/wiki_book_seed/"
 else
-  echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 없이 배포합니다: $WIKI_PACKAGE_SRC"
+  echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 시드 없이 배포합니다: $WIKI_PACKAGE_SRC"
 fi
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" -C "$TMP_STAGE" .
 rm -rf "$TMP_STAGE"
@@ -168,7 +147,7 @@ WIKI_GITHUB_TOKEN_ARG="${WIKI_GITHUB_TOKEN:-__EMPTY__}"
 OPENAI_API_KEY_ARG="${OPENAI_API_KEY_VALUE:-__EMPTY__}"
 
 
-"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN_ARG" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$WIKI_SYNC_INTERVAL_MINUTES" "$OPENAI_API_KEY_ARG" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN_ARG" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$OPENAI_API_KEY_ARG" <<'REMOTE'
 set -euo pipefail
 REMOTE_DIR="$1"
 REMOTE_PORT="$2"
@@ -180,8 +159,7 @@ WIKI_GITHUB_REPO="${7-}"
 WIKI_GITHUB_BRANCH="${8-}"
 WIKI_GITHUB_TOKEN="${9-}"
 WIKI_GITHUB_PATH_PREFIX="${10-}"
-WIKI_SYNC_INTERVAL_MINUTES="${11-5}"
-OPENAI_API_KEY_VALUE="${12-}"
+OPENAI_API_KEY_VALUE="${11-}"
 if [[ "$WIKI_GITHUB_TOKEN" == "__EMPTY__" ]]; then
   WIKI_GITHUB_TOKEN=""
 fi
@@ -204,6 +182,15 @@ rm -rf "$REMOTE_DIR/cs_flashcards"
 tar -xzf /tmp/cs-flashcards.tar.gz -C "$REMOTE_DIR"
 rm -f /tmp/cs-flashcards.tar.gz
 rm -rf "$REMOTE_DIR/static/generated"
+if [[ -d "$REMOTE_DIR/wiki_book_seed/pages" ]]; then
+  if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then
+    echo "원격 wiki_book 보존: 기존 서버 위키를 그대로 유지합니다."
+  else
+    echo "원격 wiki_book 부트스트랩: 로컬 시드로 초기화합니다."
+    mv "$REMOTE_DIR/wiki_book_seed" "$REMOTE_DIR/wiki_book"
+  fi
+fi
+rm -rf "$REMOTE_DIR/wiki_book_seed"
 cd "$REMOTE_DIR"
 python3 -m venv .venv
 .venv/bin/python -m pip install -q --upgrade pip
@@ -263,114 +250,16 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
-if [[ -n "$WIKI_GITHUB_REPO" ]]; then
-  mkdir -p "$REMOTE_DIR/bin"
-  tee "$REMOTE_DIR/bin/sync_wiki_book.sh" >/dev/null <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:?}"
-WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
-WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-main}"
-WIKI_GITHUB_TOKEN="${CS_FLASHCARDS_WIKI_GITHUB_TOKEN:-}"
-WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
-if [[ -z "$WIKI_GITHUB_REPO" ]]; then
-  echo "wiki sync: repo not configured"
-  exit 0
-fi
-REPO_DIR="$REMOTE_DIR/state/wiki_repo"
-SOURCE_DIR="$REPO_DIR"
-if [[ -n "$WIKI_GITHUB_PATH_PREFIX" ]]; then
-  SOURCE_DIR="$REPO_DIR/$WIKI_GITHUB_PATH_PREFIX"
-fi
-AUTH_URL="https://github.com/${WIKI_GITHUB_REPO}.git"
-if [[ -n "$WIKI_GITHUB_TOKEN" ]]; then
-  AUTH_URL="https://x-access-token:${WIKI_GITHUB_TOKEN}@github.com/${WIKI_GITHUB_REPO}.git"
-fi
-PLAIN_URL="https://github.com/${WIKI_GITHUB_REPO}.git"
-if [[ ! -d "$REPO_DIR/.git" ]]; then
-  rm -rf "$REPO_DIR"
-  git clone --depth 1 --branch "$WIKI_GITHUB_BRANCH" "$AUTH_URL" "$REPO_DIR"
-else
-  git -C "$REPO_DIR" remote set-url origin "$AUTH_URL"
-  git -C "$REPO_DIR" fetch --depth 1 origin "$WIKI_GITHUB_BRANCH"
-  git -C "$REPO_DIR" checkout -B "$WIKI_GITHUB_BRANCH" "origin/$WIKI_GITHUB_BRANCH"
-  git -C "$REPO_DIR" reset --hard "origin/$WIKI_GITHUB_BRANCH"
-fi
-git -C "$REPO_DIR" remote set-url origin "$PLAIN_URL"
-if [[ ! -f "$SOURCE_DIR/README.md" || ! -f "$SOURCE_DIR/TOC.md" || ! -d "$SOURCE_DIR/pages" ]]; then
-  echo "wiki sync: expected README.md, TOC.md, pages/ under $SOURCE_DIR" >&2
-  exit 1
-fi
-STAGE_DIR="$(mktemp -d "$REMOTE_DIR/state/wiki_book.stage.XXXXXX")"
-trap 'rm -rf "$STAGE_DIR"' EXIT
-cp "$SOURCE_DIR/README.md" "$STAGE_DIR/README.md"
-cp "$SOURCE_DIR/TOC.md" "$STAGE_DIR/TOC.md"
-cp -R "$SOURCE_DIR/pages" "$STAGE_DIR/"
-git -C "$REPO_DIR" rev-parse HEAD > "$STAGE_DIR/.source-commit"
-PREV_DIR="$REMOTE_DIR/wiki_book.previous"
-rm -rf "$PREV_DIR"
-if [[ -e "$REMOTE_DIR/wiki_book" ]]; then
-  mv "$REMOTE_DIR/wiki_book" "$PREV_DIR"
-fi
-mv "$STAGE_DIR" "$REMOTE_DIR/wiki_book"
-rm -rf "$PREV_DIR"
-trap - EXIT
-echo "wiki sync: $(cat "$REMOTE_DIR/wiki_book/.source-commit")"
-EOF
-  chmod 700 "$REMOTE_DIR/bin/sync_wiki_book.sh"
-
-  sudo tee /etc/systemd/system/cs-flashcards-wiki-sync.service >/dev/null <<EOF
-[Unit]
-Description=Sync CS Flashcards wiki mirror from GitHub
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=oneshot
-User=ubuntu
-WorkingDirectory=$REMOTE_DIR
-Environment=CS_FLASHCARDS_REMOTE_DIR=$REMOTE_DIR
-Environment=CS_FLASHCARDS_WIKI_GITHUB_REPO=$WIKI_GITHUB_REPO
-Environment=CS_FLASHCARDS_WIKI_GITHUB_BRANCH=$WIKI_GITHUB_BRANCH
-Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=$WIKI_GITHUB_TOKEN
-Environment=CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX=$WIKI_GITHUB_PATH_PREFIX
-ExecStart=/usr/bin/env bash $REMOTE_DIR/bin/sync_wiki_book.sh
-EOF
-
-  sudo tee /etc/systemd/system/cs-flashcards-wiki-sync.timer >/dev/null <<EOF
-[Unit]
-Description=Periodic wiki mirror sync for CS Flashcards
-
-[Timer]
-OnBootSec=2min
-OnUnitActiveSec=${WIKI_SYNC_INTERVAL_MINUTES}min
-RandomizedDelaySec=30s
-Persistent=true
-Unit=cs-flashcards-wiki-sync.service
-
-[Install]
-WantedBy=timers.target
-EOF
-else
-  sudo systemctl disable --now cs-flashcards-wiki-sync.timer >/dev/null 2>&1 || true
-  sudo rm -f /etc/systemd/system/cs-flashcards-wiki-sync.service /etc/systemd/system/cs-flashcards-wiki-sync.timer
-  rm -f "$REMOTE_DIR/bin/sync_wiki_book.sh"
-fi
+sudo systemctl disable --now cs-flashcards-wiki-sync.timer >/dev/null 2>&1 || true
+sudo rm -f /etc/systemd/system/cs-flashcards-wiki-sync.service /etc/systemd/system/cs-flashcards-wiki-sync.timer
+rm -f "$REMOTE_DIR/bin/sync_wiki_book.sh"
+rm -rf "$REMOTE_DIR/state/wiki_repo"
 
 sudo systemctl daemon-reload
 sudo systemctl enable cs-flashcards >/dev/null
 sudo systemctl restart cs-flashcards
 sleep 1
 sudo systemctl --no-pager --full status cs-flashcards | sed -n '1,18p'
-if [[ -n "$WIKI_GITHUB_REPO" ]]; then
-  sudo systemctl enable cs-flashcards-wiki-sync.timer >/dev/null
-  if ! sudo systemctl start cs-flashcards-wiki-sync.service; then
-    echo "경고: 위키 동기화 서비스 시작 실패. 앱 배포는 계속 진행합니다." >&2
-    sudo systemctl --no-pager --full status cs-flashcards-wiki-sync.service | sed -n '1,18p' || true
-  fi
-  sudo systemctl restart cs-flashcards-wiki-sync.timer
-  sudo systemctl --no-pager --full status cs-flashcards-wiki-sync.timer | sed -n '1,12p'
-fi
 
 write_nginx_http() {
   sudo tee /etc/nginx/sites-available/cs-flashcards >/dev/null <<EOF
