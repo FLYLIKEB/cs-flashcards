@@ -6405,6 +6405,67 @@ function renderMarkdownTable(lines) {
   return `<div class="question-md-table-wrap"><table class="question-md-table"><thead><tr>${header.map((cell) => `<th>${cell}</th>`).join('')}</tr></thead><tbody>${body.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
+function questionMarkdownListMatch(line) {
+  const match = String(line || '').match(/^(\s*)([-*]|\d+[.)])\s+(.+)$/);
+  if (!match) return null;
+  return {
+    indent: match[1].replace(/\t/g, '    ').length,
+    ordered: /^\d/.test(match[2]),
+    text: match[3],
+  };
+}
+
+function renderQuestionMarkdownListLevel(lines, startIndex, indent, ordered) {
+  const items = [];
+  let index = startIndex;
+  while (index < lines.length) {
+    const current = questionMarkdownListMatch(lines[index]);
+    if (!current) break;
+    if (current.indent < indent) break;
+    if (current.indent > indent) {
+      if (!items.length) break;
+      const nested = renderQuestionMarkdownListLevel(lines, index, current.indent, current.ordered);
+      if (!nested) break;
+      items[items.length - 1].nested.push(nested.html);
+      index = nested.index;
+      continue;
+    }
+    if (current.ordered !== ordered) break;
+    const item = {parts: [renderMarkdownInline(current.text)], nested: []};
+    index += 1;
+    while (index < lines.length) {
+      const raw = lines[index];
+      const trimmed = raw.trim();
+      if (!trimmed) break;
+      const nextList = questionMarkdownListMatch(raw);
+      if (nextList) {
+        if (nextList.indent > indent) {
+          const nested = renderQuestionMarkdownListLevel(lines, index, nextList.indent, nextList.ordered);
+          if (!nested) break;
+          item.nested.push(nested.html);
+          index = nested.index;
+          continue;
+        }
+        break;
+      }
+      const continuationIndent = raw.match(/^\s*/)[0].replace(/\t/g, '    ').length;
+      if (continuationIndent > indent) {
+        item.parts.push(renderMarkdownInline(trimmed));
+        index += 1;
+        continue;
+      }
+      break;
+    }
+    items.push(item);
+  }
+  if (!items.length) return null;
+  const tag = ordered ? 'ol' : 'ul';
+  return {
+    html: `<${tag} class="question-md-list${ordered ? ' ordered' : ''}">${items.map((item) => `<li>${item.parts.join('<br />')}${item.nested.join('')}</li>`).join('')}</${tag}>`,
+    index,
+  };
+}
+
 function renderQuestionMarkdown(source) {
   const text = String(source || '').replace(/\r\n?/g, '\n');
   if (!text.trim()) return '';
@@ -6456,29 +6517,19 @@ function renderQuestionMarkdown(source) {
       html.push(`<blockquote class="question-md-blockquote">${quote.map((part) => `<p>${renderMarkdownInline(part)}</p>`).join('')}</blockquote>`);
       continue;
     }
-    if (/^[-*]\s+/.test(trimmed)) {
-      const items = [];
-      while (index < lines.length && /^[-*]\s+/.test(lines[index].trim())) {
-        items.push(lines[index].trim().replace(/^[-*]\s+/, ''));
-        index += 1;
-      }
-      html.push(`<ul class="question-md-list">${items.map((item) => `<li>${renderMarkdownInline(item)}</li>`).join('')}</ul>`);
-      continue;
-    }
-    if (/^\d+[.)]\s+/.test(trimmed)) {
-      const items = [];
-      while (index < lines.length && /^\d+[.)]\s+/.test(lines[index].trim())) {
-        items.push(lines[index].trim().replace(/^\d+[.)]\s+/, ''));
-        index += 1;
-      }
-      html.push(`<ol class="question-md-list ordered">${items.map((item) => `<li>${renderMarkdownInline(item)}</li>`).join('')}</ol>`);
+    const listBlock = questionMarkdownListMatch(line)
+      ? renderQuestionMarkdownListLevel(lines, index, questionMarkdownListMatch(line).indent, questionMarkdownListMatch(line).ordered)
+      : null;
+    if (listBlock) {
+      html.push(listBlock.html);
+      index = listBlock.index;
       continue;
     }
     const paragraph = [trimmed];
     index += 1;
     while (index < lines.length) {
       const next = lines[index].trim();
-      if (!next || /^```/.test(next) || /^(#{1,6})\s+/.test(next) || /^>\s?/.test(next) || /^[-*]\s+/.test(next) || /^\d+[.)]\s+/.test(next)) break;
+      if (!next || /^```/.test(next) || /^(#{1,6})\s+/.test(next) || /^>\s?/.test(next) || questionMarkdownListMatch(lines[index])) break;
       if (next.includes('|') && index + 1 < lines.length && /^\s*\|?\s*[:-]-*.*\|/.test(lines[index + 1])) break;
       paragraph.push(next);
       index += 1;

@@ -776,6 +776,9 @@ class StaticFrontendTests(unittest.TestCase):
             'question-session-meta',
             'question-history-session-meta',
         ]:
+            'function questionMarkdownListMatch(line)',
+            'function renderQuestionMarkdownListLevel(lines, startIndex, indent, ordered)',
+
             self.assertIn(snippet, APP_JS)
         self.assertIn('id="questionHistoryDialog"', INDEX_HTML)
         self.assertIn('id="questionHistoryBody"', INDEX_HTML)
@@ -809,6 +812,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-md-image', STYLE_CSS)
         self.assertIn('.question-answer-meta', STYLE_CSS)
         self.assertIn('.question-answer-meta-card-button', STYLE_CSS)
+        self.assertIn('.question-markdown ul ul', STYLE_CSS)
+        self.assertIn('.question-markdown ol ol', STYLE_CSS)
         self.assertIn('question-bank-shell-topbar', QUESTION_BANK_HTML)
         self.assertIn('.question-bank-shell', STYLE_CSS)
         self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
