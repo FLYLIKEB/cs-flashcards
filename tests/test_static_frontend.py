@@ -51,7 +51,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function loadQuestionBankPage()', QUESTION_BANK_JS)
         self.assertIn('function launch(startIndex = 0, {reveal = true} = {})', QUESTION_BANK_JS)
         self.assertIn('window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY', QUESTION_BANK_JS)
-        self.assertIn("question-bank-filters-collapsed", QUESTION_BANK_JS)
+        self.assertIn('question-bank-filters-collapsed', QUESTION_BANK_JS)
 
     def test_calendar_js_smoke_keeps_tab_and_drawer_focus_handlers(self):
         self.assertIn('function setMainTab(tabId)', CALENDAR_JS)
@@ -68,6 +68,18 @@ class StaticFrontendSmokeTests(unittest.TestCase):
     def test_css_smoke_keeps_question_and_table_shell_visibility_rules(self):
         self.assertIn('.question-panel[hidden]', STYLE_CSS)
         self.assertIn('display: none !important', STYLE_CSS)
+        self.assertIn('body.question-bank-embed #questionBankToggleBtn', STYLE_CSS)
+        self.assertIn('body.question-bank-embed #questionBankBrowser', STYLE_CSS)
+        self.assertIn('body.question-bank-embed {', STYLE_CSS)
+        self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-overview-grid', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-selection-summary', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-practice-status', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-header-chip', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-filter-chip', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-header-chip-button', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-table-selection', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-shell-header-chips', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-guide-table', TABLE_SHELL_CSS)
 
