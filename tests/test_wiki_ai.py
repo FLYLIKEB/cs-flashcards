@@ -395,11 +395,22 @@ class WikiAiRewriteTests(unittest.TestCase):
             try:
                 flashcard_app.WIKI_BOOK_DIR = book
                 flashcard_app.OPENAI_API_KEY = 'test-key'
+                frame_payloads = []
+                for color in ('#60a5fa', '#34d399', '#f59e0b'):
+                    buffer = BytesIO()
+                    Image.new('RGBA', (96, 54), color).save(buffer, format='PNG')
+                    frame_payloads.append(FakeUrlopenResponse({
+                        'data': [{'b64_json': base64.b64encode(buffer.getvalue()).decode('ascii')}],
+                    }))
                 with mock.patch.object(
                     flashcard_app,
                     'request_wiki_gif_plan',
                     return_value=sample_gif_plan(),
-                ):
+                ), mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    side_effect=frame_payloads,
+                ) as urlopen_mock:
                     data = flashcard_app.api_wiki_image_regenerate(
                         flashcard_app.WikiImageRegenerateRequest(
                             source_path='pages/intro.md',
@@ -410,8 +421,9 @@ class WikiAiRewriteTests(unittest.TestCase):
                 asset_path = book / data['updated']['asset_relative_path']
                 self.assertEqual(asset_path.read_bytes()[:6], b'GIF89a')
                 self.assertTrue(data['updated']['asset_relative_path'].endswith('.gif'))
+                self.assertEqual(urlopen_mock.call_count, len(sample_gif_plan()['stages']))
                 with Image.open(asset_path) as image:
-                    self.assertGreaterEqual(image.n_frames, 6)
+                    self.assertGreaterEqual(image.n_frames, 3)
             finally:
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
                 flashcard_app.OPENAI_API_KEY = original_key

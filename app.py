@@ -6370,8 +6370,109 @@ def render_wiki_gif_plan(plan: dict[str, Any]) -> bytes:
 
 
 
+def normalize_wiki_gif_frame_image(image_bytes: bytes, size: tuple[int, int] = WIKI_GIF_CANVAS_SIZE) -> Image.Image:
+    resampling = getattr(getattr(Image, "Resampling", Image), "LANCZOS", Image.LANCZOS)
+    with Image.open(io.BytesIO(image_bytes)) as original:
+        base = original.convert("RGBA")
+    canvas = Image.new("RGBA", size, (248, 250, 252, 255))
+    scale = min(size[0] / max(1, base.width), size[1] / max(1, base.height))
+    target = (max(1, int(base.width * scale)), max(1, int(base.height * scale)))
+    resized = base.resize(target, resampling)
+    left = (size[0] - target[0]) // 2
+    top = (size[1] - target[1]) // 2
+    canvas.paste(resized, (left, top), resized)
+    return canvas
+
+
+
+def build_wiki_gif_frame_prompt(
+    page_title: str,
+    image: dict[str, Any],
+    plan: dict[str, Any],
+    stage_index: int,
+    stage: dict[str, Any],
+    *,
+    prompt_override: str = "",
+) -> str:
+    node_lookup = {node["id"]: node for node in plan["nodes"]}
+    edge_lookup = {edge["id"]: edge for edge in plan["edges"]}
+    active_nodes = [node_lookup[node_id]["label"] for node_id in stage.get("active_nodes", []) if node_id in node_lookup]
+    active_edges = []
+    for edge_id in stage.get("active_edges", []):
+        edge = edge_lookup.get(edge_id)
+        if not edge:
+            continue
+        start = node_lookup.get(edge["from"], {}).get("label", edge["from"])
+        end = node_lookup.get(edge["to"], {}).get("label", edge["to"])
+        active_edges.append(f"{start} -> {end}")
+    design_brief = normalized_card_text(prompt_override or wiki_gif_image_prompt(page_title, image), limit=12000)
+    context_excerpt = normalized_card_text(image.get("context_excerpt", ""), limit=1200)
+    section_title = normalized_card_text(image.get("section_title", ""), limit=200) or page_title
+    alt = normalized_card_text(image.get("alt", ""), limit=400) or page_title
+    return (
+        "Create exactly one still frame for a Korean educational animated GIF. "
+        "This frame must look like part of the same GIF sequence as the neighboring frames. "
+        "Keep the same camera, layout, palette, icon style, and object positions across frames. "
+        "No text, no letters, no labels, no watermark, no UI chrome. "
+        "Use clean academic diagram-like visuals with obvious state changes, highlighted active elements, and motion implied by token movement or progression. "
+        "Do not return multiple panels or collage. Return one 16:9 frame only. "
+        f"Page title: {page_title}. "
+        f"Section: {section_title}. "
+        f"Image subject: {alt}. "
+        f"Sequence frame: {stage_index + 1}/{len(plan['stages'])}. "
+        f"Active states in this frame: {', '.join(active_nodes) or 'none'}. "
+        f"Active transitions in this frame: {', '.join(active_edges) or 'none'}. "
+        f"Local content context: {context_excerpt}. "
+        f"Overall design brief: {design_brief}."
+    )
+
+
+
+def build_wiki_gif_playback_indices(stage_count: int) -> list[int]:
+    if stage_count <= 1:
+        return [0, 0, 0]
+    forward = list(range(stage_count))
+    reverse = list(range(stage_count - 2, 0, -1)) if stage_count > 2 else []
+    sequence = forward + reverse
+    playback: list[int] = []
+    for index in sequence:
+        playback.extend([index, index])
+    return playback
+
+
+
+def gif_from_api_frame_bytes(frame_bytes_list: list[bytes], playback_indices: list[int]) -> bytes:
+    normalized_frames = [normalize_wiki_gif_frame_image(frame_bytes) for frame_bytes in frame_bytes_list]
+    rendered_frames = [normalized_frames[index].convert("P", palette=Image.Palette.ADAPTIVE) for index in playback_indices]
+    out = io.BytesIO()
+    rendered_frames[0].save(
+        out,
+        format="GIF",
+        save_all=True,
+        append_images=rendered_frames[1:],
+        duration=140,
+        loop=0,
+        optimize=False,
+        disposal=2,
+    )
+    return out.getvalue()
+
+
+
 def render_wiki_learning_gif(page_title: str, image: dict[str, Any], *, prompt_override: str = "") -> bytes:
-    return render_wiki_gif_plan(request_wiki_gif_plan(page_title, image, prompt_override=prompt_override))
+    plan = request_wiki_gif_plan(page_title, image, prompt_override=prompt_override)
+    frame_bytes_list: list[bytes] = []
+    for stage_index, stage in enumerate(plan["stages"]):
+        frame_prompt = build_wiki_gif_frame_prompt(
+            page_title,
+            image,
+            plan,
+            stage_index,
+            stage,
+            prompt_override=prompt_override,
+        )
+        frame_bytes_list.append(request_openai_generated_image_bytes(frame_prompt))
+    return gif_from_api_frame_bytes(frame_bytes_list, build_wiki_gif_playback_indices(len(frame_bytes_list)))
 
 
 
