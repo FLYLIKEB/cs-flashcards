@@ -764,6 +764,95 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_filter_refresh_keeps_hidden_practice_inert_until_explicit_launch(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                () => {
+                  window.__confirmCalls = [];
+                  window.confirm = (message) => {
+                    window.__confirmCalls.push({message, allow: false});
+                    return false;
+                  };
+                }
+                """
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            case['initial_frame_src'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+
+            embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            case['draft_mode'] = await embed_frame.evaluate(
+                """
+                () => {
+                  const answerInput = document.getElementById('questionAnswerInput');
+                  if (answerInput) {
+                    answerInput.value = 'draft answer';
+                    answerInput.dispatchEvent(new Event('input', {bubbles: true}));
+                    return 'text';
+                  }
+                  const choiceButton = document.querySelector('.question-choice');
+                  if (choiceButton) {
+                    choiceButton.click();
+                    return 'choice';
+                  }
+                  return 'none';
+                }
+                """
+            )
+            self.assertNotEqual(case['draft_mode'], 'none')
+
+            await page.evaluate('document.getElementById("bankPageTogglePracticeBtn").click()')
+            await page.waitForFunction("document.body.classList.contains('question-bank-practice-collapsed')")
+            case['practice_collapsed_after_toggle'] = await page.evaluate("document.body.classList.contains('question-bank-practice-collapsed')")
+            self.assertTrue(case['practice_collapsed_after_toggle'])
+
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await page.type('#bankPageQueryInput', '데이터베이스')
+            await page.waitForFunction("window.location.search.includes('q=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4')")
+            await page.waitForFunction("document.querySelector('#bankPageSummary').textContent.includes('총')")
+            case['confirm_calls_after_filter'] = await page.evaluate('window.__confirmCalls.length')
+            case['frame_src_after_filter'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+            self.assertEqual(case['confirm_calls_after_filter'], 0)
+            self.assertEqual(case['frame_src_after_filter'], case['initial_frame_src'])
+
+            await page.click('#bankPageResetFiltersBtn')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
+            await page.waitForFunction('window.__confirmCalls.length === 1')
+            case['frame_src_after_launch_cancel'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+            self.assertEqual(case['frame_src_after_launch_cancel'], case['initial_frame_src'])
+
+            await page.evaluate(
+                """
+                () => {
+                  window.confirm = (message) => {
+                    window.__confirmCalls.push({message, allow: true});
+                    return true;
+                  };
+                }
+                """
+            )
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
+            await page.waitForFunction('window.__confirmCalls.length === 2')
+            await page.waitForFunction(
+                '(initialSrc) => (document.querySelector("#bankPagePracticeFrame")?.getAttribute("src") || "") !== initialSrc',
+                {},
+                case['initial_frame_src'],
+            )
+            case['frame_src_after_launch_confirm'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+            self.assertNotEqual(case['frame_src_after_launch_confirm'], case['initial_frame_src'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-hidden-practice-refresh', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_row_change_confirms_before_discarding_in_progress_state(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
