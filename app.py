@@ -106,6 +106,8 @@ WIKI_GITHUB_BRANCH = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_BRANCH", "mai
 WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).strip()
 WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX", "")).strip().strip("/")
 WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
+QUESTION_BANK_SYNC_ALLOW_SHRINK = str(os.environ.get("CS_FLASHCARDS_QUESTION_BANK_SYNC_ALLOW_SHRINK", "")).strip().lower() in {"1", "true", "yes", "on"}
+QUESTION_BANK_SYNC_MIN_RETAIN_RATIO = min(1.0, max(0.0, float(os.environ.get("CS_FLASHCARDS_QUESTION_BANK_SYNC_MIN_RETAIN_RATIO", "0.5") or "0.5")))
 CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_alt")
 CONCEPT_MEDIA_TYPES = {"", "image", "gif", "video", "mermaid", "html"}
 
@@ -2616,45 +2618,6 @@ def upsert_question_bank_entries(
     }
 
 
-def seed_demo_question_bank_entries(
-    progress_db_path: Path | None = None,
-) -> None:
-    db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        existing_count = int(conn.execute("SELECT COUNT(*) FROM question_bank").fetchone()[0] or 0)
-    if existing_count:
-        return
-    rows, _ = read_cards(db_path)
-    if not rows:
-        return
-    sample = rows[0]
-    upsert_question_bank_entries(
-        [
-            {
-                "card_id": sample.get("id") or "",
-                "question_type": "subjective",
-                "prompt": "## 더미 문제\n**정규화(Normalization)** 의 목적을 설명하시오.",
-                "body": "다음 요구를 모두 반영해 답하시오.\n\n- 데이터 중복 관점\n- 이상 현상 관점\n- 실무 설계 관점\n\n![예시 이미지](/static/favicon.svg)\n\n> 위 이미지는 마크다운 이미지 렌더링 예시입니다.",
-                "answer": "정규화는 릴레이션을 분해하여 **데이터 중복을 줄이고**, 삽입/삭제/갱신 이상을 방지하며, 스키마를 더 일관되게 유지하기 위한 과정이다.",
-                "explanation": "### 해설\n\n1. **중복 감소**: 같은 사실을 여러 행에 반복 저장하지 않게 한다.\n2. **이상 현상 방지**: 삽입 이상, 삭제 이상, 갱신 이상을 완화한다.\n3. **유지보수성 향상**: 제약조건과 의미가 더 분명해진다.\n\n![해설 이미지](/static/favicon.svg)",
-                "rubric": ["중복 감소", "이상 현상 방지", "유지보수성 향상"],
-                "topic": "데이터베이스",
-                "field_name": "데모",
-                "keywords": ["정규화", "이상 현상", "데이터베이스"],
-                "difficulty": "중",
-                "issuer": "샘플",
-                "source_location": "더미 데이터 1번",
-                "section": "연습문제",
-                "points": 10,
-                "expected_time_seconds": 300,
-                "answer_guide": "정의 → 목적 → 이상 현상 순으로 3~5문장",
-                "session_mode": "practice",
-            }
-        ],
-        db_path,
-    )
-
 
 def read_question_bank_entries(
     progress_db_path: Path | None = None,
@@ -2674,7 +2637,6 @@ def read_question_bank_entries(
 ) -> dict[str, Any]:
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
-    seed_demo_question_bank_entries(db_path)
     safe_limit = max(1, min(int(limit or 200), 500))
     filters = {
         "card_id": normalize_question_bank_text(card_id, limit=255),
@@ -2762,6 +2724,29 @@ def read_question_bank_entries(
         field_name_rows = conn.execute(
             "SELECT DISTINCT field_name FROM question_bank WHERE TRIM(field_name) <> '' ORDER BY field_name COLLATE NOCASE ASC"
         ).fetchall()
+        category_breakdown_rows = conn.execute(
+            f"""
+            SELECT
+                COALESCE(NULLIF(TRIM(question_bank.category), ''), '미분류') AS category,
+                COUNT(*) AS total,
+                SUM(CASE WHEN question_bank.question_type = 'multiple_choice' THEN 1 ELSE 0 END) AS multiple_choice_count,
+                SUM(CASE WHEN question_bank.question_type = 'short' THEN 1 ELSE 0 END) AS short_count,
+                SUM(CASE WHEN question_bank.question_type = 'subjective' THEN 1 ELSE 0 END) AS subjective_count,
+                SUM(CASE WHEN question_bank.question_type = 'essay' THEN 1 ELSE 0 END) AS essay_count,
+                SUM(CASE WHEN question_bank.difficulty = '상' THEN 1 ELSE 0 END) AS high_difficulty_count,
+                SUM(CASE WHEN question_bank.difficulty = '중' THEN 1 ELSE 0 END) AS medium_difficulty_count,
+                SUM(CASE WHEN question_bank.difficulty = '하' THEN 1 ELSE 0 END) AS low_difficulty_count,
+                SUM(CASE WHEN latest_attempt.question_bank_id IS NULL OR latest_attempt.judgment = 'pending' THEN 1 ELSE 0 END) AS unseen_count,
+                SUM(CASE WHEN latest_attempt.judgment = 'correct' THEN 1 ELSE 0 END) AS correct_count,
+                SUM(CASE WHEN latest_attempt.judgment IN ('ambiguous', 'wrong', 'unknown') THEN 1 ELSE 0 END) AS wrong_count
+            FROM question_bank
+            {latest_attempt_join_sql}
+            {where_sql}
+            GROUP BY 1
+            ORDER BY total DESC, category COLLATE NOCASE ASC
+            """,
+            tuple(params),
+        ).fetchall()
         query_rows = conn.execute(
             f"""
             SELECT question_bank.id, question_bank.card_id, question_bank.question_type, question_bank.prompt, question_bank.body,
@@ -2808,6 +2793,23 @@ def read_question_bank_entries(
             "available_categories": [str(row[0] or "").strip() for row in category_rows if str(row[0] or "").strip()],
             "available_topics": [str(row[0] or "").strip() for row in topic_rows if str(row[0] or "").strip()],
             "available_field_names": [str(row[0] or "").strip() for row in field_name_rows if str(row[0] or "").strip()],
+            "category_breakdown": [
+                {
+                    "category": str(row["category"] or "").strip() or "미분류",
+                    "total": int(row["total"] or 0),
+                    "multiple_choice_count": int(row["multiple_choice_count"] or 0),
+                    "short_count": int(row["short_count"] or 0),
+                    "subjective_count": int(row["subjective_count"] or 0),
+                    "essay_count": int(row["essay_count"] or 0),
+                    "high_difficulty_count": int(row["high_difficulty_count"] or 0),
+                    "medium_difficulty_count": int(row["medium_difficulty_count"] or 0),
+                    "low_difficulty_count": int(row["low_difficulty_count"] or 0),
+                    "unseen_count": int(row["unseen_count"] or 0),
+                    "correct_count": int(row["correct_count"] or 0),
+                    "wrong_count": int(row["wrong_count"] or 0),
+                }
+                for row in category_breakdown_rows
+            ],
             **filters,
         },
     }
@@ -4279,34 +4281,72 @@ def parse_fin_corp_question_bank_entries(
 
 
 
-def clear_fin_corp_question_bank_entries(
+def count_fin_corp_question_bank_entries(
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> int:
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
-        count = int(conn.execute(
+        return int(conn.execute(
             "SELECT COUNT(*) FROM question_bank WHERE id LIKE ?",
             ("qb-fin239-%",),
         ).fetchone()[0] or 0)
+
+
+def clear_fin_corp_question_bank_entries(
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> int:
+    db_path = progress_db_for(progress_db_path)
+    existing_count = count_fin_corp_question_bank_entries(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
             "DELETE FROM question_bank WHERE id LIKE ?",
             ("qb-fin239-%",),
         )
         conn.commit()
-    return count
+    return existing_count
 
+
+def assert_safe_question_bank_sync(
+    *,
+    label: str,
+    source_pages: int,
+    parsed_entries: int,
+    existing_entries: int,
+) -> None:
+    if existing_entries <= 0:
+        return
+    if source_pages <= 0:
+        raise RuntimeError(f"{label} 문제은행 동기화를 중단했습니다. 원본 위키 페이지를 찾지 못했습니다.")
+    if parsed_entries <= 0:
+        raise RuntimeError(f"{label} 문제은행 동기화를 중단했습니다. 파싱 결과가 0건이라 기존 DB를 지우면 안 됩니다.")
+    if QUESTION_BANK_SYNC_ALLOW_SHRINK:
+        return
+    minimum_expected = max(1, math.ceil(existing_entries * QUESTION_BANK_SYNC_MIN_RETAIN_RATIO))
+    if parsed_entries < minimum_expected:
+        raise RuntimeError(
+            f"{label} 문제은행 동기화를 중단했습니다. 기존 {existing_entries}건 대비 새 파싱 결과가 {parsed_entries}건으로 너무 적습니다. "
+            f"(기본 최소 비율 {QUESTION_BANK_SYNC_MIN_RETAIN_RATIO:.2f})"
+        )
 
 
 def sync_fin_corp_question_bank_entries(
     repo_dir: Path | None = None,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
+    pages = len(fin_corp_question_bank_source_pages(repo_dir))
     entries = parse_fin_corp_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    existing_count = count_fin_corp_question_bank_entries(progress_db_path)
+    assert_safe_question_bank_sync(
+        label="금융공기업",
+        source_pages=pages,
+        parsed_entries=len(entries),
+        existing_entries=existing_count,
+    )
     cleared = clear_fin_corp_question_bank_entries(progress_db_path)
     saved = upsert_question_bank_entries(entries, progress_db_path)
     return {
-        "pages": len(fin_corp_question_bank_source_pages(repo_dir)),
+        "pages": pages,
         "cleared": cleared,
         "count": saved.get("count", 0),
         "items": saved.get("items", []),
@@ -4759,33 +4799,49 @@ def parse_bok_question_bank_entries(
 
 
 
-def clear_bok_question_bank_entries(
+def count_bok_question_bank_entries(
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> int:
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
-        count = int(conn.execute(
+        return int(conn.execute(
             "SELECT COUNT(*) FROM question_bank WHERE issuer = ? AND session_mode = ?",
             ("한국은행", "bok"),
         ).fetchone()[0] or 0)
+
+
+def clear_bok_question_bank_entries(
+    progress_db_path: Path | None = PROGRESS_DB_PATH,
+) -> int:
+    db_path = progress_db_for(progress_db_path)
+    existing_count = count_bok_question_bank_entries(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
             "DELETE FROM question_bank WHERE issuer = ? AND session_mode = ?",
             ("한국은행", "bok"),
         )
         conn.commit()
-    return count
+    return existing_count
 
 
 def sync_bok_question_bank_entries(
     repo_dir: Path | None = None,
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
+    pages = len(bok_question_bank_source_pages(repo_dir))
     entries = parse_bok_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    existing_count = count_bok_question_bank_entries(progress_db_path)
+    assert_safe_question_bank_sync(
+        label="한국은행",
+        source_pages=pages,
+        parsed_entries=len(entries),
+        existing_entries=existing_count,
+    )
     cleared = clear_bok_question_bank_entries(progress_db_path)
     saved = upsert_question_bank_entries(entries, progress_db_path)
     return {
-        "pages": len(bok_question_bank_source_pages(repo_dir)),
+        "pages": pages,
         "cleared": cleared,
         "count": saved.get("count", 0),
         "items": saved.get("items", []),

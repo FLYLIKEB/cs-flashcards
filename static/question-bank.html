@@ -37,6 +37,7 @@
             <div class="cs-table-toolbar question-bank-primary-actions">
               <button id="bankPageRefreshBtn" class="cs-table-button" type="button">새로고침</button>
               <button id="bankPageLaunchBtn" class="cs-table-button" type="button">첫 문제</button>
+              <button id="bankPageCategoryGuideBtn" class="cs-table-button" type="button">카테고리 풀이 순서</button>
             </div>
           </div>
           <div id="bankPageOverviewCards" class="question-bank-overview-grid" aria-live="polite"></div>
@@ -170,6 +171,19 @@
       </section>
     </div>
   </main>
+  <div id="bankPageCategoryGuideDialog" class="question-bank-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="bankPageCategoryGuideTitle" hidden>
+    <div class="question-bank-dialog-card question-bank-guide-dialog-card">
+      <div class="question-bank-dialog-head">
+        <div>
+          <p class="question-bank-section-kicker">Guide</p>
+          <h2 id="bankPageCategoryGuideTitle" class="cs-table-title">문제은행 카테고리 풀이 순서</h2>
+          <p id="bankPageCategoryGuideSummary" class="cs-table-hint">현재 문제은행을 기준으로 카테고리별 시작 순서를 계산합니다.</p>
+        </div>
+        <button id="bankPageCategoryGuideCloseBtn" class="cs-table-button question-bank-dialog-close" type="button" aria-label="카테고리 풀이 순서 닫기">닫기</button>
+      </div>
+      <div id="bankPageCategoryGuideBody" class="question-bank-guide-dialog-body"></div>
+    </div>
+  </div>
   <script src="/static/table-shell.js"></script>
   <script src="/static/question-bank.js"></script>
 </body>

@@ -1020,6 +1020,13 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed['summary']['total'], 1)
             self.assertIn('한국은행', listed['summary']['available_issuers'])
             self.assertIn('데이터베이스', listed['summary']['available_categories'])
+            breakdown = listed['summary']['category_breakdown']
+            self.assertEqual(len(breakdown), 1)
+            self.assertEqual(breakdown[0]['category'], '데이터베이스')
+            self.assertEqual(breakdown[0]['total'], 1)
+            self.assertEqual(breakdown[0]['subjective_count'], 1)
+            self.assertEqual(breakdown[0]['correct_count'], 1)
+            self.assertEqual(breakdown[0]['unseen_count'], 0)
             self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
 
     def test_question_bank_preserves_markdown_blocks(self):
@@ -1240,6 +1247,50 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertTrue(all(item['difficulty'] in {'상', '중', '하'} for item in listed['items']))
             self.assertTrue(all(item['source_location'] for item in listed['items']))
             self.assertTrue(all(item['answer_guide'] for item in listed['items']))
+
+    def test_sync_fin_corp_question_bank_entries_refuses_dangerous_shrink(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+
+            with csv_path.open('w', encoding='utf-8-sig', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=BASE_FIELDS)
+                writer.writeheader()
+                writer.writerow({
+                    'id': 'CS-002',
+                    'term': '프라이빗 블록체인',
+                    'english': 'Private Blockchain',
+                    'category': '금융IT·신기술',
+                    'definition': '허가형 참여자로 제한하는 블록체인이다.',
+                    'detailed_explanation': '운영 주체가 명확하고 접근 권한을 통제한다.',
+                    'related_concepts': '[[블록체인]]',
+                    'source_files': 'pages/05-01-우리은행-기출.md',
+                    'exam_note': '퍼블릭과 비교',
+                    'bok_appeared': '',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+            seed_runtime_db(csv_path, db_path)
+
+            (pages / '05-01-우리은행-기출.md').write_text(
+                '# 05-01. 우리은행 기출\n\n'
+                '### 1. 프라이빗 블록체인의 특징으로 옳지 않은 것은?\n'
+                '1. 분산형으로 네트워크 운영과 관리가 각각 이루어진다.\n'
+                '2. 퍼블릭보다 합의 알고리즘이 경량화될 수 있다.\n\n'
+                '  **답:** 1번\n'
+                '- 프라이빗 블록체인은 운영 주체가 명확하고 접근을 통제한다.\n',
+                encoding='utf-8',
+            )
+            flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, db_path)
+            before_count = flashcard_app.count_fin_corp_question_bank_entries(db_path)
+            with mock.patch.object(flashcard_app, 'parse_fin_corp_question_bank_entries', return_value=[]):
+                with self.assertRaisesRegex(RuntimeError, '금융공기업 문제은행 동기화를 중단했습니다'):
+                    flashcard_app.sync_fin_corp_question_bank_entries(wiki_root, db_path)
+            self.assertEqual(flashcard_app.count_fin_corp_question_bank_entries(db_path), before_count)
 
     def test_parse_fin_corp_question_bank_entries_fixes_wrapped_titles_inline_choices_and_ai_misanswers(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1762,6 +1813,31 @@ class FlashcardProgressTests(unittest.TestCase):
                 '한국은행 2021 컴퓨터공학 학술 파트 II · 1. 원격근무(VDI) 환경 참고 그림',
             })
 
+    def test_sync_bok_question_bank_entries_refuses_dangerous_shrink(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+            (pages / '05-14-01-한국은행-2021-컴퓨터공학-학술-파트-I.md').write_text(
+                '# 05-14-01. 한국은행 2021 컴퓨터공학 학술 파트 I\n\n'
+                '## 2021 파트 I\n\n'
+                '### 1. 데이터베이스\n\n'
+                '정규화의 장단점을 설명하시오.\n',
+                encoding='utf-8',
+            )
+            flashcard_app.sync_bok_question_bank_entries(wiki_root, db_path)
+            before_count = flashcard_app.count_bok_question_bank_entries(db_path)
+            with mock.patch.object(flashcard_app, 'parse_bok_question_bank_entries', return_value=[]):
+                with self.assertRaisesRegex(RuntimeError, '한국은행 문제은행 동기화를 중단했습니다'):
+                    flashcard_app.sync_bok_question_bank_entries(wiki_root, db_path)
+            self.assertEqual(flashcard_app.count_bok_question_bank_entries(db_path), before_count)
+
     def test_api_generate_questions_persists_question_bank_rows(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -1789,7 +1865,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed['summary']['total'], 1)
             self.assertEqual(listed['items'][0]['question_bank_id'], question['question_bank_id'])
 
-    def test_read_question_bank_entries_seeds_demo_and_filters(self):
+    def test_read_question_bank_entries_returns_empty_when_no_rows_exist(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
@@ -1797,24 +1873,43 @@ class FlashcardProgressTests(unittest.TestCase):
             write_sample(csv_path)
             seed_runtime_db(csv_path, db_path)
 
+            listed = flashcard_app.read_question_bank_entries(db_path, limit=10)
+            self.assertEqual(listed['summary']['total'], 0)
+            self.assertEqual(listed['summary']['returned'], 0)
+            self.assertEqual(listed['items'], [])
 
-            seeded = flashcard_app.read_question_bank_entries(db_path, limit=10)
-            self.assertEqual(seeded['summary']['total'], 1)
-            seeded_item = seeded['items'][0]
-            self.assertEqual(seeded_item['issuer'], '샘플')
-            self.assertEqual(seeded_item['topic'], '데이터베이스')
-            self.assertIn('/static/favicon.svg', seeded_item['body'])
+    def test_read_question_bank_entries_filters_attempt_status_on_real_rows(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
 
-            filtered = flashcard_app.read_question_bank_entries(
+            saved = flashcard_app.upsert_question_bank_entries(
+                [{
+                    'card_id': 'CS-001',
+                    'question_type': 'subjective',
+                    'prompt': '정규화의 목적은?',
+                    'body': '중복과 이상 현상 관점에서 설명하시오.',
+                    'answer': '데이터 중복을 줄이고 이상 현상을 방지한다.',
+                    'explanation': '정규화는 스키마 일관성을 높인다.',
+                    'rubric': ['중복 감소', '이상 현상 방지'],
+                    'topic': '데이터베이스',
+                    'field_name': '테스트',
+                    'keywords': ['정규화'],
+                    'difficulty': '중',
+                    'issuer': '테스트',
+                    'source_location': '테스트 문제 1',
+                    'section': '연습문제',
+                    'points': 10,
+                    'expected_time_seconds': 300,
+                    'answer_guide': '정의 → 목적',
+                    'session_mode': 'practice',
+                }],
                 db_path,
-                issuer='샘플',
-                difficulty='중',
-                topic='데이터',
-                query='정규화',
-                limit=10,
             )
-            self.assertEqual(filtered['summary']['total'], 1)
-            self.assertEqual(filtered['items'][0]['field_name'], '데모')
+            seeded_item = saved['items'][0]
 
             unseen = flashcard_app.read_question_bank_entries(db_path, attempt_status='unseen', limit=10)
             self.assertEqual(unseen['summary']['total'], 1)
@@ -1822,14 +1917,14 @@ class FlashcardProgressTests(unittest.TestCase):
 
             save_question_attempt(
                 flashcard_app.QuestionAttemptRequest(
-                    question_id='bank-demo-1',
+                    question_id='bank-test-1',
                     question_bank_id=seeded_item['question_bank_id'],
-                    card_id=seeded_item['card_id'],
+                    card_id='CS-001',
                     question_type=seeded_item['question_type'],
                     prompt=seeded_item['prompt'],
                     body=seeded_item['body'],
                     judgment='correct',
-                    user_answer='정규화를 통해 중복을 줄인다.',
+                    user_answer='중복을 줄인다.',
                 ),
                 db_path,
             )
@@ -1840,9 +1935,9 @@ class FlashcardProgressTests(unittest.TestCase):
 
             save_question_attempt(
                 flashcard_app.QuestionAttemptRequest(
-                    question_id='bank-demo-1',
+                    question_id='bank-test-1',
                     question_bank_id=seeded_item['question_bank_id'],
-                    card_id=seeded_item['card_id'],
+                    card_id='CS-001',
                     question_type=seeded_item['question_type'],
                     prompt=seeded_item['prompt'],
                     body=seeded_item['body'],
@@ -1863,8 +1958,29 @@ class FlashcardProgressTests(unittest.TestCase):
             db_path = root / 'progress.sqlite'
             write_sample(csv_path)
             seed_runtime_db(csv_path, db_path)
-            seeded = flashcard_app.read_question_bank_entries(db_path, limit=10)
-            seeded_item = seeded['items'][0]
+            saved = flashcard_app.upsert_question_bank_entries([
+                {
+                    'card_id': 'CS-001',
+                    'question_type': 'subjective',
+                    'prompt': '정규화의 목적은?',
+                    'body': '중복과 이상 현상 관점에서 설명하시오.',
+                    'answer': '데이터 중복을 줄이고 이상 현상을 방지한다.',
+                    'explanation': '정규화는 스키마 일관성을 높인다.',
+                    'rubric': ['중복 감소', '이상 현상 방지'],
+                    'topic': '데이터베이스',
+                    'field_name': '테스트',
+                    'keywords': ['정규화'],
+                    'difficulty': '중',
+                    'issuer': '테스트',
+                    'source_location': '테스트 문제 1',
+                    'section': '연습문제',
+                    'points': 10,
+                    'expected_time_seconds': 300,
+                    'answer_guide': '정의 → 목적',
+                    'session_mode': 'practice',
+                }
+            ], db_path)
+            seeded_item = saved['items'][0]
             original_db = flashcard_app.PROGRESS_DB_PATH
             original_key = flashcard_app.OPENAI_API_KEY
             try:

@@ -19,6 +19,7 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
         self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('question-bank-shell-grid', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageCategoryGuideDialog"', QUESTION_BANK_HTML)
 
     def test_question_bank_page_uses_shared_renderer(self):
         self.assertIn('QUESTION_BANK_COLUMN_ORDER_KEY', QUESTION_BANK_JS)
@@ -29,6 +30,7 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('function practiceFrameUrl()', QUESTION_BANK_JS)
         self.assertIn('function setPracticeCollapsed(', QUESTION_BANK_JS)
         self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
+        self.assertIn('function renderCategoryGuideDialog()', QUESTION_BANK_JS)
 
     def test_question_bank_layout_prioritizes_full_table_width(self):
         self.assertIn("width: min(1440px, calc(100% - 32px));", TABLE_SHELL_CSS)
@@ -57,6 +59,8 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('.question-bank-shell-table-pane .cs-table th', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-dialog-backdrop', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-guide-table', TABLE_SHELL_CSS)
 
 
 if __name__ == '__main__':
