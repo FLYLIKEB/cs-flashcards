@@ -54,6 +54,32 @@ extract_github_repo() {
   esac
 }
 
+verify_sqlite_has_cards() {
+  local db_path="$1"
+  local label="$2"
+  python3 - <<'PY' "$db_path" "$label"
+import importlib
+import sys
+from pathlib import Path
+
+sqlite = importlib.import_module("sqlite3")
+path = Path(sys.argv[1])
+label = sys.argv[2]
+if not path.exists():
+    raise SystemExit(f"{label} progress.sqlite 파일이 없습니다: {path}")
+with sqlite.connect(path) as conn:
+    table = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='cards'"
+    ).fetchone()
+    if table is None:
+        raise SystemExit(f"{label} progress.sqlite 에 cards 테이블이 없습니다: {path}")
+    count = int(conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0] or 0)
+    if count <= 0:
+        raise SystemExit(f"{label} progress.sqlite 에 카드가 없습니다: {path}")
+print(f"{label} progress.sqlite 카드 수: {count}")
+PY
+}
+
 append_env_line() {
   local key="$1"
   local value="$2"
@@ -167,6 +193,7 @@ append_env_line "CS_FLASHCARDS_WIKI_GITHUB_TOKEN" "$WIKI_GITHUB_TOKEN"
 append_env_line "CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX" "$WIKI_GITHUB_PATH_PREFIX"
 append_env_line "OPENAI_API_KEY" "$OPENAI_API_KEY_VALUE"
 
+verify_sqlite_has_cards "$ROOT_DIR/state/progress.sqlite" "로컬"
 mkdir -p "$TMP_STAGE/data"
 cp app.py flashcards_backend.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
