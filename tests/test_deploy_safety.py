@@ -70,6 +70,20 @@ def write_full_app_schema_sqlite(path: Path, *, cards_count: int) -> None:
     flashcard_app.ensure_progress_db(path, seed_rows=seed_rows)
 
 
+def write_incomplete_app_schema_sqlite(path: Path, *, cards_count: int) -> None:
+    with sqlite3.connect(path) as conn:
+        conn.execute("CREATE TABLE cards (card_id TEXT PRIMARY KEY, term TEXT NOT NULL DEFAULT '')")
+        conn.executemany(
+            'INSERT INTO cards (card_id, term) VALUES (?, ?)',
+            [(f'card-{index}', f'용어 {index}') for index in range(cards_count)],
+        )
+        conn.execute("CREATE TABLE card_progress (card_id TEXT PRIMARY KEY, known_status TEXT NOT NULL DEFAULT '')")
+        conn.execute("CREATE TABLE question_bank (id TEXT PRIMARY KEY, card_id TEXT, question_type TEXT NOT NULL DEFAULT '')")
+        conn.execute("CREATE TABLE question_attempts (question_id TEXT PRIMARY KEY, card_id TEXT NOT NULL, question_type TEXT NOT NULL DEFAULT '')")
+        conn.execute("CREATE TABLE wiki_ai_jobs (job_id TEXT PRIMARY KEY, status TEXT NOT NULL DEFAULT 'queued')")
+        conn.commit()
+
+
 def run_pull_remote_sqlite(output_path: Path, downloaded_db: Path, temp_root: Path) -> subprocess.CompletedProcess[str]:
     fake_key = temp_root / 'fake-key.pem'
     fake_key.write_text('fake-key\n', encoding='utf-8')
@@ -239,6 +253,7 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertIn("'question_bank'", PULL_SCRIPT)
         self.assertIn("'question_attempts'", PULL_SCRIPT)
         self.assertIn("'wiki_ai_jobs'", PULL_SCRIPT)
+        self.assertIn('앱 스키마 컬럼이 누락되었습니다', PULL_SCRIPT)
         self.assertIn("SELECT COUNT(*) FROM cards", PULL_SCRIPT)
         self.assertLess(PULL_SCRIPT.index('validate_downloaded_sqlite "$TMP_FILE"'), PULL_SCRIPT.index('mv "$TMP_FILE" "$OUTPUT_PATH"'))
 
@@ -257,6 +272,26 @@ class DeploySafetyTests(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('다운로드한 SQLite 검증에 실패했습니다: 앱 스키마 테이블이 누락되었습니다: card_progress, question_attempts, question_bank, wiki_ai_jobs', result.stderr)
+            self.assertIn(f'기존 로컬 SQLite는 유지됩니다: {output_path}', result.stderr)
+            self.assertEqual(output_path.read_bytes(), baseline_bytes)
+
+    def test_pull_script_keeps_existing_output_when_downloaded_db_is_missing_required_columns(self):
+        with tempfile.TemporaryDirectory() as td:
+            temp_root = Path(td)
+            output_path = temp_root / 'state' / 'progress.sqlite'
+            output_path.parent.mkdir(parents=True)
+            write_full_app_schema_sqlite(output_path, cards_count=2)
+            baseline_bytes = output_path.read_bytes()
+
+            downloaded_db = temp_root / 'downloaded.sqlite'
+            write_incomplete_app_schema_sqlite(downloaded_db, cards_count=2)
+
+            result = run_pull_remote_sqlite(output_path, downloaded_db, temp_root)
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('다운로드한 SQLite 검증에 실패했습니다: 앱 스키마 컬럼이 누락되었습니다:', result.stderr)
+            self.assertIn('cards.alphabet_index', result.stderr)
+            self.assertIn('question_bank.answer', result.stderr)
             self.assertIn(f'기존 로컬 SQLite는 유지됩니다: {output_path}', result.stderr)
             self.assertEqual(output_path.read_bytes(), baseline_bytes)
 
