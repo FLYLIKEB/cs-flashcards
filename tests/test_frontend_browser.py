@@ -341,6 +341,53 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             }
         )
 
+    async def test_flashcard_dialog_focus_trap_and_question_panel_restore_opener(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#menuBtn')
+            await page.focus('#menuBtn')
+            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            case['question_panel_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_panel_focus_on_open'], 'closeQuestionModeBtn')
+
+            await page.click('#openQuestionImportBtn')
+            await page.waitForFunction("document.querySelector('#questionImportDialog').hidden === false")
+            case['question_import_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_import_focus_on_open'], 'questionImportInput')
+
+            await page.focus('#questionImportApplyBtn')
+            await page.keyboard.press('Tab')
+            case['question_import_focus_after_wrap'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_import_focus_after_wrap'], 'questionImportCloseBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#questionImportDialog').hidden === true")
+            case['question_import_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_import_focus_after_close'], 'openQuestionImportBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === true")
+            case['question_panel_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_panel_focus_after_close'], 'menuBtn')
+
+            await page.click('#menuBtn')
+            await page.click('#memoListBtn')
+            await page.waitForFunction("document.querySelector('#memoListDialog').hidden === false")
+            case['memo_dialog_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['memo_dialog_focus_on_open'], 'memoListCloseBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#memoListDialog').hidden === true")
+            case['memo_dialog_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['memo_dialog_focus_after_close'], 'menuBtn')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='modal-focus-restore', status=status, observations=case)
+            await page.close()
     async def test_question_bank_page_loads_filters_and_launches_embedded_practice(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
