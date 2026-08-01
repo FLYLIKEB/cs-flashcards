@@ -1205,6 +1205,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['active_row_before_reload'] = await page.evaluate(
                 "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
             )
+            embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            case['practice_prompt_before_reload'] = await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
             case['stored_open_state'] = await page.evaluate(
                 """
                 (filterKey, practiceKey) => ({
@@ -1235,11 +1237,14 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['active_row_after_reload'] = await page.evaluate(
                 "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
             )
+            reloaded_embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            case['practice_prompt_after_reload'] = await reloaded_embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
             self.assertFalse(case['open_state_after_reload']['filtersCollapsed'])
             self.assertFalse(case['open_state_after_reload']['practiceCollapsed'])
             self.assertFalse(case['open_state_after_reload']['practiceFrameHidden'])
             self.assertIn('현재 2 /', case['practice_status_after_reload'])
             self.assertEqual(case['active_row_after_reload'], case['active_row_before_reload'])
+            self.assertEqual(case['practice_prompt_after_reload'], case['practice_prompt_before_reload'])
             await page.click('#bankPagePracticeExitBtn')
             await page.waitForFunction("document.body.classList.contains('question-bank-practice-collapsed')")
             await page.click('#bankPageToggleFiltersBtn')
