@@ -85,6 +85,8 @@ const state = {
   questionBankSummary: null,
   questionBankError: '',
   questionBankSelectedId: '',
+  questionAnswerRefineLoading: false,
+
 
 };
 
@@ -4692,6 +4694,28 @@ function currentQuestionCard() {
     || state.filtered.find((item) => item.id === question.card_id)
     || null;
 }
+
+function syncUpdatedQuestionBankItem(item) {
+  const questionBankId = String(item?.question_bank_id || '').trim();
+  if (!questionBankId) return;
+  const bankIndex = state.questionBankItems.findIndex((entry) => String(entry?.question_bank_id || '') === questionBankId);
+  if (bankIndex >= 0) state.questionBankItems[bankIndex] = {...state.questionBankItems[bankIndex], ...item};
+  state.questions.forEach((question) => {
+    const current = hydrateQuestionState(question);
+    if (!current || current.questionBankId !== questionBankId) return;
+    current.answer = String(item.answer || '');
+    current.explanation = String(item.explanation || '');
+    current.rubric = Array.isArray(item.rubric) ? item.rubric : [];
+    current.answerGuide = String(item.answer_guide || '');
+  });
+  if (state.questionBankOpen) renderQuestionBankBrowser();
+}
+
+function notifyQuestionBankParentUpdate(item) {
+  if (!questionBankEmbedMode() || window.parent === window || !item?.question_bank_id) return;
+  window.parent.postMessage({type: 'cs-flashcards-question-bank-updated', item}, '*');
+}
+
 function resolveImportedCard(rawQuestion, index) {
   const explicitId = String(rawQuestion.card_id ?? rawQuestion.cardId ?? rawQuestion.id ?? '').trim();
   if (explicitId) {
@@ -5139,8 +5163,10 @@ function hydrateQuestionState(question) {
   if (typeof question.issuer !== 'string') question.issuer = '';
   if (typeof question.sourceLocation !== 'string') question.sourceLocation = String(question.source_location || '');
   if (!Number.isFinite(question.questionActiveSinceMs)) question.questionActiveSinceMs = 0;
+  if (typeof question.answerRefineInstruction !== 'string') question.answerRefineInstruction = '';
   return question;
 }
+
 
 function questionTypeBadge(question) {
   if (!question) return '';
@@ -5363,6 +5389,32 @@ function syncUpdatedCard(card) {
   if (state.renderedCardId === card.id) renderCard();
 }
 
+async function refineCurrentQuestionAnswer() {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question || !question.questionBankId || state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading) return;
+  state.questionAnswerRefineLoading = true;
+  renderQuestionPanel();
+  try {
+    const res = await fetch(`/api/question-bank/${encodeURIComponent(question.questionBankId)}/ai-refine-answer`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({instruction: question.answerRefineInstruction || ''}),
+    });
+    if (!res.ok) throw new Error(await responseErrorText(res));
+    const data = await res.json();
+    syncUpdatedQuestionBankItem(data.item || null);
+    question.answerRefineInstruction = '';
+    notifyQuestionBankParentUpdate(data.item || null);
+    setMessage('AI가 문제은행 답안과 해설을 구체화했습니다.');
+  } catch (error) {
+    setMessage(`AI 답안 구체화 실패: ${error.message || error}`, true);
+  } finally {
+    state.questionAnswerRefineLoading = false;
+    renderQuestionPanel();
+  }
+}
+
+
 function questionAttemptPayload(question) {
   const current = hydrateQuestionState(question);
   if (!current) return null;
@@ -5564,7 +5616,8 @@ function renderQuestionPanel() {
     return;
   }
 
-  setQuestionControlsDisabled(state.questionLoading || state.questionSaving || state.markSaving);
+  setQuestionControlsDisabled(state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading);
+
   const total = state.questions.length;
   const question = hydrateQuestionState(currentQuestion());
   const reviewCard = currentQuestionCard();
@@ -5591,7 +5644,7 @@ function renderQuestionPanel() {
   }
 
   const revealLocked = questionRevealLocked(question);
-  const reviewDisabled = state.questionLoading || state.questionSaving || state.markSaving || !reviewCard;
+  const reviewDisabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !reviewCard;
   const reviewStatus = reviewCard?.known_status || '';
   const reviewStatusText = reviewCard
     ? `카드 상태 ${statusLabel(reviewStatus)}`
@@ -5615,7 +5668,7 @@ function renderQuestionPanel() {
         ${choices.map((choice, index) => {
           const isAnswer = question.answerRevealed && index === question.answer_index;
           const isSelected = index === question.selectedChoiceIndex;
-          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${renderMarkdownInline(choice)}</button></li>`;
+          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>${renderMarkdownInline(choice)}</button></li>`;
         }).join('')}
       </ol>
     </div>` : '';
@@ -5628,7 +5681,7 @@ function renderQuestionPanel() {
   const draftHtml = questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft question-surface">
       <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
-      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
+      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
       ${answerGuideHtml}
     </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
@@ -5648,16 +5701,25 @@ function renderQuestionPanel() {
           ['ambiguous', '애매함'],
           ['wrong', '틀림'],
           ['unknown', '모름'],
-        ].map(([key, label]) => `<button class="question-grade-button ${key}${question.judgment === key ? ' active' : ''}" type="button" data-question-judgment="${key}" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${label} 저장</button>`).join('')}
+        ].map(([key, label]) => `<button class="question-grade-button ${key}${question.judgment === key ? ' active' : ''}" type="button" data-question-judgment="${key}" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>${label} 저장</button>`).join('')}
       </div>
       ${resultHtml}
     </div>` : resultHtml;
   const wrongNoteHtml = question.answerRevealed && ['ambiguous', 'wrong', 'unknown'].includes(question.judgment) ? `
     <div class="question-wrong-note-box">
       <label class="question-answer-label" for="questionWrongNoteInput">오답노트</label>
-      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 애매했는지, 왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${state.questionSaving || state.markSaving ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
+      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 애매했는지, 왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
       <div class="question-wrong-note-actions">
-        <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${state.questionSaving || state.markSaving ? 'disabled' : ''}>오답노트 저장</button>
+        <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>오답노트 저장</button>
+      </div>
+    </div>` : '';
+  const answerRefineHtml = question.answerRevealed && question.questionBankId ? `
+    <div class="question-answer-refine-box">
+      <label class="question-answer-label" for="questionAnswerRefineInstruction">답안 구체화 요청</label>
+      <textarea id="questionAnswerRefineInstruction" class="question-answer-refine-instruction" rows="2" placeholder="선택: 더 보강하고 싶은 요구사항을 적으세요. 비워두면 답안과 해설을 자동으로 구체화합니다." ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>${escapeHtml(question.answerRefineInstruction || '')}</textarea>
+      <div class="question-answer-refine-actions">
+        <button class="question-toolbar-button is-primary question-answer-refine-button" type="button" data-question-answer-refine="1" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>${state.questionAnswerRefineLoading ? '구체화 중…' : '답안 구체화'}</button>
+        <p class="question-answer-refine-help">버튼만 눌러도 수정됩니다. 추가 요청을 쓰면 함께 반영합니다.</p>
       </div>
     </div>` : '';
   const answer = question.answerRevealed ? `
@@ -5665,10 +5727,12 @@ function renderQuestionPanel() {
       <strong>정답/모범답안</strong>
       <div class="question-answer-markdown">${renderQuestionMarkdown(question.answer || '')}</div>
       ${question.explanation ? `<div class="question-explanation-markdown">${renderQuestionMarkdown(question.explanation)}</div>` : ''}
+      ${answerRefineHtml}
       ${rubric}
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+
   const sessionMode = question.sessionMode || state.questionSessionMode;
   const sessionModeLabelText = questionSessionModeLabel(sessionMode);
   const lockNoticeHtml = revealLocked ? `
@@ -5735,16 +5799,17 @@ function renderQuestionPanel() {
       </div>
     </div>
   `;
-  $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex <= 0;
-  $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionIndex >= total - 1;
-  $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !question || revealLocked;
+  $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex <= 0;
+  $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex >= total - 1;
+  $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !question || revealLocked;
   if ($('revealAnswerBtn')) {
     $('revealAnswerBtn').textContent = revealLocked ? '정답 잠금' : '정답';
     $('revealAnswerBtn').title = revealLocked ? '한은 모드는 세트 종료 전 정답이 공개되지 않습니다.' : '정답/해설 보기';
   }
-  $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !reviewCard;
+  $('openQuestionCardBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !reviewCard;
+
   if ($('finishQuestionSessionBtn')) {
-    $('finishQuestionSessionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || !total;
+    $('finishQuestionSessionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !total;
     $('finishQuestionSessionBtn').textContent = questionSessionIsBok(question.sessionMode || state.questionSessionMode) && !state.questionSessionFinishedAt ? '제출' : '종료';
   }
 }
@@ -6514,6 +6579,10 @@ $('questionCard')?.addEventListener('click', (event) => {
     setQuestionJudgment(judgmentButton.dataset.questionJudgment || 'pending');
     return;
   }
+  if (event.target.closest('[data-question-answer-refine="1"]')) {
+    refineCurrentQuestionAnswer();
+    return;
+  }
   if (event.target.closest('[data-question-wrong-note-save="1"]')) {
     saveCurrentWrongNote();
   }
@@ -6526,6 +6595,10 @@ $('questionCard')?.addEventListener('input', (event) => {
   if (!question) return;
   if (event.target.matches('.question-answer-input')) {
     question.userAnswer = event.target.value || '';
+    return;
+  }
+  if (event.target.matches('.question-answer-refine-instruction')) {
+    question.answerRefineInstruction = event.target.value || '';
     return;
   }
   if (event.target.matches('.question-wrong-note')) {

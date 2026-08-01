@@ -837,6 +837,10 @@ class CardAiApplyRequest(BaseModel):
     concept_image_alt: str | None = Field(default=None, max_length=4000)
 
 
+class QuestionBankAiRefineRequest(BaseModel):
+    instruction: str = Field(default="", max_length=4000)
+
+
 class CardAiImageApplyRequest(BaseModel):
     preview_name: str = Field(min_length=5, max_length=255)
 
@@ -1724,6 +1728,73 @@ def rewrite_card_with_codex(card: dict[str, str], instruction: str = "") -> dict
     return rewritten
 
 
+def rewrite_question_bank_answer_with_codex(
+    entry: dict[str, Any],
+    card: dict[str, Any] | None = None,
+    instruction: str = "",
+) -> dict[str, Any]:
+    linked_card = card or {}
+    parsed = request_codex_json_object(
+        (
+            "You refine Korean CS question-bank answer content. Return only one JSON object with the keys "
+            "answer, explanation, rubric, answer_guide. Keep facts grounded in the provided question, existing "
+            "answer, and linked flashcard context. Do not invent citations, URLs, or nonexistent standards. For "
+            "multiple_choice questions, keep answer as the final correct choice only or an equivalently short final "
+            "answer, and put the detail in explanation. For short, subjective, and essay questions, make the answer "
+            "more concrete, study-friendly, and usable as a model answer in Korean. explanation should clarify the "
+            "reasoning, likely pitfalls, and what should be mentioned for scoring. rubric should be a concise Korean "
+            "list of scoring points. answer_guide should be a short Korean writing guide."
+        ),
+        {
+            "instruction": str(instruction or "").strip() or "현재 문항의 모범답안과 해설을 더 구체적이고 학습 친화적으로 보강해 주세요.",
+            "question": {
+                "question_bank_id": entry.get("question_bank_id", ""),
+                "card_id": entry.get("card_id", ""),
+                "question_type": entry.get("question_type", ""),
+                "prompt": entry.get("prompt", ""),
+                "body": entry.get("body", ""),
+                "answer": entry.get("answer", ""),
+                "explanation": entry.get("explanation", ""),
+                "rubric": entry.get("rubric", []),
+                "choices": entry.get("choices", []),
+                "answer_index": entry.get("answer_index"),
+                "topic": entry.get("topic", ""),
+                "field_name": entry.get("field_name", ""),
+                "category": entry.get("category", ""),
+                "keywords": entry.get("keywords", []),
+                "difficulty": entry.get("difficulty", ""),
+                "issuer": entry.get("issuer", ""),
+                "source_location": entry.get("source_location", ""),
+                "section": entry.get("section", ""),
+                "points": entry.get("points"),
+                "expected_time_seconds": entry.get("expected_time_seconds"),
+                "answer_guide": entry.get("answer_guide", ""),
+                "session_mode": entry.get("session_mode", "practice"),
+            },
+            "linked_card": {
+                "id": linked_card.get("id", ""),
+                "term": linked_card.get("term", ""),
+                "english": linked_card.get("english", ""),
+                "category": linked_card.get("category", ""),
+                "definition": linked_card.get("definition", ""),
+                "detailed_explanation": linked_card.get("detailed_explanation", ""),
+                "exam_note": linked_card.get("exam_note", ""),
+                "related_concepts": linked_card.get("related_concepts", ""),
+                "difficulty": linked_card.get("difficulty", ""),
+                "importance": linked_card.get("importance", ""),
+            },
+        },
+        parse_error_message="Codex 응답을 문제은행 답안 보강 JSON으로 해석하지 못했습니다.",
+    )
+    return {
+        "answer": normalize_question_bank_markdown(parsed.get("answer", entry.get("answer", "")), limit=20000),
+        "explanation": normalize_question_bank_markdown(parsed.get("explanation", entry.get("explanation", "")), limit=50000),
+        "rubric": normalize_question_bank_list(parsed.get("rubric", entry.get("rubric", [])), item_limit=2000),
+        "answer_guide": normalize_question_bank_markdown(parsed.get("answer_guide", entry.get("answer_guide", "")), limit=255),
+    }
+
+
+
 def rewrite_wiki_markdown_with_codex(source_path: str, content: str, instruction: str = "") -> str:
     title = extract_markdown_title(content, PurePosixPath(str(source_path or "wiki.md")).stem or "문서")
     parsed = request_codex_json_object(
@@ -2362,6 +2433,82 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
         "created_at": row["created_at"] if "created_at" in row.keys() else "",
         "updated_at": row["updated_at"] if "updated_at" in row.keys() else "",
     }
+
+
+def update_question_bank_ai_content(
+    question_bank_id: str,
+    payload: QuestionBankAiRefineRequest,
+    progress_db_path: Path | None = None,
+) -> dict[str, Any]:
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        row = conn.execute(
+            """
+            SELECT id, card_id, question_type, prompt, body, answer, explanation,
+                   rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
+                   difficulty, issuer, source_location, section, points, expected_time_seconds,
+                   answer_guide, session_mode, created_at, updated_at
+            FROM question_bank
+            WHERE id = ?
+            """,
+            (question_bank_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(question_bank_id)
+        current = question_bank_row_to_dict(row) or {}
+        linked_card: dict[str, Any] = {}
+        if current.get("card_id"):
+            rows, _ = read_cards(db_path)
+            linked_card = next((item for item in rows if str(item.get("id") or "").strip() == current.get("card_id")), {})
+        proposal = rewrite_question_bank_answer_with_codex(current, linked_card, payload.instruction)
+        next_entry = {**current, **proposal}
+        changed = any(next_entry.get(field) != current.get(field) for field in ("answer", "explanation", "rubric", "answer_guide"))
+        if not changed:
+            return current
+        next_fingerprint = question_bank_fingerprint(next_entry)
+        duplicate = conn.execute(
+            "SELECT id FROM question_bank WHERE fingerprint = ? AND id <> ?",
+            (next_fingerprint, question_bank_id),
+        ).fetchone()
+        if duplicate is not None:
+            raise ValueError("AI 보강 결과가 기존 문제은행 문항과 중복되어 저장할 수 없습니다.")
+        now = utc_now_iso()
+        conn.execute(
+            """
+            UPDATE question_bank
+            SET answer = ?,
+                explanation = ?,
+                rubric_json = ?,
+                answer_guide = ?,
+                fingerprint = ?,
+                updated_at = ?
+            WHERE id = ?
+            """,
+            (
+                next_entry["answer"],
+                next_entry["explanation"],
+                question_bank_json_text(next_entry["rubric"], item_limit=2000),
+                next_entry["answer_guide"],
+                next_fingerprint,
+                now,
+                question_bank_id,
+            ),
+        )
+        saved = conn.execute(
+            """
+            SELECT id, card_id, question_type, prompt, body, answer, explanation,
+                   rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
+                   difficulty, issuer, source_location, section, points, expected_time_seconds,
+                   answer_guide, session_mode, created_at, updated_at
+            FROM question_bank
+            WHERE id = ?
+            """,
+            (question_bank_id,),
+        ).fetchone()
+        conn.commit()
+    return question_bank_row_to_dict(saved) or next_entry
+
 
 
 def upsert_question_bank_entries(
@@ -7739,6 +7886,23 @@ def api_question_bank_upsert(payload: QuestionBankUpsertRequest) -> dict[str, An
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
+@app.post("/api/question-bank/{question_bank_id}/ai-refine-answer")
+def api_question_bank_ai_refine_answer(question_bank_id: str, payload: QuestionBankAiRefineRequest) -> dict[str, Any]:
+    try:
+        item = update_question_bank_ai_content(question_bank_id, payload, progress_db_path=PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Question bank item not found: {question_bank_id}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "question_bank_id": question_bank_id,
+        "model": CODEX_MODEL,
+        "item": item,
+    }
 @app.get("/api/question-bank")
 def api_question_bank(request: Request) -> dict[str, Any]:
     raw_limit = str(request.query_params.get("limit") or "200").strip()

@@ -357,6 +357,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('available_categories', QUESTION_BANK_JS)
         self.assertIn('question-keyword-link', QUESTION_BANK_JS)
         self.assertIn('card_query=', QUESTION_BANK_JS)
+        self.assertIn('cs-flashcards-question-bank-updated', QUESTION_BANK_JS)
+        self.assertIn("window.addEventListener('message'", QUESTION_BANK_JS)
         self.assertIn('function renderHeader()', QUESTION_BANK_JS)
         self.assertIn('function renderOverviewCards()', QUESTION_BANK_JS)
         self.assertIn('function renderActiveFilters()', QUESTION_BANK_JS)
@@ -736,6 +738,10 @@ class StaticFrontendTests(unittest.TestCase):
             'function markQuestionSourceCard(status)',
             'data-question-mark',
             'data-question-judgment',
+            'data-question-answer-refine',
+            'questionAnswerRefineInstruction',
+            'function refineCurrentQuestionAnswer()',
+            '/ai-refine-answer',
             'question-review-box',
             'question-review-actions',
             "markQuestionSourceCard('O')",

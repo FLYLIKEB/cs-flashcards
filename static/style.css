@@ -5352,6 +5352,34 @@ select,
   padding-top: .78rem;
   border-top: 1px solid rgba(31, 58, 95, .08);
 }
+.question-answer-refine-box {
+  margin-top: .9rem;
+  padding-top: .82rem;
+  border-top: 1px solid rgba(31, 58, 95, .08);
+}
+.question-answer-refine-instruction {
+  min-height: 4.5rem;
+  border-radius: 16px;
+  background: rgba(255,255,255,.9);
+  border: 1px solid rgba(31, 58, 95, .08);
+}
+.question-answer-refine-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .58rem;
+  margin-top: .7rem;
+}
+.question-answer-refine-button {
+  min-width: 8.4rem;
+}
+.question-answer-refine-help {
+  margin: 0;
+  color: #617184;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
 .question-answer-input,
 .question-wrong-note {
   min-height: 7rem;
@@ -5389,7 +5417,8 @@ select,
   border-top: 1px solid rgba(31, 58, 95, .08);
 }
 .question-grade-actions,
-.question-wrong-note-actions {
+.question-wrong-note-actions,
+.question-answer-refine-actions {
   gap: .46rem;
 }
 .question-grade-button {

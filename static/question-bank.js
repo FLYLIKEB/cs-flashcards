@@ -173,6 +173,17 @@ function clearFilterField(key) {
   loadQuestionBankPage().catch(() => {});
 }
 
+function applyEmbeddedQuestionBankUpdate(item) {
+  const questionBankId = String(item?.question_bank_id || '').trim();
+  if (!questionBankId) return;
+  const index = bankState.items.findIndex((entry) => String(entry?.question_bank_id || '') === questionBankId);
+  if (index < 0) return;
+  bankState.items[index] = {...bankState.items[index], ...item};
+  renderTable();
+  renderPracticePane();
+}
+
+
 function applyPracticeViewState() {
   const practiceFocus = bankState.practiceLoaded && !bankState.practiceCollapsed;
   document.body.classList.toggle('question-bank-practice-collapsed', !practiceFocus);
@@ -646,4 +657,11 @@ $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollaps
 
 ['bankPageAttemptStatusSelect', 'bankPageFieldInput', 'bankPageCategoryInput', 'bankPageIssuerInput', 'bankPageDifficultySelect', 'bankPageTypeSelect'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankPage().catch(() => {}));
+});
+
+window.addEventListener('message', (event) => {
+  if (event.origin && event.origin !== window.location.origin) return;
+  const data = event?.data;
+  if (!data || data.type !== 'cs-flashcards-question-bank-updated') return;
+  applyEmbeddedQuestionBankUpdate(data.item || null);
 });

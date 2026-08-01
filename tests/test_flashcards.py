@@ -469,6 +469,39 @@ class FlashcardProgressTests(unittest.TestCase):
         finally:
             flashcard_app.OPENAI_API_KEY = original_key
 
+    def test_rewrite_question_bank_answer_with_codex_parses_json_output(self):
+        original_key = flashcard_app.OPENAI_API_KEY
+        try:
+            flashcard_app.OPENAI_API_KEY = 'test-key'
+            with mock.patch.object(
+                flashcard_app,
+                'urlopen',
+                return_value=FakeUrlopenResponse({
+                    'output_text': json.dumps({
+                        'answer': '정규화는 중복을 줄이고 이상 현상을 방지하기 위한 데이터베이스 설계 원칙이다.',
+                        'explanation': '정답 논리와 함께 이상 현상 방지 이유까지 설명합니다.',
+                        'rubric': ['중복 제거', '이상 현상 방지'],
+                        'answer_guide': '정의 → 목적 → 효과 순으로 3문장',
+                    }, ensure_ascii=False),
+                }),
+            ) as urlopen_mock:
+                result = flashcard_app.rewrite_question_bank_answer_with_codex({
+                    'question_bank_id': 'qb-sample-1',
+                    'card_id': 'CS-001',
+                    'question_type': 'subjective',
+                    'prompt': '정규화의 목적을 설명하시오.',
+                    'answer': '중복을 줄인다.',
+                    'explanation': '기존 해설',
+                    'rubric': ['중복 제거'],
+                    'answer_guide': '기존 가이드',
+                }, {'id': 'CS-001', 'term': '정규화', 'definition': '중복을 줄이는 설계 기법'}, '더 자세히')
+            self.assertIn('이상 현상', result['answer'])
+            self.assertEqual(result['rubric'], ['중복 제거', '이상 현상 방지'])
+            self.assertIn('/responses', urlopen_mock.call_args.args[0].full_url)
+        finally:
+            flashcard_app.OPENAI_API_KEY = original_key
+
+
     def test_api_card_ai_rewrite_preview_uses_csv_cards(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -1822,6 +1855,49 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(wrong['summary']['total'], 1)
             self.assertEqual(wrong['items'][0]['question_attempt_status'], 'wrong')
             self.assertEqual(flashcard_app.read_question_bank_entries(db_path, attempt_status='correct', limit=10)['summary']['total'], 0)
+
+    def test_api_question_bank_ai_refine_answer_updates_existing_row(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+            seeded = flashcard_app.read_question_bank_entries(db_path, limit=10)
+            seeded_item = seeded['items'][0]
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'output_text': json.dumps({
+                            'answer': '정규화는 데이터 중복을 줄이고 삽입·수정·삭제 이상을 방지하기 위한 설계 원칙이다.',
+                            'explanation': '중복과 이상 현상을 함께 설명해야 고득점입니다.',
+                            'rubric': ['중복 제거', '이상 현상 방지'],
+                            'answer_guide': '정의 → 목적 → 기대 효과 순으로 답안 작성',
+                        }, ensure_ascii=False),
+                    }),
+                ):
+                    data = flashcard_app.api_question_bank_ai_refine_answer(
+                        seeded_item['question_bank_id'],
+                        flashcard_app.QuestionBankAiRefineRequest(instruction='면접 답변용으로 더 구체화'),
+                    )
+                self.assertEqual(data['question_bank_id'], seeded_item['question_bank_id'])
+                self.assertEqual(data['model'], flashcard_app.CODEX_MODEL)
+                self.assertIn('이상', data['item']['answer'])
+                self.assertEqual(data['item']['rubric'], ['중복 제거', '이상 현상 방지'])
+                self.assertEqual(data['item']['answer_guide'], '정의 → 목적 → 기대 효과 순으로 답안 작성')
+                listed = flashcard_app.read_question_bank_entries(db_path, limit=10)
+                self.assertEqual(listed['summary']['total'], 1)
+                self.assertEqual(listed['items'][0]['question_bank_id'], seeded_item['question_bank_id'])
+                self.assertEqual(listed['items'][0]['answer'], data['item']['answer'])
+            finally:
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.OPENAI_API_KEY = original_key
     def test_old_progress_schema_migrates_for_bookmark_and_memo_columns(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
