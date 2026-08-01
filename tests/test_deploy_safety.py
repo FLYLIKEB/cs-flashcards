@@ -66,6 +66,7 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertNotIn('cp state/progress.sqlite', DEPLOY_SCRIPT)
         self.assertNotIn('import sqlite3', DEPLOY_SCRIPT)
         self.assertNotIn('read_card_content(app.PROGRESS_DB_PATH)', DEPLOY_SCRIPT)
+        self.assertIn('cp app.py flashcards_backend.py question_generator.py requirements.txt "$TMP_STAGE/"', DEPLOY_SCRIPT)
         self.assertIn('배포 번들에 SQLite 파일을 포함하지 않습니다.', DEPLOY_SCRIPT)
         self.assertIn('CS_FLASHCARD_PROGRESS_DB_MUST_EXIST=1', DEPLOY_SCRIPT)
         self.assertIn('원격 SQLite 파일이 없으면 배포를 중단합니다', DEPLOY_SCRIPT)
@@ -103,6 +104,7 @@ class DeploySafetyTests(unittest.TestCase):
             (stage_dir / 'static').mkdir(parents=True)
             (stage_dir / 'data').mkdir()
             (stage_dir / 'app.py').write_text('print("ok")\n', encoding='utf-8')
+            (stage_dir / 'flashcards_backend.py').write_text('def connect_progress_db(*args, **kwargs):\n    raise NotImplementedError\n', encoding='utf-8')
             (stage_dir / 'static' / 'placeholder.txt').write_text('ok', encoding='utf-8')
             (stage_dir / 'data' / 'recruitment_schedule_2026.json').write_text('{}\n', encoding='utf-8')
             archive_path = Path(td) / 'bundle.tar.gz'
@@ -110,6 +112,7 @@ class DeploySafetyTests(unittest.TestCase):
                 archive_path,
                 {
                     './app.py': 'print("ok")\n',
+                    './flashcards_backend.py': 'def connect_progress_db(*args, **kwargs):\n    raise NotImplementedError\n',
                     './static/placeholder.txt': 'ok',
                     './data/recruitment_schedule_2026.json': '{}\n',
                 },

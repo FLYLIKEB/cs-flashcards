@@ -168,7 +168,7 @@ append_env_line "CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX" "$WIKI_GITHUB_PATH_PREFI
 append_env_line "OPENAI_API_KEY" "$OPENAI_API_KEY_VALUE"
 
 mkdir -p "$TMP_STAGE/data"
-cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
+cp app.py flashcards_backend.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
 cp data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
 echo "원격 state/progress.sqlite 보호: 배포 번들에 SQLite 파일을 포함하지 않습니다."
