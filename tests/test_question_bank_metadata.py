@@ -1,7 +1,10 @@
+from contextlib import closing
 from pathlib import Path
+import sqlite3
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+PROGRESS_DB = ROOT / 'state' / 'progress.sqlite'
 INDEX_HTML = (ROOT / 'static' / 'index.html').read_text(encoding='utf-8')
 QUESTION_BANK_HTML = (ROOT / 'static' / 'question-bank.html').read_text(encoding='utf-8')
 APP_JS = (ROOT / 'static' / 'app.js').read_text(encoding='utf-8')
@@ -42,6 +45,13 @@ class QuestionBankMetadataTests(unittest.TestCase):
         self.assertIn('available_field_names', APP_JS)
         self.assertIn('available_issuers', APP_JS)
         self.assertIn('available_categories', APP_JS)
+
+    def test_question_bank_runtime_rows_use_normalized_difficulty_labels(self):
+        with closing(sqlite3.connect(PROGRESS_DB)) as conn:
+            invalid_count = conn.execute(
+                "SELECT COUNT(*) FROM question_bank WHERE trim(coalesce(difficulty, '')) NOT IN ('상', '중', '하')"
+            ).fetchone()[0]
+        self.assertEqual(invalid_count, 0)
 
 
 if __name__ == '__main__':
