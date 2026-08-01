@@ -23,7 +23,7 @@ from uuid import uuid4
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request as UrlRequest, urlopen
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -5878,28 +5878,441 @@ def generate_wiki_svg_markup(page_title: str, image: dict[str, Any], *, prompt_o
 
 
 
-def subtle_loop_gif_from_png(image_bytes: bytes) -> bytes:
-    resampling = getattr(getattr(Image, "Resampling", Image), "LANCZOS", Image.LANCZOS)
-    with Image.open(io.BytesIO(image_bytes)) as original:
-        base = original.convert("RGBA")
-        side = max(base.width, base.height)
-        canvas = Image.new("RGBA", (side, side), (255, 255, 255, 255))
-        canvas.paste(base, ((side - base.width) // 2, (side - base.height) // 2), base)
-        if side > 720:
-            canvas = canvas.resize((720, 720), resampling)
-            side = 720
-        frames: list[Image.Image] = []
-        for step in range(12):
-            angle = (2 * math.pi * step) / 12
-            scale = 1.0 + 0.035 * math.sin(angle)
-            offset_x = int(side * 0.012 * math.sin(angle))
-            offset_y = int(side * 0.01 * math.cos(angle))
-            scaled_side = max(1, int(side * scale))
-            scaled = canvas.resize((scaled_side, scaled_side), resampling)
-            frame = Image.new("RGBA", (side, side), (255, 255, 255, 255))
-            left = (side - scaled_side) // 2 + offset_x
-            top = (side - scaled_side) // 2 + offset_y
-            frame.paste(scaled, (left, top), scaled)
+WIKI_GIF_FONT_CANDIDATES = (
+    "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+    "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
+    "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/noto/NotoSansCJKkr-Regular.otf",
+)
+WIKI_GIF_NODE_ID_RE = re.compile(r"[^a-z0-9_-]+")
+WIKI_GIF_CANVAS_SIZE = (960, 540)
+WIKI_GIF_BASE_COLORS = ("#dbeafe", "#e0e7ff", "#dcfce7", "#fef3c7", "#ffe4e6", "#ede9fe")
+WIKI_GIF_ACCENT_COLORS = ("#2563eb", "#7c3aed", "#16a34a", "#d97706", "#e11d48", "#0891b2")
+
+
+def clamp_number(value: Any, lower: float, upper: float, default: float) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        number = default
+    return max(lower, min(upper, number))
+
+
+
+def normalized_gif_color(value: Any, fallback: str) -> str:
+    candidate = str(value or "").strip()
+    if re.fullmatch(r"#[0-9a-fA-F]{6}", candidate):
+        return candidate.lower()
+    return fallback.lower()
+
+
+
+def sanitize_wiki_gif_node_id(value: Any, fallback: str) -> str:
+    candidate = WIKI_GIF_NODE_ID_RE.sub("-", str(value or "").strip().lower()).strip("-")
+    return candidate[:32] or fallback
+
+
+
+def wrap_wiki_gif_label(value: str, max_lines: int = 2, line_width: int = 9) -> list[str]:
+    text = normalized_card_text(value, limit=max_lines * line_width * 2).replace("\n", " ").strip()
+    if not text:
+        return [""]
+    words = [chunk for chunk in text.split(" ") if chunk]
+    if not words:
+        words = [text]
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        if current and len(current) + 1 + len(word) <= line_width:
+            current = f"{current} {word}"
+            continue
+        if current:
+            lines.append(current)
+            current = ""
+            if len(lines) >= max_lines:
+                break
+        if len(word) <= line_width:
+            current = word
+            continue
+        start = 0
+        while start < len(word) and len(lines) < max_lines:
+            piece = word[start:start + line_width]
+            start += line_width
+            if len(piece) == line_width or start >= len(word):
+                lines.append(piece)
+            else:
+                current = piece
+        if len(lines) >= max_lines:
+            current = ""
+            break
+    if current and len(lines) < max_lines:
+        lines.append(current)
+    if not lines:
+        lines = [text[:line_width]]
+    return [line[:line_width] for line in lines[:max_lines]]
+
+
+
+def load_wiki_gif_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    for candidate in WIKI_GIF_FONT_CANDIDATES:
+        if Path(candidate).exists():
+            try:
+                return ImageFont.truetype(candidate, size=size)
+            except OSError:
+                continue
+    return ImageFont.load_default()
+
+
+
+def fallback_wiki_gif_plan(page_title: str, image: dict[str, Any]) -> dict[str, Any]:
+    focus_subject = normalized_card_text(wiki_image_focus_subject(page_title, image), limit=20)
+    seed_text = "\n".join(
+        part for part in (
+            image.get("section_title"),
+            image.get("alt"),
+            image.get("caption"),
+            image.get("context_excerpt"),
+        )
+        if str(part or "").strip()
+    )
+    steps: list[str] = []
+    seen: set[str] = set()
+    for chunk in re.split(r"[\n.!?。,:;]+|->|=>|→", seed_text):
+        label = normalized_card_text(chunk, limit=20).replace("  ", " ").strip()
+        if len(label) < 2 or label in seen:
+            continue
+        seen.add(label)
+        steps.append(label)
+        if len(steps) >= 4:
+            break
+    if focus_subject and focus_subject not in seen:
+        steps.insert(0, focus_subject)
+    while len(steps) < 3:
+        steps.append(("핵심 단계", "상태 변화", "결과 확인")[len(steps)])
+    steps = steps[:5]
+    x_positions = [0.16, 0.38, 0.62, 0.84, 0.84]
+    y_positions = [0.5, 0.5, 0.5, 0.5, 0.78]
+    nodes = []
+    for idx, label in enumerate(steps):
+        nodes.append({
+            "id": f"node-{idx + 1}",
+            "label": label,
+            "x": x_positions[idx],
+            "y": y_positions[idx],
+            "width": 0.2,
+            "height": 0.15,
+            "color": WIKI_GIF_BASE_COLORS[idx % len(WIKI_GIF_BASE_COLORS)],
+            "accent": WIKI_GIF_ACCENT_COLORS[idx % len(WIKI_GIF_ACCENT_COLORS)],
+        })
+    edges = []
+    for idx in range(len(nodes) - 1):
+        edges.append({
+            "id": f"edge-{idx + 1}",
+            "from": nodes[idx]["id"],
+            "to": nodes[idx + 1]["id"],
+        })
+    stages = []
+    for idx, node in enumerate(nodes):
+        stages.append({"active_nodes": [node["id"]], "active_edges": []})
+        if idx < len(edges):
+            stages.append({
+                "active_nodes": [node["id"], nodes[idx + 1]["id"]],
+                "active_edges": [edges[idx]["id"]],
+            })
+    return {"nodes": nodes, "edges": edges, "stages": stages}
+
+
+
+def validate_wiki_gif_plan(plan: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(plan, dict):
+        raise ValueError("GIF 계획은 객체여야 합니다.")
+    raw_nodes = plan.get("nodes")
+    if not isinstance(raw_nodes, list):
+        raise ValueError("GIF 계획에 nodes 배열이 필요합니다.")
+    nodes: list[dict[str, Any]] = []
+    node_lookup: dict[str, dict[str, Any]] = {}
+    default_positions = (
+        (0.18, 0.28),
+        (0.5, 0.28),
+        (0.82, 0.28),
+        (0.18, 0.68),
+        (0.5, 0.68),
+        (0.82, 0.68),
+    )
+    for idx, raw in enumerate(raw_nodes[:6]):
+        if not isinstance(raw, dict):
+            continue
+        fallback_id = f"node-{idx + 1}"
+        node_id = sanitize_wiki_gif_node_id(raw.get("id"), fallback_id)
+        while node_id in node_lookup:
+            node_id = f"{node_id}-{idx + 1}"[:32]
+        default_x, default_y = default_positions[idx]
+        color = normalized_gif_color(raw.get("color"), WIKI_GIF_BASE_COLORS[idx % len(WIKI_GIF_BASE_COLORS)])
+        accent = normalized_gif_color(raw.get("accent"), WIKI_GIF_ACCENT_COLORS[idx % len(WIKI_GIF_ACCENT_COLORS)])
+        node = {
+            "id": node_id,
+            "label": normalized_card_text(raw.get("label") or raw.get("title") or fallback_id, limit=24) or fallback_id,
+            "x": clamp_number(raw.get("x"), 0.12, 0.88, default_x),
+            "y": clamp_number(raw.get("y"), 0.16, 0.84, default_y),
+            "width": clamp_number(raw.get("width"), 0.14, 0.26, 0.2),
+            "height": clamp_number(raw.get("height"), 0.11, 0.2, 0.15),
+            "color": color,
+            "accent": accent,
+        }
+        nodes.append(node)
+        node_lookup[node_id] = node
+    if len(nodes) < 2:
+        raise ValueError("GIF 계획에는 최소 두 개의 노드가 필요합니다.")
+    raw_edges = plan.get("edges") if isinstance(plan.get("edges"), list) else []
+    edges: list[dict[str, str]] = []
+    edge_lookup: dict[str, dict[str, str]] = {}
+    for idx, raw in enumerate(raw_edges[:12]):
+        if not isinstance(raw, dict):
+            continue
+        from_id = sanitize_wiki_gif_node_id(raw.get("from"), "")
+        to_id = sanitize_wiki_gif_node_id(raw.get("to"), "")
+        if from_id not in node_lookup or to_id not in node_lookup or from_id == to_id:
+            continue
+        fallback_id = f"edge-{idx + 1}"
+        edge_id = sanitize_wiki_gif_node_id(raw.get("id"), fallback_id)
+        while edge_id in edge_lookup:
+            edge_id = f"{edge_id}-{idx + 1}"[:32]
+        edge = {"id": edge_id, "from": from_id, "to": to_id}
+        edges.append(edge)
+        edge_lookup[edge_id] = edge
+    if not edges:
+        for idx in range(len(nodes) - 1):
+            edge = {"id": f"edge-{idx + 1}", "from": nodes[idx]["id"], "to": nodes[idx + 1]["id"]}
+            edges.append(edge)
+            edge_lookup[edge["id"]] = edge
+    raw_stages = plan.get("stages") if isinstance(plan.get("stages"), list) else []
+    stages: list[dict[str, Any]] = []
+    for idx, raw in enumerate(raw_stages[:6]):
+        if not isinstance(raw, dict):
+            continue
+        active_nodes = [sanitize_wiki_gif_node_id(item, "") for item in raw.get("active_nodes") or []]
+        active_nodes = [item for item in active_nodes if item in node_lookup]
+        active_edges = [sanitize_wiki_gif_node_id(item, "") for item in raw.get("active_edges") or []]
+        active_edges = [item for item in active_edges if item in edge_lookup]
+        if active_edges:
+            for edge_id in active_edges:
+                edge = edge_lookup[edge_id]
+                if edge["from"] not in active_nodes:
+                    active_nodes.append(edge["from"])
+                if edge["to"] not in active_nodes:
+                    active_nodes.append(edge["to"])
+        if not active_nodes and not active_edges:
+            continue
+        stages.append({
+            "id": f"stage-{idx + 1}",
+            "active_nodes": active_nodes,
+            "active_edges": active_edges,
+        })
+    if not stages:
+        for idx, node in enumerate(nodes):
+            stages.append({"id": f"stage-{len(stages) + 1}", "active_nodes": [node["id"]], "active_edges": []})
+            if idx < len(edges):
+                stages.append({
+                    "id": f"stage-{len(stages) + 1}",
+                    "active_nodes": [node["id"], nodes[idx + 1]["id"]],
+                    "active_edges": [edges[idx]["id"]],
+                })
+        stages = stages[:6]
+    return {"nodes": nodes, "edges": edges, "stages": stages}
+
+
+
+def request_wiki_gif_plan(page_title: str, image: dict[str, Any], *, prompt_override: str = "") -> dict[str, Any]:
+    prompt_text = normalized_card_text(prompt_override or wiki_gif_image_prompt(page_title, image), limit=20000)
+    payload = {
+        "page": {
+            "title": page_title,
+            "section_title": normalized_card_text(image.get("section_title", ""), limit=200),
+        },
+        "image": {
+            "alt": normalized_card_text(image.get("alt", ""), limit=400),
+            "caption": normalized_card_text(image.get("caption", ""), limit=800),
+            "source_note": normalized_card_text(image.get("source_note", ""), limit=500),
+            "context_excerpt": normalized_card_text(image.get("context_excerpt", ""), limit=1200),
+        },
+        "design_brief": prompt_text,
+        "output_schema": {
+            "nodes": [{"id": "input", "label": "입력", "x": 0.18, "y": 0.5, "width": 0.2, "height": 0.15, "color": "#dbeafe", "accent": "#2563eb"}],
+            "edges": [{"id": "flow-1", "from": "input", "to": "process"}],
+            "stages": [{"active_nodes": ["input"], "active_edges": []}, {"active_nodes": ["input", "process"], "active_edges": ["flow-1"]}],
+        },
+    }
+    try:
+        parsed = request_codex_json_object(
+            (
+                "You design motion-first educational GIF storyboards for Korean CS/IT wiki pages. "
+                "Return only one JSON object with keys nodes, edges, stages. "
+                "The result must describe real state transitions, not camera shake, zoom wobble, or decorative motion. "
+                "Use 2-6 short-labeled nodes, 1-12 directed edges, and 2-6 stages. "
+                "Each node needs id, label, normalized x and y coordinates, and may include width, height, color, accent. "
+                "Each edge needs id, from, to. Each stage needs active_nodes and active_edges. "
+                "Prefer a simple flow diagram that can animate tokens moving through the active edges. "
+                "Keep labels short and grounded only in the provided page context and design brief."
+            ),
+            payload,
+            parse_error_message="AI GIF 계획을 JSON으로 해석하지 못했습니다.",
+        )
+        return validate_wiki_gif_plan(parsed)
+    except RuntimeError as exc:
+        if "OPENAI_API_KEY" in str(exc):
+            raise
+    except ValueError:
+        pass
+    return validate_wiki_gif_plan(fallback_wiki_gif_plan(page_title, image))
+
+
+
+def node_center(node: dict[str, Any]) -> tuple[float, float]:
+    width, height = WIKI_GIF_CANVAS_SIZE
+    return node["x"] * width, node["y"] * height
+
+
+
+def node_anchor_point(node: dict[str, Any], target_x: float, target_y: float) -> tuple[float, float]:
+    center_x, center_y = node_center(node)
+    half_w = node["width"] * WIKI_GIF_CANVAS_SIZE[0] / 2
+    half_h = node["height"] * WIKI_GIF_CANVAS_SIZE[1] / 2
+    dx = target_x - center_x
+    dy = target_y - center_y
+    if abs(dx) * half_h >= abs(dy) * half_w:
+        edge_x = center_x + (half_w if dx >= 0 else -half_w)
+        scale = 0 if abs(dx) < 1e-6 else half_w / abs(dx)
+        edge_y = center_y + dy * scale
+    else:
+        edge_y = center_y + (half_h if dy >= 0 else -half_h)
+        scale = 0 if abs(dy) < 1e-6 else half_h / abs(dy)
+        edge_x = center_x + dx * scale
+    return edge_x, edge_y
+
+
+
+def interpolate_color(start: str, end: str, amount: float) -> tuple[int, int, int, int]:
+    amount = max(0.0, min(1.0, amount))
+    start_rgb = tuple(int(start[index:index + 2], 16) for index in (1, 3, 5))
+    end_rgb = tuple(int(end[index:index + 2], 16) for index in (1, 3, 5))
+    return tuple(int(start_rgb[idx] + (end_rgb[idx] - start_rgb[idx]) * amount) for idx in range(3)) + (255,)
+
+
+
+def draw_arrow(draw: ImageDraw.ImageDraw, start: tuple[float, float], end: tuple[float, float], *, fill: tuple[int, int, int, int], width: int) -> None:
+    draw.line([start, end], fill=fill, width=width)
+    angle = math.atan2(end[1] - start[1], end[0] - start[0])
+    head = max(10, width * 3)
+    left = (
+        end[0] - head * math.cos(angle - math.pi / 7),
+        end[1] - head * math.sin(angle - math.pi / 7),
+    )
+    right = (
+        end[0] - head * math.cos(angle + math.pi / 7),
+        end[1] - head * math.sin(angle + math.pi / 7),
+    )
+    draw.polygon([end, left, right], fill=fill)
+
+
+
+def draw_wrapped_centered_text(draw: ImageDraw.ImageDraw, box: tuple[float, float, float, float], text: str, font: ImageFont.ImageFont, fill: tuple[int, int, int, int]) -> None:
+    lines = wrap_wiki_gif_label(text)
+    if not lines:
+        return
+    bboxes = [draw.textbbox((0, 0), line, font=font) for line in lines]
+    line_heights = [bbox[3] - bbox[1] for bbox in bboxes]
+    total_height = sum(line_heights) + max(0, len(lines) - 1) * 4
+    top = box[1] + (box[3] - box[1] - total_height) / 2
+    for line, bbox, line_height in zip(lines, bboxes, line_heights):
+        width = bbox[2] - bbox[0]
+        left = box[0] + (box[2] - box[0] - width) / 2
+        draw.text((left, top), line, font=font, fill=fill)
+        top += line_height + 4
+
+
+
+def render_wiki_gif_plan(plan: dict[str, Any]) -> bytes:
+    validated = validate_wiki_gif_plan(plan)
+    canvas_width, canvas_height = WIKI_GIF_CANVAS_SIZE
+    bg_color = (248, 250, 252, 255)
+    text_color = (15, 23, 42, 255)
+    shadow_color = (15, 23, 42, 24)
+    label_font = load_wiki_gif_font(22)
+    nodes = validated["nodes"]
+    node_lookup = {node["id"]: node for node in nodes}
+    edges = validated["edges"]
+    edge_lookup = {edge["id"]: edge for edge in edges}
+    frames: list[Image.Image] = []
+    stage_total = len(validated["stages"])
+    for stage_index, stage in enumerate(validated["stages"]):
+        edge_count = max(1, len(stage["active_edges"]))
+        subframes = 4 if edge_count else 3
+        for step in range(subframes):
+            progress = 0.0 if subframes == 1 else step / (subframes - 1)
+            pulse = 0.5 + 0.5 * math.sin(progress * math.pi)
+            frame = Image.new("RGBA", (canvas_width, canvas_height), bg_color)
+            draw = ImageDraw.Draw(frame, "RGBA")
+            for edge in edges:
+                start_node = node_lookup[edge["from"]]
+                end_node = node_lookup[edge["to"]]
+                target_center = node_center(end_node)
+                source_center = node_center(start_node)
+                start = node_anchor_point(start_node, *target_center)
+                end = node_anchor_point(end_node, *source_center)
+                active = edge["id"] in stage["active_edges"]
+                accent = normalized_gif_color(end_node.get("accent"), WIKI_GIF_ACCENT_COLORS[0])
+                edge_fill = interpolate_color("#94a3b8", accent, 0.8 if active else 0.0)
+                draw_arrow(draw, start, end, fill=edge_fill, width=5 if active else 3)
+            for node in nodes:
+                center_x, center_y = node_center(node)
+                width = node["width"] * canvas_width
+                height = node["height"] * canvas_height
+                active = node["id"] in stage["active_nodes"]
+                accent = normalized_gif_color(node["accent"], WIKI_GIF_ACCENT_COLORS[0])
+                fill = normalized_gif_color(node["color"], WIKI_GIF_BASE_COLORS[0])
+                outline_fill = interpolate_color(fill, accent, 0.68 if active else 0.25)
+                box = [center_x - width / 2, center_y - height / 2, center_x + width / 2, center_y + height / 2]
+                glow_pad = 8 + int(6 * pulse) if active else 6
+                draw.rounded_rectangle(
+                    [box[0] - glow_pad, box[1] - glow_pad, box[2] + glow_pad, box[3] + glow_pad],
+                    radius=26,
+                    fill=(outline_fill[0], outline_fill[1], outline_fill[2], 40 if active else 18),
+                )
+                draw.rounded_rectangle(
+                    [box[0] + 4, box[1] + 6, box[2] + 4, box[3] + 6],
+                    radius=22,
+                    fill=shadow_color,
+                )
+                draw.rounded_rectangle(box, radius=22, fill=fill, outline=outline_fill, width=5 if active else 3)
+                draw_wrapped_centered_text(draw, tuple(box), node["label"], label_font, text_color)
+            for edge_id in stage["active_edges"]:
+                edge = edge_lookup[edge_id]
+                start_node = node_lookup[edge["from"]]
+                end_node = node_lookup[edge["to"]]
+                target_center = node_center(end_node)
+                source_center = node_center(start_node)
+                start = node_anchor_point(start_node, *target_center)
+                end = node_anchor_point(end_node, *source_center)
+                token_x = start[0] + (end[0] - start[0]) * progress
+                token_y = start[1] + (end[1] - start[1]) * progress
+                accent = normalized_gif_color(end_node.get("accent"), WIKI_GIF_ACCENT_COLORS[0])
+                token_fill = interpolate_color("#ffffff", accent, 0.92)
+                radius = 10 + int(3 * pulse)
+                draw.ellipse([token_x - radius - 3, token_y - radius - 3, token_x + radius + 3, token_y + radius + 3], fill=(255, 255, 255, 120))
+                draw.ellipse([token_x - radius, token_y - radius, token_x + radius, token_y + radius], fill=token_fill, outline=(255, 255, 255, 255), width=2)
+            progress_y = canvas_height - 28
+            dot_radius = 7
+            total_width = stage_total * 24
+            start_x = (canvas_width - total_width) / 2 + 12
+            for idx in range(stage_total):
+                cx = start_x + idx * 24
+                active_dot = idx == stage_index
+                dot_fill = (37, 99, 235, 255) if active_dot else (203, 213, 225, 255)
+                radius = dot_radius + (2 if active_dot else 0)
+                draw.ellipse([cx - radius, progress_y - radius, cx + radius, progress_y + radius], fill=dot_fill)
             frames.append(frame.convert("P", palette=Image.Palette.ADAPTIVE))
     out = io.BytesIO()
     frames[0].save(
@@ -5907,12 +6320,17 @@ def subtle_loop_gif_from_png(image_bytes: bytes) -> bytes:
         format="GIF",
         save_all=True,
         append_images=frames[1:],
-        duration=110,
+        duration=120,
         loop=0,
         optimize=False,
         disposal=2,
     )
     return out.getvalue()
+
+
+
+def render_wiki_learning_gif(page_title: str, image: dict[str, Any], *, prompt_override: str = "") -> bytes:
+    return render_wiki_gif_plan(request_wiki_gif_plan(page_title, image, prompt_override=prompt_override))
 
 
 
@@ -5976,7 +6394,7 @@ def regenerate_wiki_image_asset(
     if image_format == "svg":
         asset_bytes = generate_wiki_svg_markup(page_title, image, prompt_override=prompt_override).encode("utf-8")
     elif image_format == "gif":
-        asset_bytes = subtle_loop_gif_from_png(request_openai_generated_image_bytes(prompt_override or wiki_gif_image_prompt(page_title, image)))
+        asset_bytes = render_wiki_learning_gif(page_title, image, prompt_override=prompt_override)
     else:
         asset_bytes = request_openai_generated_image_bytes(prompt_override or wiki_png_image_prompt(page_title, image))
     asset_relative_path = wiki_generated_image_asset_relative_path(source_relative, payload.image_index, image_format)
@@ -6044,7 +6462,7 @@ def generate_wiki_section_image_asset(
     if image_format == "svg":
         asset_bytes = generate_wiki_svg_markup(page_title, section_subject, prompt_override=prompt_override).encode("utf-8")
     elif image_format == "gif":
-        asset_bytes = subtle_loop_gif_from_png(request_openai_generated_image_bytes(prompt_override or wiki_gif_image_prompt(page_title, section_subject)))
+        asset_bytes = render_wiki_learning_gif(page_title, section_subject, prompt_override=prompt_override)
     else:
         asset_bytes = request_openai_generated_image_bytes(prompt_override or wiki_png_image_prompt(page_title, section_subject))
     asset_relative_path = wiki_generated_section_asset_relative_path(source_relative, payload.section_index, image_format)

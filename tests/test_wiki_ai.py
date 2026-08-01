@@ -50,6 +50,25 @@ def write_wiki_book(root: Path) -> Path:
     return book
 
 
+def sample_gif_plan() -> dict:
+    return {
+        'nodes': [
+            {'id': 'enqueue', 'label': 'enqueue', 'x': 0.2, 'y': 0.5, 'width': 0.18, 'height': 0.14},
+            {'id': 'queue', 'label': 'queue', 'x': 0.5, 'y': 0.5, 'width': 0.18, 'height': 0.14},
+            {'id': 'dequeue', 'label': 'dequeue', 'x': 0.8, 'y': 0.5, 'width': 0.18, 'height': 0.14},
+        ],
+        'edges': [
+            {'id': 'into-queue', 'from': 'enqueue', 'to': 'queue'},
+            {'id': 'out-queue', 'from': 'queue', 'to': 'dequeue'},
+        ],
+        'stages': [
+            {'active_nodes': ['enqueue'], 'active_edges': []},
+            {'active_nodes': ['enqueue', 'queue'], 'active_edges': ['into-queue']},
+            {'active_nodes': ['queue', 'dequeue'], 'active_edges': ['out-queue']},
+        ],
+    }
+
+
 class WikiAiRewriteTests(unittest.TestCase):
     def test_rewrite_wiki_markdown_with_codex_parses_json_output(self):
         original_key = flashcard_app.OPENAI_API_KEY
@@ -291,6 +310,31 @@ class WikiAiRewriteTests(unittest.TestCase):
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
                 flashcard_app.OPENAI_API_KEY = original_key
 
+    def test_request_wiki_gif_plan_uses_prompt_override(self):
+        with mock.patch.object(
+            flashcard_app,
+            'request_codex_json_object',
+            return_value=sample_gif_plan(),
+        ) as request_mock:
+            plan = flashcard_app.request_wiki_gif_plan(
+                '소개 문서',
+                {'section_title': '큐', 'context_excerpt': 'enqueue 후 dequeue 순서를 단계별로 확인한다.'},
+                prompt_override='CUSTOM GIF PROMPT',
+            )
+        self.assertEqual(plan['stages'][1]['active_edges'], ['into-queue'])
+        self.assertEqual(request_mock.call_args.args[1]['design_brief'], 'CUSTOM GIF PROMPT')
+
+    def test_render_wiki_gif_plan_produces_distinct_frames(self):
+        gif_bytes = flashcard_app.render_wiki_gif_plan(sample_gif_plan())
+        self.assertEqual(gif_bytes[:6], b'GIF89a')
+        with Image.open(BytesIO(gif_bytes)) as image:
+            self.assertGreaterEqual(image.n_frames, 6)
+            image.seek(0)
+            first = image.convert('RGBA').tobytes()
+            image.seek(image.n_frames - 1)
+            last = image.convert('RGBA').tobytes()
+        self.assertNotEqual(first, last)
+
     def test_api_wiki_image_regenerate_gif_writes_gif_asset(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
@@ -299,15 +343,10 @@ class WikiAiRewriteTests(unittest.TestCase):
             try:
                 flashcard_app.WIKI_BOOK_DIR = book
                 flashcard_app.OPENAI_API_KEY = 'test-key'
-                buffer = BytesIO()
-                Image.new('RGBA', (4, 4), '#60a5fa').save(buffer, format='PNG')
-                png_bytes = buffer.getvalue()
                 with mock.patch.object(
                     flashcard_app,
-                    'urlopen',
-                    return_value=FakeUrlopenResponse({
-                        'data': [{'b64_json': base64.b64encode(png_bytes).decode('ascii')}],
-                    }),
+                    'request_wiki_gif_plan',
+                    return_value=sample_gif_plan(),
                 ):
                     data = flashcard_app.api_wiki_image_regenerate(
                         flashcard_app.WikiImageRegenerateRequest(
@@ -319,6 +358,8 @@ class WikiAiRewriteTests(unittest.TestCase):
                 asset_path = book / data['updated']['asset_relative_path']
                 self.assertEqual(asset_path.read_bytes()[:6], b'GIF89a')
                 self.assertTrue(data['updated']['asset_relative_path'].endswith('.gif'))
+                with Image.open(asset_path) as image:
+                    self.assertGreaterEqual(image.n_frames, 6)
             finally:
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
                 flashcard_app.OPENAI_API_KEY = original_key
