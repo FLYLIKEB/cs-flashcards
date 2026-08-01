@@ -3,32 +3,33 @@
   "wave_id": "wave-2",
   "branch": "wave-2-frontend-regression-foundation",
   "command": ".venv/bin/python -m unittest tests.test_frontend_browser",
-  "generated_at": "2026-08-01T14:11:38+00:00",
-  "base_url": "http://127.0.0.1:65387",
+  "generated_at": "2026-08-01T14:25:14+00:00",
+  "base_url": "http://127.0.0.1:49550",
   "cases": [
     {
       "id": "calendar-drawer-focus",
       "status": "passed",
-      "url": "http://127.0.0.1:65387",
+      "url": "http://127.0.0.1:49550",
       "observations": {
         "path": "/calendar",
         "active_tab_after_keyboard": "true",
         "first_event_id": "bok-2027-apply",
         "drawer_hidden_after_open": false,
         "focused_after_open": "calendarDetailCloseBtn",
+        "focus_within_drawer_after_close": false,
         "focused_after_close": "body"
       }
     },
     {
       "id": "question-bank-load-launch",
       "status": "passed",
-      "url": "http://127.0.0.1:65387",
+      "url": "http://127.0.0.1:49550",
       "observations": {
         "path": "/question-bank",
         "initial_summary": "총 546문항 · 현재 200문항 · 필터 0개",
         "filters_collapsed_initially": true,
         "active_filters": "통합 검색데이터베이스×",
-        "practice_frame_src": "/?question-bank-embed=1&question-bank-run=1785593494223-3",
+        "practice_frame_src": "/?question-bank-embed=1&question-bank-run=1785594309891-3",
         "launch_state_present": false,
         "practice_status": "현재 1 / 68서술형난이도 상한국은행 대비 제작"
       }
@@ -36,7 +37,7 @@
     {
       "id": "wiki-sidebar-status",
       "status": "passed",
-      "url": "http://127.0.0.1:65387",
+      "url": "http://127.0.0.1:49550",
       "observations": {
         "path": "/wiki",
         "sidebar_initially_open": false,

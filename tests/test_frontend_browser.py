@@ -36,6 +36,8 @@ def free_port() -> int:
 
 def browser_executable() -> str | None:
     candidates = [
+        os.environ.get('CHROME_BIN', '').strip(),
+        os.environ.get('PUPPETEER_EXECUTABLE_PATH', '').strip(),
         shutil.which('google-chrome'),
         shutil.which('google-chrome-stable'),
         shutil.which('chromium-browser'),
@@ -48,24 +50,45 @@ def browser_executable() -> str | None:
     return None
 
 
+def branch_name_candidates() -> list[str]:
+    candidates = [
+        os.environ.get('CS_FRONTEND_BROWSER_BRANCH', '').strip(),
+        os.environ.get('GITHUB_HEAD_REF', '').strip(),
+        os.environ.get('GITHUB_REF_NAME', '').strip(),
+    ]
+    try:
+        result = subprocess.run(
+            ['git', 'branch', '--show-current'],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        candidates.append(result.stdout.strip())
+    except subprocess.CalledProcessError:
+        pass
+    return [candidate for candidate in candidates if candidate]
+
+
 def current_branch_name() -> str:
-    result = subprocess.run(
-        ['git', 'branch', '--show-current'],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout.strip() or 'detached-head'
+    candidates = branch_name_candidates()
+    return candidates[0] if candidates else 'detached-head'
 
 
 def transcript_wave_id() -> str:
-    match = WAVE_ID_RE.match(current_branch_name())
-    return match.group(1) if match else 'manual-run'
+    explicit_wave_id = os.environ.get('CS_FRONTEND_BROWSER_WAVE_ID', '').strip()
+    if explicit_wave_id:
+        return explicit_wave_id
+    for candidate in branch_name_candidates():
+        match = WAVE_ID_RE.match(candidate)
+        if match:
+            return match.group(1)
+    return 'manual-run'
 
 
 def transcript_path() -> Path:
     return TRANSCRIPT_DIR / f'{transcript_wave_id()}-transcript.json'
+
 
 
 def write_test_wiki_book(root: Path) -> Path:
@@ -237,11 +260,18 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
             case['practice_frame_src'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
             self.assertIn('question-bank-embed=1', case['practice_frame_src'])
+            await page.waitForFunction(
+                '(key) => !window.sessionStorage.getItem(key)',
+                {},
+                QUESTION_BANK_LAUNCH_KEY,
+            )
             case['launch_state_present'] = await page.evaluate(
                 '(key) => Boolean(window.sessionStorage.getItem(key))',
                 QUESTION_BANK_LAUNCH_KEY,
             )
+            self.assertFalse(case['launch_state_present'])
             case['practice_status'] = await self.text(page, '#bankPagePracticeStatus')
+            self.assertIn('현재 1 /', case['practice_status'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
@@ -270,10 +300,16 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(case['focused_after_open'], 'calendarDetailCloseBtn')
             await page.keyboard.press('Escape')
             await page.waitForFunction("document.querySelector('#calendarDetailDrawer').hidden === true")
-            case['focused_after_close'] = await page.evaluate(
-                'document.activeElement && document.activeElement.id ? document.activeElement.id : (document.activeElement && document.activeElement.tagName ? document.activeElement.tagName.toLowerCase() : "")'
+            await page.waitForFunction(
+                '() => { const drawer = document.querySelector("#calendarDetailDrawer"); return !drawer || !drawer.contains(document.activeElement); }'
             )
-            self.assertNotEqual(case['focused_after_close'], 'calendarDetailCloseBtn')
+            case['focus_within_drawer_after_close'] = await page.evaluate(
+                '() => { const drawer = document.querySelector("#calendarDetailDrawer"); return Boolean(drawer && drawer.contains(document.activeElement)); }'
+            )
+            self.assertFalse(case['focus_within_drawer_after_close'])
+            case['focused_after_close'] = await page.evaluate(
+                'document.activeElement && document.activeElement.id ? document.activeElement.id : (document.activeElement && document.activeElement.dataset ? (document.activeElement.dataset.eventId || (document.activeElement.tagName ? document.activeElement.tagName.toLowerCase() : "")) : (document.activeElement && document.activeElement.tagName ? document.activeElement.tagName.toLowerCase() : ""))'
+            )
             status = 'passed'
         finally:
             self.record_case(case_id='calendar-drawer-focus', status=status, observations=case)
