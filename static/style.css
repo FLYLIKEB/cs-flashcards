@@ -6179,6 +6179,16 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   color: #bbbbbb;
 }
 
+#wikiUpdatedAt {
+  margin: 0;
+  color: #888888;
+  font-size: .8rem;
+}
+
+#wikiUpdatedAt time {
+  font-variant-numeric: tabular-nums;
+}
+
 .wiki-page-footer {
   max-width: 48rem;
   margin: 1.5rem auto 0;

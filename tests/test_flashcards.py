@@ -1,6 +1,9 @@
 import base64
 import csv
 import json
+import os
+from datetime import datetime, timezone
+
 import sqlite3
 import tempfile
 import unittest
@@ -1945,6 +1948,9 @@ class WikiBookTests(unittest.TestCase):
     def test_read_wiki_index_and_page_render_internal_links(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
+            intro_path = book / 'pages' / 'intro.md'
+            stamp = datetime(2026, 8, 1, 5, 35, tzinfo=timezone.utc).timestamp()
+            os.utime(intro_path, (stamp, stamp))
             index = flashcard_app.read_wiki_index(book)
             self.assertEqual(index['book']['title'], '금공 IT 위키')
             self.assertEqual(index['default_page_slug'], 'intro')
@@ -1952,12 +1958,15 @@ class WikiBookTests(unittest.TestCase):
 
             page = flashcard_app.read_wiki_page('intro', book)
             self.assertEqual(page['title'], '소개 문서')
+            self.assertEqual(page['last_modified_at'], '2026-08-01T14:35:00+09:00')
+            self.assertEqual(page['last_modified_label'], '2026-08-01 14:35')
             self.assertIn('/wiki/page/child', page['html'])
             self.assertIn('data-wiki-task-checkbox="1"', page['html'])
             self.assertIn('data-wiki-task-source="pages/intro.md"', page['html'])
             self.assertIn('data-wiki-task-line="3"', page['html'])
             self.assertIn('<table>', page['html'])
             self.assertIn('<pre><code class="language-text">hello</code></pre>', page['html'])
+
 
     def test_read_wiki_page_includes_linked_flashcards(self):
         with tempfile.TemporaryDirectory() as td:
@@ -2057,6 +2066,8 @@ class WikiBookTests(unittest.TestCase):
                 self.assertTrue(response['updated']['changed'])
                 self.assertIn('소개 문서 수정', response['page']['html'])
                 self.assertIn('수정된 본문입니다.', response['page']['html'])
+                self.assertTrue(response['page']['last_modified_at'])
+                self.assertRegex(response['page']['last_modified_label'], r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$')
                 saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
                 self.assertEqual(saved, updated_content)
             finally:

@@ -44,6 +44,8 @@ WIKI_PAGES_DIRNAME = "pages"
 WIKI_TOC_NAME = "TOC.md"
 WIKI_BOOK_README_NAME = "README.md"
 WIKI_BOOK_HOME_SLUG = "_book"
+WIKI_DISPLAY_TIMEZONE = ZoneInfo("Asia/Seoul")
+
 REVIEW_COLUMNS = ["known_status", "last_reviewed", "review_count"]
 CARD_CONTENT_COLUMNS = [
     "id",
@@ -857,6 +859,12 @@ async def optional_basic_auth(request: Request, call_next):
 
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+
+
+def wiki_last_modified_metadata(path: Path) -> tuple[str, str]:
+    updated = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).astimezone(WIKI_DISPLAY_TIMEZONE)
+    return updated.isoformat(timespec="seconds"), updated.strftime("%Y-%m-%d %H:%M")
+
 
 
 def ensure_review_columns(fieldnames: list[str] | None) -> list[str]:
@@ -5644,6 +5652,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     page_meta = index["pages"].get(slug, {})
     title = page_meta.get("title") or extract_markdown_title(markdown_text, source_path.stem)
     linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, progress_db_path=PROGRESS_DB_PATH)
+    last_modified_at, last_modified_label = wiki_last_modified_metadata(source_path)
 
     return {
         "slug": slug,
@@ -5653,6 +5662,8 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
         "url": wiki_page_url(slug),
         "breadcrumbs": index["breadcrumbs"].get(slug, [{"title": title, "slug": slug, "url": wiki_page_url(slug)}]),
         "html": render_markdown_page(markdown_text, repo, source_path),
+        "last_modified_at": last_modified_at,
+        "last_modified_label": last_modified_label,
         "primary_card": linked_cards[0] if linked_cards else None,
         "linked_cards": linked_cards,
     }

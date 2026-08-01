@@ -392,6 +392,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="wikiEditorAiTemplateEditor"', WIKI_HTML)
         self.assertIn('id="wikiEditorAiTemplateList"', WIKI_HTML)
         self.assertIn('id="wikiEditorAiTemplateResetBtn"', WIKI_HTML)
+        self.assertIn('id="wikiUpdatedAt"', WIKI_HTML)
+
         self.assertLess(WIKI_HTML.index('id="wikiPageNav"'), WIKI_HTML.index('id="wikiRawLink"'))
         self.assertLess(WIKI_HTML.index('id="wikiArticle"'), WIKI_HTML.index('id="wikiRawLink"'))
         self.assertIn('pretendard.css', WIKI_HTML)
@@ -410,6 +412,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('function wikiRenderLinkedCards(page)', WIKI_JS)
         self.assertIn('function wikiNavigationItems()', WIKI_JS)
         self.assertIn('function wikiRenderPageNav(page)', WIKI_JS)
+        self.assertIn('function wikiRenderLastModified(page)', WIKI_JS)
+
         self.assertIn('function wikiApplyEditorState()', WIKI_JS)
         self.assertIn('function wikiStartEdit()', WIKI_JS)
         self.assertIn('function wikiSaveEditor()', WIKI_JS)
@@ -431,6 +435,10 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('window.CsAiTools', APP_JS)
         self.assertIn("event.key.toLowerCase() === 's'", WIKI_JS)
         self.assertIn('wikiRenderPageNav(page);', WIKI_JS)
+        self.assertIn('wikiRenderLastModified(page);', WIKI_JS)
+        self.assertIn('last_modified_label', WIKI_JS)
+        self.assertIn('last_modified_at', WIKI_JS)
+
         self.assertIn('closeWikiSidebarOnMobile()', WIKI_JS)
         self.assertIn('closeWikiSearch()', WIKI_JS)
         self.assertIn('function wikiShowSearchResults()', WIKI_JS)
@@ -456,6 +464,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.wiki-page-nav-link', STYLE_CSS)
         self.assertIn('.wiki-page-nav-kicker', STYLE_CSS)
         self.assertIn('.wiki-page-footer', STYLE_CSS)
+        self.assertIn('#wikiUpdatedAt', STYLE_CSS)
+        self.assertIn('#wikiUpdatedAt time', STYLE_CSS)
         self.assertIn('.wiki-editor', STYLE_CSS)
         self.assertIn('.wiki-editor-textarea', STYLE_CSS)
         self.assertIn('.wiki-editor-actions', STYLE_CSS)

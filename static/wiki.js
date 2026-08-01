@@ -242,6 +242,16 @@ function wikiRenderBreadcrumbs(page) {
   el.innerHTML = crumbs.map((crumb) => `<a href="${wikiPageUrl(crumb.slug)}" data-wiki-nav="1">${wikiEscapeHtml(crumb.title)}</a>`).join(' <span>›</span> ');
 }
 
+function wikiRenderLastModified(page) {
+  const el = wiki$('wikiUpdatedAt');
+  if (!el) return;
+  const label = String(page?.last_modified_label || '').trim();
+  const iso = String(page?.last_modified_at || '').trim();
+  el.hidden = !label;
+  el.innerHTML = label ? `최종 수정 <time datetime="${wikiEscapeHtml(iso)}">${wikiEscapeHtml(label)}</time>` : '';
+}
+
+
 function wikiNavigationItems() {
   const items = [];
   const seen = new Set();
@@ -716,6 +726,7 @@ function wikiApplyPage(page) {
   wiki$('wikiRawLink').href = page?.raw_url || '#';
   document.title = `${page?.title || '문서'} · ${wikiState.index?.book?.title || 'CS 학습 위키'}`;
   wikiRenderBreadcrumbs(page);
+  wikiRenderLastModified(page);
   wikiRenderLinkedCards(page);
   wikiRenderPageNav(page);
   wikiRenderToc();
