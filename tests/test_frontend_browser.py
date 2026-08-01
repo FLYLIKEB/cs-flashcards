@@ -1202,6 +1202,9 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             )
             case['practice_status_before_reload'] = await self.text(page, '#bankPagePracticeStatus')
             self.assertIn('현재 2 /', case['practice_status_before_reload'])
+            case['active_row_before_reload'] = await page.evaluate(
+                "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
+            )
             case['stored_open_state'] = await page.evaluate(
                 """
                 (filterKey, practiceKey) => ({
@@ -1212,7 +1215,6 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 QUESTION_BANK_FILTER_STATE_KEY,
                 QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
             )
-
             await page.reload({'waitUntil': 'networkidle2'})
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             await page.waitForFunction(
@@ -1227,10 +1229,15 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 })
                 """
             )
+            case['practice_status_after_reload'] = await self.text(page, '#bankPagePracticeStatus')
+            case['active_row_after_reload'] = await page.evaluate(
+                "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
+            )
             self.assertFalse(case['open_state_after_reload']['filtersCollapsed'])
             self.assertFalse(case['open_state_after_reload']['practiceCollapsed'])
             self.assertFalse(case['open_state_after_reload']['practiceFrameHidden'])
-
+            self.assertIn('현재 2 /', case['practice_status_after_reload'])
+            self.assertEqual(case['active_row_after_reload'], case['active_row_before_reload'])
             await page.click('#bankPagePracticeExitBtn')
             await page.waitForFunction("document.body.classList.contains('question-bank-practice-collapsed')")
             await page.click('#bankPageToggleFiltersBtn')
