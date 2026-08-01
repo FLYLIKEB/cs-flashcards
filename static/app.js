@@ -5305,6 +5305,7 @@ async function loadQuestionBankBrowser() {
   const controller = typeof window.AbortController === 'function' ? new window.AbortController() : null;
   questionBankAbortController = controller;
   const filters = questionBankFilterValues();
+  const selectedIdBeforeRequest = String(state.questionBankSelectedId || '');
   state.questionBankLoading = true;
   state.questionBankError = '';
   renderQuestionBankBrowser();
@@ -5312,13 +5313,14 @@ async function loadQuestionBankBrowser() {
     const data = await fetchQuestionBankEntries({filters, signal: controller?.signal});
     if (requestId !== questionBankLoadRequest) return;
     const currentSelectedId = String(state.questionBankSelectedId || '');
+    const targetSelectedId = currentSelectedId || selectedIdBeforeRequest;
     state.questionBankItems = Array.isArray(data.items) ? data.items : [];
     state.questionBankSummary = data.summary || {total: state.questionBankItems.length, returned: state.questionBankItems.length};
     populateQuestionBankTopicOptions(state.questionBankSummary?.available_topics || [], filters.topic);
     populateQuestionBankFieldNameOptions(state.questionBankSummary?.available_field_names || [], filters.field_name);
     populateQuestionBankIssuerOptions(state.questionBankSummary?.available_issuers || [], filters.issuer);
     populateQuestionBankCategoryOptions(state.questionBankSummary?.available_categories || [], filters.category);
-    const nextIndex = state.questionBankItems.findIndex((item) => String(item?.question_bank_id || '') === currentSelectedId);
+    const nextIndex = state.questionBankItems.findIndex((item) => String(item?.question_bank_id || '') === targetSelectedId);
     state.questionBankSelectedId = String(state.questionBankItems[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
   } catch (error) {
     if (error?.name === 'AbortError' || requestId !== questionBankLoadRequest) return;
