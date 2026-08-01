@@ -5373,6 +5373,22 @@ function selectedAnswerText(question) {
   }
   return String(current.userAnswer || '');
 }
+function questionHasSubmittedAnswer(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return false;
+  if (Array.isArray(current.choices) && current.choices.length) return Number.isInteger(current.selectedChoiceIndex);
+  return Boolean(String(current.userAnswer || '').trim());
+}
+
+function markUnansweredQuestionWrong(question, answeredAt = new Date().toISOString()) {
+  const current = hydrateQuestionState(question);
+  if (!current || questionHasSubmittedAnswer(current)) return false;
+  current.answerRevealed = true;
+  current.judgment = 'wrong';
+  current.gradedCorrect = false;
+  current.answeredAt = current.answeredAt || answeredAt;
+  return true;
+}
 
 function questionResultText(question) {
   const current = hydrateQuestionState(question);
@@ -5499,7 +5515,11 @@ async function finishQuestionSession() {
   commitCurrentQuestionElapsed();
   state.questionSessionElapsedBaseSeconds = currentQuestionSessionElapsedSeconds();
   state.questionSessionStartMs = 0;
-  state.questionSessionFinishedAt = new Date().toISOString();
+  const finishedAt = new Date().toISOString();
+  state.questionSessionFinishedAt = finishedAt;
+  state.questions.forEach((question) => {
+    markUnansweredQuestionWrong(question, finishedAt);
+  });
   stopQuestionTimer();
   state.questionSaving = true;
   renderQuestionPanel();
