@@ -11,6 +11,7 @@ REMOTE_HOST="${CS_FLASHCARDS_LIGHTSAIL_HOST:-}"
 REMOTE_USER="${CS_FLASHCARDS_LIGHTSAIL_USER:-ubuntu}"
 SSH_KEY="${CS_FLASHCARDS_LIGHTSAIL_KEY:-}"
 REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:-/home/ubuntu/cs-flashcards}"
+REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"
 REMOTE_PORT="${CS_FLASHCARDS_REMOTE_PORT:-8010}"
 USERNAME="${CS_FLASHCARDS_USERNAME:-cs}"
 PASSWORD="${CS_FLASHCARDS_PASSWORD:-}"
@@ -22,14 +23,8 @@ WIKI_GITHUB_TOKEN="${CS_FLASHCARDS_WIKI_GITHUB_TOKEN:-${GITHUB_TOKEN:-${GH_TOKEN
 WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
 WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-}"
 WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
-FORCE_DB_REPLACE="${CS_FLASHCARDS_FORCE_DB_REPLACE:-0}"
 OPENAI_API_KEY_VALUE="${OPENAI_API_KEY:-${CS_FLASHCARDS_OPENAI_API_KEY:-}}"
 
-
-if ! [[ "$FORCE_DB_REPLACE" =~ ^(0|1)$ ]]; then
-  echo "CS_FLASHCARDS_FORCE_DB_REPLACE 는 0 또는 1 이어야 합니다: $FORCE_DB_REPLACE" >&2
-  exit 1
-fi
 
 
 if [[ -f "$CHALOG_CONFIG" ]]; then
@@ -91,6 +86,11 @@ if [[ -z "${REMOTE_HOST:-}" || ! -f "${SSH_KEY:-}" ]]; then
   echo "Lightsail 접속 정보가 없습니다. CS_FLASHCARDS_LIGHTSAIL_HOST / CS_FLASHCARDS_LIGHTSAIL_KEY를 지정하세요." >&2
   exit 1
 fi
+if [[ -n "${CS_FLASHCARDS_REMOTE_DB_PATH:-}" && "$CS_FLASHCARDS_REMOTE_DB_PATH" != "$REMOTE_DB_PATH" ]]; then
+  echo "원격 DB 경로 변경은 금지됩니다: $CS_FLASHCARDS_REMOTE_DB_PATH" >&2
+  exit 1
+fi
+
 
 echo "개념 이미지: SQLite cards 테이블에 URL/미디어를 기록하고 AI 재생성 이미지는 서버 state/ai_images 에 저장"
 
@@ -111,16 +111,12 @@ fi
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 REMOTE_ARCHIVE="/tmp/cs-flashcards-$(date +%Y%m%dT%H%M%S)-$$.tar.gz"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
-mkdir -p "$TMP_STAGE/data" "$TMP_STAGE/state"
+mkdir -p "$TMP_STAGE/data"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
 cp data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
-if [[ "$FORCE_DB_REPLACE" == "1" ]]; then
-  echo "경고: CS_FLASHCARDS_FORCE_DB_REPLACE=1 이므로 원격 state/progress.sqlite 전체를 로컬 파일로 교체합니다."
-  cp state/progress.sqlite "$TMP_STAGE/state/"
-else
-  echo "원격 state/progress.sqlite 보존: 일반 배포에서는 런타임 DB 전체 파일을 덮어쓰지 않습니다."
-fi
+echo "원격 state/progress.sqlite 보호: 배포 번들에 SQLite 파일을 포함하지 않습니다."
+
 WIKI_PACKAGE_SRC="$WIKI_BOOK_SRC"
 if [[ -d "$WIKI_PACKAGE_SRC" ]]; then
   if [[ ! -f "$WIKI_PACKAGE_SRC/README.md" || ! -f "$WIKI_PACKAGE_SRC/TOC.md" || ! -d "$WIKI_PACKAGE_SRC/pages" ]]; then
@@ -177,13 +173,34 @@ if [[ -z "$WIKI_GITHUB_TOKEN" && -f /etc/systemd/system/cs-flashcards.service ]]
     echo "위키 GitHub 토큰 보존: 기존 systemd 설정값을 유지합니다."
   fi
 fi
+REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"
 
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
 sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot python3-certbot-nginx >/dev/null
 
-mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
+mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state" "$REMOTE_DIR/backups"
+if [[ ! -f "$REMOTE_DB_PATH" ]]; then
+  echo "원격 SQLite 파일이 없으면 배포를 중단합니다: $REMOTE_DB_PATH" >&2
+  exit 1
+fi
+cp "$REMOTE_DB_PATH" "$REMOTE_DIR/backups/progress-before-deploy-$(date +%Y%m%dT%H%M%S).sqlite"
+python3 - <<'PY' "$REMOTE_DB_PATH"
+import sqlite3
+import sys
+path = sys.argv[1]
+conn = sqlite3.connect(path)
+try:
+    count = conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0]
+except sqlite3.Error as exc:
+    raise SystemExit(f"원격 SQLite 검증 실패: {exc}") from exc
+finally:
+    conn.close()
+if count <= 0:
+    raise SystemExit(f"원격 SQLite cards 테이블이 비어 있어 배포를 중단합니다: {path}")
+print(f"원격 SQLite 검증 완료: {path} cards={count}")
+PY
 
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
@@ -203,7 +220,7 @@ cd "$REMOTE_DIR"
 python3 -m venv .venv
 .venv/bin/python -m pip install -q --upgrade pip
 .venv/bin/python -m pip install -q -r requirements.txt
-.venv/bin/python - <<'PY'
+CS_FLASHCARD_PROGRESS_DB="$REMOTE_DB_PATH" CS_FLASHCARD_PROGRESS_DB_MUST_EXIST=1 .venv/bin/python - <<'PY'
 import json
 import app
 cards, _ = app.read_card_content(app.PROGRESS_DB_PATH)
@@ -212,6 +229,7 @@ print("SQLite card db:", json.dumps({
     "path": str(app.PROGRESS_DB_PATH),
 }, ensure_ascii=False))
 PY
+
 
 sudo tee /etc/systemd/system/cs-flashcards.service >/dev/null <<EOF
 [Unit]
@@ -225,7 +243,8 @@ WorkingDirectory=$REMOTE_DIR
 Environment=CS_FLASHCARDS_USERNAME=$USERNAME
 Environment=CS_FLASHCARDS_PASSWORD=$PASSWORD
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
-Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DIR/state/progress.sqlite
+Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DB_PATH
+Environment=CS_FLASHCARD_PROGRESS_DB_MUST_EXIST=1
 Environment=CS_FLASHCARDS_WIKI_BOOK_DIR=$REMOTE_DIR/wiki_book
 Environment=CS_FLASHCARDS_WIKI_GITHUB_REPO=$WIKI_GITHUB_REPO
 Environment=CS_FLASHCARDS_WIKI_GITHUB_BRANCH=$WIKI_GITHUB_BRANCH

@@ -10,13 +10,13 @@ REMOTE_HOST="${CS_FLASHCARDS_LIGHTSAIL_HOST:-}"
 REMOTE_USER="${CS_FLASHCARDS_LIGHTSAIL_USER:-ubuntu}"
 SSH_KEY="${CS_FLASHCARDS_LIGHTSAIL_KEY:-}"
 REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:-/home/ubuntu/cs-flashcards}"
-REMOTE_DB="${CS_FLASHCARDS_REMOTE_DB_PATH:-$REMOTE_DIR/state/progress.sqlite}"
+REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"
 OUTPUT_PATH="${CS_FLASHCARDS_LOCAL_DB:-$ROOT_DIR/state/progress.sqlite}"
 BACKUP_DIR="${CS_FLASHCARDS_LOCAL_DB_BACKUP_DIR:-$ROOT_DIR/backups/manual-db-pull}"
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/pull_remote_sqlite.sh [--output PATH] [--remote-db PATH]
+Usage: ./scripts/pull_remote_sqlite.sh [--output PATH]
 
 Copies the live remote SQLite DB to the local workspace before intentional DB edits.
 EOF
@@ -29,9 +29,10 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --remote-db)
-      REMOTE_DB="$2"
-      shift 2
+      echo "원격 DB 경로 변경은 금지됩니다. 고정 경로만 사용합니다: $REMOTE_DB_PATH" >&2
+      exit 1
       ;;
+
     -h|--help)
       usage
       exit 0
@@ -60,6 +61,11 @@ if [[ -z "${REMOTE_HOST:-}" || ! -f "${SSH_KEY:-}" ]]; then
   echo "Lightsail 접속 정보가 없습니다. CS_FLASHCARDS_LIGHTSAIL_HOST / CS_FLASHCARDS_LIGHTSAIL_KEY를 지정하세요." >&2
   exit 1
 fi
+if [[ -n "${CS_FLASHCARDS_REMOTE_DB_PATH:-}" && "$CS_FLASHCARDS_REMOTE_DB_PATH" != "$REMOTE_DB_PATH" ]]; then
+  echo "원격 DB 경로 변경은 금지됩니다: $CS_FLASHCARDS_REMOTE_DB_PATH" >&2
+  exit 1
+fi
+
 
 mkdir -p "$(dirname "$OUTPUT_PATH")" "$BACKUP_DIR"
 if [[ -f "$OUTPUT_PATH" ]]; then
@@ -73,7 +79,7 @@ cleanup() {
 trap cleanup EXIT
 
 SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new)
-"${SCP[@]}" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DB" "$TMP_FILE"
+"${SCP[@]}" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DB_PATH" "$TMP_FILE"
 mv "$TMP_FILE" "$OUTPUT_PATH"
 
 python3 - <<'PY' "$OUTPUT_PATH"

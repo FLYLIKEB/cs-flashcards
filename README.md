@@ -50,10 +50,11 @@ http://127.0.0.1:8000
 
 카드 콘텐츠와 학습 진행상태를 모두 SQLite 중심으로 관리합니다.
 
-| 구분 | 저장 위치 | Git 관리 | 배포 시 덮어쓰기 | 용도 |
+| 구분 | 저장 위치 | Git 관리 | 일반 배포 시 원격 DB 파일 덮어쓰기 | 용도 |
 | --- | --- | --- | --- | --- |
-| 카드 콘텐츠 | `state/progress.sqlite`의 `cards` 테이블 | O | O | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트, 이미지 URL/alt, 한국은행 출제 여부, 중요도, 난이도 |
-| 학습 진행상태 | `state/progress.sqlite`의 `card_progress` 테이블 | O | O | O/X, 마지막 학습 시각, 복습 횟수, 북마크, 메모, 문제풀이 기록 |
+| 카드 콘텐츠 | `state/progress.sqlite`의 `cards` 테이블 | O | X | 용어, 영어명, 카테고리, 요약, 상세설명, 관련개념, 시험포인트, 이미지 URL/alt, 한국은행 출제 여부, 중요도, 난이도 |
+| 학습 진행상태 | `state/progress.sqlite`의 `card_progress` 테이블 | O | X | O/X, 마지막 학습 시각, 복습 횟수, 북마크, 메모, 문제풀이 기록 |
+
 
 앱은 `/api/cards`를 호출할 때 SQLite의 `cards` 테이블을 카드 콘텐츠 정본(source of truth)으로 읽고, 같은 DB의 진행상태·문제풀이 통계를 합쳐 반환합니다. 예전 배포에서 `card_progress`에 남아 있던 AI 설명/이미지 오버레이는 서버 시작 시 `cards` 테이블로 자동 이관한 뒤 비웁니다.
 
@@ -135,7 +136,8 @@ CREATE TABLE card_progress (
 - 개별 이미지/섹션 버튼과 문서 일괄 AI는 모두 비동기 작업 큐로 들어갑니다. 버튼을 누르면 즉시 요청 알림만 보이고, 백그라운드 완료 후 현재 문서가 자동 새로고침됩니다. 목차 체크박스로 여러 Markdown 문서를 골라 한 번에 일괄 생성할 수 있습니다.
 - 생성 중 이미지는 서버에서 처리되고, 완료되면 현재 화면 메시지와 브라우저 알림으로 알려줍니다.
 - 이미지 URL과 동적 미디어 설정은 모두 SQLite `cards` 테이블 정본을 직접 수정합니다.
-- 배포 시에는 `state/progress.sqlite`와 필요한 `state/ai_images/` 파일을 함께 반영해야 합니다.
+- 일반 배포는 `state/progress.sqlite`와 `state/ai_images/`를 건드리지 않습니다. 런타임 데이터 반영은 배포와 분리해서 수행합니다.
+
 - 프롬프트 입력 UI는 없고, 서버에 고정된 교육용 개념 이미지 프롬프트를 사용합니다.
 - AI 이미지 생성에는 서버 환경변수 `OPENAI_API_KEY`가 필요합니다.
 
@@ -194,7 +196,8 @@ CREATE TABLE card_progress (
 state/progress.sqlite
 ```
 
-수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 다만 일반 배포는 원격 `state/progress.sqlite`를 보존하므로, DB 내용 변경은 배포만으로 반영되지 않습니다.
+수정 후 GitHub에 커밋/푸시하면 코드와 정적 파일은 원격 사이트에 자동 반영됩니다. 하지만 원격 `state/progress.sqlite`는 일반 배포가 절대 덮어쓰지 않으므로, DB 내용 변경은 배포만으로 반영되지 않습니다.
+
 브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. 위키 이미지 AI 재생성도 같은 OpenAI 설정만 있으면 서버 로컬 위키 기준으로 바로 반영됩니다. GitHub 보관이 필요할 때만 `CS_FLASHCARDS_WIKI_GITHUB_REPO`/`CS_FLASHCARDS_WIKI_GITHUB_TOKEN`을 추가로 설정합니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
@@ -265,13 +268,14 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 문제은행/런타임 DB를 건드렸다면 여기서 끝내면 안 됩니다.
 
 - `state/progress.sqlite` 변경은 **GitHub push**와 **실서버 반영 확인**을 둘 다 끝내야 완료입니다.
-- 일반 배포는 원격 `state/progress.sqlite`를 **보존**해야 하며, 코드 배포로 전체 DB 파일을 덮어쓰면 안 됩니다.
+- 일반 배포는 원격 `state/progress.sqlite`를 **보존**해야 하며, 코드 배포로 전체 DB 파일을 덮어쓰는 경로는 제거되었습니다.
 - DB 내용 수정은 변경한 row/field만 원격에 반영해야 합니다. 변경과 무관한 원격 데이터는 그대로 유지되어야 합니다.
 - 같은 row/field를 누군가 원격에서 동시에 수정하면 마지막 반영이 이깁니다. 충돌 가능성이 있으면 먼저 원격 DB를 다시 pull 받아 기준을 맞춥니다.
-- `./scripts/sync_remote_sqlite_rows.sh`는 기본값으로 **row 전체를 upsert**합니다. 일부 필드만 바꿀 때는 `--columns answer,explanation`처럼 필요한 컬럼만 지정하고, 불필요한 row 삭제는 `--delete`로 대상 id만 지웁니다.
+- `./scripts/sync_remote_sqlite_rows.sh`는 이제 `--columns` 지정이 **필수**입니다. 필요한 컬럼만 명시적으로 반영하고, 불필요한 row 삭제는 `--delete`로 대상 id만 지웁니다.
 - 배포 후에는 `/api/health`만 보지 말고, 변경한 레코드를 `/api/question-bank`, `/api/cards` 같은 인증된 API로 직접 조회해 값이 맞는지 확인합니다.
 - 원격 DB가 비어 있거나 오래된 값이면 즉시 로컬의 정상 `state/progress.sqlite`를 서버로 복구하고 서비스를 재시작한 뒤 다시 검증합니다.
-- 정말로 전체 DB 복구가 필요한 재해 복구 상황이 아니면 `CS_FLASHCARDS_FORCE_DB_REPLACE=1` 같은 전체 교체 경로를 사용하지 않습니다.
+- 원격 DB 경로를 다른 파일로 바꾸는 옵션과 전체 파일 교체 경로는 모두 제거되었습니다.
+
 
 ### 권장 SQLite 작업 순서
 
@@ -284,7 +288,7 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 
 # 3) 바뀐 row/field만 원격에 반영
 ./scripts/sync_remote_sqlite_rows.sh --columns answer,explanation,answer_guide question_bank qb-011b1c688f53bb3974beb2e3
-./scripts/sync_remote_sqlite_rows.sh cards CS-001
+./scripts/sync_remote_sqlite_rows.sh --columns term,definition,detailed_explanation cards CS-001
 ./scripts/sync_remote_sqlite_rows.sh --delete question_bank qb-sample-001
 
 # 4) 인증된 API로 실제 서비스 값을 확인

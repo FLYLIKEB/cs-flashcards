@@ -36,7 +36,9 @@ from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions, nor
 ROOT = Path(__file__).resolve().parent
 DEFAULT_PROGRESS_DB_PATH = ROOT / "state" / "progress.sqlite"
 PROGRESS_DB_PATH = Path(os.environ.get("CS_FLASHCARD_PROGRESS_DB", DEFAULT_PROGRESS_DB_PATH)).expanduser().resolve()
+PROGRESS_DB_MUST_EXIST_ENV = "CS_FLASHCARD_PROGRESS_DB_MUST_EXIST"
 BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).expanduser().resolve()
+
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 PUBLIC_WIKI_ASSET_DIR = STATIC_DIR / "wiki-assets"
 PUBLIC_WIKI_ASSET_DIR.mkdir(parents=True, exist_ok=True)
@@ -985,7 +987,13 @@ def normalized_concept_media_type(value: Any) -> str:
 
 
 
+def progress_db_must_exist() -> bool:
+    return str(os.environ.get(PROGRESS_DB_MUST_EXIST_ENV, "")).strip() == "1"
+
+
 def connect_progress_db(progress_db_path: Path) -> sqlite3.Connection:
+    if progress_db_must_exist() and not progress_db_path.exists():
+        raise FileNotFoundError(f"Progress DB must already exist: {progress_db_path}")
     progress_db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(progress_db_path)
     conn.row_factory = sqlite3.Row
@@ -1142,6 +1150,8 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_field_name ON question_bank(field_name)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_category ON question_bank(category)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_issuer ON question_bank(issuer)")
+        backfill_question_bank_difficulty_rows(conn)
+
 
         conn.execute(
             """
@@ -2229,6 +2239,13 @@ def question_bank_keywords_for_card(card: dict[str, Any]) -> list[str]:
         *related,
     ])
 
+
+def question_bank_keywords_for_linked_card(card: dict[str, Any] | None) -> list[str]:
+    if not isinstance(card, dict) or not card:
+        return []
+    return question_bank_keywords_for_card(card)
+
+
 QUESTION_BANK_CATEGORIES = (
     "금융IT·신기술",
     "네트워크",
@@ -2367,14 +2384,24 @@ def normalize_question_bank_entry(
         raise ValueError("Multiple-choice answer_index must point to an existing choice")
     topic = normalize_question_bank_text(raw.get("topic"), limit=255)
     body = normalize_question_bank_markdown(raw.get("body"), limit=12000)
+    answer = normalize_question_bank_markdown(raw.get("answer"), limit=20000)
+    explanation = normalize_question_bank_markdown(raw.get("explanation"), limit=50000)
+    difficulty = normalized_question_bank_difficulty(raw.get("difficulty")) or infer_question_bank_difficulty(
+        question_type,
+        prompt,
+        body,
+        answer,
+        explanation,
+        card=card,
+    )
     normalized = {
         "question_bank_id": normalize_question_bank_text(raw.get("question_bank_id"), limit=255),
         "card_id": card_id,
         "question_type": question_type,
         "prompt": prompt,
         "body": body,
-        "answer": normalize_question_bank_markdown(raw.get("answer"), limit=20000),
-        "explanation": normalize_question_bank_markdown(raw.get("explanation"), limit=50000),
+        "answer": answer,
+        "explanation": explanation,
         "rubric": normalize_question_bank_list(raw.get("rubric"), item_limit=2000),
         "choices": choices,
         "answer_index": answer_index,
@@ -2388,8 +2415,8 @@ def normalize_question_bank_entry(
             body=body,
                 progress_db_path=progress_db_path,
         ),
-        "keywords": normalize_question_bank_list(raw.get("keywords"), item_limit=255),
-        "difficulty": normalize_question_bank_text(raw.get("difficulty"), limit=64),
+        "keywords": question_bank_keywords_for_linked_card(card),
+        "difficulty": difficulty,
         "issuer": normalize_question_bank_text(raw.get("issuer"), limit=255),
         "source_location": normalize_question_bank_text(raw.get("source_location"), limit=255),
         "section": normalize_question_bank_text(raw.get("section"), limit=64),
@@ -2398,6 +2425,7 @@ def normalize_question_bank_entry(
         "answer_guide": normalize_question_bank_markdown(raw.get("answer_guide"), limit=255),
         "session_mode": normalize_question_bank_text(raw.get("session_mode") or "practice", limit=32) or "practice",
     }
+
     if not normalized["category"]:
         raise ValueError("question category is required and must match an existing flashcard category")
     normalized["fingerprint"] = question_bank_fingerprint(normalized)
@@ -2408,14 +2436,22 @@ def normalize_question_bank_entry(
 def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     if row is None:
         return None
+    question_type = row["question_type"] if "question_type" in row.keys() else ""
+    prompt = row["prompt"] if "prompt" in row.keys() else ""
+    body = row["body"] if "body" in row.keys() else ""
+    answer = row["answer"] if "answer" in row.keys() else ""
+    explanation = row["explanation"] if "explanation" in row.keys() else ""
+    difficulty = normalized_question_bank_difficulty(row["difficulty"] if "difficulty" in row.keys() else "")
+    if not difficulty:
+        difficulty = infer_question_bank_difficulty(question_type, prompt, body, answer, explanation)
     return {
         "question_bank_id": row["id"],
         "card_id": row["card_id"] or "",
-        "question_type": row["question_type"] or "",
-        "prompt": row["prompt"] or "",
-        "body": row["body"] or "",
-        "answer": row["answer"] or "",
-        "explanation": row["explanation"] or "",
+        "question_type": question_type or "",
+        "prompt": prompt or "",
+        "body": body or "",
+        "answer": answer or "",
+        "explanation": explanation or "",
         "rubric": question_bank_json_list(row["rubric_json"] if "rubric_json" in row.keys() else "[]"),
         "choices": question_bank_json_list(row["choices_json"] if "choices_json" in row.keys() else "[]"),
         "answer_index": row["answer_index"] if "answer_index" in row.keys() else None,
@@ -2423,7 +2459,7 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
         "field_name": row["field_name"] if "field_name" in row.keys() else "",
         "category": row["category"] if "category" in row.keys() else "",
         "keywords": question_bank_json_list(row["keywords_json"] if "keywords_json" in row.keys() else "[]"),
-        "difficulty": row["difficulty"] if "difficulty" in row.keys() else "",
+        "difficulty": difficulty,
         "issuer": row["issuer"] if "issuer" in row.keys() else "",
         "source_location": row["source_location"] if "source_location" in row.keys() else "",
         "section": row["section"] if "section" in row.keys() else "",
@@ -2434,6 +2470,7 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
         "created_at": row["created_at"] if "created_at" in row.keys() else "",
         "updated_at": row["updated_at"] if "updated_at" in row.keys() else "",
     }
+
 
 
 
@@ -2783,6 +2820,7 @@ def read_question_bank_entries(
         item["question_attempt_status_label"] = QUESTION_BANK_ATTEMPT_FILTER_LABELS.get(item["question_attempt_status"], "안푼")
         item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
         item["english"] = card.get("english") or ""
+        item["keywords"] = question_bank_keywords_for_linked_card(card)
         item["card_category"] = card.get("category") or ""
         item["card_url"] = flashcard_card_url(item.get("card_id") or "") if item.get("card_id") else ""
         items.append(item)
@@ -2983,6 +3021,8 @@ FIN_CORP_MID_DIFFICULTY_HINTS = (
     "클라우드",
     "보안",
 )
+QUESTION_BANK_DIFFICULTY_LEVELS = {"상", "중", "하"}
+
 FIN_CORP_CONCEPT_CONVERSION_MARKERS = (
     "계산문제",
     "출력결과",
@@ -4110,6 +4150,99 @@ def fin_corp_question_bank_repair_answer(
 
 
 
+def normalized_question_bank_difficulty(value: Any) -> str:
+    difficulty = normalize_question_bank_text(value, limit=64)
+    return difficulty if difficulty in QUESTION_BANK_DIFFICULTY_LEVELS else ""
+
+
+
+def infer_question_bank_difficulty(
+    question_type: str,
+    prompt: str,
+    body: str,
+    answer: str,
+    explanation: str,
+    *,
+    card: dict[str, Any] | None = None,
+) -> str:
+    normalized_question_type = normalize_question_bank_text(question_type, limit=64).lower()
+    card_difficulty = normalized_question_bank_difficulty(card.get("difficulty")) if isinstance(card, dict) else ""
+    if card_difficulty:
+        if normalized_question_type == "essay":
+            return "상"
+        return card_difficulty
+    combined = "\n".join(part for part in (prompt, body, answer, explanation) if part).casefold()
+    if normalized_question_type == "essay":
+        return "상"
+    if normalized_question_type in {"multiple_choice", "short"}:
+        if any(hint.casefold() in combined for hint in FIN_CORP_HIGH_DIFFICULTY_HINTS):
+            return "중"
+        return "하"
+    if "```" in body or any(hint.casefold() in combined for hint in FIN_CORP_HIGH_DIFFICULTY_HINTS):
+        return "상"
+    if any(hint.casefold() in combined for hint in FIN_CORP_MID_DIFFICULTY_HINTS):
+        return "중"
+    return "중"
+
+
+
+def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
+    rows = conn.execute(
+        """
+        SELECT id, card_id, question_type, prompt, body, answer, explanation, difficulty, keywords_json
+        FROM question_bank
+        """
+    ).fetchall()
+    if not rows:
+        return
+    card_ids = sorted({str(row["card_id"] or "").strip() for row in rows if str(row["card_id"] or "").strip()})
+    card_map: dict[str, dict[str, Any]] = {}
+    if card_ids:
+        qmarks = ", ".join("?" for _ in card_ids)
+        card_rows = conn.execute(
+            f"SELECT card_id, term, english, related_concepts, difficulty FROM cards WHERE card_id IN ({qmarks})",
+            tuple(card_ids),
+        ).fetchall()
+        card_map = {
+            str(row["card_id"] or "").strip(): {
+                "term": row["term"] or "",
+                "english": row["english"] or "",
+                "related_concepts": row["related_concepts"] or "",
+                "difficulty": row["difficulty"] or "",
+            }
+            for row in card_rows
+            if str(row["card_id"] or "").strip()
+        }
+    difficulty_updates: list[tuple[str, str]] = []
+    keyword_updates: list[tuple[str, str]] = []
+    for row in rows:
+        card = card_map.get(str(row["card_id"] or "").strip())
+        expected_keywords = question_bank_keywords_for_linked_card(card)
+        current_keywords = question_bank_json_list(row["keywords_json"] if "keywords_json" in row.keys() else "[]")
+        if current_keywords != expected_keywords:
+            keyword_updates.append((question_bank_json_text(expected_keywords, item_limit=255), row["id"]))
+        current_difficulty = normalized_question_bank_difficulty(row["difficulty"] if "difficulty" in row.keys() else "")
+        if current_difficulty:
+            continue
+        difficulty_updates.append((
+            infer_question_bank_difficulty(
+                row["question_type"] or "",
+                row["prompt"] or "",
+                row["body"] or "",
+                row["answer"] or "",
+                row["explanation"] or "",
+                card=card,
+            ),
+            row["id"],
+        ))
+    if keyword_updates:
+        conn.executemany("UPDATE question_bank SET keywords_json = ? WHERE id = ?", keyword_updates)
+    if difficulty_updates:
+        conn.executemany("UPDATE question_bank SET difficulty = ? WHERE id = ?", difficulty_updates)
+
+
+
+
 def fin_corp_question_bank_difficulty(
     question_type: str,
     title: str,
@@ -4119,22 +4252,8 @@ def fin_corp_question_bank_difficulty(
     *,
     card: dict[str, Any] | None = None,
 ) -> str:
-    if isinstance(card, dict) and card.get("difficulty") in {"상", "중", "하"}:
-        if question_type == "essay":
-            return "상"
-        return str(card.get("difficulty"))
-    combined = "\n".join(part for part in (title, body, answer, explanation) if part).casefold()
-    if question_type == "essay":
-        return "상"
-    if question_type in {"multiple_choice", "short"}:
-        if any(hint.casefold() in combined for hint in FIN_CORP_HIGH_DIFFICULTY_HINTS):
-            return "중"
-        return "하"
-    if "```" in body or any(hint.casefold() in combined for hint in FIN_CORP_HIGH_DIFFICULTY_HINTS):
-        return "상"
-    if any(hint.casefold() in combined for hint in FIN_CORP_MID_DIFFICULTY_HINTS):
-        return "중"
-    return "중"
+    return infer_question_bank_difficulty(question_type, title, body, answer, explanation, card=card)
+
 
 
 
@@ -4270,7 +4389,8 @@ def parse_fin_corp_question_bank_entries(
                 "topic": fin_corp_question_bank_topic(title),
                 "field_name": FIN_CORP_FIELD_NAME,
                 "category": category,
-                "keywords": fin_corp_question_bank_keywords(title, stored_body, answer, explanation, card=card, rows=rows, choice_text=choice_text),
+                "keywords": question_bank_keywords_for_linked_card(card),
+
                 "difficulty": fin_corp_question_bank_difficulty(question_type, title, stored_body, answer, explanation, card=card),
                 "issuer": issuer,
                 "source_location": f"{page_title} · {question_number}. {title}",
@@ -4662,15 +4782,9 @@ def parse_bok_question_bank_entries(
                     "topic": topic,
                     "field_name": field_name,
                     "category": category,
-                    "keywords": bok_question_bank_keywords(
-                        page_title,
-                        topic,
-                        prompt=prompt,
-                        body=body,
-                        category=category,
-                        question_type=question_type,
-                    ),
-                    "difficulty": "",
+                    "keywords": [],
+                    "difficulty": infer_question_bank_difficulty(question_type, prompt, body, "", ""),
+
                     "issuer": "한국은행",
                     "source_location": f"{page_title} · {question_no}. {topic}" if topic else f"{page_title} · {question_no}",
                     "section": bok_question_bank_section_name(field_name, question_type),
@@ -4712,15 +4826,9 @@ def parse_bok_question_bank_entries(
             "topic": fallback_topic,
             "field_name": field_name,
             "category": category,
-            "keywords": bok_question_bank_keywords(
-                page_title,
-                fallback_topic,
-                prompt=f"### 1. {fallback_topic}",
-                body=body,
-                category=category,
-                question_type=question_type,
-            ),
-            "difficulty": "",
+            "keywords": [],
+            "difficulty": infer_question_bank_difficulty(question_type, f"### 1. {fallback_topic}", body, "", ""),
+
             "issuer": "한국은행",
             "source_location": f"{page_title} · 1. {fallback_topic}" if fallback_topic else f"{page_title} · 1",
             "section": bok_question_bank_section_name(field_name, question_type),

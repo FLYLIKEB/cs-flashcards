@@ -11,7 +11,7 @@ REMOTE_HOST="${CS_FLASHCARDS_LIGHTSAIL_HOST:-}"
 REMOTE_USER="${CS_FLASHCARDS_LIGHTSAIL_USER:-ubuntu}"
 SSH_KEY="${CS_FLASHCARDS_LIGHTSAIL_KEY:-}"
 REMOTE_DIR="${CS_FLASHCARDS_REMOTE_DIR:-/home/ubuntu/cs-flashcards}"
-REMOTE_DB="${CS_FLASHCARDS_REMOTE_DB_PATH:-$REMOTE_DIR/state/progress.sqlite}"
+REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"
 LOCAL_TARGET=""
 KEY_COLUMN=""
 COLUMN_SPEC=""
@@ -19,14 +19,13 @@ DELETE_MODE=0
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/sync_remote_sqlite_rows.sh [--local-db PATH] [--remote-db PATH] [--key COLUMN] [--columns col1,col2] [--delete] [--local-target PATH] <table> <row-id> [<row-id>...]
+Usage: ./scripts/sync_remote_sqlite_rows.sh [--local-db PATH] [--key COLUMN] [--columns col1,col2] [--delete] [--local-target PATH] <table> <row-id> [<row-id>...]
 
 Examples:
-  ./scripts/sync_remote_sqlite_rows.sh question_bank qb-011b1c688f53bb3974beb2e3
   ./scripts/sync_remote_sqlite_rows.sh --columns answer,explanation,answer_guide question_bank qb-011b1c688f53bb3974beb2e3
-  ./scripts/sync_remote_sqlite_rows.sh cards CS-001 CS-002
+  ./scripts/sync_remote_sqlite_rows.sh --columns term,definition,detailed_explanation cards CS-001 CS-002
   ./scripts/sync_remote_sqlite_rows.sh --delete question_bank qb-sample-001
-  ./scripts/sync_remote_sqlite_rows.sh --local-target /tmp/remote.sqlite question_bank qb-011b1c688f53bb3974beb2e3
+  ./scripts/sync_remote_sqlite_rows.sh --local-target /tmp/remote.sqlite --columns answer,explanation question_bank qb-011b1c688f53bb3974beb2e3
 EOF
 }
 
@@ -37,9 +36,10 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --remote-db)
-      REMOTE_DB="$2"
-      shift 2
+      echo "원격 DB 경로 변경은 금지됩니다. 고정 경로만 사용합니다: $REMOTE_DB_PATH" >&2
+      exit 1
       ;;
+
     --key)
       KEY_COLUMN="$2"
       shift 2
@@ -106,6 +106,11 @@ if [[ "$DELETE_MODE" == "1" && -n "$COLUMN_SPEC" ]]; then
   echo "--delete 와 --columns 는 함께 사용할 수 없습니다." >&2
   exit 1
 fi
+if [[ "$DELETE_MODE" != "1" && -z "$COLUMN_SPEC" ]]; then
+  echo "--columns 는 필수입니다. 원격 row 전체 덮어쓰기는 금지됩니다." >&2
+  exit 1
+fi
+
 
 if [[ "$DELETE_MODE" != "1" && ! -f "$LOCAL_DB" ]]; then
   echo "로컬 SQLite 파일을 찾을 수 없습니다: $LOCAL_DB" >&2
@@ -133,7 +138,7 @@ def valid_identifier(value: str) -> bool:
 
 def parse_column_spec(raw: str, *, key_column: str, available_columns: list[str]) -> list[str]:
     if not raw.strip():
-        return list(available_columns)
+        raise SystemExit('--columns 는 필수입니다. 원격 row 전체 덮어쓰기는 금지됩니다.')
     requested: list[str] = []
     seen: set[str] = set()
     for piece in re.split(r'[\s,]+', raw.strip()):
@@ -151,6 +156,7 @@ def parse_column_spec(raw: str, *, key_column: str, available_columns: list[str]
     if not requested:
         raise SystemExit('--columns 에 최소 1개 컬럼이 필요합니다.')
     return [key_column] + [column for column in requested if column != key_column]
+
 
 
 delete_mode = sys.argv[1] == '1'
@@ -287,12 +293,17 @@ if [[ -z "${REMOTE_HOST:-}" || ! -f "${SSH_KEY:-}" ]]; then
   echo "Lightsail 접속 정보가 없습니다. CS_FLASHCARDS_LIGHTSAIL_HOST / CS_FLASHCARDS_LIGHTSAIL_KEY를 지정하세요." >&2
   exit 1
 fi
+if [[ -n "${CS_FLASHCARDS_REMOTE_DB_PATH:-}" && "$CS_FLASHCARDS_REMOTE_DB_PATH" != "$REMOTE_DB_PATH" ]]; then
+  echo "원격 DB 경로 변경은 금지됩니다: $CS_FLASHCARDS_REMOTE_DB_PATH" >&2
+  exit 1
+fi
+
 
 SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new)
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 "${SCP[@]}" "$PAYLOAD_FILE" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PAYLOAD"
 "${SSH[@]}" "set -euo pipefail
 trap 'rm -f '\''$REMOTE_PAYLOAD'\''' EXIT
-python3 - '$REMOTE_DB' '$REMOTE_PAYLOAD' <<PY
+python3 - '$REMOTE_DB_PATH' '$REMOTE_PAYLOAD' <<PY
 $APPLY_PY
 PY"
