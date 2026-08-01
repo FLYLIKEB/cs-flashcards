@@ -42,7 +42,7 @@ select {
 
 .question-bank-shell-topbar,
 .cs-table-shell.question-bank-shell {
-  width: min(1280px, calc(100% - 32px));
+  width: min(1440px, calc(100% - 32px));
   margin: 0 auto;
 }
 
@@ -56,7 +56,7 @@ select {
 }
 
 .question-bank-shell-topbar-inner {
-  width: min(1280px, calc(100% - 32px));
+  width: min(1440px, calc(100% - 32px));
   margin: 0 auto;
   min-height: 66px;
   display: flex;
@@ -255,7 +255,7 @@ select {
 }
 
 .question-bank-shell-table-pane {
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
   grid-template-areas:
     "hero hero"
     "table filter"
@@ -530,6 +530,11 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   min-width: 0;
 }
 
+.question-bank-shell-table-pane #bankPageList .cs-table-wrap {
+  width: 100%;
+  max-width: 100%;
+}
+
 .cs-table-wrap {
   overflow: auto;
   border: 1px solid var(--cs-table-line);
@@ -539,7 +544,7 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
 
 .cs-table {
   width: 100%;
-  min-width: 920px;
+  min-width: 960px;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 0.76rem;
@@ -551,6 +556,10 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   border-bottom: 1px solid var(--cs-table-line);
   text-align: left;
   vertical-align: top;
+}
+
+.question-bank-shell-table-pane .cs-table th {
+  white-space: nowrap;
 }
 
 .cs-table th {
@@ -629,6 +638,8 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.32;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .question-bank-item-preview {
@@ -639,6 +650,8 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   color: var(--cs-table-muted);
   font-size: 0.71rem;
   line-height: 1.32;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .question-bank-issuer-text {
@@ -656,6 +669,8 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   color: var(--cs-table-muted);
   font-size: 0.71rem;
   line-height: 1.32;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .question-bank-type-pill,
@@ -720,7 +735,7 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
 }
 
 
-@media (max-width: 1100px) {
+@media (max-width: 1240px) {
   .question-bank-shell-table-pane {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
@@ -734,10 +749,11 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
     position: static;
   }
 }
+
 @media (max-width: 900px) {
   .question-bank-shell-topbar-inner,
   .cs-table-shell.question-bank-shell {
-    width: min(100vw - 20px, 1280px);
+    width: min(100vw - 20px, 1440px);
   }
 
   .question-bank-shell-topbar-inner,
@@ -767,7 +783,7 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
 @media (max-width: 620px) {
   .question-bank-shell-topbar,
   .cs-table-shell.question-bank-shell {
-    width: min(100vw - 16px, 1280px);
+    width: min(100vw - 16px, 1440px);
   }
 
   .question-bank-shell-card,
@@ -781,6 +797,6 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   }
 
   .cs-table {
-    min-width: 920px;
+    min-width: 960px;
   }
 }

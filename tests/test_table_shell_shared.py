@@ -30,6 +30,13 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn('function setPracticeCollapsed(', QUESTION_BANK_JS)
         self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
 
+    def test_question_bank_layout_prioritizes_full_table_width(self):
+        self.assertIn("width: min(1440px, calc(100% - 32px));", TABLE_SHELL_CSS)
+        self.assertIn('grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);', TABLE_SHELL_CSS)
+        self.assertIn('@media (max-width: 1240px)', TABLE_SHELL_CSS)
+        self.assertIn('overflow-wrap: anywhere;', TABLE_SHELL_CSS)
+        self.assertIn("{key: 'prompt', label: '문제', width: '24rem'", QUESTION_BANK_JS)
+        self.assertIn("tableMinWidth: '960px'", QUESTION_BANK_JS)
     def test_flashcard_popup_uses_shared_renderer(self):
         self.assertIn('/static/table-shell.css', APP_JS)
         self.assertIn('/static/table-shell.js', APP_JS)

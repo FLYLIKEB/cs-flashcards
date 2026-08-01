@@ -4,12 +4,12 @@ const QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_BANK_COLUMNS = [
   {key: 'index', label: '#', width: '56px'},
-  {key: 'prompt', label: '문제', width: '36rem', cellClassName: 'term-cell'},
-  {key: 'type', label: '형식', width: '6.5rem'},
-  {key: 'topic', label: '키워드', width: '10.5rem'},
-  {key: 'issuer', label: '기관', width: '7rem'},
-  {key: 'difficulty', label: '난이도', width: '5.5rem'},
-  {key: 'source', label: '출처', width: '8rem'},
+  {key: 'prompt', label: '문제', width: '24rem', cellClassName: 'term-cell'},
+  {key: 'type', label: '형식', width: '6rem'},
+  {key: 'topic', label: '키워드', width: '8.5rem'},
+  {key: 'issuer', label: '기관', width: '6.25rem'},
+  {key: 'difficulty', label: '난이도', width: '5rem'},
+  {key: 'source', label: '출처', width: '7rem'},
 ];
 const FILTER_FIELDS = [
   {key: 'q', id: 'bankPageQueryInput', label: '통합 검색'},
@@ -522,7 +522,7 @@ function renderTable() {
     columns: QUESTION_BANK_COLUMNS,
     rows: tableRows(),
     storageKey: QUESTION_BANK_COLUMN_ORDER_KEY,
-    tableMinWidth: '920px',
+    tableMinWidth: '960px',
     emptyText: '조건에 맞는 문제가 없습니다.',
     onRowActivate: (_row, index) => {
       bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
