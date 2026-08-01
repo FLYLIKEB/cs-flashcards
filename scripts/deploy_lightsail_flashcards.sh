@@ -293,24 +293,6 @@ print("SQLite runtime db:", json.dumps(summary, ensure_ascii=False))
 if not summary.get("ok"):
     raise SystemExit(f"Runtime progress DB is not healthy: {summary}")
 PY
-if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then
-  .venv/bin/python - <<'PY'
-import json
-import app
-fin_corp = app.sync_fin_corp_question_bank_entries(app.wiki_book_dir(), app.PROGRESS_DB_PATH)
-print("239 question-bank sync:", json.dumps({
-    "pages": fin_corp.get("pages", 0),
-    "cleared": fin_corp.get("cleared", 0),
-    "count": fin_corp.get("count", 0),
-}, ensure_ascii=False))
-bok = app.sync_bok_question_bank_entries(app.wiki_book_dir(), app.PROGRESS_DB_PATH)
-print("BOK question-bank sync:", json.dumps({
-    "pages": bok.get("pages", 0),
-    "cleared": bok.get("cleared", 0),
-    "count": bok.get("count", 0),
-}, ensure_ascii=False))
-PY
-fi
 
 sudo tee /etc/systemd/system/cs-flashcards.service >/dev/null <<EOF
 [Unit]
