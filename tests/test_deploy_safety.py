@@ -12,6 +12,7 @@ from unittest import mock
 import app as flashcard_app
 
 ROOT = Path(__file__).resolve().parents[1]
+APP_SOURCE = (ROOT / 'app.py').read_text(encoding='utf-8')
 BACKEND_SOURCE = (ROOT / 'flashcards_backend.py').read_text(encoding='utf-8')
 DEPLOY_SCRIPT = (ROOT / 'scripts' / 'deploy_lightsail_flashcards.sh').read_text(encoding='utf-8')
 PULL_SCRIPT = (ROOT / 'scripts' / 'pull_remote_sqlite.sh').read_text(encoding='utf-8')
@@ -46,6 +47,13 @@ def run_deploy_sqlite_guard(stage_dir: Path, archive_path: Path) -> subprocess.C
         text=True,
         check=False,
     )
+
+
+def bundled_stage_copy_targets() -> set[str]:
+    match = re.search(r'^cp (?P<targets>.+?) "\$TMP_STAGE/"$', DEPLOY_SCRIPT, re.MULTILINE)
+    if match is None:
+        raise AssertionError('deploy stage copy command not found')
+    return set(match.group('targets').split())
 
 def write_cards_sqlite(path: Path, *, cards_count: int) -> None:
     conn = sqlite3.connect(path)
@@ -180,6 +188,10 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertIn('배포 번들에 SQLite 파일을 포함하지 않습니다.', DEPLOY_SCRIPT)
         self.assertIn('CS_FLASHCARD_PROGRESS_DB_MUST_EXIST=1', DEPLOY_SCRIPT)
         self.assertIn('원격 SQLite 파일이 없으면 배포를 중단합니다', DEPLOY_SCRIPT)
+
+    def test_deploy_script_bundles_runtime_imported_backend_helper(self):
+        self.assertIn('import flashcards_backend', APP_SOURCE)
+        self.assertIn('flashcards_backend.py', bundled_stage_copy_targets())
 
     def test_deploy_script_has_valid_bash_syntax(self):
         result = subprocess.run(
