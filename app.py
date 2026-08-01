@@ -3,7 +3,10 @@ from __future__ import annotations
 import base64
 import html
 import hashlib
+import io
 import json
+import math
+import xml.etree.ElementTree as ET
 
 from contextlib import closing
 import hmac
@@ -18,8 +21,9 @@ from zoneinfo import ZoneInfo
 from uuid import uuid4
 
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request as UrlRequest, urlopen
+from PIL import Image
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -110,6 +114,9 @@ AI_IMAGE_ARTIFACT_RE = re.compile(
     r"^(?P<card_id>.+)-(?P<stamp>\d{8}-\d{6})-(?P<token>[0-9a-f]{8})\.(?P<ext>png|jpg|jpeg|webp|gif)$",
     re.IGNORECASE,
 )
+WIKI_IMAGE_FORMATS = {"png", "svg", "gif"}
+WIKI_GENERATED_ASSET_DIR = PurePosixPath("assets/generated-wiki-ai")
+WIKI_MARKDOWN_IMAGE_RE = re.compile(r"!\[(?P<alt>[^\]]*)\]\((?P<href>[^)\n]+)\)")
 
 DEFAULT_RECRUITMENT_SCHEDULE_PATH = ROOT / "data" / "recruitment_schedule_2026.json"
 RECRUITMENT_SCHEDULE_PATH = Path(
@@ -773,6 +780,14 @@ class WikiAiRewriteRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     content: str = Field(max_length=2_000_000)
     instruction: str = Field(default="", max_length=4000)
+
+
+class WikiImageRegenerateRequest(BaseModel):
+    source_path: str = Field(min_length=1, max_length=4096)
+    image_index: int = Field(ge=0, le=20000)
+    format: str = Field(default="png", max_length=16)
+
+
 class CardAiRewriteRequest(BaseModel):
     instruction: str = Field(default="", max_length=4000)
 
@@ -1832,16 +1847,12 @@ def image_generation_result_bytes(payload: dict[str, Any]) -> bytes:
     raise ValueError("이미지 생성 응답에서 결과 이미지를 찾지 못했습니다.")
 
 
-def generate_ai_concept_image_preview(
-    card: dict[str, str],
-    *,
-    preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
-) -> dict[str, str]:
+def request_openai_generated_image_bytes(prompt: str) -> bytes:
     if not OPENAI_API_KEY:
         raise RuntimeError("OPENAI_API_KEY가 설정되지 않아 AI 이미지 초안을 만들 수 없습니다.")
     payload = {
         "model": IMAGE_MODEL,
-        "prompt": concept_image_prompt(card),
+        "prompt": str(prompt or "").strip(),
         "size": IMAGE_SIZE,
         "quality": IMAGE_QUALITY,
     }
@@ -1866,7 +1877,15 @@ def generate_ai_concept_image_preview(
         parsed = json.loads(raw)
     except json.JSONDecodeError as exc:
         raise RuntimeError("OpenAI 이미지 API 응답을 JSON으로 해석하지 못했습니다.") from exc
-    image_bytes = image_generation_result_bytes(parsed)
+    return image_generation_result_bytes(parsed)
+
+
+def generate_ai_concept_image_preview(
+    card: dict[str, str],
+    *,
+    preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
+) -> dict[str, str]:
+    image_bytes = request_openai_generated_image_bytes(concept_image_prompt(card))
     preview_root = ensure_ai_image_dir(preview_dir)
     token = uuid4().hex
     preview_name = f"{token}.png"
@@ -5311,7 +5330,13 @@ def wiki_github_contents_api_url(relative_path: str) -> str:
     return f"{WIKI_GITHUB_API_BASE}/repos/{quote(owner, safe='')}/{quote(repo, safe='')}/contents/{quote(content_path, safe='/')}"
 
 
-def wiki_github_api_json(method: str, url: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+def wiki_github_api_json(
+    method: str,
+    url: str,
+    payload: dict[str, Any] | None = None,
+    *,
+    allow_missing: bool = False,
+) -> dict[str, Any] | None:
     headers = {
         "Accept": "application/vnd.github+json",
         "User-Agent": "cs-flashcards/wiki-checklist",
@@ -5327,6 +5352,8 @@ def wiki_github_api_json(method: str, url: str, payload: dict[str, Any] | None =
         with urlopen(request, timeout=20) as response:
             body = response.read().decode(response.headers.get_content_charset() or "utf-8")
     except HTTPError as exc:
+        if allow_missing and exc.code == 404:
+            return None
         raw_body = exc.read().decode("utf-8", errors="replace")
         message = raw_body or str(exc)
         try:
@@ -5476,6 +5503,320 @@ def render_wiki_markdown_preview(
         "html": render_markdown_page(content, repo, target),
     }
 
+
+
+def normalized_wiki_image_format(value: str) -> str:
+    normalized = str(value or "png").strip().lower() or "png"
+    if normalized not in WIKI_IMAGE_FORMATS:
+        raise ValueError("지원하지 않는 위키 이미지 포맷입니다. png, svg, gif 중에서 선택하세요.")
+    return normalized
+
+
+
+def wiki_markdown_image_format(href: str) -> str:
+    clean = str(href or "").split("#", 1)[0].split("?", 1)[0].strip()
+    suffix = PurePosixPath(urlparse(clean).path or clean).suffix.lower().lstrip(".")
+    return suffix if suffix in WIKI_IMAGE_FORMATS else "png"
+
+
+
+def parse_wiki_markdown_images(markdown_text: str, repo_dir: Path, current_source: Path) -> list[dict[str, Any]]:
+    lines = markdown_text.splitlines()
+    section_by_line: dict[int, str] = {}
+    current_section = extract_markdown_title(markdown_text, current_source.stem)
+    for line_number, line in enumerate(lines, start=1):
+        heading = WIKI_HEADING_RE.match(line.strip())
+        if heading:
+            current_section = heading.group(2).strip()
+        section_by_line[line_number] = current_section
+    images: list[dict[str, Any]] = []
+    for image_index, match in enumerate(WIKI_MARKDOWN_IMAGE_RE.finditer(markdown_text)):
+        href = match.group("href").strip()
+        line_number = markdown_text.count("\n", 0, match.start()) + 1
+        caption = ""
+        source_note = ""
+        if line_number < len(lines):
+            next_line = lines[line_number].strip()
+            if next_line.startswith("> 그림:"):
+                caption = next_line.removeprefix("> 그림:").strip()
+        if line_number + 1 < len(lines):
+            source_line = lines[line_number + 1].strip()
+            if source_line.startswith("> 출처:"):
+                source_note = source_line.removeprefix("> 출처:").strip()
+        images.append({
+            "index": image_index,
+            "line_number": line_number,
+            "alt": match.group("alt").strip(),
+            "source_href": href,
+            "src": rewrite_markdown_href(repo_dir, current_source, href),
+            "caption": caption,
+            "source_note": source_note,
+            "section_title": section_by_line.get(line_number, current_source.stem),
+            "format": wiki_markdown_image_format(href),
+        })
+    return images
+
+
+
+def replace_nth_markdown_image_href(markdown_text: str, image_index: int, next_href: str) -> tuple[str, dict[str, Any]]:
+    matches = list(WIKI_MARKDOWN_IMAGE_RE.finditer(markdown_text))
+    if image_index < 0 or image_index >= len(matches):
+        raise ValueError(f"위키 이미지 인덱스를 찾지 못했습니다: {image_index}")
+    target = matches[image_index]
+    updated = markdown_text[: target.start("href")] + next_href + markdown_text[target.end("href") :]
+    return updated, {
+        "index": image_index,
+        "alt": target.group("alt").strip(),
+        "previous_href": target.group("href").strip(),
+        "next_href": next_href,
+    }
+
+
+
+def wiki_generated_image_asset_relative_path(source_relative: str, image_index: int, image_format: str) -> str:
+    normalized_format = normalized_wiki_image_format(image_format)
+    base_name = re.sub(r"[^A-Za-z0-9._-]+", "-", PurePosixPath(source_relative).stem).strip("-") or "wiki"
+    token = hashlib.sha1(str(source_relative).encode("utf-8")).hexdigest()[:8]
+    return (WIKI_GENERATED_ASSET_DIR / f"{base_name}-{token}-image-{image_index + 1:02d}.{normalized_format}").as_posix()
+
+
+
+def wiki_png_image_prompt(page_title: str, image: dict[str, Any]) -> str:
+    section_title = normalized_card_text(image.get("section_title", ""), limit=200)
+    alt = normalized_card_text(image.get("alt", ""), limit=400)
+    caption = normalized_card_text(image.get("caption", ""), limit=800)
+    source_note = normalized_card_text(image.get("source_note", ""), limit=500)
+    return (
+        "Create a clean, minimal educational concept illustration for a Korean CS wiki page. "
+        "No text, no letters, no labels, no UI, no watermark, no logo, no border, no collage. "
+        "Use a simple single-scene composition with soft modern colors and high clarity. "
+        f"Page title: {page_title}. "
+        f"Section: {section_title or page_title}. "
+        f"Image alt: {alt or page_title}. "
+        f"Caption: {caption}. "
+        f"Source note: {source_note}. "
+        "Visualize the core mechanism or mental model so a learner can understand it at a glance. "
+        "Prefer a neutral academic diagram-like illustration, but rendered as a polished image rather than literal text diagram."
+    )
+
+
+
+def wiki_gif_image_prompt(page_title: str, image: dict[str, Any]) -> str:
+    section_title = normalized_card_text(image.get("section_title", ""), limit=200)
+    alt = normalized_card_text(image.get("alt", ""), limit=400)
+    caption = normalized_card_text(image.get("caption", ""), limit=800)
+    return (
+        "Create a clean, minimal educational concept illustration for a Korean CS wiki page that implies a short looping process. "
+        "No text, no letters, no labels, no UI, no watermark, no logo, no border, no collage. "
+        "Use a centered single-scene composition with soft modern colors, clear depth cues, and 3 to 4 implied motion stages. "
+        f"Page title: {page_title}. "
+        f"Section: {section_title or page_title}. "
+        f"Image alt: {alt or page_title}. "
+        f"Caption: {caption}. "
+        "Visualize the process so it can be converted into a subtle looping educational GIF with clear progression at a glance."
+    )
+
+
+
+def validate_generated_wiki_svg(svg_text: str) -> str:
+    clean = str(svg_text or "").strip()
+    if not clean:
+        raise ValueError("AI SVG 본문이 비어 있습니다.")
+    if len(clean) > 200_000:
+        raise ValueError("AI SVG 본문이 너무 깁니다.")
+    try:
+        root = ET.fromstring(clean)
+    except ET.ParseError as exc:
+        raise ValueError("AI SVG 응답이 올바른 XML이 아닙니다.") from exc
+    if root.tag.rsplit("}", 1)[-1].lower() != "svg":
+        raise ValueError("AI SVG 응답의 루트가 svg가 아닙니다.")
+    for element in root.iter():
+        tag_name = element.tag.rsplit("}", 1)[-1].lower()
+        if tag_name in {"script", "foreignobject", "iframe", "object", "embed"}:
+            raise ValueError("AI SVG 응답에 허용되지 않는 요소가 포함되어 있습니다.")
+        for attr_name, attr_value in element.attrib.items():
+            local_name = attr_name.rsplit("}", 1)[-1].lower()
+            value = str(attr_value or "").strip()
+            if local_name == "href" and value and not value.startswith("#"):
+                raise ValueError("AI SVG 응답에 외부 참조가 포함되어 있습니다.")
+    return clean
+
+
+
+def generate_wiki_svg_markup(page_title: str, image: dict[str, Any]) -> str:
+    section_title = normalized_card_text(image.get("section_title", ""), limit=200)
+    alt = normalized_card_text(image.get("alt", ""), limit=400)
+    caption = normalized_card_text(image.get("caption", ""), limit=800)
+    source_note = normalized_card_text(image.get("source_note", ""), limit=500)
+    parsed = request_codex_json_object(
+        (
+            "You design valid standalone SVG illustrations. Return only one JSON object with the key svg. "
+            "The svg value must be a complete standalone SVG string sized for a square canvas. "
+            "Use only safe SVG elements and attributes. Do not use script, foreignObject, iframe, external href, CSS imports, fonts, or text."
+        ),
+        {
+            "page": {
+                "title": page_title,
+                "section_title": section_title,
+            },
+            "image": {
+                "alt": alt,
+                "caption": caption,
+                "source_note": source_note,
+            },
+            "style": {
+                "tone": "clean minimal educational concept illustration",
+                "constraints": [
+                    "no text",
+                    "no letters",
+                    "no labels",
+                    "no UI",
+                    "soft modern colors",
+                    "simple academic diagram feel",
+                ],
+            },
+        },
+        parse_error_message="AI SVG 응답을 JSON으로 해석하지 못했습니다.",
+    )
+    return validate_generated_wiki_svg(str(parsed.get("svg") or ""))
+
+
+
+def subtle_loop_gif_from_png(image_bytes: bytes) -> bytes:
+    resampling = getattr(getattr(Image, "Resampling", Image), "LANCZOS", Image.LANCZOS)
+    with Image.open(io.BytesIO(image_bytes)) as original:
+        base = original.convert("RGBA")
+        side = max(base.width, base.height)
+        canvas = Image.new("RGBA", (side, side), (255, 255, 255, 255))
+        canvas.paste(base, ((side - base.width) // 2, (side - base.height) // 2), base)
+        if side > 720:
+            canvas = canvas.resize((720, 720), resampling)
+            side = 720
+        frames: list[Image.Image] = []
+        for step in range(12):
+            angle = (2 * math.pi * step) / 12
+            scale = 1.0 + 0.035 * math.sin(angle)
+            offset_x = int(side * 0.012 * math.sin(angle))
+            offset_y = int(side * 0.01 * math.cos(angle))
+            scaled_side = max(1, int(side * scale))
+            scaled = canvas.resize((scaled_side, scaled_side), resampling)
+            frame = Image.new("RGBA", (side, side), (255, 255, 255, 255))
+            left = (side - scaled_side) // 2 + offset_x
+            top = (side - scaled_side) // 2 + offset_y
+            frame.paste(scaled, (left, top), scaled)
+            frames.append(frame.convert("P", palette=Image.Palette.ADAPTIVE))
+    out = io.BytesIO()
+    frames[0].save(
+        out,
+        format="GIF",
+        save_all=True,
+        append_images=frames[1:],
+        duration=110,
+        loop=0,
+        optimize=False,
+        disposal=2,
+    )
+    return out.getvalue()
+
+
+
+def upsert_wiki_binary_asset(
+    relative_path: str,
+    content: bytes,
+    *,
+    message: str,
+    repo_dir: Path | None = None,
+) -> dict[str, Any]:
+    repo = wiki_book_dir(repo_dir)
+    target = safe_wiki_path(repo, relative_path)
+    if not target:
+        raise ValueError(f"잘못된 위키 자산 경로입니다: {relative_path}")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    sync_target = wiki_checklist_sync_target()
+    if sync_target == "github":
+        existing = wiki_github_api_json(
+            "GET",
+            f"{wiki_github_contents_api_url(relative_path)}?ref={quote(WIKI_GITHUB_BRANCH, safe='')}",
+            allow_missing=True,
+        )
+        payload = {
+            "message": message,
+            "content": base64.b64encode(content).decode("ascii"),
+            "branch": WIKI_GITHUB_BRANCH,
+        }
+        if isinstance(existing, dict):
+            sha = str(existing.get("sha") or "").strip()
+            if sha:
+                payload["sha"] = sha
+        wiki_github_api_json("PUT", wiki_github_contents_api_url(relative_path), payload)
+    previous = target.read_bytes() if target.exists() else None
+    if previous != content:
+        target.write_bytes(content)
+    return {
+        "sync_target": sync_target,
+        "relative_path": str(relative_path).replace(os.sep, "/"),
+        "url": wiki_raw_url(relative_path),
+    }
+
+
+
+def regenerate_wiki_image_asset(
+    payload: WikiImageRegenerateRequest,
+    repo_dir: Path | None = None,
+) -> dict[str, Any]:
+    repo, target, source_relative, local_content = resolve_wiki_markdown_source(payload.source_path, repo_dir)
+    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
+        source_relative,
+        local_content,
+        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 이미지 재생성을 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
+    )
+    images = parse_wiki_markdown_images(current_content, repo, target)
+    if payload.image_index >= len(images):
+        raise ValueError(f"위키 이미지 인덱스를 찾지 못했습니다: {payload.image_index}")
+    image = images[payload.image_index]
+    image_format = normalized_wiki_image_format(payload.format)
+    page_title = extract_markdown_title(current_content, target.stem)
+    if image_format == "svg":
+        asset_bytes = generate_wiki_svg_markup(page_title, image).encode("utf-8")
+    elif image_format == "gif":
+        asset_bytes = subtle_loop_gif_from_png(request_openai_generated_image_bytes(wiki_gif_image_prompt(page_title, image)))
+    else:
+        asset_bytes = request_openai_generated_image_bytes(wiki_png_image_prompt(page_title, image))
+    asset_relative_path = wiki_generated_image_asset_relative_path(source_relative, payload.image_index, image_format)
+    asset_saved = upsert_wiki_binary_asset(
+        asset_relative_path,
+        asset_bytes,
+        message=f"Regenerate wiki asset: {asset_relative_path}",
+        repo_dir=repo,
+    )
+    updated_content, image_update = replace_nth_markdown_image_href(current_content, payload.image_index, asset_relative_path)
+    changed = updated_content != current_content
+    if sync_target == "github" and changed and remote_sha:
+        github_update_wiki_source(
+            source_relative,
+            updated_content,
+            remote_sha,
+            f"Regenerate wiki image: {source_relative}#image-{payload.image_index + 1}",
+        )
+    if updated_content != local_content:
+        target.write_text(updated_content, encoding="utf-8")
+    page_slug = wiki_slug_for_source(repo, target)
+    return {
+        "page": read_wiki_page(page_slug, repo),
+        "updated": {
+            "source_path": source_relative,
+            "page_slug": page_slug,
+            "sync_target": sync_target,
+            "changed": changed,
+            "format": image_format,
+            "image_index": payload.image_index,
+            "asset_relative_path": asset_saved["relative_path"],
+            "asset_url": asset_saved["url"],
+            "alt": image.get("alt") or "",
+            "previous_href": image_update["previous_href"],
+            "next_href": image_update["next_href"],
+        },
+    }
 
 
 
@@ -5653,6 +5994,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
     title = page_meta.get("title") or extract_markdown_title(markdown_text, source_path.stem)
     linked_cards = linked_cards_for_wiki_page(slug, title, source_relative, progress_db_path=PROGRESS_DB_PATH)
     last_modified_at, last_modified_label = wiki_last_modified_metadata(source_path)
+    images = parse_wiki_markdown_images(markdown_text, repo, source_path)
 
     return {
         "slug": slug,
@@ -5662,6 +6004,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
         "url": wiki_page_url(slug),
         "breadcrumbs": index["breadcrumbs"].get(slug, [{"title": title, "slug": slug, "url": wiki_page_url(slug)}]),
         "html": render_markdown_page(markdown_text, repo, source_path),
+        "images": images,
         "last_modified_at": last_modified_at,
         "last_modified_label": last_modified_label,
         "primary_card": linked_cards[0] if linked_cards else None,
@@ -5750,6 +6093,20 @@ def api_wiki_ai_rewrite_preview(payload: WikiAiRewriteRequest) -> dict[str, Any]
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+
+
+@app.post("/api/wiki/image-ai/regenerate")
+def api_wiki_image_regenerate(payload: WikiImageRegenerateRequest) -> dict[str, Any]:
+    try:
+        return regenerate_wiki_image_asset(payload)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 @app.post("/api/wiki/render-preview")

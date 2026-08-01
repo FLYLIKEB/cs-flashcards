@@ -6721,15 +6721,55 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   border-top: 1px solid var(--wiki-border-soft);
 }
 
+.wiki-inline-image-shell {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.15rem auto;
+}
+
 .wiki-inline-image {
   display: block;
   max-width: 100%;
   height: auto;
-  margin: 1.15rem auto;
+  margin: 0;
   border: 1px solid var(--wiki-border-soft);
   border-radius: 2px;
   background: #ffffff;
   box-shadow: none;
+}
+
+.wiki-inline-image-ai {
+  position: absolute;
+  top: .42rem;
+  right: .42rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .32rem;
+  padding: .18rem;
+  border: 1px solid rgba(148, 163, 184, .32);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .08);
+}
+
+.wiki-inline-image-format {
+  min-width: 3.45rem;
+  padding: .16rem .42rem;
+  border: 1px solid var(--wiki-border-soft);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: .68rem;
+  line-height: 1.2;
+}
+
+.wiki-inline-image-ai-btn {
+  min-width: 2rem;
+  padding: .16rem .52rem;
+  font-size: .7rem;
+  line-height: 1.2;
 }
 
 .wiki-article blockquote {

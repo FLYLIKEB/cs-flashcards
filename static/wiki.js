@@ -19,6 +19,7 @@ const wikiState = {
   editorAiTemplateEditorOpen: false,
   editorSourcePath: '',
   editorOriginalContent: '',
+  imageAiLoadingIndex: -1,
 };
 
 const wiki$ = (id) => document.getElementById(id);
@@ -719,10 +720,103 @@ function wikiSyncStatusLabel(syncTarget) {
   return syncTarget === 'github' ? 'GitHub 반영 완료' : '로컬 저장 완료';
 }
 
+function wikiEnhanceInlineImages(page = wikiState.page) {
+  const article = wiki$('wikiArticle');
+  if (!article) return;
+  const items = Array.isArray(page?.images) ? page.images : [];
+  article.querySelectorAll('img.wiki-inline-image').forEach((image, index) => {
+    const item = items[index] || {index, format: 'png', alt: image.getAttribute('alt') || ''};
+    let shell = image.parentElement?.classList?.contains('wiki-inline-image-shell') ? image.parentElement : null;
+    if (!shell) {
+      shell = document.createElement('span');
+      shell.className = 'wiki-inline-image-shell';
+      image.parentNode?.insertBefore(shell, image);
+      shell.appendChild(image);
+    }
+    shell.querySelector('.wiki-inline-image-ai')?.remove();
+    const controls = document.createElement('span');
+    controls.className = 'wiki-inline-image-ai';
+    const select = document.createElement('select');
+    select.className = 'wiki-inline-image-format';
+    select.dataset.wikiImageIndex = String(index);
+    select.setAttribute('aria-label', `${item?.alt || image.getAttribute('alt') || '위키 이미지'} 파일 포맷`);
+    ['png', 'svg', 'gif'].forEach((format) => {
+      const option = document.createElement('option');
+      option.value = format;
+      option.textContent = format;
+      select.appendChild(option);
+    });
+    const currentFormat = ['png', 'svg', 'gif'].includes(String(item?.format || '').toLowerCase())
+      ? String(item.format).toLowerCase()
+      : 'png';
+    select.value = currentFormat;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'inline-ai-btn has-tip wiki-inline-image-ai-btn';
+    button.dataset.wikiImageIndex = String(index);
+    button.dataset.tip = '이미지 AI';
+    button.textContent = 'AI';
+    button.title = 'AI 이미지 재생성';
+    if (wikiAiTools?.setButtonBusy) {
+      wikiAiTools.setButtonBusy(button, {
+        active: wikiState.imageAiLoadingIndex === index,
+        idleLabel: 'AI',
+        busyLabel: '…',
+        idleTitle: 'AI 이미지 재생성',
+        busyTitle: 'AI 이미지 생성 중',
+      });
+    } else {
+      button.disabled = wikiState.imageAiLoadingIndex === index;
+      if (button.disabled) button.textContent = '…';
+    }
+    button.addEventListener('click', () => {
+      wikiRegenerateInlineImage(index);
+    });
+    controls.append(select, button);
+    shell.appendChild(controls);
+  });
+}
+
+async function wikiRegenerateInlineImage(imageIndex) {
+  const page = wikiState.page;
+  if (!page?.source_path || wikiState.imageAiLoadingIndex >= 0) return;
+  const image = Array.isArray(page?.images) ? page.images[imageIndex] : null;
+  if (!image) return;
+  const select = document.querySelector(`.wiki-inline-image-format[data-wiki-image-index="${imageIndex}"]`);
+  const format = String(select?.value || image?.format || 'png').trim().toLowerCase() || 'png';
+  wikiState.imageAiLoadingIndex = imageIndex;
+  wikiEnhanceInlineImages(page);
+  try {
+    const response = wikiAiTools?.postJson
+      ? await wikiAiTools.postJson(wikiApiUrl('/api/wiki/image-ai/regenerate'), {
+          source_path: page.source_path,
+          image_index: imageIndex,
+          format,
+        })
+      : await wikiFetchJson(wikiApiUrl('/api/wiki/image-ai/regenerate'), {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            source_path: page.source_path,
+            image_index: imageIndex,
+            format,
+          }),
+        });
+    wikiApplyPage(response?.page || null);
+    wikiStatus(`${image?.alt || page?.title || '이미지'} ${format.toUpperCase()} AI 저장 완료`);
+  } catch (error) {
+    wikiStatus(`AI 이미지 재생성 실패: ${error.message || error}`, true);
+  } finally {
+    wikiState.imageAiLoadingIndex = -1;
+    wikiEnhanceInlineImages(wikiState.page);
+  }
+}
+
 function wikiApplyPage(page) {
   wikiState.page = page || null;
   wikiState.currentSlug = page?.slug || '';
   wiki$('wikiArticle').innerHTML = page?.html || '<p class="muted">문서가 비어 있습니다.</p>';
+  wikiEnhanceInlineImages(page);
   wiki$('wikiRawLink').href = page?.raw_url || '#';
   document.title = `${page?.title || '문서'} · ${wikiState.index?.book?.title || 'CS 학습 위키'}`;
   wikiRenderBreadcrumbs(page);

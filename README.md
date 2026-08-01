@@ -131,6 +131,7 @@ CREATE TABLE card_progress (
 - 브라우저 카드 뒷면의 `코드` 버튼으로 `image`/`gif`/`video` URL이나 `mermaid`/`html` 코드를 바로 저장할 수 있습니다.
 - `html`은 메인 페이지에 직접 삽입하지 않고 sandbox iframe 안에서만 실행됩니다.
 - 브라우저의 작은 `AI` 버튼으로 새 이미지를 만들면 결과는 SQLite `cards` 테이블에 기록되고, 최종 PNG는 서버 `state/ai_images/` 아래에 보관됩니다. AI가 저장한 이미지는 `concept_media_type=image`, `concept_media_payload=/api/ai-images/...`로도 함께 기록됩니다.
+- 위키 문서의 각 이미지에도 작은 포맷 선택(`png`/`svg`/`gif`)과 `AI` 버튼이 붙습니다. 누르면 결과가 위키 원본 저장소 `assets/generated-wiki-ai/` 아래에 저장되고 현재 Markdown 이미지 링크도 함께 갱신됩니다.
 - 생성 중 이미지는 서버에서 처리되고, 완료되면 현재 화면 메시지와 브라우저 알림으로 알려줍니다.
 - 이미지 URL과 동적 미디어 설정은 모두 SQLite `cards` 테이블 정본을 직접 수정합니다.
 - 배포 시에는 `state/progress.sqlite`와 필요한 `state/ai_images/` 파일을 함께 반영해야 합니다.
@@ -193,7 +194,7 @@ state/progress.sqlite
 ```
 
 수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 저장소의 `state/progress.sqlite`를 서버에 그대로 반영합니다.
-브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
+브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. 위키 이미지 AI 재생성은 같은 OpenAI 설정을 쓰고, 원격까지 반영하려면 `CS_FLASHCARDS_WIKI_GITHUB_REPO`/`CS_FLASHCARDS_WIKI_GITHUB_TOKEN` 구성이 필요합니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
 
