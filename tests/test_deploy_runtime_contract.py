@@ -33,7 +33,7 @@ class DeployRuntimeContractTests(unittest.TestCase):
 
     def test_readme_documents_preserved_remote_sqlite_contract(self):
         readme = README.read_text(encoding="utf-8")
-        self.assertIn('일반 배포는 원격 `state/progress.sqlite`를 **보존**합니다.', readme)
+        self.assertIn('원격 `state/progress.sqlite`를 **보존**', readme)
         self.assertIn('content_card_count', readme)
 
 

@@ -194,7 +194,7 @@ CREATE TABLE card_progress (
 state/progress.sqlite
 ```
 
-수정 후 GitHub에 커밋/푸시하면 코드 배포가 자동으로 시작되지만, 일반 배포는 원격 `state/progress.sqlite`를 **보존**합니다. 콘텐츠/문제은행 데이터를 바꿨다면 GitHub push만으로 끝나지 않고, 필요한 row/field를 별도로 원격 SQLite에 반영해야 합니다.
+수정 후 GitHub에 커밋/푸시하면 원격 사이트 코드 배포가 자동으로 시작됩니다. 다만 일반 배포는 원격 `state/progress.sqlite`를 **보존**하므로, 콘텐츠/문제은행 데이터 변경은 GitHub push만으로 끝나지 않고 필요한 row/field를 별도로 원격 SQLite에 반영해야 합니다.
 브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. 위키 이미지 AI 재생성도 같은 OpenAI 설정만 있으면 서버 로컬 위키 기준으로 바로 반영됩니다. GitHub 보관이 필요할 때만 `CS_FLASHCARDS_WIKI_GITHUB_REPO`/`CS_FLASHCARDS_WIKI_GITHUB_TOKEN`을 추가로 설정합니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
@@ -270,6 +270,7 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 - 일반 배포는 원격 `state/progress.sqlite`를 **보존**해야 하며, 코드 배포로 전체 DB 파일을 덮어쓰면 안 됩니다.
 - DB 내용 수정은 변경한 row/field만 원격에 반영해야 합니다. 변경과 무관한 원격 데이터는 그대로 유지되어야 합니다.
 - 같은 row/field를 누군가 원격에서 동시에 수정하면 마지막 반영이 이깁니다. 충돌 가능성이 있으면 먼저 원격 DB를 다시 pull 받아 기준을 맞춥니다.
+- `./scripts/sync_remote_sqlite_rows.sh`는 기본값으로 **row 전체를 upsert**합니다. 일부 필드만 바꿀 때는 `--columns answer,explanation`처럼 필요한 컬럼만 지정하고, 불필요한 row 삭제는 `--delete`로 대상 id만 지웁니다.
 - 배포 후에는 `/api/health`만 보지 말고, 변경한 레코드를 `/api/question-bank`, `/api/cards` 같은 인증된 API로 직접 조회해 값이 맞는지 확인합니다.
 - 원격 DB가 비어 있거나 오래된 값이면 즉시 로컬의 정상 `state/progress.sqlite`를 서버로 복구하고 서비스를 재시작한 뒤 다시 검증합니다.
 - 정말로 전체 DB 복구가 필요한 재해 복구 상황이 아니면 `CS_FLASHCARDS_FORCE_DB_REPLACE=1` 같은 전체 교체 경로를 사용하지 않습니다.
@@ -283,9 +284,10 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 # 2) 로컬에서 필요한 row만 수정
 #    예: state/progress.sqlite 안의 question_bank / cards row 수정
 
-# 3) 바뀐 row만 원격에 반영
-./scripts/sync_remote_sqlite_rows.sh question_bank qb-011b1c688f53bb3974beb2e3
+# 3) 바뀐 row/field만 원격에 반영
+./scripts/sync_remote_sqlite_rows.sh --columns answer,explanation,answer_guide question_bank qb-011b1c688f53bb3974beb2e3
 ./scripts/sync_remote_sqlite_rows.sh cards CS-001
+./scripts/sync_remote_sqlite_rows.sh --delete question_bank qb-sample-001
 
 # 4) 인증된 API로 실제 서비스 값을 확인
 ./scripts/remote_flashcards_api.sh '/api/question-bank?query=리팩토링&limit=1'

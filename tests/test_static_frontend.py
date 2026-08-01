@@ -342,6 +342,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="bankPageSelectionSummary"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticeStatus"', QUESTION_BANK_HTML)
         self.assertIn('question-bank-table-selection', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageCategoryGuideBtn"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageCategoryGuideDialog"', QUESTION_BANK_HTML)
         self.assertIn('bankPageHeaderPracticeToggle', QUESTION_BANK_JS)
         self.assertNotIn('bankPageOpenPracticeTab', QUESTION_BANK_HTML)
         self.assertIn('/api/question-bank', QUESTION_BANK_JS)
@@ -361,6 +363,9 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn("window.addEventListener('message'", QUESTION_BANK_JS)
         self.assertIn('function renderHeader()', QUESTION_BANK_JS)
         self.assertIn('function renderOverviewCards()', QUESTION_BANK_JS)
+        self.assertIn('function renderCategoryGuideDialog()', QUESTION_BANK_JS)
+        self.assertIn('function openCategoryGuideDialog()', QUESTION_BANK_JS)
+        self.assertIn('function closeCategoryGuideDialog(', QUESTION_BANK_JS)
         self.assertIn('function renderActiveFilters()', QUESTION_BANK_JS)
         self.assertIn('function renderSelectionSummary()', QUESTION_BANK_JS)
         self.assertIn('function resetFilters()', QUESTION_BANK_JS)
@@ -742,6 +747,14 @@ class StaticFrontendTests(unittest.TestCase):
             'questionAnswerRefineInstruction',
             'function refineCurrentQuestionAnswer()',
             '/ai-refine-answer',
+            'data-question-finish-session',
+            '제출하고 정답 보기',
+            'question-embed-topbar',
+            'data-question-nav="prev"',
+            'data-question-reveal="1"',
+            'question-judgment-badge',
+            'is-judged-wrong',
+            '틀림 표시됨',
             'question-review-box',
             'question-review-actions',
             "markQuestionSourceCard('O')",

@@ -147,6 +147,7 @@ fi
 verify_sqlite_has_cards "$ROOT_DIR/state/progress.sqlite" "로컬"
 
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
+REMOTE_ARCHIVE="/tmp/cs-flashcards-$(date +%Y%m%dT%H%M%S)-$$.tar.gz"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
 TMP_RUNTIME_ENV="$(mktemp -t cs-flashcards-runtime.XXXXXX.env)"
 cleanup() {
@@ -190,16 +191,43 @@ fi
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" -C "$TMP_STAGE" .
 
 "${SSH[@]}" "mkdir -p '$REMOTE_DIR' '$REMOTE_DIR/backups'"
-"${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards.tar.gz"
+"${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_ARCHIVE"
 "${SCP[@]}" "$TMP_RUNTIME_ENV" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards-runtime.env"
+rm -f "$TMP_ARCHIVE"
 
-"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_ARCHIVE" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" <<'REMOTE'
 set -euo pipefail
 REMOTE_DIR="$1"
-REMOTE_PORT="$2"
-DOMAIN="$3"
-ORIGIN_DOMAIN="$4"
+REMOTE_ARCHIVE="$2"
+REMOTE_PORT="$3"
+DOMAIN="$4"
+ORIGIN_DOMAIN="$5"
 RUNTIME_ENV_PATH="$REMOTE_DIR/.runtime-secrets.env"
+PREVIOUS_WIKI_GITHUB_TOKEN="$(python3 - <<'PY' "$RUNTIME_ENV_PATH"
+import ast
+import sys
+from pathlib import Path
+
+env_path = Path(sys.argv[1])
+if not env_path.exists():
+    print("")
+    raise SystemExit(0)
+values: dict[str, str] = {}
+for raw_line in env_path.read_text(encoding='utf-8').splitlines():
+    line = raw_line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    key, raw_value = line.split('=', 1)
+    key = key.strip()
+    raw_value = raw_value.strip()
+    if raw_value.startswith('"') and raw_value.endswith('"'):
+        value = ast.literal_eval(raw_value)
+    else:
+        value = raw_value
+    values[key] = value
+print(values.get('CS_FLASHCARDS_WIKI_GITHUB_TOKEN', ''))
+PY
+)"
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
@@ -208,11 +236,41 @@ sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot pytho
 mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
 install -m 600 /tmp/cs-flashcards-runtime.env "$RUNTIME_ENV_PATH"
 rm -f /tmp/cs-flashcards-runtime.env
+if [[ -n "$PREVIOUS_WIKI_GITHUB_TOKEN" ]]; then
+  python3 - <<'PY' "$RUNTIME_ENV_PATH" "$PREVIOUS_WIKI_GITHUB_TOKEN"
+import sys
+from pathlib import Path
+
+env_path = Path(sys.argv[1])
+preserved_token = sys.argv[2]
+raw_lines = env_path.read_text(encoding='utf-8').splitlines()
+updated: list[str] = []
+seen = False
+replaced = False
+escaped = preserved_token.replace('\\', '\\\\').replace('"', '\\"')
+for raw_line in raw_lines:
+    stripped = raw_line.strip()
+    if stripped.startswith('CS_FLASHCARDS_WIKI_GITHUB_TOKEN='):
+        seen = True
+        if stripped == 'CS_FLASHCARDS_WIKI_GITHUB_TOKEN=""':
+            updated.append(f'CS_FLASHCARDS_WIKI_GITHUB_TOKEN="{escaped}"')
+            replaced = True
+        else:
+            updated.append(raw_line)
+    else:
+        updated.append(raw_line)
+if not seen:
+    updated.append(f'CS_FLASHCARDS_WIKI_GITHUB_TOKEN="{escaped}"')
+    replaced = True
+if replaced:
+    env_path.write_text('\n'.join(updated) + '\n', encoding='utf-8')
+PY
+fi
 
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
-tar -xzf /tmp/cs-flashcards.tar.gz -C "$REMOTE_DIR"
-rm -f /tmp/cs-flashcards.tar.gz
+tar -xzf "$REMOTE_ARCHIVE" -C "$REMOTE_DIR"
+rm -f "$REMOTE_ARCHIVE"
 rm -rf "$REMOTE_DIR/static/generated"
 if [[ -d "$REMOTE_DIR/wiki_book_seed/pages" ]]; then
   if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then

@@ -5740,6 +5740,12 @@ function renderQuestionPanel() {
       <strong>한은 모드</strong>
       <p>세트 종료 전까지 정답과 해설이 잠겨 있습니다. 전 문항을 먼저 풀고 제출한 뒤 문항별로 회고하세요.</p>
     </div>` : '';
+  const lockActionHtml = revealLocked ? `
+    <div class="question-lock-action question-surface">
+      <strong>정답 확인하려면 제출</strong>
+      <p>현재 문항만이 아니라 세트 전체 정답 잠금이 걸려 있습니다. 제출하면 문항별 정답/해설을 바로 확인할 수 있습니다.</p>
+      <button class="question-toolbar-button is-primary" type="button" data-question-finish-session="1" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !total ? 'disabled' : ''}>제출하고 정답 보기</button>
+    </div>` : '';
   const sideStateHtml = revealLocked
     ? lockNoticeHtml
     : `<div class="question-side-note">
@@ -5763,8 +5769,25 @@ function renderQuestionPanel() {
   const questionPosition = total ? `문항 ${state.questionIndex + 1} / ${total}` : '문항';
   const bodyHtml = question.body ? `<div class="question-body question-surface">${renderQuestionMarkdown(question.body)}</div>` : '';
   const keywordHtml = renderQuestionKeywordLinks(question.keywords, {interactive: true});
+  const judgmentBadgeHtml = question.judgment !== 'pending'
+    ? `<span class="badge question-judgment-badge ${escapeHtml(question.judgment)}">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>`
+    : '';
+  const embedTopbarHtml = questionBankEmbedMode() ? `
+    <div class="question-embed-topbar question-surface${question.judgment === 'wrong' ? ' is-wrong' : ''}">
+      <div class="question-embed-topbar-copy">
+        <strong>${escapeHtml(questionPosition)}</strong>
+        <span class="question-embed-topbar-status${question.judgment === 'wrong' ? ' wrong' : ''}">${escapeHtml(revealLocked ? '정답 잠금 중' : question.judgment === 'wrong' ? '틀림 표시됨' : '정답 확인 가능')}</span>
+      </div>
+      <div class="question-embed-topbar-actions">
+        <button class="question-toolbar-button" type="button" data-question-nav="prev" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex <= 0 ? 'disabled' : ''}>이전</button>
+        ${revealLocked
+          ? `<button class="question-toolbar-button is-primary" type="button" data-question-finish-session="1" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !total ? 'disabled' : ''}>제출</button>`
+          : `<button class="question-toolbar-button" type="button" data-question-reveal="1" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !question ? 'disabled' : ''}>정답</button>`}
+        <button class="question-toolbar-button" type="button" data-question-nav="next" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex >= total - 1 ? 'disabled' : ''}>다음</button>
+      </div>
+    </div>` : '';
   card.innerHTML = `
-    <div class="question-card-shell">
+    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
       <div class="question-card-head">
         <div class="question-card-head-copy">
@@ -5780,16 +5803,19 @@ function renderQuestionPanel() {
           ${question.difficulty ? `<span class="badge">난이도 ${escapeHtml(question.difficulty)}</span>` : ''}
           ${question.section ? `<span class="badge">${escapeHtml(question.section)}</span>` : ''}
           ${Number.isInteger(question.points) ? `<span class="badge">${escapeHtml(String(question.points))}점</span>` : ''}
-          ${question.judgment !== 'pending' ? `<span class="badge">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>` : ''}
+          ${judgmentBadgeHtml}
         </div>
       </div>
       <div class="question-card-grid">
         <div class="question-main-stack">
+          ${embedTopbarHtml}
           <div class="question-prompt question-surface">${renderQuestionMarkdown(question.prompt || '문제')}</div>
           ${bodyHtml}
           ${choiceHtml}
           ${draftHtml}
+          ${lockActionHtml}
           ${answer}
+
         </div>
         <aside class="question-side-stack">
           ${keywordHtml ? `<div class="question-side-note"><span class="question-side-note-label">키워드</span><p class="question-keyword-list">${keywordHtml}</p></div>` : ''}
@@ -5799,6 +5825,7 @@ function renderQuestionPanel() {
       </div>
     </div>
   `;
+
   $('prevQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex <= 0;
   $('nextQuestionBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex >= total - 1;
   $('revealAnswerBtn').disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !question || revealLocked;
@@ -6581,6 +6608,19 @@ $('questionCard')?.addEventListener('click', (event) => {
   }
   if (event.target.closest('[data-question-answer-refine="1"]')) {
     refineCurrentQuestionAnswer();
+    return;
+  }
+  const navButton = event.target.closest('[data-question-nav]');
+  if (navButton) {
+    moveQuestion(navButton.dataset.questionNav === 'prev' ? -1 : 1);
+    return;
+  }
+  if (event.target.closest('[data-question-reveal="1"]')) {
+    revealQuestionAnswer();
+    return;
+  }
+  if (event.target.closest('[data-question-finish-session="1"]')) {
+    finishQuestionSession();
     return;
   }
   if (event.target.closest('[data-question-wrong-note-save="1"]')) {

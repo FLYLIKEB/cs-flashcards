@@ -41,6 +41,7 @@ const bankState = {
 };
 
 let pendingLoadTimer = 0;
+let categoryGuideLastFocused = null;
 
 function escapeHtml(value) {
   return window.CSTableShell?.escapeHtml ? window.CSTableShell.escapeHtml(value) : String(value ?? '');
@@ -152,9 +153,171 @@ function selectedPrompt(item, fallback = '문제를 선택하세요.') {
   return markdownPreviewText(item?.prompt || '').slice(0, 120) || fallback;
 }
 
+function questionBankCategoryBreakdown() {
+  return Array.isArray(bankState.summary?.category_breakdown) ? bankState.summary.category_breakdown : [];
+}
+
 function activeFilterEntries() {
   const values = filterValues();
   return FILTER_FIELDS.map((field) => ({...field, value: String(values[field.key] || '').trim()})).filter((field) => field.value);
+}
+
+function categoryGuideFilterSummary() {
+  const entries = activeFilterEntries();
+  if (!entries.length) return '전체 문제은행 기준';
+  const labels = entries.slice(0, 4).map((entry) => `${entry.label} ${entry.value}`);
+  if (entries.length > 4) labels.push(`외 ${entries.length - 4}개`);
+  return `현재 필터 반영: ${labels.join(' · ')}`;
+}
+
+function categoryGuideStarterCount(entry) {
+  return Number(entry?.multiple_choice_count || 0) + Number(entry?.short_count || 0);
+}
+
+function categoryGuideWrittenCount(entry) {
+  return Number(entry?.subjective_count || 0) + Number(entry?.essay_count || 0);
+}
+
+function categoryGuideOutstandingCount(entry) {
+  return Number(entry?.unseen_count || 0) + Number(entry?.wrong_count || 0);
+}
+
+function categoryGuidePriorityScore(entry) {
+  return (categoryGuideOutstandingCount(entry) * 4)
+    + (categoryGuideStarterCount(entry) * 3)
+    + (Number(entry?.medium_difficulty_count || 0) * 2)
+    + Number(entry?.total || 0);
+}
+
+function categoryGuideStartingSetSize(entry) {
+  const total = Number(entry?.total || 0);
+  if (total >= 45) return '25문항';
+  if (total >= 30) return '20문항';
+  if (total >= 18) return '15문항';
+  return '10문항';
+}
+
+function categoryGuideReason(entry) {
+  const reasons = [];
+  const outstanding = categoryGuideOutstandingCount(entry);
+  const starter = categoryGuideStarterCount(entry);
+  const written = categoryGuideWrittenCount(entry);
+  const medium = Number(entry?.medium_difficulty_count || 0);
+  const high = Number(entry?.high_difficulty_count || 0);
+  const low = Number(entry?.low_difficulty_count || 0);
+  if (outstanding) reasons.push(`안푼·틀린 ${outstanding}문항`);
+  reasons.push(starter >= written
+    ? `객관식·주관식 ${starter}문항으로 초반 회전용`
+    : `서술·논술 ${written}문항 비중으로 후반 정리용`);
+  if (medium >= Math.max(high, low)) reasons.push(`중 난도 ${medium}문항 중심`);
+  else if (high > medium) reasons.push(`상 난도 ${high}문항 비중 높음`);
+  else reasons.push(`하 난도 ${low}문항으로 가볍게 착수 가능`);
+  return reasons.join(' · ');
+}
+
+function categoryGuideRows() {
+  return questionBankCategoryBreakdown()
+    .map((entry) => ({
+      category: String(entry?.category || '미분류').trim() || '미분류',
+      total: Number(entry?.total || 0),
+      multiple_choice_count: Number(entry?.multiple_choice_count || 0),
+      short_count: Number(entry?.short_count || 0),
+      subjective_count: Number(entry?.subjective_count || 0),
+      essay_count: Number(entry?.essay_count || 0),
+      high_difficulty_count: Number(entry?.high_difficulty_count || 0),
+      medium_difficulty_count: Number(entry?.medium_difficulty_count || 0),
+      low_difficulty_count: Number(entry?.low_difficulty_count || 0),
+      unseen_count: Number(entry?.unseen_count || 0),
+      correct_count: Number(entry?.correct_count || 0),
+      wrong_count: Number(entry?.wrong_count || 0),
+    }))
+    .filter((entry) => entry.total > 0)
+    .sort((left, right) => categoryGuidePriorityScore(right) - categoryGuidePriorityScore(left)
+      || right.total - left.total
+      || left.category.localeCompare(right.category, 'ko'));
+}
+
+function renderCategoryGuideDialog() {
+  const summary = $('bankPageCategoryGuideSummary');
+  const body = $('bankPageCategoryGuideBody');
+  if (summary) {
+    if (bankState.loading) {
+      summary.textContent = '현재 문제은행을 다시 계산하는 중입니다.';
+    } else if (bankState.error) {
+      summary.textContent = '문제은행을 먼저 정상적으로 불러와야 카테고리 순서를 계산할 수 있습니다.';
+    } else {
+      summary.textContent = `${categoryGuideFilterSummary()} · 총 ${Number(bankState.summary?.total || 0)}문항 · 안푼/틀린 + 객관식/주관식 + 중 난도 순으로 우선순위를 계산했습니다.`;
+    }
+  }
+  if (!body) return;
+  if (bankState.loading) {
+    body.innerHTML = '<p class="question-bank-guide-empty">문제은행 기준표를 계산하는 중입니다.</p>';
+    return;
+  }
+  if (bankState.error) {
+    body.innerHTML = `<p class="question-bank-guide-empty">${escapeHtml(bankState.error)}</p>`;
+    return;
+  }
+  const rows = categoryGuideRows();
+  if (!rows.length) {
+    body.innerHTML = '<p class="question-bank-guide-empty">현재 조건에서는 추천할 카테고리가 없습니다.</p>';
+    return;
+  }
+  body.innerHTML = `
+    <div class="question-bank-guide-intro">
+      <p class="question-bank-guide-copy">남은 양이 많고, 객관식·주관식과 중 난도 비중이 큰 카테고리를 먼저 두었습니다. <strong>남은/총</strong>은 현재 필터 안에서 <strong>안푼 + 틀린</strong> 문항 수입니다.</p>
+    </div>
+    <div class="question-bank-guide-table-wrap">
+      <table class="question-bank-guide-table">
+        <thead>
+          <tr>
+            <th scope="col">순서</th>
+            <th scope="col">카테고리</th>
+            <th scope="col">남은/총</th>
+            <th scope="col">첫 세트</th>
+            <th scope="col">형식 구성</th>
+            <th scope="col">난이도</th>
+            <th scope="col">설명</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map((entry, index) => {
+            const outstanding = categoryGuideOutstandingCount(entry);
+            return `
+              <tr>
+                <td>${escapeHtml(String(index + 1))}</td>
+                <th scope="row">${escapeHtml(entry.category)}</th>
+                <td>${escapeHtml(`${outstanding} / ${entry.total}`)}</td>
+                <td>${escapeHtml(categoryGuideStartingSetSize(entry))}</td>
+                <td>${escapeHtml(`객관 ${entry.multiple_choice_count} · 주관 ${entry.short_count} · 서술/논술 ${categoryGuideWrittenCount(entry)}`)}</td>
+                <td>${escapeHtml(`중 ${entry.medium_difficulty_count} · 상 ${entry.high_difficulty_count} · 하 ${entry.low_difficulty_count}`)}</td>
+                <td>${escapeHtml(categoryGuideReason(entry))}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function openCategoryGuideDialog() {
+  const dialog = $('bankPageCategoryGuideDialog');
+  if (!dialog) return;
+  categoryGuideLastFocused = document.activeElement;
+  renderCategoryGuideDialog();
+  dialog.hidden = false;
+  document.body.classList.add('question-bank-dialog-open');
+  $('bankPageCategoryGuideCloseBtn')?.focus();
+}
+
+function closeCategoryGuideDialog({restoreFocus = true} = {}) {
+  const dialog = $('bankPageCategoryGuideDialog');
+  if (!dialog || dialog.hidden) return;
+  dialog.hidden = true;
+  document.body.classList.remove('question-bank-dialog-open');
+  if (restoreFocus && categoryGuideLastFocused && typeof categoryGuideLastFocused.focus === 'function') categoryGuideLastFocused.focus();
+  categoryGuideLastFocused = null;
 }
 
 function fieldByKey(key) {
@@ -536,6 +699,7 @@ function renderTable() {
   error.textContent = bankState.error || '';
   renderHeader();
   renderOverviewCards();
+  renderCategoryGuideDialog();
   renderActiveFilters();
   renderSelectionSummary();
   renderFilterToggle();
@@ -642,6 +806,11 @@ $('bankPageLaunchSelectedBtn')?.addEventListener('click', () => launch(selectedI
 $('bankPageTogglePracticeBtn')?.addEventListener('click', togglePracticeCollapsed);
 $('bankPageToggleFiltersBtn')?.addEventListener('click', toggleFiltersCollapsed);
 $('bankPageResetFiltersBtn')?.addEventListener('click', resetFilters);
+$('bankPageCategoryGuideBtn')?.addEventListener('click', openCategoryGuideDialog);
+$('bankPageCategoryGuideCloseBtn')?.addEventListener('click', () => closeCategoryGuideDialog());
+$('bankPageCategoryGuideDialog')?.addEventListener('click', (event) => {
+  if (event.target === event.currentTarget) closeCategoryGuideDialog();
+});
 $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollapsed(true));
 
 ['bankPageQueryInput', 'bankPageTopicInput', 'bankPageSourceInput', 'bankPageSectionInput'].forEach((id) => {
@@ -657,6 +826,10 @@ $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollaps
 
 ['bankPageAttemptStatusSelect', 'bankPageFieldInput', 'bankPageCategoryInput', 'bankPageIssuerInput', 'bankPageDifficultySelect', 'bankPageTypeSelect'].forEach((id) => {
   $(id)?.addEventListener('change', () => loadQuestionBankPage().catch(() => {}));
+});
+window.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  if ($('bankPageCategoryGuideDialog')?.hidden === false) closeCategoryGuideDialog();
 });
 
 window.addEventListener('message', (event) => {
