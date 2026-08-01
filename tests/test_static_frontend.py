@@ -436,6 +436,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('function wikiRegenerateInlineImage(imageIndex)', WIKI_JS)
         self.assertIn('/api/wiki/image-ai/regenerate', WIKI_JS)
         self.assertIn('wiki-inline-image-format', WIKI_JS)
+        self.assertIn('AI 생성 중…', WIKI_JS)
+        self.assertIn('const minBusyMs = 900', WIKI_JS)
         self.assertIn('window.CsAiTools', APP_JS)
         self.assertIn("event.key.toLowerCase() === 's'", WIKI_JS)
         self.assertIn('wikiRenderPageNav(page);', WIKI_JS)

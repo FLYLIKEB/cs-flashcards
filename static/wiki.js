@@ -750,6 +750,8 @@ function wikiEnhanceInlineImages(page = wikiState.page) {
       ? String(item.format).toLowerCase()
       : 'png';
     select.value = currentFormat;
+    const activeBusy = wikiState.imageAiLoadingIndex === index;
+    select.disabled = activeBusy;
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'inline-ai-btn has-tip wiki-inline-image-ai-btn';
@@ -759,14 +761,14 @@ function wikiEnhanceInlineImages(page = wikiState.page) {
     button.title = 'AI 이미지 재생성';
     if (wikiAiTools?.setButtonBusy) {
       wikiAiTools.setButtonBusy(button, {
-        active: wikiState.imageAiLoadingIndex === index,
+        active: activeBusy,
         idleLabel: 'AI',
         busyLabel: '…',
         idleTitle: 'AI 이미지 재생성',
         busyTitle: 'AI 이미지 생성 중',
       });
     } else {
-      button.disabled = wikiState.imageAiLoadingIndex === index;
+      button.disabled = activeBusy;
       if (button.disabled) button.textContent = '…';
     }
     button.addEventListener('click', () => {
@@ -784,7 +786,10 @@ async function wikiRegenerateInlineImage(imageIndex) {
   if (!image) return;
   const select = document.querySelector(`.wiki-inline-image-format[data-wiki-image-index="${imageIndex}"]`);
   const format = String(select?.value || image?.format || 'png').trim().toLowerCase() || 'png';
+  const startedAt = Date.now();
+  const minBusyMs = 900;
   wikiState.imageAiLoadingIndex = imageIndex;
+  wikiStatus(`${image?.alt || page?.title || '이미지'} ${format.toUpperCase()} AI 생성 중…`);
   wikiEnhanceInlineImages(page);
   try {
     const response = wikiAiTools?.postJson
@@ -807,6 +812,8 @@ async function wikiRegenerateInlineImage(imageIndex) {
   } catch (error) {
     wikiStatus(`AI 이미지 재생성 실패: ${error.message || error}`, true);
   } finally {
+    const remaining = minBusyMs - (Date.now() - startedAt);
+    if (remaining > 0) await new Promise((resolve) => window.setTimeout(resolve, remaining));
     wikiState.imageAiLoadingIndex = -1;
     wikiEnhanceInlineImages(wikiState.page);
   }
