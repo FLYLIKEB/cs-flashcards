@@ -204,8 +204,9 @@ function persistedPracticeRestoreState() {
   return persistedFilterState()?.practice || null;
 }
 
-let restorePracticePaneOnReload = isReloadNavigation() && !persistedPracticeCollapsed();
-let restoredPracticeState = restorePracticePaneOnReload ? persistedPracticeRestoreState() : null;
+let restoredPracticeState = isReloadNavigation() ? persistedPracticeRestoreState() : null;
+let restorePracticePaneOnReload = Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();
+
 function persistedFilterState() {
   try {
     const raw = window.localStorage.getItem(QUESTION_BANK_FILTER_STATE_KEY);
@@ -527,10 +528,12 @@ function persistFilterState() {
       filters: filterValues(),
       filtersCollapsed: bankState.filtersCollapsed,
       practice: {
-        selectedId: String(bankState.practiceActiveId || bankState.selectedId || ''),
+        loaded: bankState.practiceLoaded,
+        selectedId: bankState.practiceLoaded ? String(bankState.practiceActiveId || bankState.selectedId || '') : '',
         startIndex: bankState.practiceLoaded ? practiceActiveIndex() : bankState.practiceStartIndex,
       },
     }));
+
   } catch (_error) {
     // Ignore storage failures.
   }
@@ -1015,6 +1018,7 @@ async function loadQuestionBankPage() {
       if (!preservingHiddenPractice) {
         bankState.practiceLoaded = false;
         bankState.practiceActiveId = '';
+        persistFilterState();
       }
     } else if (pendingPracticeLaunch) {
       const launchRequest = pendingPracticeLaunch;
@@ -1036,6 +1040,7 @@ async function loadQuestionBankPage() {
         bankState.practiceLoaded = false;
         bankState.practiceActiveId = '';
         bankState.practiceCollapsed = true;
+        persistFilterState();
       }
     } else {
       pendingPracticeLaunch = null;
@@ -1053,6 +1058,7 @@ async function loadQuestionBankPage() {
     pendingPracticeLaunch = null;
     bankState.practiceLoaded = false;
     bankState.practiceActiveId = '';
+    persistFilterState();
   } finally {
     if (requestId !== activeQuestionBankLoadRequest) return;
     if (questionBankLoadAbortController === controller) {

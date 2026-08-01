@@ -1215,6 +1215,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 QUESTION_BANK_FILTER_STATE_KEY,
                 QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
             )
+            self.assertTrue(case['stored_open_state']['filterState']['practice']['loaded'])
+
             await page.reload({'waitUntil': 'networkidle2'})
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             await page.waitForFunction(
@@ -1253,7 +1255,9 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
             )
             self.assertTrue(case['stored_closed_state']['filterState']['filtersCollapsed'])
+            self.assertTrue(case['stored_closed_state']['filterState']['practice']['loaded'])
             self.assertEqual(case['stored_closed_state']['practiceCollapsed'], '1')
+
 
             await page.reload({'waitUntil': 'networkidle2'})
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
@@ -1275,6 +1279,51 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-pane-state-reload', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_page_does_not_reopen_practice_from_stale_open_bit_without_session(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.evaluate(
+                """
+                (filterKey, practiceKey) => {
+                  window.localStorage.setItem(filterKey, JSON.stringify({
+                    filters: {},
+                    filtersCollapsed: false,
+                    practice: {loaded: false, selectedId: '', startIndex: 1},
+                  }));
+                  window.localStorage.setItem(practiceKey, '0');
+                }
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
+            )
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-filters-collapsed') && document.body.classList.contains('question-bank-practice-collapsed') && document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            case['state_after_reload'] = await page.evaluate(
+                """
+                () => ({
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame').hidden,
+                  practiceToggleDisabled: document.querySelector('#bankPageTogglePracticeBtn').disabled,
+                })
+                """
+            )
+            self.assertFalse(case['state_after_reload']['filtersCollapsed'])
+            self.assertTrue(case['state_after_reload']['practiceCollapsed'])
+            self.assertTrue(case['state_after_reload']['practiceFrameHidden'])
+            self.assertTrue(case['state_after_reload']['practiceToggleDisabled'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-stale-open-bit', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_page_renders_runtime_fallback_difficulty_label(self):
