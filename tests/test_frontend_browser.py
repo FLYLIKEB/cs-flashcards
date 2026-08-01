@@ -21,13 +21,124 @@ from pyppeteer.chromium_downloader import check_chromium, download_chromium
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MAIN_WORKSPACE_ROOT = ROOT.parent / 'cs_flashcards'
+FRONTEND_BROWSER_SERVER_PYTHON_ENV = 'CS_FRONTEND_BROWSER_PYTHON'
+DEFAULT_MAIN_WORKSPACE_NAME = 'cs_flashcards'
+MAIN_BRANCH_REF = 'refs/heads/main'
 QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1'
 QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1'
 WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1'
 WAVE_ID_RE = re.compile(r'^(wave-\d+)')
 CANONICAL_COMMAND = '.venv/bin/python -m unittest tests.test_frontend_browser'
 TRANSCRIPT_DIR = ROOT / 'artifacts' / 'frontend-browser'
+
+
+def python_executable_path(worktree_root: Path) -> Path:
+    return worktree_root / '.venv' / 'bin' / 'python'
+
+
+def usable_python(path: Path) -> bool:
+    return path.is_file() and os.access(path, os.X_OK)
+
+
+def parse_git_worktree_entries(output: str) -> list[tuple[Path, str | None]]:
+    entries: list[tuple[Path, str | None]] = []
+    current_path: Path | None = None
+    current_branch: str | None = None
+    for raw_line in output.splitlines():
+        line = raw_line.strip()
+        if not line:
+            if current_path is not None:
+                entries.append((current_path, current_branch))
+            current_path = None
+            current_branch = None
+            continue
+        if line.startswith('worktree '):
+            current_path = Path(line.removeprefix('worktree ').strip())
+            continue
+        if line.startswith('branch '):
+            current_branch = line.removeprefix('branch ').strip()
+    if current_path is not None:
+        entries.append((current_path, current_branch))
+    return entries
+
+
+def git_worktree_entries(root: Path = ROOT) -> list[tuple[Path, str | None]]:
+    try:
+        result = subprocess.run(
+            ['git', 'worktree', 'list', '--porcelain'],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return []
+    return parse_git_worktree_entries(result.stdout)
+
+
+def main_workspace_root(root: Path = ROOT, *, worktree_entries: list[tuple[Path, str | None]] | None = None) -> Path | None:
+    entries = git_worktree_entries(root) if worktree_entries is None else worktree_entries
+    for worktree_root, branch in entries:
+        if branch == MAIN_BRANCH_REF:
+            return worktree_root
+    for worktree_root, _branch in entries:
+        if worktree_root.name == DEFAULT_MAIN_WORKSPACE_NAME:
+            return worktree_root
+    fallback = root.parent / DEFAULT_MAIN_WORKSPACE_NAME
+    return fallback if fallback != root else None
+
+
+def frontend_browser_server_python_candidates(
+    root: Path = ROOT,
+    *,
+    env: dict[str, str] | None = None,
+    worktree_entries: list[tuple[Path, str | None]] | None = None,
+) -> list[Path]:
+    resolved_env = os.environ if env is None else env
+    candidates: list[Path] = []
+    override = resolved_env.get(FRONTEND_BROWSER_SERVER_PYTHON_ENV, '').strip()
+    if override:
+        candidates.append(Path(override).expanduser())
+
+    candidates.append(python_executable_path(root))
+    main_root = main_workspace_root(root, worktree_entries=worktree_entries)
+    if main_root is not None:
+        candidates.append(python_executable_path(main_root))
+
+    repo_names = [DEFAULT_MAIN_WORKSPACE_NAME]
+    if main_root is not None and main_root.name not in repo_names:
+        repo_names.insert(0, main_root.name)
+    for base_dir in (root.parent, root.parent.parent):
+        for repo_name in repo_names:
+            candidates.append(base_dir / repo_name / '.venv' / 'bin' / 'python')
+
+    deduped: list[Path] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        key = str(candidate)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(candidate)
+    return deduped
+
+
+def frontend_browser_server_python(
+    root: Path = ROOT,
+    *,
+    env: dict[str, str] | None = None,
+    worktree_entries: list[tuple[Path, str | None]] | None = None,
+) -> Path:
+    candidates = frontend_browser_server_python_candidates(root, env=env, worktree_entries=worktree_entries)
+    for candidate in candidates:
+        if usable_python(candidate):
+            return candidate
+    checked_paths = ', '.join(str(candidate) for candidate in candidates)
+    raise RuntimeError(
+        'Could not find a usable Python for the frontend browser harness. '
+        f'Set {FRONTEND_BROWSER_SERVER_PYTHON_ENV} to a valid executable or create a repo-local .venv. '
+        f'Checked: {checked_paths}'
+    )
 
 
 def free_port() -> int:
@@ -128,6 +239,91 @@ def wait_for_http_ok(url: str, *, timeout: float = 30.0) -> None:
     raise RuntimeError(f'Server did not start: {url} ({last_error})')
 
 
+class FrontendBrowserHarnessPythonDiscoveryTests(unittest.TestCase):
+    @staticmethod
+    def make_fake_python(path: Path) -> Path:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text('#!/bin/sh\nexit 0\n', encoding='utf-8')
+        path.chmod(0o755)
+        return path
+
+    def test_env_override_wins_when_valid(self):
+        with tempfile.TemporaryDirectory(prefix='cs-frontend-browser-python-') as td:
+            root = Path(td) / 'issue-32-browser-harness-portability'
+            root.mkdir()
+            override_python = self.make_fake_python(Path(td) / 'custom-python')
+            self.make_fake_python(root / '.venv' / 'bin' / 'python')
+
+            selected = frontend_browser_server_python(
+                root,
+                env={FRONTEND_BROWSER_SERVER_PYTHON_ENV: str(override_python)},
+                worktree_entries=[],
+            )
+
+            self.assertEqual(selected, override_python)
+
+    def test_current_worktree_venv_beats_main_workspace_venv(self):
+        with tempfile.TemporaryDirectory(prefix='cs-frontend-browser-python-') as td:
+            parent = Path(td)
+            root = parent / 'issue-32-browser-harness-portability'
+            root.mkdir()
+            main_root = parent / 'cs_flashcards'
+            main_root.mkdir()
+            current_python = self.make_fake_python(root / '.venv' / 'bin' / 'python')
+            self.make_fake_python(main_root / '.venv' / 'bin' / 'python')
+
+            selected = frontend_browser_server_python(
+                root,
+                env={},
+                worktree_entries=[
+                    (main_root, MAIN_BRANCH_REF),
+                    (root, 'refs/heads/issue-32-browser-harness-portability'),
+                ],
+            )
+
+            self.assertEqual(selected, current_python)
+
+    def test_main_workspace_worktree_venv_is_used_before_name_based_fallbacks(self):
+        with tempfile.TemporaryDirectory(prefix='cs-frontend-browser-python-') as td:
+            parent = Path(td)
+            root = parent / 'review-worktree'
+            root.mkdir()
+            main_root = parent / 'authoritative-main-worktree'
+            main_root.mkdir()
+            main_python = self.make_fake_python(main_root / '.venv' / 'bin' / 'python')
+            fallback_python = self.make_fake_python(parent / 'cs_flashcards' / '.venv' / 'bin' / 'python')
+
+            selected = frontend_browser_server_python(
+                root,
+                env={},
+                worktree_entries=[
+                    (main_root, MAIN_BRANCH_REF),
+                    (root, 'refs/heads/review-worktree'),
+                ],
+            )
+
+            self.assertEqual(selected, main_python)
+            self.assertNotEqual(selected, fallback_python)
+
+    def test_missing_python_error_lists_checked_paths(self):
+        with tempfile.TemporaryDirectory(prefix='cs-frontend-browser-python-') as td:
+            root = Path(td) / 'issue-32-browser-harness-portability'
+            root.mkdir()
+            override = Path(td) / 'missing-python'
+
+            with self.assertRaises(RuntimeError) as raised:
+                frontend_browser_server_python(
+                    root,
+                    env={FRONTEND_BROWSER_SERVER_PYTHON_ENV: str(override)},
+                    worktree_entries=[],
+                )
+
+            message = str(raised.exception)
+            self.assertIn(FRONTEND_BROWSER_SERVER_PYTHON_ENV, message)
+            self.assertIn(str(override), message)
+            self.assertIn(str(root / '.venv' / 'bin' / 'python'), message)
+
+
 class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -198,14 +394,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 'PYTHONUNBUFFERED': '1',
             }
         )
-        python_candidates = [
-            ROOT / '.venv' / 'bin' / 'python',
-            MAIN_WORKSPACE_ROOT / '.venv' / 'bin' / 'python',
-            ROOT.parent.parent / 'cs_flashcards' / '.venv' / 'bin' / 'python',
-        ]
-        python_path = next((path for path in python_candidates if path.exists()), None)
-        if python_path is None:
-            raise RuntimeError('A project .venv Python is required to run the frontend browser harness.')
+        python_path = frontend_browser_server_python(ROOT)
         cls.server = subprocess.Popen(
             [str(python_path), '-m', 'uvicorn', 'app:app', '--host', '127.0.0.1', '--port', str(cls.port)],
             cwd=ROOT,
