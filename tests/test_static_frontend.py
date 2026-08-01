@@ -95,6 +95,17 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function openQuestionBankSession(startIndex = 0)', APP_JS)
         self.assertIn('questionBankToggleBtn', APP_JS)
 
+
+    def test_embed_bootstrap_consumes_pending_launch_before_general_card_load(self):
+        self.assertIn('async function bootstrapInitialCardLoad()', APP_JS)
+        self.assertIn('if (questionBankEmbedMode() && consumePendingQuestionBankLaunch()) {', APP_JS)
+        self.assertIn('loadCards({preserveQuestionSession: true}).catch((err) => {', APP_JS)
+        self.assertIn('const keepQuestionSession = preserveQuestionSession && questionBankEmbedMode() && state.questionMode && state.questions.length;', APP_JS)
+        self.assertIn('if (!keepQuestionSession) consumePendingQuestionBankLaunch();', APP_JS)
+        bootstrap_start = APP_JS.index('async function bootstrapInitialCardLoad()')
+        pending_branch = APP_JS.index('if (questionBankEmbedMode() && consumePendingQuestionBankLaunch()) {', bootstrap_start)
+        generic_load = APP_JS.index('await loadCards();', bootstrap_start)
+        self.assertLess(pending_branch, generic_load)
     def test_question_bank_js_smoke_keeps_load_launch_and_persistence_hooks(self):
         self.assertIn("const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';", QUESTION_BANK_JS)
         self.assertIn('function loadQuestionBankPage()', QUESTION_BANK_JS)
