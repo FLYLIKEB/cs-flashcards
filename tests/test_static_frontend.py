@@ -698,6 +698,8 @@ class StaticFrontendTests(unittest.TestCase):
             'if (reloadOnFilterMismatch && !nextBankItem)',
             'function syncQuestionBankAttemptState(question, {reloadOnFilterMismatch = true} = {})',
             'loadQuestionBankBrowser().catch(() => {});',
+            "cache: 'no-store'",
+            "params.set('__ts', String(Date.now()))",
             'function openQuestionBankSession(startIndex = 0)',
             'function consumePendingQuestionBankLaunch()',
             'PENDING_QUESTION_BANK_LAUNCH_KEY',
