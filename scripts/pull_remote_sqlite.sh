@@ -78,16 +78,26 @@ import sqlite3
 import sys
 
 path = sys.argv[1]
+required_tables = {
+    'cards',
+    'card_progress',
+    'question_bank',
+    'question_attempts',
+    'wiki_ai_jobs',
+}
 
 try:
     conn = sqlite3.connect(f'file:{path}?mode=ro', uri=True)
     try:
         conn.execute('PRAGMA schema_version').fetchone()
-        table_exists = conn.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='cards'"
-        ).fetchone()
-        if table_exists is None:
-            raise RuntimeError('cards table이 없습니다.')
+        table_names = {
+            row[0]
+            for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            if row[0] and not str(row[0]).startswith('sqlite_')
+        }
+        missing_tables = sorted(required_tables - table_names)
+        if missing_tables:
+            raise RuntimeError(f"앱 스키마 테이블이 누락되었습니다: {', '.join(missing_tables)}")
         card_count = conn.execute('SELECT COUNT(*) FROM cards').fetchone()[0]
         if card_count <= 0:
             raise RuntimeError('cards 테이블이 비어 있습니다.')
@@ -121,7 +131,7 @@ import sys
 path = sys.argv[1]
 conn = sqlite3.connect(path)
 rows = {}
-for table in ['cards', 'card_progress', 'question_bank', 'question_attempts']:
+for table in ['cards', 'card_progress', 'question_bank', 'question_attempts', 'wiki_ai_jobs']:
     try:
         rows[table] = conn.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0]
     except Exception as exc:

@@ -57,6 +57,55 @@ def write_cards_sqlite(path: Path, *, cards_count: int) -> None:
     finally:
         conn.close()
 
+
+def write_full_app_schema_sqlite(path: Path, *, cards_count: int) -> None:
+    seed_rows = [
+        {
+            'id': f'card-{index}',
+            'term': f'용어 {index}',
+            'definition': f'정의 {index}',
+        }
+        for index in range(cards_count)
+    ]
+    flashcard_app.ensure_progress_db(path, seed_rows=seed_rows)
+
+
+def run_pull_remote_sqlite(output_path: Path, downloaded_db: Path, temp_root: Path) -> subprocess.CompletedProcess[str]:
+    fake_key = temp_root / 'fake-key.pem'
+    fake_key.write_text('fake-key\n', encoding='utf-8')
+
+    fake_bin = temp_root / 'bin'
+    fake_bin.mkdir()
+    fake_scp = fake_bin / 'scp'
+    fake_scp.write_text(
+        '#!/usr/bin/env bash\n'
+        'set -euo pipefail\n'
+        'dest="${@: -1}"\n'
+        'cp "$FAKE_REMOTE_DB_SOURCE" "$dest"\n',
+        encoding='utf-8',
+    )
+    fake_scp.chmod(0o755)
+
+    env = os.environ.copy()
+    env.update(
+        {
+            'CS_FLASHCARDS_LIGHTSAIL_HOST': 'example.com',
+            'CS_FLASHCARDS_LIGHTSAIL_KEY': str(fake_key),
+            'CS_FLASHCARDS_REMOTE_CONFIG': str(temp_root / 'missing-config'),
+            'FAKE_REMOTE_DB_SOURCE': str(downloaded_db),
+            'PATH': f"{fake_bin}{os.pathsep}{env.get('PATH', '')}",
+        }
+    )
+    return subprocess.run(
+        ['bash', str(ROOT / 'scripts' / 'pull_remote_sqlite.sh'), '--output', str(output_path)],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
 def run_remote_sql_block(db_path: Path, sql_text: str) -> subprocess.CompletedProcess[str]:
     match = REMOTE_SQL_REMOTE_BLOCK_PATTERN.search(REMOTE_SQL_SCRIPT)
     if match is None:
@@ -69,7 +118,6 @@ def run_remote_sql_block(db_path: Path, sql_text: str) -> subprocess.CompletedPr
         text=True,
         check=False,
     )
-
 
 
 def run_remote_sql_validation(sql_text: str) -> subprocess.CompletedProcess[str]:
@@ -86,13 +134,11 @@ def run_remote_sql_validation(sql_text: str) -> subprocess.CompletedProcess[str]
     )
 
 
-
 def write_named_rows_sqlite(path: Path, *names: str) -> None:
     with sqlite3.connect(path) as conn:
         conn.execute('CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT NOT NULL)')
         conn.executemany('INSERT INTO items (name) VALUES (?)', [(name,) for name in names])
         conn.commit()
-
 
 class DeploySafetyTests(unittest.TestCase):
     def test_connect_progress_db_refuses_missing_file_when_guard_enabled(self):
@@ -189,61 +235,50 @@ class DeploySafetyTests(unittest.TestCase):
 
     def test_pull_script_validates_download_before_replacing_output(self):
         self.assertIn("sqlite3.connect(f'file:{path}?mode=ro', uri=True)", PULL_SCRIPT)
-        self.assertIn("SELECT 1 FROM sqlite_master WHERE type='table' AND name='cards'", PULL_SCRIPT)
+        self.assertIn("'card_progress'", PULL_SCRIPT)
+        self.assertIn("'question_bank'", PULL_SCRIPT)
+        self.assertIn("'question_attempts'", PULL_SCRIPT)
+        self.assertIn("'wiki_ai_jobs'", PULL_SCRIPT)
         self.assertIn("SELECT COUNT(*) FROM cards", PULL_SCRIPT)
         self.assertLess(PULL_SCRIPT.index('validate_downloaded_sqlite "$TMP_FILE"'), PULL_SCRIPT.index('mv "$TMP_FILE" "$OUTPUT_PATH"'))
 
-    def test_pull_script_keeps_existing_output_when_downloaded_db_is_empty(self):
+    def test_pull_script_keeps_existing_output_when_downloaded_db_is_missing_app_tables(self):
         with tempfile.TemporaryDirectory() as td:
             temp_root = Path(td)
             output_path = temp_root / 'state' / 'progress.sqlite'
             output_path.parent.mkdir(parents=True)
-            write_cards_sqlite(output_path, cards_count=2)
+            write_full_app_schema_sqlite(output_path, cards_count=2)
             baseline_bytes = output_path.read_bytes()
 
             downloaded_db = temp_root / 'downloaded.sqlite'
-            write_cards_sqlite(downloaded_db, cards_count=0)
+            write_cards_sqlite(downloaded_db, cards_count=2)
 
-            fake_key = temp_root / 'fake-key.pem'
-            fake_key.write_text('fake-key\n', encoding='utf-8')
-
-            fake_bin = temp_root / 'bin'
-            fake_bin.mkdir()
-            fake_scp = fake_bin / 'scp'
-            fake_scp.write_text(
-                '#!/usr/bin/env bash\n'
-                'set -euo pipefail\n'
-                'dest="${@: -1}"\n'
-                'cp "$FAKE_REMOTE_DB_SOURCE" "$dest"\n',
-                encoding='utf-8',
-            )
-            fake_scp.chmod(0o755)
-
-            env = os.environ.copy()
-            env.update(
-                {
-                    'CS_FLASHCARDS_LIGHTSAIL_HOST': 'example.com',
-                    'CS_FLASHCARDS_LIGHTSAIL_KEY': str(fake_key),
-                    'CS_FLASHCARDS_REMOTE_CONFIG': str(temp_root / 'missing-config'),
-                    'FAKE_REMOTE_DB_SOURCE': str(downloaded_db),
-                    'PATH': f"{fake_bin}{os.pathsep}{env.get('PATH', '')}",
-                }
-            )
-
-            result = subprocess.run(
-                ['bash', str(ROOT / 'scripts' / 'pull_remote_sqlite.sh'), '--output', str(output_path)],
-                cwd=ROOT,
-                env=env,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
+            result = run_pull_remote_sqlite(output_path, downloaded_db, temp_root)
 
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn('다운로드한 SQLite 검증에 실패했습니다: cards 테이블이 비어 있습니다.', result.stderr)
+            self.assertIn('다운로드한 SQLite 검증에 실패했습니다: 앱 스키마 테이블이 누락되었습니다: card_progress, question_attempts, question_bank, wiki_ai_jobs', result.stderr)
             self.assertIn(f'기존 로컬 SQLite는 유지됩니다: {output_path}', result.stderr)
             self.assertEqual(output_path.read_bytes(), baseline_bytes)
 
+    def test_pull_script_replaces_output_when_downloaded_db_has_full_app_schema(self):
+        with tempfile.TemporaryDirectory() as td:
+            temp_root = Path(td)
+            output_path = temp_root / 'state' / 'progress.sqlite'
+            output_path.parent.mkdir(parents=True)
+            write_full_app_schema_sqlite(output_path, cards_count=1)
+            baseline_bytes = output_path.read_bytes()
+
+            downloaded_db = temp_root / 'downloaded.sqlite'
+            write_full_app_schema_sqlite(downloaded_db, cards_count=3)
+            downloaded_bytes = downloaded_db.read_bytes()
+
+            result = run_pull_remote_sqlite(output_path, downloaded_db, temp_root)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(output_path.read_bytes(), downloaded_bytes)
+            self.assertNotEqual(output_path.read_bytes(), baseline_bytes)
+            self.assertIn(f'"output_path": "{output_path}"', result.stdout)
+            self.assertIn('"wiki_ai_jobs": 0', result.stdout)
     def test_remote_sql_script_executes_direct_sql_only(self):
         self.assertNotIn('[--remote-db PATH]', REMOTE_SQL_SCRIPT)
         self.assertNotIn('scp ', REMOTE_SQL_SCRIPT)
