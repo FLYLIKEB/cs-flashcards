@@ -145,7 +145,7 @@ const CONCEPT_IMAGE_SCALE_MIN = 0.8;
 const CONCEPT_IMAGE_SCALE_MAX = 1.8;
 const CONCEPT_IMAGE_SCALE_STEP = 0.1;
 const CONCEPT_MEDIA_TYPES = Object.freeze(['', 'image', 'gif', 'video', 'mermaid', 'html']);
-const MODAL_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const MODAL_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), audio[controls], video[controls], iframe, [tabindex]:not([tabindex="-1"])';
 const MERMAID_MODULE_URL = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 let mermaidRendererPromise = null;
 let conceptMediaRenderToken = 0;
