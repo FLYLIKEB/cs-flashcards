@@ -2730,6 +2730,16 @@ function renderConceptImage(card) {
 
 
 
+async function bootstrapInitialCardLoad() {
+  if (questionBankEmbedMode() && consumePendingQuestionBankLaunch()) {
+    loadCards().catch((err) => {
+      setMessage(`카드 목록 후속 로딩 실패: ${err.message}`, true);
+    });
+    return;
+  }
+  await loadCards();
+}
+
 async function loadCards() {
   const res = await fetch('/api/cards');
   if (!res.ok) throw new Error(await res.text());
@@ -7223,7 +7233,7 @@ updateQuestionPracticeButton();
 document.body.classList.toggle('question-bank-embed', questionBankEmbedMode());
 
 if (!bootstrapFlashcardTablePopupWindow() && !bootstrapMindMapPopupWindow()) {
-  loadCards().catch((err) => {
+  bootstrapInitialCardLoad().catch((err) => {
     setMessage(`로딩 실패: ${err.message}`, true);
     applyFrontIllustration({term: '로딩 실패', english: '', category: ''});
     $('frontTerm').textContent = '로딩 실패';
