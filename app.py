@@ -1114,6 +1114,7 @@ def ensure_progress_db(
                 category TEXT NOT NULL DEFAULT '',
 
                 keywords_json TEXT NOT NULL DEFAULT '[]',
+                missing_card_keywords_json TEXT NOT NULL DEFAULT '[]',
                 difficulty TEXT NOT NULL DEFAULT '',
                 issuer TEXT NOT NULL DEFAULT '',
                 source_location TEXT NOT NULL DEFAULT '',
@@ -1145,6 +1146,7 @@ def ensure_progress_db(
             "category": "TEXT NOT NULL DEFAULT ''",
 
             "keywords_json": "TEXT NOT NULL DEFAULT '[]'",
+            "missing_card_keywords_json": "TEXT NOT NULL DEFAULT '[]'",
             "difficulty": "TEXT NOT NULL DEFAULT ''",
             "issuer": "TEXT NOT NULL DEFAULT ''",
             "source_location": "TEXT NOT NULL DEFAULT ''",
@@ -2345,6 +2347,43 @@ def question_bank_keywords_for_linked_card(card: dict[str, Any] | None) -> list[
     return question_bank_keywords_for_card(card)
 
 
+def question_bank_missing_card_keywords(values: Any, *, linked_keywords: Any = None) -> list[str]:
+    linked = {item.casefold() for item in normalize_question_bank_list(linked_keywords, item_limit=255)}
+    return [
+        keyword
+        for keyword in normalize_question_bank_list(values, item_limit=255)
+        if keyword.casefold() not in linked
+    ]
+
+
+def question_bank_missing_card_rows(
+    rows: list[dict[str, Any]],
+    *,
+    card_keyword_to_card_id: dict[str, str] | None = None,
+) -> list[dict[str, Any]]:
+    keyword_counts: dict[str, int] = {}
+    keyword_labels: dict[str, str] = {}
+    for row in rows:
+        for keyword in question_bank_json_list(row.get("missing_card_keywords_json") or []):
+            key = keyword.casefold()
+            if key in keyword_counts:
+                keyword_counts[key] += 1
+                continue
+            keyword_counts[key] = 1
+            keyword_labels[key] = keyword
+    lookup = card_keyword_to_card_id or {}
+    items: list[dict[str, Any]] = []
+    for key, count in sorted(keyword_counts.items(), key=lambda item: (-item[1], keyword_labels[item[0]].casefold())):
+        card_id = str(lookup.get(key) or "").strip()
+        items.append({
+            "keyword": keyword_labels[key],
+            "question_count": count,
+            "card_created": bool(card_id),
+            "card_id": card_id,
+        })
+    return items
+
+
 QUESTION_BANK_CATEGORIES = (
     "금융IT·신기술",
     "네트워크",
@@ -2443,6 +2482,7 @@ def question_bank_fingerprint(entry: dict[str, Any]) -> str:
         "field_name": entry["field_name"],
         "category": entry["category"],
         "keywords": entry["keywords"],
+        "missing_card_keywords": entry.get("missing_card_keywords", []),
         "difficulty": entry["difficulty"],
         "issuer": entry["issuer"],
         "source_location": entry["source_location"],
@@ -2485,6 +2525,8 @@ def normalize_question_bank_entry(
     body = normalize_question_bank_markdown(raw.get("body"), limit=12000)
     answer = normalize_question_bank_markdown(raw.get("answer"), limit=20000)
     explanation = normalize_question_bank_markdown(raw.get("explanation"), limit=50000)
+    linked_keywords = question_bank_keywords_for_linked_card(card)
+    missing_card_keywords = question_bank_missing_card_keywords(raw.get("keywords"), linked_keywords=linked_keywords)
     difficulty = normalized_question_bank_difficulty(raw.get("difficulty")) or infer_question_bank_difficulty(
         question_type,
         prompt,
@@ -2514,7 +2556,8 @@ def normalize_question_bank_entry(
             body=body,
                 progress_db_path=progress_db_path,
         ),
-        "keywords": question_bank_keywords_for_linked_card(card),
+        "keywords": linked_keywords,
+        "missing_card_keywords": missing_card_keywords,
         "difficulty": difficulty,
         "issuer": normalize_question_bank_text(raw.get("issuer"), limit=255),
         "source_location": normalize_question_bank_text(raw.get("source_location"), limit=255),
@@ -2558,6 +2601,7 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
         "field_name": row["field_name"] if "field_name" in row.keys() else "",
         "category": row["category"] if "category" in row.keys() else "",
         "keywords": question_bank_json_list(row["keywords_json"] if "keywords_json" in row.keys() else "[]"),
+        "missing_card_keywords": question_bank_json_list(row["missing_card_keywords_json"] if "missing_card_keywords_json" in row.keys() else "[]"),
         "difficulty": difficulty,
         "issuer": row["issuer"] if "issuer" in row.keys() else "",
         "source_location": row["source_location"] if "source_location" in row.keys() else "",
@@ -2588,7 +2632,7 @@ def update_question_bank_ai_content(
             """
             SELECT id, card_id, question_type, prompt, body, answer, explanation,
                    rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
-                   difficulty, issuer, source_location, section, points, expected_time_seconds,
+                   missing_card_keywords_json, difficulty, issuer, source_location, section, points, expected_time_seconds,
                    answer_guide, session_mode, created_at, updated_at
             FROM question_bank
             WHERE id = ?
@@ -2640,7 +2684,7 @@ def update_question_bank_ai_content(
             """
             SELECT id, card_id, question_type, prompt, body, answer, explanation,
                    rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
-                   difficulty, issuer, source_location, section, points, expected_time_seconds,
+                   missing_card_keywords_json, difficulty, issuer, source_location, section, points, expected_time_seconds,
                    answer_guide, session_mode, created_at, updated_at
             FROM question_bank
             WHERE id = ?
@@ -2721,10 +2765,10 @@ def upsert_question_bank_entries(
                 INSERT INTO question_bank (
                     id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
                     rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
-                    difficulty, issuer, source_location, section, points, expected_time_seconds,
+                    missing_card_keywords_json, difficulty, issuer, source_location, section, points, expected_time_seconds,
                     answer_guide, session_mode, created_at, updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(fingerprint) DO UPDATE SET
                     card_id = excluded.card_id,
                     question_type = excluded.question_type,
@@ -2739,6 +2783,7 @@ def upsert_question_bank_entries(
                     field_name = excluded.field_name,
                     category = excluded.category,
                     keywords_json = excluded.keywords_json,
+                    missing_card_keywords_json = excluded.missing_card_keywords_json,
                     difficulty = excluded.difficulty,
                     issuer = excluded.issuer,
                     source_location = excluded.source_location,
@@ -2766,6 +2811,7 @@ def upsert_question_bank_entries(
                     entry["category"],
 
                     question_bank_json_text(entry["keywords"], item_limit=255),
+                    question_bank_json_text(entry.get("missing_card_keywords", []), item_limit=255),
                     entry["difficulty"],
                     entry["issuer"],
                     entry["source_location"],
@@ -2782,7 +2828,7 @@ def upsert_question_bank_entries(
                 """
                 SELECT id, card_id, question_type, prompt, body, answer, explanation,
                        rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
-                       difficulty, issuer, source_location, section, points, expected_time_seconds,
+                       missing_card_keywords_json, difficulty, issuer, source_location, section, points, expected_time_seconds,
                        answer_guide, session_mode, created_at, updated_at
                 FROM question_bank
                 WHERE fingerprint = ?
@@ -2855,10 +2901,11 @@ def read_question_bank_entries(
                 "LOWER(question_bank.issuer) LIKE ?",
                 "LOWER(question_bank.source_location) LIKE ?",
                 "LOWER(question_bank.keywords_json) LIKE ?",
+                "LOWER(question_bank.missing_card_keywords_json) LIKE ?",
             ]) + ")"
         )
         needle = f"%{filters['query'].lower()}%"
-        params.extend([needle] * 10)
+        params.extend([needle] * 11)
     if filters["attempt_status"] == "unseen":
         where_clauses.append("(latest_attempt.question_bank_id IS NULL OR latest_attempt.judgment = 'pending')")
     elif filters["attempt_status"] == "correct":
@@ -2887,6 +2934,13 @@ def read_question_bank_entries(
     """
     rows, _ = read_cards(db_path)
     card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
+    card_keyword_to_card_id: dict[str, str] = {}
+    for row in rows:
+        card_id_value = str(row.get("id") or "").strip()
+        if not card_id_value:
+            continue
+        for keyword in question_bank_keywords_for_card(row):
+            card_keyword_to_card_id.setdefault(keyword.casefold(), card_id_value)
     with closing(connect_progress_db(db_path)) as conn:
         total_row = conn.execute(
             f"SELECT COUNT(*) AS total_count FROM question_bank {latest_attempt_join_sql} {where_sql}",
@@ -2927,12 +2981,22 @@ def read_question_bank_entries(
             """,
             tuple(params),
         ).fetchall()
+        missing_card_summary_rows = conn.execute(
+            f"""
+            SELECT question_bank.missing_card_keywords_json
+            FROM question_bank
+            {latest_attempt_join_sql}
+            {where_sql}
+            """,
+            tuple(params),
+        ).fetchall()
+
         query_rows = conn.execute(
             f"""
             SELECT question_bank.id, question_bank.card_id, question_bank.question_type, question_bank.prompt, question_bank.body,
                    question_bank.answer, question_bank.explanation, question_bank.rubric_json, question_bank.choices_json,
                    question_bank.answer_index, question_bank.topic, question_bank.field_name, question_bank.category,
-                   question_bank.keywords_json, question_bank.difficulty, question_bank.issuer, question_bank.source_location,
+                   question_bank.keywords_json, question_bank.missing_card_keywords_json, question_bank.difficulty, question_bank.issuer, question_bank.source_location,
                    question_bank.section, question_bank.points, question_bank.expected_time_seconds, question_bank.answer_guide,
                    question_bank.session_mode, question_bank.created_at, question_bank.updated_at,
                    latest_attempt.judgment AS latest_attempt_judgment,
@@ -2961,6 +3025,7 @@ def read_question_bank_entries(
         item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
         item["english"] = card.get("english") or ""
         item["keywords"] = question_bank_keywords_for_linked_card(card)
+        item["missing_card_keywords"] = question_bank_json_list(row["missing_card_keywords_json"] if "missing_card_keywords_json" in row.keys() else [])
         item["card_category"] = card.get("category") or ""
         item["card_url"] = flashcard_card_url(item.get("card_id") or "") if item.get("card_id") else ""
         items.append(item)
@@ -2974,6 +3039,10 @@ def read_question_bank_entries(
             "available_categories": [str(row[0] or "").strip() for row in category_rows if str(row[0] or "").strip()],
             "available_topics": [str(row[0] or "").strip() for row in topic_rows if str(row[0] or "").strip()],
             "available_field_names": [str(row[0] or "").strip() for row in field_name_rows if str(row[0] or "").strip()],
+            "missing_cards": question_bank_missing_card_rows(
+                [dict(row) for row in missing_card_summary_rows],
+                card_keyword_to_card_id=card_keyword_to_card_id,
+            ),
             "category_breakdown": [
                 {
                     "category": str(row["category"] or "").strip() or "미분류",
@@ -3012,6 +3081,7 @@ def generated_question_bank_entry(question: dict[str, Any], card: dict[str, Any]
         "field_name": "",
         "category": question.get("category") or card.get("category") or "",
         "keywords": question_bank_keywords_for_card(card),
+        "missing_card_keywords": [],
         "difficulty": card.get("difficulty") or "",
         "issuer": "카드 생성",
         "source_location": card.get("source_files") or card.get("id") or "",
@@ -4329,7 +4399,7 @@ def infer_question_bank_difficulty(
 def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
     rows = conn.execute(
         """
-        SELECT id, card_id, question_type, prompt, body, answer, explanation, difficulty, keywords_json
+        SELECT id, card_id, question_type, prompt, body, answer, explanation, difficulty, keywords_json, missing_card_keywords_json
         FROM question_bank
         """
     ).fetchall()
