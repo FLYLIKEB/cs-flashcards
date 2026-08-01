@@ -575,6 +575,51 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_category_guide_traps_focus_and_restores_opener(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.focus('#bankPageCategoryGuideBtn')
+            await page.click('#bankPageCategoryGuideBtn')
+            await page.waitForFunction("document.getElementById('bankPageCategoryGuideDialog').hidden === false")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'bankPageCategoryGuideCloseBtn'")
+            case['initial_focus'] = await page.evaluate("document.activeElement && document.activeElement.id")
+            self.assertEqual(case['initial_focus'], 'bankPageCategoryGuideCloseBtn')
+            case['focus_inside_after_open'] = await page.evaluate(
+                "document.getElementById('bankPageCategoryGuideDialog').contains(document.activeElement)"
+            )
+            self.assertTrue(case['focus_inside_after_open'])
+
+            await page.keyboard.press('Tab')
+            case['focus_after_tab'] = await page.evaluate("document.activeElement && document.activeElement.id")
+            case['focus_inside_after_tab'] = await page.evaluate(
+                "document.getElementById('bankPageCategoryGuideDialog').contains(document.activeElement)"
+            )
+            self.assertEqual(case['focus_after_tab'], 'bankPageCategoryGuideCloseBtn')
+            self.assertTrue(case['focus_inside_after_tab'])
+
+            await page.keyboard.down('Shift')
+            await page.keyboard.press('Tab')
+            await page.keyboard.up('Shift')
+            case['focus_after_shift_tab'] = await page.evaluate("document.activeElement && document.activeElement.id")
+            case['focus_inside_after_shift_tab'] = await page.evaluate(
+                "document.getElementById('bankPageCategoryGuideDialog').contains(document.activeElement)"
+            )
+            self.assertEqual(case['focus_after_shift_tab'], 'bankPageCategoryGuideCloseBtn')
+            self.assertTrue(case['focus_inside_after_shift_tab'])
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.getElementById('bankPageCategoryGuideDialog').hidden === true")
+            case['focus_after_escape'] = await page.evaluate("document.activeElement && document.activeElement.id")
+            self.assertEqual(case['focus_after_escape'], 'bankPageCategoryGuideBtn')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-category-guide-focus', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_status_column_tracks_saved_attempt_state_across_filters_and_refresh(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
