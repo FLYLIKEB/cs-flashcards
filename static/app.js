@@ -4982,8 +4982,10 @@ function questionBankQueryString() {
 }
 
 async function fetchQuestionBankEntries() {
-  const qs = questionBankQueryString();
-  const res = await fetch(`/api/question-bank${qs ? `?${qs}` : ''}`);
+  const params = new URLSearchParams(questionBankQueryString());
+  params.set('__ts', String(Date.now()));
+  const qs = params.toString();
+  const res = await fetch(`/api/question-bank${qs ? `?${qs}` : ''}`, {cache: 'no-store'});
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
