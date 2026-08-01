@@ -90,6 +90,11 @@ const state = {
 
 };
 
+let questionHistoryLoadRequest = 0;
+let questionHistoryAbortController = null;
+let questionBankLoadRequest = 0;
+let questionBankAbortController = null;
+
 const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
 const aiTools = window.CsAiTools || null;
@@ -4325,12 +4330,12 @@ function questionHistoryCardIds() {
   return [...new Set(pool.map((card) => String(card?.id || '').trim()).filter(Boolean))];
 }
 
-function questionHistoryRequestUrl() {
+function questionHistoryRequestUrl({filter = state.questionHistoryFilter, cardIds = questionHistoryCardIds()} = {}) {
   const params = new URLSearchParams({
-    result: state.questionHistoryFilter || 'all',
+    result: filter || 'all',
     limit: '200',
   });
-  questionHistoryCardIds().forEach((cardId) => params.append('card_id', cardId));
+  cardIds.forEach((cardId) => params.append('card_id', cardId));
   return `/api/questions/attempts?${params.toString()}`;
 }
 
@@ -4410,29 +4415,42 @@ function renderQuestionHistoryDialog() {
 }
 
 async function loadQuestionHistory() {
-  if (state.questionHistoryLoading) return;
+  const requestId = questionHistoryLoadRequest + 1;
+  questionHistoryLoadRequest = requestId;
+  if (questionHistoryAbortController) {
+    questionHistoryAbortController.abort();
+  }
+  const controller = typeof window.AbortController === 'function' ? new window.AbortController() : null;
+  questionHistoryAbortController = controller;
   state.questionHistoryLoading = true;
   state.questionHistoryError = '';
   renderQuestionHistoryDialog();
+  const filter = state.questionHistoryFilter || 'all';
   const cardIds = questionHistoryCardIds();
   if (state.cards.length && !cardIds.length) {
     state.questionHistoryItems = [];
-    state.questionHistorySummary = {selected_card_count: 0, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0, returned: 0, filter: state.questionHistoryFilter || 'all'};
+    state.questionHistorySummary = {selected_card_count: 0, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0, returned: 0, filter};
     state.questionHistoryLoading = false;
     renderQuestionHistoryDialog();
     return;
   }
   try {
-    const res = await fetch(questionHistoryRequestUrl());
+    const res = await fetch(questionHistoryRequestUrl({filter, cardIds}), {signal: controller?.signal});
     if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
+    if (requestId !== questionHistoryLoadRequest) return;
     state.questionHistoryItems = Array.isArray(data.items) ? data.items : [];
     state.questionHistorySummary = data.summary || null;
   } catch (error) {
+    if (error?.name === 'AbortError' || requestId !== questionHistoryLoadRequest) return;
     state.questionHistoryItems = [];
     state.questionHistorySummary = null;
     state.questionHistoryError = error.message || String(error);
   } finally {
+    if (requestId !== questionHistoryLoadRequest) return;
+    if (questionHistoryAbortController === controller) {
+      questionHistoryAbortController = null;
+    }
     state.questionHistoryLoading = false;
     renderQuestionHistoryDialog();
   }
@@ -4946,7 +4964,7 @@ async function importQuestionsFromText() {
     renderQuestionPanel();
     setMessage(`가져온 모의 세트 ${questions.length}문항을 불러왔습니다.`);
     state.questionBankItems = [];
-    if (state.questionBankOpen && !state.questionBankLoading) loadQuestionBankBrowser().catch(() => {});
+    if (state.questionBankOpen) loadQuestionBankBrowser().catch(() => {});
 
   } catch (error) {
     setQuestionImportError(error.message || String(error));
@@ -4972,20 +4990,20 @@ function questionBankFilterValues() {
   };
 }
 
-function questionBankQueryString() {
+function questionBankQueryString(filters = questionBankFilterValues()) {
   const params = new URLSearchParams();
-  Object.entries(questionBankFilterValues()).forEach(([key, value]) => {
+  Object.entries(filters).forEach(([key, value]) => {
     if (!value) return;
     params.set(key, value);
   });
   return params.toString();
 }
 
-async function fetchQuestionBankEntries() {
-  const params = new URLSearchParams(questionBankQueryString());
+async function fetchQuestionBankEntries({filters = questionBankFilterValues(), signal} = {}) {
+  const params = new URLSearchParams(questionBankQueryString(filters));
   params.set('__ts', String(Date.now()));
   const qs = params.toString();
-  const res = await fetch(`/api/question-bank${qs ? `?${qs}` : ''}`, {cache: 'no-store'});
+  const res = await fetch(`/api/question-bank${qs ? `?${qs}` : ''}`, {cache: 'no-store', signal});
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
@@ -5145,30 +5163,43 @@ function openQuestionBankSession(startIndex = 0) {
 }
 
 async function loadQuestionBankBrowser() {
+  const requestId = questionBankLoadRequest + 1;
+  questionBankLoadRequest = requestId;
+  if (questionBankAbortController) {
+    questionBankAbortController.abort();
+  }
+  const controller = typeof window.AbortController === 'function' ? new window.AbortController() : null;
+  questionBankAbortController = controller;
+  const filters = questionBankFilterValues();
   state.questionBankLoading = true;
   state.questionBankError = '';
   renderQuestionBankBrowser();
   try {
-    const data = await fetchQuestionBankEntries();
+    const data = await fetchQuestionBankEntries({filters, signal: controller?.signal});
+    if (requestId !== questionBankLoadRequest) return;
+    const previousSelectedId = state.questionBankSelectedId;
     state.questionBankItems = Array.isArray(data.items) ? data.items : [];
     state.questionBankSummary = data.summary || {total: state.questionBankItems.length, returned: state.questionBankItems.length};
-    populateQuestionBankTopicOptions(state.questionBankSummary?.available_topics || [], questionBankFilterValues().topic);
-    populateQuestionBankFieldNameOptions(state.questionBankSummary?.available_field_names || [], questionBankFilterValues().field_name);
-    populateQuestionBankIssuerOptions(state.questionBankSummary?.available_issuers || [], questionBankFilterValues().issuer);
-    populateQuestionBankCategoryOptions(state.questionBankSummary?.available_categories || [], questionBankFilterValues().category);
-
-    if (!state.questionBankSelectedId && state.questionBankItems[0]?.question_bank_id) {
-      state.questionBankSelectedId = String(state.questionBankItems[0].question_bank_id);
-    }
+    populateQuestionBankTopicOptions(state.questionBankSummary?.available_topics || [], filters.topic);
+    populateQuestionBankFieldNameOptions(state.questionBankSummary?.available_field_names || [], filters.field_name);
+    populateQuestionBankIssuerOptions(state.questionBankSummary?.available_issuers || [], filters.issuer);
+    populateQuestionBankCategoryOptions(state.questionBankSummary?.available_categories || [], filters.category);
+    const nextIndex = state.questionBankItems.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
+    state.questionBankSelectedId = String(state.questionBankItems[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
   } catch (error) {
+    if (error?.name === 'AbortError' || requestId !== questionBankLoadRequest) return;
     state.questionBankItems = [];
     state.questionBankSummary = {total: 0, returned: 0};
-    populateQuestionBankTopicOptions([], questionBankFilterValues().topic);
-    populateQuestionBankFieldNameOptions([], questionBankFilterValues().field_name);
-    populateQuestionBankIssuerOptions([], questionBankFilterValues().issuer);
-    populateQuestionBankCategoryOptions([], questionBankFilterValues().category);
+    populateQuestionBankTopicOptions([], filters.topic);
+    populateQuestionBankFieldNameOptions([], filters.field_name);
+    populateQuestionBankIssuerOptions([], filters.issuer);
+    populateQuestionBankCategoryOptions([], filters.category);
     state.questionBankError = error.message || String(error);
   } finally {
+    if (requestId !== questionBankLoadRequest) return;
+    if (questionBankAbortController === controller) {
+      questionBankAbortController = null;
+    }
     state.questionBankLoading = false;
     renderQuestionBankBrowser();
   }
@@ -5178,7 +5209,7 @@ function toggleQuestionBankBrowser(force = !state.questionBankOpen) {
   const next = Boolean(force);
   state.questionBankOpen = next;
   renderQuestionBankBrowser();
-  if (next && !state.questionBankLoading) {
+  if (next) {
     loadQuestionBankBrowser().catch(() => {});
   }
 }
@@ -6024,7 +6055,7 @@ async function generateQuestionsFromCurrentFilter() {
         })).questions || [];
     prepareQuestionSession(questions.map((item) => hydrateQuestionState({...item})), {mode});
     state.questionBankItems = [];
-    if (state.questionBankOpen && !state.questionBankLoading) loadQuestionBankBrowser().catch(() => {});
+    if (state.questionBankOpen) loadQuestionBankBrowser().catch(() => {});
     setMessage(questionSessionIsBok(mode) ? '한국은행 모의 세트 9문항 생성 완료' : `모의 세트 ${state.questions.length}문항 생성 완료`);
   } catch (error) {
     state.questions = [];
@@ -6050,7 +6081,7 @@ function toggleQuestionMode(force = !state.questionMode) {
     activateCurrentQuestionTimer();
   }
   state.questionMode = nextMode;
-  if (state.questionMode && state.questionBankOpen && !state.questionBankItems.length && !state.questionBankLoading) {
+  if (state.questionMode && state.questionBankOpen && !state.questionBankItems.length) {
     loadQuestionBankBrowser().catch(() => {});
   }
   renderQuestionPanel();

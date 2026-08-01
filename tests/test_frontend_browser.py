@@ -229,6 +229,108 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
     async def attr(self, page, selector: str, name: str) -> str:
         return await page.Jeval(selector, '(node, attributeName) => node.getAttribute(attributeName) || ""', name)
 
+    async def install_delayed_json_route(self, page, *, route_path: str, key_param: str, responses: dict[str, dict[str, object]]) -> None:
+        await page.evaluate(
+            """
+            ({ routePath, keyParam, responses }) => {
+              const originalFetch = window.fetch.bind(window);
+              window.fetch = (input, init = undefined) => {
+                const url = typeof input === 'string' ? input : input.url;
+                const parsed = new URL(url, window.location.origin);
+                if (parsed.pathname !== routePath) return originalFetch(input, init);
+                const key = parsed.searchParams.get(keyParam) || '';
+                const config = responses[key];
+                if (!config) return originalFetch(input, init);
+                return new Promise((resolve) => {
+                  window.setTimeout(() => {
+                    resolve(new Response(JSON.stringify(config.payload), {
+                      status: 200,
+                      headers: {'Content-Type': 'application/json'},
+                    }));
+                  }, Number(config.delayMs || 0));
+                });
+              };
+            }
+            """,
+            {'routePath': route_path, 'keyParam': key_param, 'responses': responses},
+        )
+
+    async def set_input_value(self, page, selector: str, value: str, *, submit: bool = False) -> None:
+        await page.evaluate(
+            """
+            ({ selector, value, submit }) => {
+              const input = document.querySelector(selector);
+              if (!input) return;
+              input.focus();
+              input.value = value;
+              input.dispatchEvent(new Event('input', {bubbles: true}));
+              if (submit) {
+                input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+              }
+            }
+            """,
+            {'selector': selector, 'value': value, 'submit': submit},
+        )
+
+    def question_bank_payload(self, label: str) -> dict[str, object]:
+        return {
+            'items': [
+                {
+                    'question_bank_id': f'{label}-1',
+                    'prompt': f'{label} prompt',
+                    'body': f'{label} body',
+                    'answer': f'{label} answer',
+                    'explanation': f'{label} explanation',
+                    'question_type': 'subjective',
+                    'keywords': [label],
+                    'difficulty': '중',
+                    'issuer': '테스트기관',
+                    'source_location': '테스트출처',
+                    'category': '테스트',
+                    'field_name': '테스트분야',
+                }
+            ],
+            'summary': {
+                'total': 1,
+                'returned': 1,
+                'available_topics': [label],
+                'available_field_names': ['테스트분야'],
+                'available_issuers': ['테스트기관'],
+                'available_categories': ['테스트'],
+                'category_breakdown': [],
+            },
+        }
+
+    def question_history_payload(self, title: str, result_key: str) -> dict[str, object]:
+        return {
+            'items': [
+                {
+                    'card_id': 'CS-001',
+                    'term': title,
+                    'card_category': '테스트',
+                    'question_type': 'subjective',
+                    'prompt': f'{title} prompt',
+                    'body': f'{title} body',
+                    'result_key': result_key,
+                    'result_label': title,
+                    'user_answer': title,
+                    'updated_at': '2026-08-01T00:00:00Z',
+                }
+            ],
+            'summary': {
+                'selected_card_count': 1,
+                'total': 1,
+                'correct': 1 if result_key == 'correct' else 0,
+                'ambiguous': 0,
+                'wrong': 1 if result_key == 'wrong' else 0,
+                'unknown': 0,
+                'pending': 0,
+                'returned': 1,
+                'filter': result_key,
+            },
+        }
+
+
     def record_case(self, *, case_id: str, status: str, observations: dict[str, object]) -> None:
         self.__class__.transcript_cases.append(
             {
@@ -272,11 +374,98 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(case['launch_state_present'])
             case['practice_status'] = await self.text(page, '#bankPagePracticeStatus')
             self.assertIn('현재 1 /', case['practice_status'])
+            await page.evaluate('document.querySelector("#bankPageRefreshBtn").click()')
+            await page.waitForFunction("document.querySelector('#bankPageSummary').textContent.includes('총')")
+            case['practice_frame_src_after_refresh'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+            self.assertEqual(case['practice_frame_src_after_refresh'], case['practice_frame_src'])
+            case['practice_status_after_refresh'] = await self.text(page, '#bankPagePracticeStatus')
+            self.assertIn('현재 1 /', case['practice_status_after_refresh'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_page_rejects_stale_query_responses(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await self.install_delayed_json_route(
+                page,
+                route_path='/api/question-bank',
+                key_param='q',
+                responses={
+                    'first': {'delayMs': 450, 'payload': self.question_bank_payload('first')},
+                    'second': {'delayMs': 0, 'payload': self.question_bank_payload('second')},
+                },
+            )
+            await self.set_input_value(page, '#bankPageQueryInput', 'first', submit=True)
+            await self.set_input_value(page, '#bankPageQueryInput', 'second', submit=True)
+            await page.waitForFunction("document.querySelector('#bankPageActiveFilters').textContent.includes('second')")
+            await page.waitForFunction("document.querySelector('#bankPageList').textContent.includes('second prompt')")
+            await asyncio.sleep(0.6)
+            case['active_filters'] = await self.text(page, '#bankPageActiveFilters')
+            case['summary'] = await self.text(page, '#bankPageSummary')
+            case['first_row_text'] = await self.text(page, '#bankPageList')
+            self.assertIn('second', case['active_filters'])
+            self.assertIn('second prompt', case['first_row_text'])
+            self.assertNotIn('first prompt', case['first_row_text'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-stale-query', status=status, observations=case)
+            await page.close()
+
+    async def test_embedded_question_bank_and_history_reject_stale_responses(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.click('#questionBankToggleBtn')
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await self.install_delayed_json_route(
+                page,
+                route_path='/api/question-bank',
+                key_param='q',
+                responses={
+                    'alpha': {'delayMs': 450, 'payload': self.question_bank_payload('alpha')},
+                    'beta': {'delayMs': 0, 'payload': self.question_bank_payload('beta')},
+                },
+            )
+            await self.set_input_value(page, '#questionBankQueryInput', 'alpha')
+            await self.set_input_value(page, '#questionBankQueryInput', 'beta')
+            await page.waitForFunction("document.querySelector('#questionBankList').textContent.includes('beta prompt')")
+            await asyncio.sleep(0.6)
+            case['embedded_question_bank_text'] = await self.text(page, '#questionBankList')
+            self.assertIn('beta prompt', case['embedded_question_bank_text'])
+            self.assertNotIn('alpha prompt', case['embedded_question_bank_text'])
+
+            await self.install_delayed_json_route(
+                page,
+                route_path='/api/questions/attempts',
+                key_param='result',
+                responses={
+                    'correct': {'delayMs': 450, 'payload': self.question_history_payload('늦은 정답', 'correct')},
+                    'wrong': {'delayMs': 0, 'payload': self.question_history_payload('최신 오답', 'wrong')},
+                },
+            )
+            await page.click('#questionHistoryBtn')
+            await page.waitForFunction("document.querySelector('#questionHistoryDialog').hidden === false")
+            await page.click('[data-question-history-filter="correct"]')
+            await page.click('[data-question-history-filter="wrong"]')
+            await page.waitForFunction("document.querySelector('#questionHistoryBody').textContent.includes('최신 오답')")
+            await asyncio.sleep(0.6)
+            case['question_history_text'] = await self.text(page, '#questionHistoryBody')
+            self.assertIn('최신 오답', case['question_history_text'])
+            self.assertNotIn('늦은 정답', case['question_history_text'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='embedded-stale-response', status=status, observations=case)
+            await page.close()
     async def test_calendar_tabs_and_detail_drawer_restore_focus(self):
         case = {'path': '/calendar'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

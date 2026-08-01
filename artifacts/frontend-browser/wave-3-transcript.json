@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "wave_id": "wave-3",
+  "branch": "wave-3-question-bank-state",
+  "command": ".venv/bin/python -m unittest tests.test_frontend_browser",
+  "generated_at": "2026-08-01T14:51:01+00:00",
+  "base_url": "http://127.0.0.1:50678",
+  "cases": [
+    {
+      "id": "calendar-drawer-focus",
+      "status": "passed",
+      "url": "http://127.0.0.1:50678",
+      "observations": {
+        "path": "/calendar",
+        "active_tab_after_keyboard": "true",
+        "first_event_id": "bok-2027-apply",
+        "drawer_hidden_after_open": false,
+        "focused_after_open": "calendarDetailCloseBtn",
+        "focus_within_drawer_after_close": false,
+        "focused_after_close": "body"
+      }
+    },
+    {
+      "id": "embedded-stale-response",
+      "status": "passed",
+      "url": "http://127.0.0.1:50678",
+      "observations": {
+        "path": "/",
+        "embedded_question_bank_text": "1beta promptbeta body문제beta테스트기관중테스트출처",
+        "question_history_text": "최신 오답\n            미분류 · 서술형\n            일반 · 저장 08. 01. 오전 09:00\n          \n          틀림\n        \n        \n          최신 오답 prompt\n          최신 오답 body\n        \n        \n          내 답최신 오답\n          \n        \n        \n          카드"
+      }
+    },
+    {
+      "id": "question-bank-load-launch",
+      "status": "passed",
+      "url": "http://127.0.0.1:50678",
+      "observations": {
+        "path": "/question-bank",
+        "initial_summary": "총 545문항 · 현재 200문항 · 필터 0개",
+        "filters_collapsed_initially": true,
+        "active_filters": "통합 검색데이터베이스×",
+        "practice_frame_src": "/?question-bank-embed=1&question-bank-run=1785595853511-1",
+        "launch_state_present": false,
+        "practice_status": "현재 1 / 70서술형한국은행",
+        "practice_frame_src_after_refresh": "/?question-bank-embed=1&question-bank-run=1785595853511-1",
+        "practice_status_after_refresh": "현재 1 / 70서술형한국은행"
+      }
+    },
+    {
+      "id": "question-bank-stale-query",
+      "status": "passed",
+      "url": "http://127.0.0.1:50678",
+      "observations": {
+        "path": "/question-bank",
+        "active_filters": "통합 검색second×",
+        "summary": "총 1문항 · 현재 1문항 · 필터 1개",
+        "first_row_text": "#문제형식키워드기관난이도출처1second promptsecond body서술형second테스트기관중테스트출처"
+      }
+    },
+    {
+      "id": "wiki-sidebar-status",
+      "status": "passed",
+      "url": "http://127.0.0.1:50678",
+      "observations": {
+        "path": "/wiki",
+        "sidebar_initially_open": false,
+        "sidebar_open_after_reload": true,
+        "wiki_status": "일치하는 문서가 없습니다."
+      }
+    }
+  ]
+}
