@@ -403,6 +403,134 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             }
         )
 
+    async def test_flashcard_dialog_focus_trap_and_question_panel_restore_opener(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#menuBtn')
+            await page.focus('#menuBtn')
+            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            case['question_panel_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_panel_focus_on_open'], 'closeQuestionModeBtn')
+
+            await page.click('#openQuestionImportBtn')
+            await page.waitForFunction("document.querySelector('#questionImportDialog').hidden === false")
+            case['question_import_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_import_focus_on_open'], 'questionImportInput')
+
+            await page.focus('#questionImportApplyBtn')
+            await page.keyboard.press('Tab')
+            case['question_import_focus_after_wrap'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_import_focus_after_wrap'], 'questionImportCloseBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#questionImportDialog').hidden === true")
+            case['question_import_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_import_focus_after_close'], 'openQuestionImportBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === true")
+            case['question_panel_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_panel_focus_after_close'], 'menuBtn')
+
+            await page.click('#menuBtn')
+            await page.click('#memoListBtn')
+            await page.waitForFunction("document.querySelector('#memoListDialog').hidden === false")
+            case['memo_dialog_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['memo_dialog_focus_on_open'], 'memoListCloseBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#memoListDialog').hidden === true")
+            case['memo_dialog_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['memo_dialog_focus_after_close'], 'menuBtn')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='modal-focus-restore', status=status, observations=case)
+            await page.close()
+
+    async def test_concept_image_dialog_focus_traps_embedded_media_and_restores_opener(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#conceptImageZoomBtn')
+            await page.keyboard.press(' ')
+            await page.waitForFunction("document.querySelector('#card').classList.contains('flipped')")
+            await page.waitForFunction("document.querySelector('#conceptMediaEditBtn') && !document.querySelector('#conceptMediaEditBtn').closest('[hidden]')")
+            await page.evaluate("document.querySelector('#conceptMediaEditBtn')?.click()")
+            await page.waitForFunction("document.querySelector('#conceptMediaDialog').hidden === false")
+            await page.select('#conceptMediaTypeInput', 'html')
+            await self.set_input_value(
+                page,
+                '#conceptMediaPayloadInput',
+                '<div style="padding:12px;display:grid;gap:12px;"><button type="button" id="embeddedHtmlButton">임베디드 버튼</button><video id="embeddedHtmlVideo" controls aria-label="임베디드 비디오"></video></div>',
+            )
+            await self.set_input_value(page, '#conceptMediaAltInput', '임베디드 HTML 비디오')
+            await page.evaluate("document.querySelector('#conceptMediaDialogSaveBtn')?.click()")
+            await page.waitForFunction("document.querySelector('#conceptMediaDialog').hidden === true")
+            await page.waitForFunction("document.querySelector('#backConceptHtmlFrame') && document.querySelector('#backConceptHtmlFrame').hidden === false")
+            await page.focus('#conceptImageZoomBtn')
+            await page.evaluate("document.querySelector('#conceptImageZoomBtn')?.click()")
+            await page.waitForFunction("document.querySelector('#conceptImageDialog').hidden === false")
+            case['html_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['html_focus_on_open'], 'conceptImageDialogCloseBtn')
+
+            await page.keyboard.press('Tab')
+            case['html_focus_after_tab'] = await page.evaluate(
+                'document.activeElement ? `${document.activeElement.tagName}:${document.activeElement.className || ""}` : ""'
+            )
+            self.assertEqual(case['html_focus_after_tab'], 'IFRAME:concept-image-modal-iframe')
+
+            await page.keyboard.down('Shift')
+            await page.keyboard.press('Tab')
+            await page.keyboard.up('Shift')
+            case['html_focus_after_shift_tab'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['html_focus_after_shift_tab'], 'conceptImageDialogCloseBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#conceptImageDialog').hidden === true")
+            case['html_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['html_focus_after_close'], 'conceptImageZoomBtn')
+
+            await page.focus('#conceptImageZoomBtn')
+            await page.evaluate("document.querySelector('#conceptImageZoomBtn')?.click()")
+            await page.waitForFunction("document.querySelector('#conceptImageDialog').hidden === false")
+            await page.evaluate(
+                """
+                () => {
+                  const stage = document.querySelector('#conceptImageDialogStage');
+                  if (!stage) return;
+                  stage.innerHTML = '<video class="concept-image-modal-video" controls aria-label="모달 비디오"></video>';
+                }
+                """
+            )
+            case['video_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['video_focus_on_open'], 'conceptImageDialogCloseBtn')
+
+            await page.keyboard.press('Tab')
+            case['video_focus_after_tab'] = await page.evaluate(
+                'document.activeElement ? `${document.activeElement.tagName}:${document.activeElement.className || ""}` : ""'
+            )
+            self.assertEqual(case['video_focus_after_tab'], 'VIDEO:concept-image-modal-video')
+
+            await page.keyboard.down('Shift')
+            await page.keyboard.press('Tab')
+            await page.keyboard.up('Shift')
+            case['video_focus_after_shift_tab'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['video_focus_after_shift_tab'], 'conceptImageDialogCloseBtn')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#conceptImageDialog').hidden === true")
+            case['video_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['video_focus_after_close'], 'conceptImageZoomBtn')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='concept-image-modal-focus', status=status, observations=case)
+            await page.close()
     async def test_question_bank_page_loads_filters_and_launches_embedded_practice(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

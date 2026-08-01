@@ -86,6 +86,8 @@ const state = {
   questionBankError: '',
   questionBankSelectedId: '',
   questionAnswerRefineLoading: false,
+  modalStack: [],
+  questionModeOpener: null,
 
 
 };
@@ -143,6 +145,7 @@ const CONCEPT_IMAGE_SCALE_MIN = 0.8;
 const CONCEPT_IMAGE_SCALE_MAX = 1.8;
 const CONCEPT_IMAGE_SCALE_STEP = 0.1;
 const CONCEPT_MEDIA_TYPES = Object.freeze(['', 'image', 'gif', 'video', 'mermaid', 'html']);
+const MODAL_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), audio[controls], video[controls], iframe, [tabindex]:not([tabindex="-1"])';
 const MERMAID_MODULE_URL = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 let mermaidRendererPromise = null;
 let conceptMediaRenderToken = 0;
@@ -658,6 +661,126 @@ function restoreAppFocusAfterSearch(openedWindow = null) {
       focusAppCard();
     }, delay);
   });
+}
+function canRestoreFocusToElement(element) {
+  return Boolean(
+    element
+    && typeof element.focus === 'function'
+    && element.isConnected !== false
+    && !element.hasAttribute?.('disabled')
+    && element.getAttribute?.('aria-hidden') !== 'true'
+    && !element.closest?.('[hidden], [aria-hidden="true"]')
+  );
+}
+
+function focusElement(element) {
+  if (!element || typeof element.focus !== 'function') return false;
+  try {
+    element.focus({preventScroll: true});
+    return true;
+  } catch (_error) {
+    try {
+      element.focus();
+      return true;
+    } catch (_error2) {
+      return false;
+    }
+  }
+}
+
+function modalFocusableElements(dialog) {
+  if (!dialog || dialog.hidden) return [];
+  return [...dialog.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)].filter((element) => !element.hasAttribute('hidden') && !element.closest('[hidden]'));
+}
+
+function activeModalEntry() {
+  return state.modalStack[state.modalStack.length - 1] || null;
+}
+
+function activeModalDialog() {
+  const entry = activeModalEntry();
+  return entry ? $(entry.id) : null;
+}
+
+function registerOpenModal(dialogId, opener = document.activeElement) {
+  state.modalStack = state.modalStack.filter((entry) => entry.id !== dialogId);
+  state.modalStack.push({id: dialogId, opener: canRestoreFocusToElement(opener) ? opener : null});
+}
+
+function openModalDialog(dialogId, {focusTarget = null, opener = document.activeElement} = {}) {
+  const dialog = $(dialogId);
+  if (!dialog) return null;
+  registerOpenModal(dialogId, opener);
+  dialog.hidden = false;
+  const target = typeof focusTarget === 'function' ? focusTarget(dialog) : (focusTarget || modalFocusableElements(dialog)[0] || dialog);
+  window.setTimeout(() => {
+    focusElement(target || modalFocusableElements(dialog)[0] || dialog);
+  }, 0);
+  return dialog;
+}
+
+function closeModalDialog(dialogId, {restoreFocus = true, fallbackFocus = focusAppCard} = {}) {
+  const dialog = $(dialogId);
+  if (!dialog || dialog.hidden) return false;
+  dialog.hidden = true;
+  const entryIndex = state.modalStack.findIndex((entry) => entry.id === dialogId);
+  const entry = entryIndex >= 0 ? state.modalStack.splice(entryIndex, 1)[0] : null;
+  const focusTarget = restoreFocus && canRestoreFocusToElement(entry?.opener) ? entry.opener : null;
+  if (restoreFocus) {
+    if (!focusElement(focusTarget) && typeof fallbackFocus === 'function') fallbackFocus();
+  }
+  return true;
+}
+
+function trapTabKeyWithinDialog(event, dialog) {
+  if (event.key !== 'Tab') return false;
+  const focusable = modalFocusableElements(dialog);
+  if (!focusable.length) {
+    event.preventDefault();
+    focusElement(dialog);
+    return true;
+  }
+  const currentIndex = focusable.findIndex((element) => element === document.activeElement);
+  const nextIndex = event.shiftKey
+    ? (currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1)
+    : (currentIndex < 0 || currentIndex === focusable.length - 1 ? 0 : currentIndex + 1);
+  const movingOutside = event.shiftKey ? document.activeElement === focusable[0] : document.activeElement === focusable[focusable.length - 1];
+  if (currentIndex < 0 || movingOutside) {
+    event.preventDefault();
+    focusElement(focusable[nextIndex]);
+    return true;
+  }
+  return false;
+}
+
+function focusQuestionModeSurface() {
+  return focusElement($('closeQuestionModeBtn') || $('generateQuestionsBtn') || $('questionPanel'));
+}
+
+function rememberQuestionModeOpener(opener = document.activeElement) {
+  state.questionModeOpener = canRestoreFocusToElement(opener) ? opener : null;
+}
+
+function restoreQuestionModeFocus() {
+  const opener = canRestoreFocusToElement(state.questionModeOpener) ? state.questionModeOpener : null;
+  state.questionModeOpener = null;
+  if (!focusElement(opener)) focusAppCard();
+}
+
+function handleOpenModalKeydown(event) {
+  const dialog = activeModalDialog();
+  if (!dialog) return false;
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    if (dialog.id === 'memoListDialog') closeMemoList();
+    else if (dialog.id === 'bookmarkListDialog') closeBookmarkList();
+    else if (dialog.id === 'questionHistoryDialog') closeQuestionHistory();
+    else if (dialog.id === 'questionImportDialog') closeQuestionImportDialog();
+    else if (dialog.id === 'conceptImageDialog') closeConceptImageDialog();
+    else if (dialog.id === 'conceptMediaDialog') closeConceptMediaDialog();
+    return true;
+  }
+  return trapTabKeyWithinDialog(event, dialog);
 }
 
 function openCurrentGoogleSearch(event = null) {
@@ -2416,24 +2539,20 @@ function conceptImageDialogOpen() {
   return Boolean(dialog && !dialog.hidden);
 }
 
-function openConceptImageDialog() {
+function openConceptImageDialog(event = null) {
   const current = state.filtered[state.index] || null;
   const dialog = $('conceptImageDialog');
   if (!current || !dialog) return;
   const {hasMedia} = conceptMediaDisplayState(current);
   if (!hasMedia) return;
-  dialog.hidden = false;
   renderConceptImageDialogContent(current);
-  $('conceptImageDialogCloseBtn')?.focus();
+  openModalDialog('conceptImageDialog', {focusTarget: $('conceptImageDialogCloseBtn') || dialog, opener: event?.currentTarget || document.activeElement});
 }
 
 function closeConceptImageDialog({restoreFocus = true} = {}) {
-  const dialog = $('conceptImageDialog');
   const stage = $('conceptImageDialogStage');
-  if (!dialog || dialog.hidden) return;
-  dialog.hidden = true;
   if (stage) stage.innerHTML = '';
-  if (restoreFocus) focusAppCard();
+  closeModalDialog('conceptImageDialog', {restoreFocus});
 }
 
 function conceptMediaDialogOpen() {
@@ -2470,7 +2589,7 @@ function setConceptMediaDialogBusy(disabled) {
   if (cancelBtn) cancelBtn.disabled = disabled;
 }
 
-function openConceptMediaDialog() {
+function openConceptMediaDialog(event = null) {
   const current = state.filtered[state.index] || null;
   const dialog = $('conceptMediaDialog');
   if (!current || !dialog) return;
@@ -2484,15 +2603,11 @@ function openConceptMediaDialog() {
   if (errorEl) errorEl.textContent = '';
   updateConceptMediaDialogPlaceholder();
   setConceptMediaDialogBusy(false);
-  dialog.hidden = false;
-  (payloadInput || typeInput || altInput)?.focus();
+  openModalDialog('conceptMediaDialog', {focusTarget: payloadInput || typeInput || altInput || dialog, opener: event?.currentTarget || document.activeElement});
 }
 
 function closeConceptMediaDialog({restoreFocus = true} = {}) {
-  const dialog = $('conceptMediaDialog');
-  if (!dialog || dialog.hidden) return;
-  dialog.hidden = true;
-  if (restoreFocus) focusAppCard();
+  closeModalDialog('conceptMediaDialog', {restoreFocus});
 }
 
 async function saveConceptMedia() {
@@ -3135,16 +3250,14 @@ function renderMemoList() {
   `).join('');
 }
 
-function openMemoList() {
+function openMemoList(event = null) {
   toggleMenu(false);
   renderMemoList();
-  const dialog = $('memoListDialog');
-  if (dialog) dialog.hidden = false;
+  openModalDialog('memoListDialog', {focusTarget: $('memoListCloseBtn') || $('memoListDialog'), opener: $('menuBtn') || event?.currentTarget || document.activeElement});
 }
 
 function closeMemoList() {
-  const dialog = $('memoListDialog');
-  if (dialog) dialog.hidden = true;
+  closeModalDialog('memoListDialog');
 }
 
 function renderBookmarkList() {
@@ -3164,16 +3277,14 @@ function renderBookmarkList() {
   `).join('');
 }
 
-function openBookmarkList() {
+function openBookmarkList(event = null) {
   toggleMenu(false);
   renderBookmarkList();
-  const dialog = $('bookmarkListDialog');
-  if (dialog) dialog.hidden = false;
+  openModalDialog('bookmarkListDialog', {focusTarget: $('bookmarkListCloseBtn') || $('bookmarkListDialog'), opener: $('menuBtn') || event?.currentTarget || document.activeElement});
 }
 
 function closeBookmarkList() {
-  const dialog = $('bookmarkListDialog');
-  if (dialog) dialog.hidden = true;
+  closeModalDialog('bookmarkListDialog');
 }
 
 function flashcardTableSummaryText() {
@@ -4482,19 +4593,17 @@ async function loadQuestionHistory() {
   }
 }
 
-function openQuestionHistory() {
+function openQuestionHistory(event = null) {
   toggleMenu(false);
   state.questionHistoryOpen = true;
-  const dialog = $('questionHistoryDialog');
-  if (dialog) dialog.hidden = false;
   renderQuestionHistoryDialog();
+  openModalDialog('questionHistoryDialog', {focusTarget: $('questionHistoryCloseBtn') || $('questionHistoryDialog'), opener: event?.currentTarget || document.activeElement});
   loadQuestionHistory();
 }
 
 function closeQuestionHistory() {
   state.questionHistoryOpen = false;
-  const dialog = $('questionHistoryDialog');
-  if (dialog) dialog.hidden = true;
+  closeModalDialog('questionHistoryDialog');
 }
 
 function setQuestionHistoryFilter(filter) {
@@ -4541,7 +4650,6 @@ function jumpToBookmarkCard(cardId) {
   }
 }
 
-
 function normalizeQuestionSessionMode(value) {
   return String(value || '').trim().toLowerCase() === 'bok' ? 'bok' : 'practice';
 }
@@ -4579,7 +4687,6 @@ function selectedQuestionTypes() {
   return checked.length ? checked : ['short', 'subjective', 'multiple_choice', 'essay'];
 }
 
-
 function selectedQuestionTypeLabelsForPrompt() {
   const selected = new Set(selectedQuestionTypes());
   return AI_QUIZ_PROMPT_TYPE_ORDER
@@ -4590,6 +4697,7 @@ function selectedQuestionTypeLabelsForPrompt() {
 function questionCountValue() {
   return Number.parseInt($('questionCountSelect')?.value || '10', 10) || 10;
 }
+
 function syncQuestionTimeLimitSelect(seconds) {
   const select = $('questionTimeLimitSelect');
   if (!select || !Number.isFinite(seconds) || seconds < 0 || seconds % 60 !== 0) return;
@@ -4611,18 +4719,15 @@ function setQuestionImportError(message = '') {
   if (errorEl) errorEl.textContent = String(message || '').trim();
 }
 
-function openQuestionImportDialog() {
+function openQuestionImportDialog(event = null) {
   toggleMenu(false);
   setQuestionImportError('');
-  const dialog = questionImportDialog();
-  if (dialog) dialog.hidden = false;
-  window.setTimeout(() => $('questionImportInput')?.focus(), 0);
+  openModalDialog('questionImportDialog', {focusTarget: $('questionImportInput') || questionImportDialog(), opener: event?.currentTarget || document.activeElement});
 }
 
 function closeQuestionImportDialog() {
   setQuestionImportError('');
-  const dialog = questionImportDialog();
-  if (dialog) dialog.hidden = true;
+  closeModalDialog('questionImportDialog');
 }
 
 function extractImportJsonText(rawText) {
@@ -6095,6 +6200,8 @@ async function generateQuestionsFromCurrentFilter() {
 
 function toggleQuestionMode(force = !state.questionMode) {
   const nextMode = Boolean(force);
+  const wasOpen = state.questionMode;
+  if (nextMode && !wasOpen) rememberQuestionModeOpener();
   if (nextMode && state.audioPlaying) stopAudioPlayback('문제 풀이 모드로 전환해 자동 듣기를 정지했습니다.');
   if (!nextMode) {
     commitCurrentQuestionElapsed();
@@ -6111,12 +6218,14 @@ function toggleQuestionMode(force = !state.questionMode) {
     loadQuestionBankBrowser().catch(() => {});
   }
   renderQuestionPanel();
+  if (nextMode && !wasOpen) focusQuestionModeSurface();
+  if (!nextMode && wasOpen) restoreQuestionModeFocus();
   setMessage(state.questionMode ? (state.questions.length ? '모의 세트를 다시 열었습니다.' : '문제 풀이를 열었습니다. 생성 버튼, 가져오기, 또는 문제은행을 사용하세요.') : '문제 풀이를 닫았습니다.');
 }
 
-
-function openQuestionPracticeFromMenu() {
+function openQuestionPracticeFromMenu(event = null) {
   toggleMenu(false);
+  rememberQuestionModeOpener(event?.currentTarget || $('questionPracticeBtn') || document.activeElement);
   toggleQuestionMode(true);
 }
 
@@ -6874,12 +6983,12 @@ $('conceptImageZoomInBtn')?.addEventListener('click', (event) => {
 $('conceptImageZoomBtn')?.addEventListener('click', (event) => {
   event.preventDefault();
   event.stopPropagation();
-  openConceptImageDialog();
+  openConceptImageDialog(event);
 });
 $('conceptMediaEditBtn')?.addEventListener('click', (event) => {
   event.preventDefault();
   event.stopPropagation();
-  openConceptMediaDialog();
+  openConceptMediaDialog(event);
 });
 $('conceptMediaTypeInput')?.addEventListener('change', updateConceptMediaDialogPlaceholder);
 $('conceptMediaDialogSaveBtn')?.addEventListener('click', saveConceptMedia);
@@ -7037,16 +7146,8 @@ document.addEventListener('keydown', (e) => {
     saveMemo();
     return;
   }
-  if (e.key === 'Escape' && conceptImageDialogOpen()) {
-    e.preventDefault();
-    closeConceptImageDialog();
-    return;
-  }
-  if (e.key === 'Escape' && conceptMediaDialogOpen()) {
-    e.preventDefault();
-    closeConceptMediaDialog();
-    return;
-  }
+  if (handleOpenModalKeydown(e)) return;
+  if (activeModalDialog()) return;
   if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
     if (e.key === 'Escape') {
       document.activeElement.blur();
@@ -7057,13 +7158,13 @@ document.addEventListener('keydown', (e) => {
 
 const key = e.key.toLowerCase();
 if (state.questionMode) {
+  if (e.key === 'Escape' || key === 'q') { e.preventDefault(); toggleQuestionMode(false); return; }
   if (e.key === 'ArrowLeft') { e.preventDefault(); moveQuestion(-1); return; }
   if (e.key === 'ArrowRight') { e.preventDefault(); moveQuestion(1); return; }
   if (e.key === ' ') { e.preventDefault(); revealQuestionAnswer(); return; }
   if (key === 'o' || e.key === '.') { e.preventDefault(); markQuestionSourceCard('O'); return; }
   if (key === 'x') { e.preventDefault(); markQuestionSourceCard('X'); return; }
   if (e.key === '-') { e.preventDefault(); markQuestionSourceCard(''); return; }
-  if (key === 'q') { e.preventDefault(); toggleQuestionMode(false); return; }
 }
 if (e.key === ' ') { e.preventDefault(); state.flipped = !state.flipped; if (state.flipped) state.backPage = 0; renderCard(); }
 else if (state.flipped && e.key === 'ArrowUp') { e.preventDefault(); setBackPage(state.backPage - 1); }
