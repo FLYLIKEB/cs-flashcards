@@ -1,0 +1,44 @@
+name: Frontend Browser Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - wave-*
+
+jobs:
+  frontend-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install browser runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk-bridge2.0-0 libgtk-3-0 libgbm1 libasound2t64
+
+      - name: Create venv and install requirements
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Run focused frontend browser harness
+        run: .venv/bin/python -m unittest tests.test_frontend_browser
+
+      - name: Upload frontend browser transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-browser-transcript
+          path: artifacts/frontend-browser/*.json
+          if-no-files-found: error

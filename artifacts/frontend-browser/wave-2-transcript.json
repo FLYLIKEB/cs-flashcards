@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "wave_id": "wave-2",
+  "branch": "wave-2-frontend-regression-foundation",
+  "command": ".venv/bin/python -m unittest tests.test_frontend_browser",
+  "generated_at": "2026-08-01T14:02:28+00:00",
+  "base_url": "http://127.0.0.1:65031",
+  "cases": [
+    {
+      "id": "calendar-drawer-focus",
+      "status": "passed",
+      "url": "http://127.0.0.1:65031",
+      "observations": {
+        "path": "/calendar",
+        "active_tab_after_keyboard": "true",
+        "first_event_id": "bok-2027-apply",
+        "drawer_hidden_after_open": false,
+        "focused_after_open": "calendarDetailCloseBtn",
+        "focused_after_close": "body"
+      }
+    },
+    {
+      "id": "question-bank-load-launch",
+      "status": "passed",
+      "url": "http://127.0.0.1:65031",
+      "observations": {
+        "path": "/question-bank",
+        "initial_summary": "총 546문항 · 현재 200문항 · 필터 0개",
+        "filters_collapsed_initially": true,
+        "active_filters": "통합 검색데이터베이스×",
+        "practice_frame_src": "/?question-bank-embed=1&question-bank-run=1785592944086-3",
+        "launch_state_present": true,
+        "practice_status": "현재 1 / 68서술형난이도 상한국은행 대비 제작"
+      }
+    },
+    {
+      "id": "wiki-sidebar-status",
+      "status": "passed",
+      "url": "http://127.0.0.1:65031",
+      "observations": {
+        "path": "/wiki",
+        "sidebar_initially_open": false,
+        "sidebar_open_after_reload": true,
+        "wiki_status": "일치하는 문서가 없습니다."
+      }
+    }
+  ]
+}
