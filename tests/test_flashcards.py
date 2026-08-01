@@ -2103,21 +2103,47 @@ class FlashcardProgressTests(unittest.TestCase):
             flashcard_app.PUBLIC_PASSWORD = original_password
 
     def test_health_reports_ai_rewrite_config(self):
+        original_db = flashcard_app.PROGRESS_DB_PATH
         original_key = flashcard_app.OPENAI_API_KEY
         original_model = flashcard_app.CODEX_MODEL
         original_image_model = flashcard_app.IMAGE_MODEL
-        try:
-            flashcard_app.OPENAI_API_KEY = 'test-key'
-            flashcard_app.CODEX_MODEL = 'codex-test'
-            flashcard_app.IMAGE_MODEL = 'gpt-image-test'
-            payload = flashcard_app.health()
-            self.assertTrue(payload['ai_rewrite_enabled'])
-            self.assertEqual(payload['codex_model'], 'codex-test')
-            self.assertEqual(payload['ai_image_model'], 'gpt-image-test')
-        finally:
-            flashcard_app.OPENAI_API_KEY = original_key
-            flashcard_app.CODEX_MODEL = original_model
-            flashcard_app.IMAGE_MODEL = original_image_model
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'progress.sqlite'
+            flashcard_app.ensure_progress_db(db_path, seed_rows=[{'id': 'CS-001', 'term': '큐'}])
+            try:
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                flashcard_app.CODEX_MODEL = 'codex-test'
+                flashcard_app.IMAGE_MODEL = 'gpt-image-test'
+                response = flashcard_app.Response()
+                payload = flashcard_app.health(response)
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(payload['ok'])
+                self.assertTrue(payload['ai_rewrite_enabled'])
+                self.assertEqual(payload['codex_model'], 'codex-test')
+                self.assertEqual(payload['ai_image_model'], 'gpt-image-test')
+                self.assertEqual(payload['content_card_count'], 1)
+                self.assertTrue(payload['progress_db_readable'])
+            finally:
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.OPENAI_API_KEY = original_key
+                flashcard_app.CODEX_MODEL = original_model
+                flashcard_app.IMAGE_MODEL = original_image_model
+
+    def test_health_reports_missing_progress_db_as_unhealthy(self):
+        original_db = flashcard_app.PROGRESS_DB_PATH
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'missing.sqlite'
+            try:
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                response = flashcard_app.Response()
+                payload = flashcard_app.health(response)
+                self.assertEqual(response.status_code, 503)
+                self.assertFalse(payload['ok'])
+                self.assertFalse(payload['progress_db_exists'])
+                self.assertEqual(payload['content_card_count'], 0)
+            finally:
+                flashcard_app.PROGRESS_DB_PATH = original_db
 
 
 
@@ -2436,7 +2462,9 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_BRANCH = 'main'
                 flashcard_app.WIKI_GITHUB_TOKEN = 'token'
                 self.assertEqual(flashcard_app.wiki_book_dir(), book.resolve())
-                payload = flashcard_app.health()
+                response = flashcard_app.Response()
+                payload = flashcard_app.health(response)
+                self.assertEqual(response.status_code, 200)
                 self.assertTrue(payload['wiki_book_exists'])
                 self.assertEqual(payload['wiki_book_dir'], str(book.resolve()))
                 self.assertEqual(payload['wiki_book_configured_dir'], str(flashcard_app.WIKI_BOOK_DIR))
