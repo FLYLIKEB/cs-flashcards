@@ -21,6 +21,7 @@ DEPLOY_CHECKLIST = (ROOT / '.codex/skills/cs-flashcards-deploy-guard/references/
 REMOTE_AI_SKILL = (ROOT / '.gjc/skills/cs-remote-ai-batch/SKILL.md').read_text(encoding='utf-8')
 DEPLOY_GUARD_PATTERN = re.compile(r'^ensure_stage_has_no_sqlite_payload\(\) \{\n(?P<body>.*?)^\}\n', re.MULTILINE | re.DOTALL)
 DEPLOY_GUARD_CALL = 'ensure_stage_has_no_sqlite_payload "$TMP_STAGE" "$TMP_ARCHIVE"'
+REMOTE_SQL_REMOTE_BLOCK_PATTERN = re.compile(r"<<'REMOTE'\n(?P<body>.*?)^REMOTE$", re.MULTILINE | re.DOTALL)
 
 
 def write_tar_gz(path: Path, members: dict[str, str]) -> None:
@@ -53,6 +54,26 @@ def write_cards_sqlite(path: Path, *, cards_count: int) -> None:
         conn.commit()
     finally:
         conn.close()
+
+def run_remote_sql_block(db_path: Path, sql_text: str) -> subprocess.CompletedProcess[str]:
+    match = REMOTE_SQL_REMOTE_BLOCK_PATTERN.search(REMOTE_SQL_SCRIPT)
+    if match is None:
+        raise AssertionError('remote sqlite body not found')
+    script = match.group('body')
+    return subprocess.run(
+        ['bash', '-c', script, 'remote-sql-test', str(db_path)],
+        env={**os.environ, 'SQL_TEXT': sql_text},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def write_named_rows_sqlite(path: Path, *names: str) -> None:
+    with sqlite3.connect(path) as conn:
+        conn.execute('CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT NOT NULL)')
+        conn.executemany('INSERT INTO items (name) VALUES (?)', [(name,) for name in names])
+        conn.commit()
 
 
 class DeploySafetyTests(unittest.TestCase):
@@ -211,7 +232,33 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertNotIn('PAYLOAD_FILE', REMOTE_SQL_SCRIPT)
         self.assertNotIn('INSERT INTO {table}', REMOTE_SQL_SCRIPT)
         self.assertIn('원격 DB 경로 변경은 금지됩니다', REMOTE_SQL_SCRIPT)
-        self.assertIn('sqlite3 "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
+        self.assertIn('sqlite3 -bail "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
+
+    def test_remote_sql_script_wraps_sql_in_transaction_and_bails_on_error(self):
+        self.assertIn("BEGIN IMMEDIATE;", REMOTE_SQL_SCRIPT)
+        self.assertIn('sqlite3 -bail "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
+
+    def test_remote_sql_script_rolls_back_partial_changes_on_failure(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'remote.sqlite'
+            write_named_rows_sqlite(db_path, 'before')
+
+            result = run_remote_sql_block(db_path, "UPDATE items SET name='changed';\nINVALID SQL;\n")
+
+            self.assertNotEqual(result.returncode, 0)
+            with sqlite3.connect(db_path) as conn:
+                self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('before',)])
+
+    def test_remote_sql_script_applies_all_statements_when_transaction_succeeds(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'remote.sqlite'
+            write_named_rows_sqlite(db_path, 'before')
+
+            result = run_remote_sql_block(db_path, "UPDATE items SET name='changed';\nINSERT INTO items (name) VALUES ('after');\n")
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            with sqlite3.connect(db_path) as conn:
+                self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('changed',), ('after',)])
 
     def test_skill_docs_use_direct_remote_sql_policy(self):
         self.assertIn('./scripts/remote_sqlite_sql.sh', DEPLOY_SKILL)
