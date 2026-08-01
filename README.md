@@ -35,14 +35,13 @@ http://127.0.0.1:8000
   1. `CS_FLASHCARDS_WIKI_BOOK_DIR`
   2. 프로젝트 내부 `wiki_book/`
   3. 기존 로컬 개발 경로 `../wikidocs-ebook`
-- Lightsail 배포 스크립트는 기본적으로 로컬 `../wikidocs-ebook`를 묶어서 서버의 `/home/ubuntu/cs-flashcards/wiki_book`으로 함께 배포합니다.
-- `CS_FLASHCARDS_WIKI_GITHUB_REPO`가 설정되어 있으면 배포 스크립트가 로컬 위키 대신 해당 GitHub 브랜치 HEAD를 내려받아 서버 `wiki_book`에 반영하고, 서버에도 같은 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`을 주입해 `/wiki` 수정이 GitHub 원본에 바로 반영되게 합니다. 토큰이 없으면 배포를 중단합니다. 기본값은 5분 주기이며 `CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES`로 조절할 수 있습니다.
-- 따라서 위키 레포에 push만 해도 별도 앱 재배포 없이 `/home/ubuntu/cs-flashcards/wiki_book`가 자동 갱신되고, 서버에서 AI/수정 버튼으로 바꾼 내용도 다음 배포에 덮어써지지 않습니다.
-- 다른 위치의 문서를 배포하려면 `CS_FLASHCARDS_WIKI_BOOK_SRC`를 지정합니다.
+- Lightsail 배포 스크립트는 로컬 `../wikidocs-ebook`를 위키 시드로만 묶어 전달하고, 서버의 `/home/ubuntu/cs-flashcards/wiki_book`가 이미 있으면 그대로 보존합니다. 즉 일반 기능 배포가 원격 위키를 덮어쓰지 않습니다.
+- 서버 `wiki_book`가 없을 때만 로컬 시드로 최초 부트스트랩합니다. 다른 위치의 시드를 쓰려면 `CS_FLASHCARDS_WIKI_BOOK_SRC`를 지정합니다.
 - 위키 마크다운의 `- [ ]` / `- [x]` 체크리스트는 `/wiki`에서 실제 체크박스로 렌더링됩니다.
-- 체크를 누르면 배포된 `wiki_book` 마크다운이 바로 갱신됩니다.
-- 문서 상단 `수정` 버튼으로 Markdown 원문을 직접 편집할 수 있고, 저장하면 배포된 `wiki_book`와 현재 문서 화면이 즉시 갱신됩니다.
-- 체크 상태와 문서 수정을 GitHub에도 같이 반영하려면 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정합니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
+- 체크를 누르면 서버의 `wiki_book` 마크다운이 바로 갱신됩니다.
+- 문서 상단 `수정` 버튼으로 Markdown 원문을 직접 편집할 수 있고, 저장하면 서버의 `wiki_book`와 현재 문서 화면이 즉시 갱신됩니다.
+- 위키 AI 이미지 재생성, 체크리스트 저장, 문서 저장도 모두 서버 로컬 위키만 기준으로 동작합니다. GitHub 내용과 비교하거나 GitHub 원본으로 서버 위키를 덮어쓰지 않습니다.
+- GitHub는 자동 동기화 원본이 아니라 수동 보관처입니다. 서버 환경변수에 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`, `CS_FLASHCARDS_WIKI_GITHUB_REPO`(예: `owner/repo`), `CS_FLASHCARDS_WIKI_GITHUB_BRANCH`(기본 `main`)를 설정하면 `/wiki` 문서 하단 `GitHub 보관` 버튼으로 현재 서버 위키 스냅샷을 명시적으로 push할 수 있습니다. 위키가 저장소 하위 경로라면 `CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX`도 함께 지정합니다.
 - 위키 문서는 제목/출처 파일 기준으로 연결된 플래시카드를 찾아 `대표 카드` 버튼과 관련 카드 칩을 보여줍니다.
 - 위키에서 카드를 열면 URL 쿼리로 해당 카드에 바로 점프합니다.
 
@@ -196,7 +195,7 @@ state/progress.sqlite
 ```
 
 수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 저장소의 `state/progress.sqlite`를 서버에 그대로 반영합니다.
-브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. 위키 이미지 AI 재생성은 같은 OpenAI 설정을 쓰고, 원격까지 반영하려면 `CS_FLASHCARDS_WIKI_GITHUB_REPO`/`CS_FLASHCARDS_WIKI_GITHUB_TOKEN` 구성이 필요합니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
+브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. 위키 이미지 AI 재생성도 같은 OpenAI 설정만 있으면 서버 로컬 위키 기준으로 바로 반영됩니다. GitHub 보관이 필요할 때만 `CS_FLASHCARDS_WIKI_GITHUB_REPO`/`CS_FLASHCARDS_WIKI_GITHUB_TOKEN`을 추가로 설정합니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
 
@@ -252,7 +251,8 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
   "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book",
-  "wiki_checklist_sync_target": "local 또는 github"
+  "wiki_checklist_sync_target": "local",
+  "wiki_archive_enabled": true 또는 false
 }
 ```
 
