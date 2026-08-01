@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "kind": "package-test-report",
+  "status": "passed",
+  "sourceHash": "sha256:2269ecdf134b770db48bf3c908909bfb469a3283ea9e11bb87a9d370e9cebc5d",
+  "commands": [
+    "python3 - <<'PY' ... validate cs-auto-optimization-orchestrator skill content ... PY",
+    "python3 - <<'PY' ... assert readiness artifact canStartRound is false with open issues/prs/worktrees ... PY",
+    "gh issue list --state open --limit 100 --json number,title,state,labels,assignees,url",
+    "gh pr list --state open --limit 100 --json number,title,headRefName,baseRefName,reviewDecision,mergeStateStatus,isDraft,url",
+    "git worktree list --porcelain"
+  ],
+  "checks": [
+    "Skill file exists with required orchestration and wait-state rules.",
+    "Project skill is discoverable by exact name.",
+    "Readiness artifact proves the loop is currently blocked by live open issue/PR/worktree evidence.",
+    "The self-realization step did not start a new optimization round while blockers remain."
+  ],
+  "artifacts": [
+    "artifacts/auto-optimization-skill-check.json",
+    "artifacts/auto-optimization-readiness.json",
+    "artifacts/auto-optimization-ai-slop-cleanup-report.md",
+    "artifacts/auto-optimization-source-hash.txt"
+  ]
+}

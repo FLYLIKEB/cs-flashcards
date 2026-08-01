@@ -1,0 +1,27 @@
+{
+  "goalId": "G002",
+  "objective": "현재 상태 기준 자기실현 초기화",
+  "skillPath": ".gjc/skills/cs-auto-optimization-orchestrator/SKILL.md",
+  "sourceHash": "sha256:2269ecdf134b770db48bf3c908909bfb469a3283ea9e11bb87a9d370e9cebc5d",
+  "readinessArtifact": "artifacts/auto-optimization-readiness.json",
+  "verificationArtifacts": [
+    "artifacts/auto-optimization-skill-check.json",
+    "artifacts/auto-optimization-test-report.json",
+    "artifacts/auto-optimization-ai-slop-cleanup-report.md"
+  ],
+  "result": {
+    "canStartRound": false,
+    "reason": "Live open issues, an open PR, and retained issue/wave worktrees still exist, so the new optimization loop must wait.",
+    "counts": {
+      "openIssues": 8,
+      "openPullRequests": 1,
+      "blockingWorktrees": 12
+    }
+  },
+  "checks": [
+    "Created the project skill with the requested hard gate and orchestration loop.",
+    "Ran immediate self-realization readiness checks against GitHub issues, GitHub PRs, and local worktrees.",
+    "Persisted a durable wait-state artifact instead of starting a prohibited optimization round."
+  ],
+  "blockingIssues": []
+}

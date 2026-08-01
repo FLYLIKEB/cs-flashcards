@@ -1,0 +1,13 @@
+{
+  "path": ".gjc/skills/cs-auto-optimization-orchestrator/SKILL.md",
+  "exists": true,
+  "lineCount": 94,
+  "hasFrontmatterName": true,
+  "hasReadinessGate": true,
+  "hasIssueCommand": true,
+  "hasPrCommand": true,
+  "hasWorktreeCommand": true,
+  "hasKoreanPrRule": true,
+  "hasCompletionHeuristic": true,
+  "hasSelfRealizationRule": true
+}
