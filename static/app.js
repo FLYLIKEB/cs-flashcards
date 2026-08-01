@@ -5672,6 +5672,7 @@ function renderQuestionPanel() {
         }).join('')}
       </ol>
     </div>` : '';
+  const answerKeywordHtml = renderQuestionKeywordLinks(question.keywords, {interactive: true});
   const answerGuideHtml = question.answerGuide
     ? `<div class="question-answer-guide question-markdown"><strong>답안 가이드</strong>${renderQuestionMarkdown(question.answerGuide)}</div>`
     : '';
@@ -5688,6 +5689,23 @@ function renderQuestionPanel() {
     <div class="question-rubric">
       <strong>채점 포인트</strong>
       <ul>${question.rubric.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+    </div>` : '';
+  const answerMetaFields = [
+    {label: '문제유형', value: question.topic || ''},
+    {label: '키워드', html: answerKeywordHtml},
+    {label: '기관', value: question.issuer || ''},
+    {label: '출처', value: question.sourceLocation || ''},
+    {label: '분야', value: question.fieldName || ''},
+    {label: '섹션', value: question.section || ''},
+    {label: '난이도', value: question.difficulty || ''},
+  ].filter((item) => item.value || item.html);
+  const answerMetaHtml = question.answerRevealed && (answerMetaFields.length || reviewCard) ? `
+    <div class="question-answer-meta">
+      <strong>문항 정보</strong>
+      <div class="question-answer-meta-grid">
+        ${answerMetaFields.map((item) => `<div class="question-answer-meta-item"><span class="question-answer-meta-label">${escapeHtml(item.label)}</span><div class="question-answer-meta-value${item.label === '키워드' ? ' question-keyword-list' : ''}">${item.html || escapeHtml(item.value)}</div></div>`).join('')}
+        ${reviewCard ? `<div class="question-answer-meta-item"><span class="question-answer-meta-label">원본 카드</span><button class="question-answer-meta-card-button" type="button" data-question-open-card="1">${escapeHtml(reviewCard.term || reviewCard.id || '원본 카드로 이동')}</button></div>` : ''}
+      </div>
     </div>` : '';
   const resultText = questionResultText(question);
   const resultTone = question.judgment === 'pending' ? '' : question.judgment;
@@ -5727,11 +5745,13 @@ function renderQuestionPanel() {
       <strong>정답/모범답안</strong>
       <div class="question-answer-markdown">${renderQuestionMarkdown(question.answer || '')}</div>
       ${question.explanation ? `<div class="question-explanation-markdown">${renderQuestionMarkdown(question.explanation)}</div>` : ''}
+      ${answerMetaHtml}
       ${answerRefineHtml}
       ${rubric}
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+
 
   const sessionMode = question.sessionMode || state.questionSessionMode;
   const sessionModeLabelText = questionSessionModeLabel(sessionMode);
@@ -5768,7 +5788,8 @@ function renderQuestionPanel() {
   const progressPercent = total ? Math.max(0, Math.min(100, Math.round(((state.questionIndex + 1) / total) * 100))) : 0;
   const questionPosition = total ? `문항 ${state.questionIndex + 1} / ${total}` : '문항';
   const bodyHtml = question.body ? `<div class="question-body question-surface">${renderQuestionMarkdown(question.body)}</div>` : '';
-  const keywordHtml = renderQuestionKeywordLinks(question.keywords, {interactive: true});
+  const keywordHtml = answerKeywordHtml;
+
   const judgmentBadgeHtml = question.judgment !== 'pending'
     ? `<span class="badge question-judgment-badge ${escapeHtml(question.judgment)}">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>`
     : '';
@@ -6589,6 +6610,10 @@ $('questionCard')?.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
     goToQuestionKeyword(keywordButton.dataset.questionKeyword || '');
+    return;
+  }
+  if (event.target.closest('[data-question-open-card="1"]')) {
+    openQuestionSourceCard();
     return;
   }
   const choice = event.target.closest('[data-choice-index]');

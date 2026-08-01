@@ -4853,6 +4853,48 @@ select,
   padding: .72rem .8rem;
   line-height: 1.58;
 }
+.question-answer-meta {
+  margin-top: .78rem;
+  padding-top: .78rem;
+  border-top: 1px solid rgba(31, 58, 95, .08);
+}
+.question-answer-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: .62rem .82rem;
+  margin-top: .58rem;
+}
+.question-answer-meta-item {
+  min-width: 0;
+}
+.question-answer-meta-label {
+  display: block;
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 720;
+  margin-bottom: .14rem;
+}
+.question-answer-meta-value {
+  color: #334155;
+  line-height: 1.55;
+  word-break: break-word;
+}
+.question-answer-meta .question-keyword-list {
+  margin: 0;
+}
+.question-answer-meta-card-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.question-answer-meta-card-button:hover {
+  color: var(--accent-strong);
+}
 .question-answer p {
   margin: .38rem 0 0;
 }

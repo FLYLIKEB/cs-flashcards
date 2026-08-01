@@ -701,6 +701,8 @@ class StaticFrontendTests(unittest.TestCase):
             'function renderQuestionPanel()',
             'function revealQuestionAnswer()',
             'function openQuestionSourceCard()',
+            'question-answer-meta',
+            'data-question-open-card="1"',
             'question-keyword-link',
             'function openQuestionPracticeFromMenu()',
             'toggleQuestionMode(true)',
@@ -795,6 +797,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-bank-list', STYLE_CSS)
         self.assertIn('.question-markdown', STYLE_CSS)
         self.assertIn('.question-md-image', STYLE_CSS)
+        self.assertIn('.question-answer-meta', STYLE_CSS)
+        self.assertIn('.question-answer-meta-card-button', STYLE_CSS)
         self.assertIn('question-bank-shell-topbar', QUESTION_BANK_HTML)
         self.assertIn('.question-bank-shell', STYLE_CSS)
         self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
