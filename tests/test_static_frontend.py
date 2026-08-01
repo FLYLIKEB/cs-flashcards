@@ -27,6 +27,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageCategoryGuideDialog"', QUESTION_BANK_HTML)
+        self.assertIn('question-bank-shell-topbar', QUESTION_BANK_HTML)
 
     def test_calendar_page_smoke_has_tabs_and_detail_drawer(self):
         self.assertIn('id="mainTabCalendarBtn"', CALENDAR_HTML)
@@ -44,7 +45,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function renderQuestionBankBrowser()', APP_JS)
         self.assertIn('function loadQuestionBankBrowser()', APP_JS)
         self.assertIn('function openQuestionBankSession(startIndex = 0)', APP_JS)
-        self.assertIn("questionBankToggleBtn", APP_JS)
+        self.assertIn('questionBankToggleBtn', APP_JS)
 
     def test_question_bank_js_smoke_keeps_load_launch_and_persistence_hooks(self):
         self.assertIn("const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';", QUESTION_BANK_JS)
@@ -68,6 +69,17 @@ class StaticFrontendSmokeTests(unittest.TestCase):
     def test_css_smoke_keeps_question_and_table_shell_visibility_rules(self):
         self.assertIn('.question-panel[hidden]', STYLE_CSS)
         self.assertIn('display: none !important', STYLE_CSS)
+        self.assertIn('.question-bank-row-trigger', STYLE_CSS)
+        self.assertIn('.question-bank-list', STYLE_CSS)
+        self.assertIn('.question-markdown', STYLE_CSS)
+        self.assertIn('.question-md-image', STYLE_CSS)
+        self.assertIn('.question-answer-meta', STYLE_CSS)
+        self.assertIn('.question-answer-meta-card-button', STYLE_CSS)
+        self.assertIn('.question-markdown ul ul', STYLE_CSS)
+        self.assertIn('.question-markdown ol ol', STYLE_CSS)
+        self.assertIn('.question-bank-shell', STYLE_CSS)
+        self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
+        self.assertIn('.question-bank-embed .topbar', STYLE_CSS)
         self.assertIn('body.question-bank-embed #questionBankToggleBtn', STYLE_CSS)
         self.assertIn('body.question-bank-embed #questionBankBrowser', STYLE_CSS)
         self.assertIn('body.question-bank-embed {', STYLE_CSS)

@@ -335,13 +335,23 @@ function clearFilterField(key) {
   setFilterValue(key, '');
   loadQuestionBankPage().catch(() => {});
 }
+function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = filterValues().attempt_status) {
+  if (!attemptStatus) return true;
+  return String(item?.question_attempt_status || 'unseen') === String(attemptStatus || '');
+}
+
 
 function applyEmbeddedQuestionBankUpdate(item) {
   const questionBankId = String(item?.question_bank_id || '').trim();
   if (!questionBankId) return;
   const index = bankState.items.findIndex((entry) => String(entry?.question_bank_id || '') === questionBankId);
   if (index < 0) return;
-  bankState.items[index] = {...bankState.items[index], ...item};
+  const nextItem = {...bankState.items[index], ...item};
+  bankState.items[index] = nextItem;
+  if (!questionBankItemMatchesAttemptStatusFilter(nextItem)) {
+    loadQuestionBankPage().catch(() => {});
+    return;
+  }
   renderTable();
   renderPracticePane();
 }

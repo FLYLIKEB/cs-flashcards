@@ -105,8 +105,7 @@ WIKI_GITHUB_BRANCH = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_BRANCH", "mai
 WIKI_GITHUB_TOKEN = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_TOKEN", "")).strip()
 WIKI_GITHUB_PATH_PREFIX = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX", "")).strip().strip("/")
 WIKI_GITHUB_API_BASE = str(os.environ.get("CS_FLASHCARDS_WIKI_GITHUB_API_BASE", "https://api.github.com")).rstrip("/")
-QUESTION_BANK_SYNC_ALLOW_SHRINK = str(os.environ.get("CS_FLASHCARDS_QUESTION_BANK_SYNC_ALLOW_SHRINK", "")).strip().lower() in {"1", "true", "yes", "on"}
-QUESTION_BANK_SYNC_MIN_RETAIN_RATIO = min(1.0, max(0.0, float(os.environ.get("CS_FLASHCARDS_QUESTION_BANK_SYNC_MIN_RETAIN_RATIO", "0.5") or "0.5")))
+
 CARD_AI_EDITABLE_FIELDS = ("definition", "detailed_explanation", "exam_note", "concept_image_alt")
 CONCEPT_MEDIA_TYPES = {"", "image", "gif", "video", "mermaid", "html"}
 
@@ -2536,6 +2535,10 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     }
 
 
+
+
+
+
 def update_question_bank_ai_content(
     question_bank_id: str,
     payload: QuestionBankAiRefineRequest,
@@ -4421,76 +4424,7 @@ def parse_fin_corp_question_bank_entries(
 
 
 
-def count_fin_corp_question_bank_entries(
-    progress_db_path: Path | None = PROGRESS_DB_PATH,
-) -> int:
-    db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        return int(conn.execute(
-            "SELECT COUNT(*) FROM question_bank WHERE id LIKE ?",
-            ("qb-fin239-%",),
-        ).fetchone()[0] or 0)
 
-
-def clear_fin_corp_question_bank_entries(
-    progress_db_path: Path | None = PROGRESS_DB_PATH,
-) -> int:
-    db_path = progress_db_for(progress_db_path)
-    existing_count = count_fin_corp_question_bank_entries(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        conn.execute(
-            "DELETE FROM question_bank WHERE id LIKE ?",
-            ("qb-fin239-%",),
-        )
-        conn.commit()
-    return existing_count
-
-
-def assert_safe_question_bank_sync(
-    *,
-    label: str,
-    source_pages: int,
-    parsed_entries: int,
-    existing_entries: int,
-) -> None:
-    if existing_entries <= 0:
-        return
-    if source_pages <= 0:
-        raise RuntimeError(f"{label} 문제은행 동기화를 중단했습니다. 원본 위키 페이지를 찾지 못했습니다.")
-    if parsed_entries <= 0:
-        raise RuntimeError(f"{label} 문제은행 동기화를 중단했습니다. 파싱 결과가 0건이라 기존 DB를 지우면 안 됩니다.")
-    if QUESTION_BANK_SYNC_ALLOW_SHRINK:
-        return
-    minimum_expected = max(1, math.ceil(existing_entries * QUESTION_BANK_SYNC_MIN_RETAIN_RATIO))
-    if parsed_entries < minimum_expected:
-        raise RuntimeError(
-            f"{label} 문제은행 동기화를 중단했습니다. 기존 {existing_entries}건 대비 새 파싱 결과가 {parsed_entries}건으로 너무 적습니다. "
-            f"(기본 최소 비율 {QUESTION_BANK_SYNC_MIN_RETAIN_RATIO:.2f})"
-        )
-
-
-def sync_fin_corp_question_bank_entries(
-    repo_dir: Path | None = None,
-    progress_db_path: Path | None = PROGRESS_DB_PATH,
-) -> dict[str, Any]:
-    pages = len(fin_corp_question_bank_source_pages(repo_dir))
-    entries = parse_fin_corp_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
-    existing_count = count_fin_corp_question_bank_entries(progress_db_path)
-    assert_safe_question_bank_sync(
-        label="금융공기업",
-        source_pages=pages,
-        parsed_entries=len(entries),
-        existing_entries=existing_count,
-    )
-    cleared = clear_fin_corp_question_bank_entries(progress_db_path)
-    saved = upsert_question_bank_entries(entries, progress_db_path)
-    return {
-        "pages": pages,
-        "cleared": cleared,
-        "count": saved.get("count", 0),
-        "items": saved.get("items", []),
-    }
 BOK_QUESTION_BANK_PAGE_GLOB = "05-14-[0-9][0-9]-*.md"
 BOK_ANY_HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 BOK_NUMBERED_HEADING_RE = re.compile(r"^(#{2,6})\s+(\d+)\.\s+(.+?)\s*$")
@@ -4939,53 +4873,6 @@ def parse_bok_question_bank_entries(
 
 
 
-def count_bok_question_bank_entries(
-    progress_db_path: Path | None = PROGRESS_DB_PATH,
-) -> int:
-    db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        return int(conn.execute(
-            "SELECT COUNT(*) FROM question_bank WHERE issuer = ? AND session_mode = ?",
-            ("한국은행", "bok"),
-        ).fetchone()[0] or 0)
-
-
-def clear_bok_question_bank_entries(
-    progress_db_path: Path | None = PROGRESS_DB_PATH,
-) -> int:
-    db_path = progress_db_for(progress_db_path)
-    existing_count = count_bok_question_bank_entries(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        conn.execute(
-            "DELETE FROM question_bank WHERE issuer = ? AND session_mode = ?",
-            ("한국은행", "bok"),
-        )
-        conn.commit()
-    return existing_count
-
-
-def sync_bok_question_bank_entries(
-    repo_dir: Path | None = None,
-    progress_db_path: Path | None = PROGRESS_DB_PATH,
-) -> dict[str, Any]:
-    pages = len(bok_question_bank_source_pages(repo_dir))
-    entries = parse_bok_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
-    existing_count = count_bok_question_bank_entries(progress_db_path)
-    assert_safe_question_bank_sync(
-        label="한국은행",
-        source_pages=pages,
-        parsed_entries=len(entries),
-        existing_entries=existing_count,
-    )
-    cleared = clear_bok_question_bank_entries(progress_db_path)
-    saved = upsert_question_bank_entries(entries, progress_db_path)
-    return {
-        "pages": pages,
-        "cleared": cleared,
-        "count": saved.get("count", 0),
-        "items": saved.get("items", []),
-    }
 
 
 def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:

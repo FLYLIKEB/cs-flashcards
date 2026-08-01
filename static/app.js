@@ -4695,25 +4695,67 @@ function currentQuestionCard() {
     || null;
 }
 
-function syncUpdatedQuestionBankItem(item) {
+function questionAttemptStatusFromJudgment(judgment = 'pending') {
+  if (judgment === 'correct') return 'correct';
+  if (['ambiguous', 'wrong', 'unknown'].includes(judgment)) return 'wrong';
+  return 'unseen';
+}
+
+function questionAttemptStatusLabel(status = 'unseen') {
+  const labels = {unseen: '안푼', wrong: '틀린', correct: '맞은'};
+  return labels[status] || labels.unseen;
+}
+
+function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = questionBankFilterValues().attempt_status) {
+  if (!attemptStatus) return true;
+  return String(item?.question_attempt_status || 'unseen') === String(attemptStatus || '');
+}
+
+function syncUpdatedQuestionBankItem(item, {reloadOnFilterMismatch = true} = {}) {
   const questionBankId = String(item?.question_bank_id || '').trim();
   if (!questionBankId) return;
   const bankIndex = state.questionBankItems.findIndex((entry) => String(entry?.question_bank_id || '') === questionBankId);
-  if (bankIndex >= 0) state.questionBankItems[bankIndex] = {...state.questionBankItems[bankIndex], ...item};
+  let nextBankItem = null;
+  if (bankIndex >= 0) {
+    nextBankItem = {...state.questionBankItems[bankIndex], ...item};
+    state.questionBankItems[bankIndex] = nextBankItem;
+  }
   state.questions.forEach((question) => {
     const current = hydrateQuestionState(question);
     if (!current || current.questionBankId !== questionBankId) return;
-    current.answer = String(item.answer || '');
-    current.explanation = String(item.explanation || '');
-    current.rubric = Array.isArray(item.rubric) ? item.rubric : [];
-    current.answerGuide = String(item.answer_guide || '');
+    current.answer = String(item.answer ?? current.answer ?? '');
+    current.explanation = String(item.explanation ?? current.explanation ?? '');
+    current.rubric = Array.isArray(item.rubric) ? item.rubric : current.rubric;
+    current.answerGuide = String(item.answer_guide ?? current.answerGuide ?? '');
+    if (item.question_attempt_judgment) current.judgment = String(item.question_attempt_judgment || current.judgment || 'pending');
+    if (item.question_attempt_status) current.questionAttemptStatus = String(item.question_attempt_status || current.questionAttemptStatus || 'unseen');
   });
-  if (state.questionBankOpen) renderQuestionBankBrowser();
+  if (state.questionBankOpen) {
+    if (reloadOnFilterMismatch && nextBankItem && !questionBankItemMatchesAttemptStatusFilter(nextBankItem)) {
+      loadQuestionBankBrowser().catch(() => {});
+      return;
+    }
+    renderQuestionBankBrowser();
+  }
 }
 
 function notifyQuestionBankParentUpdate(item) {
   if (!questionBankEmbedMode() || window.parent === window || !item?.question_bank_id) return;
   window.parent.postMessage({type: 'cs-flashcards-question-bank-updated', item}, '*');
+}
+
+function syncQuestionBankAttemptState(question, {reloadOnFilterMismatch = true} = {}) {
+  const current = hydrateQuestionState(question);
+  if (!current?.questionBankId) return;
+  const status = questionAttemptStatusFromJudgment(current.judgment || 'pending');
+  const item = {
+    question_bank_id: current.questionBankId,
+    question_attempt_judgment: current.judgment || 'pending',
+    question_attempt_status: status,
+    question_attempt_status_label: questionAttemptStatusLabel(status),
+  };
+  syncUpdatedQuestionBankItem(item, {reloadOnFilterMismatch});
+  notifyQuestionBankParentUpdate(item);
 }
 
 function resolveImportedCard(rawQuestion, index) {
@@ -5497,6 +5539,7 @@ async function saveQuestionAttempt(question, {quiet = false} = {}) {
     current.sessionElapsedSeconds = Number.isInteger(data.attempt?.session_elapsed_seconds) ? data.attempt.session_elapsed_seconds : current.sessionElapsedSeconds;
     if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
     syncUpdatedCard(data.card);
+    syncQuestionBankAttemptState(current);
     if (state.questionHistoryOpen) loadQuestionHistory();
     if (!quiet) setMessage(questionResultText(current) || '문제 채점 저장 완료');
     return data;
@@ -5546,6 +5589,7 @@ async function finishQuestionSession() {
       current.answerGuide = String(payload.attempt?.answer_guide || current.answerGuide || '');
       current.questionElapsedSeconds = Number.isInteger(payload.attempt?.question_elapsed_seconds) ? payload.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
       syncUpdatedCard(payload.card);
+      syncQuestionBankAttemptState(current, {reloadOnFilterMismatch: index === state.questionIndex});
     });
     if (state.questionHistoryOpen) loadQuestionHistory();
     const counts = questionJudgmentCounts();
@@ -6361,6 +6405,67 @@ function renderMarkdownTable(lines) {
   return `<div class="question-md-table-wrap"><table class="question-md-table"><thead><tr>${header.map((cell) => `<th>${cell}</th>`).join('')}</tr></thead><tbody>${body.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
+function questionMarkdownListMatch(line) {
+  const match = String(line || '').match(/^(\s*)([-*]|\d+[.)])\s+(.+)$/);
+  if (!match) return null;
+  return {
+    indent: match[1].replace(/\t/g, '    ').length,
+    ordered: /^\d/.test(match[2]),
+    text: match[3],
+  };
+}
+
+function renderQuestionMarkdownListLevel(lines, startIndex, indent, ordered) {
+  const items = [];
+  let index = startIndex;
+  while (index < lines.length) {
+    const current = questionMarkdownListMatch(lines[index]);
+    if (!current) break;
+    if (current.indent < indent) break;
+    if (current.indent > indent) {
+      if (!items.length) break;
+      const nested = renderQuestionMarkdownListLevel(lines, index, current.indent, current.ordered);
+      if (!nested) break;
+      items[items.length - 1].nested.push(nested.html);
+      index = nested.index;
+      continue;
+    }
+    if (current.ordered !== ordered) break;
+    const item = {parts: [renderMarkdownInline(current.text)], nested: []};
+    index += 1;
+    while (index < lines.length) {
+      const raw = lines[index];
+      const trimmed = raw.trim();
+      if (!trimmed) break;
+      const nextList = questionMarkdownListMatch(raw);
+      if (nextList) {
+        if (nextList.indent > indent) {
+          const nested = renderQuestionMarkdownListLevel(lines, index, nextList.indent, nextList.ordered);
+          if (!nested) break;
+          item.nested.push(nested.html);
+          index = nested.index;
+          continue;
+        }
+        break;
+      }
+      const continuationIndent = raw.match(/^\s*/)[0].replace(/\t/g, '    ').length;
+      if (continuationIndent > indent) {
+        item.parts.push(renderMarkdownInline(trimmed));
+        index += 1;
+        continue;
+      }
+      break;
+    }
+    items.push(item);
+  }
+  if (!items.length) return null;
+  const tag = ordered ? 'ol' : 'ul';
+  return {
+    html: `<${tag} class="question-md-list${ordered ? ' ordered' : ''}">${items.map((item) => `<li>${item.parts.join('<br />')}${item.nested.join('')}</li>`).join('')}</${tag}>`,
+    index,
+  };
+}
+
 function renderQuestionMarkdown(source) {
   const text = String(source || '').replace(/\r\n?/g, '\n');
   if (!text.trim()) return '';
@@ -6412,29 +6517,19 @@ function renderQuestionMarkdown(source) {
       html.push(`<blockquote class="question-md-blockquote">${quote.map((part) => `<p>${renderMarkdownInline(part)}</p>`).join('')}</blockquote>`);
       continue;
     }
-    if (/^[-*]\s+/.test(trimmed)) {
-      const items = [];
-      while (index < lines.length && /^[-*]\s+/.test(lines[index].trim())) {
-        items.push(lines[index].trim().replace(/^[-*]\s+/, ''));
-        index += 1;
-      }
-      html.push(`<ul class="question-md-list">${items.map((item) => `<li>${renderMarkdownInline(item)}</li>`).join('')}</ul>`);
-      continue;
-    }
-    if (/^\d+[.)]\s+/.test(trimmed)) {
-      const items = [];
-      while (index < lines.length && /^\d+[.)]\s+/.test(lines[index].trim())) {
-        items.push(lines[index].trim().replace(/^\d+[.)]\s+/, ''));
-        index += 1;
-      }
-      html.push(`<ol class="question-md-list ordered">${items.map((item) => `<li>${renderMarkdownInline(item)}</li>`).join('')}</ol>`);
+    const listBlock = questionMarkdownListMatch(line)
+      ? renderQuestionMarkdownListLevel(lines, index, questionMarkdownListMatch(line).indent, questionMarkdownListMatch(line).ordered)
+      : null;
+    if (listBlock) {
+      html.push(listBlock.html);
+      index = listBlock.index;
       continue;
     }
     const paragraph = [trimmed];
     index += 1;
     while (index < lines.length) {
       const next = lines[index].trim();
-      if (!next || /^```/.test(next) || /^(#{1,6})\s+/.test(next) || /^>\s?/.test(next) || /^[-*]\s+/.test(next) || /^\d+[.)]\s+/.test(next)) break;
+      if (!next || /^```/.test(next) || /^(#{1,6})\s+/.test(next) || /^>\s?/.test(next) || questionMarkdownListMatch(lines[index])) break;
       if (next.includes('|') && index + 1 < lines.length && /^\s*\|?\s*[:-]-*.*\|/.test(lines[index + 1])) break;
       paragraph.push(next);
       index += 1;

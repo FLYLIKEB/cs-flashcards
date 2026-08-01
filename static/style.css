@@ -4622,6 +4622,28 @@ select,
 .question-markdown ol {
   padding-left: 1.4rem;
 }
+.question-markdown ul ul,
+.question-markdown ul ol,
+.question-markdown ol ul,
+.question-markdown ol ol {
+  margin: .35rem 0 0;
+  padding-left: 1.25rem;
+}
+.question-markdown ul ul {
+  list-style-type: circle;
+}
+.question-markdown ul ul ul {
+  list-style-type: square;
+}
+.question-markdown ol ol {
+  list-style-type: lower-alpha;
+}
+.question-markdown ol ol ol {
+  list-style-type: lower-roman;
+}
+.question-markdown li > .question-md-list {
+  margin-top: .35rem;
+}
 .question-markdown blockquote {
   padding: .2rem .85rem;
   border-left: 4px solid rgba(31, 58, 95, .18);
