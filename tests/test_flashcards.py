@@ -12,6 +12,7 @@ from pathlib import Path
 from unittest import mock
 
 import app as flashcard_app
+import flashcards_backend
 from app import mark_card, read_cards, save_memo, save_question_attempt, set_bookmark, summarize
 
 
@@ -286,7 +287,13 @@ class FlashcardProgressTests(unittest.TestCase):
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
                 flashcard_app.PROGRESS_DB_PATH = db_path
-                data = flashcard_app.api_cards()
+                with mock.patch.object(
+                    flashcard_app.flashcards_backend,
+                    'connect_progress_db',
+                    wraps=flashcards_backend.connect_progress_db,
+                ) as backend_connect:
+                    data = flashcard_app.api_cards()
+                self.assertGreaterEqual(backend_connect.call_count, 1)
             finally:
                 flashcard_app.PROGRESS_DB_PATH = original_db
 
