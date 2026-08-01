@@ -194,7 +194,7 @@ CREATE TABLE card_progress (
 state/progress.sqlite
 ```
 
-수정 후 GitHub에 커밋/푸시하면 원격 사이트에 자동 반영됩니다. 배포 스크립트는 저장소의 `state/progress.sqlite`를 서버에 그대로 반영합니다.
+수정 후 GitHub에 커밋/푸시하면 코드 배포가 자동으로 시작되지만, 일반 배포는 원격 `state/progress.sqlite`를 **보존**합니다. 콘텐츠/문제은행 데이터를 바꿨다면 GitHub push만으로 끝나지 않고, 필요한 row/field를 별도로 원격 SQLite에 반영해야 합니다.
 브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. 위키 이미지 AI 재생성도 같은 OpenAI 설정만 있으면 서버 로컬 위키 기준으로 바로 반영됩니다. GitHub 보관이 필요할 때만 `CS_FLASHCARDS_WIKI_GITHUB_REPO`/`CS_FLASHCARDS_WIKI_GITHUB_TOKEN`을 추가로 설정합니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
@@ -234,19 +234,21 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 
 ## 배포 후 확인 방법
 
-원격 배포 후 아래가 맞으면 정상입니다.
+원격 배포 후 아래가 맞으면 정상입니다. `state/progress.sqlite`가 없거나 `cards` 테이블이 비어 있으면 `/api/health`는 503으로 실패해야 합니다.
 
 ```bash
 ./scripts/remote_flashcards_api.sh /api/health
 ```
 
-응답에 아래 값이 포함되어야 합니다.
+성공 응답에는 아래 값이 포함되어야 합니다.
 
 ```json
 {
   "ok": true,
   "content_db_exists": true,
+  "content_card_count": 1 이상,
   "progress_db_exists": true,
+  "progress_db_readable": true,
   "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite",
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
@@ -300,4 +302,4 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 - [ ] 일반 배포로 원격 `state/progress.sqlite` 전체를 덮어쓰지 않는다.
 - [ ] 작업 전에 `./scripts/pull_remote_sqlite.sh`로 live 기준본을 가져온다.
 - [ ] DB 내용 변경 시 `./scripts/sync_remote_sqlite_rows.sh`로 바뀐 row/field만 반영하고, `./scripts/remote_flashcards_api.sh`로 결과를 확인한다.
-- [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`를 확인한다.
+- [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`, `progress_db_readable: true`, `content_card_count > 0`를 확인한다.

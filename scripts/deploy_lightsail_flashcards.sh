@@ -25,12 +25,10 @@ WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
 FORCE_DB_REPLACE="${CS_FLASHCARDS_FORCE_DB_REPLACE:-0}"
 OPENAI_API_KEY_VALUE="${OPENAI_API_KEY:-${CS_FLASHCARDS_OPENAI_API_KEY:-}}"
 
-
 if ! [[ "$FORCE_DB_REPLACE" =~ ^(0|1)$ ]]; then
   echo "CS_FLASHCARDS_FORCE_DB_REPLACE 는 0 또는 1 이어야 합니다: $FORCE_DB_REPLACE" >&2
   exit 1
 fi
-
 
 if [[ -f "$CHALOG_CONFIG" ]]; then
   # shellcheck disable=SC1090
@@ -59,6 +57,44 @@ extract_github_repo() {
   esac
 }
 
+append_env_line() {
+  local key="$1"
+  local value="$2"
+  python3 - <<'PY' "$key" "$value" >> "$TMP_RUNTIME_ENV"
+import sys
+key, value = sys.argv[1], sys.argv[2]
+escaped = value.replace('\\', '\\\\').replace('"', '\\"')
+print(f'{key}="{escaped}"')
+PY
+}
+
+verify_sqlite_has_cards() {
+  local sqlite_path="$1"
+  local label="$2"
+  python3 - <<'PY' "$sqlite_path" "$label"
+import os
+import sqlite3
+import sys
+
+path = sys.argv[1]
+label = sys.argv[2]
+if not os.path.exists(path):
+    raise SystemExit(f"{label} progress.sqlite not found: {path}")
+try:
+    conn = sqlite3.connect(path)
+    try:
+        row = conn.execute("SELECT COUNT(*) FROM cards").fetchone()
+    finally:
+        conn.close()
+except sqlite3.Error as exc:
+    raise SystemExit(f"{label} progress.sqlite validation failed: {exc}") from exc
+count = int(row[0] or 0)
+if count <= 0:
+    raise SystemExit(f"{label} progress.sqlite has no card rows: {path}")
+print(f"{label} progress.sqlite card_count={count}")
+PY
+}
+
 if [[ -d "$WIKI_BOOK_SRC/.git" ]]; then
   if [[ -z "$WIKI_GITHUB_REPO" ]]; then
     ORIGIN_URL="$(git -C "$WIKI_BOOK_SRC" remote get-url origin 2>/dev/null || true)"
@@ -74,7 +110,6 @@ WIKI_GITHUB_BRANCH="${WIKI_GITHUB_BRANCH:-main}"
 if [[ -n "$WIKI_GITHUB_REPO" && -z "$WIKI_GITHUB_TOKEN" ]] && command -v gh >/dev/null 2>&1; then
   WIKI_GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
 fi
-
 
 if [[ ! -f "${SSH_KEY:-}" && -f "/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem" ]]; then
   SSH_KEY="/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem"
@@ -94,7 +129,6 @@ fi
 
 echo "개념 이미지: SQLite cards 테이블에 URL/미디어를 기록하고 AI 재생성 이미지는 서버 state/ai_images 에 저장"
 
-
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new)
@@ -108,8 +142,25 @@ else
   echo "위키 GitHub 수동 보관 버튼: 비활성"
 fi
 
+verify_sqlite_has_cards "$ROOT_DIR/state/progress.sqlite" "로컬"
+
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
+TMP_RUNTIME_ENV="$(mktemp -t cs-flashcards-runtime.XXXXXX.env)"
+cleanup() {
+  rm -f "$TMP_ARCHIVE" "$TMP_RUNTIME_ENV"
+  rm -rf "$TMP_STAGE"
+}
+trap cleanup EXIT
+
+append_env_line "CS_FLASHCARDS_USERNAME" "$USERNAME"
+append_env_line "CS_FLASHCARDS_PASSWORD" "$PASSWORD"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_REPO" "$WIKI_GITHUB_REPO"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_BRANCH"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_TOKEN" "$WIKI_GITHUB_TOKEN"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX" "$WIKI_GITHUB_PATH_PREFIX"
+append_env_line "OPENAI_API_KEY" "$OPENAI_API_KEY_VALUE"
+
 mkdir -p "$TMP_STAGE/data" "$TMP_STAGE/state"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
@@ -135,47 +186,28 @@ else
   echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 시드 없이 배포합니다: $WIKI_PACKAGE_SRC"
 fi
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" -C "$TMP_STAGE" .
-rm -rf "$TMP_STAGE"
-
 
 "${SSH[@]}" "mkdir -p '$REMOTE_DIR' '$REMOTE_DIR/backups'"
 "${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards.tar.gz"
-rm -f "$TMP_ARCHIVE"
-WIKI_GITHUB_PATH_PREFIX_ARG="${WIKI_GITHUB_PATH_PREFIX:-__EMPTY__}"
-WIKI_GITHUB_TOKEN_ARG="${WIKI_GITHUB_TOKEN:-__EMPTY__}"
+"${SCP[@]}" "$TMP_RUNTIME_ENV" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards-runtime.env"
 
-OPENAI_API_KEY_ARG="${OPENAI_API_KEY_VALUE:-__EMPTY__}"
-
-
-"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN_ARG" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$OPENAI_API_KEY_ARG" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" <<'REMOTE'
 set -euo pipefail
 REMOTE_DIR="$1"
 REMOTE_PORT="$2"
 DOMAIN="$3"
 ORIGIN_DOMAIN="$4"
-USERNAME="$5"
-PASSWORD="$6"
-WIKI_GITHUB_REPO="${7-}"
-WIKI_GITHUB_BRANCH="${8-}"
-WIKI_GITHUB_TOKEN="${9-}"
-WIKI_GITHUB_PATH_PREFIX="${10-}"
-OPENAI_API_KEY_VALUE="${11-}"
-if [[ "$WIKI_GITHUB_TOKEN" == "__EMPTY__" ]]; then
-  WIKI_GITHUB_TOKEN=""
-fi
-if [[ "$WIKI_GITHUB_PATH_PREFIX" == "__EMPTY__" ]]; then
-  WIKI_GITHUB_PATH_PREFIX=""
-fi
-if [[ "$OPENAI_API_KEY_VALUE" == "__EMPTY__" ]]; then
-  OPENAI_API_KEY_VALUE=""
-fi
-
+RUNTIME_ENV_PATH="$REMOTE_DIR/.runtime-secrets.env"
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
 sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot python3-certbot-nginx >/dev/null
 
 mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
+install -m 600 /tmp/cs-flashcards-runtime.env "$RUNTIME_ENV_PATH"
+rm -f /tmp/cs-flashcards-runtime.env
+# shellcheck disable=SC1090
+source "$RUNTIME_ENV_PATH"
 
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
@@ -198,11 +230,10 @@ python3 -m venv .venv
 .venv/bin/python - <<'PY'
 import json
 import app
-cards, _ = app.read_card_content(app.PROGRESS_DB_PATH)
-print("SQLite card db:", json.dumps({
-    "count": len(cards),
-    "path": str(app.PROGRESS_DB_PATH),
-}, ensure_ascii=False))
+summary = app.progress_db_runtime_summary(app.PROGRESS_DB_PATH)
+print("SQLite runtime db:", json.dumps(summary, ensure_ascii=False))
+if not summary.get("ok"):
+    raise SystemExit(f"Runtime progress DB is not healthy: {summary}")
 PY
 if [[ -d "$REMOTE_DIR/wiki_book/pages" ]]; then
   .venv/bin/python - <<'PY'
@@ -232,16 +263,10 @@ After=network.target
 Type=simple
 User=ubuntu
 WorkingDirectory=$REMOTE_DIR
-Environment=CS_FLASHCARDS_USERNAME=$USERNAME
-Environment=CS_FLASHCARDS_PASSWORD=$PASSWORD
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
 Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DIR/state/progress.sqlite
 Environment=CS_FLASHCARDS_WIKI_BOOK_DIR=$REMOTE_DIR/wiki_book
-Environment=CS_FLASHCARDS_WIKI_GITHUB_REPO=$WIKI_GITHUB_REPO
-Environment=CS_FLASHCARDS_WIKI_GITHUB_BRANCH=$WIKI_GITHUB_BRANCH
-Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=$WIKI_GITHUB_TOKEN
-Environment=CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX=$WIKI_GITHUB_PATH_PREFIX
-Environment=OPENAI_API_KEY=$OPENAI_API_KEY_VALUE
+EnvironmentFile=$RUNTIME_ENV_PATH
 ExecStart=$REMOTE_DIR/.venv/bin/uvicorn app:app --host 127.0.0.1 --port $REMOTE_PORT
 Restart=always
 RestartSec=3
@@ -325,11 +350,15 @@ EOF
   sudo nginx -t && sudo systemctl reload nginx
 fi
 
-curl -sS -H "Authorization: Basic $(python3 - <<PY
+curl --fail --show-error --silent \
+  -H "Authorization: Basic $(python3 - <<'PY'
 import base64
-print(base64.b64encode(b'$USERNAME:$PASSWORD').decode())
+import os
+value = f"{os.environ['CS_FLASHCARDS_USERNAME']}:{os.environ['CS_FLASHCARDS_PASSWORD']}".encode()
+print(base64.b64encode(value).decode())
 PY
-)" "http://127.0.0.1:$REMOTE_PORT/api/health" || true
+)" \
+  "http://127.0.0.1:$REMOTE_PORT/api/health"
 REMOTE
 
 echo

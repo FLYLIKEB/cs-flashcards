@@ -9,7 +9,6 @@ import math
 import threading
 import xml.etree.ElementTree as ET
 
-from collections import deque
 from contextlib import closing
 import hmac
 import os
@@ -129,10 +128,9 @@ WIKI_MARKDOWN_IMAGE_RE = re.compile(r"!\[(?P<alt>[^\]]*)\]\((?P<href>[^)\n]+)\)"
 WIKI_AI_JOB_STATUS_VALUES = {"queued", "running", "completed", "failed"}
 WIKI_AI_JOB_TARGET_VALUES = {"single_image", "single_section", "page_batch"}
 WIKI_AI_JOB_LOCK = threading.Lock()
-WIKI_AI_JOB_QUEUE: deque[str] = deque()
 WIKI_AI_JOB_EVENT = threading.Event()
-WIKI_AI_JOBS: dict[str, dict[str, Any]] = {}
 WIKI_AI_WORKER_THREAD: threading.Thread | None = None
+WIKI_AI_WORKER_RECOVERY_DONE = False
 
 DEFAULT_RECRUITMENT_SCHEDULE_PATH = ROOT / "data" / "recruitment_schedule_2026.json"
 RECRUITMENT_SCHEDULE_PATH = Path(
@@ -701,6 +699,11 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/public/wiki-assets", StaticFiles(directory=PUBLIC_WIKI_ASSET_DIR), name="public-wiki-assets")
 
 
+@app.on_event("startup")
+def startup_background_workers() -> None:
+    ensure_wiki_ai_worker_started()
+
+
 class MarkRequest(BaseModel):
     known_status: str = Field(pattern="^(O|X|)$")
 
@@ -984,8 +987,15 @@ def normalized_concept_media_type(value: Any) -> str:
 
 
 
-def connect_progress_db(progress_db_path: Path) -> sqlite3.Connection:
+def progress_db_not_found_error(progress_db_path: Path) -> FileNotFoundError:
+    return FileNotFoundError(f"Progress DB not found: {progress_db_path}")
+
+
+
+def connect_progress_db(progress_db_path: Path, *, must_exist: bool = False) -> sqlite3.Connection:
     progress_db_path.parent.mkdir(parents=True, exist_ok=True)
+    if must_exist and not progress_db_path.exists():
+        raise progress_db_not_found_error(progress_db_path)
     conn = sqlite3.connect(progress_db_path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
@@ -993,8 +1003,14 @@ def connect_progress_db(progress_db_path: Path) -> sqlite3.Connection:
     return conn
 
 
-def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] | None = None) -> None:
-    with closing(connect_progress_db(progress_db_path)) as conn:
+
+def ensure_progress_db(
+    progress_db_path: Path,
+    seed_rows: list[dict[str, Any]] | None = None,
+    *,
+    must_exist: bool = False,
+) -> None:
+    with closing(connect_progress_db(progress_db_path, must_exist=must_exist)) as conn:
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS cards (
@@ -1201,6 +1217,31 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_bank_id ON question_attempts(question_bank_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS wiki_ai_jobs (
+                job_id TEXT PRIMARY KEY,
+                status TEXT NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'running', 'completed', 'failed')),
+                target TEXT NOT NULL DEFAULT 'page_batch' CHECK (target IN ('single_image', 'single_section', 'page_batch')),
+                source_paths_json TEXT NOT NULL DEFAULT '[]',
+                format TEXT NOT NULL DEFAULT 'png',
+                prompt_template TEXT NOT NULL DEFAULT '',
+                include_existing_images INTEGER NOT NULL DEFAULT 0 CHECK (include_existing_images IN (0, 1)),
+                include_sections INTEGER NOT NULL DEFAULT 0 CHECK (include_sections IN (0, 1)),
+                image_index INTEGER,
+                section_index INTEGER,
+                queued_targets INTEGER NOT NULL DEFAULT 0 CHECK (queued_targets >= 0),
+                processed_targets INTEGER NOT NULL DEFAULT 0 CHECK (processed_targets >= 0),
+                requested_at TEXT NOT NULL,
+                started_at TEXT NOT NULL DEFAULT '',
+                completed_at TEXT NOT NULL DEFAULT '',
+                message TEXT NOT NULL DEFAULT '',
+                error TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL DEFAULT ''
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_wiki_ai_jobs_status_requested ON wiki_ai_jobs(status, requested_at)")
 
         initial_rows = seed_rows or []
 
@@ -1268,10 +1309,63 @@ def ensure_progress_db(progress_db_path: Path, seed_rows: list[dict[str, Any]] |
         conn.commit()
 
 
+
+def progress_db_runtime_summary(progress_db_path: Path | None = None) -> dict[str, Any]:
+    db_path = progress_db_for(progress_db_path)
+    summary = {
+        "path": str(db_path),
+        "exists": db_path.exists(),
+        "readable": False,
+        "content_card_count": 0,
+        "question_bank_count": 0,
+        "question_attempt_count": 0,
+        "wiki_ai_job_queue_count": 0,
+        "wiki_ai_job_running_count": 0,
+        "wiki_ai_job_failed_count": 0,
+        "error": "",
+    }
+    if not summary["exists"]:
+        summary["error"] = str(progress_db_not_found_error(db_path))
+        summary["ok"] = False
+        return summary
+    try:
+        ensure_progress_db(db_path, must_exist=True)
+        with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+            table_names = {
+                str(row["name"])
+                for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
+            }
+            if "cards" in table_names:
+                summary["content_card_count"] = int(conn.execute("SELECT COUNT(*) AS count FROM cards").fetchone()["count"] or 0)
+            if "question_bank" in table_names:
+                summary["question_bank_count"] = int(conn.execute("SELECT COUNT(*) AS count FROM question_bank").fetchone()["count"] or 0)
+            if "question_attempts" in table_names:
+                summary["question_attempt_count"] = int(conn.execute("SELECT COUNT(*) AS count FROM question_attempts").fetchone()["count"] or 0)
+            if "wiki_ai_jobs" in table_names:
+                job_counts = conn.execute(
+                    """
+                    SELECT
+                        SUM(CASE WHEN status = 'queued' THEN 1 ELSE 0 END) AS queued_count,
+                        SUM(CASE WHEN status = 'running' THEN 1 ELSE 0 END) AS running_count,
+                        SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed_count
+                    FROM wiki_ai_jobs
+                    """
+                ).fetchone()
+                summary["wiki_ai_job_queue_count"] = int(job_counts["queued_count"] or 0) if job_counts else 0
+                summary["wiki_ai_job_running_count"] = int(job_counts["running_count"] or 0) if job_counts else 0
+                summary["wiki_ai_job_failed_count"] = int(job_counts["failed_count"] or 0) if job_counts else 0
+        summary["readable"] = True
+    except (FileNotFoundError, sqlite3.Error) as exc:
+        summary["error"] = str(exc)
+    summary["ok"] = bool(summary["exists"] and summary["readable"] and summary["content_card_count"] > 0)
+    return summary
+
+
+
 def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
-    ensure_progress_db(progress_db_path)
+    ensure_progress_db(progress_db_path, must_exist=True)
     select_fields = ["card_id", "known_status", "last_reviewed", "review_count", "bookmarked", "memo", "memo_updated_at"]
-    with closing(connect_progress_db(progress_db_path)) as conn:
+    with closing(connect_progress_db(progress_db_path, must_exist=True)) as conn:
         rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM card_progress").fetchall()
     progress: dict[str, dict[str, str]] = {}
     for row in rows:
@@ -1286,10 +1380,11 @@ def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     return progress
 
 
+
 def read_card_content(progress_db_path: Path) -> tuple[list[dict[str, str]], list[str]]:
-    ensure_progress_db(progress_db_path)
+    ensure_progress_db(progress_db_path, must_exist=True)
     select_fields = ["card_id", *CARD_CONTENT_DB_COLUMNS]
-    with closing(connect_progress_db(progress_db_path)) as conn:
+    with closing(connect_progress_db(progress_db_path, must_exist=True)) as conn:
         rows = conn.execute(
             f"SELECT {', '.join(select_fields)} FROM cards ORDER BY sort_order ASC, card_id ASC"
         ).fetchall()
@@ -1305,6 +1400,7 @@ def read_card_content(progress_db_path: Path) -> tuple[list[dict[str, str]], lis
         cards.append(item)
 
     return cards, content_fieldnames()
+
 
 
 def merge_progress(
@@ -1341,15 +1437,18 @@ def merge_progress(
     return merged
 
 
+
 def read_cards(progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
+    ensure_progress_db(db_path, must_exist=True)
     sync_ai_image_files_to_db(db_path)
     card_rows, fieldnames = read_card_content(db_path)
     if not card_rows:
         raise FileNotFoundError(f"Card content not found in SQLite: {db_path}")
     rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
+
+
 
 def runtime_ai_image_url(name: str) -> str:
     return f"/api/ai-images/{validated_ai_image_name(name)}"
@@ -2673,7 +2772,7 @@ def read_question_bank_entries(
     limit: int = 200,
 ) -> dict[str, Any]:
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
+    ensure_progress_db(db_path, must_exist=True)
     seed_demo_question_bank_entries(db_path)
     safe_limit = max(1, min(int(limit or 200), 500))
     filters = {
@@ -4873,7 +4972,7 @@ def read_question_attempts(
     rows, _ = read_cards(progress_db_path)
     card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
+    ensure_progress_db(db_path, must_exist=True)
 
     where_clauses: list[str] = []
     where_params: list[Any] = []
@@ -4951,7 +5050,7 @@ SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user
 
 
 def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, Any]]:
-    ensure_progress_db(progress_db_path)
+    ensure_progress_db(progress_db_path, must_exist=True)
     stats: dict[str, dict[str, Any]] = {}
     with closing(connect_progress_db(progress_db_path)) as conn:
         for row in conn.execute(
@@ -7032,22 +7131,36 @@ def normalize_wiki_ai_job_request(payload: WikiAiJobCreateRequest) -> dict[str, 
 
 
 
-def wiki_ai_job_snapshot(job: dict[str, Any]) -> dict[str, Any]:
+def wiki_ai_job_snapshot(job: dict[str, Any] | sqlite3.Row | None) -> dict[str, Any] | None:
+    if not job:
+        return None
+    payload = dict(job)
+    source_paths = payload.get("source_paths")
+    if source_paths is None:
+        try:
+            source_paths = json.loads(payload.get("source_paths_json") or "[]")
+        except json.JSONDecodeError:
+            source_paths = []
+    if not isinstance(source_paths, list):
+        source_paths = []
     return {
-        "job_id": job["job_id"],
-        "status": job["status"],
-        "target": job["target"],
-        "source_paths": list(job.get("source_paths") or []),
-        "format": job.get("format") or "png",
-        "include_existing_images": bool(job.get("include_existing_images")),
-        "include_sections": bool(job.get("include_sections")),
-        "queued_targets": int(job.get("queued_targets") or 0),
-        "processed_targets": int(job.get("processed_targets") or 0),
-        "requested_at": job.get("requested_at") or "",
-        "started_at": job.get("started_at") or "",
-        "completed_at": job.get("completed_at") or "",
-        "message": job.get("message") or "",
-        "error": job.get("error") or "",
+        "job_id": payload["job_id"],
+        "status": payload["status"],
+        "target": payload["target"],
+        "source_paths": [str(value or "") for value in source_paths],
+        "format": payload.get("format") or "png",
+        "prompt_template": payload.get("prompt_template") or "",
+        "include_existing_images": bool(payload.get("include_existing_images")),
+        "include_sections": bool(payload.get("include_sections")),
+        "image_index": payload.get("image_index"),
+        "section_index": payload.get("section_index"),
+        "queued_targets": int(payload.get("queued_targets") or 0),
+        "processed_targets": int(payload.get("processed_targets") or 0),
+        "requested_at": payload.get("requested_at") or "",
+        "started_at": payload.get("started_at") or "",
+        "completed_at": payload.get("completed_at") or "",
+        "message": payload.get("message") or "",
+        "error": payload.get("error") or "",
     }
 
 
@@ -7061,47 +7174,179 @@ def create_wiki_ai_job(payload: WikiAiJobCreateRequest) -> dict[str, Any]:
         queued_targets = 1
     else:
         queued_targets = len(normalized["source_paths"])
+    now = utc_now_iso()
     job = {
         **normalized,
         "job_id": job_id,
         "status": "queued",
         "queued_targets": queued_targets,
         "processed_targets": 0,
-        "requested_at": utc_now_iso(),
+        "requested_at": now,
         "started_at": "",
         "completed_at": "",
         "message": "요청 대기 중",
         "error": "",
+        "updated_at": now,
     }
-    with WIKI_AI_JOB_LOCK:
-        WIKI_AI_JOBS[job_id] = job
-        WIKI_AI_JOB_QUEUE.append(job_id)
+    db_path = progress_db_for(PROGRESS_DB_PATH)
+    ensure_progress_db(db_path, must_exist=True)
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        conn.execute(
+            """
+            INSERT INTO wiki_ai_jobs (
+                job_id, status, target, source_paths_json, format, prompt_template,
+                include_existing_images, include_sections, image_index, section_index,
+                queued_targets, processed_targets, requested_at, started_at, completed_at,
+                message, error, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                job["job_id"],
+                job["status"],
+                job["target"],
+                json.dumps(job["source_paths"], ensure_ascii=False),
+                job["format"],
+                job["prompt_template"],
+                int(job["include_existing_images"]),
+                int(job["include_sections"]),
+                job["image_index"],
+                job["section_index"],
+                job["queued_targets"],
+                job["processed_targets"],
+                job["requested_at"],
+                job["started_at"],
+                job["completed_at"],
+                job["message"],
+                job["error"],
+                job["updated_at"],
+            ),
+        )
+        conn.commit()
     WIKI_AI_JOB_EVENT.set()
     ensure_wiki_ai_worker_started()
-    return wiki_ai_job_snapshot(job)
+    return wiki_ai_job_snapshot(job) or {}
 
 
 
 def update_wiki_ai_job(job_id: str, **changes: Any) -> dict[str, Any] | None:
-    with WIKI_AI_JOB_LOCK:
-        job = WIKI_AI_JOBS.get(job_id)
-        if not job:
+    normalized_job_id = str(job_id or "").strip()
+    if not normalized_job_id:
+        return None
+    column_map = {
+        "status": ("status", lambda value: str(value or "").strip()),
+        "target": ("target", lambda value: str(value or "").strip()),
+        "source_paths": ("source_paths_json", lambda value: json.dumps([str(item or "") for item in list(value or [])], ensure_ascii=False)),
+        "format": ("format", lambda value: normalized_wiki_image_format(value)),
+        "prompt_template": ("prompt_template", lambda value: str(value or "")),
+        "include_existing_images": ("include_existing_images", lambda value: int(bool(value))),
+        "include_sections": ("include_sections", lambda value: int(bool(value))),
+        "image_index": ("image_index", lambda value: None if value is None else int(value)),
+        "section_index": ("section_index", lambda value: None if value is None else int(value)),
+        "queued_targets": ("queued_targets", lambda value: int(value or 0)),
+        "processed_targets": ("processed_targets", lambda value: int(value or 0)),
+        "requested_at": ("requested_at", lambda value: str(value or "")),
+        "started_at": ("started_at", lambda value: str(value or "")),
+        "completed_at": ("completed_at", lambda value: str(value or "")),
+        "message": ("message", lambda value: str(value or "")),
+        "error": ("error", lambda value: str(value or "")),
+    }
+    assignments: list[str] = []
+    params: list[Any] = []
+    for key, value in changes.items():
+        if key not in column_map:
+            continue
+        column, serializer = column_map[key]
+        assignments.append(f"{column} = ?")
+        params.append(serializer(value))
+    if not assignments:
+        return get_wiki_ai_job(normalized_job_id)
+    db_path = progress_db_for(PROGRESS_DB_PATH)
+    try:
+        ensure_progress_db(db_path, must_exist=True)
+    except FileNotFoundError:
+        return None
+    params.append(utc_now_iso())
+    params.append(normalized_job_id)
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        conn.execute(
+            f"UPDATE wiki_ai_jobs SET {', '.join(assignments)}, updated_at = ? WHERE job_id = ?",
+            tuple(params),
+        )
+        row = conn.execute("SELECT * FROM wiki_ai_jobs WHERE job_id = ?", (normalized_job_id,)).fetchone()
+        conn.commit()
+    return wiki_ai_job_snapshot(row)
+
+
+
+def recover_incomplete_wiki_ai_jobs() -> int:
+    db_path = progress_db_for(PROGRESS_DB_PATH)
+    try:
+        ensure_progress_db(db_path, must_exist=True)
+    except FileNotFoundError:
+        return 0
+    now = utc_now_iso()
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        cursor = conn.execute(
+            """
+            UPDATE wiki_ai_jobs
+            SET status = 'queued',
+                started_at = '',
+                completed_at = '',
+                message = '요청 대기 중 (프로세스 재개)',
+                updated_at = ?
+            WHERE status = 'running'
+            """,
+            (now,),
+        )
+        conn.commit()
+    return int(cursor.rowcount or 0)
+
+
+
+def claim_next_wiki_ai_job() -> dict[str, Any] | None:
+    db_path = progress_db_for(PROGRESS_DB_PATH)
+    try:
+        ensure_progress_db(db_path, must_exist=True)
+    except FileNotFoundError:
+        return None
+    now = utc_now_iso()
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        conn.execute("BEGIN IMMEDIATE")
+        next_row = conn.execute(
+            """
+            SELECT job_id
+            FROM wiki_ai_jobs
+            WHERE status = 'queued'
+            ORDER BY requested_at ASC, job_id ASC
+            LIMIT 1
+            """
+        ).fetchone()
+        if not next_row:
+            conn.commit()
             return None
-        job.update(changes)
-        return dict(job)
+        conn.execute(
+            """
+            UPDATE wiki_ai_jobs
+            SET status = 'running',
+                started_at = CASE WHEN TRIM(COALESCE(started_at, '')) = '' THEN ? ELSE started_at END,
+                completed_at = '',
+                message = 'AI 이미지 생성 중',
+                error = '',
+                updated_at = ?
+            WHERE job_id = ?
+            """,
+            (now, now, next_row["job_id"]),
+        )
+        claimed = conn.execute("SELECT * FROM wiki_ai_jobs WHERE job_id = ?", (next_row["job_id"],)).fetchone()
+        conn.commit()
+    return wiki_ai_job_snapshot(claimed)
 
 
 
-def run_wiki_ai_job(job_id: str) -> None:
-    with WIKI_AI_JOB_LOCK:
-        job = WIKI_AI_JOBS.get(job_id)
-        if not job:
-            return
-        job["status"] = "running"
-        job["started_at"] = utc_now_iso()
-        job["message"] = "AI 이미지 생성 중"
-        job["error"] = ""
-        snapshot = dict(job)
+def run_wiki_ai_job(job_id: str, snapshot: dict[str, Any] | None = None) -> None:
+    snapshot = snapshot or get_wiki_ai_job(job_id)
+    if not snapshot:
+        return
     try:
         if snapshot["target"] == "single_image":
             regenerate_wiki_image_asset(
@@ -7152,33 +7397,45 @@ def run_wiki_ai_job(job_id: str) -> None:
 
 def wiki_ai_worker_loop() -> None:
     while True:
-        job_id = ""
-        with WIKI_AI_JOB_LOCK:
-            if WIKI_AI_JOB_QUEUE:
-                job_id = WIKI_AI_JOB_QUEUE.popleft()
-            else:
-                WIKI_AI_JOB_EVENT.clear()
-        if not job_id:
-            WIKI_AI_JOB_EVENT.wait()
+        snapshot = claim_next_wiki_ai_job()
+        if snapshot is None:
+            WIKI_AI_JOB_EVENT.wait(timeout=1)
+            WIKI_AI_JOB_EVENT.clear()
             continue
-        run_wiki_ai_job(job_id)
+        run_wiki_ai_job(snapshot["job_id"], snapshot=snapshot)
 
 
 
 def ensure_wiki_ai_worker_started() -> None:
-    global WIKI_AI_WORKER_THREAD
+    global WIKI_AI_WORKER_THREAD, WIKI_AI_WORKER_RECOVERY_DONE
+    recovered_jobs = 0
     with WIKI_AI_JOB_LOCK:
+        if not WIKI_AI_WORKER_RECOVERY_DONE:
+            recovered_jobs = recover_incomplete_wiki_ai_jobs()
+            WIKI_AI_WORKER_RECOVERY_DONE = True
         if WIKI_AI_WORKER_THREAD and WIKI_AI_WORKER_THREAD.is_alive():
+            if recovered_jobs:
+                WIKI_AI_JOB_EVENT.set()
             return
         WIKI_AI_WORKER_THREAD = threading.Thread(target=wiki_ai_worker_loop, name="wiki-ai-worker", daemon=True)
         WIKI_AI_WORKER_THREAD.start()
+    if recovered_jobs:
+        WIKI_AI_JOB_EVENT.set()
 
 
 
 def get_wiki_ai_job(job_id: str) -> dict[str, Any] | None:
-    with WIKI_AI_JOB_LOCK:
-        job = WIKI_AI_JOBS.get(str(job_id or "").strip())
-        return wiki_ai_job_snapshot(job) if job else None
+    normalized_job_id = str(job_id or "").strip()
+    if not normalized_job_id:
+        return None
+    db_path = progress_db_for(PROGRESS_DB_PATH)
+    try:
+        ensure_progress_db(db_path, must_exist=True)
+    except FileNotFoundError:
+        return None
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        row = conn.execute("SELECT * FROM wiki_ai_jobs WHERE job_id = ?", (normalized_job_id,)).fetchone()
+    return wiki_ai_job_snapshot(row)
 
 
 
@@ -7980,19 +8237,28 @@ def api_question_types() -> dict[str, Any]:
 
 
 @app.get("/api/health")
-def health() -> dict[str, Any]:
+def health(response: Response) -> dict[str, Any]:
     try:
         resolved_wiki_book_dir = wiki_book_dir()
         wiki_book_exists = True
     except FileNotFoundError:
         resolved_wiki_book_dir = WIKI_BOOK_DIR
         wiki_book_exists = False
+    db_summary = progress_db_runtime_summary(PROGRESS_DB_PATH)
+    ok = bool(db_summary["ok"])
+    if not ok:
+        response.status_code = 503
     return {
-        "ok": True,
+        "ok": ok,
         "content_db_path": str(PROGRESS_DB_PATH),
-        "content_db_exists": PROGRESS_DB_PATH.exists(),
+        "content_db_exists": db_summary["exists"],
+        "content_card_count": db_summary["content_card_count"],
+        "question_bank_count": db_summary["question_bank_count"],
+        "question_attempt_count": db_summary["question_attempt_count"],
         "progress_db_path": str(PROGRESS_DB_PATH),
-        "progress_db_exists": PROGRESS_DB_PATH.exists(),
+        "progress_db_exists": db_summary["exists"],
+        "progress_db_readable": db_summary["readable"],
+        "progress_db_error": db_summary["error"],
         "wiki_book_dir": str(resolved_wiki_book_dir),
         "wiki_book_exists": wiki_book_exists,
         "wiki_book_configured_dir": str(WIKI_BOOK_DIR),
@@ -8001,6 +8267,9 @@ def health() -> dict[str, Any]:
         "wiki_github_repo": WIKI_GITHUB_REPO,
         "wiki_github_branch": WIKI_GITHUB_BRANCH,
         "wiki_github_path_prefix": WIKI_GITHUB_PATH_PREFIX,
+        "wiki_ai_job_queue_count": db_summary["wiki_ai_job_queue_count"],
+        "wiki_ai_job_running_count": db_summary["wiki_ai_job_running_count"],
+        "wiki_ai_job_failed_count": db_summary["wiki_ai_job_failed_count"],
         "ai_rewrite_enabled": bool(OPENAI_API_KEY),
         "codex_model": CODEX_MODEL,
         "ai_image_model": IMAGE_MODEL,
