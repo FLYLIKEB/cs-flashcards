@@ -1,10 +1,11 @@
 import app as flashcard_app
 import json
-
+import tempfile
 from contextlib import closing
 from pathlib import Path
 import sqlite3
 import unittest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PROGRESS_DB = ROOT / 'state' / 'progress.sqlite'
@@ -55,6 +56,100 @@ class QuestionBankMetadataTests(unittest.TestCase):
         self.assertIn('available_field_names', APP_JS)
         self.assertIn('available_issuers', APP_JS)
         self.assertIn('available_categories', APP_JS)
+
+    def test_question_bank_upsert_response_and_readback_preserve_missing_card_keywords(self):
+        fieldnames = flashcard_app.content_fieldnames()
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'progress.sqlite'
+            flashcard_app.ensure_progress_db(db_path, [{
+                **{field: '' for field in fieldnames},
+                'id': 'CS-001',
+                'term': '테스트',
+                'english': 'Test',
+                'category': '소프트웨어공학',
+                'related_concepts': '[[검증]]',
+                'source_files': 'sample.md',
+                'difficulty': '중',
+                'known_status': '',
+                'last_reviewed': '',
+                'review_count': '0',
+            }])
+
+            saved = flashcard_app.upsert_question_bank_entries([
+                {
+                    'card_id': 'CS-001',
+                    'question_type': 'short',
+                    'prompt': '### 테스트 문제',
+                    'answer': '정답',
+                    'explanation': '설명',
+                    'topic': '테스트',
+                    'field_name': '소프트웨어공학',
+                    'category': '소프트웨어공학',
+                    'keywords': ['테스트', '검증', '없는 카드'],
+                    'difficulty': '중',
+                    'issuer': '한국은행',
+                    'source_location': '샘플 위치',
+                }
+            ], db_path)
+
+            self.assertEqual(saved['items'][0]['keywords'], ['테스트', 'Test', '검증'])
+            self.assertEqual(saved['items'][0]['missing_card_keywords'], ['없는 카드'])
+
+            listed = flashcard_app.read_question_bank_entries(db_path, query='없는 카드', limit=10)
+            self.assertEqual(listed['items'][0]['keywords'], ['테스트', 'Test', '검증'])
+            self.assertEqual(listed['items'][0]['missing_card_keywords'], ['없는 카드'])
+
+    def test_question_bank_missing_card_summary_uses_full_filtered_result_set(self):
+        fieldnames = flashcard_app.content_fieldnames()
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'progress.sqlite'
+            flashcard_app.ensure_progress_db(db_path, [{
+                **{field: '' for field in fieldnames},
+                'id': 'CS-001',
+                'term': '테스트',
+                'english': 'Test',
+                'category': '소프트웨어공학',
+                'related_concepts': '[[검증]]',
+                'source_files': 'sample.md',
+                'difficulty': '중',
+                'known_status': '',
+                'last_reviewed': '',
+                'review_count': '0',
+            }])
+
+            flashcard_app.upsert_question_bank_entries([
+                {
+                    'card_id': 'CS-001',
+                    'question_type': 'short',
+                    'prompt': '### 첫 번째 테스트 문제',
+                    'answer': '정답',
+                    'explanation': '설명',
+                    'topic': '테스트',
+                    'field_name': '소프트웨어공학',
+                    'category': '소프트웨어공학',
+                    'keywords': ['테스트', '검증', '없는 카드'],
+                    'difficulty': '중',
+                },
+                {
+                    'card_id': 'CS-001',
+                    'question_type': 'short',
+                    'prompt': '### 두 번째 테스트 문제',
+                    'answer': '정답',
+                    'explanation': '설명',
+                    'topic': '테스트',
+                    'field_name': '소프트웨어공학',
+                    'category': '소프트웨어공학',
+                    'keywords': ['테스트', '없는 카드'],
+                    'difficulty': '중',
+                },
+            ], db_path)
+
+            listed = flashcard_app.read_question_bank_entries(db_path, query='없는 카드', limit=1)
+            self.assertEqual(listed['summary']['total'], 2)
+            self.assertEqual(listed['summary']['returned'], 1)
+            self.assertEqual(listed['summary']['missing_cards'], [
+                {'keyword': '없는 카드', 'question_count': 2, 'card_created': False, 'card_id': ''},
+            ])
 
     def test_question_bank_runtime_rows_use_normalized_difficulty_labels(self):
         with closing(sqlite3.connect(PROGRESS_DB)) as conn:
