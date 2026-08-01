@@ -840,6 +840,59 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         finally:
             self.record_case(case_id='question-bank-row-change-confirm', status=status, observations=case)
             await page.close()
+
+    async def test_question_bank_embed_consumes_pending_launch_before_cards_fetch_resolves(self):
+        case = {'path': '/?question-bank-embed=1'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        pending_item = self.question_bank_item('embed bootstrap')
+        pending_payload = {'items': [pending_item], 'startIndex': 0}
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ launchKey, payload }) => {
+                  window.__cardsFetchStarted = 0;
+                  window.__cardsFetchResolved = 0;
+                  window.__releaseCardsFetch = null;
+                  const originalFetch = window.fetch.bind(window);
+                  const pendingCardsFetch = new Promise((resolve) => {
+                    window.__releaseCardsFetch = resolve;
+                  });
+                  window.sessionStorage.setItem(launchKey, JSON.stringify(payload));
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/cards') {
+                      window.__cardsFetchStarted += 1;
+                      return pendingCardsFetch.then(() => {
+                        window.__cardsFetchResolved += 1;
+                        return originalFetch(input, init);
+                      });
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                {'launchKey': QUESTION_BANK_LAUNCH_KEY, 'payload': pending_payload},
+            )
+            await page.goto(f'{self.base_url}/?question-bank-embed=1', waitUntil='domcontentloaded')
+            await page.waitForFunction("document.getElementById('questionPanel') && document.getElementById('questionPanel').hidden === false")
+            await page.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('embed bootstrap prompt')")
+            case['cards_fetch_started_before_prompt'] = await page.evaluate('window.__cardsFetchStarted')
+            self.assertEqual(case['cards_fetch_started_before_prompt'], 1)
+            case['question_prompt'] = await page.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertIn('embed bootstrap prompt', case['question_prompt'])
+            await page.evaluate('window.__releaseCardsFetch()')
+            await page.waitForFunction('window.__cardsFetchResolved === 1')
+            await page.waitForFunction("document.getElementById('questionPanel') && document.getElementById('questionPanel').hidden === false")
+            case['question_panel_hidden_after_cards_fetch'] = await page.evaluate("document.getElementById('questionPanel')?.hidden ?? true")
+            case['question_prompt_after_cards_fetch'] = await page.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertFalse(case['question_panel_hidden_after_cards_fetch'])
+            self.assertIn('embed bootstrap prompt', case['question_prompt_after_cards_fetch'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-embed-bootstrap', status=status, observations=case)
+            await page.close()
     async def test_question_bank_category_guide_traps_focus_and_restores_opener(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

@@ -2730,23 +2730,34 @@ function renderConceptImage(card) {
 
 
 
-async function loadCards() {
+async function bootstrapInitialCardLoad() {
+  if (questionBankEmbedMode() && consumePendingQuestionBankLaunch()) {
+    loadCards({preserveQuestionSession: true}).catch((err) => {
+      setMessage(`카드 목록 후속 로딩 실패: ${err.message}`, true);
+    });
+    return;
+  }
+  await loadCards();
+}
+
+async function loadCards({preserveQuestionSession = false} = {}) {
   const res = await fetch('/api/cards');
   if (!res.ok) throw new Error(await res.text());
   const data = await res.json();
+  const keepQuestionSession = preserveQuestionSession && questionBankEmbedMode() && state.questionMode && state.questions.length;
   state.cards = data.cards;
   state.summary = data.summary;
   buildCategoryOptions(data.summary.categories || []);
   restoreViewState();
-  applyFilters();
+  applyFilters(null, {preserveQuestionSession: keepQuestionSession});
   if (!state.initialCardQueryApplied) {
     state.initialCardQueryApplied = true;
-    applyInitialCardQuery();
+    if (!keepQuestionSession) applyInitialCardQuery();
   }
   $('contentDbPath').textContent = data.summary.content_db_path;
   setAudioButtons();
   updateAudioEstimate();
-  consumePendingQuestionBankLaunch();
+  if (!keepQuestionSession) consumePendingQuestionBankLaunch();
 }
 
 async function refreshCards(options = {}) {
@@ -6390,7 +6401,7 @@ function renderBackPage() {
   if ($('backPageNext')) $('backPageNext').disabled = page === 1;
 }
 
-function applyFilters(keepCurrentId = null) {
+function applyFilters(keepCurrentId = null, {preserveQuestionSession = false} = {}) {
   if (state.audioPlaying) stopAudioPlayback('필터가 바뀌어 자동 듣기를 정지했습니다.');
   commitCurrentQuestionElapsed();
   state.importanceFilter = $('importanceSelect')?.value || '';
@@ -6407,7 +6418,7 @@ function applyFilters(keepCurrentId = null) {
   state.backPage = 0;
   renderCard();
   renderStats(summaryFromRows(rowsForHeaderStats()));
-  if (state.questionMode) {
+  if (state.questionMode && !preserveQuestionSession) {
     state.questions = [];
     state.questionIndex = 0;
     state.answerRevealed = false;
@@ -7223,7 +7234,7 @@ updateQuestionPracticeButton();
 document.body.classList.toggle('question-bank-embed', questionBankEmbedMode());
 
 if (!bootstrapFlashcardTablePopupWindow() && !bootstrapMindMapPopupWindow()) {
-  loadCards().catch((err) => {
+  bootstrapInitialCardLoad().catch((err) => {
     setMessage(`로딩 실패: ${err.message}`, true);
     applyFrontIllustration({term: '로딩 실패', english: '', category: ''});
     $('frontTerm').textContent = '로딩 실패';
