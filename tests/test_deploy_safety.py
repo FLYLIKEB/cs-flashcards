@@ -11,6 +11,7 @@ from unittest import mock
 import app as flashcard_app
 
 ROOT = Path(__file__).resolve().parents[1]
+BACKEND_SOURCE = (ROOT / 'flashcards_backend.py').read_text(encoding='utf-8')
 DEPLOY_SCRIPT = (ROOT / 'scripts' / 'deploy_lightsail_flashcards.sh').read_text(encoding='utf-8')
 PULL_SCRIPT = (ROOT / 'scripts' / 'pull_remote_sqlite.sh').read_text(encoding='utf-8')
 REMOTE_SQL_SCRIPT = (ROOT / 'scripts' / 'remote_sqlite_sql.sh').read_text(encoding='utf-8')
@@ -52,6 +53,14 @@ class DeploySafetyTests(unittest.TestCase):
                     flashcard_app.connect_progress_db(db_path)
             self.assertFalse(db_path.exists())
 
+    def test_flashcards_backend_is_app_independent_and_keeps_missing_db_guard(self):
+        self.assertNotIn('import app', BACKEND_SOURCE)
+        self.assertNotIn('from app import', BACKEND_SOURCE)
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'missing.sqlite'
+            with self.assertRaises(FileNotFoundError):
+                flashcard_app.flashcards_backend.connect_progress_db(db_path, must_exist=True)
+            self.assertFalse(db_path.exists())
     def test_deploy_script_removes_db_copy_and_sqlite_touch_path(self):
         self.assertNotIn('CS_FLASHCARDS_FORCE_DB_REPLACE', DEPLOY_SCRIPT)
         self.assertNotIn('cp state/progress.sqlite', DEPLOY_SCRIPT)

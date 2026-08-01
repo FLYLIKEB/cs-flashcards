@@ -30,6 +30,7 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import flashcards_backend
 from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions, normalize_card_ids
 
 ROOT = Path(__file__).resolve().parent
@@ -999,17 +1000,11 @@ def progress_db_not_found_error(progress_db_path: Path) -> FileNotFoundError:
 
 
 def connect_progress_db(progress_db_path: Path, *, must_exist: bool = False) -> sqlite3.Connection:
-    progress_db_path.parent.mkdir(parents=True, exist_ok=True)
-    if (must_exist or progress_db_must_exist()) and not progress_db_path.exists():
-        raise progress_db_not_found_error(progress_db_path)
-    progress_db_path.parent.mkdir(parents=True, exist_ok=True)
-    if must_exist and not progress_db_path.exists():
-        raise progress_db_not_found_error(progress_db_path)
-    conn = sqlite3.connect(progress_db_path)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
+    return flashcards_backend.connect_progress_db(
+        progress_db_path,
+        must_exist=(must_exist or progress_db_must_exist()),
+        not_found_error_factory=progress_db_not_found_error,
+    )
 
 
 

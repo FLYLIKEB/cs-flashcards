@@ -1,9 +1,11 @@
 import csv
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import app as flashcard_app
+import flashcards_backend
 from question_generator import generate_questions, normalize_question_types, parse_related_concepts
 
 
@@ -146,12 +148,18 @@ class QuestionGeneratorTests(unittest.TestCase):
             original_db = flashcard_app.PROGRESS_DB_PATH
             try:
                 flashcard_app.PROGRESS_DB_PATH = db_path
-                data = flashcard_app.api_generate_questions(flashcard_app.QuestionGenerateRequest(
-                    card_ids=['CS-001'],
-                    types=['short', 'multiple_choice'],
-                    count=2,
-                    seed=11,
-                ))
+                with mock.patch.object(
+                    flashcard_app.flashcards_backend,
+                    'connect_progress_db',
+                    wraps=flashcards_backend.connect_progress_db,
+                ) as backend_connect:
+                    data = flashcard_app.api_generate_questions(flashcard_app.QuestionGenerateRequest(
+                        card_ids=['CS-001'],
+                        types=['short', 'multiple_choice'],
+                        count=2,
+                        seed=11,
+                    ))
+                self.assertGreaterEqual(backend_connect.call_count, 1)
                 self.assertEqual(len(data['questions']), 2)
                 self.assertEqual(data['summary']['available_cards'], 1)
                 self.assertTrue(all(q['card_id'] == 'CS-001' for q in data['questions']))
