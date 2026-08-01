@@ -326,10 +326,13 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('id="backWikiLink"', INDEX_HTML)
         self.assertIn('id="wikiSearchInput"', WIKI_HTML)
         self.assertIn('id="bankPageList"', QUESTION_BANK_HTML)
-        self.assertIn('<select id="bankPageTopicInput"', QUESTION_BANK_HTML)
+        self.assertIn('<input id="bankPageTopicInput"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageTopicOptions"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="bankPageAttemptStatusSelect"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageFieldInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageCategoryInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
+
 
         self.assertIn('문제 풀이 · 문제은행', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
@@ -633,8 +636,10 @@ class StaticFrontendTests(unittest.TestCase):
             'id="questionBankToggleBtn"',
             'id="questionBankBrowser"',
             'id="questionBankQueryInput"',
+            'id="questionBankAttemptStatusSelect"',
             'id="questionBankTopicInput"',
-            '<select id="questionBankTopicInput"',
+            '<input id="questionBankTopicInput"',
+            'id="questionBankTopicOptions"',
             'id="questionBankFieldInput"',
             '<select id="questionBankFieldInput"',
             'id="questionBankCategoryInput"',

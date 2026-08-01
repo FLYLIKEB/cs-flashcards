@@ -1767,9 +1767,10 @@ class FlashcardProgressTests(unittest.TestCase):
 
             seeded = flashcard_app.read_question_bank_entries(db_path, limit=10)
             self.assertEqual(seeded['summary']['total'], 1)
-            self.assertEqual(seeded['items'][0]['issuer'], '샘플')
-            self.assertEqual(seeded['items'][0]['topic'], '데이터베이스')
-            self.assertIn('/static/favicon.svg', seeded['items'][0]['body'])
+            seeded_item = seeded['items'][0]
+            self.assertEqual(seeded_item['issuer'], '샘플')
+            self.assertEqual(seeded_item['topic'], '데이터베이스')
+            self.assertIn('/static/favicon.svg', seeded_item['body'])
 
             filtered = flashcard_app.read_question_bank_entries(
                 db_path,
@@ -1781,6 +1782,46 @@ class FlashcardProgressTests(unittest.TestCase):
             )
             self.assertEqual(filtered['summary']['total'], 1)
             self.assertEqual(filtered['items'][0]['field_name'], '데모')
+
+            unseen = flashcard_app.read_question_bank_entries(db_path, attempt_status='unseen', limit=10)
+            self.assertEqual(unseen['summary']['total'], 1)
+            self.assertEqual(unseen['items'][0]['question_attempt_status'], 'unseen')
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='bank-demo-1',
+                    question_bank_id=seeded_item['question_bank_id'],
+                    card_id=seeded_item['card_id'],
+                    question_type=seeded_item['question_type'],
+                    prompt=seeded_item['prompt'],
+                    body=seeded_item['body'],
+                    judgment='correct',
+                    user_answer='정규화를 통해 중복을 줄인다.',
+                ),
+                db_path,
+            )
+            correct = flashcard_app.read_question_bank_entries(db_path, attempt_status='correct', limit=10)
+            self.assertEqual(correct['summary']['total'], 1)
+            self.assertEqual(correct['items'][0]['question_attempt_status'], 'correct')
+            self.assertEqual(flashcard_app.read_question_bank_entries(db_path, attempt_status='wrong', limit=10)['summary']['total'], 0)
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='bank-demo-1',
+                    question_bank_id=seeded_item['question_bank_id'],
+                    card_id=seeded_item['card_id'],
+                    question_type=seeded_item['question_type'],
+                    prompt=seeded_item['prompt'],
+                    body=seeded_item['body'],
+                    judgment='wrong',
+                    user_answer='틀린 답',
+                ),
+                db_path,
+            )
+            wrong = flashcard_app.read_question_bank_entries(db_path, attempt_status='wrong', limit=10)
+            self.assertEqual(wrong['summary']['total'], 1)
+            self.assertEqual(wrong['items'][0]['question_attempt_status'], 'wrong')
+            self.assertEqual(flashcard_app.read_question_bank_entries(db_path, attempt_status='correct', limit=10)['summary']['total'], 0)
     def test_old_progress_schema_migrates_for_bookmark_and_memo_columns(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -2011,10 +2052,9 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_TOKEN = original_token
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
 
-    def test_update_wiki_checklist_item_syncs_github_when_configured(self):
+    def test_update_wiki_checklist_item_stays_local_when_archive_configured(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
-            local_text = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
             original_repo = flashcard_app.WIKI_GITHUB_REPO
             original_branch = flashcard_app.WIKI_GITHUB_BRANCH
             original_token = flashcard_app.WIKI_GITHUB_TOKEN
@@ -2024,13 +2064,10 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_BRANCH = 'main'
                 flashcard_app.WIKI_GITHUB_TOKEN = 'token'
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
-                with mock.patch.object(flashcard_app, 'github_fetch_wiki_source', return_value=(local_text, 'sha123')) as fetch_mock:
-                    with mock.patch.object(flashcard_app, 'github_update_wiki_source', return_value={}) as update_mock:
-                        updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, book)
-                fetch_mock.assert_called_once_with('pages/intro.md')
-                update_mock.assert_called_once()
-                self.assertEqual(update_mock.call_args.args[0], 'pages/intro.md')
-                self.assertEqual(updated['sync_target'], 'github')
+                with mock.patch.object(flashcard_app, 'archive_wiki_snapshot_to_github') as archive_mock:
+                    updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, book)
+                archive_mock.assert_not_called()
+                self.assertEqual(updated['sync_target'], 'local')
                 saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
                 self.assertIn('- [x] 체크 항목', saved)
             finally:
@@ -2077,11 +2114,11 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
 
-    def test_update_wiki_page_source_syncs_github_when_configured(self):
+    def test_update_wiki_page_source_stays_local_when_archive_configured(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
             local_text = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
-            updated_content = local_text + '\nGitHub 저장 테스트\n'
+            updated_content = local_text + '\n로컬 저장 테스트\n'
             original_repo = flashcard_app.WIKI_GITHUB_REPO
             original_branch = flashcard_app.WIKI_GITHUB_BRANCH
             original_token = flashcard_app.WIKI_GITHUB_TOKEN
@@ -2091,15 +2128,67 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_BRANCH = 'main'
                 flashcard_app.WIKI_GITHUB_TOKEN = 'token'
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
-                with mock.patch.object(flashcard_app, 'github_fetch_wiki_source', return_value=(local_text, 'sha123')) as fetch_mock:
-                    with mock.patch.object(flashcard_app, 'github_update_wiki_source', return_value={}) as update_mock:
-                        updated = flashcard_app.update_wiki_page_source('pages/intro.md', updated_content, local_text, book)
-                fetch_mock.assert_called_once_with('pages/intro.md')
-                update_mock.assert_called_once_with('pages/intro.md', updated_content, 'sha123', 'Update wiki page: pages/intro.md')
-                self.assertEqual(updated['sync_target'], 'github')
+                with mock.patch.object(flashcard_app, 'archive_wiki_snapshot_to_github') as archive_mock:
+                    updated = flashcard_app.update_wiki_page_source('pages/intro.md', updated_content, local_text, book)
+                archive_mock.assert_not_called()
+                self.assertEqual(updated['sync_target'], 'local')
                 self.assertTrue(updated['changed'])
                 saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
                 self.assertEqual(saved, updated_content)
+            finally:
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
+
+    def test_api_wiki_archive_github_runs_only_on_explicit_request(self):
+        with mock.patch.object(
+            flashcard_app,
+            'archive_wiki_snapshot_to_github',
+            return_value={'committed': True, 'commit_sha': 'abc1234', 'changed_file_count': 2, 'deleted_file_count': 0},
+        ) as archive_mock:
+            response = flashcard_app.api_wiki_archive_github(
+                flashcard_app.WikiGithubArchiveRequest(source_path='pages/intro.md')
+            )
+        archive_mock.assert_called_once_with('pages/intro.md')
+        self.assertTrue(response['archive']['committed'])
+        self.assertEqual(response['archive']['commit_sha'], 'abc1234')
+
+    def test_archive_wiki_snapshot_to_github_pushes_current_local_snapshot(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
+            original_prefix = flashcard_app.WIKI_GITHUB_PATH_PREFIX
+            try:
+                flashcard_app.WIKI_GITHUB_REPO = 'owner/repo'
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = 'token'
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
+                local_snapshot = flashcard_app.collect_local_wiki_archive_snapshot(book)
+                blob_shas = [f'blob-{index}' for index, _ in enumerate(local_snapshot, start=1)]
+                with mock.patch.object(flashcard_app, 'github_read_wiki_archive_head_state', return_value=('head-sha', 'tree-sha', {})):
+                    with mock.patch.object(flashcard_app, 'github_create_wiki_archive_blob', side_effect=blob_shas) as blob_mock:
+                        with mock.patch.object(flashcard_app, 'github_create_wiki_archive_tree', return_value='new-tree-sha') as tree_mock:
+                            with mock.patch.object(flashcard_app, 'github_create_wiki_archive_commit', return_value='new-commit-sha') as commit_mock:
+                                with mock.patch.object(flashcard_app, 'github_update_wiki_archive_branch_head') as update_mock:
+                                    result = flashcard_app.archive_wiki_snapshot_to_github('pages/intro.md', book)
+                self.assertTrue(result['committed'])
+                self.assertEqual(result['changed_file_count'], len(local_snapshot))
+                self.assertEqual(result['deleted_file_count'], 0)
+                self.assertEqual(result['commit_sha'], 'new-commit-sha')
+                self.assertEqual(blob_mock.call_count, len(local_snapshot))
+                self.assertEqual(tree_mock.call_args.args[0], 'tree-sha')
+                self.assertEqual(commit_mock.call_args.args[1:], ('new-tree-sha', 'head-sha'))
+                self.assertIn('(pages/intro.md)', commit_mock.call_args.args[0])
+                self.assertIn(f'{len(local_snapshot)} changed, 0 deleted', commit_mock.call_args.args[0])
+                tree_entries = tree_mock.call_args.args[1]
+                self.assertEqual(
+                    {entry['path'] for entry in tree_entries},
+                    {flashcard_app.wiki_github_content_path(path) for path in local_snapshot},
+                )
+                update_mock.assert_called_once_with('new-commit-sha')
             finally:
                 flashcard_app.WIKI_GITHUB_REPO = original_repo
                 flashcard_app.WIKI_GITHUB_BRANCH = original_branch
@@ -2132,15 +2221,30 @@ class WikiBookTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
             original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
             try:
                 flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.WIKI_GITHUB_REPO = 'owner/repo'
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = 'token'
                 self.assertEqual(flashcard_app.wiki_book_dir(), book.resolve())
                 payload = flashcard_app.health()
                 self.assertTrue(payload['wiki_book_exists'])
                 self.assertEqual(payload['wiki_book_dir'], str(book.resolve()))
                 self.assertEqual(payload['wiki_book_configured_dir'], str(flashcard_app.WIKI_BOOK_DIR))
+                self.assertEqual(payload['wiki_checklist_sync_target'], 'local')
+                self.assertTrue(payload['wiki_archive_enabled'])
+                index_payload = flashcard_app.read_wiki_index(book)
+                page_payload = flashcard_app.read_wiki_page('intro', book)
+                self.assertTrue(index_payload['archive']['enabled'])
+                self.assertEqual(page_payload['archive']['repo'], 'owner/repo')
             finally:
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
 
     def test_wiki_route_helpers_serve_local_book(self):
         with tempfile.TemporaryDirectory() as td:

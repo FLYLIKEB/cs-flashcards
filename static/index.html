@@ -246,9 +246,14 @@
           </div>
           <div class="question-bank-filter-grid">
             <input id="questionBankQueryInput" type="search" placeholder="문제/정답/키워드 검색" />
-            <select id="questionBankTopicInput" aria-label="문제유형">
-              <option value="">문제유형 *</option>
+            <select id="questionBankAttemptStatusSelect" aria-label="풀이상태">
+              <option value="">풀이상태 *</option>
+              <option value="unseen">안푼</option>
+              <option value="wrong">틀린</option>
+              <option value="correct">맞은</option>
             </select>
+            <input id="questionBankTopicInput" type="search" list="questionBankTopicOptions" aria-label="문제유형 검색" placeholder="문제유형 검색(예: 데이터베이스)" />
+            <datalist id="questionBankTopicOptions"></datalist>
             <select id="questionBankFieldInput" aria-label="분야">
               <option value="">분야 *</option>
             </select>

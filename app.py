@@ -84,6 +84,13 @@ QUESTION_ATTEMPT_JUDGMENT_LABELS = {
     "unknown": "모름",
     "pending": "미채점",
 }
+QUESTION_BANK_ATTEMPT_FILTER_VALUES = {"", "unseen", "wrong", "correct"}
+QUESTION_BANK_ATTEMPT_FILTER_LABELS = {
+    "unseen": "안푼",
+    "wrong": "틀린",
+    "correct": "맞은",
+}
+
 
 PUBLIC_USERNAME = os.environ.get("CS_FLASHCARDS_USERNAME", "cs")
 PUBLIC_PASSWORD = os.environ.get("CS_FLASHCARDS_PASSWORD", "")
@@ -773,6 +780,9 @@ class WikiChecklistRequest(BaseModel):
     line_number: int = Field(ge=1, le=200000)
     checked: bool
 
+
+class WikiGithubArchiveRequest(BaseModel):
+    source_path: str | None = Field(default=None, max_length=4096)
 
 class WikiPageUpdateRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
@@ -2063,6 +2073,34 @@ def normalize_question_attempt_judgment(value: str | None, is_correct: bool | No
     return normalized
 
 
+def normalize_question_bank_attempt_status(value: str | None) -> str:
+    raw = str(value or "").strip().lower()
+    aliases = {
+        "": "",
+        "all": "",
+        "unseen": "unseen",
+        "pending": "unseen",
+        "unanswered": "unseen",
+        "안푼": "unseen",
+        "미풀이": "unseen",
+        "correct": "correct",
+        "right": "correct",
+        "맞음": "correct",
+        "맞은": "correct",
+        "정답": "correct",
+        "wrong": "wrong",
+        "incorrect": "wrong",
+        "틀림": "wrong",
+        "틀린": "wrong",
+        "오답": "wrong",
+    }
+    normalized = aliases.get(raw)
+    if normalized is None or normalized not in QUESTION_BANK_ATTEMPT_FILTER_VALUES:
+        raise ValueError(f"Unsupported question bank attempt status: {value}")
+    return normalized
+
+
+
 
 def normalize_question_bank_text(value: Any, *, limit: int) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()[:limit]
@@ -2484,6 +2522,7 @@ def read_question_bank_entries(
     section: str = "",
     source_location: str = "",
     query: str = "",
+    attempt_status: str = "",
     limit: int = 200,
 ) -> dict[str, Any]:
     db_path = progress_db_for(progress_db_path)
@@ -2501,6 +2540,7 @@ def read_question_bank_entries(
         "section": normalize_question_bank_text(section, limit=64),
         "source_location": normalize_question_bank_text(source_location, limit=255),
         "query": normalize_question_bank_text(query, limit=255),
+        "attempt_status": normalize_question_bank_attempt_status(attempt_status),
     }
     where_clauses: list[str] = []
     params: list[Any] = []
@@ -2508,34 +2548,59 @@ def read_question_bank_entries(
         value = filters[column]
         if not value:
             continue
-        where_clauses.append(f"LOWER({column}) LIKE ?")
+        where_clauses.append(f"LOWER(question_bank.{column}) LIKE ?")
         params.append(f"%{value.lower()}%")
     if filters["question_type"]:
-        where_clauses.append("question_type = ?")
+        where_clauses.append("question_bank.question_type = ?")
         params.append(filters["question_type"])
     if filters["query"]:
         where_clauses.append(
             "(" + " OR ".join([
-                "LOWER(prompt) LIKE ?",
-                "LOWER(body) LIKE ?",
-                "LOWER(answer) LIKE ?",
-                "LOWER(explanation) LIKE ?",
-                "LOWER(topic) LIKE ?",
-                "LOWER(field_name) LIKE ?",
-                "LOWER(category) LIKE ?",
-                "LOWER(issuer) LIKE ?",
-                "LOWER(source_location) LIKE ?",
-                "LOWER(keywords_json) LIKE ?",
+                "LOWER(question_bank.prompt) LIKE ?",
+                "LOWER(question_bank.body) LIKE ?",
+                "LOWER(question_bank.answer) LIKE ?",
+                "LOWER(question_bank.explanation) LIKE ?",
+                "LOWER(question_bank.topic) LIKE ?",
+                "LOWER(question_bank.field_name) LIKE ?",
+                "LOWER(question_bank.category) LIKE ?",
+                "LOWER(question_bank.issuer) LIKE ?",
+                "LOWER(question_bank.source_location) LIKE ?",
+                "LOWER(question_bank.keywords_json) LIKE ?",
             ]) + ")"
         )
         needle = f"%{filters['query'].lower()}%"
         params.extend([needle] * 10)
+    if filters["attempt_status"] == "unseen":
+        where_clauses.append("(latest_attempt.question_bank_id IS NULL OR latest_attempt.judgment = 'pending')")
+    elif filters["attempt_status"] == "correct":
+        where_clauses.append("latest_attempt.judgment = 'correct'")
+    elif filters["attempt_status"] == "wrong":
+        where_clauses.append("latest_attempt.judgment IN ('ambiguous', 'wrong', 'unknown')")
     where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    latest_attempt_join_sql = """
+        LEFT JOIN (
+            SELECT question_bank_id, judgment, is_correct
+            FROM (
+                SELECT
+                    question_bank_id,
+                    judgment,
+                    is_correct,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY question_bank_id
+                        ORDER BY updated_at DESC, created_at DESC, question_id DESC
+                    ) AS rn
+                FROM question_attempts
+                WHERE TRIM(COALESCE(question_bank_id, '')) <> ''
+            )
+            WHERE rn = 1
+        ) AS latest_attempt
+        ON latest_attempt.question_bank_id = question_bank.id
+    """
     rows, _ = read_cards(db_path)
     card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
     with closing(connect_progress_db(db_path)) as conn:
         total_row = conn.execute(
-            f"SELECT COUNT(*) AS total_count FROM question_bank {where_sql}",
+            f"SELECT COUNT(*) AS total_count FROM question_bank {latest_attempt_join_sql} {where_sql}",
             tuple(params),
         ).fetchone()
         issuer_rows = conn.execute(
@@ -2552,13 +2617,18 @@ def read_question_bank_entries(
         ).fetchall()
         query_rows = conn.execute(
             f"""
-            SELECT id, card_id, question_type, prompt, body, answer, explanation,
-                   rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
-                   difficulty, issuer, source_location, section, points, expected_time_seconds,
-                   answer_guide, session_mode, created_at, updated_at
+            SELECT question_bank.id, question_bank.card_id, question_bank.question_type, question_bank.prompt, question_bank.body,
+                   question_bank.answer, question_bank.explanation, question_bank.rubric_json, question_bank.choices_json,
+                   question_bank.answer_index, question_bank.topic, question_bank.field_name, question_bank.category,
+                   question_bank.keywords_json, question_bank.difficulty, question_bank.issuer, question_bank.source_location,
+                   question_bank.section, question_bank.points, question_bank.expected_time_seconds, question_bank.answer_guide,
+                   question_bank.session_mode, question_bank.created_at, question_bank.updated_at,
+                   latest_attempt.judgment AS latest_attempt_judgment,
+                   latest_attempt.is_correct AS latest_attempt_is_correct
             FROM question_bank
+            {latest_attempt_join_sql}
             {where_sql}
-            ORDER BY updated_at DESC, created_at DESC, id DESC
+            ORDER BY question_bank.updated_at DESC, question_bank.created_at DESC, question_bank.id DESC
             LIMIT ?
             """,
             tuple(params + [safe_limit]),
@@ -2567,6 +2637,15 @@ def read_question_bank_entries(
     for row in query_rows:
         item = question_bank_row_to_dict(row) or {}
         card = card_map.get(item.get("card_id", ""), {})
+        latest_judgment = str(row["latest_attempt_judgment"] or "").strip().lower()
+        if latest_judgment == "correct":
+            item["question_attempt_status"] = "correct"
+        elif latest_judgment in {"ambiguous", "wrong", "unknown"}:
+            item["question_attempt_status"] = "wrong"
+        else:
+            item["question_attempt_status"] = "unseen"
+        item["question_attempt_judgment"] = latest_judgment or "pending"
+        item["question_attempt_status_label"] = QUESTION_BANK_ATTEMPT_FILTER_LABELS.get(item["question_attempt_status"], "안푼")
         item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
         item["english"] = card.get("english") or ""
         item["card_category"] = card.get("category") or ""
@@ -2585,6 +2664,7 @@ def read_question_bank_entries(
             **filters,
         },
     }
+
 
 
 def generated_question_bank_entry(question: dict[str, Any], card: dict[str, Any]) -> dict[str, Any]:
@@ -5329,7 +5409,20 @@ def render_markdown_page(markdown_text: str, repo_dir: Path, current_source: Pat
 
 
 def wiki_checklist_sync_target() -> str:
-    return "github" if WIKI_GITHUB_REPO and WIKI_GITHUB_TOKEN else "local"
+    return "local"
+
+
+def wiki_github_archive_enabled() -> bool:
+    return bool(WIKI_GITHUB_REPO and WIKI_GITHUB_TOKEN)
+
+
+def wiki_archive_public_state() -> dict[str, Any]:
+    return {
+        "enabled": wiki_github_archive_enabled(),
+        "repo": WIKI_GITHUB_REPO,
+        "branch": WIKI_GITHUB_BRANCH,
+        "path_prefix": WIKI_GITHUB_PATH_PREFIX,
+    }
 
 
 def wiki_github_repo_parts() -> tuple[str, str]:
@@ -5340,6 +5433,11 @@ def wiki_github_repo_parts() -> tuple[str, str]:
     if not owner or not repo:
         raise ValueError(f"Invalid GitHub repo slug: {WIKI_GITHUB_REPO}")
     return owner, repo
+
+
+def wiki_github_repo_api_base_url() -> str:
+    owner, repo = wiki_github_repo_parts()
+    return f"{WIKI_GITHUB_API_BASE}/repos/{quote(owner, safe='')}/{quote(repo, safe='')}"
 
 
 def wiki_github_content_path(relative_path: str) -> str:
@@ -5353,9 +5451,29 @@ def wiki_github_content_path(relative_path: str) -> str:
 
 
 def wiki_github_contents_api_url(relative_path: str) -> str:
-    owner, repo = wiki_github_repo_parts()
     content_path = wiki_github_content_path(relative_path)
-    return f"{WIKI_GITHUB_API_BASE}/repos/{quote(owner, safe='')}/{quote(repo, safe='')}/contents/{quote(content_path, safe='/')}"
+    return f"{wiki_github_repo_api_base_url()}/contents/{quote(content_path, safe='/')}"
+
+
+def wiki_github_git_ref_api_url(branch_name: str | None = None) -> str:
+    branch = str(branch_name or WIKI_GITHUB_BRANCH).strip() or "main"
+    return f"{wiki_github_repo_api_base_url()}/git/ref/{quote(f'heads/{branch}', safe='/')}"
+
+
+def wiki_github_git_commit_api_url(commit_sha: str) -> str:
+    return f"{wiki_github_repo_api_base_url()}/git/commits/{quote(str(commit_sha or '').strip(), safe='')}"
+
+
+def wiki_github_git_tree_api_url(tree_sha: str) -> str:
+    return f"{wiki_github_repo_api_base_url()}/git/trees/{quote(str(tree_sha or '').strip(), safe='')}"
+
+
+def wiki_github_git_blobs_api_url() -> str:
+    return f"{wiki_github_repo_api_base_url()}/git/blobs"
+
+
+def wiki_github_git_commits_api_url() -> str:
+    return f"{wiki_github_repo_api_base_url()}/git/commits"
 
 
 def wiki_github_api_json(
@@ -5367,7 +5485,7 @@ def wiki_github_api_json(
 ) -> dict[str, Any] | None:
     headers = {
         "Accept": "application/vnd.github+json",
-        "User-Agent": "cs-flashcards/wiki-checklist",
+        "User-Agent": "cs-flashcards/wiki-archive",
     }
     if WIKI_GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {WIKI_GITHUB_TOKEN}"
@@ -5400,30 +5518,199 @@ def wiki_github_api_json(
         raise RuntimeError("GitHub API 응답을 해석하지 못했습니다.") from exc
 
 
-def github_fetch_wiki_source(relative_path: str) -> tuple[str, str]:
-    url = f"{wiki_github_contents_api_url(relative_path)}?ref={quote(WIKI_GITHUB_BRANCH, safe='')}"
-    payload = wiki_github_api_json("GET", url)
-    if str(payload.get("encoding") or "").lower() != "base64":
-        raise RuntimeError(f"GitHub 파일 인코딩이 예상과 다릅니다: {relative_path}")
+def is_wiki_archive_relative_path(relative_path: str) -> bool:
+    normalized = PurePosixPath(str(relative_path or "").replace(os.sep, "/").lstrip("/"))
+    if not normalized.parts or any(part in {"", ".", ".."} for part in normalized.parts):
+        return False
+    if any(part.startswith(".") for part in normalized.parts):
+        return False
+    relative = normalized.as_posix()
+    if relative in {WIKI_BOOK_README_NAME, WIKI_TOC_NAME}:
+        return True
+    return normalized.parts[0] in {"pages", "assets"}
+
+
+def wiki_archive_relative_path_from_repo_path(repo_path: str) -> str | None:
+    normalized = PurePosixPath(str(repo_path or "").replace(os.sep, "/").lstrip("/"))
+    if not normalized.parts or any(part in {"", ".", ".."} for part in normalized.parts):
+        return None
+    parts = normalized.parts
+    if WIKI_GITHUB_PATH_PREFIX:
+        prefix_parts = PurePosixPath(WIKI_GITHUB_PATH_PREFIX).parts
+        if tuple(parts[: len(prefix_parts)]) != prefix_parts:
+            return None
+        parts = parts[len(prefix_parts):]
+        if not parts:
+            return None
+    relative = PurePosixPath(*parts).as_posix()
+    return relative if is_wiki_archive_relative_path(relative) else None
+
+
+def collect_local_wiki_archive_snapshot(repo_dir: Path | None = None) -> dict[str, bytes]:
+    repo = wiki_book_dir(repo_dir)
+    snapshot: dict[str, bytes] = {}
+    for target in sorted(repo.rglob("*")):
+        if not target.is_file():
+            continue
+        relative = str(target.relative_to(repo)).replace(os.sep, "/")
+        if not is_wiki_archive_relative_path(relative):
+            continue
+        snapshot[relative] = target.read_bytes()
+    return snapshot
+
+
+def git_blob_sha_for_content(content: bytes) -> str:
+    payload = content if isinstance(content, bytes) else bytes(content)
+    return hashlib.sha1(f"blob {len(payload)}\0".encode("utf-8") + payload).hexdigest()
+
+
+def github_read_wiki_archive_head_state() -> tuple[str, str, dict[str, str]]:
+    ref_payload = wiki_github_api_json("GET", wiki_github_git_ref_api_url()) or {}
+    commit_sha = str(((ref_payload.get("object") or {}).get("sha") or "")).strip()
+    if not commit_sha:
+        raise RuntimeError(f"GitHub 브랜치 HEAD를 찾지 못했습니다: {WIKI_GITHUB_BRANCH}")
+    commit_payload = wiki_github_api_json("GET", wiki_github_git_commit_api_url(commit_sha)) or {}
+    tree_sha = str(((commit_payload.get("tree") or {}).get("sha") or "")).strip()
+    if not tree_sha:
+        raise RuntimeError(f"GitHub 커밋 트리를 찾지 못했습니다: {commit_sha}")
+    tree_payload = wiki_github_api_json("GET", f"{wiki_github_git_tree_api_url(tree_sha)}?recursive=1") or {}
+    remote_snapshot: dict[str, str] = {}
+    for entry in tree_payload.get("tree") or []:
+        if str(entry.get("type") or "") != "blob":
+            continue
+        relative = wiki_archive_relative_path_from_repo_path(str(entry.get("path") or ""))
+        sha = str(entry.get("sha") or "").strip()
+        if relative and sha:
+            remote_snapshot[relative] = sha
+    return commit_sha, tree_sha, remote_snapshot
+
+
+def github_create_wiki_archive_blob(content: bytes) -> str:
+    payload = wiki_github_api_json(
+        "POST",
+        wiki_github_git_blobs_api_url(),
+        {
+            "content": base64.b64encode(content).decode("ascii"),
+            "encoding": "base64",
+        },
+    ) or {}
     sha = str(payload.get("sha") or "").strip()
     if not sha:
-        raise RuntimeError(f"GitHub 파일 SHA를 찾지 못했습니다: {relative_path}")
-    raw_content = str(payload.get("content") or "").replace("\n", "")
-    decoded = base64.b64decode(raw_content.encode("ascii")).decode("utf-8")
-    return decoded, sha
+        raise RuntimeError("GitHub blob SHA를 찾지 못했습니다.")
+    return sha
 
 
-def github_update_wiki_source(relative_path: str, content: str, sha: str, message: str) -> dict[str, Any]:
-    return wiki_github_api_json(
-        "PUT",
-        wiki_github_contents_api_url(relative_path),
+def github_create_wiki_archive_tree(base_tree_sha: str, entries: list[dict[str, Any]]) -> str:
+    payload = wiki_github_api_json(
+        "POST",
+        f"{wiki_github_repo_api_base_url()}/git/trees",
+        {
+            "base_tree": base_tree_sha,
+            "tree": entries,
+        },
+    ) or {}
+    sha = str(payload.get("sha") or "").strip()
+    if not sha:
+        raise RuntimeError("GitHub 트리 SHA를 찾지 못했습니다.")
+    return sha
+
+
+def github_create_wiki_archive_commit(message: str, tree_sha: str, parent_commit_sha: str) -> str:
+    payload = wiki_github_api_json(
+        "POST",
+        wiki_github_git_commits_api_url(),
         {
             "message": message,
-            "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
-            "sha": sha,
-            "branch": WIKI_GITHUB_BRANCH,
+            "tree": tree_sha,
+            "parents": [parent_commit_sha],
         },
+    ) or {}
+    sha = str(payload.get("sha") or "").strip()
+    if not sha:
+        raise RuntimeError("GitHub 커밋 SHA를 찾지 못했습니다.")
+    return sha
+
+
+def github_update_wiki_archive_branch_head(commit_sha: str) -> dict[str, Any]:
+    return wiki_github_api_json(
+        "PATCH",
+        wiki_github_git_ref_api_url(),
+        {
+            "sha": commit_sha,
+            "force": False,
+        },
+    ) or {}
+
+
+def wiki_github_archive_commit_message(source_path: str, *, changed_count: int, deleted_count: int) -> str:
+    subject = normalized_card_text(source_path, limit=255) or "manual-wiki-archive"
+    return (
+        f"Archive wiki snapshot from cs-flashcards ({subject}) · "
+        f"{changed_count} changed, {deleted_count} deleted · {utc_now_iso()}"
     )
+
+
+def archive_wiki_snapshot_to_github(source_path: str = "", repo_dir: Path | None = None) -> dict[str, Any]:
+    if not wiki_github_archive_enabled():
+        raise RuntimeError("GitHub 보관 구성이 없어 실행할 수 없습니다. 서버 환경변수에 CS_FLASHCARDS_WIKI_GITHUB_REPO 와 CS_FLASHCARDS_WIKI_GITHUB_TOKEN 을 설정하세요.")
+    local_snapshot = collect_local_wiki_archive_snapshot(repo_dir)
+    head_commit_sha, base_tree_sha, remote_snapshot = github_read_wiki_archive_head_state()
+    tree_entries: list[dict[str, Any]] = []
+    created_paths: list[str] = []
+    updated_paths: list[str] = []
+    for relative_path, content in local_snapshot.items():
+        local_sha = git_blob_sha_for_content(content)
+        remote_sha = remote_snapshot.get(relative_path)
+        if remote_sha == local_sha:
+            continue
+        blob_sha = github_create_wiki_archive_blob(content)
+        tree_entries.append({
+            "path": wiki_github_content_path(relative_path),
+            "mode": "100644",
+            "type": "blob",
+            "sha": blob_sha,
+        })
+        if remote_sha:
+            updated_paths.append(relative_path)
+        else:
+            created_paths.append(relative_path)
+    deleted_paths = sorted(set(remote_snapshot) - set(local_snapshot))
+    for relative_path in deleted_paths:
+        tree_entries.append({
+            "path": wiki_github_content_path(relative_path),
+            "mode": "100644",
+            "type": "blob",
+            "sha": None,
+        })
+    committed = bool(tree_entries)
+    commit_sha = ""
+    commit_message = wiki_github_archive_commit_message(
+        source_path,
+        changed_count=len(created_paths) + len(updated_paths),
+        deleted_count=len(deleted_paths),
+    )
+    if committed:
+        tree_sha = github_create_wiki_archive_tree(base_tree_sha, tree_entries)
+        commit_sha = github_create_wiki_archive_commit(commit_message, tree_sha, head_commit_sha)
+        github_update_wiki_archive_branch_head(commit_sha)
+    return {
+        "enabled": True,
+        "repo": WIKI_GITHUB_REPO,
+        "branch": WIKI_GITHUB_BRANCH,
+        "path_prefix": WIKI_GITHUB_PATH_PREFIX,
+        "source_path": normalized_card_text(source_path, limit=4096),
+        "committed": committed,
+        "commit_sha": commit_sha,
+        "commit_message": commit_message,
+        "created_file_count": len(created_paths),
+        "updated_file_count": len(updated_paths),
+        "changed_file_count": len(created_paths) + len(updated_paths),
+        "deleted_file_count": len(deleted_paths),
+        "created_paths": created_paths[:20],
+        "updated_paths": updated_paths[:20],
+        "deleted_paths": deleted_paths[:20],
+        "local_file_count": len(local_snapshot),
+    }
 
 
 def resolve_wiki_markdown_source(source_path: str, repo_dir: Path | None = None) -> tuple[Path, Path, str, str]:
@@ -5437,23 +5724,6 @@ def resolve_wiki_markdown_source(source_path: str, repo_dir: Path | None = None)
     return repo, target, source_relative, target.read_text(encoding="utf-8")
 
 
-def synchronized_wiki_source_content(
-    source_relative: str,
-    local_content: str,
-    *,
-    mismatch_message: str,
-) -> tuple[str, str, str | None]:
-    sync_target = wiki_checklist_sync_target()
-    current_content = local_content
-    remote_sha: str | None = None
-    if sync_target == "github":
-        remote_content, remote_sha = github_fetch_wiki_source(source_relative)
-        if remote_content != local_content:
-            raise RuntimeError(mismatch_message)
-        current_content = remote_content
-    return sync_target, current_content, remote_sha
-
-
 def update_wiki_checklist_item(
     source_path: str,
     line_number: int,
@@ -5461,26 +5731,14 @@ def update_wiki_checklist_item(
     repo_dir: Path | None = None,
 ) -> dict[str, Any]:
     repo, target, source_relative, local_content = resolve_wiki_markdown_source(source_path, repo_dir)
-    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
-        source_relative,
-        local_content,
-        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 체크 동기화를 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
-    )
-    updated_content, task_meta = set_markdown_task_state(current_content, line_number, checked)
-    if sync_target == "github" and task_meta["changed"] and remote_sha:
-        github_update_wiki_source(
-            source_relative,
-            updated_content,
-            remote_sha,
-            f"Toggle wiki checklist: {source_relative}#L{line_number}",
-        )
+    updated_content, task_meta = set_markdown_task_state(local_content, line_number, checked)
     if updated_content != local_content:
         target.write_text(updated_content, encoding="utf-8")
     return {
         "source_path": source_relative,
         "line_number": line_number,
         "page_slug": wiki_slug_for_source(repo, target),
-        "sync_target": sync_target,
+        "sync_target": "local",
         **task_meta,
     }
 
@@ -5492,27 +5750,15 @@ def update_wiki_page_source(
     repo_dir: Path | None = None,
 ) -> dict[str, Any]:
     repo, target, source_relative, local_content = resolve_wiki_markdown_source(source_path, repo_dir)
-    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
-        source_relative,
-        local_content,
-        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 문서 저장을 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
-    )
-    if previous_content is not None and previous_content != current_content:
+    if previous_content is not None and previous_content != local_content:
         raise RuntimeError("문서 원본이 다른 내용으로 바뀌어 저장을 중단했습니다. 문서를 새로고침한 뒤 다시 수정하세요.")
-    changed = content != current_content
-    if sync_target == "github" and changed and remote_sha:
-        github_update_wiki_source(
-            source_relative,
-            content,
-            remote_sha,
-            f"Update wiki page: {source_relative}",
-        )
-    if content != local_content:
+    changed = content != local_content
+    if changed:
         target.write_text(content, encoding="utf-8")
     return {
         "source_path": source_relative,
         "page_slug": wiki_slug_for_source(repo, target),
-        "sync_target": sync_target,
+        "sync_target": "local",
         "changed": changed,
         "title": extract_markdown_title(content, target.stem),
     }
@@ -6488,28 +6734,11 @@ def upsert_wiki_binary_asset(
     if not target:
         raise ValueError(f"잘못된 위키 자산 경로입니다: {relative_path}")
     target.parent.mkdir(parents=True, exist_ok=True)
-    sync_target = wiki_checklist_sync_target()
-    if sync_target == "github":
-        existing = wiki_github_api_json(
-            "GET",
-            f"{wiki_github_contents_api_url(relative_path)}?ref={quote(WIKI_GITHUB_BRANCH, safe='')}",
-            allow_missing=True,
-        )
-        payload = {
-            "message": message,
-            "content": base64.b64encode(content).decode("ascii"),
-            "branch": WIKI_GITHUB_BRANCH,
-        }
-        if isinstance(existing, dict):
-            sha = str(existing.get("sha") or "").strip()
-            if sha:
-                payload["sha"] = sha
-        wiki_github_api_json("PUT", wiki_github_contents_api_url(relative_path), payload)
     previous = target.read_bytes() if target.exists() else None
     if previous != content:
         target.write_bytes(content)
     return {
-        "sync_target": sync_target,
+        "sync_target": "local",
         "relative_path": str(relative_path).replace(os.sep, "/"),
         "url": wiki_raw_url(relative_path),
     }
@@ -6521,18 +6750,13 @@ def regenerate_wiki_image_asset(
     repo_dir: Path | None = None,
 ) -> dict[str, Any]:
     repo, target, source_relative, local_content = resolve_wiki_markdown_source(payload.source_path, repo_dir)
-    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
-        source_relative,
-        local_content,
-        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 이미지 재생성을 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
-    )
-    images = parse_wiki_markdown_images(current_content, repo, target)
+    images = parse_wiki_markdown_images(local_content, repo, target)
     if payload.image_index >= len(images):
         raise ValueError(f"위키 이미지 인덱스를 찾지 못했습니다: {payload.image_index}")
     image = images[payload.image_index]
     image_format = normalized_wiki_image_format(payload.format)
     prompt_override = normalized_card_text(payload.prompt_override, limit=20000)
-    page_title = extract_markdown_title(current_content, target.stem)
+    page_title = extract_markdown_title(local_content, target.stem)
     if image_format == "svg":
         asset_bytes = generate_wiki_svg_markup(page_title, image, prompt_override=prompt_override).encode("utf-8")
     elif image_format == "gif":
@@ -6546,16 +6770,9 @@ def regenerate_wiki_image_asset(
         message=f"Regenerate wiki asset: {asset_relative_path}",
         repo_dir=repo,
     )
-    updated_content, image_update = replace_nth_markdown_image_href(current_content, payload.image_index, asset_relative_path)
-    changed = updated_content != current_content
-    if sync_target == "github" and changed and remote_sha:
-        github_update_wiki_source(
-            source_relative,
-            updated_content,
-            remote_sha,
-            f"Regenerate wiki image: {source_relative}#image-{payload.image_index + 1}",
-        )
-    if updated_content != local_content:
+    updated_content, image_update = replace_nth_markdown_image_href(local_content, payload.image_index, asset_relative_path)
+    changed = updated_content != local_content
+    if changed:
         target.write_text(updated_content, encoding="utf-8")
     page_slug = wiki_slug_for_source(repo, target)
     return {
@@ -6563,7 +6780,7 @@ def regenerate_wiki_image_asset(
         "updated": {
             "source_path": source_relative,
             "page_slug": page_slug,
-            "sync_target": sync_target,
+            "sync_target": "local",
             "changed": changed,
             "format": image_format,
             "image_index": payload.image_index,
@@ -6823,12 +7040,7 @@ def generate_wiki_section_image_asset(
     repo_dir: Path | None = None,
 ) -> dict[str, Any]:
     repo, target, source_relative, local_content = resolve_wiki_markdown_source(payload.source_path, repo_dir)
-    sync_target, current_content, remote_sha = synchronized_wiki_source_content(
-        source_relative,
-        local_content,
-        mismatch_message="GitHub 위키 원본과 현재 배포본이 달라 섹션 이미지 생성을 중단했습니다. 위키를 다시 배포한 뒤 재시도하세요.",
-    )
-    sections = parse_wiki_markdown_sections(current_content, repo, target)
+    sections = parse_wiki_markdown_sections(local_content, repo, target)
     if payload.section_index >= len(sections):
         raise ValueError(f"위키 섹션 인덱스를 찾지 못했습니다: {payload.section_index}")
     section = sections[payload.section_index]
@@ -6841,7 +7053,7 @@ def generate_wiki_section_image_asset(
     }
     image_format = normalized_wiki_image_format(payload.format)
     prompt_override = normalized_card_text(payload.prompt_override, limit=20000)
-    page_title = extract_markdown_title(current_content, target.stem)
+    page_title = extract_markdown_title(local_content, target.stem)
     if image_format == "svg":
         asset_bytes = generate_wiki_svg_markup(page_title, section_subject, prompt_override=prompt_override).encode("utf-8")
     elif image_format == "gif":
@@ -6855,16 +7067,9 @@ def generate_wiki_section_image_asset(
         message=f"Generate wiki section image: {asset_relative_path}",
         repo_dir=repo,
     )
-    updated_content, section_update = upsert_wiki_section_image_markdown(current_content, source_relative, section, asset_relative_path)
-    changed = updated_content != current_content
-    if sync_target == "github" and changed and remote_sha:
-        github_update_wiki_source(
-            source_relative,
-            updated_content,
-            remote_sha,
-            f"Generate wiki section image: {source_relative}#section-{payload.section_index + 1}",
-        )
-    if updated_content != local_content:
+    updated_content, section_update = upsert_wiki_section_image_markdown(local_content, source_relative, section, asset_relative_path)
+    changed = updated_content != local_content
+    if changed:
         target.write_text(updated_content, encoding="utf-8")
     page_slug = wiki_slug_for_source(repo, target)
     return {
@@ -6872,7 +7077,7 @@ def generate_wiki_section_image_asset(
         "updated": {
             "source_path": source_relative,
             "page_slug": page_slug,
-            "sync_target": sync_target,
+            "sync_target": "local",
             "changed": changed,
             "format": image_format,
             "section_index": payload.section_index,
@@ -6946,6 +7151,7 @@ def read_wiki_index(repo_dir: Path | None = None) -> dict[str, Any]:
         "flat": flat,
         "pages": pages,
         "breadcrumbs": breadcrumbs,
+        "archive": wiki_archive_public_state(),
     }
 
 
@@ -7077,6 +7283,7 @@ def read_wiki_page(page_slug: str | None = None, repo_dir: Path | None = None) -
         "last_modified_label": last_modified_label,
         "primary_card": linked_cards[0] if linked_cards else None,
         "linked_cards": linked_cards,
+        "archive": index.get("archive") or wiki_archive_public_state(),
     }
 
 
@@ -7217,6 +7424,19 @@ def api_wiki_render_preview(payload: WikiRenderPreviewRequest) -> dict[str, Any]
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+@app.post("/api/wiki/archive/github")
+def api_wiki_archive_github(payload: WikiGithubArchiveRequest) -> dict[str, Any]:
+    try:
+        return {
+            "archive": archive_wiki_snapshot_to_github(payload.source_path or ""),
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -7539,6 +7759,7 @@ def api_question_bank(request: Request) -> dict[str, Any]:
             section=request.query_params.get("section", ""),
             source_location=request.query_params.get("source_location", ""),
             query=request.query_params.get("q", request.query_params.get("query", "")),
+            attempt_status=request.query_params.get("attempt_status", request.query_params.get("status", "")),
             limit=limit,
         )
 
@@ -7612,6 +7833,7 @@ def health() -> dict[str, Any]:
         "wiki_book_exists": wiki_book_exists,
         "wiki_book_configured_dir": str(WIKI_BOOK_DIR),
         "wiki_checklist_sync_target": wiki_checklist_sync_target(),
+        "wiki_archive_enabled": wiki_github_archive_enabled(),
         "wiki_github_repo": WIKI_GITHUB_REPO,
         "wiki_github_branch": WIKI_GITHUB_BRANCH,
         "wiki_github_path_prefix": WIKI_GITHUB_PATH_PREFIX,

@@ -12,12 +12,16 @@ QUESTION_BANK_JS = (ROOT / 'static' / 'question-bank.js').read_text(encoding='ut
 
 
 class QuestionBankMetadataTests(unittest.TestCase):
-    def test_question_bank_pages_use_category_and_issuer_selects(self):
-        self.assertIn('<select id="bankPageTopicInput"', QUESTION_BANK_HTML)
+    def test_question_bank_pages_use_searchable_topic_and_status_filters(self):
+        self.assertIn('<input id="bankPageTopicInput"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageTopicOptions"', QUESTION_BANK_HTML)
+        self.assertIn('<select id="bankPageAttemptStatusSelect"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageFieldInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageCategoryInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
-        self.assertIn('<select id="questionBankTopicInput"', INDEX_HTML)
+        self.assertIn('<input id="questionBankTopicInput"', INDEX_HTML)
+        self.assertIn('id="questionBankTopicOptions"', INDEX_HTML)
+        self.assertIn('<select id="questionBankAttemptStatusSelect"', INDEX_HTML)
         self.assertIn('<select id="questionBankFieldInput"', INDEX_HTML)
         self.assertIn('<select id="questionBankCategoryInput"', INDEX_HTML)
         self.assertIn('<select id="questionBankIssuerInput"', INDEX_HTML)

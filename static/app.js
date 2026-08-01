@@ -4886,6 +4886,7 @@ async function importQuestionsFromText() {
 function questionBankFilterValues() {
   return {
     q: $('questionBankQueryInput')?.value?.trim() || '',
+    attempt_status: $('questionBankAttemptStatusSelect')?.value || '',
     topic: $('questionBankTopicInput')?.value?.trim() || '',
     field_name: $('questionBankFieldInput')?.value?.trim() || '',
     category: $('questionBankCategoryInput')?.value?.trim() || '',
@@ -4943,18 +4944,18 @@ function populateQuestionBankCategoryOptions(categories, selected = '') {
 }
 
 function populateQuestionBankTopicOptions(topics, selected = '') {
-  const select = $('questionBankTopicInput');
-  if (!select) return;
-  const selectedValue = String(selected || select.value || '').trim();
-  const options = ['<option value="">문제유형 *</option>'];
-  (Array.isArray(topics) ? topics : []).forEach((topic) => {
-    const value = String(topic || '').trim();
-    if (!value) return;
-    options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
-  });
-  select.innerHTML = options.join('');
-  select.value = (Array.isArray(topics) && topics.includes(selectedValue)) ? selectedValue : '';
+  const input = $('questionBankTopicInput');
+  const datalist = $('questionBankTopicOptions');
+  if (!input || !datalist) return;
+  const selectedValue = String(selected || input.value || '').trim();
+  datalist.innerHTML = (Array.isArray(topics) ? topics : [])
+    .map((topic) => String(topic || '').trim())
+    .filter(Boolean)
+    .map((topic) => `<option value="${escapeHtml(topic)}"></option>`)
+    .join('');
+  input.value = selectedValue;
 }
+
 
 function populateQuestionBankFieldNameOptions(fieldNames, selected = '') {
   const select = $('questionBankFieldInput');
@@ -5513,7 +5514,8 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankCloseBtn', 'questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankCloseBtn', 'questionBankQueryInput', 'questionBankAttemptStatusSelect', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
+
     const element = $(id);
     if (element) element.disabled = disabled;
   });
@@ -6453,14 +6455,17 @@ $('questionBankToggleBtn')?.addEventListener('click', () => toggleQuestionBankBr
 $('questionBankRefreshBtn')?.addEventListener('click', () => loadQuestionBankBrowser().catch(() => {}));
 $('questionBankLoadBtn')?.addEventListener('click', () => openQuestionBankSession(0));
 $('questionBankCloseBtn')?.addEventListener('click', () => toggleQuestionBankBrowser(false));
-['questionBankQueryInput', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
-  $(id)?.addEventListener('change', () => loadQuestionBankBrowser().catch(() => {}));
+['questionBankQueryInput', 'questionBankTopicInput', 'questionBankSourceInput', 'questionBankSectionInput'].forEach((id) => {
+  $(id)?.addEventListener('input', () => loadQuestionBankBrowser().catch(() => {}));
   $(id)?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
       loadQuestionBankBrowser().catch(() => {});
     }
   });
+});
+['questionBankAttemptStatusSelect', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankDifficultySelect', 'questionBankTypeSelect'].forEach((id) => {
+  $(id)?.addEventListener('change', () => loadQuestionBankBrowser().catch(() => {}));
 });
 
 $('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);

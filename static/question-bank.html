@@ -61,10 +61,18 @@
               <input id="bankPageQueryInput" class="cs-table-control" type="search" placeholder="문제/정답/키워드" />
             </label>
             <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">문제유형</span>
-              <select id="bankPageTopicInput" class="cs-table-control" aria-label="문제유형">
-                <option value="">문제유형</option>
+              <span class="question-bank-filter-label">풀이상태</span>
+              <select id="bankPageAttemptStatusSelect" class="cs-table-control" aria-label="풀이상태">
+                <option value="">풀이상태</option>
+                <option value="unseen">안푼</option>
+                <option value="wrong">틀린</option>
+                <option value="correct">맞은</option>
               </select>
+            </label>
+            <label class="question-bank-filter-field">
+              <span class="question-bank-filter-label">문제유형 검색</span>
+              <input id="bankPageTopicInput" class="cs-table-control" type="search" list="bankPageTopicOptions" aria-label="문제유형 검색" placeholder="예: 데이터베이스" />
+              <datalist id="bankPageTopicOptions"></datalist>
             </label>
             <label class="question-bank-filter-field">
               <span class="question-bank-filter-label">분야</span>
