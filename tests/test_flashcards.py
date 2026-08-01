@@ -2180,19 +2180,57 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_BRANCH = 'main'
                 flashcard_app.WIKI_GITHUB_TOKEN = ''
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
-                updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, book)
+                original = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, original, book)
                 self.assertEqual(updated['sync_target'], 'local')
                 self.assertTrue(updated['checked'])
                 saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
                 self.assertIn('- [x] 체크 항목', saved)
                 page = flashcard_app.read_wiki_page('intro', book)
                 self.assertIn(' checked />', page['html'])
+
             finally:
                 flashcard_app.WIKI_GITHUB_REPO = original_repo
                 flashcard_app.WIKI_GITHUB_BRANCH = original_branch
                 flashcard_app.WIKI_GITHUB_TOKEN = original_token
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
 
+    def test_api_wiki_checklist_rejects_stale_editor_content(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_repo = flashcard_app.WIKI_GITHUB_REPO
+            original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+            original_token = flashcard_app.WIKI_GITHUB_TOKEN
+            original_prefix = flashcard_app.WIKI_GITHUB_PATH_PREFIX
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.WIKI_GITHUB_REPO = ''
+                flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+                flashcard_app.WIKI_GITHUB_TOKEN = ''
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
+                original = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                (book / 'pages' / 'intro.md').write_text(original + '\n다른 사용자의 변경\n', encoding='utf-8')
+                with self.assertRaises(flashcard_app.HTTPException) as exc:
+                    flashcard_app.api_wiki_checklist(
+                        flashcard_app.WikiChecklistRequest(
+                            source_path='pages/intro.md',
+                            line_number=3,
+                            checked=True,
+                            previous_content=original,
+                        )
+                    )
+                self.assertEqual(exc.exception.status_code, 409)
+                self.assertIn('문서를 새로고침한 뒤 다시 수정하세요.', str(exc.exception.detail))
+                saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                self.assertIn('다른 사용자의 변경', saved)
+                self.assertIn('- [ ] 체크 항목', saved)
+            finally:
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
+                flashcard_app.WIKI_GITHUB_REPO = original_repo
+                flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+                flashcard_app.WIKI_GITHUB_TOKEN = original_token
+                flashcard_app.WIKI_GITHUB_PATH_PREFIX = original_prefix
     def test_update_wiki_checklist_item_stays_local_when_archive_configured(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
@@ -2206,7 +2244,7 @@ class WikiBookTests(unittest.TestCase):
                 flashcard_app.WIKI_GITHUB_TOKEN = 'token'
                 flashcard_app.WIKI_GITHUB_PATH_PREFIX = ''
                 with mock.patch.object(flashcard_app, 'archive_wiki_snapshot_to_github') as archive_mock:
-                    updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, book)
+                    updated = flashcard_app.update_wiki_checklist_item('pages/intro.md', 3, True, repo_dir=book)
                 archive_mock.assert_not_called()
                 self.assertEqual(updated['sync_target'], 'local')
                 saved = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')

@@ -786,6 +786,8 @@ class WikiChecklistRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     line_number: int = Field(ge=1, le=200000)
     checked: bool
+    previous_content: str | None = Field(default=None, max_length=2_000_000)
+
 
 
 class WikiGithubArchiveRequest(BaseModel):
@@ -6138,13 +6140,20 @@ def resolve_wiki_markdown_source(source_path: str, repo_dir: Path | None = None)
     return repo, target, source_relative, target.read_text(encoding="utf-8")
 
 
+def ensure_wiki_source_matches_previous_content(previous_content: str | None, local_content: str) -> None:
+    if previous_content is not None and previous_content != local_content:
+        raise RuntimeError("문서 원본이 다른 내용으로 바뀌어 저장을 중단했습니다. 문서를 새로고침한 뒤 다시 수정하세요.")
+
+
 def update_wiki_checklist_item(
     source_path: str,
     line_number: int,
     checked: bool,
+    previous_content: str | None = None,
     repo_dir: Path | None = None,
 ) -> dict[str, Any]:
     repo, target, source_relative, local_content = resolve_wiki_markdown_source(source_path, repo_dir)
+    ensure_wiki_source_matches_previous_content(previous_content, local_content)
     updated_content, task_meta = set_markdown_task_state(local_content, line_number, checked)
     if updated_content != local_content:
         target.write_text(updated_content, encoding="utf-8")
@@ -6164,8 +6173,7 @@ def update_wiki_page_source(
     repo_dir: Path | None = None,
 ) -> dict[str, Any]:
     repo, target, source_relative, local_content = resolve_wiki_markdown_source(source_path, repo_dir)
-    if previous_content is not None and previous_content != local_content:
-        raise RuntimeError("문서 원본이 다른 내용으로 바뀌어 저장을 중단했습니다. 문서를 새로고침한 뒤 다시 수정하세요.")
+    ensure_wiki_source_matches_previous_content(previous_content, local_content)
     changed = content != local_content
     if changed:
         target.write_text(content, encoding="utf-8")
@@ -8033,7 +8041,7 @@ def api_wiki_page_save(payload: WikiPageUpdateRequest) -> dict[str, Any]:
 @app.post("/api/wiki/checklist")
 def api_wiki_checklist(payload: WikiChecklistRequest) -> dict[str, Any]:
     try:
-        updated = update_wiki_checklist_item(payload.source_path, payload.line_number, payload.checked)
+        updated = update_wiki_checklist_item(payload.source_path, payload.line_number, payload.checked, payload.previous_content)
         return {
             "page": read_wiki_page(updated["page_slug"]),
             "updated": updated,
