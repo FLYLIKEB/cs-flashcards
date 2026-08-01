@@ -10,6 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DEPLOY_SCRIPT = (ROOT / 'scripts' / 'deploy_lightsail_flashcards.sh').read_text(encoding='utf-8')
 PULL_SCRIPT = (ROOT / 'scripts' / 'pull_remote_sqlite.sh').read_text(encoding='utf-8')
 REMOTE_SQL_SCRIPT = (ROOT / 'scripts' / 'remote_sqlite_sql.sh').read_text(encoding='utf-8')
+DEPLOY_SKILL = (ROOT / '.codex/skills/cs-flashcards-deploy-guard/SKILL.md').read_text(encoding='utf-8')
+DEPLOY_CHECKLIST = (ROOT / '.codex/skills/cs-flashcards-deploy-guard/references/deploy-checklist.md').read_text(encoding='utf-8')
+REMOTE_AI_SKILL = (ROOT / '.gjc/skills/cs-remote-ai-batch/SKILL.md').read_text(encoding='utf-8')
+
 
 
 
@@ -43,6 +47,14 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertNotIn('INSERT INTO {table}', REMOTE_SQL_SCRIPT)
         self.assertIn('원격 DB 경로 변경은 금지됩니다', REMOTE_SQL_SCRIPT)
         self.assertIn('sqlite3 "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
+
+    def test_skill_docs_use_direct_remote_sql_policy(self):
+        self.assertIn('./scripts/remote_sqlite_sql.sh', DEPLOY_SKILL)
+        self.assertNotIn('sync_remote_sqlite_rows.sh', DEPLOY_SKILL)
+        self.assertNotIn('not Git-managed', DEPLOY_CHECKLIST)
+        self.assertIn('may be Git-tracked locally', DEPLOY_CHECKLIST)
+        self.assertNotIn('Never edit or commit `state/progress.sqlite`', REMOTE_AI_SKILL)
+        self.assertIn('direct remote SQL is the only allowed path', REMOTE_AI_SKILL)
 
 
 if __name__ == '__main__':

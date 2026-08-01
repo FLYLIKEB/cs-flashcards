@@ -1,0 +1,6 @@
+interface:
+  display_name: "CS 플래시카드 배포 가드"
+  short_description: "배포 전후 앱·CSV·진행상태 안전 점검"
+  default_prompt: "Use $cs-flashcards-deploy-guard 로 플래시카드 앱 배포 전 안전 점검을 실행해줘."
+policy:
+  allow_implicit_invocation: true

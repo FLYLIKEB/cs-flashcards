@@ -12,8 +12,8 @@ Use this skill to batch-apply the flashcard app's remote AI rewrite and AI image
 ## Core invariants
 
 - Treat `data/CS_encyclopedia_300plus.csv` as an optional bootstrap baseline for "아직 AI가 안 먹은 카드" 판정에만 사용합니다.
-- Treat remote `/api/cards` as the live merged view. 카드 콘텐츠 정본과 학습 진행상태가 모두 `state/progress.sqlite`에 있습니다.
-- Never edit or commit `state/progress.sqlite`, `state/ai_images/`, `.omx/*password*`, API keys, or Basic Auth credentials.
+- Treat remote `/api/cards` as the live merged view. 카드 콘텐츠 정본과 학습 진행상태는 라이브 `state/progress.sqlite`에서 합쳐집니다.
+- This workflow must not hand-edit or replace `state/progress.sqlite` or `state/ai_images/`; when DB changes are explicitly required elsewhere, direct remote SQL is the only allowed path.
 
 - Use the public app endpoints with Basic Auth. The default username is `cs`; read the password from `.omx/cs_flashcards_public_password` unless the user gives another credential.
 - Verify `/api/health` first. Stop if `ai_rewrite_enabled` is false or `progress_db_exists` is false.
