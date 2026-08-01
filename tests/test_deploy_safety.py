@@ -21,7 +21,9 @@ DEPLOY_CHECKLIST = (ROOT / '.codex/skills/cs-flashcards-deploy-guard/references/
 REMOTE_AI_SKILL = (ROOT / '.gjc/skills/cs-remote-ai-batch/SKILL.md').read_text(encoding='utf-8')
 DEPLOY_GUARD_PATTERN = re.compile(r'^ensure_stage_has_no_sqlite_payload\(\) \{\n(?P<body>.*?)^\}\n', re.MULTILINE | re.DOTALL)
 DEPLOY_GUARD_CALL = 'ensure_stage_has_no_sqlite_payload "$TMP_STAGE" "$TMP_ARCHIVE"'
+REMOTE_SQL_VALIDATE_PATTERN = re.compile(r'^validate_sql_text\(\) \{\n(?P<body>.*?)^\}\n', re.MULTILINE | re.DOTALL)
 REMOTE_SQL_REMOTE_BLOCK_PATTERN = re.compile(r"<<'REMOTE'\n(?P<body>.*?)^REMOTE$", re.MULTILINE | re.DOTALL)
+
 
 
 def write_tar_gz(path: Path, members: dict[str, str]) -> None:
@@ -67,6 +69,22 @@ def run_remote_sql_block(db_path: Path, sql_text: str) -> subprocess.CompletedPr
         text=True,
         check=False,
     )
+
+
+
+def run_remote_sql_validation(sql_text: str) -> subprocess.CompletedProcess[str]:
+    match = REMOTE_SQL_VALIDATE_PATTERN.search(REMOTE_SQL_SCRIPT)
+    if match is None:
+        raise AssertionError('remote sqlite validator not found')
+    script = f"set -euo pipefail\n{match.group(0)}\nvalidate_sql_text \"$SQL_TEXT\"\n"
+    return subprocess.run(
+        ['bash', '-c', script, 'remote-sql-validate-test'],
+        env={**os.environ, 'SQL_TEXT': sql_text},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
 
 
 def write_named_rows_sqlite(path: Path, *names: str) -> None:
@@ -238,6 +256,31 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertIn("BEGIN IMMEDIATE;", REMOTE_SQL_SCRIPT)
         self.assertIn('sqlite3 -bail "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
 
+    def test_remote_sql_script_rejects_sqlite_meta_and_transaction_commands(self):
+        self.assertIn('sqlite dot-command는 허용되지 않습니다.', REMOTE_SQL_SCRIPT)
+        self.assertIn('트랜잭션 제어 SQL은 허용되지 않습니다.', REMOTE_SQL_SCRIPT)
+        self.assertIn('SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.', REMOTE_SQL_SCRIPT)
+        self.assertLess(REMOTE_SQL_SCRIPT.index('validate_sql_text "$SQL_TEXT"'), REMOTE_SQL_SCRIPT.index('SSH=('))
+
+    def test_remote_sql_script_rejects_unsafe_sql_before_ssh_or_sqlite(self):
+        cases = [
+            ('BEGIN IMMEDIATE;\nUPDATE items SET name=\'changed\';\n', '트랜잭션 제어 SQL은 허용되지 않습니다.'),
+            ('commit;\nUPDATE items SET name=\'changed\';\n', '트랜잭션 제어 SQL은 허용되지 않습니다.'),
+            ('ROLLBACK;\n', '트랜잭션 제어 SQL은 허용되지 않습니다.'),
+            ('SAVEPOINT keep_me;\n', '트랜잭션 제어 SQL은 허용되지 않습니다.'),
+            ('RELEASE keep_me;\n', '트랜잭션 제어 SQL은 허용되지 않습니다.'),
+            ('ATTACH DATABASE \'other.sqlite\' AS other;\n', 'SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.'),
+            ('detach database other;\n', 'SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.'),
+            ('PRAGMA journal_mode=WAL;\n', 'SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.'),
+            ('.read /tmp/payload.sql\n', 'sqlite dot-command는 허용되지 않습니다.'),
+        ]
+
+        for sql_text, expected_message in cases:
+            with self.subTest(sql_text=sql_text):
+                result = run_remote_sql_validation(sql_text)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(expected_message, result.stderr)
+
     def test_remote_sql_script_rolls_back_partial_changes_on_failure(self):
         with tempfile.TemporaryDirectory() as td:
             db_path = Path(td) / 'remote.sqlite'
@@ -246,6 +289,18 @@ class DeploySafetyTests(unittest.TestCase):
             result = run_remote_sql_block(db_path, "UPDATE items SET name='changed';\nINVALID SQL;\n")
 
             self.assertNotEqual(result.returncode, 0)
+            with sqlite3.connect(db_path) as conn:
+                self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('before',)])
+
+    def test_remote_sql_script_rejects_outer_transaction_escape_hatches(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'remote.sqlite'
+            write_named_rows_sqlite(db_path, 'before')
+
+            result = run_remote_sql_block(db_path, "COMMIT;\nUPDATE items SET name='changed';\nINVALID SQL;\n")
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('트랜잭션 제어 SQL은 허용되지 않습니다.', result.stderr)
             with sqlite3.connect(db_path) as conn:
                 self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('before',)])
 
