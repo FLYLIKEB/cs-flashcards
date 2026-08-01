@@ -35,6 +35,7 @@ const bankState = {
   loading: false,
   error: '',
   selectedId: '',
+  practiceActiveId: '',
   practiceLoaded: false,
   practiceStartIndex: 0,
   practiceNonce: 0,
@@ -151,6 +152,15 @@ function selectedIndex(fallback = 0) {
 function selectedItem() {
   if (!bankState.items.length) return null;
   return bankState.items[selectedIndex(bankState.practiceStartIndex)] || bankState.items[0] || null;
+}
+function practiceActiveIndex() {
+  const found = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === bankState.practiceActiveId);
+  return found >= 0 ? found : Math.max(0, Math.min(bankState.items.length - 1, bankState.practiceStartIndex));
+}
+
+function practiceItem() {
+  if (!bankState.items.length) return null;
+  return bankState.items[practiceActiveIndex()] || bankState.items[0] || null;
 }
 
 function practiceFrameUrl() {
@@ -841,7 +851,7 @@ function renderPracticePane() {
   const status = $('bankPagePracticeStatus');
   const placeholder = $('bankPagePracticePlaceholder');
   const frame = $('bankPagePracticeFrame');
-  const item = selectedItem();
+  const item = bankState.practiceLoaded ? practiceItem() : selectedItem();
   if (!summary || !status || !placeholder || !frame) return;
   if (!bankState.items.length) {
     summary.textContent = bankState.loading ? '문제은행 목록을 불러온 뒤 시험형 풀이 화면을 준비합니다.' : '표시할 문제가 없습니다.';
@@ -852,7 +862,7 @@ function renderPracticePane() {
     applyPracticeViewState();
     return;
   }
-  const start = selectedIndex(bankState.practiceStartIndex);
+  const start = bankState.practiceLoaded ? practiceActiveIndex() : selectedIndex(bankState.practiceStartIndex);
   summary.textContent = `현재 목록 ${bankState.items.length}문항 · ${start + 1}번부터 풀이 중 · ${selectedPrompt(item, `문제 ${start + 1}`).slice(0, 58)}`;
   status.innerHTML = [
     `<span class="question-bank-practice-pill">현재 ${escapeHtml(`${start + 1} / ${bankState.items.length}`)}</span>`,
@@ -914,6 +924,7 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
   const frame = $('bankPagePracticeFrame');
   bankState.selectedId = String(bankState.items[safeStart]?.question_bank_id || '');
+  bankState.practiceActiveId = bankState.selectedId;
   bankState.practiceLoaded = true;
   bankState.practiceStartIndex = safeStart;
   if (reveal) setPracticeCollapsed(false);
@@ -936,7 +947,7 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
 function launch(startIndex = 0, {reveal = true} = {}) {
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
   const targetId = String(bankState.items[safeStart]?.question_bank_id || '');
-  const currentId = String(bankState.selectedId || '');
+  const currentId = String(bankState.practiceActiveId || '');
   if (bankState.practiceLoaded && targetId && targetId === currentId) {
     if (reveal) setPracticeCollapsed(false);
     ensureSelectedRowVisible();
@@ -962,6 +973,7 @@ async function loadQuestionBankPage() {
   const controller = typeof window.AbortController === 'function' ? new window.AbortController() : null;
   questionBankLoadAbortController = controller;
   const selectedIdBeforeRequest = String(bankState.selectedId || '');
+  const practiceActiveIdBeforeRequest = String(bankState.practiceActiveId || '');
   bankState.loading = true;
   bankState.error = '';
   syncUrl();
@@ -981,18 +993,28 @@ async function loadQuestionBankPage() {
     const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === targetSelectedId);
     bankState.selectedId = String(bankState.items[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
     bankState.practiceStartIndex = nextIndex >= 0 ? nextIndex : 0;
+    const preservingHiddenPractice = bankState.practiceLoaded && bankState.practiceCollapsed && !pendingPracticeLaunch;
     if (!bankState.items.length) {
       pendingPracticeLaunch = null;
-      bankState.practiceLoaded = false;
+      if (!preservingHiddenPractice) {
+        bankState.practiceLoaded = false;
+        bankState.practiceActiveId = '';
+      }
     } else if (pendingPracticeLaunch) {
       const launchRequest = pendingPracticeLaunch;
       pendingPracticeLaunch = null;
       applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal});
     } else if (bankState.practiceLoaded && nextIndex < 0) {
-      bankState.practiceLoaded = false;
-      bankState.practiceCollapsed = true;
+      if (preservingHiddenPractice) {
+        bankState.practiceActiveId = practiceActiveIdBeforeRequest;
+      } else {
+        bankState.practiceLoaded = false;
+        bankState.practiceActiveId = '';
+        bankState.practiceCollapsed = true;
+      }
     } else {
       pendingPracticeLaunch = null;
+      if (bankState.practiceLoaded && !bankState.practiceActiveId) bankState.practiceActiveId = practiceActiveIdBeforeRequest || bankState.selectedId;
     }
   } catch (error) {
     if (error?.name === 'AbortError' || requestId !== activeQuestionBankLoadRequest) return;
@@ -1005,6 +1027,7 @@ async function loadQuestionBankPage() {
     bankState.error = error.message || String(error);
     pendingPracticeLaunch = null;
     bankState.practiceLoaded = false;
+    bankState.practiceActiveId = '';
   } finally {
     if (requestId !== activeQuestionBankLoadRequest) return;
     if (questionBankLoadAbortController === controller) {
