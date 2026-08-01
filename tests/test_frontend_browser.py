@@ -852,6 +852,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 """
                 ({ launchKey, payload }) => {
                   window.__cardsFetchStarted = 0;
+                  window.__cardsFetchResolved = 0;
                   window.__releaseCardsFetch = null;
                   const originalFetch = window.fetch.bind(window);
                   const pendingCardsFetch = new Promise((resolve) => {
@@ -863,7 +864,10 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                     const parsed = new URL(url, window.location.origin);
                     if (parsed.pathname === '/api/cards') {
                       window.__cardsFetchStarted += 1;
-                      return pendingCardsFetch.then(() => originalFetch(input, init));
+                      return pendingCardsFetch.then(() => {
+                        window.__cardsFetchResolved += 1;
+                        return originalFetch(input, init);
+                      });
                     }
                     return originalFetch(input, init);
                   };
@@ -879,11 +883,15 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['question_prompt'] = await page.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
             self.assertIn('embed bootstrap prompt', case['question_prompt'])
             await page.evaluate('window.__releaseCardsFetch()')
-            await page.waitForFunction("document.getElementById('frontTerm').textContent && document.getElementById('frontTerm').textContent !== '로딩 중...'")
+            await page.waitForFunction('window.__cardsFetchResolved === 1')
+            await page.waitForFunction("document.getElementById('questionPanel') && document.getElementById('questionPanel').hidden === false")
+            case['question_panel_hidden_after_cards_fetch'] = await page.evaluate("document.getElementById('questionPanel')?.hidden ?? true")
+            case['question_prompt_after_cards_fetch'] = await page.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertFalse(case['question_panel_hidden_after_cards_fetch'])
+            self.assertIn('embed bootstrap prompt', case['question_prompt_after_cards_fetch'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-embed-bootstrap', status=status, observations=case)
-            await page.close()
             await page.close()
     async def test_question_bank_category_guide_traps_focus_and_restores_opener(self):
         case = {'path': '/question-bank'}
