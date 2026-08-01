@@ -66,23 +66,54 @@ if [[ -n "${CS_FLASHCARDS_REMOTE_DB_PATH:-}" && "$CS_FLASHCARDS_REMOTE_DB_PATH" 
   exit 1
 fi
 
-
-mkdir -p "$(dirname "$OUTPUT_PATH")" "$BACKUP_DIR"
-if [[ -f "$OUTPUT_PATH" ]]; then
-  cp "$OUTPUT_PATH" "$BACKUP_DIR/progress-before-pull-$(date +%Y%m%dT%H%M%S).sqlite"
-fi
-
 TMP_FILE="$(mktemp -t cs-flashcards-remote-db.XXXXXX.sqlite)"
 cleanup() {
   rm -f "$TMP_FILE"
 }
 trap cleanup EXIT
 
+validate_downloaded_sqlite() {
+  python3 - "$1" <<'PY'
+import sqlite3
+import sys
+
+path = sys.argv[1]
+
+try:
+    conn = sqlite3.connect(f'file:{path}?mode=ro', uri=True)
+    try:
+        conn.execute('PRAGMA schema_version').fetchone()
+        table_exists = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='cards'"
+        ).fetchone()
+        if table_exists is None:
+            raise RuntimeError('cards table이 없습니다.')
+        card_count = conn.execute('SELECT COUNT(*) FROM cards').fetchone()[0]
+        if card_count <= 0:
+            raise RuntimeError('cards 테이블이 비어 있습니다.')
+    finally:
+        conn.close()
+except Exception as exc:
+    print(f'다운로드한 SQLite 검증에 실패했습니다: {exc}', file=sys.stderr)
+    sys.exit(1)
+PY
+}
+
 SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new)
 "${SCP[@]}" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DB_PATH" "$TMP_FILE"
+if ! validate_downloaded_sqlite "$TMP_FILE"; then
+  echo "기존 로컬 SQLite는 유지됩니다: $OUTPUT_PATH" >&2
+  exit 1
+fi
+
+mkdir -p "$(dirname "$OUTPUT_PATH")" "$BACKUP_DIR"
+if [[ -f "$OUTPUT_PATH" ]]; then
+  cp "$OUTPUT_PATH" "$BACKUP_DIR/progress-before-pull-$(date +%Y%m%dT%H%M%S).sqlite"
+fi
+
 mv "$TMP_FILE" "$OUTPUT_PATH"
 
-python3 - <<'PY' "$OUTPUT_PATH"
+python3 - "$OUTPUT_PATH" <<'PY'
 import json
 import os
 import sqlite3
