@@ -786,6 +786,7 @@ class WikiImageRegenerateRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     image_index: int = Field(ge=0, le=20000)
     format: str = Field(default="png", max_length=16)
+    prompt_override: str = Field(default="", max_length=20000)
 
 
 class CardAiRewriteRequest(BaseModel):
@@ -5520,6 +5521,30 @@ def wiki_markdown_image_format(href: str) -> str:
 
 
 
+def wiki_image_context_excerpt(lines: list[str], line_number: int, *, window: int = 6) -> str:
+    parts: list[str] = []
+    start = max(0, line_number - 1 - window)
+    end = min(len(lines), line_number + 2 + window)
+    for index in range(start, end):
+        if index in {line_number - 1, line_number, line_number + 1}:
+            continue
+        stripped = lines[index].strip()
+        if not stripped:
+            continue
+        if stripped.startswith('![') or stripped.startswith('> 그림:') or stripped.startswith('> 출처:'):
+            continue
+        stripped = re.sub(r'^#+\s*', '', stripped)
+        stripped = re.sub(r'`([^`]*)`', r'\1', stripped)
+        stripped = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', stripped)
+        stripped = re.sub(r'\*\*([^*]+)\*\*', r'\1', stripped)
+        stripped = re.sub(r'\*([^*]+)\*', r'\1', stripped)
+        stripped = re.sub(r'\s+', ' ', stripped).strip()
+        if stripped:
+            parts.append(stripped)
+    return normalized_card_text(' '.join(parts), limit=1200)
+
+
+
 def parse_wiki_markdown_images(markdown_text: str, repo_dir: Path, current_source: Path) -> list[dict[str, Any]]:
     lines = markdown_text.splitlines()
     section_by_line: dict[int, str] = {}
@@ -5551,6 +5576,7 @@ def parse_wiki_markdown_images(markdown_text: str, repo_dir: Path, current_sourc
             "src": rewrite_markdown_href(repo_dir, current_source, href),
             "caption": caption,
             "source_note": source_note,
+            "context_excerpt": wiki_image_context_excerpt(lines, line_number),
             "section_title": section_by_line.get(line_number, current_source.stem),
             "format": wiki_markdown_image_format(href),
         })
@@ -5581,39 +5607,66 @@ def wiki_generated_image_asset_relative_path(source_relative: str, image_index: 
 
 
 
+def wiki_image_focus_subject(page_title: str, image: dict[str, Any]) -> str:
+    caption = normalized_card_text(image.get("caption", ""), limit=240)
+    alt = normalized_card_text(image.get("alt", ""), limit=200)
+    section_title = normalized_card_text(image.get("section_title", ""), limit=200)
+    return caption or alt or section_title or page_title
+
+
+
 def wiki_png_image_prompt(page_title: str, image: dict[str, Any]) -> str:
+    focus_subject = wiki_image_focus_subject(page_title, image)
     section_title = normalized_card_text(image.get("section_title", ""), limit=200)
     alt = normalized_card_text(image.get("alt", ""), limit=400)
     caption = normalized_card_text(image.get("caption", ""), limit=800)
     source_note = normalized_card_text(image.get("source_note", ""), limit=500)
+    context_excerpt = normalized_card_text(image.get("context_excerpt", ""), limit=1200)
     return (
         "Create a clean, minimal educational concept illustration for a Korean CS wiki page. "
         "No text, no letters, no labels, no UI, no watermark, no logo, no border, no collage. "
         "Use a simple single-scene composition with soft modern colors and high clarity. "
+        f"Primary subject: {focus_subject}. "
         f"Page title: {page_title}. "
         f"Section: {section_title or page_title}. "
         f"Image alt: {alt or page_title}. "
         f"Caption: {caption}. "
         f"Source note: {source_note}. "
-        "Visualize the core mechanism or mental model so a learner can understand it at a glance. "
+        f"Local content context: {context_excerpt}. "
+        "Visualize the real mechanism or mental model described by the local content context so a learner can understand it at a glance. "
         "Prefer a neutral academic diagram-like illustration, but rendered as a polished image rather than literal text diagram."
     )
 
 
 
 def wiki_gif_image_prompt(page_title: str, image: dict[str, Any]) -> str:
+    focus_subject = wiki_image_focus_subject(page_title, image)
     section_title = normalized_card_text(image.get("section_title", ""), limit=200)
     alt = normalized_card_text(image.get("alt", ""), limit=400)
     caption = normalized_card_text(image.get("caption", ""), limit=800)
+    source_note = normalized_card_text(image.get("source_note", ""), limit=500)
+    context_excerpt = normalized_card_text(image.get("context_excerpt", ""), limit=1200)
     return (
-        "Create a clean, minimal educational concept illustration for a Korean CS wiki page that implies a short looping process. "
-        "No text, no letters, no labels, no UI, no watermark, no logo, no border, no collage. "
-        "Use a centered single-scene composition with soft modern colors, clear depth cues, and 3 to 4 implied motion stages. "
-        f"Page title: {page_title}. "
-        f"Section: {section_title or page_title}. "
-        f"Image alt: {alt or page_title}. "
-        f"Caption: {caption}. "
-        "Visualize the process so it can be converted into a subtle looping educational GIF with clear progression at a glance."
+        f"{focus_subject}을 설명하는 학습용 GIF를 만들어줘.\n\n"
+        "요구사항:\n"
+        "- 설명문보다 움직임만 보고 작동 원리가 직관적으로 이해되게 만들어.\n"
+        "- 텍스트/자막은 최소화.\n"
+        "- 한 번 보면 ‘아, 이렇게 동작하는구나’가 바로 와야 해.\n"
+        "- 정적인 인포그래픽 말고 실제 looping GIF로 만들어.\n"
+        "- 핵심 상태 변화가 분명히 보여야 해. (예: push/pop, enqueue/dequeue, 탐색 순서, split, swap, relax 등)\n"
+        "- 모바일/위키 본문 폭에서도 식별 가능하게 만들어.\n"
+        "- active 요소는 색상/강조로 분명히 보여줘.\n"
+        "- 아래 문맥에 없는 임의의 메커니즘은 만들지 말고, 실제 설명된 단계/상태 변화만 시각화해.\n\n"
+        "문맥:\n"
+        f"- 문서 제목: {page_title}\n"
+        f"- 섹션: {section_title or page_title}\n"
+        f"- 그림 대체텍스트: {alt or page_title}\n"
+        f"- 그림 설명: {caption}\n"
+        f"- 인접 본문 요약: {context_excerpt}\n"
+        f"- 출처 메모: {source_note}\n\n"
+        "의도:\n"
+        "- 시험/면접용 학습 자료라서 긴 설명보다 동작 구조를 한눈에 이해시키는 게 목적이야.\n"
+        "- ‘설명’이 아니라 ‘상태 변화 시각화’에 집중해."
     )
 
 
@@ -5643,16 +5696,19 @@ def validate_generated_wiki_svg(svg_text: str) -> str:
 
 
 
-def generate_wiki_svg_markup(page_title: str, image: dict[str, Any]) -> str:
+def generate_wiki_svg_markup(page_title: str, image: dict[str, Any], *, prompt_override: str = "") -> str:
     section_title = normalized_card_text(image.get("section_title", ""), limit=200)
     alt = normalized_card_text(image.get("alt", ""), limit=400)
     caption = normalized_card_text(image.get("caption", ""), limit=800)
     source_note = normalized_card_text(image.get("source_note", ""), limit=500)
+    context_excerpt = normalized_card_text(image.get("context_excerpt", ""), limit=1200)
+    custom_prompt = normalized_card_text(prompt_override, limit=12000)
     parsed = request_codex_json_object(
         (
             "You design valid standalone SVG illustrations. Return only one JSON object with the key svg. "
             "The svg value must be a complete standalone SVG string sized for a square canvas. "
-            "Use only safe SVG elements and attributes. Do not use script, foreignObject, iframe, external href, CSS imports, fonts, or text."
+            "Use only safe SVG elements and attributes. Do not use script, foreignObject, iframe, external href, CSS imports, fonts, or text. "
+            "When custom_prompt is provided, follow it as the highest-priority visual brief while still obeying all SVG safety constraints."
         ),
         {
             "page": {
@@ -5663,7 +5719,9 @@ def generate_wiki_svg_markup(page_title: str, image: dict[str, Any]) -> str:
                 "alt": alt,
                 "caption": caption,
                 "source_note": source_note,
+                "context_excerpt": context_excerpt,
             },
+            "custom_prompt": custom_prompt,
             "style": {
                 "tone": "clean minimal educational concept illustration",
                 "constraints": [
@@ -5775,13 +5833,14 @@ def regenerate_wiki_image_asset(
         raise ValueError(f"위키 이미지 인덱스를 찾지 못했습니다: {payload.image_index}")
     image = images[payload.image_index]
     image_format = normalized_wiki_image_format(payload.format)
+    prompt_override = normalized_card_text(payload.prompt_override, limit=20000)
     page_title = extract_markdown_title(current_content, target.stem)
     if image_format == "svg":
-        asset_bytes = generate_wiki_svg_markup(page_title, image).encode("utf-8")
+        asset_bytes = generate_wiki_svg_markup(page_title, image, prompt_override=prompt_override).encode("utf-8")
     elif image_format == "gif":
-        asset_bytes = subtle_loop_gif_from_png(request_openai_generated_image_bytes(wiki_gif_image_prompt(page_title, image)))
+        asset_bytes = subtle_loop_gif_from_png(request_openai_generated_image_bytes(prompt_override or wiki_gif_image_prompt(page_title, image)))
     else:
-        asset_bytes = request_openai_generated_image_bytes(wiki_png_image_prompt(page_title, image))
+        asset_bytes = request_openai_generated_image_bytes(prompt_override or wiki_png_image_prompt(page_title, image))
     asset_relative_path = wiki_generated_image_asset_relative_path(source_relative, payload.image_index, image_format)
     asset_saved = upsert_wiki_binary_asset(
         asset_relative_path,

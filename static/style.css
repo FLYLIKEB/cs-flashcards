@@ -6772,6 +6772,56 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   line-height: 1.2;
 }
 
+.wiki-inline-image-edit-btn {
+  min-width: 1.8rem;
+  padding: .16rem .44rem;
+  font-size: .7rem;
+  line-height: 1.2;
+}
+
+.wiki-inline-image-prompt-editor {
+  margin-top: .45rem;
+  display: grid;
+  gap: .4rem;
+  padding: .6rem;
+  border: 1px solid var(--wiki-border-soft);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, .08);
+}
+
+.wiki-inline-image-prompt-label {
+  font-size: .74rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.wiki-inline-image-prompt-textarea {
+  width: min(34rem, 100%);
+  min-height: 9rem;
+  padding: .55rem .65rem;
+  border: 1px solid var(--wiki-border-soft);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.wiki-inline-image-prompt-hint,
+.wiki-inline-image-prompt-status {
+  margin: 0;
+  font-size: .7rem;
+  color: var(--muted);
+}
+
+.wiki-inline-image-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+}
+
 .wiki-article blockquote {
   margin-left: 0;
   padding: .82rem 1rem;

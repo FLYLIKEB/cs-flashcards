@@ -36,10 +36,11 @@ def write_wiki_book(root: Path) -> Path:
     (book / 'TOC.md').write_text('# 목차\n\n- [소개 문서](pages/intro.md)\n', encoding='utf-8')
     (pages / 'intro.md').write_text(
         '# 소개 문서\n\n'
+        '큐는 먼저 들어온 데이터가 먼저 나가는 구조다.\n'
         '![기존 그림](https://example.com/old.png)\n'
         '> 그림: 큐 처리 흐름을 간단히 보여준다.\n'
         '> 출처: 예시 출처\n\n'
-        '원본 본문입니다.\n',
+        'enqueue 후 dequeue 순서를 단계별로 확인한다.\n',
         encoding='utf-8',
     )
     return book
@@ -105,6 +106,19 @@ class WikiAiRewriteTests(unittest.TestCase):
             self.assertEqual(page['images'][0]['alt'], '기존 그림')
             self.assertEqual(page['images'][0]['format'], 'png')
             self.assertIn('https://example.com/old.png', page['images'][0]['src'])
+            self.assertIn('먼저 들어온 데이터', page['images'][0]['context_excerpt'])
+
+    def test_wiki_gif_image_prompt_uses_skill_style_and_context(self):
+        prompt = flashcard_app.wiki_gif_image_prompt('소개 문서', {
+            'section_title': '큐',
+            'alt': '큐 처리 흐름',
+            'caption': '큐 처리 흐름을 간단히 보여준다.',
+            'context_excerpt': 'enqueue 후 dequeue 순서를 단계별로 확인한다.',
+            'source_note': '예시 출처',
+        })
+        self.assertIn('설명문보다 움직임만 보고 작동 원리가 직관적으로 이해되게 만들어.', prompt)
+        self.assertIn('정적인 인포그래픽 말고 실제 looping GIF로 만들어.', prompt)
+        self.assertIn('enqueue 후 dequeue 순서', prompt)
 
     def test_api_wiki_image_regenerate_png_updates_local_markdown_and_asset(self):
         with tempfile.TemporaryDirectory() as td:
@@ -135,6 +149,36 @@ class WikiAiRewriteTests(unittest.TestCase):
                 asset_path = book / data['updated']['asset_relative_path']
                 self.assertEqual(asset_path.read_bytes(), png_bytes)
                 self.assertIn('/api/wiki/raw/assets/generated-wiki-ai/', data['page']['html'])
+            finally:
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
+                flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_api_wiki_image_regenerate_png_uses_prompt_override(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                png_bytes = b'\x89PNG\r\n\x1a\npng-preview'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'data': [{'b64_json': base64.b64encode(png_bytes).decode('ascii')}],
+                    }),
+                ) as urlopen_mock:
+                    flashcard_app.api_wiki_image_regenerate(
+                        flashcard_app.WikiImageRegenerateRequest(
+                            source_path='pages/intro.md',
+                            image_index=0,
+                            format='png',
+                            prompt_override='CUSTOM PNG PROMPT',
+                        )
+                    )
+                payload = json.loads(urlopen_mock.call_args.args[0].data.decode('utf-8'))
+                self.assertEqual(payload['prompt'], 'CUSTOM PNG PROMPT')
             finally:
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
                 flashcard_app.OPENAI_API_KEY = original_key
