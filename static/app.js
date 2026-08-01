@@ -4731,6 +4731,10 @@ function syncUpdatedQuestionBankItem(item, {reloadOnFilterMismatch = true} = {})
     if (item.question_attempt_status) current.questionAttemptStatus = String(item.question_attempt_status || current.questionAttemptStatus || 'unseen');
   });
   if (state.questionBankOpen) {
+    if (reloadOnFilterMismatch && !nextBankItem) {
+      loadQuestionBankBrowser().catch(() => {});
+      return;
+    }
     if (reloadOnFilterMismatch && nextBankItem && !questionBankItemMatchesAttemptStatusFilter(nextBankItem)) {
       loadQuestionBankBrowser().catch(() => {});
       return;
@@ -4941,6 +4945,9 @@ async function importQuestionsFromText() {
     closeQuestionImportDialog();
     renderQuestionPanel();
     setMessage(`가져온 모의 세트 ${questions.length}문항을 불러왔습니다.`);
+    state.questionBankItems = [];
+    if (state.questionBankOpen && !state.questionBankLoading) loadQuestionBankBrowser().catch(() => {});
+
   } catch (error) {
     setQuestionImportError(error.message || String(error));
   } finally {
@@ -5169,10 +5176,11 @@ function toggleQuestionBankBrowser(force = !state.questionBankOpen) {
   const next = Boolean(force);
   state.questionBankOpen = next;
   renderQuestionBankBrowser();
-  if (next && !state.questionBankItems.length && !state.questionBankLoading) {
+  if (next && !state.questionBankLoading) {
     loadQuestionBankBrowser().catch(() => {});
   }
 }
+
 
 
 function hydrateQuestionState(question) {
@@ -6013,6 +6021,8 @@ async function generateQuestionsFromCurrentFilter() {
           seed,
         })).questions || [];
     prepareQuestionSession(questions.map((item) => hydrateQuestionState({...item})), {mode});
+    state.questionBankItems = [];
+    if (state.questionBankOpen && !state.questionBankLoading) loadQuestionBankBrowser().catch(() => {});
     setMessage(questionSessionIsBok(mode) ? '한국은행 모의 세트 9문항 생성 완료' : `모의 세트 ${state.questions.length}문항 생성 완료`);
   } catch (error) {
     state.questions = [];
