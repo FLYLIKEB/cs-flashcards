@@ -240,12 +240,12 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
 
 응답에 아래 값이 포함되어야 합니다.
 
+```json
 {
   "ok": true,
   "content_db_exists": true,
   "progress_db_exists": true,
   "progress_db_path": "/home/ubuntu/cs-flashcards/state/progress.sqlite",
-  "wiki_book_exists": true,
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
   "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book",
@@ -259,6 +259,13 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
 curl --user "cs:비밀번호" https://cs.chamung.com/api/cards
 ```
 
+문제은행/런타임 DB를 건드렸다면 여기서 끝내면 안 됩니다.
+
+- `state/progress.sqlite` 변경은 **GitHub push**와 **실서버 반영 확인**을 둘 다 끝내야 완료입니다.
+- 배포 후에는 `/api/health`만 보지 말고, 변경한 레코드를 `/api/question-bank`, `/api/cards` 같은 인증된 API로 직접 조회해 값이 맞는지 확인합니다.
+- 원격 DB가 비어 있거나 오래된 값이면 즉시 로컬의 정상 `state/progress.sqlite`를 서버로 복구하고 서비스를 재시작한 뒤 다시 검증합니다.
+- `state/progress.sqlite`는 운영 정본이라 의도적으로 바꿨다면 커밋 대상에서 빼지 말고 명시적으로 stage/add 합니다. `.gitignore` 때문에 필요하면 `git add -f state/progress.sqlite`를 사용합니다.
+
 ## O/X 원복 방지 체크리스트
 
 콘텐츠를 수정하거나 개념을 추가하기 전후로 아래만 지키면 됩니다.
@@ -267,5 +274,5 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/cards
 - [ ] 삭제한 `id`를 새 개념에 재사용하지 않는다.
 - [ ] 새 개념에는 새 `CS-xxx`를 부여한다.
 - [ ] `card_progress`의 `known_status`, `last_reviewed`, `review_count`를 콘텐츠 수정용으로 직접 관리하지 않는다.
-- [ ] `state/progress.sqlite`는 Git에 커밋하지 않는다.
+- [ ] `state/progress.sqlite`를 의도적으로 수정했다면 커밋·배포·인증된 원격 API 검증까지 한 번에 끝낸다.
 - [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`를 확인한다.
