@@ -11,7 +11,8 @@ Use this skill to run a repo-wide optimization loop without stepping on already-
 ## Hard gates
 
 - Never start a new optimization round while any GitHub issue is still open, any GitHub PR is still open, or any issue-train/worktree created for active issue work still exists.
-- When the gate is closed, record the blocking evidence first and wait. Do not create new issues, branches, worktrees, PRs, or review noise for the next round.
+- A blocked readiness check is not completion. It is a background wait state.
+- When the gate is closed, record the blocking evidence first and keep waiting in the background. Do not create new issues, branches, worktrees, PRs, or review noise for the next round until the gate opens.
 - Keep the main agent terse. Put detailed evidence in artifacts, issue bodies, PR bodies, and review comments instead of chat.
 - Use separate backend and frontend tracks when both surfaces need work. Frontend review must include UI/UX polish candidates, not only correctness bugs.
 - Every implementation track must use its own worktree/branch and its own Korean PR title/body.
@@ -33,7 +34,17 @@ Use this skill to run a repo-wide optimization loop without stepping on already-
    ```bash
    git worktree list --porcelain
    ```
-4. If any of the above show in-flight work, write a compact status artifact with the blocker summary and stop there for this round.
+4. If any of the above show in-flight work, write a compact status artifact with the blocker summary and stay in the wait loop instead of treating the round as finished.
+
+## Wait loop
+
+A blocked repository is a polling state, not a terminal state.
+
+1. Run the readiness check immediately when the skill starts.
+2. If blockers remain, persist the latest blocker snapshot to `artifacts/auto-optimization-readiness.json`.
+3. Stay alive in the background and re-run the readiness check repeatedly.
+4. Keep repeating until there are zero blocking open issues, zero blocking open PRs, and zero blocking issue/wave worktrees.
+5. The moment the gate opens, start the optimization round automatically without waiting for a new manual trigger.
 
 ## Optimization round
 
@@ -58,7 +69,10 @@ Run this only when the readiness check is clean.
    - If the diff is clean, approve it.
 9. Merge approved PRs.
 10. After merge, delete the finished worktree/branch if safe and close the linked issue.
-11. Re-run the readiness check. If clean, start the next optimization round. If no worthwhile candidates remain, stop.
+11. Re-run the readiness check.
+12. If blockers remain again, return to the wait loop and keep polling in the background.
+13. If the gate is still clean, start the next optimization round immediately.
+14. If no worthwhile candidates remain, stop.
 
 ## Review lane contract
 
@@ -85,10 +99,20 @@ Treat the loop as done only when all are true:
 - `artifacts/auto-optimization-audit-<round>.md`
 - `artifacts/auto-optimization-merge-log.jsonl`
 
+## Ultragoal persistence rule
+
+When this skill runs under Ultragoal:
+
+- do not let the run die just because the readiness gate is blocked;
+- do not treat the wait artifact as terminal success;
+- do not complete the Ultragoal while open issues, open PRs, or blocking worktrees still mean the next optimization round has not started yet;
+- keep the aggregate objective active and keep repeating the wait-loop → optimization-round cycle until the 95% completion heuristic is truly satisfied;
+- only then create the final completion checkpoint and reconcile the inline goal as complete.
+
 ## Self-realization rule
 
 When this skill is invoked by the leader itself:
 
 - run the readiness check immediately;
-- if blocked, persist the wait evidence and exit the round without spawning new optimization work;
+- if blocked, persist the wait evidence, stay in the background wait loop, and keep re-checking until the gate opens;
 - if unblocked, begin with issue creation before any implementation delegation.
