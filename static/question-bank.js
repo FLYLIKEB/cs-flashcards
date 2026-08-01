@@ -44,6 +44,38 @@ const bankState = {
 
 let pendingLoadTimer = 0;
 let categoryGuideLastFocused = null;
+const CATEGORY_GUIDE_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function canRestoreFocusToElement(element) {
+  return Boolean(
+    element
+    && typeof element.focus === 'function'
+    && element.isConnected !== false
+    && !element.hasAttribute?.('disabled')
+    && element.getAttribute?.('aria-hidden') !== 'true'
+    && !element.closest?.('[hidden], [aria-hidden="true"]')
+  );
+}
+
+function focusElement(element) {
+  if (!element || typeof element.focus !== 'function') return false;
+  try {
+    element.focus({preventScroll: true});
+    return true;
+  } catch (_error) {
+    try {
+      element.focus();
+      return true;
+    } catch (_error2) {
+      return false;
+    }
+  }
+}
+
+function categoryGuideFocusableElements(dialog) {
+  if (!dialog || dialog.hidden) return [];
+  return [...dialog.querySelectorAll(CATEGORY_GUIDE_FOCUSABLE_SELECTOR)].filter((element) => !element.hasAttribute('hidden') && !element.closest('[hidden]'));
+}
 let activeQuestionBankLoadRequest = 0;
 let questionBankLoadAbortController = null;
 
@@ -333,11 +365,13 @@ function renderCategoryGuideDialog() {
 function openCategoryGuideDialog() {
   const dialog = $('bankPageCategoryGuideDialog');
   if (!dialog) return;
-  categoryGuideLastFocused = document.activeElement;
+  categoryGuideLastFocused = canRestoreFocusToElement(document.activeElement) ? document.activeElement : null;
   renderCategoryGuideDialog();
   dialog.hidden = false;
   document.body.classList.add('question-bank-dialog-open');
-  $('bankPageCategoryGuideCloseBtn')?.focus();
+  window.setTimeout(() => {
+    focusElement($('bankPageCategoryGuideCloseBtn') || categoryGuideFocusableElements(dialog)[0] || dialog);
+  }, 0);
 }
 
 function closeCategoryGuideDialog({restoreFocus = true} = {}) {
@@ -345,8 +379,43 @@ function closeCategoryGuideDialog({restoreFocus = true} = {}) {
   if (!dialog || dialog.hidden) return;
   dialog.hidden = true;
   document.body.classList.remove('question-bank-dialog-open');
-  if (restoreFocus && categoryGuideLastFocused && typeof categoryGuideLastFocused.focus === 'function') categoryGuideLastFocused.focus();
+  const focusTarget = restoreFocus && canRestoreFocusToElement(categoryGuideLastFocused) ? categoryGuideLastFocused : null;
   categoryGuideLastFocused = null;
+  focusElement(focusTarget);
+}
+
+function trapTabKeyWithinCategoryGuideDialog(event) {
+  if (event.key !== 'Tab') return false;
+  const dialog = $('bankPageCategoryGuideDialog');
+  if (!dialog || dialog.hidden) return false;
+  const focusable = categoryGuideFocusableElements(dialog);
+  if (!focusable.length) {
+    event.preventDefault();
+    focusElement(dialog);
+    return true;
+  }
+  const currentIndex = focusable.findIndex((element) => element === document.activeElement);
+  const nextIndex = event.shiftKey
+    ? (currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1)
+    : (currentIndex < 0 || currentIndex === focusable.length - 1 ? 0 : currentIndex + 1);
+  const movingOutside = event.shiftKey ? document.activeElement === focusable[0] : document.activeElement === focusable[focusable.length - 1];
+  if (currentIndex < 0 || movingOutside) {
+    event.preventDefault();
+    focusElement(focusable[nextIndex]);
+    return true;
+  }
+  return false;
+}
+
+function handleOpenCategoryGuideDialogKeydown(event) {
+  const dialog = $('bankPageCategoryGuideDialog');
+  if (!dialog || dialog.hidden) return false;
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeCategoryGuideDialog();
+    return true;
+  }
+  return trapTabKeyWithinCategoryGuideDialog(event);
 }
 
 function fieldByKey(key) {
@@ -917,6 +986,9 @@ $('bankPageCategoryGuideCloseBtn')?.addEventListener('click', () => closeCategor
 $('bankPageCategoryGuideDialog')?.addEventListener('click', (event) => {
   if (event.target === event.currentTarget) closeCategoryGuideDialog();
 });
+$('bankPageCategoryGuideDialog')?.addEventListener('keydown', (event) => {
+  handleOpenCategoryGuideDialogKeydown(event);
+});
 $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollapsed(true));
 
 ['bankPageQueryInput', 'bankPageTopicInput', 'bankPageSourceInput', 'bankPageSectionInput'].forEach((id) => {
@@ -938,8 +1010,7 @@ $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollaps
   });
 });
 window.addEventListener('keydown', (event) => {
-  if (event.key !== 'Escape') return;
-  if ($('bankPageCategoryGuideDialog')?.hidden === false) closeCategoryGuideDialog();
+  handleOpenCategoryGuideDialogKeydown(event);
 });
 
 window.addEventListener('message', (event) => {
