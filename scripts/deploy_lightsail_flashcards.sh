@@ -168,7 +168,7 @@ append_env_line "CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX" "$WIKI_GITHUB_PATH_PREFI
 append_env_line "OPENAI_API_KEY" "$OPENAI_API_KEY_VALUE"
 
 mkdir -p "$TMP_STAGE/data"
-cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
+cp app.py flashcards_backend.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
 cp data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
 echo "원격 state/progress.sqlite 보호: 배포 번들에 SQLite 파일을 포함하지 않습니다."
@@ -230,26 +230,6 @@ print(values.get('CS_FLASHCARDS_WIKI_GITHUB_TOKEN', ''))
 PY
 )"
 
-env_path = Path(sys.argv[1])
-if not env_path.exists():
-    print("")
-    raise SystemExit(0)
-values: dict[str, str] = {}
-for raw_line in env_path.read_text(encoding='utf-8').splitlines():
-    line = raw_line.strip()
-    if not line or line.startswith('#') or '=' not in line:
-        continue
-    key, raw_value = line.split('=', 1)
-    key = key.strip()
-    raw_value = raw_value.strip()
-    if raw_value.startswith('"') and raw_value.endswith('"'):
-        value = ast.literal_eval(raw_value)
-    else:
-        value = raw_value
-    values[key] = value
-print(values.get('CS_FLASHCARDS_WIKI_GITHUB_TOKEN', ''))
-PY
-)"
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
