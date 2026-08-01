@@ -197,6 +197,12 @@ function persistedPracticeCollapsed() {
   }
 }
 
+function isReloadNavigation() {
+  return window.performance?.getEntriesByType?.('navigation')?.[0]?.type === 'reload';
+}
+
+let restorePracticePaneOnReload = isReloadNavigation() && !persistedPracticeCollapsed();
+
 function persistedFilterState() {
   try {
     const raw = window.localStorage.getItem(QUESTION_BANK_FILTER_STATE_KEY);
@@ -603,8 +609,7 @@ function applyFiltersFromState(filters = {}) {
 
 function restoreFilterState() {
   const storedState = persistedFilterState();
-  const navigationEntry = window.performance?.getEntriesByType?.('navigation')?.[0] || null;
-  if (navigationEntry?.type === 'reload' && storedState?.filters) {
+  if (isReloadNavigation() && storedState?.filters) {
     applyFiltersFromState(storedState.filters);
     return;
   }
@@ -996,6 +1001,7 @@ async function loadQuestionBankPage() {
     const preservingHiddenPractice = bankState.practiceLoaded && bankState.practiceCollapsed && !pendingPracticeLaunch;
     if (!bankState.items.length) {
       pendingPracticeLaunch = null;
+      restorePracticePaneOnReload = false;
       if (!preservingHiddenPractice) {
         bankState.practiceLoaded = false;
         bankState.practiceActiveId = '';
@@ -1003,7 +1009,11 @@ async function loadQuestionBankPage() {
     } else if (pendingPracticeLaunch) {
       const launchRequest = pendingPracticeLaunch;
       pendingPracticeLaunch = null;
+      restorePracticePaneOnReload = false;
       applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal});
+    } else if (restorePracticePaneOnReload && !bankState.practiceLoaded) {
+      restorePracticePaneOnReload = false;
+      applyPracticeLaunch(bankState.practiceStartIndex, {reveal: true});
     } else if (bankState.practiceLoaded && nextIndex < 0) {
       if (preservingHiddenPractice) {
         bankState.practiceActiveId = practiceActiveIdBeforeRequest;
