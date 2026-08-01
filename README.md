@@ -36,8 +36,8 @@ http://127.0.0.1:8000
   2. 프로젝트 내부 `wiki_book/`
   3. 기존 로컬 개발 경로 `../wikidocs-ebook`
 - Lightsail 배포 스크립트는 기본적으로 로컬 `../wikidocs-ebook`를 묶어서 서버의 `/home/ubuntu/cs-flashcards/wiki_book`으로 함께 배포합니다.
-- `CS_FLASHCARDS_WIKI_GITHUB_REPO`가 설정되어 있으면 서버에 위키 자동 동기화 타이머도 같이 설치됩니다. 기본값은 5분 주기이며 `CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES`로 조절할 수 있습니다.
-- 따라서 위키 레포에 push만 해도 별도 앱 재배포 없이 `/home/ubuntu/cs-flashcards/wiki_book`가 자동 갱신됩니다.
+- `CS_FLASHCARDS_WIKI_GITHUB_REPO`가 설정되어 있으면 배포 스크립트가 로컬 위키 대신 해당 GitHub 브랜치 HEAD를 내려받아 서버 `wiki_book`에 반영하고, 서버에도 같은 `CS_FLASHCARDS_WIKI_GITHUB_TOKEN`을 주입해 `/wiki` 수정이 GitHub 원본에 바로 반영되게 합니다. 토큰이 없으면 배포를 중단합니다. 기본값은 5분 주기이며 `CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES`로 조절할 수 있습니다.
+- 따라서 위키 레포에 push만 해도 별도 앱 재배포 없이 `/home/ubuntu/cs-flashcards/wiki_book`가 자동 갱신되고, 서버에서 AI/수정 버튼으로 바꾼 내용도 다음 배포에 덮어써지지 않습니다.
 - 다른 위치의 문서를 배포하려면 `CS_FLASHCARDS_WIKI_BOOK_SRC`를 지정합니다.
 - 위키 마크다운의 `- [ ]` / `- [x]` 체크리스트는 `/wiki`에서 실제 체크박스로 렌더링됩니다.
 - 체크를 누르면 배포된 `wiki_book` 마크다운이 바로 갱신됩니다.

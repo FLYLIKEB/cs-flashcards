@@ -76,6 +76,13 @@ if [[ -d "$WIKI_BOOK_SRC/.git" ]]; then
   fi
 fi
 WIKI_GITHUB_BRANCH="${WIKI_GITHUB_BRANCH:-main}"
+if [[ -n "$WIKI_GITHUB_REPO" && -z "$WIKI_GITHUB_TOKEN" ]] && command -v gh >/dev/null 2>&1; then
+  WIKI_GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
+fi
+if [[ -n "$WIKI_GITHUB_REPO" && -z "$WIKI_GITHUB_TOKEN" ]]; then
+  echo "CS_FLASHCARDS_WIKI_GITHUB_REPO 가 설정된 배포는 CS_FLASHCARDS_WIKI_GITHUB_TOKEN 또는 gh auth token 이 필요합니다." >&2
+  exit 1
+fi
 
 if [[ ! -f "${SSH_KEY:-}" && -f "/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem" ]]; then
   SSH_KEY="/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem"
@@ -125,14 +132,28 @@ if [[ "$FORCE_DB_REPLACE" == "1" ]]; then
 else
   echo "원격 state/progress.sqlite 보존: 일반 배포에서는 런타임 DB 전체 파일을 덮어쓰지 않습니다."
 fi
-if [[ -d "$WIKI_BOOK_SRC" ]]; then
-  echo "위키 문서 포함: $WIKI_BOOK_SRC"
+WIKI_PACKAGE_SRC="$WIKI_BOOK_SRC"
+if [[ -n "$WIKI_GITHUB_REPO" ]]; then
+  WIKI_CLONE_DIR="$TMP_STAGE/.wiki-source"
+  WIKI_AUTH_URL="https://x-access-token:${WIKI_GITHUB_TOKEN}@github.com/${WIKI_GITHUB_REPO}.git"
+  echo "위키 문서 포함: GitHub ${WIKI_GITHUB_REPO}@${WIKI_GITHUB_BRANCH}"
+  git clone --depth 1 --branch "$WIKI_GITHUB_BRANCH" "$WIKI_AUTH_URL" "$WIKI_CLONE_DIR" >/dev/null
+  WIKI_PACKAGE_SRC="$WIKI_CLONE_DIR"
+  if [[ -n "$WIKI_GITHUB_PATH_PREFIX" ]]; then
+    WIKI_PACKAGE_SRC="$WIKI_CLONE_DIR/$WIKI_GITHUB_PATH_PREFIX"
+  fi
+fi
+if [[ -d "$WIKI_PACKAGE_SRC" ]]; then
+  if [[ ! -f "$WIKI_PACKAGE_SRC/README.md" || ! -f "$WIKI_PACKAGE_SRC/TOC.md" || ! -d "$WIKI_PACKAGE_SRC/pages" ]]; then
+    echo "위키 문서 디렉터리 구조가 올바르지 않습니다: $WIKI_PACKAGE_SRC" >&2
+    exit 1
+  fi
   mkdir -p "$TMP_STAGE/wiki_book"
-  cp "$WIKI_BOOK_SRC/README.md" "$TMP_STAGE/wiki_book/README.md"
-  cp "$WIKI_BOOK_SRC/TOC.md" "$TMP_STAGE/wiki_book/TOC.md"
-  cp -R "$WIKI_BOOK_SRC/pages" "$TMP_STAGE/wiki_book/"
+  cp "$WIKI_PACKAGE_SRC/README.md" "$TMP_STAGE/wiki_book/README.md"
+  cp "$WIKI_PACKAGE_SRC/TOC.md" "$TMP_STAGE/wiki_book/TOC.md"
+  cp -R "$WIKI_PACKAGE_SRC/pages" "$TMP_STAGE/wiki_book/"
 else
-  echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 없이 배포합니다: $WIKI_BOOK_SRC"
+  echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 없이 배포합니다: $WIKI_PACKAGE_SRC"
 fi
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" -C "$TMP_STAGE" .
 rm -rf "$TMP_STAGE"
