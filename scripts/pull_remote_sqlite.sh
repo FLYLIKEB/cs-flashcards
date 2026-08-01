@@ -78,12 +78,34 @@ import sqlite3
 import sys
 
 path = sys.argv[1]
-required_tables = {
-    'cards',
-    'card_progress',
-    'question_bank',
-    'question_attempts',
-    'wiki_ai_jobs',
+required_schema = {
+    'cards': {
+        'card_id', 'term', 'english', 'category', 'alphabet_index', 'korean_initial',
+        'definition', 'detailed_explanation', 'related_concepts', 'source_files',
+        'exam_note', 'bok_appeared', 'importance', 'difficulty', 'concept_image_url',
+        'concept_image_alt', 'concept_media_type', 'concept_media_payload', 'sort_order', 'updated_at',
+    },
+    'card_progress': {
+        'card_id', 'known_status', 'last_reviewed', 'review_count', 'bookmarked', 'memo', 'memo_updated_at', 'updated_at',
+    },
+    'question_bank': {
+        'id', 'fingerprint', 'card_id', 'question_type', 'prompt', 'body', 'answer', 'explanation',
+        'rubric_json', 'choices_json', 'answer_index', 'topic', 'field_name', 'category',
+        'keywords_json', 'missing_card_keywords_json', 'difficulty', 'issuer', 'source_location',
+        'section', 'points', 'expected_time_seconds', 'answer_guide', 'session_mode', 'created_at', 'updated_at',
+    },
+    'question_attempts': {
+        'question_id', 'question_bank_id', 'card_id', 'question_type', 'prompt', 'body', 'user_answer',
+        'selected_choice_index', 'is_correct', 'judgment', 'wrong_note', 'session_id', 'session_title',
+        'session_mode', 'section', 'points', 'expected_time_seconds', 'answer_guide', 'question_order',
+        'question_elapsed_seconds', 'session_elapsed_seconds', 'time_limit_seconds', 'question_started_at',
+        'answered_at', 'created_at', 'updated_at',
+    },
+    'wiki_ai_jobs': {
+        'job_id', 'status', 'target', 'source_paths_json', 'format', 'prompt_template',
+        'include_existing_images', 'include_sections', 'image_index', 'section_index', 'queued_targets',
+        'processed_targets', 'requested_at', 'started_at', 'completed_at', 'message', 'error', 'updated_at',
+    },
 }
 
 try:
@@ -95,9 +117,16 @@ try:
             for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
             if row[0] and not str(row[0]).startswith('sqlite_')
         }
-        missing_tables = sorted(required_tables - table_names)
+        missing_tables = sorted(required_schema.keys() - table_names)
         if missing_tables:
             raise RuntimeError(f"앱 스키마 테이블이 누락되었습니다: {', '.join(missing_tables)}")
+        missing_columns = []
+        for table, required_columns in required_schema.items():
+            column_names = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+            for column in sorted(required_columns - column_names):
+                missing_columns.append(f'{table}.{column}')
+        if missing_columns:
+            raise RuntimeError(f"앱 스키마 컬럼이 누락되었습니다: {', '.join(missing_columns)}")
         card_count = conn.execute('SELECT COUNT(*) FROM cards').fetchone()[0]
         if card_count <= 0:
             raise RuntimeError('cards 테이블이 비어 있습니다.')
