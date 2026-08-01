@@ -81,6 +81,99 @@ if [[ -z "$(printf '%s' "$SQL_TEXT" | tr -d '[:space:]')" ]]; then
   exit 1
 fi
 
+validate_sql_text() {
+  python3 - "$1" <<'PY'
+import re
+import sys
+
+TRANSACTION_KEYWORDS = {'BEGIN', 'COMMIT', 'ROLLBACK', 'SAVEPOINT', 'RELEASE', 'END'}
+BOUNDARY_KEYWORDS = {'ATTACH', 'DETACH', 'PRAGMA'}
+
+
+def sanitize_sql(sql: str) -> str:
+    result: list[str] = []
+    index = 0
+    state = 'normal'
+    while index < len(sql):
+        char = sql[index]
+        nxt = sql[index + 1] if index + 1 < len(sql) else ''
+        if state == 'normal':
+            if char == "'":
+                state = 'single'
+                result.append(' ')
+            elif char == '"':
+                state = 'double'
+                result.append(' ')
+            elif char == '-' and nxt == '-':
+                state = 'line_comment'
+                result.extend((' ', ' '))
+                index += 1
+            elif char == '/' and nxt == '*':
+                state = 'block_comment'
+                result.extend((' ', ' '))
+                index += 1
+            else:
+                result.append(char)
+        elif state == 'single':
+            if char == "'":
+                if nxt == "'":
+                    result.extend((' ', ' '))
+                    index += 1
+                else:
+                    state = 'normal'
+                    result.append(' ')
+            else:
+                result.append('\n' if char == '\n' else ' ')
+        elif state == 'double':
+            if char == '"':
+                if nxt == '"':
+                    result.extend((' ', ' '))
+                    index += 1
+                else:
+                    state = 'normal'
+                    result.append(' ')
+            else:
+                result.append('\n' if char == '\n' else ' ')
+        elif state == 'line_comment':
+            if char == '\n':
+                state = 'normal'
+                result.append('\n')
+            else:
+                result.append(' ')
+        else:
+            if char == '*' and nxt == '/':
+                state = 'normal'
+                result.extend((' ', ' '))
+                index += 1
+            else:
+                result.append('\n' if char == '\n' else ' ')
+        index += 1
+    return ''.join(result)
+
+
+sql = sys.argv[1]
+sanitized = sanitize_sql(sql)
+for line in sanitized.splitlines():
+    if re.match(r'^[ \t]*\.', line):
+        print('sqlite dot-command는 허용되지 않습니다.', file=sys.stderr)
+        sys.exit(1)
+for statement in sanitized.split(';'):
+    tokens = re.findall(r'[A-Za-z_]+|\.', statement)
+    if not tokens:
+        continue
+    first = tokens[0].upper()
+    second = tokens[1].upper() if len(tokens) > 1 and tokens[1] != '.' else None
+    if first in TRANSACTION_KEYWORDS or (first == 'EXPLAIN' and second in TRANSACTION_KEYWORDS):
+        print('트랜잭션 제어 SQL은 허용되지 않습니다.', file=sys.stderr)
+        sys.exit(1)
+    if first in BOUNDARY_KEYWORDS or (first == 'EXPLAIN' and second in BOUNDARY_KEYWORDS):
+        print('SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.', file=sys.stderr)
+        sys.exit(1)
+PY
+}
+
+validate_sql_text "$SQL_TEXT"
+
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 
@@ -91,5 +184,93 @@ if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없습니다: $REMOTE_DB_PATH" >&2
   exit 1
 fi
+python3 - <<'PY' "$SQL_TEXT"
+import re
+import sys
+
+TRANSACTION_KEYWORDS = {'BEGIN', 'COMMIT', 'ROLLBACK', 'SAVEPOINT', 'RELEASE', 'END'}
+BOUNDARY_KEYWORDS = {'ATTACH', 'DETACH', 'PRAGMA'}
+
+
+def sanitize_sql(sql: str) -> str:
+    result: list[str] = []
+    index = 0
+    state = 'normal'
+    while index < len(sql):
+        char = sql[index]
+        nxt = sql[index + 1] if index + 1 < len(sql) else ''
+        if state == 'normal':
+            if char == "'":
+                state = 'single'
+                result.append(' ')
+            elif char == '"':
+                state = 'double'
+                result.append(' ')
+            elif char == '-' and nxt == '-':
+                state = 'line_comment'
+                result.extend((' ', ' '))
+                index += 1
+            elif char == '/' and nxt == '*':
+                state = 'block_comment'
+                result.extend((' ', ' '))
+                index += 1
+            else:
+                result.append(char)
+        elif state == 'single':
+            if char == "'":
+                if nxt == "'":
+                    result.extend((' ', ' '))
+                    index += 1
+                else:
+                    state = 'normal'
+                    result.append(' ')
+            else:
+                result.append('\n' if char == '\n' else ' ')
+        elif state == 'double':
+            if char == '"':
+                if nxt == '"':
+                    result.extend((' ', ' '))
+                    index += 1
+                else:
+                    state = 'normal'
+                    result.append(' ')
+            else:
+                result.append('\n' if char == '\n' else ' ')
+        elif state == 'line_comment':
+            if char == '\n':
+                state = 'normal'
+                result.append('\n')
+            else:
+                result.append(' ')
+        else:
+            if char == '*' and nxt == '/':
+                state = 'normal'
+                result.extend((' ', ' '))
+                index += 1
+            else:
+                result.append('\n' if char == '\n' else ' ')
+        index += 1
+    return ''.join(result)
+
+
+sql = sys.argv[1]
+sanitized = sanitize_sql(sql)
+for line in sanitized.splitlines():
+    if re.match(r'^[ \t]*\.', line):
+        print('sqlite dot-command는 허용되지 않습니다.', file=sys.stderr)
+        sys.exit(1)
+for statement in sanitized.split(';'):
+    tokens = re.findall(r'[A-Za-z_]+|\.', statement)
+    if not tokens:
+        continue
+    first = tokens[0].upper()
+    second = tokens[1].upper() if len(tokens) > 1 and tokens[1] != '.' else None
+    if first in TRANSACTION_KEYWORDS or (first == 'EXPLAIN' and second in TRANSACTION_KEYWORDS):
+        print('트랜잭션 제어 SQL은 허용되지 않습니다.', file=sys.stderr)
+        sys.exit(1)
+    if first in BOUNDARY_KEYWORDS or (first == 'EXPLAIN' and second in BOUNDARY_KEYWORDS):
+        print('SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.', file=sys.stderr)
+        sys.exit(1)
+PY
 printf 'BEGIN IMMEDIATE;\n%s\nCOMMIT;\n' "$SQL_TEXT" | sqlite3 -bail "$REMOTE_DB_PATH"
 REMOTE
