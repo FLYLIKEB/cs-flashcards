@@ -6,8 +6,10 @@ import hashlib
 import io
 import json
 import math
+import threading
 import xml.etree.ElementTree as ET
 
+from collections import deque
 from contextlib import closing
 import hmac
 import os
@@ -117,6 +119,13 @@ AI_IMAGE_ARTIFACT_RE = re.compile(
 WIKI_IMAGE_FORMATS = {"png", "svg", "gif"}
 WIKI_GENERATED_ASSET_DIR = PurePosixPath("assets/generated-wiki-ai")
 WIKI_MARKDOWN_IMAGE_RE = re.compile(r"!\[(?P<alt>[^\]]*)\]\((?P<href>[^)\n]+)\)")
+WIKI_AI_JOB_STATUS_VALUES = {"queued", "running", "completed", "failed"}
+WIKI_AI_JOB_TARGET_VALUES = {"single_image", "single_section", "page_batch"}
+WIKI_AI_JOB_LOCK = threading.Lock()
+WIKI_AI_JOB_QUEUE: deque[str] = deque()
+WIKI_AI_JOB_EVENT = threading.Event()
+WIKI_AI_JOBS: dict[str, dict[str, Any]] = {}
+WIKI_AI_WORKER_THREAD: threading.Thread | None = None
 
 DEFAULT_RECRUITMENT_SCHEDULE_PATH = ROOT / "data" / "recruitment_schedule_2026.json"
 RECRUITMENT_SCHEDULE_PATH = Path(
@@ -794,6 +803,17 @@ class WikiSectionImageGenerateRequest(BaseModel):
     section_index: int = Field(ge=0, le=20000)
     format: str = Field(default="png", max_length=16)
     prompt_override: str = Field(default="", max_length=20000)
+
+
+class WikiAiJobCreateRequest(BaseModel):
+    source_paths: list[str] = Field(min_length=1, max_length=200)
+    format: str = Field(default="png", max_length=16)
+    prompt_template: str = Field(default="", max_length=20000)
+    include_existing_images: bool = True
+    include_sections: bool = True
+    target: str = Field(default="page_batch", max_length=32)
+    image_index: int | None = Field(default=None, ge=0, le=20000)
+    section_index: int | None = Field(default=None, ge=0, le=20000)
 
 
 class CardAiRewriteRequest(BaseModel):
@@ -5528,6 +5548,26 @@ def wiki_markdown_image_format(href: str) -> str:
 
 
 
+def render_wiki_image_prompt_template(template_text: str, page_title: str, image: dict[str, Any]) -> str:
+    context = {
+        "page_title": str(page_title or "").strip() or "문서",
+        "section_title": str(image.get("section_title") or page_title or "").strip() or "문서",
+        "alt": str(image.get("alt") or page_title or "").strip() or "문서",
+        "caption": str(image.get("caption") or "").strip(),
+        "source_note": str(image.get("source_note") or "").strip(),
+        "context_excerpt": str(image.get("context_excerpt") or "").strip(),
+    }
+    context["focus_subject"] = str(
+        context["caption"] or context["alt"] or context["section_title"] or context["page_title"]
+    ).strip() or context["page_title"]
+
+    def replace(match: re.Match[str]) -> str:
+        return str(context.get(match.group(1).strip().lower(), "")).strip()
+
+    return re.sub(r"\{\{\s*([a-z_]+)\s*\}\}", replace, str(template_text or ""), flags=re.IGNORECASE).strip()
+
+
+
 def normalized_markdown_excerpt(lines: list[str], *, limit: int = 1200) -> str:
     parts: list[str] = []
     for line in lines:
@@ -5879,6 +5919,7 @@ def generate_wiki_svg_markup(page_title: str, image: dict[str, Any], *, prompt_o
 
 
 WIKI_GIF_FONT_CANDIDATES = (
+    STATIC_DIR / "fonts" / "NanumGothic-Regular.ttf",
     "/System/Library/Fonts/AppleSDGothicNeo.ttc",
     "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
     "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
@@ -6435,6 +6476,247 @@ def regenerate_wiki_image_asset(
 
 
 
+def execute_wiki_page_batch_generation(
+    source_path: str,
+    *,
+    image_format: str,
+    prompt_template: str,
+    include_existing_images: bool,
+    include_sections: bool,
+    repo_dir: Path | None = None,
+) -> dict[str, int]:
+    processed_images = 0
+    processed_sections = 0
+    normalized_template = str(prompt_template or "").strip()
+    if include_existing_images:
+        while True:
+            repo, target, _, current_content = resolve_wiki_markdown_source(source_path, repo_dir)
+            images = parse_wiki_markdown_images(current_content, repo, target)
+            if processed_images >= len(images):
+                break
+            page_title = extract_markdown_title(current_content, target.stem)
+            image = images[processed_images]
+            prompt_override = render_wiki_image_prompt_template(normalized_template, page_title, image) if normalized_template else ""
+            regenerate_wiki_image_asset(
+                WikiImageRegenerateRequest(
+                    source_path=source_path,
+                    image_index=processed_images,
+                    format=image_format,
+                    prompt_override=prompt_override,
+                ),
+                repo_dir,
+            )
+            processed_images += 1
+    if include_sections:
+        while True:
+            repo, target, _, current_content = resolve_wiki_markdown_source(source_path, repo_dir)
+            sections = parse_wiki_markdown_sections(current_content, repo, target)
+            if processed_sections >= len(sections):
+                break
+            page_title = extract_markdown_title(current_content, target.stem)
+            section = sections[processed_sections]
+            prompt_override = render_wiki_image_prompt_template(normalized_template, page_title, section) if normalized_template else ""
+            generate_wiki_section_image_asset(
+                WikiSectionImageGenerateRequest(
+                    source_path=source_path,
+                    section_index=processed_sections,
+                    format=image_format,
+                    prompt_override=prompt_override,
+                ),
+                repo_dir,
+            )
+            processed_sections += 1
+    return {"images": processed_images, "sections": processed_sections}
+
+
+
+def normalize_wiki_ai_job_request(payload: WikiAiJobCreateRequest) -> dict[str, Any]:
+    source_paths = []
+    seen: set[str] = set()
+    for value in payload.source_paths:
+        normalized = str(value or "").strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        source_paths.append(normalized)
+    if not source_paths:
+        raise ValueError("처리할 위키 문서를 하나 이상 선택하세요.")
+    target = str(payload.target or "page_batch").strip().lower() or "page_batch"
+    if target not in WIKI_AI_JOB_TARGET_VALUES:
+        raise ValueError("지원하지 않는 위키 AI 작업 종류입니다.")
+    if target == "single_image" and payload.image_index is None:
+        raise ValueError("단일 이미지 작업에는 image_index가 필요합니다.")
+    if target == "single_section" and payload.section_index is None:
+        raise ValueError("단일 섹션 작업에는 section_index가 필요합니다.")
+    if target != "page_batch" and len(source_paths) != 1:
+        raise ValueError("단일 항목 작업은 문서 하나에만 요청할 수 있습니다.")
+    include_existing_images = bool(payload.include_existing_images)
+    include_sections = bool(payload.include_sections)
+    if target == "page_batch" and not include_existing_images and not include_sections:
+        raise ValueError("일괄 작업은 기존 이미지 또는 섹션 중 하나 이상을 포함해야 합니다.")
+    return {
+        "source_paths": source_paths,
+        "format": normalized_wiki_image_format(payload.format),
+        "prompt_template": str(payload.prompt_template or ""),
+        "include_existing_images": include_existing_images,
+        "include_sections": include_sections,
+        "target": target,
+        "image_index": payload.image_index,
+        "section_index": payload.section_index,
+    }
+
+
+
+def wiki_ai_job_snapshot(job: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "job_id": job["job_id"],
+        "status": job["status"],
+        "target": job["target"],
+        "source_paths": list(job.get("source_paths") or []),
+        "format": job.get("format") or "png",
+        "include_existing_images": bool(job.get("include_existing_images")),
+        "include_sections": bool(job.get("include_sections")),
+        "queued_targets": int(job.get("queued_targets") or 0),
+        "processed_targets": int(job.get("processed_targets") or 0),
+        "requested_at": job.get("requested_at") or "",
+        "started_at": job.get("started_at") or "",
+        "completed_at": job.get("completed_at") or "",
+        "message": job.get("message") or "",
+        "error": job.get("error") or "",
+    }
+
+
+
+def create_wiki_ai_job(payload: WikiAiJobCreateRequest) -> dict[str, Any]:
+    normalized = normalize_wiki_ai_job_request(payload)
+    job_id = uuid4().hex
+    if normalized["target"] == "single_image":
+        queued_targets = 1
+    elif normalized["target"] == "single_section":
+        queued_targets = 1
+    else:
+        queued_targets = len(normalized["source_paths"])
+    job = {
+        **normalized,
+        "job_id": job_id,
+        "status": "queued",
+        "queued_targets": queued_targets,
+        "processed_targets": 0,
+        "requested_at": utc_now_iso(),
+        "started_at": "",
+        "completed_at": "",
+        "message": "요청 대기 중",
+        "error": "",
+    }
+    with WIKI_AI_JOB_LOCK:
+        WIKI_AI_JOBS[job_id] = job
+        WIKI_AI_JOB_QUEUE.append(job_id)
+    WIKI_AI_JOB_EVENT.set()
+    ensure_wiki_ai_worker_started()
+    return wiki_ai_job_snapshot(job)
+
+
+
+def update_wiki_ai_job(job_id: str, **changes: Any) -> dict[str, Any] | None:
+    with WIKI_AI_JOB_LOCK:
+        job = WIKI_AI_JOBS.get(job_id)
+        if not job:
+            return None
+        job.update(changes)
+        return dict(job)
+
+
+
+def run_wiki_ai_job(job_id: str) -> None:
+    with WIKI_AI_JOB_LOCK:
+        job = WIKI_AI_JOBS.get(job_id)
+        if not job:
+            return
+        job["status"] = "running"
+        job["started_at"] = utc_now_iso()
+        job["message"] = "AI 이미지 생성 중"
+        job["error"] = ""
+        snapshot = dict(job)
+    try:
+        if snapshot["target"] == "single_image":
+            regenerate_wiki_image_asset(
+                WikiImageRegenerateRequest(
+                    source_path=snapshot["source_paths"][0],
+                    image_index=int(snapshot["image_index"] or 0),
+                    format=snapshot["format"],
+                    prompt_override=snapshot["prompt_template"],
+                )
+            )
+            update_wiki_ai_job(job_id, processed_targets=1)
+        elif snapshot["target"] == "single_section":
+            generate_wiki_section_image_asset(
+                WikiSectionImageGenerateRequest(
+                    source_path=snapshot["source_paths"][0],
+                    section_index=int(snapshot["section_index"] or 0),
+                    format=snapshot["format"],
+                    prompt_override=snapshot["prompt_template"],
+                )
+            )
+            update_wiki_ai_job(job_id, processed_targets=1)
+        else:
+            processed_targets = 0
+            generated_images = 0
+            generated_sections = 0
+            for source_path in snapshot["source_paths"]:
+                counts = execute_wiki_page_batch_generation(
+                    source_path,
+                    image_format=snapshot["format"],
+                    prompt_template=snapshot["prompt_template"],
+                    include_existing_images=bool(snapshot.get("include_existing_images")),
+                    include_sections=bool(snapshot.get("include_sections")),
+                )
+                generated_images += int(counts.get("images") or 0)
+                generated_sections += int(counts.get("sections") or 0)
+                processed_targets += 1
+                update_wiki_ai_job(
+                    job_id,
+                    processed_targets=processed_targets,
+                    message=f"{processed_targets}/{len(snapshot['source_paths'])} 문서 처리 완료",
+                )
+            update_wiki_ai_job(job_id, message=f"이미지 {generated_images}개, 섹션 {generated_sections}개 생성 완료")
+        update_wiki_ai_job(job_id, status="completed", completed_at=utc_now_iso())
+    except Exception as exc:
+        update_wiki_ai_job(job_id, status="failed", completed_at=utc_now_iso(), error=str(exc), message="AI 이미지 생성 실패")
+
+
+
+def wiki_ai_worker_loop() -> None:
+    while True:
+        job_id = ""
+        with WIKI_AI_JOB_LOCK:
+            if WIKI_AI_JOB_QUEUE:
+                job_id = WIKI_AI_JOB_QUEUE.popleft()
+            else:
+                WIKI_AI_JOB_EVENT.clear()
+        if not job_id:
+            WIKI_AI_JOB_EVENT.wait()
+            continue
+        run_wiki_ai_job(job_id)
+
+
+
+def ensure_wiki_ai_worker_started() -> None:
+    global WIKI_AI_WORKER_THREAD
+    with WIKI_AI_JOB_LOCK:
+        if WIKI_AI_WORKER_THREAD and WIKI_AI_WORKER_THREAD.is_alive():
+            return
+        WIKI_AI_WORKER_THREAD = threading.Thread(target=wiki_ai_worker_loop, name="wiki-ai-worker", daemon=True)
+        WIKI_AI_WORKER_THREAD.start()
+
+
+
+def get_wiki_ai_job(job_id: str) -> dict[str, Any] | None:
+    with WIKI_AI_JOB_LOCK:
+        job = WIKI_AI_JOBS.get(str(job_id or "").strip())
+        return wiki_ai_job_snapshot(job) if job else None
+
+
+
 def generate_wiki_section_image_asset(
     payload: WikiSectionImageGenerateRequest,
     repo_dir: Path | None = None,
@@ -6806,6 +7088,24 @@ def api_wiki_section_image_generate(payload: WikiSectionImageGenerateRequest) ->
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/wiki/ai-jobs")
+def api_wiki_ai_job_create(payload: WikiAiJobCreateRequest) -> dict[str, Any]:
+    try:
+        return create_wiki_ai_job(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.get("/api/wiki/ai-jobs/{job_id}")
+def api_wiki_ai_job_get(job_id: str) -> dict[str, Any]:
+    job = get_wiki_ai_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Wiki AI job not found: {job_id}")
+    return job
 
 
 @app.post("/api/wiki/render-preview")

@@ -53,9 +53,9 @@ def write_wiki_book(root: Path) -> Path:
 def sample_gif_plan() -> dict:
     return {
         'nodes': [
-            {'id': 'enqueue', 'label': 'enqueue', 'x': 0.2, 'y': 0.5, 'width': 0.18, 'height': 0.14},
-            {'id': 'queue', 'label': 'queue', 'x': 0.5, 'y': 0.5, 'width': 0.18, 'height': 0.14},
-            {'id': 'dequeue', 'label': 'dequeue', 'x': 0.8, 'y': 0.5, 'width': 0.18, 'height': 0.14},
+            {'id': 'enqueue', 'label': '입력', 'x': 0.2, 'y': 0.5, 'width': 0.18, 'height': 0.14},
+            {'id': 'queue', 'label': '대기열', 'x': 0.5, 'y': 0.5, 'width': 0.18, 'height': 0.14},
+            {'id': 'dequeue', 'label': '출력', 'x': 0.8, 'y': 0.5, 'width': 0.18, 'height': 0.14},
         ],
         'edges': [
             {'id': 'into-queue', 'from': 'enqueue', 'to': 'queue'},
@@ -278,6 +278,53 @@ class WikiAiRewriteTests(unittest.TestCase):
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
                 flashcard_app.OPENAI_API_KEY = original_key
 
+    def test_run_wiki_ai_page_batch_job_processes_current_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            book = write_wiki_book(Path(td))
+            original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                png_bytes = b'\x89PNG\r\n\x1a\npng-preview'
+                with mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'data': [{'b64_json': base64.b64encode(png_bytes).decode('ascii')}],
+                    }),
+                ):
+                    job = flashcard_app.create_wiki_ai_job(
+                        flashcard_app.WikiAiJobCreateRequest(
+                            source_paths=['pages/intro.md'],
+                            format='png',
+                            prompt_template='BATCH {{section_title}} {{context_excerpt}}',
+                            include_existing_images=True,
+                            include_sections=True,
+                            target='page_batch',
+                        )
+                    )
+                    flashcard_app.run_wiki_ai_job(job['job_id'])
+                    status = flashcard_app.get_wiki_ai_job(job['job_id'])
+                self.assertEqual(status['status'], 'completed')
+                updated_text = (book / 'pages' / 'intro.md').read_text(encoding='utf-8')
+                self.assertIn('assets/generated-wiki-ai/', updated_text)
+                self.assertIn('![큐 연산 AI 이미지](', updated_text)
+            finally:
+                flashcard_app.WIKI_BOOK_DIR = original_book_dir
+                flashcard_app.OPENAI_API_KEY = original_key
+
+    def test_create_wiki_ai_job_accepts_multiple_source_paths(self):
+        job = flashcard_app.create_wiki_ai_job(
+            flashcard_app.WikiAiJobCreateRequest(
+                source_paths=['pages/intro.md', 'pages/child.md', 'pages/intro.md'],
+                format='png',
+                target='page_batch',
+            )
+        )
+        self.assertEqual(job['queued_targets'], 2)
+        self.assertEqual(job['source_paths'], ['pages/intro.md', 'pages/child.md'])
+
     def test_api_wiki_image_regenerate_svg_updates_local_markdown_and_asset(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))
@@ -310,6 +357,10 @@ class WikiAiRewriteTests(unittest.TestCase):
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
                 flashcard_app.OPENAI_API_KEY = original_key
 
+    def test_wiki_gif_font_candidates_include_bundled_korean_font(self):
+        bundled = Path(flashcard_app.WIKI_GIF_FONT_CANDIDATES[0])
+        self.assertEqual(bundled.name, 'NanumGothic-Regular.ttf')
+        self.assertTrue(bundled.exists())
     def test_request_wiki_gif_plan_uses_prompt_override(self):
         with mock.patch.object(
             flashcard_app,
