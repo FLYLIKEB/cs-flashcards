@@ -7357,6 +7357,32 @@ body.question-bank-embed #finishQuestionSessionBtn {
   color: #111111;
   box-shadow: none;
 }
+body.question-bank-embed .question-embed-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .7rem;
+  padding: .72rem 0 .8rem;
+  border-bottom: 1px solid #ececec;
+}
+body.question-bank-embed .question-embed-topbar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: .12rem;
+}
+body.question-bank-embed .question-embed-topbar-copy span {
+  color: #66778a;
+  font-size: .8rem;
+}
+body.question-bank-embed .question-embed-topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .42rem;
+}
 
 body.question-bank-embed .question-stage {
   gap: 0;

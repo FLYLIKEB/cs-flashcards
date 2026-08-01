@@ -5769,6 +5769,20 @@ function renderQuestionPanel() {
   const questionPosition = total ? `문항 ${state.questionIndex + 1} / ${total}` : '문항';
   const bodyHtml = question.body ? `<div class="question-body question-surface">${renderQuestionMarkdown(question.body)}</div>` : '';
   const keywordHtml = renderQuestionKeywordLinks(question.keywords, {interactive: true});
+  const embedTopbarHtml = questionBankEmbedMode() ? `
+    <div class="question-embed-topbar question-surface">
+      <div class="question-embed-topbar-copy">
+        <strong>${escapeHtml(questionPosition)}</strong>
+        <span>${escapeHtml(revealLocked ? '정답 잠금 중' : '정답 확인 가능')}</span>
+      </div>
+      <div class="question-embed-topbar-actions">
+        <button class="question-toolbar-button" type="button" data-question-nav="prev" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex <= 0 ? 'disabled' : ''}>이전</button>
+        ${revealLocked
+          ? `<button class="question-toolbar-button is-primary" type="button" data-question-finish-session="1" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !total ? 'disabled' : ''}>제출</button>`
+          : `<button class="question-toolbar-button" type="button" data-question-reveal="1" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || !question ? 'disabled' : ''}>정답</button>`}
+        <button class="question-toolbar-button" type="button" data-question-nav="next" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex >= total - 1 ? 'disabled' : ''}>다음</button>
+      </div>
+    </div>` : '';
   card.innerHTML = `
     <div class="question-card-shell">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
@@ -5791,12 +5805,14 @@ function renderQuestionPanel() {
       </div>
       <div class="question-card-grid">
         <div class="question-main-stack">
+          ${embedTopbarHtml}
           <div class="question-prompt question-surface">${renderQuestionMarkdown(question.prompt || '문제')}</div>
           ${bodyHtml}
           ${choiceHtml}
           ${draftHtml}
           ${lockActionHtml}
           ${answer}
+
         </div>
         <aside class="question-side-stack">
           ${keywordHtml ? `<div class="question-side-note"><span class="question-side-note-label">키워드</span><p class="question-keyword-list">${keywordHtml}</p></div>` : ''}
@@ -6589,6 +6605,15 @@ $('questionCard')?.addEventListener('click', (event) => {
   }
   if (event.target.closest('[data-question-answer-refine="1"]')) {
     refineCurrentQuestionAnswer();
+    return;
+  }
+  const navButton = event.target.closest('[data-question-nav]');
+  if (navButton) {
+    moveQuestion(navButton.dataset.questionNav === 'prev' ? -1 : 1);
+    return;
+  }
+  if (event.target.closest('[data-question-reveal="1"]')) {
+    revealQuestionAnswer();
     return;
   }
   if (event.target.closest('[data-question-finish-session="1"]')) {
