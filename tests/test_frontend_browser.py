@@ -22,6 +22,7 @@ from pyppeteer.chromium_downloader import check_chromium, download_chromium
 ROOT = Path(__file__).resolve().parents[1]
 MAIN_WORKSPACE_ROOT = ROOT.parent / 'cs_flashcards'
 QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1'
+QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1'
 WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1'
 WAVE_ID_RE = re.compile(r'^(wave-\d+)')
 CANONICAL_COMMAND = '.venv/bin/python -m unittest tests.test_frontend_browser'
@@ -151,7 +152,11 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 'PYTHONUNBUFFERED': '1',
             }
         )
-        python_candidates = [ROOT / '.venv' / 'bin' / 'python', MAIN_WORKSPACE_ROOT / '.venv' / 'bin' / 'python']
+        python_candidates = [
+            ROOT / '.venv' / 'bin' / 'python',
+            MAIN_WORKSPACE_ROOT / '.venv' / 'bin' / 'python',
+            ROOT.parent.parent / 'cs_flashcards' / '.venv' / 'bin' / 'python',
+        ]
         python_path = next((path for path in python_candidates if path.exists()), None)
         if python_path is None:
             raise RuntimeError('A project .venv Python is required to run the frontend browser harness.')
@@ -491,6 +496,68 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-status-column', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_page_preserves_filters_across_reload_until_reset(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await page.type('#bankPageQueryInput', '데이터베이스')
+            await page.select('#bankPageDifficultySelect', '중')
+            await page.waitForFunction(
+                "document.querySelector('#bankPageActiveFilters').textContent.includes('데이터베이스') && document.querySelector('#bankPageActiveFilters').textContent.includes('중')"
+            )
+            case['stored_filter_state_before_reload'] = await page.evaluate(
+                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertEqual(case['stored_filter_state_before_reload']['filters']['q'], '데이터베이스')
+            self.assertEqual(case['stored_filter_state_before_reload']['filters']['difficulty'], '중')
+            self.assertFalse(case['stored_filter_state_before_reload']['filtersCollapsed'])
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "document.querySelector('#bankPageQueryInput').value === '데이터베이스' && document.querySelector('#bankPageDifficultySelect').value === '중'"
+            )
+            case['filters_expanded_after_reload'] = await page.evaluate(
+                "!document.body.classList.contains('question-bank-filters-collapsed')"
+            )
+            case['query_after_reload'] = await page.Jeval('#bankPageQueryInput', '(node) => node.value')
+            case['difficulty_after_reload'] = await page.Jeval('#bankPageDifficultySelect', '(node) => node.value')
+            self.assertTrue(case['filters_expanded_after_reload'])
+            self.assertEqual(case['query_after_reload'], '데이터베이스')
+            self.assertEqual(case['difficulty_after_reload'], '중')
+
+            await page.click('#bankPageActiveFilters [data-filter-key="q"]')
+            await page.waitForFunction(
+                "document.querySelector('#bankPageQueryInput').value === '' && document.querySelector('#bankPageDifficultySelect').value === '중' && !document.querySelector('#bankPageActiveFilters').textContent.includes('데이터베이스')"
+            )
+            case['stored_filter_state_after_chip_clear'] = await page.evaluate(
+                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertEqual(case['stored_filter_state_after_chip_clear']['filters']['q'], '')
+            self.assertEqual(case['stored_filter_state_after_chip_clear']['filters']['difficulty'], '중')
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "document.querySelector('#bankPageQueryInput').value === '' && document.querySelector('#bankPageDifficultySelect').value === '중'"
+            )
+            case['query_after_chip_clear_reload'] = await page.Jeval('#bankPageQueryInput', '(node) => node.value')
+            case['difficulty_after_chip_clear_reload'] = await page.Jeval('#bankPageDifficultySelect', '(node) => node.value')
+            case['active_filters_after_chip_clear_reload'] = await self.text(page, '#bankPageActiveFilters')
+            self.assertEqual(case['query_after_chip_clear_reload'], '')
+            self.assertEqual(case['difficulty_after_chip_clear_reload'], '중')
+            self.assertNotIn('데이터베이스', case['active_filters_after_chip_clear_reload'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-filter-reload', status=status, observations=case)
+            await page.close()
     async def test_question_bank_page_rejects_stale_query_responses(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
