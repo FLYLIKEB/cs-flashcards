@@ -111,6 +111,28 @@ function focusableDrawerElements() {
   return [...detailDrawer.querySelectorAll(DRAWER_FOCUSABLE_SELECTOR)].filter((element) => !element.hasAttribute('hidden'));
 }
 
+function selectedEventRowSelector() {
+  if (!calendarState.selectedEventId) return '';
+  const css = window.CSS;
+  const eventId = css && typeof css.escape === 'function'
+    ? css.escape(calendarState.selectedEventId)
+    : calendarState.selectedEventId.replace(/["\\]/g, '\\$&');
+  return `[data-event-id="${eventId}"]`;
+}
+
+function restoreDetailFocusTarget() {
+  const previousTarget = calendarState.lastFocusedElement;
+  if (previousTarget && typeof previousTarget.focus === 'function' && previousTarget.isConnected !== false) {
+    return previousTarget;
+  }
+  const selector = selectedEventRowSelector();
+  const selectedRow = selector ? $('eventList')?.querySelector(selector) : null;
+  if (selectedRow && typeof selectedRow.focus === 'function') {
+    return selectedRow;
+  }
+  return null;
+}
+
 function closeDetailDrawer({ restoreFocus = true } = {}) {
   calendarState.detailOpen = false;
   const detailDrawer = $('calendarDetailDrawer');
@@ -119,10 +141,14 @@ function closeDetailDrawer({ restoreFocus = true } = {}) {
     detailDrawer.setAttribute('aria-hidden', 'true');
   }
   syncBackdrop();
-  const focusTarget = calendarState.lastFocusedElement;
+  const focusTarget = restoreDetailFocusTarget();
   calendarState.lastFocusedElement = null;
-  if (restoreFocus && focusTarget && typeof focusTarget.focus === 'function' && focusTarget.isConnected !== false) {
-    focusTarget.focus();
+  if (restoreFocus && focusTarget && typeof focusTarget.focus === 'function') {
+    window.requestAnimationFrame(() => {
+      if (focusTarget.isConnected !== false) {
+        focusTarget.focus();
+      }
+    });
   }
 }
 

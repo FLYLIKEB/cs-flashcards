@@ -1,0 +1,68 @@
+name: Frontend Browser Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - wave-*
+
+jobs:
+  frontend-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Chrome
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Derive transcript metadata
+        id: transcript
+        shell: bash
+        run: |
+          branch_name="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          wave_id="manual-run"
+          if [[ "$branch_name" =~ ^(wave-[0-9]+) ]]; then
+            wave_id="${BASH_REMATCH[1]}"
+          fi
+          echo "branch_name=$branch_name" >> "$GITHUB_OUTPUT"
+          echo "wave_id=$wave_id" >> "$GITHUB_OUTPUT"
+          echo "path=artifacts/frontend-browser/${wave_id}-transcript.json" >> "$GITHUB_OUTPUT"
+
+      - name: Install browser runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk-bridge2.0-0 libgtk-3-0 libgbm1 libasound2t64
+
+      - name: Create venv and install requirements
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Reset expected frontend browser transcript
+        run: rm -f "${{ steps.transcript.outputs.path }}"
+
+      - name: Run focused frontend browser harness
+        env:
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+          CS_FRONTEND_BROWSER_BRANCH: ${{ steps.transcript.outputs.branch_name }}
+          CS_FRONTEND_BROWSER_WAVE_ID: ${{ steps.transcript.outputs.wave_id }}
+        run: .venv/bin/python -m unittest tests.test_frontend_browser
+
+      - name: Upload frontend browser transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-browser-transcript
+          path: ${{ steps.transcript.outputs.path }}
+          if-no-files-found: error

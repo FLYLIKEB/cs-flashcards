@@ -54,6 +54,21 @@ extract_github_repo() {
   esac
 }
 
+append_env_line() {
+  local key="$1"
+  local value="$2"
+  python3 - <<'PY' "$key" "$value" >> "$TMP_RUNTIME_ENV"
+import sys
+key, value = sys.argv[1], sys.argv[2]
+if "\n" in value or "\r" in value:
+    raise SystemExit(f"Refusing multiline runtime secret for {key}")
+escaped = value.replace('\\', '\\\\').replace('"', '\\"')
+print(f'{key}="{escaped}"')
+PY
+}
+
+
+
 if [[ -d "$WIKI_BOOK_SRC/.git" ]]; then
   if [[ -z "$WIKI_GITHUB_REPO" ]]; then
     ORIGIN_URL="$(git -C "$WIKI_BOOK_SRC" remote get-url origin 2>/dev/null || true)"
@@ -69,7 +84,6 @@ WIKI_GITHUB_BRANCH="${WIKI_GITHUB_BRANCH:-main}"
 if [[ -n "$WIKI_GITHUB_REPO" && -z "$WIKI_GITHUB_TOKEN" ]] && command -v gh >/dev/null 2>&1; then
   WIKI_GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
 fi
-
 
 if [[ ! -f "${SSH_KEY:-}" && -f "/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem" ]]; then
   SSH_KEY="/Users/jwp/Developer/ChaLog/LightsailDefaultKey-ap-northeast-2.pem"
@@ -94,7 +108,6 @@ fi
 
 echo "개념 이미지: SQLite cards 테이블에 URL/미디어를 기록하고 AI 재생성 이미지는 서버 state/ai_images 에 저장"
 
-
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 SCP=(scp -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new)
@@ -108,9 +121,25 @@ else
   echo "위키 GitHub 수동 보관 버튼: 비활성"
 fi
 
+
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 REMOTE_ARCHIVE="/tmp/cs-flashcards-$(date +%Y%m%dT%H%M%S)-$$.tar.gz"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
+TMP_RUNTIME_ENV="$(mktemp -t cs-flashcards-runtime.XXXXXX.env)"
+cleanup() {
+  rm -f "$TMP_ARCHIVE" "$TMP_RUNTIME_ENV"
+  rm -rf "$TMP_STAGE"
+}
+trap cleanup EXIT
+
+append_env_line "CS_FLASHCARDS_USERNAME" "$USERNAME"
+append_env_line "CS_FLASHCARDS_PASSWORD" "$PASSWORD"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_REPO" "$WIKI_GITHUB_REPO"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_BRANCH"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_TOKEN" "$WIKI_GITHUB_TOKEN"
+append_env_line "CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX" "$WIKI_GITHUB_PATH_PREFIX"
+append_env_line "OPENAI_API_KEY" "$OPENAI_API_KEY_VALUE"
+
 mkdir -p "$TMP_STAGE/data"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
@@ -132,49 +161,67 @@ else
   echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 시드 없이 배포합니다: $WIKI_PACKAGE_SRC"
 fi
 COPYFILE_DISABLE=1 tar --no-xattrs -czf "$TMP_ARCHIVE" -C "$TMP_STAGE" .
-rm -rf "$TMP_STAGE"
-
 
 "${SSH[@]}" "mkdir -p '$REMOTE_DIR' '$REMOTE_DIR/backups'"
 "${SCP[@]}" "$TMP_ARCHIVE" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_ARCHIVE"
+"${SCP[@]}" "$TMP_RUNTIME_ENV" "$REMOTE_USER@$REMOTE_HOST:/tmp/cs-flashcards-runtime.env"
 rm -f "$TMP_ARCHIVE"
-WIKI_GITHUB_PATH_PREFIX_ARG="${WIKI_GITHUB_PATH_PREFIX:-__EMPTY__}"
-WIKI_GITHUB_TOKEN_ARG="${WIKI_GITHUB_TOKEN:-__EMPTY__}"
 
-OPENAI_API_KEY_ARG="${OPENAI_API_KEY_VALUE:-__EMPTY__}"
-
-"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_ARCHIVE" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" "$USERNAME" "$PASSWORD" "$WIKI_GITHUB_REPO" "$WIKI_GITHUB_BRANCH" "$WIKI_GITHUB_TOKEN_ARG" "$WIKI_GITHUB_PATH_PREFIX_ARG" "$OPENAI_API_KEY_ARG" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DIR" "$REMOTE_ARCHIVE" "$REMOTE_PORT" "$DOMAIN" "$ORIGIN_DOMAIN" <<'REMOTE'
 set -euo pipefail
 REMOTE_DIR="$1"
 REMOTE_ARCHIVE="$2"
 REMOTE_PORT="$3"
 DOMAIN="$4"
 ORIGIN_DOMAIN="$5"
-USERNAME="$6"
-PASSWORD="$7"
-WIKI_GITHUB_REPO="${8-}"
-WIKI_GITHUB_BRANCH="${9-}"
-WIKI_GITHUB_TOKEN="${10-}"
-WIKI_GITHUB_PATH_PREFIX="${11-}"
-OPENAI_API_KEY_VALUE="${12-}"
-if [[ "$WIKI_GITHUB_TOKEN" == "__EMPTY__" ]]; then
-  WIKI_GITHUB_TOKEN=""
-fi
-if [[ "$WIKI_GITHUB_PATH_PREFIX" == "__EMPTY__" ]]; then
-  WIKI_GITHUB_PATH_PREFIX=""
-fi
-if [[ "$OPENAI_API_KEY_VALUE" == "__EMPTY__" ]]; then
-  OPENAI_API_KEY_VALUE=""
-fi
-if [[ -z "$WIKI_GITHUB_TOKEN" && -f /etc/systemd/system/cs-flashcards.service ]]; then
-  EXISTING_WIKI_GITHUB_TOKEN="$(sudo awk -F= '/^Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=/{sub(/^Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=/, ""); print; exit}' /etc/systemd/system/cs-flashcards.service || true)"
-  if [[ -n "$EXISTING_WIKI_GITHUB_TOKEN" ]]; then
-    WIKI_GITHUB_TOKEN="$EXISTING_WIKI_GITHUB_TOKEN"
-    echo "위키 GitHub 토큰 보존: 기존 systemd 설정값을 유지합니다."
-  fi
-fi
+RUNTIME_ENV_PATH="$REMOTE_DIR/.runtime-secrets.env"
 REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"
+PREVIOUS_WIKI_GITHUB_TOKEN="$(python3 - <<'PY' "$RUNTIME_ENV_PATH"
+import ast
+import sys
+from pathlib import Path
 
+env_path = Path(sys.argv[1])
+if not env_path.exists():
+    print("")
+    raise SystemExit(0)
+values: dict[str, str] = {}
+for raw_line in env_path.read_text(encoding='utf-8').splitlines():
+    line = raw_line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    key, raw_value = line.split('=', 1)
+    key = key.strip()
+    raw_value = raw_value.strip()
+    if raw_value.startswith('"') and raw_value.endswith('"'):
+        value = ast.literal_eval(raw_value)
+    else:
+        value = raw_value
+    values[key] = value
+print(values.get('CS_FLASHCARDS_WIKI_GITHUB_TOKEN', ''))
+PY
+)"
+
+env_path = Path(sys.argv[1])
+if not env_path.exists():
+    print("")
+    raise SystemExit(0)
+values: dict[str, str] = {}
+for raw_line in env_path.read_text(encoding='utf-8').splitlines():
+    line = raw_line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    key, raw_value = line.split('=', 1)
+    key = key.strip()
+    raw_value = raw_value.strip()
+    if raw_value.startswith('"') and raw_value.endswith('"'):
+        value = ast.literal_eval(raw_value)
+    else:
+        value = raw_value
+    values[key] = value
+print(values.get('CS_FLASHCARDS_WIKI_GITHUB_TOKEN', ''))
+PY
+)"
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y >/dev/null
@@ -185,7 +232,38 @@ if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없으면 배포를 중단합니다: $REMOTE_DB_PATH" >&2
   exit 1
 fi
+install -m 600 /tmp/cs-flashcards-runtime.env "$RUNTIME_ENV_PATH"
+rm -f /tmp/cs-flashcards-runtime.env
+if [[ -n "$PREVIOUS_WIKI_GITHUB_TOKEN" ]]; then
+  python3 - <<'PY' "$RUNTIME_ENV_PATH" "$PREVIOUS_WIKI_GITHUB_TOKEN"
+import sys
+from pathlib import Path
 
+env_path = Path(sys.argv[1])
+preserved_token = sys.argv[2]
+raw_lines = env_path.read_text(encoding='utf-8').splitlines()
+updated: list[str] = []
+seen = False
+replaced = False
+escaped = preserved_token.replace('\\', '\\\\').replace('"', '\\"')
+for raw_line in raw_lines:
+    stripped = raw_line.strip()
+    if stripped.startswith('CS_FLASHCARDS_WIKI_GITHUB_TOKEN='):
+        seen = True
+        if stripped == 'CS_FLASHCARDS_WIKI_GITHUB_TOKEN=""':
+            updated.append(f'CS_FLASHCARDS_WIKI_GITHUB_TOKEN="{escaped}"')
+            replaced = True
+        else:
+            updated.append(raw_line)
+    else:
+        updated.append(raw_line)
+if not seen:
+    updated.append(f'CS_FLASHCARDS_WIKI_GITHUB_TOKEN="{escaped}"')
+    replaced = True
+if replaced:
+    env_path.write_text('\n'.join(updated) + '\n', encoding='utf-8')
+PY
+fi
 
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
@@ -205,7 +283,14 @@ cd "$REMOTE_DIR"
 python3 -m venv .venv
 .venv/bin/python -m pip install -q --upgrade pip
 .venv/bin/python -m pip install -q -r requirements.txt
-
+.venv/bin/python - <<'PY'
+import json
+import app
+summary = app.progress_db_runtime_summary(app.PROGRESS_DB_PATH)
+print("SQLite runtime db:", json.dumps(summary, ensure_ascii=False))
+if not summary.get("ok"):
+    raise SystemExit(f"Runtime progress DB is not healthy: {summary}")
+PY
 
 sudo tee /etc/systemd/system/cs-flashcards.service >/dev/null <<EOF
 [Unit]
@@ -216,17 +301,11 @@ After=network.target
 Type=simple
 User=ubuntu
 WorkingDirectory=$REMOTE_DIR
-Environment=CS_FLASHCARDS_USERNAME=$USERNAME
-Environment=CS_FLASHCARDS_PASSWORD=$PASSWORD
 Environment=CS_FLASHCARD_BACKUP_DIR=$REMOTE_DIR/backups
 Environment=CS_FLASHCARD_PROGRESS_DB=$REMOTE_DB_PATH
 Environment=CS_FLASHCARD_PROGRESS_DB_MUST_EXIST=1
 Environment=CS_FLASHCARDS_WIKI_BOOK_DIR=$REMOTE_DIR/wiki_book
-Environment=CS_FLASHCARDS_WIKI_GITHUB_REPO=$WIKI_GITHUB_REPO
-Environment=CS_FLASHCARDS_WIKI_GITHUB_BRANCH=$WIKI_GITHUB_BRANCH
-Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=$WIKI_GITHUB_TOKEN
-Environment=CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX=$WIKI_GITHUB_PATH_PREFIX
-Environment=OPENAI_API_KEY=$OPENAI_API_KEY_VALUE
+EnvironmentFile=$RUNTIME_ENV_PATH
 ExecStart=$REMOTE_DIR/.venv/bin/uvicorn app:app --host 127.0.0.1 --port $REMOTE_PORT
 Restart=always
 RestartSec=3
@@ -310,11 +389,33 @@ EOF
   sudo nginx -t && sudo systemctl reload nginx
 fi
 
-curl -sS -H "Authorization: Basic $(python3 - <<PY
+RUNTIME_BASIC_AUTH_HEADER="$(python3 - <<'PY' "$RUNTIME_ENV_PATH"
+import ast
 import base64
-print(base64.b64encode(b'$USERNAME:$PASSWORD').decode())
+import sys
+from pathlib import Path
+
+env_path = Path(sys.argv[1])
+values: dict[str, str] = {}
+for raw_line in env_path.read_text(encoding='utf-8').splitlines():
+    line = raw_line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    key, raw_value = line.split('=', 1)
+    key = key.strip()
+    raw_value = raw_value.strip()
+    if raw_value.startswith('"') and raw_value.endswith('"'):
+        value = ast.literal_eval(raw_value)
+    else:
+        value = raw_value
+    values[key] = value
+pair = f"{values['CS_FLASHCARDS_USERNAME']}:{values['CS_FLASHCARDS_PASSWORD']}".encode()
+print(base64.b64encode(pair).decode())
 PY
-)" "http://127.0.0.1:$REMOTE_PORT/api/health" || true
+)"
+curl --fail --show-error --silent \
+  -H "Authorization: Basic $RUNTIME_BASIC_AUTH_HEADER" \
+  "http://127.0.0.1:$REMOTE_PORT/api/health"
 REMOTE
 
 echo

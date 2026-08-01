@@ -280,12 +280,21 @@ class WikiAiRewriteTests(unittest.TestCase):
 
     def test_run_wiki_ai_page_batch_job_processes_current_file(self):
         with tempfile.TemporaryDirectory() as td:
-            book = write_wiki_book(Path(td))
+            root = Path(td)
+            book = write_wiki_book(root)
+            db_path = root / 'progress.sqlite'
+            flashcard_app.ensure_progress_db(db_path, seed_rows=[{'id': 'CS-001', 'term': '큐'}])
             original_book_dir = flashcard_app.WIKI_BOOK_DIR
+            original_db = flashcard_app.PROGRESS_DB_PATH
             original_key = flashcard_app.OPENAI_API_KEY
+            original_thread = flashcard_app.WIKI_AI_WORKER_THREAD
+            original_recovery = flashcard_app.WIKI_AI_WORKER_RECOVERY_DONE
             try:
                 flashcard_app.WIKI_BOOK_DIR = book
+                flashcard_app.PROGRESS_DB_PATH = db_path
                 flashcard_app.OPENAI_API_KEY = 'test-key'
+                flashcard_app.WIKI_AI_WORKER_THREAD = None
+                flashcard_app.WIKI_AI_WORKER_RECOVERY_DONE = False
                 png_bytes = b'\x89PNG\r\n\x1a\npng-preview'
                 with mock.patch.object(
                     flashcard_app,
@@ -312,19 +321,39 @@ class WikiAiRewriteTests(unittest.TestCase):
                 self.assertIn('![큐 연산 AI 이미지](', updated_text)
             finally:
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
+                flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.OPENAI_API_KEY = original_key
+                flashcard_app.WIKI_AI_WORKER_THREAD = original_thread
+                flashcard_app.WIKI_AI_WORKER_RECOVERY_DONE = original_recovery
 
     def test_create_wiki_ai_job_accepts_multiple_source_paths(self):
-        with mock.patch.object(flashcard_app, 'ensure_wiki_ai_worker_started', return_value=None):
-            job = flashcard_app.create_wiki_ai_job(
-                flashcard_app.WikiAiJobCreateRequest(
-                    source_paths=['pages/intro.md', 'pages/child.md', 'pages/intro.md'],
-                    format='png',
-                    target='page_batch',
-                )
-            )
-        self.assertEqual(job['queued_targets'], 2)
-        self.assertEqual(job['source_paths'], ['pages/intro.md', 'pages/child.md'])
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'progress.sqlite'
+            flashcard_app.ensure_progress_db(db_path)
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_thread = flashcard_app.WIKI_AI_WORKER_THREAD
+            original_recovery = flashcard_app.WIKI_AI_WORKER_RECOVERY_DONE
+            try:
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.WIKI_AI_WORKER_THREAD = None
+                flashcard_app.WIKI_AI_WORKER_RECOVERY_DONE = False
+                with mock.patch.object(flashcard_app, 'ensure_wiki_ai_worker_started', return_value=None):
+                    job = flashcard_app.create_wiki_ai_job(
+                        flashcard_app.WikiAiJobCreateRequest(
+                            source_paths=['pages/intro.md', 'pages/child.md', 'pages/intro.md'],
+                            format='png',
+                            target='page_batch',
+                        )
+                    )
+                self.assertEqual(job['queued_targets'], 2)
+                self.assertEqual(job['source_paths'], ['pages/intro.md', 'pages/child.md'])
+                restored = flashcard_app.get_wiki_ai_job(job['job_id'])
+                self.assertEqual(restored['status'], 'queued')
+                self.assertEqual(restored['source_paths'], ['pages/intro.md', 'pages/child.md'])
+            finally:
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.WIKI_AI_WORKER_THREAD = original_thread
+                flashcard_app.WIKI_AI_WORKER_RECOVERY_DONE = original_recovery
 
     def test_api_wiki_image_regenerate_svg_updates_local_markdown_and_asset(self):
         with tempfile.TemporaryDirectory() as td:
