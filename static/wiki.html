@@ -38,18 +38,23 @@
       <div class="wiki-sidebar-head">
         <div class="wiki-sidebar-title-row">
           <span class="wiki-sidebar-caption">목차보기</span>
-          <a id="wikiBookIntroLink" class="wiki-book-home-link" href="/wiki/page/_book">책 소개</a>
+          <div class="wiki-sidebar-actions">
+            <button id="wikiBatchAiToggleBtn" class="header-link wiki-batch-ai-toggle" type="button" aria-controls="wikiBatchAiPanel" aria-expanded="false">AI</button>
+            <a id="wikiBookIntroLink" class="wiki-book-home-link" href="/wiki/page/_book">책 소개</a>
+          </div>
         </div>
-        <div class="wiki-batch-ai-bar">
-          <select id="wikiBatchAiFormat" class="wiki-batch-ai-format" aria-label="일괄 AI 파일 포맷">
-            <option value="png">png</option>
-            <option value="svg">svg</option>
-            <option value="gif">gif</option>
-          </select>
-          <button id="wikiBatchCurrentBtn" class="header-link" type="button">현재 문서 AI</button>
-          <button id="wikiBatchSelectedBtn" class="header-link" type="button">선택 문서 AI</button>
+        <div id="wikiBatchAiPanel" class="wiki-batch-ai-panel" hidden aria-hidden="true">
+          <div class="wiki-batch-ai-bar">
+            <select id="wikiBatchAiFormat" class="wiki-batch-ai-format" aria-label="일괄 AI 파일 포맷">
+              <option value="png">png</option>
+              <option value="svg">svg</option>
+              <option value="gif">gif</option>
+            </select>
+            <button id="wikiBatchCurrentBtn" class="header-link" type="button">현재 문서 AI</button>
+            <button id="wikiBatchSelectedBtn" class="header-link" type="button">선택 문서 AI</button>
+          </div>
+          <p id="wikiBatchAiHint" class="small muted">선택 문서 0개</p>
         </div>
-        <p id="wikiBatchAiHint" class="small muted">선택 문서 0개</p>
         <p id="wikiStatus" class="small muted">목차를 불러오는 중...</p>
       </div>
       <nav id="wikiToc" class="wiki-toc" aria-label="위키 목차"></nav>
@@ -99,6 +104,7 @@
         <div class="wiki-page-actions">
           <a id="wikiRawLink" class="header-link" href="#" target="_blank" rel="noopener noreferrer">원본 보기</a>
           <button id="wikiEditBtn" class="header-link" type="button" hidden>수정</button>
+          <button id="wikiGithubArchiveBtn" class="header-link" type="button" hidden>GitHub 보관</button>
           <a id="wikiFlashcardLink" class="header-link" href="/" target="_blank" rel="noopener noreferrer" hidden>대표 카드</a>
         </div>
       </div>

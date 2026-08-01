@@ -1,4 +1,5 @@
 const WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1';
+const WIKI_BATCH_AI_MODE_KEY = 'csFlashcardsWikiBatchAiMode:v1';
 
 const wikiState = {
   index: null,
@@ -6,6 +7,7 @@ const wikiState = {
   currentSlug: '',
   query: '',
   sidebarOpen: true,
+  batchAiMode: false,
   searchOpen: false,
   expandedToc: {},
   editorOpen: false,
@@ -19,6 +21,7 @@ const wikiState = {
   editorAiTemplateEditorOpen: false,
   editorSourcePath: '',
   editorOriginalContent: '',
+  archiveSaving: false,
   imageAiLoadingIndex: -1,
   imageFormatSelections: {},
   imagePromptEditorIndex: -1,
@@ -184,6 +187,41 @@ function saveWikiSidebarState() {
   }
 }
 
+function readSavedWikiBatchAiMode() {
+  try {
+    return window.localStorage.getItem(WIKI_BATCH_AI_MODE_KEY) === 'open';
+  } catch (_error) {
+    return false;
+  }
+}
+
+function saveWikiBatchAiMode() {
+  try {
+    window.localStorage.setItem(WIKI_BATCH_AI_MODE_KEY, wikiState.batchAiMode ? 'open' : 'closed');
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+}
+
+function applyWikiBatchAiMode({persist = true} = {}) {
+  document.body.classList.toggle('wiki-batch-ai-mode', wikiState.batchAiMode);
+  const panel = wiki$('wikiBatchAiPanel');
+  if (panel) {
+    panel.hidden = !wikiState.batchAiMode;
+    panel.setAttribute('aria-hidden', String(!wikiState.batchAiMode));
+  }
+  const toggleBtn = wiki$('wikiBatchAiToggleBtn');
+  if (toggleBtn) {
+    toggleBtn.textContent = wikiState.batchAiMode ? '목차' : 'AI';
+    toggleBtn.setAttribute('aria-expanded', String(wikiState.batchAiMode));
+    toggleBtn.setAttribute('aria-label', wikiState.batchAiMode ? 'AI 선택 닫기' : 'AI 선택 열기');
+    toggleBtn.setAttribute('title', wikiState.batchAiMode ? '일반 목차로 돌아가기' : 'AI 선택 열기');
+    toggleBtn.setAttribute('aria-pressed', String(wikiState.batchAiMode));
+  }
+  if (persist) saveWikiBatchAiMode();
+  wikiRenderToc();
+}
+
 function applyWikiSidebarState({persist = true} = {}) {
   document.body.classList.toggle('wiki-sidebar-collapsed', !wikiState.sidebarOpen);
   wiki$('wikiSidebar')?.setAttribute('aria-hidden', String(!wikiState.sidebarOpen));
@@ -200,6 +238,11 @@ function applyWikiSidebarState({persist = true} = {}) {
 function toggleWikiSidebar(force = !wikiState.sidebarOpen) {
   wikiState.sidebarOpen = Boolean(force);
   applyWikiSidebarState();
+}
+
+function toggleWikiBatchAiMode(force = !wikiState.batchAiMode) {
+  wikiState.batchAiMode = Boolean(force);
+  applyWikiBatchAiMode();
 }
 
 function closeWikiSidebarOnMobile() {
@@ -489,7 +532,9 @@ function wikiRenderTocItems(items, activeTrail = wikiActiveTrailSlugs()) {
       ? `<button class="wiki-toc-toggle" type="button" data-wiki-toc-toggle="${wikiEscapeHtml(item.slug)}" aria-expanded="${expanded}" aria-label="${expanded ? '하위 목차 접기' : '하위 목차 펼치기'}">▸</button>`
       : '<span class="wiki-toc-spacer" aria-hidden="true"></span>';
     const checked = Boolean(wikiState.tocAiSelections[item.source_path]);
-    const checkbox = `<input class="wiki-toc-ai-checkbox" type="checkbox" data-wiki-ai-source="${wikiEscapeHtml(item.source_path)}" aria-label="${wikiEscapeHtml(item.title)} 선택"${checked ? ' checked' : ''} />`;
+    const checkbox = wikiState.batchAiMode
+      ? `<input class="wiki-toc-ai-checkbox" type="checkbox" data-wiki-ai-source="${wikiEscapeHtml(item.source_path)}" aria-label="${wikiEscapeHtml(item.title)} 선택"${checked ? ' checked' : ''} />`
+      : '';
     return `<li class="wiki-toc-item${hasChildren ? ' has-children' : ''}${expanded ? ' open' : ''}"><div class="wiki-toc-row">${checkbox}${toggle}<a class="wiki-toc-link${active ? ' active' : ''}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1"${active ? ' aria-current="page"' : ''}>${wikiEscapeHtml(item.title)}</a></div>${children}</li>`;
   }).join('')}</ul>`;
 }
@@ -609,6 +654,60 @@ function wikiRenderLinkedCards(page) {
 
 function wikiEditablePage(page = wikiState.page) {
   return Boolean(page?.source_path && page?.raw_url);
+}
+
+function wikiArchiveInfo(page = wikiState.page) {
+  return page?.archive || wikiState.index?.archive || null;
+}
+
+function wikiArchiveEnabled(page = wikiState.page) {
+  return Boolean(wikiArchiveInfo(page)?.enabled);
+}
+
+function wikiApplyArchiveButtonState() {
+  const button = wiki$('wikiGithubArchiveBtn');
+  if (!button) return;
+  const archive = wikiArchiveInfo();
+  const canArchive = wikiEditablePage() && wikiArchiveEnabled();
+  const editorBusy = wikiState.editorOpen || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading;
+  button.hidden = !canArchive;
+  button.disabled = !canArchive || editorBusy || wikiState.archiveSaving;
+  button.textContent = wikiState.archiveSaving ? '보관 중...' : 'GitHub 보관';
+  const repo = String(archive?.repo || '').trim();
+  const branch = String(archive?.branch || '').trim() || 'main';
+  button.title = repo ? `현재 서버 위키를 ${repo}@${branch} 에 보관` : '현재 서버 위키를 GitHub에 보관';
+}
+
+async function wikiArchiveToGithub() {
+  if (wikiState.archiveSaving) return;
+  if (!wikiArchiveEnabled()) {
+    wikiStatus('GitHub 보관 구성이 없습니다.', true);
+    return;
+  }
+  wikiState.archiveSaving = true;
+  wikiApplyArchiveButtonState();
+  try {
+    const response = await wikiFetchJson(wikiApiUrl('/api/wiki/archive/github'), {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        source_path: wikiState.page?.source_path || '',
+      }),
+    });
+    const archive = response?.archive || {};
+    const details = [];
+    const commit = String(archive?.commit_sha || '').trim();
+    if (commit) details.push(`commit ${commit.slice(0, 7)}`);
+    if (Number(archive?.changed_file_count || 0) > 0) details.push(`변경 ${Number(archive.changed_file_count)}개`);
+    if (Number(archive?.deleted_file_count || 0) > 0) details.push(`삭제 ${Number(archive.deleted_file_count)}개`);
+    const summary = archive?.committed ? (details.join(' · ') || '보관 완료') : '변경 없음';
+    wikiStatus(`GitHub 보관 완료 · ${summary}`);
+  } catch (error) {
+    wikiStatus(`GitHub 보관 실패: ${error.message || error}`, true);
+  } finally {
+    wikiState.archiveSaving = false;
+    wikiApplyArchiveButtonState();
+  }
 }
 
 function wikiEditorInstance() {
@@ -950,6 +1049,7 @@ function wikiApplyEditorState() {
     saveBtn.disabled = !open || wikiState.editorLoading || wikiState.editorSaving || wikiState.editorAiLoading;
     saveBtn.textContent = wikiState.editorSaving ? '저장 중...' : '저장';
   }
+  wikiApplyArchiveButtonState();
 }
 
 function wikiResetEditorState() {
@@ -983,7 +1083,7 @@ function wikiConfirmEditorNavigation() {
 }
 
 function wikiSyncStatusLabel(syncTarget) {
-  return syncTarget === 'github' ? 'GitHub 반영 완료' : '로컬 저장 완료';
+  return syncTarget === 'local' ? '로컬 저장 완료' : '저장 완료';
 }
 
 function wikiDefaultImagePromptTemplates() {
@@ -1599,6 +1699,7 @@ async function wikiSaveEditor() {
       wikiApplyEditorState();
     }
     wikiStatus(`${response?.page?.title || '문서'} 저장됨 · ${wikiSyncStatusLabel(response?.updated?.sync_target)}`);
+    wikiApplyArchiveButtonState();
   } catch (error) {
     wikiState.editorSaving = false;
     wikiApplyEditorState();
@@ -1632,6 +1733,7 @@ async function wikiToggleChecklist(checkbox) {
       wikiApplyPage(response.page);
     }
     wikiStatus(`${response?.page?.title || '문서'} 체크 저장됨 · ${wikiSyncStatusLabel(response?.updated?.sync_target)}`);
+    wikiApplyArchiveButtonState();
   } catch (error) {
     checkbox.checked = !nextChecked;
     checkbox.disabled = false;
@@ -1642,9 +1744,12 @@ async function wikiToggleChecklist(checkbox) {
 
 async function wikiInit() {
   wikiState.sidebarOpen = readSavedWikiSidebarState();
+  wikiState.batchAiMode = readSavedWikiBatchAiMode();
   applyWikiSidebarState({persist: false});
+  applyWikiBatchAiMode({persist: false});
   applyWikiSearchState({focus: false});
   wikiApplyEditorState();
+  wikiApplyArchiveButtonState();
   try {
     wikiState.index = await wikiFetchJson(wikiApiUrl('/api/wiki/index'));
     wiki$('wikiBookTitle').textContent = wikiState.index.book?.title || 'CS 학습 위키';
@@ -1683,6 +1788,9 @@ wiki$('wikiBatchCurrentBtn')?.addEventListener('click', () => {
 wiki$('wikiBatchSelectedBtn')?.addEventListener('click', () => {
   wikiQueueSelectedDocsAi();
 });
+wiki$('wikiBatchAiToggleBtn')?.addEventListener('click', () => {
+  toggleWikiBatchAiMode();
+});
 
 wiki$('wikiToc')?.addEventListener('click', (event) => {
   const toggle = event.target.closest('[data-wiki-toc-toggle]');
@@ -1694,6 +1802,9 @@ wiki$('wikiToc')?.addEventListener('click', (event) => {
 wiki$('wikiSidebarToggleBtn')?.addEventListener('click', () => toggleWikiSidebar());
 wiki$('wikiEditBtn')?.addEventListener('click', () => {
   wikiStartEdit();
+});
+wiki$('wikiGithubArchiveBtn')?.addEventListener('click', () => {
+  wikiArchiveToGithub();
 });
 wiki$('wikiEditorCancelBtn')?.addEventListener('click', () => {
   wikiCloseEditor();

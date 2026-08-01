@@ -5995,6 +5995,16 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   gap: .5rem;
 }
 
+.wiki-batch-ai-panel[hidden] {
+  display: none !important;
+}
+
+.wiki-batch-ai-panel {
+  display: flex;
+  flex-direction: column;
+  gap: .42rem;
+}
+
 .wiki-batch-ai-bar {
   display: flex;
   flex-wrap: wrap;
@@ -6028,6 +6038,24 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   align-items: center;
   justify-content: space-between;
   gap: .55rem;
+}
+
+.wiki-sidebar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: .42rem;
+}
+
+.wiki-batch-ai-toggle {
+  min-height: 1.7rem;
+  padding: .14rem .48rem;
+  font-size: .74rem;
+}
+
+.wiki-batch-ai-toggle[aria-pressed="true"] {
+  background: #f3f4f6;
+  border-color: rgba(36, 54, 79, .2);
+  color: #111827;
 }
 
 .wiki-sidebar-caption {
