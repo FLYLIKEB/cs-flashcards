@@ -2154,6 +2154,20 @@ class WikiBookTests(unittest.TestCase):
         self.assertTrue(response['archive']['committed'])
         self.assertEqual(response['archive']['commit_sha'], 'abc1234')
 
+    def test_wiki_github_git_ref_api_url_uses_refs_endpoint(self):
+        original_repo = flashcard_app.WIKI_GITHUB_REPO
+        original_branch = flashcard_app.WIKI_GITHUB_BRANCH
+        try:
+            flashcard_app.WIKI_GITHUB_REPO = 'owner/repo'
+            flashcard_app.WIKI_GITHUB_BRANCH = 'main'
+            self.assertEqual(
+                flashcard_app.wiki_github_git_ref_api_url(),
+                'https://api.github.com/repos/owner/repo/git/refs/heads/main',
+            )
+        finally:
+            flashcard_app.WIKI_GITHUB_REPO = original_repo
+            flashcard_app.WIKI_GITHUB_BRANCH = original_branch
+
     def test_archive_wiki_snapshot_to_github_pushes_current_local_snapshot(self):
         with tempfile.TemporaryDirectory() as td:
             book = write_wiki_book(Path(td))

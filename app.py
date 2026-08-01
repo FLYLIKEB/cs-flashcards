@@ -5457,7 +5457,7 @@ def wiki_github_contents_api_url(relative_path: str) -> str:
 
 def wiki_github_git_ref_api_url(branch_name: str | None = None) -> str:
     branch = str(branch_name or WIKI_GITHUB_BRANCH).strip() or "main"
-    return f"{wiki_github_repo_api_base_url()}/git/ref/{quote(f'heads/{branch}', safe='/')}"
+    return f"{wiki_github_repo_api_base_url()}/git/refs/{quote(f'heads/{branch}', safe='/')}"
 
 
 def wiki_github_git_commit_api_url(commit_sha: str) -> str:
