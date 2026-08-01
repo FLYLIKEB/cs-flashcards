@@ -293,7 +293,7 @@ class WikiAiRewriteTests(unittest.TestCase):
                     return_value=FakeUrlopenResponse({
                         'data': [{'b64_json': base64.b64encode(png_bytes).decode('ascii')}],
                     }),
-                ):
+                ), mock.patch.object(flashcard_app, 'ensure_wiki_ai_worker_started', return_value=None):
                     job = flashcard_app.create_wiki_ai_job(
                         flashcard_app.WikiAiJobCreateRequest(
                             source_paths=['pages/intro.md'],
@@ -315,13 +315,14 @@ class WikiAiRewriteTests(unittest.TestCase):
                 flashcard_app.OPENAI_API_KEY = original_key
 
     def test_create_wiki_ai_job_accepts_multiple_source_paths(self):
-        job = flashcard_app.create_wiki_ai_job(
-            flashcard_app.WikiAiJobCreateRequest(
-                source_paths=['pages/intro.md', 'pages/child.md', 'pages/intro.md'],
-                format='png',
-                target='page_batch',
+        with mock.patch.object(flashcard_app, 'ensure_wiki_ai_worker_started', return_value=None):
+            job = flashcard_app.create_wiki_ai_job(
+                flashcard_app.WikiAiJobCreateRequest(
+                    source_paths=['pages/intro.md', 'pages/child.md', 'pages/intro.md'],
+                    format='png',
+                    target='page_batch',
+                )
             )
-        )
         self.assertEqual(job['queued_targets'], 2)
         self.assertEqual(job['source_paths'], ['pages/intro.md', 'pages/child.md'])
 

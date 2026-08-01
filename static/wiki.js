@@ -29,6 +29,10 @@ const wikiState = {
   sectionPromptEditorIndex: -1,
   sectionPromptStatus: '',
   sectionPromptStatusError: false,
+  tocAiSelections: {},
+  pendingAiJobs: {},
+  aiJobPollTimer: 0,
+  aiNotificationsRequested: false,
 };
 
 const wiki$ = (id) => document.getElementById(id);
@@ -258,6 +262,89 @@ function wikiStatus(text, isError = false) {
   el.classList.toggle('error-text', Boolean(isError));
 }
 
+function wikiRequestAiNotificationPermission() {
+  if (wikiState.aiNotificationsRequested || !('Notification' in window) || window.Notification.permission !== 'default') return;
+  wikiState.aiNotificationsRequested = true;
+  window.Notification.requestPermission().catch(() => {});
+}
+
+function wikiNotifyAiJob(title, body) {
+  if (document.visibilityState !== 'hidden' || !('Notification' in window) || window.Notification.permission !== 'granted') return;
+  try {
+    new window.Notification(title, {body, tag: 'cs-wiki-ai-update'});
+  } catch (_error) {}
+}
+
+function wikiSelectedBatchSourcePaths() {
+  return Object.entries(wikiState.tocAiSelections)
+    .filter(([, checked]) => Boolean(checked))
+    .map(([sourcePath]) => sourcePath);
+}
+
+function wikiUpdateBatchAiHint() {
+  const el = wiki$('wikiBatchAiHint');
+  if (!el) return;
+  const count = wikiSelectedBatchSourcePaths().length;
+  el.textContent = count ? `선택 문서 ${count}개` : '선택 문서 0개';
+}
+
+async function wikiPollAiJobs() {
+  const entries = Object.entries(wikiState.pendingAiJobs);
+  if (!entries.length) {
+    wikiState.aiJobPollTimer = 0;
+    return;
+  }
+  for (const [jobId, meta] of entries) {
+    try {
+      const job = await wikiFetchJson(wikiApiUrl(`/api/wiki/ai-jobs/${encodeURIComponent(jobId)}`));
+      if (job.status === 'completed' || job.status === 'failed') {
+        delete wikiState.pendingAiJobs[jobId];
+        const label = meta?.label || job.message || '위키 AI 작업';
+        const message = job.status === 'completed'
+          ? `${label} 완료`
+          : `${label} 실패: ${job.error || job.message || '오류'}`;
+        wikiStatus(message, job.status === 'failed');
+        wikiNotifyAiJob(job.status === 'completed' ? `위키 AI 완료 · ${label}` : `위키 AI 실패 · ${label}`, job.message || job.error || label);
+        if (job.status === 'completed' && Array.isArray(job.source_paths) && job.source_paths.includes(wikiState.page?.source_path) && !wikiState.editorOpen) {
+          try {
+            await wikiLoadPage(wikiState.currentSlug || job.source_paths[0], {push: false});
+          } catch (_reloadError) {}
+        }
+      } else {
+        wikiState.pendingAiJobs[jobId] = {...meta, status: job.status};
+      }
+    } catch (_error) {}
+  }
+  wikiState.aiJobPollTimer = window.setTimeout(() => {
+    wikiPollAiJobs();
+  }, 4000);
+}
+
+function wikiTrackAiJob(job, label) {
+  const jobId = String(job?.job_id || '').trim();
+  if (!jobId) return;
+  wikiState.pendingAiJobs[jobId] = {label: String(label || jobId), status: String(job?.status || 'queued')};
+  if (!wikiState.aiJobPollTimer) {
+    wikiState.aiJobPollTimer = window.setTimeout(() => {
+      wikiPollAiJobs();
+    }, 4000);
+  }
+}
+
+async function wikiQueueAiJob(payload, label) {
+  wikiRequestAiNotificationPermission();
+  const job = wikiAiTools?.postJson
+    ? await wikiAiTools.postJson(wikiApiUrl('/api/wiki/ai-jobs'), payload)
+    : await wikiFetchJson(wikiApiUrl('/api/wiki/ai-jobs'), {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload),
+      });
+  wikiTrackAiJob(job, label);
+  wikiStatus(`${label} 요청됨. 백그라운드에서 처리합니다.`);
+  return job;
+}
+
 function wikiFilteredTree(items, query) {
   const normalized = String(query || '').trim().toLowerCase();
   if (!normalized) return items;
@@ -301,7 +388,9 @@ function wikiRenderTocItems(items, activeTrail = wikiActiveTrailSlugs()) {
     const toggle = hasChildren
       ? `<button class="wiki-toc-toggle" type="button" data-wiki-toc-toggle="${wikiEscapeHtml(item.slug)}" aria-expanded="${expanded}" aria-label="${expanded ? '하위 목차 접기' : '하위 목차 펼치기'}">▸</button>`
       : '<span class="wiki-toc-spacer" aria-hidden="true"></span>';
-    return `<li class="wiki-toc-item${hasChildren ? ' has-children' : ''}${expanded ? ' open' : ''}"><div class="wiki-toc-row">${toggle}<a class="wiki-toc-link${active ? ' active' : ''}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1"${active ? ' aria-current="page"' : ''}>${wikiEscapeHtml(item.title)}</a></div>${children}</li>`;
+    const checked = Boolean(wikiState.tocAiSelections[item.source_path]);
+    const checkbox = `<input class="wiki-toc-ai-checkbox" type="checkbox" data-wiki-ai-source="${wikiEscapeHtml(item.source_path)}" aria-label="${wikiEscapeHtml(item.title)} 선택"${checked ? ' checked' : ''} />`;
+    return `<li class="wiki-toc-item${hasChildren ? ' has-children' : ''}${expanded ? ' open' : ''}"><div class="wiki-toc-row">${checkbox}${toggle}<a class="wiki-toc-link${active ? ' active' : ''}" href="${wikiPageUrl(item.slug)}" data-wiki-nav="1"${active ? ' aria-current="page"' : ''}>${wikiEscapeHtml(item.title)}</a></div>${children}</li>`;
   }).join('')}</ul>`;
 }
 
@@ -310,6 +399,7 @@ function wikiRenderToc() {
   if (!toc || !wikiState.index) return;
   const filtered = wikiFilteredTree(wikiState.index.tree || [], wikiState.query);
   toc.innerHTML = wikiRenderTocItems(filtered);
+  wikiUpdateBatchAiHint();
 }
 
 function wikiRenderBreadcrumbs(page) {
@@ -931,8 +1021,8 @@ function wikiEnhanceInlineImages(page = wikiState.page) {
     });
     const currentFormat = wikiSelectedImageFormat(index, item, page);
     select.value = currentFormat;
-    const activeBusy = wikiState.imageAiLoadingIndex === index;
-    select.disabled = activeBusy;
+    const activeBusy = false;
+    select.disabled = false;
     select.addEventListener('change', () => {
       wikiSetSelectedImageFormat(index, select.value, page);
       if (wikiState.imagePromptEditorIndex === index) wikiEnhanceInlineImages(page);
@@ -1033,44 +1123,62 @@ function wikiEnhanceInlineImages(page = wikiState.page) {
 
 async function wikiRegenerateInlineImage(imageIndex) {
   const page = wikiState.page;
-  if (!page?.source_path || wikiState.imageAiLoadingIndex >= 0 || wikiState.sectionAiLoadingIndex >= 0) return;
+  if (!page?.source_path) return;
   const image = Array.isArray(page?.images) ? page.images[imageIndex] : null;
   if (!image) return;
-  const select = document.querySelector(`.wiki-inline-image-format[data-wiki-image-index="${imageIndex}"]`);
   const format = wikiSelectedImageFormat(imageIndex, image, page);
   const promptOverride = wikiImagePromptFor(page, image, format);
-  const startedAt = Date.now();
-  const minBusyMs = 900;
-  wikiState.imageAiLoadingIndex = imageIndex;
-  wikiStatus(`${image?.alt || page?.title || '이미지'} ${format.toUpperCase()} AI 생성 중…`);
-  wikiEnhanceInlineImages(page);
   try {
-    const response = wikiAiTools?.postJson
-      ? await wikiAiTools.postJson(wikiApiUrl('/api/wiki/image-ai/regenerate'), {
-          source_path: page.source_path,
-          image_index: imageIndex,
-          format,
-          prompt_override: promptOverride,
-        })
-      : await wikiFetchJson(wikiApiUrl('/api/wiki/image-ai/regenerate'), {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            source_path: page.source_path,
-            image_index: imageIndex,
-            format,
-            prompt_override: promptOverride,
-          }),
-        });
-    wikiApplyPage(response?.page || null);
-    wikiStatus(`${image?.alt || page?.title || '이미지'} ${format.toUpperCase()} AI 저장 완료`);
+    await wikiQueueAiJob({
+      source_paths: [page.source_path],
+      format,
+      prompt_template: promptOverride,
+      include_existing_images: true,
+      include_sections: false,
+      target: 'single_image',
+      image_index: imageIndex,
+    }, `${image?.alt || page?.title || '이미지'} ${format.toUpperCase()} AI`);
   } catch (error) {
-    wikiStatus(`AI 이미지 재생성 실패: ${error.message || error}`, true);
-  } finally {
-    const remaining = minBusyMs - (Date.now() - startedAt);
-    if (remaining > 0) await new Promise((resolve) => window.setTimeout(resolve, remaining));
-    wikiState.imageAiLoadingIndex = -1;
-    wikiEnhanceInlineImages(wikiState.page);
+    wikiStatus(`AI 이미지 요청 실패: ${error.message || error}`, true);
+  }
+}
+
+async function wikiQueueCurrentPageAi() {
+  const page = wikiState.page;
+  if (!page?.source_path) return;
+  const format = String(wiki$('wikiBatchAiFormat')?.value || 'png').trim().toLowerCase() || 'png';
+  try {
+    await wikiQueueAiJob({
+      source_paths: [page.source_path],
+      format,
+      prompt_template: String(wikiImagePromptTemplate(format)?.instruction || ''),
+      include_existing_images: true,
+      include_sections: true,
+      target: 'page_batch',
+    }, `${page?.title || '현재 문서'} 일괄 AI`);
+  } catch (error) {
+    wikiStatus(`현재 문서 AI 요청 실패: ${error.message || error}`, true);
+  }
+}
+
+async function wikiQueueSelectedDocsAi() {
+  const sourcePaths = wikiSelectedBatchSourcePaths();
+  if (!sourcePaths.length) {
+    wikiStatus('선택한 문서가 없습니다.', true);
+    return;
+  }
+  const format = String(wiki$('wikiBatchAiFormat')?.value || 'png').trim().toLowerCase() || 'png';
+  try {
+    await wikiQueueAiJob({
+      source_paths: sourcePaths,
+      format,
+      prompt_template: String(wikiImagePromptTemplate(format)?.instruction || ''),
+      include_existing_images: true,
+      include_sections: true,
+      target: 'page_batch',
+    }, `선택 문서 ${sourcePaths.length}개 일괄 AI`);
+  } catch (error) {
+    wikiStatus(`선택 문서 AI 요청 실패: ${error.message || error}`, true);
   }
 }
 
@@ -1083,8 +1191,8 @@ function wikiEnhanceSectionHeadings(page = wikiState.page) {
   headings.forEach((heading, index) => {
     const section = sections[index];
     if (!section) return;
-    const anyBusy = wikiState.imageAiLoadingIndex >= 0 || wikiState.sectionAiLoadingIndex >= 0;
-    const activeBusy = wikiState.sectionAiLoadingIndex === index;
+    const anyBusy = false;
+    const activeBusy = false;
     const controls = document.createElement('span');
     controls.className = 'wiki-section-ai';
     const select = document.createElement('select');
@@ -1199,43 +1307,23 @@ function wikiEnhanceSectionHeadings(page = wikiState.page) {
 
 async function wikiGenerateSectionImage(sectionIndex) {
   const page = wikiState.page;
-  if (!page?.source_path || wikiState.imageAiLoadingIndex >= 0 || wikiState.sectionAiLoadingIndex >= 0) return;
+  if (!page?.source_path) return;
   const section = Array.isArray(page?.sections) ? page.sections[sectionIndex] : null;
   if (!section) return;
   const format = wikiSelectedSectionFormat(sectionIndex, section, page);
   const promptOverride = wikiImagePromptFor(page, section, format);
-  const startedAt = Date.now();
-  const minBusyMs = 900;
-  wikiState.sectionAiLoadingIndex = sectionIndex;
-  wikiStatus(`${section?.title || page?.title || '섹션'} ${format.toUpperCase()} AI 생성 중…`);
-  wikiEnhanceSectionHeadings(page);
   try {
-    const response = wikiAiTools?.postJson
-      ? await wikiAiTools.postJson(wikiApiUrl('/api/wiki/section-image/generate'), {
-          source_path: page.source_path,
-          section_index: sectionIndex,
-          format,
-          prompt_override: promptOverride,
-        })
-      : await wikiFetchJson(wikiApiUrl('/api/wiki/section-image/generate'), {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            source_path: page.source_path,
-            section_index: sectionIndex,
-            format,
-            prompt_override: promptOverride,
-          }),
-        });
-    wikiApplyPage(response?.page || null);
-    wikiStatus(`${section?.title || page?.title || '섹션'} ${format.toUpperCase()} AI 저장 완료`);
+    await wikiQueueAiJob({
+      source_paths: [page.source_path],
+      format,
+      prompt_template: promptOverride,
+      include_existing_images: false,
+      include_sections: true,
+      target: 'single_section',
+      section_index: sectionIndex,
+    }, `${section?.title || page?.title || '섹션'} ${format.toUpperCase()} AI`);
   } catch (error) {
-    wikiStatus(`섹션 AI 이미지 생성 실패: ${error.message || error}`, true);
-  } finally {
-    const remaining = minBusyMs - (Date.now() - startedAt);
-    if (remaining > 0) await new Promise((resolve) => window.setTimeout(resolve, remaining));
-    wikiState.sectionAiLoadingIndex = -1;
-    wikiEnhanceSectionHeadings(wikiState.page);
+    wikiStatus(`섹션 AI 요청 실패: ${error.message || error}`, true);
   }
 }
 
@@ -1262,6 +1350,12 @@ function wikiApplyPage(page) {
   wikiRenderToc();
   wikiApplyEditorState();
   wikiStatus(`${page?.title || '문서'} 열람 중`);
+}
+
+function wikiScrollPageToTop() {
+  window.requestAnimationFrame(() => {
+    window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+  });
 }
 
 async function wikiResponseError(res) {
@@ -1295,13 +1389,14 @@ async function wikiFetchText(url, options = null) {
   return res.text();
 }
 
-async function wikiLoadPage(slug, {push = false} = {}) {
+async function wikiLoadPage(slug, {push = false, scrollToTop = false} = {}) {
   const normalized = String(slug || wikiState.index?.default_page_slug || '').trim() || '_book';
   const page = await wikiFetchJson(wikiApiUrl(`/api/wiki/page/${encodeURIComponent(normalized).replace(/%2F/g, '/')}`));
   if (push && window.location.pathname !== wikiPageUrl(page.slug)) {
     window.history.pushState({}, '', wikiPageUrl(page.slug));
   }
   wikiApplyPage(page);
+  if (scrollToTop) wikiScrollPageToTop();
 }
 
 async function wikiStartEdit() {
@@ -1461,7 +1556,7 @@ async function wikiInit() {
     wiki$('wikiBookTitle').textContent = wikiState.index.book?.title || 'CS 학습 위키';
     wiki$('wikiBookIntroLink').href = wikiPageUrl(wikiState.index.book?.slug || '_book');
     wikiRenderToc();
-    await wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || wikiState.index.book?.slug || '_book');
+    await wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || wikiState.index.book?.slug || '_book', {scrollToTop: true});
   } catch (error) {
     wikiStatus(`위키 로딩 실패: ${error.message || error}`, true);
     wiki$('wikiArticle').innerHTML = `<p class="error-text">${wikiEscapeHtml(error.message || error)}</p>`;
@@ -1487,6 +1582,12 @@ wiki$('wikiSearchInput')?.addEventListener('keydown', (event) => {
 
 wiki$('wikiSearchToggleBtn')?.addEventListener('click', () => {
   toggleWikiSearch();
+});
+wiki$('wikiBatchCurrentBtn')?.addEventListener('click', () => {
+  wikiQueueCurrentPageAi();
+});
+wiki$('wikiBatchSelectedBtn')?.addEventListener('click', () => {
+  wikiQueueSelectedDocsAi();
 });
 
 wiki$('wikiToc')?.addEventListener('click', (event) => {
@@ -1522,7 +1623,7 @@ window.addEventListener('popstate', () => {
     window.history.pushState({}, '', wikiPageUrl(wikiState.currentSlug || wikiState.index.default_page_slug || '_book'));
     return;
   }
-  wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || '_book').then(() => {
+  wikiLoadPage(wikiCurrentSlug() || wikiState.index.default_page_slug || '_book', {scrollToTop: true}).then(() => {
     wikiCloseEditor({force: true});
   }).catch((error) => {
     wikiStatus(`문서 이동 실패: ${error.message || error}`, true);
@@ -1554,7 +1655,7 @@ document.addEventListener('click', (event) => {
   }
   const slug = decodeURIComponent(href.replace('/wiki/page/', '')).replace(/^\/+|\/+$/g, '');
   event.preventDefault();
-  wikiLoadPage(slug, {push: true}).then(() => {
+  wikiLoadPage(slug, {push: true, scrollToTop: true}).then(() => {
     wikiCloseEditor({force: true});
     closeWikiSidebarOnMobile();
     closeWikiSearch();
@@ -1564,6 +1665,14 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('change', (event) => {
+  const aiCheckbox = event.target.closest('input[data-wiki-ai-source]');
+  if (aiCheckbox) {
+    const sourcePath = String(aiCheckbox.dataset.wikiAiSource || '').trim();
+    if (!sourcePath) return;
+    wikiState.tocAiSelections[sourcePath] = aiCheckbox.checked;
+    wikiUpdateBatchAiHint();
+    return;
+  }
   const checkbox = event.target.closest('input[data-wiki-task-checkbox="1"]');
   if (!checkbox) return;
   wikiToggleChecklist(checkbox);

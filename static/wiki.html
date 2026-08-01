@@ -40,6 +40,16 @@
           <span class="wiki-sidebar-caption">목차보기</span>
           <a id="wikiBookIntroLink" class="wiki-book-home-link" href="/wiki/page/_book">책 소개</a>
         </div>
+        <div class="wiki-batch-ai-bar">
+          <select id="wikiBatchAiFormat" class="wiki-batch-ai-format" aria-label="일괄 AI 파일 포맷">
+            <option value="png">png</option>
+            <option value="svg">svg</option>
+            <option value="gif">gif</option>
+          </select>
+          <button id="wikiBatchCurrentBtn" class="header-link" type="button">현재 문서 AI</button>
+          <button id="wikiBatchSelectedBtn" class="header-link" type="button">선택 문서 AI</button>
+        </div>
+        <p id="wikiBatchAiHint" class="small muted">선택 문서 0개</p>
         <p id="wikiStatus" class="small muted">목차를 불러오는 중...</p>
       </div>
       <nav id="wikiToc" class="wiki-toc" aria-label="위키 목차"></nav>

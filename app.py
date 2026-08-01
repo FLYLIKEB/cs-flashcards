@@ -6647,7 +6647,7 @@ def run_wiki_ai_job(job_id: str) -> None:
                     prompt_override=snapshot["prompt_template"],
                 )
             )
-            update_wiki_ai_job(job_id, processed_targets=1)
+            update_wiki_ai_job(job_id, processed_targets=1, message="이미지 생성 완료")
         elif snapshot["target"] == "single_section":
             generate_wiki_section_image_asset(
                 WikiSectionImageGenerateRequest(
@@ -6657,7 +6657,7 @@ def run_wiki_ai_job(job_id: str) -> None:
                     prompt_override=snapshot["prompt_template"],
                 )
             )
-            update_wiki_ai_job(job_id, processed_targets=1)
+            update_wiki_ai_job(job_id, processed_targets=1, message="섹션 이미지 생성 완료")
         else:
             processed_targets = 0
             generated_images = 0

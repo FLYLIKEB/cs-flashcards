@@ -5993,6 +5993,31 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   display: flex;
   flex-direction: column;
   gap: .5rem;
+}
+
+.wiki-batch-ai-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  align-items: center;
+}
+
+.wiki-batch-ai-format {
+  min-width: 3.6rem;
+  min-height: 2.05rem;
+  padding: .2rem .42rem;
+  border: 1px solid var(--wiki-border-soft);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: .74rem;
+}
+
+.wiki-batch-ai-bar .header-link {
+  min-height: 2.05rem;
+  padding: .28rem .62rem;
+}
+
   margin-bottom: .9rem;
   padding-bottom: .85rem;
   border-bottom: 1px solid var(--wiki-border-soft);
@@ -6070,6 +6095,14 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   display: flex;
   align-items: flex-start;
   gap: .14rem;
+}
+
+.wiki-toc-ai-checkbox {
+  flex: 0 0 auto;
+  width: .92rem;
+  height: .92rem;
+  margin: .34rem .08rem 0 0;
+  accent-color: var(--wiki-link);
 }
 
 .wiki-toc-toggle,
@@ -6955,6 +6988,15 @@ body.wiki-sidebar-collapsed .wiki-sidebar {
   .wiki-search {
     padding: 0 .8rem .7rem;
     justify-content: stretch;
+  }
+
+  .wiki-batch-ai-bar {
+    align-items: stretch;
+  }
+
+  .wiki-batch-ai-format,
+  .wiki-batch-ai-bar .header-link {
+    width: 100%;
   }
 
   .wiki-search input {
