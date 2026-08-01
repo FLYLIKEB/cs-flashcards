@@ -5276,6 +5276,14 @@ select,
   font-size: .73rem;
   font-weight: 780;
 }
+.question-judgment-badge.wrong {
+  border-color: rgba(159, 47, 63, .24);
+  background: var(--unknown-soft);
+  color: var(--unknown);
+}
+.question-card-shell.is-judged-wrong {
+  box-shadow: inset 0 0 0 1px rgba(159, 47, 63, .18), inset 4px 0 0 #c23a50, 0 18px 42px rgba(15, 23, 42, .08);
+}
 .question-card-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(15rem, 18rem);
@@ -7376,6 +7384,13 @@ body.question-bank-embed .question-embed-topbar-copy {
 body.question-bank-embed .question-embed-topbar-copy span {
   color: #66778a;
   font-size: .8rem;
+}
+body.question-bank-embed .question-embed-topbar.is-wrong {
+  border-bottom-color: rgba(159, 47, 63, .2);
+}
+body.question-bank-embed .question-embed-topbar-status.wrong {
+  color: var(--unknown);
+  font-weight: 700;
 }
 body.question-bank-embed .question-embed-topbar-actions {
   display: flex;

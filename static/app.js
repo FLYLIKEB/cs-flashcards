@@ -5769,11 +5769,14 @@ function renderQuestionPanel() {
   const questionPosition = total ? `문항 ${state.questionIndex + 1} / ${total}` : '문항';
   const bodyHtml = question.body ? `<div class="question-body question-surface">${renderQuestionMarkdown(question.body)}</div>` : '';
   const keywordHtml = renderQuestionKeywordLinks(question.keywords, {interactive: true});
+  const judgmentBadgeHtml = question.judgment !== 'pending'
+    ? `<span class="badge question-judgment-badge ${escapeHtml(question.judgment)}">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>`
+    : '';
   const embedTopbarHtml = questionBankEmbedMode() ? `
-    <div class="question-embed-topbar question-surface">
+    <div class="question-embed-topbar question-surface${question.judgment === 'wrong' ? ' is-wrong' : ''}">
       <div class="question-embed-topbar-copy">
         <strong>${escapeHtml(questionPosition)}</strong>
-        <span>${escapeHtml(revealLocked ? '정답 잠금 중' : '정답 확인 가능')}</span>
+        <span class="question-embed-topbar-status${question.judgment === 'wrong' ? ' wrong' : ''}">${escapeHtml(revealLocked ? '정답 잠금 중' : question.judgment === 'wrong' ? '틀림 표시됨' : '정답 확인 가능')}</span>
       </div>
       <div class="question-embed-topbar-actions">
         <button class="question-toolbar-button" type="button" data-question-nav="prev" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex <= 0 ? 'disabled' : ''}>이전</button>
@@ -5784,7 +5787,7 @@ function renderQuestionPanel() {
       </div>
     </div>` : '';
   card.innerHTML = `
-    <div class="question-card-shell">
+    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
       <div class="question-card-head">
         <div class="question-card-head-copy">
@@ -5800,7 +5803,7 @@ function renderQuestionPanel() {
           ${question.difficulty ? `<span class="badge">난이도 ${escapeHtml(question.difficulty)}</span>` : ''}
           ${question.section ? `<span class="badge">${escapeHtml(question.section)}</span>` : ''}
           ${Number.isInteger(question.points) ? `<span class="badge">${escapeHtml(String(question.points))}점</span>` : ''}
-          ${question.judgment !== 'pending' ? `<span class="badge">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>` : ''}
+          ${judgmentBadgeHtml}
         </div>
       </div>
       <div class="question-card-grid">
