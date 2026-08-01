@@ -42,6 +42,8 @@ const bankState = {
 
 let pendingLoadTimer = 0;
 let categoryGuideLastFocused = null;
+let activeQuestionBankLoadRequest = 0;
+let questionBankLoadAbortController = null;
 
 function escapeHtml(value) {
   return window.CSTableShell?.escapeHtml ? window.CSTableShell.escapeHtml(value) : String(value ?? '');
@@ -516,11 +518,11 @@ function syncUrl() {
   if (`${window.location.pathname}${window.location.search}` !== next) window.history.replaceState({}, '', next);
 }
 
-async function fetchEntries() {
+async function fetchEntries({signal} = {}) {
   const params = new URLSearchParams(queryString());
   params.set('__ts', String(Date.now()));
   const qs = params.toString();
-  const res = await fetch(`/api/question-bank${qs ? `?${qs}` : ''}`, {cache: 'no-store'});
+  const res = await fetch(`/api/question-bank${qs ? `?${qs}` : ''}`, {cache: 'no-store', signal});
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
@@ -770,13 +772,21 @@ function launch(startIndex = 0, {reveal = true} = {}) {
 }
 
 async function loadQuestionBankPage() {
+  const requestId = activeQuestionBankLoadRequest + 1;
+  activeQuestionBankLoadRequest = requestId;
+  if (questionBankLoadAbortController) {
+    questionBankLoadAbortController.abort();
+  }
+  const controller = typeof window.AbortController === 'function' ? new window.AbortController() : null;
+  questionBankLoadAbortController = controller;
   bankState.loading = true;
   bankState.error = '';
   syncUrl();
   renderTable();
   renderPracticePane();
   try {
-    const data = await fetchEntries();
+    const data = await fetchEntries({signal: controller?.signal});
+    if (requestId !== activeQuestionBankLoadRequest) return;
     const previousSelectedId = bankState.selectedId;
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
@@ -787,8 +797,14 @@ async function loadQuestionBankPage() {
     const nextIndex = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === previousSelectedId);
     bankState.selectedId = String(bankState.items[nextIndex >= 0 ? nextIndex : 0]?.question_bank_id || '');
     bankState.practiceStartIndex = nextIndex >= 0 ? nextIndex : 0;
-    if (!bankState.items.length) bankState.practiceLoaded = false;
+    if (!bankState.items.length) {
+      bankState.practiceLoaded = false;
+    } else if (bankState.practiceLoaded && nextIndex < 0) {
+      bankState.practiceLoaded = false;
+      bankState.practiceCollapsed = true;
+    }
   } catch (error) {
+    if (error?.name === 'AbortError' || requestId !== activeQuestionBankLoadRequest) return;
     bankState.items = [];
     bankState.summary = {total: 0, returned: 0};
     populateTopicOptions([], filterValues().topic);
@@ -798,10 +814,13 @@ async function loadQuestionBankPage() {
     bankState.error = error.message || String(error);
     bankState.practiceLoaded = false;
   } finally {
+    if (requestId !== activeQuestionBankLoadRequest) return;
+    if (questionBankLoadAbortController === controller) {
+      questionBankLoadAbortController = null;
+    }
     bankState.loading = false;
     renderTable();
     renderPracticePane();
-    if (bankState.items.length) launch(selectedIndex(bankState.practiceStartIndex), {reveal: false});
   }
 }
 
