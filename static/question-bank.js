@@ -345,7 +345,10 @@ function applyEmbeddedQuestionBankUpdate(item) {
   const questionBankId = String(item?.question_bank_id || '').trim();
   if (!questionBankId) return;
   const index = bankState.items.findIndex((entry) => String(entry?.question_bank_id || '') === questionBankId);
-  if (index < 0) return;
+  if (index < 0) {
+    loadQuestionBankPage().catch(() => {});
+    return;
+  }
   const nextItem = {...bankState.items[index], ...item};
   bankState.items[index] = nextItem;
   if (!questionBankItemMatchesAttemptStatusFilter(nextItem)) {

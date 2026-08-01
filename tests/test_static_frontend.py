@@ -822,6 +822,7 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('.question-bank-shell-topbar', STYLE_CSS)
         self.assertIn('.question-bank-embed .topbar', STYLE_CSS)
         self.assertIn('body.question-bank-embed #questionBankToggleBtn', STYLE_CSS)
+        self.assertIn('if (index < 0) {', QUESTION_BANK_JS)
         self.assertIn('body.question-bank-embed #questionBankBrowser', STYLE_CSS)
         self.assertIn('body.question-bank-embed {', STYLE_CSS)
         self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
