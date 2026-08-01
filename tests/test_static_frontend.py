@@ -339,6 +339,25 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-shell-header-chips', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-guide-table', TABLE_SHELL_CSS)
 
+    def test_concept_html_widgets_use_trusted_iframe_boundary(self):
+        self.assertIn("const TRUSTED_CONCEPT_WIDGET_HTML_KIND = 'concept-widget';", APP_JS)
+        self.assertIn('function trustedConceptWidgetHtml(payload)', APP_JS)
+        self.assertIn('function isTrustedConceptWidgetHtml(value)', APP_JS)
+        self.assertIn("if (!isTrustedConceptWidgetHtml(payload)) throw new Error('Trusted concept HTML payload required.');", APP_JS)
+        self.assertIn("frame.srcdoc = conceptMediaIframeSrcdoc(payload, alt);", APP_JS)
+        self.assertIn('sandbox iframe 전용', APP_JS)
+        self.assertIn('Sandbox HTML 위젯', INDEX_HTML)
+        self.assertIn('카드 뒷면의 sandbox iframe 안에서만 렌더링되는 HTML 위젯', INDEX_HTML)
+        self.assertNotIn("frame.srcdoc = conceptMediaIframeSrcdoc(String(payload || ''), alt);", APP_JS)
+
+    def test_wiki_html_uses_trusted_render_boundary(self):
+        self.assertIn("const WIKI_TRUSTED_RENDERED_HTML_KIND = 'wiki-rendered';", WIKI_JS)
+        self.assertIn('function wikiTrustedRenderedHtml(html)', WIKI_JS)
+        self.assertIn('function wikiApplyTrustedHtml(element, trustedHtml', WIKI_JS)
+        self.assertIn("wikiApplyTrustedHtml(wiki$('wikiArticle'), wikiTrustedRenderedHtml(page?.html || ''), {emptyText: '문서가 비어 있습니다.'});", WIKI_JS)
+        self.assertIn("wikiApplyTrustedHtml(preview, wikiTrustedRenderedHtml(data?.html || ''), {emptyText: '미리보기 결과가 비어 있습니다.'});", WIKI_JS)
+        self.assertNotIn("wiki$('wikiArticle').innerHTML = page?.html || '<p class=\"muted\">문서가 비어 있습니다.</p>';", WIKI_JS)
+        self.assertNotIn("preview.innerHTML = data?.html || '<p class=\"muted\">미리보기 결과가 비어 있습니다.</p>';", WIKI_JS)
 
 if __name__ == '__main__':
     unittest.main()
