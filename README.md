@@ -271,10 +271,11 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 - 일반 배포는 원격 `state/progress.sqlite`를 **보존**해야 하며, 코드 배포로 전체 DB 파일을 덮어쓰는 경로는 제거되었습니다.
 - DB 내용 수정은 변경한 row/field만 원격에 반영해야 합니다. 변경과 무관한 원격 데이터는 그대로 유지되어야 합니다.
 - 같은 row/field를 누군가 원격에서 동시에 수정하면 마지막 반영이 이깁니다. 충돌 가능성이 있으면 먼저 원격 DB를 다시 pull 받아 기준을 맞춥니다.
-- `./scripts/sync_remote_sqlite_rows.sh`는 이제 `--columns` 지정이 **필수**입니다. 필요한 컬럼만 명시적으로 반영하고, 불필요한 row 삭제는 `--delete`로 대상 id만 지웁니다.
+- `./scripts/sync_remote_sqlite_rows.sh`는 이제 `--columns` 지정이 **필수**이며, 원격 DB 반영은 SQL `INSERT ... ON CONFLICT DO UPDATE` 방식으로만 수행합니다.
 - 배포 후에는 `/api/health`만 보지 말고, 변경한 레코드를 `/api/question-bank`, `/api/cards` 같은 인증된 API로 직접 조회해 값이 맞는지 확인합니다.
 - 원격 DB가 비어 있거나 오래된 값이면 즉시 로컬의 정상 `state/progress.sqlite`를 서버로 복구하고 서비스를 재시작한 뒤 다시 검증합니다.
-- 원격 DB 경로를 다른 파일로 바꾸는 옵션과 전체 파일 교체 경로는 모두 제거되었습니다.
+- 원격 DB 경로를 다른 파일로 바꾸는 옵션, 전체 파일 교체 경로, 원격 row 삭제 경로는 모두 제거되었습니다.
+
 
 
 ### 권장 SQLite 작업 순서
@@ -289,7 +290,6 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 # 3) 바뀐 row/field만 원격에 반영
 ./scripts/sync_remote_sqlite_rows.sh --columns answer,explanation,answer_guide question_bank qb-011b1c688f53bb3974beb2e3
 ./scripts/sync_remote_sqlite_rows.sh --columns term,definition,detailed_explanation cards CS-001
-./scripts/sync_remote_sqlite_rows.sh --delete question_bank qb-sample-001
 
 # 4) 인증된 API로 실제 서비스 값을 확인
 ./scripts/remote_flashcards_api.sh '/api/question-bank?query=리팩토링&limit=1'

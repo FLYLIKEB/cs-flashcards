@@ -15,16 +15,14 @@ REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"
 LOCAL_TARGET=""
 KEY_COLUMN=""
 COLUMN_SPEC=""
-DELETE_MODE=0
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/sync_remote_sqlite_rows.sh [--local-db PATH] [--key COLUMN] [--columns col1,col2] [--delete] [--local-target PATH] <table> <row-id> [<row-id>...]
+Usage: ./scripts/sync_remote_sqlite_rows.sh [--local-db PATH] [--key COLUMN] [--columns col1,col2] [--local-target PATH] <table> <row-id> [<row-id>...]
 
 Examples:
   ./scripts/sync_remote_sqlite_rows.sh --columns answer,explanation,answer_guide question_bank qb-011b1c688f53bb3974beb2e3
   ./scripts/sync_remote_sqlite_rows.sh --columns term,definition,detailed_explanation cards CS-001 CS-002
-  ./scripts/sync_remote_sqlite_rows.sh --delete question_bank qb-sample-001
   ./scripts/sync_remote_sqlite_rows.sh --local-target /tmp/remote.sqlite --columns answer,explanation question_bank qb-011b1c688f53bb3974beb2e3
 EOF
 }
@@ -48,10 +46,7 @@ while [[ $# -gt 0 ]]; do
       COLUMN_SPEC="${COLUMN_SPEC:+$COLUMN_SPEC,}$2"
       shift 2
       ;;
-    --delete)
-      DELETE_MODE=1
-      shift
-      ;;
+
     --local-target)
       LOCAL_TARGET="$2"
       shift 2
@@ -102,20 +97,16 @@ if [[ -z "$KEY_COLUMN" ]]; then
   esac
 fi
 
-if [[ "$DELETE_MODE" == "1" && -n "$COLUMN_SPEC" ]]; then
-  echo "--delete 와 --columns 는 함께 사용할 수 없습니다." >&2
-  exit 1
-fi
-if [[ "$DELETE_MODE" != "1" && -z "$COLUMN_SPEC" ]]; then
-  echo "--columns 는 필수입니다. 원격 row 전체 덮어쓰기는 금지됩니다." >&2
+if [[ -z "$COLUMN_SPEC" ]]; then
+  echo "--columns 는 필수입니다. 원격 row 전체 덮어쓰기와 삭제는 금지됩니다." >&2
   exit 1
 fi
 
-
-if [[ "$DELETE_MODE" != "1" && ! -f "$LOCAL_DB" ]]; then
+if [[ ! -f "$LOCAL_DB" ]]; then
   echo "로컬 SQLite 파일을 찾을 수 없습니다: $LOCAL_DB" >&2
   exit 1
 fi
+
 
 PAYLOAD_FILE="$(mktemp -t cs-flashcards-row-sync.XXXXXX.json)"
 REMOTE_PAYLOAD="/tmp/$(basename "$PAYLOAD_FILE")"
@@ -124,7 +115,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python3 - <<'PY' "$DELETE_MODE" "$LOCAL_DB" "$TABLE" "$KEY_COLUMN" "$PAYLOAD_FILE" "$COLUMN_SPEC" "${IDS[@]}"
+python3 - <<'PY' "$LOCAL_DB" "$TABLE" "$KEY_COLUMN" "$PAYLOAD_FILE" "$COLUMN_SPEC" "${IDS[@]}"
 import json
 import re
 import sqlite3
@@ -138,7 +129,7 @@ def valid_identifier(value: str) -> bool:
 
 def parse_column_spec(raw: str, *, key_column: str, available_columns: list[str]) -> list[str]:
     if not raw.strip():
-        raise SystemExit('--columns 는 필수입니다. 원격 row 전체 덮어쓰기는 금지됩니다.')
+        raise SystemExit('--columns 는 필수입니다. 원격 row 전체 덮어쓰기와 삭제는 금지됩니다.')
     requested: list[str] = []
     seen: set[str] = set()
     for piece in re.split(r'[\s,]+', raw.strip()):
@@ -158,16 +149,14 @@ def parse_column_spec(raw: str, *, key_column: str, available_columns: list[str]
     return [key_column] + [column for column in requested if column != key_column]
 
 
-
-delete_mode = sys.argv[1] == '1'
-db_path = Path(sys.argv[2])
-table = sys.argv[3]
-key_column = sys.argv[4]
-payload_path = Path(sys.argv[5])
-column_spec = sys.argv[6]
+db_path = Path(sys.argv[1])
+table = sys.argv[2]
+key_column = sys.argv[3]
+payload_path = Path(sys.argv[4])
+column_spec = sys.argv[5]
 ids: list[str] = []
 seen_ids: set[str] = set()
-for raw in sys.argv[7:]:
+for raw in sys.argv[6:]:
     if raw not in seen_ids:
         ids.append(raw)
         seen_ids.add(raw)
@@ -175,16 +164,6 @@ if not ids:
     raise SystemExit('대상 row id가 필요합니다.')
 if not valid_identifier(table) or not valid_identifier(key_column):
     raise SystemExit('테이블명/키 컬럼명은 안전한 식별자여야 합니다.')
-if delete_mode:
-    payload = {
-        'mode': 'delete',
-        'table': table,
-        'key_column': key_column,
-        'ids': ids,
-    }
-    payload_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
-    print(json.dumps({'mode': 'delete', 'table': table, 'key_column': key_column, 'rows': len(ids), 'payload_path': str(payload_path)}, ensure_ascii=False))
-    raise SystemExit(0)
 conn = sqlite3.connect(db_path)
 conn.row_factory = sqlite3.Row
 columns = [row[1] for row in conn.execute(f'PRAGMA table_info({table})').fetchall()]
@@ -200,7 +179,6 @@ missing = [row_id for row_id in ids if row_id not in row_map]
 if missing:
     raise SystemExit('로컬 DB에 없는 row id: ' + ', '.join(missing))
 payload = {
-    'mode': 'upsert',
     'table': table,
     'key_column': key_column,
     'columns': selected_columns,
@@ -208,9 +186,10 @@ payload = {
     'rows': [row_map[row_id] for row_id in ids],
 }
 payload_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
-print(json.dumps({'mode': 'upsert', 'table': table, 'key_column': key_column, 'columns': selected_columns, 'rows': len(ids), 'payload_path': str(payload_path)}, ensure_ascii=False))
+print(json.dumps({'table': table, 'key_column': key_column, 'columns': selected_columns, 'rows': len(ids), 'payload_path': str(payload_path)}, ensure_ascii=False))
 conn.close()
 PY
+
 
 APPLY_PY=$(cat <<'PY'
 import json
@@ -227,7 +206,6 @@ def valid_identifier(value: str) -> bool:
 db_path = Path(sys.argv[1])
 payload_path = Path(sys.argv[2])
 payload = json.loads(payload_path.read_text(encoding='utf-8'))
-mode = payload.get('mode', 'upsert')
 table = payload['table']
 key_column = payload['key_column']
 ids = payload['ids']
@@ -240,14 +218,7 @@ if not remote_columns:
 if key_column not in remote_columns:
     raise SystemExit(f'대상 키 컬럼이 없습니다: {table}.{key_column}')
 qmarks = ','.join('?' for _ in ids)
-if mode == 'delete':
-    before = conn.execute(f'SELECT COUNT(*) FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchone()[0]
-    conn.execute(f'DELETE FROM {table} WHERE {key_column} IN ({qmarks})', ids)
-    conn.commit()
-    matched = conn.execute(f'SELECT COUNT(*) FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchone()[0]
-    conn.close()
-    print(json.dumps({'db_path': str(db_path), 'mode': mode, 'table': table, 'key_column': key_column, 'rows_requested': len(ids), 'rows_deleted': before - matched, 'matched_after': matched, 'ids': ids}, ensure_ascii=False, indent=2))
-    raise SystemExit(0)
+
 columns = payload['columns']
 rows = payload['rows']
 if any(not valid_identifier(column) for column in columns):
@@ -266,7 +237,7 @@ conn.executemany(sql, [[row.get(column) for column in columns] for row in rows])
 conn.commit()
 matched = conn.execute(f'SELECT COUNT(*) FROM {table} WHERE {key_column} IN ({qmarks})', ids).fetchone()[0]
 conn.close()
-print(json.dumps({'db_path': str(db_path), 'mode': mode, 'table': table, 'key_column': key_column, 'columns': columns, 'rows_upserted': len(rows), 'matched_after': matched, 'ids': ids}, ensure_ascii=False, indent=2))
+print(json.dumps({'db_path': str(db_path), 'table': table, 'key_column': key_column, 'columns': columns, 'rows_upserted': len(rows), 'matched_after': matched, 'ids': ids}, ensure_ascii=False, indent=2))
 PY
 )
 

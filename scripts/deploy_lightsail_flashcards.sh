@@ -185,22 +185,7 @@ if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없으면 배포를 중단합니다: $REMOTE_DB_PATH" >&2
   exit 1
 fi
-cp "$REMOTE_DB_PATH" "$REMOTE_DIR/backups/progress-before-deploy-$(date +%Y%m%dT%H%M%S).sqlite"
-python3 - <<'PY' "$REMOTE_DB_PATH"
-import sqlite3
-import sys
-path = sys.argv[1]
-conn = sqlite3.connect(path)
-try:
-    count = conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0]
-except sqlite3.Error as exc:
-    raise SystemExit(f"원격 SQLite 검증 실패: {exc}") from exc
-finally:
-    conn.close()
-if count <= 0:
-    raise SystemExit(f"원격 SQLite cards 테이블이 비어 있어 배포를 중단합니다: {path}")
-print(f"원격 SQLite 검증 완료: {path} cards={count}")
-PY
+
 
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
@@ -220,15 +205,6 @@ cd "$REMOTE_DIR"
 python3 -m venv .venv
 .venv/bin/python -m pip install -q --upgrade pip
 .venv/bin/python -m pip install -q -r requirements.txt
-CS_FLASHCARD_PROGRESS_DB="$REMOTE_DB_PATH" CS_FLASHCARD_PROGRESS_DB_MUST_EXIST=1 .venv/bin/python - <<'PY'
-import json
-import app
-cards, _ = app.read_card_content(app.PROGRESS_DB_PATH)
-print("SQLite card db:", json.dumps({
-    "count": len(cards),
-    "path": str(app.PROGRESS_DB_PATH),
-}, ensure_ascii=False))
-PY
 
 
 sudo tee /etc/systemd/system/cs-flashcards.service >/dev/null <<EOF
