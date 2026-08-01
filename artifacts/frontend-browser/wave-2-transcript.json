@@ -3,13 +3,13 @@
   "wave_id": "wave-2",
   "branch": "wave-2-frontend-regression-foundation",
   "command": ".venv/bin/python -m unittest tests.test_frontend_browser",
-  "generated_at": "2026-08-01T14:30:32+00:00",
-  "base_url": "http://127.0.0.1:49845",
+  "generated_at": "2026-08-01T14:33:41+00:00",
+  "base_url": "http://127.0.0.1:49960",
   "cases": [
     {
       "id": "calendar-drawer-focus",
       "status": "passed",
-      "url": "http://127.0.0.1:49845",
+      "url": "http://127.0.0.1:49960",
       "observations": {
         "path": "/calendar",
         "active_tab_after_keyboard": "true",
@@ -23,13 +23,13 @@
     {
       "id": "question-bank-load-launch",
       "status": "passed",
-      "url": "http://127.0.0.1:49845",
+      "url": "http://127.0.0.1:49960",
       "observations": {
         "path": "/question-bank",
         "initial_summary": "총 545문항 · 현재 200문항 · 필터 0개",
         "filters_collapsed_initially": true,
         "active_filters": "통합 검색데이터베이스×",
-        "practice_frame_src": "/?question-bank-embed=1&question-bank-run=1785594628504-3",
+        "practice_frame_src": "/?question-bank-embed=1&question-bank-run=1785594816128-3",
         "launch_state_present": false,
         "practice_status": "현재 1 / 70서술형한국은행"
       }
@@ -37,7 +37,7 @@
     {
       "id": "wiki-sidebar-status",
       "status": "passed",
-      "url": "http://127.0.0.1:49845",
+      "url": "http://127.0.0.1:49960",
       "observations": {
         "path": "/wiki",
         "sidebar_initially_open": false,
