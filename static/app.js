@@ -4695,25 +4695,67 @@ function currentQuestionCard() {
     || null;
 }
 
-function syncUpdatedQuestionBankItem(item) {
+function questionAttemptStatusFromJudgment(judgment = 'pending') {
+  if (judgment === 'correct') return 'correct';
+  if (['ambiguous', 'wrong', 'unknown'].includes(judgment)) return 'wrong';
+  return 'unseen';
+}
+
+function questionAttemptStatusLabel(status = 'unseen') {
+  const labels = {unseen: '안푼', wrong: '틀린', correct: '맞은'};
+  return labels[status] || labels.unseen;
+}
+
+function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = questionBankFilterValues().attempt_status) {
+  if (!attemptStatus) return true;
+  return String(item?.question_attempt_status || 'unseen') === String(attemptStatus || '');
+}
+
+function syncUpdatedQuestionBankItem(item, {reloadOnFilterMismatch = true} = {}) {
   const questionBankId = String(item?.question_bank_id || '').trim();
   if (!questionBankId) return;
   const bankIndex = state.questionBankItems.findIndex((entry) => String(entry?.question_bank_id || '') === questionBankId);
-  if (bankIndex >= 0) state.questionBankItems[bankIndex] = {...state.questionBankItems[bankIndex], ...item};
+  let nextBankItem = null;
+  if (bankIndex >= 0) {
+    nextBankItem = {...state.questionBankItems[bankIndex], ...item};
+    state.questionBankItems[bankIndex] = nextBankItem;
+  }
   state.questions.forEach((question) => {
     const current = hydrateQuestionState(question);
     if (!current || current.questionBankId !== questionBankId) return;
-    current.answer = String(item.answer || '');
-    current.explanation = String(item.explanation || '');
-    current.rubric = Array.isArray(item.rubric) ? item.rubric : [];
-    current.answerGuide = String(item.answer_guide || '');
+    current.answer = String(item.answer ?? current.answer ?? '');
+    current.explanation = String(item.explanation ?? current.explanation ?? '');
+    current.rubric = Array.isArray(item.rubric) ? item.rubric : current.rubric;
+    current.answerGuide = String(item.answer_guide ?? current.answerGuide ?? '');
+    if (item.question_attempt_judgment) current.judgment = String(item.question_attempt_judgment || current.judgment || 'pending');
+    if (item.question_attempt_status) current.questionAttemptStatus = String(item.question_attempt_status || current.questionAttemptStatus || 'unseen');
   });
-  if (state.questionBankOpen) renderQuestionBankBrowser();
+  if (state.questionBankOpen) {
+    if (reloadOnFilterMismatch && nextBankItem && !questionBankItemMatchesAttemptStatusFilter(nextBankItem)) {
+      loadQuestionBankBrowser().catch(() => {});
+      return;
+    }
+    renderQuestionBankBrowser();
+  }
 }
 
 function notifyQuestionBankParentUpdate(item) {
   if (!questionBankEmbedMode() || window.parent === window || !item?.question_bank_id) return;
   window.parent.postMessage({type: 'cs-flashcards-question-bank-updated', item}, '*');
+}
+
+function syncQuestionBankAttemptState(question, {reloadOnFilterMismatch = true} = {}) {
+  const current = hydrateQuestionState(question);
+  if (!current?.questionBankId) return;
+  const status = questionAttemptStatusFromJudgment(current.judgment || 'pending');
+  const item = {
+    question_bank_id: current.questionBankId,
+    question_attempt_judgment: current.judgment || 'pending',
+    question_attempt_status: status,
+    question_attempt_status_label: questionAttemptStatusLabel(status),
+  };
+  syncUpdatedQuestionBankItem(item, {reloadOnFilterMismatch});
+  notifyQuestionBankParentUpdate(item);
 }
 
 function resolveImportedCard(rawQuestion, index) {
@@ -5497,6 +5539,7 @@ async function saveQuestionAttempt(question, {quiet = false} = {}) {
     current.sessionElapsedSeconds = Number.isInteger(data.attempt?.session_elapsed_seconds) ? data.attempt.session_elapsed_seconds : current.sessionElapsedSeconds;
     if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
     syncUpdatedCard(data.card);
+    syncQuestionBankAttemptState(current);
     if (state.questionHistoryOpen) loadQuestionHistory();
     if (!quiet) setMessage(questionResultText(current) || '문제 채점 저장 완료');
     return data;
@@ -5546,6 +5589,7 @@ async function finishQuestionSession() {
       current.answerGuide = String(payload.attempt?.answer_guide || current.answerGuide || '');
       current.questionElapsedSeconds = Number.isInteger(payload.attempt?.question_elapsed_seconds) ? payload.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
       syncUpdatedCard(payload.card);
+      syncQuestionBankAttemptState(current, {reloadOnFilterMismatch: index === state.questionIndex});
     });
     if (state.questionHistoryOpen) loadQuestionHistory();
     const counts = questionJudgmentCounts();

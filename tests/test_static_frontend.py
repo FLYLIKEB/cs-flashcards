@@ -366,6 +366,8 @@ class StaticFrontendTests(unittest.TestCase):
         self.assertIn('function renderCategoryGuideDialog()', QUESTION_BANK_JS)
         self.assertIn('function openCategoryGuideDialog()', QUESTION_BANK_JS)
         self.assertIn('function closeCategoryGuideDialog(', QUESTION_BANK_JS)
+        self.assertIn('function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = filterValues().attempt_status)', QUESTION_BANK_JS)
+        self.assertIn("if (!questionBankItemMatchesAttemptStatusFilter(nextItem))", QUESTION_BANK_JS)
         self.assertIn('function renderActiveFilters()', QUESTION_BANK_JS)
         self.assertIn('function renderSelectionSummary()', QUESTION_BANK_JS)
         self.assertIn('function resetFilters()', QUESTION_BANK_JS)
@@ -692,6 +694,9 @@ class StaticFrontendTests(unittest.TestCase):
             '/api/question-bank',
             'function fetchQuestionBankEntries()',
             'function renderQuestionBankBrowser()',
+            'function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = questionBankFilterValues().attempt_status)',
+            'function syncQuestionBankAttemptState(question, {reloadOnFilterMismatch = true} = {})',
+            'loadQuestionBankBrowser().catch(() => {});',
             'function openQuestionBankSession(startIndex = 0)',
             'function consumePendingQuestionBankLaunch()',
             'PENDING_QUESTION_BANK_LAUNCH_KEY',
@@ -726,6 +731,8 @@ class StaticFrontendTests(unittest.TestCase):
             '/api/questions/attempt',
             'function saveQuestionAttempt(question, {quiet = false} = {})',
             'function setQuestionJudgment(judgment)',
+            'syncQuestionBankAttemptState(current);',
+            "syncQuestionBankAttemptState(current, {reloadOnFilterMismatch: index === state.questionIndex});",
             'function finishQuestionSession()',
             'function questionHasSubmittedAnswer(question)',
             'function markUnansweredQuestionWrong(question, answeredAt = new Date().toISOString())',
