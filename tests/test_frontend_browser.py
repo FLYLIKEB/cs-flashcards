@@ -1342,6 +1342,94 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-stale-open-bit', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_page_does_not_restore_missing_saved_practice_selection(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.evaluate(
+                """
+                (filterKey, practiceKey) => {
+                  window.localStorage.setItem(filterKey, JSON.stringify({
+                    filters: {},
+                    filtersCollapsed: false,
+                    practice: {loaded: true, selectedId: 'missing-question-id', startIndex: 1},
+                  }));
+                  window.localStorage.setItem(practiceKey, '0');
+                }
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
+            )
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-filters-collapsed') && document.body.classList.contains('question-bank-practice-collapsed') && document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            case['state_after_reload'] = await page.evaluate(
+                """
+                (filterKey) => ({
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame').hidden,
+                  practiceToggleDisabled: document.querySelector('#bankPageTogglePracticeBtn').disabled,
+                  storedPractice: JSON.parse(window.localStorage.getItem(filterKey) || 'null')?.practice || null,
+                })
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertFalse(case['state_after_reload']['filtersCollapsed'])
+            self.assertTrue(case['state_after_reload']['practiceCollapsed'])
+            self.assertTrue(case['state_after_reload']['practiceFrameHidden'])
+            self.assertTrue(case['state_after_reload']['practiceToggleDisabled'])
+            self.assertFalse(case['state_after_reload']['storedPractice']['loaded'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-missing-saved-selection', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_page_clears_live_practice_bit_when_launch_seed_write_fails(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (launchKey) => {
+                  const originalSetItem = window.sessionStorage.setItem.bind(window.sessionStorage);
+                  window.sessionStorage.setItem = (key, value) => {
+                    if (key === launchKey) throw new Error('launch seed unavailable');
+                    return originalSetItem(key, value);
+                  };
+                }
+                """,
+                QUESTION_BANK_LAUNCH_KEY,
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
+            await page.waitForFunction("document.querySelector('#bankPageError').textContent.includes('launch seed unavailable')")
+            case['state_after_failed_launch'] = await page.evaluate(
+                """
+                (filterKey) => ({
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame').hidden,
+                  practiceToggleDisabled: document.querySelector('#bankPageTogglePracticeBtn').disabled,
+                  storedPractice: JSON.parse(window.localStorage.getItem(filterKey) || 'null')?.practice || null,
+                })
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertTrue(case['state_after_failed_launch']['practiceCollapsed'])
+            self.assertTrue(case['state_after_failed_launch']['practiceFrameHidden'])
+            self.assertFalse(case['state_after_failed_launch']['storedPractice']['loaded'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-launch-seed-failure', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_page_renders_runtime_fallback_difficulty_label(self):
         case = {'path': '/question-bank', 'query': self.__class__.difficulty_regression_prompt}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

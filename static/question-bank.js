@@ -938,26 +938,47 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
   }
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
   const frame = $('bankPagePracticeFrame');
+  const previousPracticeState = {
+    selectedId: bankState.selectedId,
+    practiceActiveId: bankState.practiceActiveId,
+    practiceLoaded: bankState.practiceLoaded,
+    practiceStartIndex: bankState.practiceStartIndex,
+    practiceCollapsed: bankState.practiceCollapsed,
+  };
   bankState.selectedId = String(bankState.items[safeStart]?.question_bank_id || '');
   bankState.practiceActiveId = bankState.selectedId;
   bankState.practiceLoaded = true;
   bankState.practiceStartIndex = safeStart;
-  if (reveal) setPracticeCollapsed(false);
-  persistFilterState();
-  renderTable();
-  renderPracticePane();
-  ensureSelectedRowVisible();
+  if (reveal) setPracticeCollapsed(false, {persist: false});
   try {
     window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY, JSON.stringify({items: bankState.items, startIndex: safeStart}));
   } catch (error) {
+    bankState.selectedId = previousPracticeState.selectedId;
+    bankState.practiceActiveId = previousPracticeState.practiceActiveId;
+    bankState.practiceLoaded = previousPracticeState.practiceLoaded;
+    bankState.practiceStartIndex = previousPracticeState.practiceStartIndex;
+    bankState.practiceCollapsed = previousPracticeState.practiceCollapsed;
     bankState.error = error.message || String(error);
+    persistFilterState();
     renderTable();
     renderPracticePane();
     return false;
   }
+  if (reveal) {
+    try {
+      window.localStorage.setItem(QUESTION_BANK_PRACTICE_COLLAPSED_KEY, '0');
+    } catch (_error) {
+      // Ignore storage failures.
+    }
+  }
+  persistFilterState();
+  renderTable();
+  renderPracticePane();
+  ensureSelectedRowVisible();
   bankState.practiceNonce += 1;
   if (frame) frame.src = practiceFrameUrl();
   return true;
+
 }
 
 function launch(startIndex = 0, {reveal = true} = {}) {
@@ -1026,13 +1047,14 @@ async function loadQuestionBankPage() {
       restorePracticePaneOnReload = false;
       restoredPracticeState = null;
       applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal});
-    } else if (restorePracticePaneOnReload && !bankState.practiceLoaded) {
-      const restoreIndex = nextIndex >= 0
-        ? nextIndex
-        : Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(restoredPracticeState?.startIndex) ? restoredPracticeState.startIndex : bankState.practiceStartIndex));
+    } else if (restorePracticePaneOnReload && !bankState.practiceLoaded && nextIndex >= 0) {
       restorePracticePaneOnReload = false;
       restoredPracticeState = null;
-      applyPracticeLaunch(restoreIndex, {reveal: true});
+      applyPracticeLaunch(nextIndex, {reveal: true});
+    } else if (restorePracticePaneOnReload && !bankState.practiceLoaded) {
+      restorePracticePaneOnReload = false;
+      restoredPracticeState = null;
+      persistFilterState();
     } else if (bankState.practiceLoaded && nextIndex < 0) {
       if (preservingHiddenPractice) {
         bankState.practiceActiveId = practiceActiveIdBeforeRequest;
