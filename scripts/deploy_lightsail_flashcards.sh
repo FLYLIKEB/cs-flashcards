@@ -23,10 +23,16 @@ WIKI_GITHUB_REPO="${CS_FLASHCARDS_WIKI_GITHUB_REPO:-}"
 WIKI_GITHUB_BRANCH="${CS_FLASHCARDS_WIKI_GITHUB_BRANCH:-}"
 WIKI_GITHUB_PATH_PREFIX="${CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX:-}"
 WIKI_SYNC_INTERVAL_MINUTES="${CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES:-5}"
+FORCE_DB_REPLACE="${CS_FLASHCARDS_FORCE_DB_REPLACE:-0}"
 OPENAI_API_KEY_VALUE="${OPENAI_API_KEY:-${CS_FLASHCARDS_OPENAI_API_KEY:-}}"
 
 if ! [[ "$WIKI_SYNC_INTERVAL_MINUTES" =~ ^[1-9][0-9]*$ ]]; then
   echo "CS_FLASHCARDS_WIKI_SYNC_INTERVAL_MINUTES 는 1 이상의 정수여야 합니다: $WIKI_SYNC_INTERVAL_MINUTES" >&2
+  exit 1
+fi
+
+if ! [[ "$FORCE_DB_REPLACE" =~ ^(0|1)$ ]]; then
+  echo "CS_FLASHCARDS_FORCE_DB_REPLACE 는 0 또는 1 이어야 합니다: $FORCE_DB_REPLACE" >&2
   exit 1
 fi
 
@@ -113,7 +119,12 @@ mkdir -p "$TMP_STAGE/data" "$TMP_STAGE/state"
 cp app.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
 cp data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
-cp state/progress.sqlite "$TMP_STAGE/state/"
+if [[ "$FORCE_DB_REPLACE" == "1" ]]; then
+  echo "경고: CS_FLASHCARDS_FORCE_DB_REPLACE=1 이므로 원격 state/progress.sqlite 전체를 로컬 파일로 교체합니다."
+  cp state/progress.sqlite "$TMP_STAGE/state/"
+else
+  echo "원격 state/progress.sqlite 보존: 일반 배포에서는 런타임 DB 전체 파일을 덮어쓰지 않습니다."
+fi
 if [[ -d "$WIKI_BOOK_SRC" ]]; then
   echo "위키 문서 포함: $WIKI_BOOK_SRC"
   mkdir -p "$TMP_STAGE/wiki_book"
