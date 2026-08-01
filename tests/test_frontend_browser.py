@@ -26,6 +26,8 @@ DEFAULT_MAIN_WORKSPACE_NAME = 'cs_flashcards'
 MAIN_BRANCH_REF = 'refs/heads/main'
 QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1'
 QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1'
+QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1'
+
 WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1'
 WAVE_ID_RE = re.compile(r'^(wave-\d+)')
 CANONICAL_COMMAND = '.venv/bin/python -m unittest tests.test_frontend_browser'
@@ -1183,6 +1185,161 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-filter-reload', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_page_restores_filter_and_practice_pane_state_across_reload(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            case['practice_status_before_reload'] = await self.text(page, '#bankPagePracticeStatus')
+            self.assertIn('현재 2 /', case['practice_status_before_reload'])
+            case['active_row_before_reload'] = await page.evaluate(
+                "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
+            )
+            embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            case['practice_prompt_before_reload'] = await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            case['stored_open_state'] = await page.evaluate(
+                """
+                (filterKey, practiceKey) => ({
+                  filterState: JSON.parse(window.localStorage.getItem(filterKey) || 'null'),
+                  practiceCollapsed: window.localStorage.getItem(practiceKey),
+                })
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
+            )
+            self.assertTrue(case['stored_open_state']['filterState']['practice']['loaded'])
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-filters-collapsed') && !document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            case['open_state_after_reload'] = await page.evaluate(
+                """
+                () => ({
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame').hidden,
+                })
+                """
+            )
+            case['practice_status_after_reload'] = await self.text(page, '#bankPagePracticeStatus')
+            case['active_row_after_reload'] = await page.evaluate(
+                "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
+            )
+            reloaded_embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            case['practice_prompt_after_reload'] = await reloaded_embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertFalse(case['open_state_after_reload']['filtersCollapsed'])
+            self.assertFalse(case['open_state_after_reload']['practiceCollapsed'])
+            self.assertFalse(case['open_state_after_reload']['practiceFrameHidden'])
+            self.assertIn('현재 2 /', case['practice_status_after_reload'])
+            self.assertEqual(case['active_row_after_reload'], case['active_row_before_reload'])
+            self.assertEqual(case['practice_prompt_after_reload'], case['practice_prompt_before_reload'])
+            await page.click('#bankPagePracticeExitBtn')
+            await page.waitForFunction("document.body.classList.contains('question-bank-practice-collapsed')")
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("document.body.classList.contains('question-bank-filters-collapsed')")
+            case['stored_closed_state'] = await page.evaluate(
+                """
+                (filterKey, practiceKey) => ({
+                  filterState: JSON.parse(window.localStorage.getItem(filterKey) || 'null'),
+                  practiceCollapsed: window.localStorage.getItem(practiceKey),
+                })
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
+            )
+            self.assertTrue(case['stored_closed_state']['filterState']['filtersCollapsed'])
+            self.assertTrue(case['stored_closed_state']['filterState']['practice']['loaded'])
+            self.assertEqual(case['stored_closed_state']['practiceCollapsed'], '1')
+
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "document.body.classList.contains('question-bank-filters-collapsed') && document.body.classList.contains('question-bank-practice-collapsed') && document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            case['closed_state_after_reload'] = await page.evaluate(
+                """
+                () => ({
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame').hidden,
+                })
+                """
+            )
+            case['active_row_after_collapsed_reload'] = await page.evaluate(
+                "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
+            )
+            self.assertTrue(case['closed_state_after_reload']['filtersCollapsed'])
+            self.assertTrue(case['closed_state_after_reload']['practiceCollapsed'])
+            self.assertTrue(case['closed_state_after_reload']['practiceFrameHidden'])
+            self.assertEqual(case['active_row_after_collapsed_reload'], case['active_row_before_reload'])
+            await page.click('#bankPageLaunchSelectedBtn')
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            reopened_embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            case['practice_prompt_after_collapsed_reopen'] = await reopened_embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertEqual(case['practice_prompt_after_collapsed_reopen'], case['practice_prompt_before_reload'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-pane-state-reload', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_page_does_not_reopen_practice_from_stale_open_bit_without_session(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.evaluate(
+                """
+                (filterKey, practiceKey) => {
+                  window.localStorage.setItem(filterKey, JSON.stringify({
+                    filters: {},
+                    filtersCollapsed: false,
+                    practice: {loaded: false, selectedId: '', startIndex: 1},
+                  }));
+                  window.localStorage.setItem(practiceKey, '0');
+                }
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
+            )
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-filters-collapsed') && document.body.classList.contains('question-bank-practice-collapsed') && document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            case['state_after_reload'] = await page.evaluate(
+                """
+                () => ({
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame').hidden,
+                  practiceToggleDisabled: document.querySelector('#bankPageTogglePracticeBtn').disabled,
+                })
+                """
+            )
+            self.assertFalse(case['state_after_reload']['filtersCollapsed'])
+            self.assertTrue(case['state_after_reload']['practiceCollapsed'])
+            self.assertTrue(case['state_after_reload']['practiceFrameHidden'])
+            self.assertTrue(case['state_after_reload']['practiceToggleDisabled'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-stale-open-bit', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_page_renders_runtime_fallback_difficulty_label(self):
