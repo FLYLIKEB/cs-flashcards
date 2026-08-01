@@ -196,7 +196,11 @@ CREATE TABLE card_progress (
 state/progress.sqlite
 ```
 
-수정 후 GitHub에 커밋/푸시하면 원격 사이트 코드 배포가 자동으로 시작됩니다. 하지만 일반 배포는 원격 `state/progress.sqlite`를 절대 덮어쓰지 않으므로, 콘텐츠/문제은행 데이터 변경은 GitHub push만으로 끝나지 않고 필요한 row/field를 별도로 원격 SQLite에 반영해야 합니다.
+#1
+수정 후 GitHub에 커밋/푸시하면 원격 사이트 코드 배포가 자동으로 시작됩니다. 하지만 일반 배포는 원격 `state/progress.sqlite`를 절대 덮어쓰지 않으므로, DB 내용 변경은 GitHub push만으로 끝나지 않습니다. `state/progress.sqlite`는 로컬 작업용 상태 DB이며, 라이브 서버 반영은 직접 원격 SQL 실행으로만 처리합니다.
+#2
+- [ ] DB 내용 변경 시 `./scripts/remote_sqlite_sql.sh`로 필요한 SQL만 직접 실행하고, `./scripts/remote_flashcards_api.sh`로 결과를 확인한다.
+- [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`, `progress_db_readable: true`, `content_card_count > 0`를 확인한다.
 브라우저에서 바로 AI 초안을 만들려면 서버 환경변수에 `OPENAI_API_KEY`(또는 `CS_FLASHCARDS_OPENAI_API_KEY`)를 넣고, 필요하면 `CS_FLASHCARDS_CODEX_MODEL`로 모델명을 바꿉니다. 간단 설명·상세 설명·시험 포인트 옆의 작은 `AI` 버튼은 각 섹션을 바로 비동기로 생성·저장하고 완료 시 알림합니다. 개념 이미지도 같은 방식으로 바로 생성·저장하며, 최종 파일은 `state/ai_images/`, 카드 내용은 SQLite `cards` 테이블에 기록됩니다. 위키 이미지 AI 재생성도 같은 OpenAI 설정만 있으면 서버 로컬 위키 기준으로 바로 반영됩니다. GitHub 보관이 필요할 때만 `CS_FLASHCARDS_WIKI_GITHUB_REPO`/`CS_FLASHCARDS_WIKI_GITHUB_TOKEN`을 추가로 설정합니다. GIF/비디오/Mermaid/HTML 위젯은 카드 뒷면 `코드` 버튼으로 저장하며, 값은 `concept_media_type`, `concept_media_payload` 필드에 남습니다.
 
 
@@ -211,6 +215,16 @@ git push
 
 ```bash
 CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashcards.sh
+```
+
+원격 DB를 바꿔야 할 때는 파일 업로드나 SQLite 파일 교체를 하지 말고, 필요한 `INSERT`/`UPDATE`/`DELETE` SQL만 직접 실행합니다.
+
+```bash
+./scripts/remote_sqlite_sql.sh <<'SQL'
+UPDATE question_bank
+SET difficulty = '중'
+WHERE id = 'qb-sample-001';
+SQL
 ```
 
 ## 개념 추가/수정/삭제 운영 규칙
@@ -272,10 +286,11 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 - 일반 배포는 원격 `state/progress.sqlite`를 **보존**해야 하며, 코드 배포로 전체 DB 파일을 덮어쓰는 경로는 제거되었습니다.
 - DB 내용 수정은 변경한 row/field만 원격에 반영해야 합니다. 변경과 무관한 원격 데이터는 그대로 유지되어야 합니다.
 - 같은 row/field를 누군가 원격에서 동시에 수정하면 마지막 반영이 이깁니다. 충돌 가능성이 있으면 먼저 원격 DB를 다시 pull 받아 기준을 맞춥니다.
-- `./scripts/sync_remote_sqlite_rows.sh`는 이제 `--columns` 지정이 **필수**이며, 원격 DB 반영은 SQL `INSERT ... ON CONFLICT DO UPDATE` 방식으로만 수행합니다.
+- 원격 반영은 `./scripts/remote_sqlite_sql.sh`로 필요한 SQL만 직접 실행합니다. 파일 업로드, row payload 생성, SQLite 파일 교체는 금지됩니다.
 - 배포 후에는 `/api/health`만 보지 말고, 변경한 레코드를 `/api/question-bank`, `/api/cards` 같은 인증된 API로 직접 조회해 값이 맞는지 확인합니다.
-- 원격 DB가 비어 있거나 오래된 값이면 즉시 로컬의 정상 `state/progress.sqlite`를 서버로 복구하고 서비스를 재시작한 뒤 다시 검증합니다.
-- 원격 DB 경로를 다른 파일로 바꾸는 옵션, 전체 파일 교체 경로, 원격 row 삭제 경로는 모두 제거되었습니다.
+- 원격 DB가 비어 있거나 오래된 값이면 즉시 원인 범위의 레코드만 직접 SQL로 복구하고 서비스를 다시 검증합니다.
+- 원격 DB 경로를 다른 파일로 바꾸는 옵션과 전체 파일 교체 경로는 모두 제거되었습니다.
+
 
 
 
@@ -288,9 +303,17 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 # 2) 로컬에서 필요한 row만 수정
 #    예: state/progress.sqlite 안의 question_bank / cards row 수정
 
-# 3) 바뀐 row/field만 원격에 반영
-./scripts/sync_remote_sqlite_rows.sh --columns answer,explanation,answer_guide question_bank qb-011b1c688f53bb3974beb2e3
-./scripts/sync_remote_sqlite_rows.sh --columns term,definition,detailed_explanation cards CS-001
+# 3) 필요한 SQL만 원격에 직접 실행
+./scripts/remote_sqlite_sql.sh <<'SQL'
+UPDATE question_bank
+SET answer = '...', explanation = '...', answer_guide = '...'
+WHERE id = 'qb-011b1c688f53bb3974beb2e3';
+
+UPDATE cards
+SET term = '...', definition = '...', detailed_explanation = '...'
+WHERE card_id = 'CS-001';
+SQL
+
 
 # 4) 인증된 API로 실제 서비스 값을 확인
 ./scripts/remote_flashcards_api.sh '/api/question-bank?query=리팩토링&limit=1'
@@ -306,5 +329,8 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 - [ ] `card_progress`의 `known_status`, `last_reviewed`, `review_count`를 콘텐츠 수정용으로 직접 관리하지 않는다.
 - [ ] 일반 배포로 원격 `state/progress.sqlite` 전체를 덮어쓰지 않는다.
 - [ ] 작업 전에 `./scripts/pull_remote_sqlite.sh`로 live 기준본을 가져온다.
-- [ ] DB 내용 변경 시 `./scripts/sync_remote_sqlite_rows.sh`로 바뀐 row/field만 반영하고, `./scripts/remote_flashcards_api.sh`로 결과를 확인한다.
+#1
+수정 후 GitHub에 커밋/푸시하면 원격 사이트 코드 배포가 자동으로 시작됩니다. 하지만 일반 배포는 원격 `state/progress.sqlite`를 절대 덮어쓰지 않으므로, DB 내용 변경은 GitHub push만으로 끝나지 않습니다. `state/progress.sqlite`는 로컬 작업용 상태 DB이며, 라이브 서버 반영은 직접 원격 SQL 실행으로만 처리합니다.
+#2
+- [ ] DB 내용 변경 시 `./scripts/remote_sqlite_sql.sh`로 필요한 SQL만 직접 실행하고, `./scripts/remote_flashcards_api.sh`로 결과를 확인한다.
 - [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`, `progress_db_readable: true`, `content_card_count > 0`를 확인한다.

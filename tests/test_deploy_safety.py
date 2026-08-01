@@ -9,7 +9,8 @@ import app as flashcard_app
 ROOT = Path(__file__).resolve().parents[1]
 DEPLOY_SCRIPT = (ROOT / 'scripts' / 'deploy_lightsail_flashcards.sh').read_text(encoding='utf-8')
 PULL_SCRIPT = (ROOT / 'scripts' / 'pull_remote_sqlite.sh').read_text(encoding='utf-8')
-SYNC_SCRIPT = (ROOT / 'scripts' / 'sync_remote_sqlite_rows.sh').read_text(encoding='utf-8')
+REMOTE_SQL_SCRIPT = (ROOT / 'scripts' / 'remote_sqlite_sql.sh').read_text(encoding='utf-8')
+
 
 
 class DeploySafetyTests(unittest.TestCase):
@@ -35,13 +36,13 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertIn('원격 DB 경로 변경은 금지됩니다', PULL_SCRIPT)
         self.assertIn('REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"', PULL_SCRIPT)
 
-    def test_sync_script_requires_explicit_columns_and_insert_update_only(self):
-        self.assertNotIn('[--remote-db PATH]', SYNC_SCRIPT)
-        self.assertNotIn('--delete', SYNC_SCRIPT)
-        self.assertNotIn('DELETE FROM', SYNC_SCRIPT)
-        self.assertIn('--columns 는 필수입니다. 원격 row 전체 덮어쓰기와 삭제는 금지됩니다.', SYNC_SCRIPT)
-        self.assertIn('ON CONFLICT({key_column}) DO UPDATE SET', SYNC_SCRIPT)
-        self.assertIn('REMOTE_DB_PATH="$REMOTE_DIR/state/progress.sqlite"', SYNC_SCRIPT)
+    def test_remote_sql_script_executes_direct_sql_only(self):
+        self.assertNotIn('[--remote-db PATH]', REMOTE_SQL_SCRIPT)
+        self.assertNotIn('scp ', REMOTE_SQL_SCRIPT)
+        self.assertNotIn('PAYLOAD_FILE', REMOTE_SQL_SCRIPT)
+        self.assertNotIn('INSERT INTO {table}', REMOTE_SQL_SCRIPT)
+        self.assertIn('원격 DB 경로 변경은 금지됩니다', REMOTE_SQL_SCRIPT)
+        self.assertIn('sqlite3 "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
 
 
 if __name__ == '__main__':
