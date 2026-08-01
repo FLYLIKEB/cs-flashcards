@@ -695,6 +695,7 @@ class StaticFrontendTests(unittest.TestCase):
             'function fetchQuestionBankEntries()',
             'function renderQuestionBankBrowser()',
             'function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = questionBankFilterValues().attempt_status)',
+            'if (reloadOnFilterMismatch && !nextBankItem)',
             'function syncQuestionBankAttemptState(question, {reloadOnFilterMismatch = true} = {})',
             'loadQuestionBankBrowser().catch(() => {});',
             'function openQuestionBankSession(startIndex = 0)',
