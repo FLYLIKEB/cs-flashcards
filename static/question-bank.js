@@ -1,6 +1,7 @@
 const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const QUESTION_BANK_COLUMN_ORDER_KEY = 'csQuestionBankTableColumnOrder:v1';
 const QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1';
+const QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1';
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_BANK_ATTEMPT_STATUS_LABELS = {unseen: '안푼', wrong: '틀린', correct: '맞은'};
 const QUESTION_BANK_COLUMNS = [
@@ -124,11 +125,26 @@ function practiceFrameUrl() {
 }
 
 function persistedPracticeCollapsed() {
-  return true;
+  try {
+    return window.localStorage.getItem(QUESTION_BANK_PRACTICE_COLLAPSED_KEY) !== '0';
+  } catch (_error) {
+    return true;
+  }
+}
+
+function persistedFilterState() {
+  try {
+    const raw = window.localStorage.getItem(QUESTION_BANK_FILTER_STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (_error) {
+    return null;
+  }
 }
 
 function persistedFiltersCollapsed() {
-  return true;
+  return persistedFilterState()?.filtersCollapsed !== false;
 }
 
 function pillTone(prefix, rawValue) {
@@ -346,6 +362,7 @@ function setFilterValue(key, value = '') {
 
 function clearFilterField(key) {
   setFilterValue(key, '');
+  persistFilterState();
   loadQuestionBankPage().catch(() => {});
 }
 function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = filterValues().attempt_status) {
@@ -393,10 +410,22 @@ function renderFilterToggle() {
   toggleButton.setAttribute('aria-expanded', String(!bankState.filtersCollapsed));
 }
 
+function persistFilterState() {
+  try {
+    window.localStorage.setItem(QUESTION_BANK_FILTER_STATE_KEY, JSON.stringify({
+      filters: filterValues(),
+      filtersCollapsed: bankState.filtersCollapsed,
+    }));
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+}
+
 function setFiltersCollapsed(collapsed) {
   bankState.filtersCollapsed = Boolean(collapsed);
   applyFilterViewState();
   renderFilterToggle();
+  persistFilterState();
 }
 
 function toggleFiltersCollapsed() {
@@ -447,6 +476,11 @@ function filterValues() {
   };
 }
 
+function hasUrlFilterState() {
+  const params = new URLSearchParams(window.location.search);
+  return FILTER_FIELDS.some(({key}) => params.has(key)) || params.has('status') || params.has('card_category');
+}
+
 function applyFiltersFromUrl() {
   const params = new URLSearchParams(window.location.search);
   if ($('bankPageQueryInput')) $('bankPageQueryInput').value = params.get('q') || '';
@@ -459,6 +493,28 @@ function applyFiltersFromUrl() {
   if ($('bankPageDifficultySelect')) $('bankPageDifficultySelect').value = params.get('difficulty') || '';
   if ($('bankPageTypeSelect')) $('bankPageTypeSelect').value = params.get('question_type') || '';
   if ($('bankPageSectionInput')) $('bankPageSectionInput').value = params.get('section') || '';
+}
+
+function applyFiltersFromState(filters = {}) {
+  FILTER_FIELDS.forEach(({key}) => setFilterValue(key, filters[key] || ''));
+}
+
+function restoreFilterState() {
+  const storedState = persistedFilterState();
+  const navigationEntry = window.performance?.getEntriesByType?.('navigation')?.[0] || null;
+  if (navigationEntry?.type === 'reload' && storedState?.filters) {
+    applyFiltersFromState(storedState.filters);
+    return;
+  }
+  if (hasUrlFilterState()) {
+    applyFiltersFromUrl();
+    return;
+  }
+  if (storedState?.filters) {
+    applyFiltersFromState(storedState.filters);
+    return;
+  }
+  applyFiltersFromUrl();
 }
 
 function populateIssuerOptions(issuers, selected = '') {
@@ -543,10 +599,12 @@ async function fetchEntries({signal} = {}) {
 
 function resetFilters() {
   FILTER_FIELDS.forEach(({key}) => setFilterValue(key, ''));
+  persistFilterState();
   loadQuestionBankPage().catch(() => {});
 }
 
 function scheduleLoad() {
+  persistFilterState();
   window.clearTimeout(pendingLoadTimer);
   pendingLoadTimer = window.setTimeout(() => {
     loadQuestionBankPage().catch(() => {});
@@ -839,7 +897,7 @@ async function loadQuestionBankPage() {
   }
 }
 
-applyFiltersFromUrl();
+restoreFilterState();
 setPracticeCollapsed(persistedPracticeCollapsed(), {persist: false});
 setFiltersCollapsed(persistedFiltersCollapsed());
 renderTable();
@@ -864,6 +922,7 @@ $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollaps
   $(id)?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
+      persistFilterState();
       window.clearTimeout(pendingLoadTimer);
       loadQuestionBankPage().catch(() => {});
     }
@@ -871,7 +930,10 @@ $('bankPagePracticeExitBtn')?.addEventListener('click', () => setPracticeCollaps
 });
 
 ['bankPageAttemptStatusSelect', 'bankPageFieldInput', 'bankPageCategoryInput', 'bankPageIssuerInput', 'bankPageDifficultySelect', 'bankPageTypeSelect'].forEach((id) => {
-  $(id)?.addEventListener('change', () => loadQuestionBankPage().catch(() => {}));
+  $(id)?.addEventListener('change', () => {
+    persistFilterState();
+    loadQuestionBankPage().catch(() => {});
+  });
 });
 window.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape') return;
