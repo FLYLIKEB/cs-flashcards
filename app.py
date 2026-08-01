@@ -2536,6 +2536,54 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     }
 
 
+def preserve_existing_question_bank_content(
+    entries: list[QuestionBankEntryRequest | dict[str, Any]],
+    progress_db_path: Path | None = None,
+) -> list[dict[str, Any]]:
+    normalized_entries = [normalize_question_bank_entry(entry, progress_db_path) for entry in entries]
+    ids = [str(entry.get("question_bank_id") or "").strip() for entry in normalized_entries if str(entry.get("question_bank_id") or "").strip()]
+    if not ids:
+        return normalized_entries
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path)
+    existing_by_id: dict[str, dict[str, Any]] = {}
+    with closing(connect_progress_db(db_path)) as conn:
+        for start in range(0, len(ids), 200):
+            chunk = ids[start:start + 200]
+            qmarks = ", ".join("?" for _ in chunk)
+            rows = conn.execute(
+                f"""
+                SELECT id, card_id, question_type, prompt, body, answer, explanation,
+                       rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
+                       difficulty, issuer, source_location, section, points, expected_time_seconds,
+                       answer_guide, session_mode, created_at, updated_at
+                FROM question_bank
+                WHERE id IN ({qmarks})
+                """,
+                tuple(chunk),
+            ).fetchall()
+            for row in rows:
+                existing = question_bank_row_to_dict(row)
+                if existing:
+                    existing_by_id[str(existing.get("question_bank_id") or "")] = existing
+    preserved_entries: list[dict[str, Any]] = []
+    for entry in normalized_entries:
+        existing = existing_by_id.get(str(entry.get("question_bank_id") or ""))
+        if existing:
+            if not entry.get("answer") and existing.get("answer"):
+                entry["answer"] = existing["answer"]
+            if not entry.get("explanation") and existing.get("explanation"):
+                entry["explanation"] = existing["explanation"]
+            if not entry.get("rubric") and existing.get("rubric"):
+                entry["rubric"] = existing["rubric"]
+            if not entry.get("answer_guide") and existing.get("answer_guide"):
+                entry["answer_guide"] = existing["answer_guide"]
+            entry["fingerprint"] = question_bank_fingerprint(entry)
+        preserved_entries.append(entry)
+    return preserved_entries
+
+
+
 def update_question_bank_ai_content(
     question_bank_id: str,
     payload: QuestionBankAiRefineRequest,
@@ -4475,7 +4523,8 @@ def sync_fin_corp_question_bank_entries(
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
     pages = len(fin_corp_question_bank_source_pages(repo_dir))
-    entries = parse_fin_corp_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    parsed_entries = parse_fin_corp_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    entries = preserve_existing_question_bank_content(parsed_entries, progress_db_path)
     existing_count = count_fin_corp_question_bank_entries(progress_db_path)
     assert_safe_question_bank_sync(
         label="금융공기업",
@@ -4485,6 +4534,7 @@ def sync_fin_corp_question_bank_entries(
     )
     cleared = clear_fin_corp_question_bank_entries(progress_db_path)
     saved = upsert_question_bank_entries(entries, progress_db_path)
+
     return {
         "pages": pages,
         "cleared": cleared,
@@ -4970,7 +5020,8 @@ def sync_bok_question_bank_entries(
     progress_db_path: Path | None = PROGRESS_DB_PATH,
 ) -> dict[str, Any]:
     pages = len(bok_question_bank_source_pages(repo_dir))
-    entries = parse_bok_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    parsed_entries = parse_bok_question_bank_entries(repo_dir, progress_db_path=progress_db_path)
+    entries = preserve_existing_question_bank_content(parsed_entries, progress_db_path)
     existing_count = count_bok_question_bank_entries(progress_db_path)
     assert_safe_question_bank_sync(
         label="한국은행",
