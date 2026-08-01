@@ -1,3 +1,6 @@
+import app as flashcard_app
+import json
+
 from contextlib import closing
 from pathlib import Path
 import sqlite3
@@ -59,6 +62,33 @@ class QuestionBankMetadataTests(unittest.TestCase):
                 "SELECT COUNT(*) FROM question_bank WHERE trim(coalesce(difficulty, '')) NOT IN ('상', '중', '하')"
             ).fetchone()[0]
         self.assertEqual(invalid_count, 0)
+
+    def test_question_bank_runtime_rows_match_linked_flashcard_keywords(self):
+        with closing(sqlite3.connect(PROGRESS_DB)) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                """
+                SELECT qb.card_id, qb.keywords_json, c.term, c.english, c.related_concepts
+                FROM question_bank AS qb
+                LEFT JOIN cards AS c ON c.card_id = qb.card_id
+                """
+            ).fetchall()
+        mismatches = []
+        for row in rows:
+            card = {
+                'term': row['term'] or '',
+                'english': row['english'] or '',
+                'related_concepts': row['related_concepts'] or '',
+            } if str(row['card_id'] or '').strip() else None
+            expected = flashcard_app.question_bank_keywords_for_linked_card(card)
+            current = flashcard_app.question_bank_json_list(row['keywords_json'] or '[]')
+            if current != expected:
+                mismatches.append({
+                    'card_id': row['card_id'] or '',
+                    'current': current,
+                    'expected': expected,
+                })
+        self.assertEqual(mismatches, [], json.dumps(mismatches[:10], ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':

@@ -956,7 +956,8 @@ class FlashcardProgressTests(unittest.TestCase):
 
             self.assertEqual(item['issuer'], '한국은행')
             self.assertEqual(item['source_location'], '2013년 학술파트 1')
-            self.assertEqual(item['keywords'], ['정규화', '이상 현상'])
+            self.assertEqual(item['keywords'], ['테스트', 'Test', '검증'])
+
             self.assertEqual(item['rubric'], ['중복 제거', '이상 현상 방지'])
 
             saved_again = flashcard_app.upsert_question_bank_entries(
@@ -1028,6 +1029,78 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(breakdown[0]['correct_count'], 1)
             self.assertEqual(breakdown[0]['unseen_count'], 0)
             self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
+
+    def test_question_bank_upsert_infers_missing_difficulty_and_backfills_runtime_rows(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '정규화와 트랜잭션 격리 수준을 설명하시오.',
+                        'body': '정규화와 동시성 제어 관점에서 비교하시오.',
+                        'answer': '정규화는 이상 현상을 줄이고, 격리 수준은 동시성 충돌을 제어한다.',
+                        'explanation': '정규화, 트랜잭션, 동시성 제어를 함께 설명해야 한다.',
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'category': '데이터베이스',
+                        'difficulty': '',
+                        'issuer': '한국은행',
+                        'source_location': '테스트 학술 1',
+                        'section': '전공필기',
+                        'session_mode': 'bok',
+                    }
+                ],
+                db_path,
+            )
+            self.assertEqual(saved['items'][0]['difficulty'], '중')
+
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute(
+                    """
+                    INSERT INTO question_bank (
+                        id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
+                        rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
+                        difficulty, issuer, source_location, section, points, expected_time_seconds,
+                        answer_guide, session_mode, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '[]', '[]', NULL, ?, ?, ?, '[]', '', ?, ?, ?, NULL, NULL, '', ?, ?, ?)
+                    """,
+                    (
+                        'qb-runtime-difficulty-backfill',
+                        'runtime-difficulty-backfill',
+                        'CS-001',
+                        'essay',
+                        '기관 간 데이터 통합 전략을 서술하시오.',
+                        '클라우드 보안과 거버넌스 관점에서 답하시오.',
+                        '',
+                        '',
+                        '클라우드',
+                        '전산논술',
+                        '클라우드·분산시스템',
+                        '한국은행',
+                        '테스트 논술 1',
+                        '전공논술',
+                        'bok',
+                        '2026-08-01T00:00:00Z',
+                        '2026-08-01T00:00:00Z',
+                    ),
+                )
+                conn.commit()
+
+            flashcard_app.ensure_progress_db(db_path)
+            with closing(sqlite3.connect(db_path)) as conn:
+                inferred = conn.execute(
+                    "SELECT difficulty FROM question_bank WHERE id = ?",
+                    ('qb-runtime-difficulty-backfill',),
+                ).fetchone()[0]
+            self.assertEqual(inferred, '상')
 
     def test_question_bank_preserves_markdown_blocks(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1530,7 +1603,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIn('원문 제목: 퍼블릭 블록체인 특징으로 옳지 않은 것은?', public_blockchain['body'])
             self.assertEqual(public_blockchain['card_id'], 'CS-219')
             self.assertEqual(public_blockchain['category'], '금융IT·신기술')
-            self.assertEqual(public_blockchain['keywords'], ['퍼블릭 블록체인', 'Public Blockchain'])
+            self.assertEqual(public_blockchain['keywords'], ['퍼블릭 블록체인', 'Public Blockchain', '프라이빗 블록체인', '합의 알고리즘'])
 
             c_output = by_id['qb-fin239-05-04-01']
             self.assertEqual(c_output['prompt'], '### 155. C 언어에 대해 핵심 원리와 풀이 기준을 설명하시오.')
@@ -1543,13 +1616,14 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(lru['prompt'], '### 195. LRU에 대해 핵심 원리와 풀이 기준을 설명하시오.')
             self.assertEqual(lru['card_id'], 'CS-161')
             self.assertEqual(lru['category'], '운영체제')
-            self.assertEqual(lru['keywords'], ['LRU'])
+            self.assertEqual(lru['keywords'], ['LRU', '가상 메모리', '페이지 폴트'])
+
             xss = by_id['qb-fin239-05-01-01']
             self.assertEqual(xss['card_id'], 'CS-347')
-            self.assertEqual(xss['keywords'], ['XSS', 'SQL Injection'])
+            self.assertEqual(xss['keywords'], ['XSS', 'SQL Injection', 'CSRF'])
 
             petabyte = by_id['qb-fin239-05-01-02']
-            self.assertEqual(petabyte['keywords'], ['Petabyte'])
+            self.assertEqual(petabyte['keywords'], [])
 
 
     def test_parse_bok_question_bank_entries_splits_and_preserves_markdown(self):
@@ -1610,7 +1684,10 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(database['expected_time_seconds'], 12 * 60)
             self.assertEqual(database['session_mode'], 'bok')
             self.assertEqual(database['source_location'], '한국은행 2021 컴퓨터공학 학술 파트 I · 1. 데이터베이스')
-            self.assertEqual(database['keywords'], ['데이터베이스'])
+            self.assertEqual(database['keywords'], [])
+
+            self.assertEqual(database['difficulty'], '상')
+
 
 
             essay = next(item for item in entries if item['question_type'] == 'essay')
@@ -1622,10 +1699,9 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(essay['points'], 20)
             self.assertEqual(essay['expected_time_seconds'], 54 * 60)
             self.assertEqual(essay['answer'], '')
-            self.assertIn('VDI', essay['keywords'])
-            self.assertIn('원격근무', essay['keywords'])
-            self.assertNotIn('한국은행', essay['keywords'])
-            self.assertNotIn('2021', essay['keywords'])
+            self.assertEqual(essay['keywords'], [])
+            self.assertEqual(essay['difficulty'], '상')
+
 
 
             multiple_choice = next(item for item in entries if item['question_type'] == 'multiple_choice')
@@ -1636,6 +1712,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIsNone(multiple_choice['points'])
             self.assertEqual(multiple_choice['session_mode'], 'bok')
             self.assertEqual(multiple_choice['category'], '자료구조·알고리즘')
+            self.assertEqual(multiple_choice['difficulty'], '하')
 
     def test_bok_question_bank_keywords_drop_generic_labels(self):
         essay_keywords = flashcard_app.bok_question_bank_keywords(
