@@ -2581,6 +2581,7 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     difficulty = normalized_question_bank_difficulty(row["difficulty"] if "difficulty" in row.keys() else "")
     if not difficulty:
         difficulty = infer_question_bank_difficulty(question_type, prompt, body, answer, explanation)
+
     return {
         "question_bank_id": row["id"],
         "card_id": row["card_id"] or "",
@@ -2641,6 +2642,7 @@ def update_question_bank_ai_content(
         if current.get("card_id"):
             rows, _ = read_cards(db_path)
             linked_card = next((item for item in rows if str(item.get("id") or "").strip() == current.get("card_id")), {})
+
         proposal = rewrite_question_bank_answer_with_codex(current, linked_card, payload.instruction)
         next_entry = {**current, **proposal}
         changed = any(next_entry.get(field) != current.get(field) for field in ("answer", "explanation", "rubric", "answer_guide"))
@@ -2688,6 +2690,7 @@ def update_question_bank_ai_content(
         ).fetchone()
         conn.commit()
     return question_bank_row_to_dict(saved) or next_entry
+
 def seed_demo_question_bank_entries(
     progress_db_path: Path | None = None,
 ) -> None:
@@ -3227,6 +3230,8 @@ FIN_CORP_MID_DIFFICULTY_HINTS = (
     "보안",
 )
 QUESTION_BANK_DIFFICULTY_LEVELS = {"상", "중", "하"}
+QUESTION_BANK_DEFAULT_DIFFICULTY = "중"
+
 
 FIN_CORP_CONCEPT_CONVERSION_MARKERS = (
     "계산문제",
@@ -4427,19 +4432,13 @@ def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
         if current_keywords != expected_keywords:
             keyword_updates.append((question_bank_json_text(expected_keywords, item_limit=255), row["id"]))
         current_difficulty = normalized_question_bank_difficulty(row["difficulty"] if "difficulty" in row.keys() else "")
-        if current_difficulty:
-            continue
-        difficulty_updates.append((
-            infer_question_bank_difficulty(
-                row["question_type"] or "",
-                row["prompt"] or "",
-                row["body"] or "",
-                row["answer"] or "",
-                row["explanation"] or "",
-                card=card,
-            ),
-            row["id"],
-        ))
+        expected_difficulty = current_difficulty
+        if not expected_difficulty:
+            expected_difficulty = normalized_question_bank_difficulty(card.get("difficulty")) if isinstance(card, dict) else ""
+        if not expected_difficulty:
+            expected_difficulty = QUESTION_BANK_DEFAULT_DIFFICULTY
+        if current_difficulty != expected_difficulty:
+            difficulty_updates.append((expected_difficulty, row["id"]))
     if keyword_updates:
         conn.executemany("UPDATE question_bank SET keywords_json = ? WHERE id = ?", keyword_updates)
     if difficulty_updates:

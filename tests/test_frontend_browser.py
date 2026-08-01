@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import socket
+import sqlite3
 import subprocess
 import tempfile
 import time
@@ -138,6 +139,51 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         cls.temp_root = Path(cls._temp_dir.name)
         cls.progress_db_path = cls.temp_root / 'progress.sqlite'
         shutil.copy2(ROOT / 'state' / 'progress.sqlite', cls.progress_db_path)
+        cls.difficulty_regression_prompt = 'difficulty fallback browser regression'
+        cls.difficulty_regression_question_id = 'qb-browser-difficulty-fallback'
+        with sqlite3.connect(cls.progress_db_path) as conn:
+            now = '2026-08-01T00:00:00Z'
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO cards (card_id, term, category, difficulty, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                ('CARD-BROWSER-DIFFICULTY', '브라우저 난이도 카드', '테스트', '상', now),
+            )
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO card_progress (card_id, known_status, updated_at)
+                VALUES (?, ?, ?)
+                """,
+                ('CARD-BROWSER-DIFFICULTY', 'X', now),
+            )
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO question_bank (
+                    id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
+                    difficulty, issuer, source_location, category, created_at, updated_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    cls.difficulty_regression_question_id,
+                    'fp-browser-difficulty-fallback',
+                    'CARD-BROWSER-DIFFICULTY',
+                    'short',
+                    cls.difficulty_regression_prompt,
+                    'difficulty fallback body',
+                    'difficulty fallback answer',
+                    'difficulty fallback explanation',
+                    '어려움',
+                    '테스트기관',
+                    '브라우저 회귀',
+                    '테스트',
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
         cls.wiki_book_dir = write_test_wiki_book(cls.temp_root)
         cls.port = free_port()
         cls.base_url = f'http://127.0.0.1:{cls.port}'
@@ -557,6 +603,41 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-filter-reload', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_page_renders_runtime_fallback_difficulty_label(self):
+        case = {'path': '/question-bank', 'query': self.__class__.difficulty_regression_prompt}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await self.set_input_value(page, '#bankPageQueryInput', self.__class__.difficulty_regression_prompt)
+            await page.waitForFunction(
+                """
+                (expectedPrompt, expectedId) => {
+                  const rows = document.querySelectorAll('#bankPageList [data-table-row-id]');
+                  const pill = document.querySelector('#bankPageList .question-bank-difficulty-pill');
+                  return rows.length === 1
+                    && rows[0].getAttribute('data-table-row-id') === expectedId
+                    && document.querySelector('#bankPageList').textContent.includes(expectedPrompt)
+                    && pill
+                    && pill.textContent.trim() === '상';
+                }
+                """,
+                {},
+                self.__class__.difficulty_regression_prompt,
+                self.__class__.difficulty_regression_question_id,
+            )
+            case['summary'] = await self.text(page, '#bankPageSummary')
+            case['difficulty_label'] = await self.text(page, '#bankPageList .question-bank-difficulty-pill')
+            self.assertIn('현재 1문항', case['summary'])
+            self.assertEqual(case['difficulty_label'], '상')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-runtime-difficulty-label', status=status, observations=case)
             await page.close()
     async def test_question_bank_page_rejects_stale_query_responses(self):
         case = {'path': '/question-bank'}

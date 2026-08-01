@@ -1,6 +1,7 @@
 import app as flashcard_app
 import json
 import tempfile
+
 from contextlib import closing
 from pathlib import Path
 import sqlite3
@@ -157,6 +158,56 @@ class QuestionBankMetadataTests(unittest.TestCase):
                 "SELECT COUNT(*) FROM question_bank WHERE trim(coalesce(difficulty, '')) NOT IN ('상', '중', '하')"
             ).fetchone()[0]
         self.assertEqual(invalid_count, 0)
+
+    def test_question_bank_backfill_normalizes_invalid_difficulty_labels(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'progress.sqlite'
+            flashcard_app.ensure_progress_db(
+                db_path,
+                seed_rows=[
+                    {'id': 'CARD-HIGH', 'term': '고난도 카드', 'category': '테스트', 'difficulty': '상', 'known_status': 'X'},
+                    {'id': 'CARD-DEFAULT', 'term': '기본 난이도 카드', 'category': '테스트', 'known_status': 'X'},
+                ],
+            )
+            now = flashcard_app.utc_now_iso()
+            with closing(flashcard_app.connect_progress_db(db_path)) as conn:
+                conn.executemany(
+                    """
+                    INSERT INTO question_bank (
+                        id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
+                        difficulty, issuer, source_location, category, created_at, updated_at
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    [
+                        (
+                            'qb-fallback-blank', 'fp-fallback-blank', 'CARD-HIGH', 'short', 'blank difficulty prompt', '', '', '',
+                            '', '테스트기관', '테스트출처', '테스트', now, now,
+                        ),
+                        (
+                            'qb-fallback-invalid', 'fp-fallback-invalid', 'CARD-HIGH', 'short', 'invalid difficulty prompt', '', '', '',
+                            '어려움', '테스트기관', '테스트출처', '테스트', now, now,
+                        ),
+                        (
+                            'qb-fallback-default', 'fp-fallback-default', 'CARD-DEFAULT', 'short', 'default difficulty prompt', '', '', '',
+                            '보통', '테스트기관', '테스트출처', '테스트', now, now,
+                        ),
+                    ],
+                )
+                flashcard_app.backfill_question_bank_difficulty_rows(conn)
+                conn.commit()
+                persisted_rows = conn.execute(
+                    "SELECT id, difficulty FROM question_bank WHERE id LIKE 'qb-fallback-%' ORDER BY id"
+                ).fetchall()
+            persisted = {row['id']: row['difficulty'] for row in persisted_rows}
+            self.assertEqual(persisted['qb-fallback-blank'], '상')
+            self.assertEqual(persisted['qb-fallback-invalid'], '상')
+            self.assertEqual(persisted['qb-fallback-default'], flashcard_app.QUESTION_BANK_DEFAULT_DIFFICULTY)
+            listed = flashcard_app.read_question_bank_entries(db_path, query='difficulty prompt', limit=10)
+            items_by_id = {item['question_bank_id']: item for item in listed['items']}
+            self.assertEqual(items_by_id['qb-fallback-blank']['difficulty'], '상')
+            self.assertEqual(items_by_id['qb-fallback-invalid']['difficulty'], '상')
+            self.assertEqual(items_by_id['qb-fallback-default']['difficulty'], flashcard_app.QUESTION_BANK_DEFAULT_DIFFICULTY)
 
     def test_question_bank_runtime_rows_match_linked_flashcard_keywords(self):
         with closing(sqlite3.connect(PROGRESS_DB)) as conn:
