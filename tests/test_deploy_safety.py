@@ -71,6 +71,15 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertIn('CS_FLASHCARD_PROGRESS_DB_MUST_EXIST=1', DEPLOY_SCRIPT)
         self.assertIn('원격 SQLite 파일이 없으면 배포를 중단합니다', DEPLOY_SCRIPT)
 
+    def test_deploy_script_has_valid_bash_syntax(self):
+        result = subprocess.run(
+            ['bash', '-n', str(ROOT / 'scripts' / 'deploy_lightsail_flashcards.sh')],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_deploy_guard_rejects_staged_state_directory(self):
         with tempfile.TemporaryDirectory() as td:
             stage_dir = Path(td) / 'stage'
