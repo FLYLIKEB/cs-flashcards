@@ -11,6 +11,7 @@
 
 - Treat `state/progress.sqlite` changes as a two-step delivery: GitHub push and live server DB reflection are separate requirements.
 - Ordinary deploys MUST preserve the live remote `state/progress.sqlite`; never rely on the normal archive deploy path to replace the whole DB.
-- For intentional SQLite data changes, apply only the targeted remote row/field updates or an explicitly approved disaster-recovery restore; unrelated remote data MUST remain intact.
-- Do not report SQLite work complete until the authenticated live service confirms the change through `/api/health` plus a focused API spot-check for the affected rows/fields.
+- Before intentional local SQLite edits, refresh the workspace copy from the live server with `./scripts/pull_remote_sqlite.sh` unless the task explicitly requires a different baseline.
+- For intentional SQLite data changes, apply only the targeted remote row/field updates with `./scripts/sync_remote_sqlite_rows.sh` or an explicitly approved disaster-recovery restore; unrelated remote data MUST remain intact.
+- Do not report SQLite work complete until the authenticated live service confirms the change through `./scripts/remote_flashcards_api.sh` plus a focused API spot-check for the affected rows/fields.
 - If a deploy leaves the remote SQLite empty, stale, or inconsistent, restore a known-good DB immediately and keep working until the live checks pass.

@@ -235,7 +235,7 @@ CS_FLASHCARDS_PASSWORD="개인용비밀번호" ./scripts/deploy_lightsail_flashc
 원격 배포 후 아래가 맞으면 정상입니다.
 
 ```bash
-curl --user "cs:비밀번호" https://cs.chamung.com/api/health
+./scripts/remote_flashcards_api.sh /api/health
 ```
 
 응답에 아래 값이 포함되어야 합니다.
@@ -249,14 +249,14 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/health
   "wiki_book_exists": true,
   "wiki_book_dir": "/home/ubuntu/cs-flashcards/wiki_book",
   "wiki_book_configured_dir": "/home/ubuntu/cs-flashcards/wiki_book",
-  "wiki_checklist_sync_target": "github"
+  "wiki_checklist_sync_target": "local 또는 github"
 }
 ```
 
 카드 수와 진행상태 요약은 아래 API에서 확인합니다.
 
 ```bash
-curl --user "cs:비밀번호" https://cs.chamung.com/api/cards
+./scripts/remote_flashcards_api.sh /api/cards
 ```
 
 문제은행/런타임 DB를 건드렸다면 여기서 끝내면 안 됩니다.
@@ -264,9 +264,27 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/cards
 - `state/progress.sqlite` 변경은 **GitHub push**와 **실서버 반영 확인**을 둘 다 끝내야 완료입니다.
 - 일반 배포는 원격 `state/progress.sqlite`를 **보존**해야 하며, 코드 배포로 전체 DB 파일을 덮어쓰면 안 됩니다.
 - DB 내용 수정은 변경한 row/field만 원격에 반영해야 합니다. 변경과 무관한 원격 데이터는 그대로 유지되어야 합니다.
+- 같은 row/field를 누군가 원격에서 동시에 수정하면 마지막 반영이 이깁니다. 충돌 가능성이 있으면 먼저 원격 DB를 다시 pull 받아 기준을 맞춥니다.
 - 배포 후에는 `/api/health`만 보지 말고, 변경한 레코드를 `/api/question-bank`, `/api/cards` 같은 인증된 API로 직접 조회해 값이 맞는지 확인합니다.
 - 원격 DB가 비어 있거나 오래된 값이면 즉시 로컬의 정상 `state/progress.sqlite`를 서버로 복구하고 서비스를 재시작한 뒤 다시 검증합니다.
 - 정말로 전체 DB 복구가 필요한 재해 복구 상황이 아니면 `CS_FLASHCARDS_FORCE_DB_REPLACE=1` 같은 전체 교체 경로를 사용하지 않습니다.
+
+### 권장 SQLite 작업 순서
+
+```bash
+# 1) 작업 시작 전 live DB를 로컬로 당김
+./scripts/pull_remote_sqlite.sh
+
+# 2) 로컬에서 필요한 row만 수정
+#    예: state/progress.sqlite 안의 question_bank / cards row 수정
+
+# 3) 바뀐 row만 원격에 반영
+./scripts/sync_remote_sqlite_rows.sh question_bank qb-011b1c688f53bb3974beb2e3
+./scripts/sync_remote_sqlite_rows.sh cards CS-001
+
+# 4) 인증된 API로 실제 서비스 값을 확인
+./scripts/remote_flashcards_api.sh '/api/question-bank?query=리팩토링&limit=1'
+```
 
 ## O/X 원복 방지 체크리스트
 
@@ -277,5 +295,6 @@ curl --user "cs:비밀번호" https://cs.chamung.com/api/cards
 - [ ] 새 개념에는 새 `CS-xxx`를 부여한다.
 - [ ] `card_progress`의 `known_status`, `last_reviewed`, `review_count`를 콘텐츠 수정용으로 직접 관리하지 않는다.
 - [ ] 일반 배포로 원격 `state/progress.sqlite` 전체를 덮어쓰지 않는다.
-- [ ] DB 내용 변경 시 변경한 row/field만 반영하고, 인증된 원격 API로 결과를 확인한다.
+- [ ] 작업 전에 `./scripts/pull_remote_sqlite.sh`로 live 기준본을 가져온다.
+- [ ] DB 내용 변경 시 `./scripts/sync_remote_sqlite_rows.sh`로 바뀐 row/field만 반영하고, `./scripts/remote_flashcards_api.sh`로 결과를 확인한다.
 - [ ] 배포 후 `/api/health`에서 `progress_db_exists: true`를 확인한다.
