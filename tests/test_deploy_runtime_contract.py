@@ -23,6 +23,8 @@ class DeployRuntimeContractTests(unittest.TestCase):
         self.assertNotIn('Environment=CS_FLASHCARDS_WIKI_GITHUB_TOKEN=', script)
         self.assertNotIn('Environment=OPENAI_API_KEY=', script)
         self.assertIn('/tmp/cs-flashcards-runtime.env', script)
+        self.assertNotIn('source "$RUNTIME_ENV_PATH"', script)
+        self.assertIn('RUNTIME_BASIC_AUTH_HEADER', script)
 
     def test_deploy_workflow_still_verifies_health_endpoint(self):
         workflow = DEPLOY_WORKFLOW.read_text(encoding="utf-8")

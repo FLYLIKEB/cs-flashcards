@@ -63,6 +63,8 @@ append_env_line() {
   python3 - <<'PY' "$key" "$value" >> "$TMP_RUNTIME_ENV"
 import sys
 key, value = sys.argv[1], sys.argv[2]
+if "\n" in value or "\r" in value:
+    raise SystemExit(f"Refusing multiline runtime secret for {key}")
 escaped = value.replace('\\', '\\\\').replace('"', '\\"')
 print(f'{key}="{escaped}"')
 PY
@@ -206,8 +208,6 @@ sudo apt-get install -y git python3 python3-venv python3-pip nginx certbot pytho
 mkdir -p "$REMOTE_DIR" "$REMOTE_DIR/state"
 install -m 600 /tmp/cs-flashcards-runtime.env "$RUNTIME_ENV_PATH"
 rm -f /tmp/cs-flashcards-runtime.env
-# shellcheck disable=SC1090
-source "$RUNTIME_ENV_PATH"
 
 # Remove stale pre-flattened layout from older deployments.
 rm -rf "$REMOTE_DIR/cs_flashcards"
@@ -350,14 +350,32 @@ EOF
   sudo nginx -t && sudo systemctl reload nginx
 fi
 
-curl --fail --show-error --silent \
-  -H "Authorization: Basic $(python3 - <<'PY'
+RUNTIME_BASIC_AUTH_HEADER="$(python3 - <<'PY' "$RUNTIME_ENV_PATH"
+import ast
 import base64
-import os
-value = f"{os.environ['CS_FLASHCARDS_USERNAME']}:{os.environ['CS_FLASHCARDS_PASSWORD']}".encode()
-print(base64.b64encode(value).decode())
+import sys
+from pathlib import Path
+
+env_path = Path(sys.argv[1])
+values: dict[str, str] = {}
+for raw_line in env_path.read_text(encoding='utf-8').splitlines():
+    line = raw_line.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    key, raw_value = line.split('=', 1)
+    key = key.strip()
+    raw_value = raw_value.strip()
+    if raw_value.startswith('"') and raw_value.endswith('"'):
+        value = ast.literal_eval(raw_value)
+    else:
+        value = raw_value
+    values[key] = value
+pair = f"{values['CS_FLASHCARDS_USERNAME']}:{values['CS_FLASHCARDS_PASSWORD']}".encode()
+print(base64.b64encode(pair).decode())
 PY
-)" \
+)"
+curl --fail --show-error --silent \
+  -H "Authorization: Basic $RUNTIME_BASIC_AUTH_HEADER" \
   "http://127.0.0.1:$REMOTE_PORT/api/health"
 REMOTE
 
