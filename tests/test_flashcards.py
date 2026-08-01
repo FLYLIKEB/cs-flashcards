@@ -1813,6 +1813,51 @@ class FlashcardProgressTests(unittest.TestCase):
                 '한국은행 2021 컴퓨터공학 학술 파트 II · 1. 원격근무(VDI) 환경 참고 그림',
             })
 
+    def test_sync_bok_question_bank_entries_preserves_existing_answers(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            wiki_root = root / 'wikidocs-ebook'
+            pages = wiki_root / 'pages'
+            pages.mkdir(parents=True)
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            (pages / '05-14-01-한국은행-2021-컴퓨터공학-학술-파트-I.md').write_text(
+                '# 05-14-01. 한국은행 2021 컴퓨터공학 학술 파트 I\n\n'
+                '## 2021 파트 I\n\n'
+                '### 1. 데이터베이스\n\n'
+                '정규화의 장단점을 설명하시오.\n',
+                encoding='utf-8',
+            )
+
+            first = flashcard_app.sync_bok_question_bank_entries(wiki_root, db_path)
+            self.assertEqual(first['count'], 1)
+            question_bank_id = first['items'][0]['question_bank_id']
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.row_factory = sqlite3.Row
+                row = conn.execute(
+                    'SELECT * FROM question_bank WHERE id = ?',
+                    (question_bank_id,),
+                ).fetchone()
+                current = flashcard_app.question_bank_row_to_dict(row)
+                current['answer'] = '1. **장점**: 중복 감소\n2. **단점**: 조인 증가'
+                current['answer_guide'] = '장점과 단점을 나눠 작성'
+                current['fingerprint'] = flashcard_app.question_bank_fingerprint(current)
+                conn.execute(
+                    'UPDATE question_bank SET answer = ?, fingerprint = ? WHERE id = ?',
+                    (current['answer'], current['fingerprint'], question_bank_id),
+                )
+
+                conn.commit()
+
+            second = flashcard_app.sync_bok_question_bank_entries(wiki_root, db_path)
+            self.assertEqual(second['count'], 1)
+            listed = flashcard_app.read_question_bank_entries(db_path, issuer='한국은행', limit=10)
+            self.assertEqual(listed['items'][0]['answer'], '1. **장점**: 중복 감소\n2. **단점**: 조인 증가')
+            self.assertTrue(listed['items'][0]['answer_guide'])
+
     def test_sync_bok_question_bank_entries_refuses_dangerous_shrink(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
