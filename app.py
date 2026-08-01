@@ -4434,9 +4434,21 @@ def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
         current_difficulty = normalized_question_bank_difficulty(row["difficulty"] if "difficulty" in row.keys() else "")
         expected_difficulty = current_difficulty
         if not expected_difficulty:
-            expected_difficulty = normalized_question_bank_difficulty(card.get("difficulty")) if isinstance(card, dict) else ""
-        if not expected_difficulty:
-            expected_difficulty = QUESTION_BANK_DEFAULT_DIFFICULTY
+            card_difficulty = normalized_question_bank_difficulty(card.get("difficulty")) if isinstance(card, dict) else ""
+            question_type = normalize_question_bank_text(row["question_type"] or "", limit=64).lower()
+            if card_difficulty:
+                expected_difficulty = infer_question_bank_difficulty(
+                    row["question_type"] or "",
+                    row["prompt"] or "",
+                    row["body"] or "",
+                    row["answer"] or "",
+                    row["explanation"] or "",
+                    card=card,
+                )
+            elif question_type == "essay":
+                expected_difficulty = "상"
+            else:
+                expected_difficulty = QUESTION_BANK_DEFAULT_DIFFICULTY
         if current_difficulty != expected_difficulty:
             difficulty_updates.append((expected_difficulty, row["id"]))
     if keyword_updates:
