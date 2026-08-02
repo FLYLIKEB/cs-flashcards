@@ -5821,9 +5821,7 @@ def read_question_bank_attempts(
 def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Path | None = None) -> dict[str, Any]:
     card_id = normalize_question_bank_text(payload.card_id, limit=255)
     question_bank_id = normalize_question_bank_text(payload.question_bank_id, limit=255)
-    if card_id:
-        _ensure_card_exists(card_id, progress_db_path)
-    elif not question_bank_id:
+    if not card_id and not question_bank_id:
         raise ValueError("card_id or question_bank_id is required")
     question_type = str(payload.question_type or "").strip().lower()
     if question_type not in SUPPORTED_QUESTION_TYPES:
@@ -5849,6 +5847,17 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
     section = str(payload.section or "")[:64]
     answer_guide = str(payload.answer_guide or "")[:255]
     with closing(connect_progress_db(db_path)) as conn:
+        if question_bank_id:
+            linked = conn.execute("SELECT id, card_id FROM question_bank WHERE id = ?", (question_bank_id,)).fetchone()
+            if linked is None:
+                raise ValueError(f"Unknown question_bank_id: {question_bank_id}")
+            linked_card_id = normalize_question_bank_text(linked["card_id"] if "card_id" in linked.keys() else "", limit=255)
+            if linked_card_id:
+                if card_id and card_id != linked_card_id:
+                    raise ValueError(f"question_bank_id {question_bank_id} is linked to card_id {linked_card_id}, not {card_id}")
+                card_id = linked_card_id
+        if card_id:
+            _ensure_card_exists(card_id, db_path)
         conn.execute(
             """
             INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
@@ -5857,10 +5866,6 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
             """,
             (card_id, now),
         )
-        if question_bank_id:
-            linked = conn.execute("SELECT id FROM question_bank WHERE id = ?", (question_bank_id,)).fetchone()
-            if linked is None:
-                raise ValueError(f"Unknown question_bank_id: {question_bank_id}")
         existing = conn.execute(
             "SELECT created_at, question_started_at FROM question_attempts WHERE question_id = ?",
             (question_id,),

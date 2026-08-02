@@ -1612,6 +1612,188 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(breakdown[0]['unseen_count'], 0)
             self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
 
+
+    def test_linked_question_bank_attempt_without_card_id_uses_linked_card(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            with csv_path.open('w', encoding='utf-8-sig', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=BASE_FIELDS)
+                writer.writeheader()
+                writer.writerow({
+                    'id': 'CS-001',
+                    'term': '정규화',
+                    'english': 'Normalization',
+                    'category': '데이터베이스',
+                    'definition': '중복을 줄이는 설계 원칙',
+                    'detailed_explanation': '이상 현상을 방지한다.',
+                    'related_concepts': '[[이상 현상]]',
+                    'source_files': 'sample-1.md',
+                    'exam_note': '기본 카드',
+                    'bok_appeared': '',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+                writer.writerow({
+                    'id': 'CS-002',
+                    'term': '트랜잭션',
+                    'english': 'Transaction',
+                    'category': '데이터베이스',
+                    'definition': '작업 단위',
+                    'detailed_explanation': '원자성을 보장한다.',
+                    'related_concepts': '[[ACID]]',
+                    'source_files': 'sample-2.md',
+                    'exam_note': '연결 카드',
+                    'bok_appeared': '',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-002',
+                        'question_type': 'subjective',
+                        'prompt': '트랜잭션의 핵심 속성은?',
+                        'body': 'ACID 관점에서 답하시오.',
+                        'answer': '원자성, 일관성, 고립성, 지속성이다.',
+                        'explanation': 'ACID 네 속성을 설명해야 한다.',
+                        'rubric': ['ACID', '원자성'],
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'keywords': ['트랜잭션', 'ACID'],
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '무결성 회귀 1',
+                        'section': '전공필기',
+                        'points': 10,
+                        'expected_time_seconds': 180,
+                        'answer_guide': 'ACID를 순서대로 설명',
+                        'session_mode': 'practice',
+                    }
+                ],
+                db_path,
+            )
+            item = saved['items'][0]
+
+            attempt = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='bank-linked-empty-card',
+                    question_bank_id=item['question_bank_id'],
+                    card_id='',
+                    question_type='subjective',
+                    prompt=item['prompt'],
+                    body=item['body'],
+                    user_answer='원자성과 일관성',
+                    is_correct=False,
+                    judgment='wrong',
+                    wrong_note='연결 카드 기준으로 저장돼야 한다.',
+                ),
+                csv_path,
+                db_path,
+            )
+
+            self.assertEqual(attempt['attempt']['question_bank_id'], item['question_bank_id'])
+            self.assertEqual(attempt['attempt']['card_id'], 'CS-002')
+            self.assertEqual(attempt['card']['id'], 'CS-002')
+
+            rows, _ = flashcard_app.read_cards(db_path)
+            row_map = {row['id']: row for row in rows}
+            self.assertEqual(row_map['CS-001']['question_attempt_count'], 0)
+            self.assertEqual(row_map['CS-001']['question_wrong_count'], 0)
+            self.assertEqual(row_map['CS-002']['question_attempt_count'], 1)
+            self.assertEqual(row_map['CS-002']['question_wrong_count'], 1)
+            self.assertEqual(row_map['CS-002']['latest_wrong_note'], '연결 카드 기준으로 저장돼야 한다.')
+
+    def test_linked_question_bank_attempt_rejects_mismatched_card_id(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            with csv_path.open('w', encoding='utf-8-sig', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=BASE_FIELDS)
+                writer.writeheader()
+                writer.writerow({
+                    'id': 'CS-001',
+                    'term': '정규화',
+                    'english': 'Normalization',
+                    'category': '데이터베이스',
+                    'definition': '중복을 줄이는 설계 원칙',
+                    'detailed_explanation': '이상 현상을 방지한다.',
+                    'related_concepts': '[[이상 현상]]',
+                    'source_files': 'sample-1.md',
+                    'exam_note': '기본 카드',
+                    'bok_appeared': '',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+                writer.writerow({
+                    'id': 'CS-002',
+                    'term': '트랜잭션',
+                    'english': 'Transaction',
+                    'category': '데이터베이스',
+                    'definition': '작업 단위',
+                    'detailed_explanation': '원자성을 보장한다.',
+                    'related_concepts': '[[ACID]]',
+                    'source_files': 'sample-2.md',
+                    'exam_note': '연결 카드',
+                    'bok_appeared': '',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-002',
+                        'question_type': 'subjective',
+                        'prompt': '트랜잭션의 핵심 속성은?',
+                        'body': 'ACID 관점에서 답하시오.',
+                        'answer': '원자성, 일관성, 고립성, 지속성이다.',
+                        'explanation': 'ACID 네 속성을 설명해야 한다.',
+                        'rubric': ['ACID', '원자성'],
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'keywords': ['트랜잭션', 'ACID'],
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '무결성 회귀 2',
+                        'section': '전공필기',
+                        'points': 10,
+                        'expected_time_seconds': 180,
+                        'answer_guide': 'ACID를 순서대로 설명',
+                        'session_mode': 'practice',
+                    }
+                ],
+                db_path,
+            )
+            item = saved['items'][0]
+
+            with self.assertRaises(ValueError) as exc:
+                save_question_attempt(
+                    flashcard_app.QuestionAttemptRequest(
+                        question_id='bank-linked-mismatch-card',
+                        question_bank_id=item['question_bank_id'],
+                        card_id='CS-001',
+                        question_type='subjective',
+                        prompt=item['prompt'],
+                        body=item['body'],
+                        user_answer='원자성과 일관성',
+                        is_correct=False,
+                        judgment='wrong',
+                        wrong_note='다른 카드로 저장되면 안 된다.',
+                    ),
+                    csv_path,
+                    db_path,
+                )
+            self.assertIn('linked to card_id CS-002', str(exc.exception))
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                attempt_count = conn.execute('SELECT COUNT(*) FROM question_attempts').fetchone()[0]
+            self.assertEqual(attempt_count, 0)
     def test_read_question_bank_entries_missing_cards_cover_filtered_results_beyond_first_page(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
