@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">09-01 선형 자료구조 복잡도 요약</title>
+  <desc id="desc">배열, 연결리스트, 스택, 큐의 접근, 검색, 삽입, 삭제, 메모리 특성을 읽기 쉬운 표와 해설로 정리한 SVG</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .hero { fill: #1e293b; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #cbd5e1; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .head { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .cell { font: 600 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .note { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .good { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
+      .warn { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #b45309; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="760"/>
+  <rect x="30" y="30" width="1140" height="700" rx="30" fill="#e2e8f0"/>
+  <rect x="44" y="44" width="1112" height="672" rx="28" fill="#ffffff"/>
+
+  <rect class="hero" x="72" y="68" width="1056" height="128" rx="28"/>
+  <text class="title" x="104" y="126">선형 자료구조 복잡도 요약</text>
+  <text class="subtitle" x="104" y="164">언제 빠른지, 언제 느린지, 메모리 특징이 무엇인지 표와 해설을 분리해 읽기 쉽게 정리</text>
+
+  <text class="section" x="84" y="236">핵심 표</text>
+  <rect x="84" y="256" width="1032" height="64" rx="18" fill="#0f172a"/>
+  <text class="head" x="124" y="296">자료구조</text>
+  <text class="head" x="370" y="296" text-anchor="middle">접근</text>
+  <text class="head" x="498" y="296" text-anchor="middle">검색</text>
+  <text class="head" x="626" y="296" text-anchor="middle">삽입</text>
+  <text class="head" x="754" y="296" text-anchor="middle">삭제</text>
+  <text class="head" x="964" y="296" text-anchor="middle">추가 메모리</text>
+
+  <rect x="84" y="320" width="1032" height="72" rx="0" fill="#eff6ff"/>
+  <rect x="84" y="392" width="1032" height="72" rx="0" fill="#ffffff"/>
+  <rect x="84" y="464" width="1032" height="72" rx="0" fill="#f8fafc"/>
+  <rect x="84" y="536" width="1032" height="72" rx="0" fill="#ffffff"/>
+  <line x1="308" y1="256" x2="308" y2="608" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="434" y1="256" x2="434" y2="608" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="562" y1="256" x2="562" y2="608" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="690" y1="256" x2="690" y2="608" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="818" y1="256" x2="818" y2="608" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="84" y1="392" x2="1116" y2="392" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="84" y1="464" x2="1116" y2="464" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="84" y1="536" x2="1116" y2="536" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="84" y1="608" x2="1116" y2="608" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="label" x="112" y="362">배열</text>
+  <text class="cell" x="370" y="362" text-anchor="middle">O(1)</text>
+  <text class="cell" x="498" y="362" text-anchor="middle">O(n)</text>
+  <text class="cell" x="626" y="362" text-anchor="middle">O(n)</text>
+  <text class="cell" x="754" y="362" text-anchor="middle">O(n)</text>
+  <text class="cell" x="964" y="362" text-anchor="middle">낮음 · 연속 메모리</text>
+
+  <text class="label" x="112" y="434">연결리스트</text>
+  <text class="cell" x="370" y="434" text-anchor="middle">O(n)</text>
+  <text class="cell" x="498" y="434" text-anchor="middle">O(n)</text>
+  <text class="cell" x="626" y="434" text-anchor="middle">O(1)*</text>
+  <text class="cell" x="754" y="434" text-anchor="middle">O(1)*</text>
+  <text class="cell" x="964" y="434" text-anchor="middle">포인터 저장 비용</text>
+
+  <text class="label" x="112" y="506">스택</text>
+  <text class="cell" x="370" y="506" text-anchor="middle">O(1)</text>
+  <text class="cell" x="498" y="506" text-anchor="middle">O(n)</text>
+  <text class="cell" x="626" y="506" text-anchor="middle">O(1)</text>
+  <text class="cell" x="754" y="506" text-anchor="middle">O(1)</text>
+  <text class="cell" x="964" y="506" text-anchor="middle">구현에 따라 다름</text>
+
+  <text class="label" x="112" y="578">큐</text>
+  <text class="cell" x="370" y="578" text-anchor="middle">O(1)</text>
+  <text class="cell" x="498" y="578" text-anchor="middle">O(n)</text>
+  <text class="cell" x="626" y="578" text-anchor="middle">O(1)</text>
+  <text class="cell" x="754" y="578" text-anchor="middle">O(1)</text>
+  <text class="cell" x="964" y="578" text-anchor="middle">원형/리스트에 따라 다름</text>
+
+  <rect class="card" x="84" y="634" width="486" height="58" rx="18" fill="#eff6ff"/>
+  <text class="good" x="108" y="669">빠르게 읽는 법</text>
+  <text class="body" x="224" y="669">임의 접근이 중요하면 배열, 순서 유지 삽입·삭제가 중요하면 리스트·큐·스택을 본다.</text>
+
+  <rect class="card" x="586" y="634" width="530" height="58" rx="18" fill="#fff7ed"/>
+  <text class="warn" x="610" y="669">주의</text>
+  <text class="body" x="666" y="669">연결리스트의 O(1)* 는 위치를 이미 알고 있을 때만 성립한다. 찾는 비용 O(n)은 별도다.</text>
+</svg>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">08-04 CIDR와 서브넷 계산 예시</title>
+  <desc id="desc">192.168.10.66/26 주소를 기준으로 마스크, 블록 크기, 네트워크 주소, 브로드캐스트 주소, 사용 가능한 호스트 범위를 단계별로 설명하는 SVG</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .soft { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2; }
+      .green { fill: #ecfdf5; stroke: #34d399; stroke-width: 2; }
+      .red { fill: #fef2f2; stroke: #f87171; stroke-width: 2; }
+      .slate { fill: #e2e8f0; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .section { font: 700 25px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 20px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .monoSmall { font: 700 15px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #1e293b; }
+      .pill { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="760"/>
+  <rect x="36" y="36" width="1128" height="688" rx="30" class="slate"/>
+  <rect x="58" y="58" width="1084" height="644" rx="28" class="panel"/>
+
+  <text x="92" y="116" class="title">CIDR 및 서브넷 계산: 192.168.10.66/26</text>
+  <text x="92" y="147" class="body">면접에서는 “마스크 → 블록 크기 → 소속 서브넷 → 네트워크/브로드캐스트 → usable host 범위” 순서로 말하면 정리가 쉽다.</text>
+
+  <rect x="92" y="178" width="320" height="42" rx="21" fill="#dbeafe"/>
+  <text x="252" y="205" text-anchor="middle" class="pill">CIDR /26 = 네트워크 26비트 + 호스트 6비트</text>
+
+  <rect x="92" y="250" width="492" height="132" rx="22" class="soft"/>
+  <text x="118" y="286" class="section">1. 마스크와 블록 크기</text>
+  <text x="118" y="318" class="monoSmall">subnet mask = 255.255.255.192</text>
+  <text x="118" y="345" class="monoSmall">host bits = 32 - 26 = 6</text>
+  <text x="118" y="372" class="monoSmall">block size = 2^6 = 64</text>
+
+  <rect x="616" y="250" width="434" height="132" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="642" y="286" class="section">2. 빠른 암기 포인트</text>
+  <text x="642" y="318" class="body">/24는 256개, /25는 128개, /26은 64개 단위로 구간이 끊긴다.</text>
+  <text x="642" y="345" class="body">따라서 마지막 옥텟이 0, 64, 128, 192에서 새 서브넷이 시작된다.</text>
+
+  <rect x="92" y="418" width="958" height="134" rx="22" class="soft"/>
+  <text x="118" y="454" class="section">3. 어떤 서브넷에 속하나?</text>
+  <text x="118" y="487" class="monoSmall">가능한 블록: 192.168.10.0/26 | 192.168.10.64/26 | 192.168.10.128/26 | 192.168.10.192/26</text>
+  <text x="118" y="515" class="body">주어진 IP 192.168.10.66은 64 이상 127 이하 구간에 있으므로 192.168.10.64/26에 속한다.</text>
+
+  <rect x="92" y="580" width="286" height="92" rx="20" class="green"/>
+  <text x="118" y="614" class="label">네트워크 주소</text>
+  <text x="118" y="643" class="mono">192.168.10.64</text>
+  <text x="118" y="664" class="small">호스트 비트를 모두 0으로 만든 값</text>
+
+  <rect x="418" y="580" width="286" height="92" rx="20" class="red"/>
+  <text x="444" y="614" class="label">브로드캐스트 주소</text>
+  <text x="444" y="643" class="mono">192.168.10.127</text>
+  <text x="444" y="664" class="small">호스트 비트를 모두 1로 만든 값</text>
+
+  <rect x="744" y="580" width="306" height="92" rx="20" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+  <text x="770" y="614" class="label">사용 가능한 호스트</text>
+  <text x="770" y="643" class="monoSmall">192.168.10.65 ~ 192.168.10.126</text>
+  <text x="770" y="664" class="small">총 62개 = 64 - 2</text>
+</svg>

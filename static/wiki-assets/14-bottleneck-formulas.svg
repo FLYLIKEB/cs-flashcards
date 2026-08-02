@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">컴퓨터구조 심화 공식과 병목 지도 SVG</title>
+  <desc id="desc">CPU time과 AMAT 공식을 중심으로 CPU, 메모리, I/O 병목의 원인과 개선 방향을 비교하는 SVG</desc>
+  <defs>
+    <style>
+      text { font-family: "Pretendard", "Noto Sans KR", sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 18px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 36px; font-weight: 800; }
+      .subtitle { font-size: 19px; font-weight: 500; fill: #334155; }
+      .section { font-size: 17px; font-weight: 800; letter-spacing: 0.04em; fill: #1e293b; }
+      .cardTitle { font-size: 27px; font-weight: 800; }
+      .formula { font-size: 24px; font-weight: 800; }
+      .body { font-size: 17px; font-weight: 500; fill: #334155; }
+      .small { font-size: 15px; font-weight: 700; fill: #475569; }
+      .white { fill: #ffffff; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="820" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="764" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="88" class="eyebrow">FORMULA + BOTTLENECK MAP</text>
+  <text x="72" y="134" class="title">두 공식으로 병목 위치를 설명하는 방법</text>
+  <text x="72" y="170" class="subtitle">CPU time은 내부 실행 병목을, AMAT는 메모리 접근 병목을 설명한다. I/O는 인터럽트와 DMA로 CPU 점유율 변화를 해석한다.</text>
+
+  <rect x="72" y="214" width="500" height="220" rx="28" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="108" y="258" class="section">공식 1 · CPU 내부 병목</text>
+  <text x="108" y="314" class="formula">CPU time = Instruction Count × CPI × Clock Cycle Time</text>
+  <text x="108" y="354" class="body">Instruction Count: 명령어 수가 줄면 총 실행량이 줄어든다.</text>
+  <text x="108" y="384" class="body">CPI: 파이프라인 해저드와 분기 실패가 커지면 증가한다.</text>
+  <text x="108" y="414" class="body">Clock Cycle Time: 클럭 주기가 길어질수록 한 사이클 비용이 커진다.</text>
+
+  <rect x="628" y="214" width="500" height="220" rx="28" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="664" y="258" class="section">공식 2 · 메모리 계층 병목</text>
+  <text x="664" y="314" class="formula">AMAT = Hit Time + Miss Rate × Miss Penalty</text>
+  <text x="664" y="354" class="body">Hit Time: 캐시에서 바로 찾을 때 드는 기본 접근 시간.</text>
+  <text x="664" y="384" class="body">Miss Rate: 캐시·TLB에서 실패하는 비율이 높을수록 악화된다.</text>
+  <text x="664" y="414" class="body">Miss Penalty: DRAM이나 저장장치까지 내려갈수록 지연이 커진다.</text>
+
+  <text x="72" y="490" class="section">병목 지도 · 실행 → 메모리 → I/O</text>
+
+  <rect x="72" y="522" width="320" height="214" rx="28" fill="#0f172a"/>
+  <text x="104" y="572" class="white" style="font-size:30px;font-weight:800;">CPU</text>
+  <text x="104" y="608" class="white" style="font-size:18px;font-weight:600;">대표 원인</text>
+  <text x="104" y="636" class="white" style="font-size:17px;font-weight:500;">• 파이프라인 해저드</text>
+  <text x="104" y="662" class="white" style="font-size:17px;font-weight:500;">• 분기 예측 실패</text>
+  <text x="104" y="688" class="white" style="font-size:17px;font-weight:500;">• 명령어 수 증가</text>
+  <rect x="104" y="704" width="256" height="20" rx="10" fill="#2563eb"/>
+  <text x="104" y="748" class="white" style="font-size:15px;font-weight:700;">설명 문장: CPI가 커져 CPU time이 증가한다.</text>
+
+  <rect x="440" y="522" width="320" height="214" rx="28" fill="#155e75"/>
+  <text x="472" y="572" class="white" style="font-size:30px;font-weight:800;">Memory</text>
+  <text x="472" y="608" class="white" style="font-size:18px;font-weight:600;">대표 원인</text>
+  <text x="472" y="636" class="white" style="font-size:17px;font-weight:500;">• 캐시 미스</text>
+  <text x="472" y="662" class="white" style="font-size:17px;font-weight:500;">• TLB 미스</text>
+  <text x="472" y="688" class="white" style="font-size:17px;font-weight:500;">• DRAM 접근 증가</text>
+  <rect x="472" y="704" width="256" height="20" rx="10" fill="#06b6d4"/>
+  <text x="472" y="748" class="white" style="font-size:15px;font-weight:700;">설명 문장: miss rate 또는 penalty가 커져 AMAT가 증가한다.</text>
+
+  <rect x="808" y="522" width="320" height="214" rx="28" fill="#9a3412"/>
+  <text x="840" y="572" class="white" style="font-size:30px;font-weight:800;">I/O</text>
+  <text x="840" y="608" class="white" style="font-size:18px;font-weight:600;">대표 원인</text>
+  <text x="840" y="636" class="white" style="font-size:17px;font-weight:500;">• 인터럽트 폭주</text>
+  <text x="840" y="662" class="white" style="font-size:17px;font-weight:500;">• DMA 미사용</text>
+  <text x="840" y="688" class="white" style="font-size:17px;font-weight:500;">• 느린 저장장치 응답</text>
+  <rect x="840" y="704" width="256" height="20" rx="10" fill="#f97316"/>
+  <text x="840" y="748" class="white" style="font-size:15px;font-weight:700;">설명 문장: CPU가 I/O 대기 처리에 더 오래 묶인다.</text>
+
+  <line x1="392" y1="629" x2="440" y2="629" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="760" y1="629" x2="808" y2="629" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow)"/>
+</svg>

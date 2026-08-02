@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="960" viewBox="0 0 1280 960" role="img" aria-labelledby="title desc">
+  <title id="title">WHERE와 GROUP BY worked example</title>
+  <desc id="desc">orders 예제 테이블에서 paid 행만 남긴 뒤 customer_id별 합계를 구하는 과정을 단계별로 보여주는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 600 16px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .monoMuted { font: 600 16px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #94a3b8; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; }
+      .blue { fill: #eff6ff; stroke: #93c5fd; stroke-width: 1.5; }
+      .green { fill: #f0fdf4; stroke: #86efac; stroke-width: 1.5; }
+      .violet { fill: #f5f3ff; stroke: #c4b5fd; stroke-width: 1.5; }
+      .line { stroke: #cbd5e1; stroke-width: 1; }
+      .strike { stroke: #ef4444; stroke-width: 3; stroke-linecap: round; }
+      .pill { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="960" fill="url(#bg)"/>
+  <rect x="32" y="32" width="1216" height="896" rx="28" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+
+  <text class="title" x="72" y="92">worked example: paid 주문만 남겨 고객별 합계 구하기</text>
+  <text class="subtitle" x="72" y="126">예제 쿼리: SELECT customer_id, SUM(amount) AS total_paid FROM orders WHERE status = 'paid' GROUP BY customer_id;</text>
+
+  <rect class="card" x="72" y="164" width="346" height="664" rx="24"/>
+  <text class="section" x="100" y="208">1. 원본 orders 테이블</text>
+  <text class="small" x="100" y="236">학습용 데이터 5행</text>
+  <rect x="100" y="264" width="290" height="516" rx="18" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+  <line class="line" x1="100" y1="314" x2="390" y2="314"/>
+  <line class="line" x1="154" y1="264" x2="154" y2="780"/>
+  <line class="line" x1="252" y1="264" x2="252" y2="780"/>
+  <line class="line" x1="322" y1="264" x2="322" y2="780"/>
+  <line class="line" x1="100" y1="380" x2="390" y2="380"/>
+  <line class="line" x1="100" y1="446" x2="390" y2="446"/>
+  <line class="line" x1="100" y1="512" x2="390" y2="512"/>
+  <line class="line" x1="100" y1="578" x2="390" y2="578"/>
+  <line class="line" x1="100" y1="644" x2="390" y2="644"/>
+  <line class="line" x1="100" y1="710" x2="390" y2="710"/>
+  <text class="mono" x="114" y="296">id</text>
+  <text class="mono" x="172" y="296">customer_id</text>
+  <text class="mono" x="270" y="296">amount</text>
+  <text class="mono" x="340" y="296">status</text>
+  <text class="mono" x="114" y="354">1</text>
+  <text class="mono" x="172" y="354">100</text>
+  <text class="mono" x="270" y="354">10</text>
+  <text class="mono" x="340" y="354">paid</text>
+  <text class="mono" x="114" y="420">2</text>
+  <text class="mono" x="172" y="420">101</text>
+  <text class="mono" x="270" y="420">20</text>
+  <text class="mono" x="340" y="420">pending</text>
+  <text class="mono" x="114" y="486">3</text>
+  <text class="mono" x="172" y="486">100</text>
+  <text class="mono" x="270" y="486">15</text>
+  <text class="mono" x="340" y="486">paid</text>
+  <text class="mono" x="114" y="552">4</text>
+  <text class="mono" x="172" y="552">102</text>
+  <text class="mono" x="264" y="552">NULL</text>
+  <text class="mono" x="340" y="552">cancelled</text>
+  <text class="mono" x="114" y="618">5</text>
+  <text class="mono" x="172" y="618">101</text>
+  <text class="mono" x="270" y="618">5</text>
+  <text class="mono" x="340" y="618">paid</text>
+
+  <rect class="blue" x="468" y="164" width="346" height="664" rx="24"/>
+  <text class="section" x="496" y="208">2. WHERE status = 'paid'</text>
+  <text class="small" x="496" y="236">paid가 아닌 행은 먼저 제거</text>
+  <rect x="496" y="264" width="290" height="516" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="1.5"/>
+  <line class="line" x1="496" y1="314" x2="786" y2="314"/>
+  <line class="line" x1="550" y1="264" x2="550" y2="780"/>
+  <line class="line" x1="648" y1="264" x2="648" y2="780"/>
+  <line class="line" x1="718" y1="264" x2="718" y2="780"/>
+  <line class="line" x1="496" y1="380" x2="786" y2="380"/>
+  <line class="line" x1="496" y1="446" x2="786" y2="446"/>
+  <line class="line" x1="496" y1="512" x2="786" y2="512"/>
+  <line class="line" x1="496" y1="578" x2="786" y2="578"/>
+  <line class="line" x1="496" y1="644" x2="786" y2="644"/>
+  <line class="line" x1="496" y1="710" x2="786" y2="710"/>
+  <text class="mono" x="510" y="296">id</text>
+  <text class="mono" x="568" y="296">customer_id</text>
+  <text class="mono" x="666" y="296">amount</text>
+  <text class="mono" x="736" y="296">status</text>
+  <text class="mono" x="510" y="354">1</text>
+  <text class="mono" x="568" y="354">100</text>
+  <text class="mono" x="666" y="354">10</text>
+  <text class="mono" x="736" y="354">paid</text>
+  <text class="monoMuted" x="510" y="420">2</text>
+  <text class="monoMuted" x="568" y="420">101</text>
+  <text class="monoMuted" x="666" y="420">20</text>
+  <text class="monoMuted" x="736" y="420">pending</text>
+  <line class="strike" x1="508" y1="402" x2="782" y2="436"/>
+  <text class="mono" x="510" y="486">3</text>
+  <text class="mono" x="568" y="486">100</text>
+  <text class="mono" x="666" y="486">15</text>
+  <text class="mono" x="736" y="486">paid</text>
+  <text class="monoMuted" x="510" y="552">4</text>
+  <text class="monoMuted" x="568" y="552">102</text>
+  <text class="monoMuted" x="660" y="552">NULL</text>
+  <text class="monoMuted" x="736" y="552">cancelled</text>
+  <line class="strike" x1="508" y1="534" x2="782" y2="568"/>
+  <text class="mono" x="510" y="618">5</text>
+  <text class="mono" x="568" y="618">101</text>
+  <text class="mono" x="666" y="618">5</text>
+  <text class="mono" x="736" y="618">paid</text>
+  <rect x="520" y="722" width="242" height="42" rx="14" fill="#dbeafe"/>
+  <text class="pill" x="538" y="748" fill="#1d4ed8">남은 행 3개만 GROUP BY로 전달</text>
+
+  <rect class="green" x="864" y="164" width="344" height="664" rx="24"/>
+  <text class="section" x="892" y="208">3. GROUP BY customer_id</text>
+  <text class="small" x="892" y="236">남은 행을 고객별로 묶어 SUM(amount) 계산</text>
+
+  <rect class="card" x="892" y="280" width="288" height="138" rx="20"/>
+  <text class="label" x="916" y="316">customer_id = 100</text>
+  <text class="mono" x="916" y="348">rows: (10), (15)</text>
+  <text class="mono" x="916" y="380">SUM(amount) = 25</text>
+  <rect x="1070" y="300" width="88" height="30" rx="15" fill="#dcfce7"/>
+  <text class="pill" x="1089" y="320" fill="#166534">2건</text>
+
+  <rect class="card" x="892" y="448" width="288" height="138" rx="20"/>
+  <text class="label" x="916" y="484">customer_id = 101</text>
+  <text class="mono" x="916" y="516">rows: (5)</text>
+  <text class="mono" x="916" y="548">SUM(amount) = 5</text>
+  <rect x="1070" y="468" width="88" height="30" rx="15" fill="#dbeafe"/>
+  <text class="pill" x="1089" y="488" fill="#1d4ed8">1건</text>
+
+  <rect class="violet" x="892" y="632" width="288" height="122" rx="20"/>
+  <text class="label" x="916" y="668">최종 SELECT 결과</text>
+  <text class="mono" x="916" y="704">customer_id | total_paid</text>
+  <text class="mono" x="916" y="734">100         | 25</text>
+  <text class="mono" x="916" y="760">101         | 5</text>
+
+  <text class="small" x="72" y="882">해석 순서: 원본 행 확인 → WHERE로 선필터링 → GROUP BY로 묶은 뒤 SUM 계산 → SELECT로 결과 출력</text>
+</svg>

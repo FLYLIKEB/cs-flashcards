@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">15-4. 금융 규제별 통제 실무 예시</title>
+  <desc id="desc">금융 규제 프레임워크를 면접과 실무에서 설명할 때 규제별로 문제, 기술 통제, 운영 통제, 증적을 어떻게 연결하는지 보여주는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#eef6ff" />
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .eyebrow { font-size: 14px; font-weight: 700; fill: #a7f3d0; letter-spacing: 0.04em; }
+      .title { font-size: 34px; font-weight: 800; fill: #ffffff; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #d1fae5; }
+      .section { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .cardTitle { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 16px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 700; fill: #475569; }
+      .center { text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="860" fill="url(#bg)" />
+  <rect x="32" y="28" width="1136" height="804" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <rect x="58" y="52" width="1084" height="136" rx="26" fill="url(#hero)" />
+  <text class="eyebrow" x="84" y="90">CONTROL PRACTICE EXAMPLES</text>
+  <text class="title" x="84" y="126">규제별 통제 실무 예시</text>
+  <text class="subtitle" x="84" y="156">면접에서는 규제 이름만 나열하지 말고, 문제 → 기술 통제 → 운영 통제 → 증적 순서로 답하면 설계 감각이 드러난다.</text>
+
+  <text class="section" x="80" y="240">규제를 운영 절차로 바꾸는 4가지 답변 틀</text>
+
+  <rect x="80" y="268" width="500" height="230" rx="24" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" />
+  <text class="cardTitle" x="108" y="308">1. 바젤Ⅲ: 리스크 보고 수치 불일치 방지</text>
+  <text class="label" x="108" y="344">문제</text>
+  <text class="body" x="164" y="344">원장·ETL·보고서 수치가 어긋나면 규제보고 신뢰가 무너진다.</text>
+  <text class="label" x="108" y="378">기술 통제</text>
+  <text class="body" x="196" y="378">컬럼 lineage, 배치 검증, 시나리오별 계산 재실행 자동화</text>
+  <text class="label" x="108" y="412">운영 통제</text>
+  <text class="body" x="196" y="412">정기 대사, 예외 승인, 보고 마감 전 품질 점검 체크리스트</text>
+  <text class="label" x="108" y="446">증적</text>
+  <text class="body" x="164" y="446">변환 이력, 검증 로그, 제출 보고서 버전과 해시값</text>
+
+  <rect x="620" y="268" width="500" height="230" rx="24" fill="#fef2f2" stroke="#ef4444" stroke-width="2" />
+  <text class="cardTitle" x="648" y="308">2. 전자금융거래법: 계정 탈취와 분쟁 대응</text>
+  <text class="label" x="648" y="344">문제</text>
+  <text class="body" x="704" y="344">도용 거래가 발생하면 이용자 보호와 책임 추적이 모두 필요하다.</text>
+  <text class="label" x="648" y="378">기술 통제</text>
+  <text class="body" x="736" y="378">2차 인증, 세션 만료, 거래 서명, 로그 암호화와 위변조 방지</text>
+  <text class="label" x="648" y="412">운영 통제</text>
+  <text class="body" x="736" y="412">이상 행위 알림, 사고 접수 절차, 고객 안내와 복구 기준 사전 정의</text>
+  <text class="label" x="648" y="446">증적</text>
+  <text class="body" x="704" y="446">접속 기록, 거래 승인 로그, 사고 분석 보고서, 보상 처리 이력</text>
+
+  <rect x="80" y="532" width="500" height="230" rx="24" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />
+  <text class="cardTitle" x="108" y="572">3. 망분리: 외부 파일·원격접속 통제</text>
+  <text class="label" x="108" y="608">문제</text>
+  <text class="body" x="164" y="608">외부 반입 파일이나 원격 접속이 업무망으로 악성코드를 들일 수 있다.</text>
+  <text class="label" x="108" y="642">기술 통제</text>
+  <text class="body" x="196" y="642">중계 구간 검역, 네트워크 세그먼트, 반출입 암호화, 접속 정책 분리</text>
+  <text class="label" x="108" y="676">운영 통제</text>
+  <text class="body" x="196" y="676">예외 승인, 반입·반출 기록, 위험평가, 원격근무 모니터링 강화</text>
+  <text class="label" x="108" y="710">증적</text>
+  <text class="body" x="164" y="710">승인 번호, 전송 로그, 검역 결과, 모니터링 알림 이력</text>
+
+  <rect x="620" y="532" width="500" height="230" rx="24" fill="#fff7ed" stroke="#f59e0b" stroke-width="2" />
+  <text class="cardTitle" x="648" y="572">4. 금융보안원 기준: 취약점과 사고대응</text>
+  <text class="label" x="648" y="608">문제</text>
+  <text class="body" x="704" y="608">취약점 발견 후 확산을 못 막으면 장애와 침해가 장기화된다.</text>
+  <text class="label" x="648" y="642">기술 통제</text>
+  <text class="body" x="736" y="642">SIEM, 패치 우선순위, 계정 통제, 무결성 보관, 취약점 스캔 자동화</text>
+  <text class="label" x="648" y="676">운영 통제</text>
+  <text class="body" x="736" y="676">탐지 → 격리 → 분석 → 복구 → 보고 절차와 Tabletop 훈련</text>
+  <text class="label" x="648" y="710">증적</text>
+  <text class="body" x="704" y="710">조치 티켓, 패치 결과, 훈련 보고서, 사후 개선 항목</text>
+
+  <rect x="80" y="786" width="1040" height="22" rx="11" fill="#0f172a" />
+  <text class="subtitle" x="106" y="801">면접 한 줄 정리: “규제 목적을 기술 통제와 운영 통제로 풀고, 마지막에 증적까지 제시하면 실제 운영 가능한 설계로 들립니다.”</text>
+</svg>

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
   <title id="title">11. 소프트웨어공학 인포그래픽</title>
-  <desc id="desc">소프트웨어공학 페이지의 핵심 학습 축인 개발방법론, 테스트, 설계 품질, 형상관리와 비용산정을 한 장에 정리한 SVG</desc>
+  <desc id="desc">소프트웨어공학 페이지의 핵심 학습 축인 개발방법론, 테스트, 설계 품질, 형상관리와 비용산정을 넓은 간격으로 정리한 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff" />
@@ -11,102 +11,107 @@
       <stop offset="100%" stop-color="#e0f2fe" />
     </linearGradient>
     <style>
-      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
-      .eyebrow { font-size: 15px; font-weight: 700; fill: #475569; letter-spacing: 0.04em; }
-      .title { font-size: 33px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .panelTitle { font-size: 23px; font-weight: 800; fill: #0f172a; }
-      .panelBody { font-size: 16px; font-weight: 600; fill: #334155; }
-      .chip { font-size: 14px; font-weight: 700; fill: #1e293b; }
-      .centerTitle { font-size: 27px; font-weight: 800; fill: #0f172a; }
-      .centerBody { font-size: 17px; font-weight: 600; fill: #334155; }
-      .caption { font-size: 14px; font-weight: 700; fill: #475569; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 16px; font-weight: 800; fill: #475569; letter-spacing: 0.06em; }
+      .title { font-size: 38px; font-weight: 800; }
+      .subtitle { font-size: 19px; font-weight: 600; fill: #334155; }
+      .panelTitle { font-size: 24px; font-weight: 800; }
+      .panelBody { font-size: 17px; font-weight: 600; fill: #334155; }
+      .chip { font-size: 15px; font-weight: 800; fill: #1e293b; }
+      .centerTitle { font-size: 30px; font-weight: 800; }
+      .centerBody { font-size: 18px; font-weight: 700; fill: #334155; }
+      .centerCaption { font-size: 15px; font-weight: 700; fill: #475569; }
+      .smallTitle { font-size: 15px; font-weight: 800; fill: #334155; }
+      .smallText { font-size: 14px; font-weight: 700; fill: #475569; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="32" y="28" width="1136" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <rect width="1200" height="900" fill="url(#bg)" />
+  <rect x="28" y="24" width="1144" height="852" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
 
-  <text x="78" y="82" class="eyebrow">FINANCIAL IT EXAM MAP</text>
-  <text x="78" y="122" class="title">11. 소프트웨어공학</text>
-  <text x="78" y="156" class="subtitle">시험은 구현보다 구분·순서·비교를 묻는다. 그래서 이 페이지는 “개발 → 검증 → 설계 → 관리” 네 축으로 기억한다.</text>
+  <text x="74" y="84" class="eyebrow">FINANCIAL IT EXAM MAP</text>
+  <text x="74" y="130" class="title">11. 소프트웨어공학</text>
+  <text x="74" y="170" class="subtitle">시험은 구현 자체보다 개념 구분, 절차 순서, 장단점 비교를 빠르게 묻는다.</text>
+  <text x="74" y="198" class="subtitle">그래서 이 페이지는 개발 → 검증 → 설계 → 관리의 네 축으로 정리한다.</text>
 
-  <rect x="436" y="202" width="328" height="316" rx="34" fill="url(#centerGlow)" stroke="#38bdf8" stroke-width="2.5" />
-  <circle cx="600" cy="360" r="102" fill="#ffffff" stroke="#0284c7" stroke-width="3" />
-  <circle cx="600" cy="360" r="72" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="2" />
-  <path d="M600 244 L600 282 M716 360 L678 360 M600 476 L600 438 M484 360 L522 360" stroke="#0ea5e9" stroke-width="8" stroke-linecap="round" opacity="0.9" />
-  <text x="600" y="346" text-anchor="middle" class="centerTitle">소프트웨어공학</text>
-  <text x="600" y="374" text-anchor="middle" class="centerBody">체계적 개발·운영</text>
-  <text x="600" y="398" text-anchor="middle" class="caption">개념 구분 · 절차 순서 · 장단점 비교</text>
+  <line x1="600" y1="332" x2="600" y2="252" stroke="#38bdf8" stroke-width="6" stroke-linecap="round" />
+  <line x1="770" y1="404" x2="872" y2="332" stroke="#22c55e" stroke-width="6" stroke-linecap="round" />
+  <line x1="770" y1="496" x2="872" y2="566" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
+  <line x1="430" y1="404" x2="328" y2="332" stroke="#818cf8" stroke-width="6" stroke-linecap="round" />
+  <line x1="430" y1="496" x2="328" y2="566" stroke="#f59e0b" stroke-width="6" stroke-linecap="round" />
 
-  <line x1="436" y1="282" x2="294" y2="252" stroke="#818cf8" stroke-width="4" stroke-linecap="round" />
-  <line x1="764" y1="282" x2="906" y2="252" stroke="#22c55e" stroke-width="4" stroke-linecap="round" />
-  <line x1="436" y1="438" x2="294" y2="468" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
-  <line x1="764" y1="438" x2="906" y2="468" stroke="#f97316" stroke-width="4" stroke-linecap="round" />
+  <rect x="444" y="332" width="312" height="236" rx="36" fill="url(#centerGlow)" stroke="#38bdf8" stroke-width="3" />
+  <circle cx="600" cy="450" r="92" fill="#ffffff" stroke="#0284c7" stroke-width="3" />
+  <circle cx="600" cy="450" r="62" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="2" />
+  <text x="600" y="440" text-anchor="middle" class="centerTitle">소프트웨어공학</text>
+  <text x="600" y="470" text-anchor="middle" class="centerBody">체계적 개발·운영</text>
+  <text x="600" y="496" text-anchor="middle" class="centerCaption">구분 · 순서 · 비교 중심</text>
+  <rect x="500" y="522" width="200" height="28" rx="14" fill="#dbeafe" />
+  <text x="600" y="541" text-anchor="middle" class="smallTitle">왜 출제되나?</text>
+  <text x="600" y="562" text-anchor="middle" class="smallText">프로세스 선택과 품질 판단의 기준</text>
 
   <g>
-    <rect x="86" y="186" width="286" height="164" rx="24" fill="#eef2ff" stroke="#818cf8" stroke-width="2.5" />
-    <text x="110" y="225" class="panelTitle">개발방법론</text>
-    <text x="110" y="258" class="panelBody">• 순차 = 폭포수</text>
-    <text x="110" y="286" class="panelBody">• 반복·피드백 = 애자일</text>
-    <text x="110" y="314" class="panelBody">• 위험분석 = 나선형</text>
-    <rect x="110" y="326" width="110" height="28" rx="14" fill="#c7d2fe" />
-    <text x="165" y="345" text-anchor="middle" class="chip">스크럼 · 칸반</text>
-    <rect x="230" y="326" width="112" height="28" rx="14" fill="#ddd6fe" />
-    <text x="286" y="345" text-anchor="middle" class="chip">UP · RAD · XP</text>
+    <rect x="74" y="214" width="274" height="208" rx="28" fill="#eef2ff" stroke="#818cf8" stroke-width="2.5" />
+    <text x="104" y="256" class="panelTitle">개발방법론</text>
+    <text x="104" y="292" class="panelBody">• 순차 진행, 문서 중심 = 폭포수</text>
+    <text x="104" y="324" class="panelBody">• 반복 개발, 고객 피드백 = 애자일</text>
+    <text x="104" y="356" class="panelBody">• 위험 분석, 프로토타입 = 나선형</text>
+    <rect x="104" y="376" width="102" height="32" rx="16" fill="#c7d2fe" />
+    <text x="155" y="397" text-anchor="middle" class="chip">스크럼</text>
+    <rect x="216" y="376" width="102" height="32" rx="16" fill="#ddd6fe" />
+    <text x="267" y="397" text-anchor="middle" class="chip">칸반 · XP</text>
   </g>
 
   <g>
-    <rect x="828" y="186" width="286" height="164" rx="24" fill="#ecfdf5" stroke="#22c55e" stroke-width="2.5" />
-    <text x="852" y="225" class="panelTitle">테스트</text>
-    <text x="852" y="258" class="panelBody">• V-모델로 개발 산출물 대응</text>
-    <text x="852" y="286" class="panelBody">• 단위 → 통합 → 시스템 → 인수</text>
-    <text x="852" y="314" class="panelBody">• 블랙박스 vs 화이트박스</text>
-    <rect x="852" y="326" width="108" height="28" rx="14" fill="#bbf7d0" />
-    <text x="906" y="345" text-anchor="middle" class="chip">경계값 · 동치</text>
-    <rect x="970" y="326" width="118" height="28" rx="14" fill="#86efac" />
-    <text x="1029" y="345" text-anchor="middle" class="chip">문장 · 분기 커버</text>
+    <rect x="852" y="214" width="274" height="208" rx="28" fill="#ecfdf5" stroke="#22c55e" stroke-width="2.5" />
+    <text x="882" y="256" class="panelTitle">테스트</text>
+    <text x="882" y="292" class="panelBody">• V-모델로 개발 산출물 대응</text>
+    <text x="882" y="324" class="panelBody">• 단위 → 통합 → 시스템 → 인수</text>
+    <text x="882" y="356" class="panelBody">• 블랙박스 vs 화이트박스</text>
+    <rect x="882" y="376" width="104" height="32" rx="16" fill="#bbf7d0" />
+    <text x="934" y="397" text-anchor="middle" class="chip">동치 · 경계</text>
+    <rect x="996" y="376" width="104" height="32" rx="16" fill="#86efac" />
+    <text x="1048" y="397" text-anchor="middle" class="chip">문장 · 분기</text>
   </g>
 
   <g>
-    <rect x="86" y="402" width="286" height="164" rx="24" fill="#fffbeb" stroke="#f59e0b" stroke-width="2.5" />
-    <text x="110" y="441" class="panelTitle">설계 품질</text>
-    <text x="110" y="474" class="panelBody">• 결합도는 낮을수록 좋다</text>
-    <text x="110" y="502" class="panelBody">• 응집도는 높을수록 좋다</text>
-    <text x="110" y="530" class="panelBody">• 변경 격리·재사용·테스트 용이성</text>
-    <rect x="110" y="542" width="96" height="28" rx="14" fill="#fde68a" />
-    <text x="158" y="561" text-anchor="middle" class="chip">낮은 결합</text>
-    <rect x="216" y="542" width="96" height="28" rx="14" fill="#fcd34d" />
-    <text x="264" y="561" text-anchor="middle" class="chip">높은 응집</text>
+    <rect x="74" y="478" width="274" height="208" rx="28" fill="#fffbeb" stroke="#f59e0b" stroke-width="2.5" />
+    <text x="104" y="520" class="panelTitle">설계 품질</text>
+    <text x="104" y="556" class="panelBody">• 결합도는 낮을수록 좋다</text>
+    <text x="104" y="588" class="panelBody">• 응집도는 높을수록 좋다</text>
+    <text x="104" y="620" class="panelBody">• 변경 격리, 재사용, 테스트 용이</text>
+    <rect x="104" y="640" width="102" height="32" rx="16" fill="#fde68a" />
+    <text x="155" y="661" text-anchor="middle" class="chip">낮은 결합</text>
+    <rect x="216" y="640" width="102" height="32" rx="16" fill="#fcd34d" />
+    <text x="267" y="661" text-anchor="middle" class="chip">높은 응집</text>
   </g>
 
   <g>
-    <rect x="828" y="402" width="286" height="164" rx="24" fill="#fff7ed" stroke="#f97316" stroke-width="2.5" />
-    <text x="852" y="441" class="panelTitle">형상관리 · 비용산정</text>
-    <text x="852" y="474" class="panelBody">• 브랜치·태그·베이스라인</text>
-    <text x="852" y="502" class="panelBody">• 변경통제와 릴리스 관리</text>
-    <text x="852" y="530" class="panelBody">• Man Month, COCOMO, FP</text>
-    <rect x="852" y="542" width="108" height="28" rx="14" fill="#fed7aa" />
-    <text x="906" y="561" text-anchor="middle" class="chip">브룩스의 법칙</text>
-    <rect x="970" y="542" width="90" height="28" rx="14" fill="#fdba74" />
-    <text x="1015" y="561" text-anchor="middle" class="chip">비선형 증가</text>
+    <rect x="852" y="478" width="274" height="208" rx="28" fill="#fff7ed" stroke="#f97316" stroke-width="2.5" />
+    <text x="882" y="520" class="panelTitle">형상관리 · 비용산정</text>
+    <text x="882" y="556" class="panelBody">• 브랜치, 태그, 베이스라인</text>
+    <text x="882" y="588" class="panelBody">• 변경통제, 릴리스, CI/CD 연계</text>
+    <text x="882" y="620" class="panelBody">• Man Month, COCOMO, FP</text>
+    <rect x="882" y="640" width="110" height="32" rx="16" fill="#fed7aa" />
+    <text x="937" y="661" text-anchor="middle" class="chip">브룩스 법칙</text>
+    <rect x="1002" y="640" width="98" height="32" rx="16" fill="#fdba74" />
+    <text x="1051" y="661" text-anchor="middle" class="chip">비선형 증가</text>
   </g>
 
   <g>
-    <text x="78" y="621" class="eyebrow">문제 풀이용 분류 키워드</text>
-    <rect x="78" y="639" width="126" height="34" rx="17" fill="#dbeafe" />
-    <text x="141" y="661" text-anchor="middle" class="chip">순차 → 폭포수</text>
-    <rect x="214" y="639" width="126" height="34" rx="17" fill="#dcfce7" />
-    <text x="277" y="661" text-anchor="middle" class="chip">반복 → 애자일</text>
-    <rect x="350" y="639" width="128" height="34" rx="17" fill="#ede9fe" />
-    <text x="414" y="661" text-anchor="middle" class="chip">위험 → 나선형</text>
-    <rect x="488" y="639" width="140" height="34" rx="17" fill="#fef3c7" />
-    <text x="558" y="661" text-anchor="middle" class="chip">경계 → 경계값 분석</text>
-    <rect x="638" y="639" width="140" height="34" rx="17" fill="#fde68a" />
-    <text x="708" y="661" text-anchor="middle" class="chip">결합 낮게 · 응집 높게</text>
-    <rect x="788" y="639" width="136" height="34" rx="17" fill="#ffedd5" />
-    <text x="856" y="661" text-anchor="middle" class="chip">브랜치 · 변경통제</text>
-    <rect x="934" y="639" width="188" height="34" rx="17" fill="#fee2e2" />
-    <text x="1028" y="661" text-anchor="middle" class="chip">인월은 단순 합산이 아니다</text>
+    <rect x="74" y="734" width="1052" height="108" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+    <text x="104" y="770" class="eyebrow">문제 풀이용 분류 키워드</text>
+    <rect x="104" y="786" width="144" height="34" rx="17" fill="#dbeafe" />
+    <text x="176" y="808" text-anchor="middle" class="chip">순차 → 폭포수</text>
+    <rect x="262" y="786" width="146" height="34" rx="17" fill="#dcfce7" />
+    <text x="335" y="808" text-anchor="middle" class="chip">반복 → 애자일</text>
+    <rect x="422" y="786" width="148" height="34" rx="17" fill="#ede9fe" />
+    <text x="496" y="808" text-anchor="middle" class="chip">위험 → 나선형</text>
+    <rect x="584" y="786" width="174" height="34" rx="17" fill="#fef3c7" />
+    <text x="671" y="808" text-anchor="middle" class="chip">경계 → 경계값 분석</text>
+    <rect x="772" y="786" width="190" height="34" rx="17" fill="#fde68a" />
+    <text x="867" y="808" text-anchor="middle" class="chip">결합 낮게 · 응집 높게</text>
+    <rect x="976" y="786" width="120" height="34" rx="17" fill="#ffedd5" />
+    <text x="1036" y="808" text-anchor="middle" class="chip">변경통제</text>
   </g>
 </svg>

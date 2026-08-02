@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1220" viewBox="0 0 1280 1220" role="img" aria-labelledby="title desc">
+  <title id="title">11-02. 테스트 레벨 비교</title>
+  <desc id="desc">단위, 통합, 시스템, 인수 테스트의 범위와 목적을 단계적으로 비교한 SVG</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .frame { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .title { font: 700 40px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .capsule { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; }
+      .center { text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1280" height="1220" rx="32"/>
+  <rect x="24" y="24" width="1232" height="1172" rx="28" class="frame"/>
+
+  <text x="72" y="82" class="small">소프트웨어공학 · 테스트 레벨</text>
+  <text x="72" y="130" class="title">단위 → 통합 → 시스템 → 인수 테스트</text>
+  <text x="72" y="164" class="subtitle">아래로 갈수록 검증 범위와 이해관계자가 넓어진다. 위로 갈수록 실행 속도와 원인 추적은 쉬워진다.</text>
+
+  <rect x="88" y="214" width="1104" height="170" rx="26" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="112" y="242" width="156" height="114" rx="20" fill="#1d4ed8"/>
+  <text x="190" y="286" class="section center" fill="#ffffff">단위</text>
+  <text x="190" y="316" class="label center" fill="#ffffff">Unit Test</text>
+  <text x="310" y="278" class="label">검증 범위</text>
+  <text x="310" y="304" class="body">함수, 클래스, 모듈처럼 가장 작은 구성 요소</text>
+  <text x="310" y="340" class="label">주요 목적</text>
+  <text x="310" y="366" class="body">논리 오류, 경계값, 예외 처리 문제를 빠르게 찾는다.</text>
+  <rect x="922" y="248" width="234" height="100" rx="18" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text x="942" y="280" class="capsule" fill="#1d4ed8">예시</text>
+  <text x="942" y="308" class="body">입력 0, 음수, 최대값에서</text>
+  <text x="942" y="332" class="body">반환값과 예외를 검증</text>
+
+  <path d="M640 406 V450" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="640,466 628,446 652,446" fill="#94a3b8"/>
+
+  <rect x="88" y="482" width="1104" height="170" rx="26" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <rect x="112" y="510" width="156" height="114" rx="20" fill="#0f766e"/>
+  <text x="190" y="554" class="section center" fill="#ffffff">통합</text>
+  <text x="190" y="584" class="label center" fill="#ffffff">Integration</text>
+  <text x="310" y="546" class="label">검증 범위</text>
+  <text x="310" y="572" class="body">모듈 간 연결, 데이터 흐름, 외부 API·DB 연동</text>
+  <text x="310" y="608" class="label">주요 목적</text>
+  <text x="310" y="634" class="body">인터페이스 불일치와 호출 순서 문제를 찾는다.</text>
+  <rect x="922" y="516" width="234" height="100" rx="18" fill="#ccfbf1" stroke="#2dd4bf" stroke-width="2"/>
+  <text x="942" y="548" class="capsule" fill="#0f766e">예시</text>
+  <text x="942" y="576" class="body">주문 서비스와 결제 모듈의</text>
+  <text x="942" y="600" class="body">데이터 전달 형식 검증</text>
+
+  <path d="M640 674 V718" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="640,734 628,714 652,714" fill="#94a3b8"/>
+
+  <rect x="88" y="750" width="1104" height="170" rx="26" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="2"/>
+  <rect x="112" y="778" width="156" height="114" rx="20" fill="#0369a1"/>
+  <text x="190" y="822" class="section center" fill="#ffffff">시스템</text>
+  <text x="190" y="852" class="label center" fill="#ffffff">System</text>
+  <text x="310" y="814" class="label">검증 범위</text>
+  <text x="310" y="840" class="body">전체 서비스 시나리오와 기능·비기능 요구사항</text>
+  <text x="310" y="876" class="label">주요 목적</text>
+  <text x="310" y="902" class="body">전체 흐름이 명세대로 동작하는지와 품질 기준 충족 여부를 확인한다.</text>
+  <rect x="922" y="784" width="234" height="100" rx="18" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text x="942" y="816" class="capsule" fill="#0369a1">예시</text>
+  <text x="942" y="844" class="body">로그인 → 주문 → 결제 → 알림</text>
+  <text x="942" y="868" class="body">전체 시나리오와 성능 점검</text>
+
+  <path d="M640 942 V986" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="640,1002 628,982 652,982" fill="#94a3b8"/>
+
+  <rect x="88" y="1018" width="1104" height="144" rx="26" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+  <rect x="112" y="1042" width="156" height="96" rx="20" fill="#15803d"/>
+  <text x="190" y="1080" class="section center" fill="#ffffff">인수</text>
+  <text x="190" y="1110" class="label center" fill="#ffffff">Acceptance</text>
+  <text x="310" y="1078" class="label">검증 범위</text>
+  <text x="310" y="1104" class="body">사용자 요구, 계약 조건, 수용 기준을 사용자 관점에서 확인</text>
+  <text x="310" y="1138" class="label">주요 목적</text>
+  <text x="310" y="1164" class="body">고객이 실제 인수해도 되는지 최종 판단한다.</text>
+  <rect x="922" y="1042" width="234" height="96" rx="18" fill="#d1fae5" stroke="#4ade80" stroke-width="2"/>
+  <text x="942" y="1074" class="capsule" fill="#15803d">예시</text>
+  <text x="942" y="1102" class="body">고객 수용기준 체크리스트와</text>
+  <text x="942" y="1126" class="body">실사용 시나리오 최종 승인</text>
+</svg>

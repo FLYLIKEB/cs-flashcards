@@ -1,139 +1,99 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-05. 인덱스와 동시성 인포그래픽</title>
-  <desc id="desc">인덱스의 읽기-쓰기 트레이드오프와 B+Tree, Hash, 클러스터드 인덱스 비교, 그리고 2PL·Timestamp·MVCC 동시성 제어 방식을 함께 설명하는 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-labelledby="title desc">
+  <title id="title">07-05. 인덱스와 동시성 핵심 요약</title>
+  <desc id="desc">인덱스의 읽기-쓰기 트레이드오프와 대표 인덱스 유형, 동시성 제어 핵심 방식을 큰 글자와 넉넉한 여백으로 나눠 정리한 SVG</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#ecfeff"/>
-    </linearGradient>
-    <linearGradient id="indexGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dcfce7"/>
-      <stop offset="100%" stop-color="#bbf7d0"/>
-    </linearGradient>
-    <linearGradient id="concGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#bfdbfe"/>
-    </linearGradient>
-    <linearGradient id="warnGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fef3c7"/>
-      <stop offset="100%" stop-color="#fde68a"/>
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
-    </marker>
     <style>
       text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; fill: #0f172a; }
-      .kicker { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; fill: #0f766e; }
-      .title { font-size: 34px; font-weight: 800; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .panelTitle { font-size: 22px; font-weight: 800; }
-      .panelBody { font-size: 15px; font-weight: 500; fill: #334155; }
-      .chip { font-size: 14px; font-weight: 700; }
-      .boxTitle { font-size: 18px; font-weight: 800; }
-      .boxBody { font-size: 14px; font-weight: 500; fill: #334155; }
-      .tiny { font-size: 13px; font-weight: 600; fill: #475569; }
+      .eyebrow { font-size: 20px; font-weight: 700; letter-spacing: 0.08em; fill: #0f766e; }
+      .title { font-size: 44px; font-weight: 800; }
+      .subtitle { font-size: 22px; font-weight: 500; fill: #334155; }
+      .sectionTitle { font-size: 30px; font-weight: 800; }
+      .sectionLead { font-size: 19px; font-weight: 500; fill: #334155; }
+      .cardTitle { font-size: 25px; font-weight: 800; }
+      .body { font-size: 19px; font-weight: 500; fill: #334155; }
+      .small { font-size: 18px; font-weight: 600; fill: #475569; }
       .em { font-weight: 800; fill: #0f172a; }
-      .white { fill: #ffffff; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect width="1200" height="960" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="904" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text x="70" y="78" class="kicker">DATABASE · PAGE 07-05</text>
-  <text x="70" y="122" class="title">인덱스와 동시성</text>
-  <text x="70" y="152" class="subtitle">빠른 조회를 위한 인덱스 선택과, 동시에 접근해도 일관성을 지키는 제어 전략을 한 장에 정리</text>
+  <text x="72" y="88" class="eyebrow">DATABASE · PAGE 07-05</text>
+  <text x="72" y="140" class="title">인덱스와 동시성</text>
+  <text x="72" y="178" class="subtitle">핵심 구조는 한 장에 요약하고, B+Tree 접근과 잠금/이상 현상은 아래 보조 SVG에서 따로 학습한다.</text>
 
-  <rect x="64" y="186" width="492" height="448" rx="26" fill="url(#indexGrad)" stroke="#86efac"/>
-  <rect x="596" y="186" width="540" height="448" rx="26" fill="url(#concGrad)" stroke="#93c5fd"/>
+  <rect x="64" y="220" width="504" height="632" rx="26" fill="#ecfdf5" stroke="#86efac" stroke-width="2"/>
+  <rect x="632" y="220" width="504" height="632" rx="26" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
 
-  <text x="94" y="226" class="panelTitle">① 인덱스: 읽기는 빠르게, 쓰기는 더 무겁게</text>
-  <text x="626" y="226" class="panelTitle">② 동시성: 여러 트랜잭션이 와도 결과는 꼬이지 않게</text>
+  <text x="96" y="268" class="sectionTitle">① 인덱스: 읽기 속도를 얻고 쓰기 비용을 낸다</text>
+  <text x="96" y="304" class="sectionLead">탐색 경로를 줄여 조회를 빠르게 하지만, 데이터가 바뀌면 인덱스도 함께 손봐야 한다.</text>
 
-  <rect x="92" y="250" width="196" height="104" rx="18" fill="#ffffff" stroke="#4ade80"/>
-  <circle cx="132" cy="302" r="24" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-  <circle cx="126" cy="296" r="9" fill="none" stroke="#166534" stroke-width="3"/>
-  <line x1="133" y1="303" x2="146" y2="316" stroke="#166534" stroke-width="3" stroke-linecap="round"/>
-  <text x="168" y="287" class="boxTitle">검색 속도 ↑</text>
-  <text x="168" y="308" class="boxBody">WHERE, BETWEEN, ORDER BY</text>
-  <text x="168" y="328" class="boxBody">에서 탐색 경로를 줄인다.</text>
+  <rect x="96" y="336" width="206" height="148" rx="18" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+  <text x="124" y="378" class="cardTitle">읽기 이득</text>
+  <text x="124" y="414" class="body">• WHERE 범위 축소</text>
+  <text x="124" y="446" class="body">• BETWEEN 최적화</text>
+  <text x="124" y="478" class="body">• ORDER BY 도움</text>
 
-  <rect x="328" y="250" width="196" height="104" rx="18" fill="#ffffff" stroke="#f59e0b"/>
-  <rect x="362" y="278" width="22" height="32" rx="4" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
-  <rect x="392" y="268" width="22" height="42" rx="4" fill="#fde68a" stroke="#b45309" stroke-width="2"/>
-  <rect x="422" y="258" width="22" height="52" rx="4" fill="#fcd34d" stroke="#b45309" stroke-width="2"/>
-  <text x="456" y="287" class="boxTitle">유지 비용 ↑</text>
-  <text x="456" y="308" class="boxBody">INSERT / UPDATE / DELETE 때</text>
-  <text x="456" y="328" class="boxBody">인덱스를 함께 갱신해야 한다.</text>
+  <rect x="330" y="336" width="206" height="148" rx="18" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+  <text x="358" y="378" class="cardTitle">쓰기 부담</text>
+  <text x="358" y="414" class="body">• INSERT 때 추가 갱신</text>
+  <text x="358" y="446" class="body">• UPDATE·DELETE 반영</text>
+  <text x="358" y="478" class="body">• 저장공간·유지비 증가</text>
 
-  <line x1="288" y1="302" x2="328" y2="302" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="306" y="290" class="tiny" text-anchor="middle">trade-off</text>
+  <text x="316" y="406" class="small" text-anchor="middle">trade-off</text>
 
-  <rect x="92" y="382" width="432" height="224" rx="20" fill="#ffffff" stroke="#86efac"/>
-  <text x="118" y="416" class="boxTitle">대표 인덱스 비교</text>
+  <rect x="96" y="516" width="440" height="300" rx="20" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="124" y="558" class="cardTitle">대표 인덱스 구분</text>
 
-  <rect x="118" y="434" width="122" height="146" rx="16" fill="#ecfccb" stroke="#84cc16"/>
-  <text x="138" y="462" class="chip">B+Tree</text>
-  <path d="M142 490 L168 470 L194 490 M168 470 L168 518 M154 506 L182 506" fill="none" stroke="#3f6212" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="138" y="535" class="boxBody">• 리프가 순차 연결</text>
-  <text x="138" y="555" class="boxBody">• 범위 검색/정렬 강점</text>
-  <text x="138" y="575" class="boxBody">• ORDER BY, BETWEEN 적합</text>
+  <rect x="122" y="582" width="120" height="200" rx="16" fill="#f0fdf4" stroke="#65a30d" stroke-width="2"/>
+  <text x="146" y="616" class="small" style="font-size:21px; font-weight:800; fill:#365314;">B+Tree</text>
+  <text x="146" y="652" class="body">• 순차 리프</text>
+  <text x="146" y="684" class="body">• 범위 검색</text>
+  <text x="146" y="716" class="body">• 정렬 처리</text>
 
-  <rect x="248" y="434" width="122" height="146" rx="16" fill="#fef3c7" stroke="#f59e0b"/>
-  <text x="268" y="462" class="chip">Hash</text>
-  <rect x="276" y="480" width="66" height="44" rx="10" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
-  <text x="309" y="506" class="tiny" text-anchor="middle">key → bucket</text>
-  <text x="268" y="535" class="boxBody">• 동등 비교(=) 매우 빠름</text>
-  <text x="268" y="555" class="boxBody">• 범위 검색은 부적합</text>
-  <text x="268" y="575" class="boxBody">• ORDER BY에는 약함</text>
+  <rect x="256" y="582" width="120" height="200" rx="16" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+  <text x="286" y="616" class="small" style="font-size:21px; font-weight:800; fill:#92400e;">Hash</text>
+  <text x="278" y="652" class="body">• = 조건 빠름</text>
+  <text x="278" y="684" class="body">• 범위 약함</text>
+  <text x="278" y="716" class="body">• 정렬 부적합</text>
 
-  <rect x="378" y="434" width="122" height="146" rx="16" fill="#dbeafe" stroke="#60a5fa"/>
-  <text x="398" y="462" class="chip">Clustered</text>
-  <path d="M406 486 h52 M406 500 h52 M406 514 h52" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round"/>
-  <path d="M406 482 h16 M422 496 h16 M438 510 h16" stroke="#93c5fd" stroke-width="6" stroke-linecap="round"/>
-  <text x="398" y="535" class="boxBody">• 데이터 순서와 가까움</text>
-  <text x="398" y="555" class="boxBody">• 범위 탐색 빠름</text>
-  <text x="398" y="575" class="boxBody">• 재배치 비용이 생길 수 있음</text>
+  <rect x="390" y="582" width="120" height="200" rx="16" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="404" y="616" class="small" style="font-size:21px; font-weight:800; fill:#1d4ed8;">Clustered</text>
+  <text x="404" y="652" class="body">• 물리 순서 근접</text>
+  <text x="404" y="684" class="body">• 범위 조회 빠름</text>
+  <text x="404" y="716" class="body">• 재배치 비용</text>
 
-  <rect x="626" y="250" width="480" height="96" rx="18" fill="#ffffff" stroke="#93c5fd"/>
-  <text x="654" y="282" class="boxTitle">예시 문제: 같은 계좌를 두 사용자가 동시에 갱신하면?</text>
-  <text x="654" y="304" class="boxBody">동시성 제어는 읽기/쓰기 순서를 조정해 잔액 꼬임, 갱신 손실, 비일관성을 막는다.</text>
-  <text x="654" y="326" class="boxBody">핵심은 ACID 중 <tspan class="em">격리성</tspan>을 실제 실행 순서에서 지키는 것.</text>
+  <text x="664" y="268" class="sectionTitle">② 동시성: 동시에 실행돼도 결과를 지킨다</text>
+  <text x="664" y="304" class="sectionLead">여러 트랜잭션이 같은 데이터를 건드릴 때 갱신 손실과 충돌 쓰기를 줄여 일관성을 지킨다.</text>
 
-  <rect x="626" y="372" width="148" height="190" rx="18" fill="#eff6ff" stroke="#60a5fa"/>
-  <text x="650" y="404" class="chip">2PL</text>
-  <rect x="648" y="423" width="102" height="36" rx="10" fill="#dbeafe" stroke="#2563eb"/>
-  <text x="699" y="446" class="tiny" text-anchor="middle">lock 획득</text>
-  <rect x="648" y="471" width="102" height="36" rx="10" fill="#bfdbfe" stroke="#2563eb"/>
-  <text x="699" y="494" class="tiny" text-anchor="middle">lock 해제</text>
-  <line x1="699" y1="459" x2="699" y2="471" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="650" y="530" class="boxBody">• growing → shrinking</text>
-  <text x="650" y="550" class="boxBody">• 직렬화 가능성 보장</text>
-  <text x="650" y="570" class="boxBody">• strict 2PL은</text>
-  <text x="650" y="588" class="boxBody">  cascading abort 방지</text>
+  <rect x="664" y="336" width="440" height="132" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="692" y="378" class="cardTitle">대표 문제 상황</text>
+  <text x="692" y="414" class="body">같은 계좌를 동시에 갱신하면</text>
+  <text x="692" y="446" class="body">마지막 쓰기만 남아 <tspan class="em">갱신 손실</tspan>이 생길 수 있다.</text>
 
-  <rect x="792" y="372" width="148" height="190" rx="18" fill="#f8fafc" stroke="#94a3b8"/>
-  <text x="816" y="404" class="chip">Timestamp</text>
-  <circle cx="866" cy="455" r="32" fill="#ffffff" stroke="#475569" stroke-width="3"/>
-  <line x1="866" y1="455" x2="866" y2="436" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-  <line x1="866" y1="455" x2="882" y2="464" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
-  <text x="816" y="530" class="boxBody">• 시작 시각으로 순서 규정</text>
-  <text x="816" y="550" class="boxBody">• deadlock은 없음</text>
-  <text x="816" y="570" class="boxBody">• 충돌 시 rollback 가능</text>
+  <rect x="664" y="504" width="132" height="282" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <text x="692" y="546" class="cardTitle">2PL</text>
+  <text x="692" y="582" class="body">• lock 획득</text>
+  <text x="692" y="614" class="body">• lock 해제</text>
+  <text x="692" y="646" class="body">• 직렬화 보장</text>
+  <text x="692" y="678" class="body">• strict는</text>
+  <text x="692" y="710" class="body">  롤백 전파 방지</text>
 
-  <rect x="958" y="372" width="148" height="190" rx="18" fill="#eef2ff" stroke="#818cf8"/>
-  <text x="982" y="404" class="chip">MVCC</text>
-  <rect x="986" y="426" width="64" height="34" rx="10" fill="#c7d2fe" stroke="#4338ca"/>
-  <rect x="1000" y="444" width="64" height="34" rx="10" fill="#a5b4fc" stroke="#4338ca"/>
-  <rect x="1014" y="462" width="64" height="34" rx="10" fill="#818cf8" stroke="#4338ca"/>
-  <text x="1032" y="487" class="tiny white" text-anchor="middle">v1 v2 v3</text>
-  <text x="982" y="530" class="boxBody">• 여러 버전을 유지</text>
-  <text x="982" y="550" class="boxBody">• 읽기는 과거 안정 버전</text>
-  <text x="982" y="570" class="boxBody">• 읽기 비차단에 강점</text>
+  <rect x="818" y="504" width="132" height="282" rx="18" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+  <text x="840" y="546" class="cardTitle">Timestamp</text>
+  <text x="840" y="582" class="body">• 시작 시각</text>
+  <text x="840" y="614" class="body">• 순서 강제</text>
+  <text x="840" y="646" class="body">• deadlock 없음</text>
+  <text x="840" y="678" class="body">• 충돌 시 롤백</text>
 
-  <line x1="774" y1="467" x2="792" y2="467" stroke="#64748b" stroke-width="3"/>
-  <line x1="940" y1="467" x2="958" y2="467" stroke="#64748b" stroke-width="3"/>
+  <rect x="972" y="504" width="132" height="282" rx="18" fill="#ffffff" stroke="#6366f1" stroke-width="2"/>
+  <text x="998" y="546" class="cardTitle">MVCC</text>
+  <text x="998" y="582" class="body">• 버전 유지</text>
+  <text x="998" y="614" class="body">• 과거 버전 읽기</text>
+  <text x="998" y="646" class="body">• 읽기 비차단</text>
+  <text x="998" y="678" class="body">• 읽기 많은 환경</text>
 
-  <rect x="64" y="650" width="1042" height="28" rx="14" fill="url(#warnGrad)" stroke="#fbbf24"/>
-  <text x="86" y="669" class="tiny">시험 한 줄: “B+Tree는 범위 검색·정렬에 유리, Hash는 동등 검색에 특화, 2PL은 직렬화 보장, MVCC는 읽기 비차단에 강점.”</text>
+  <rect x="64" y="880" width="1072" height="32" rx="16" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="88" y="902" class="small">시험 한 줄: <tspan class="em">B+Tree는 범위 검색·정렬</tspan>, <tspan class="em">2PL은 직렬화</tspan>, <tspan class="em">MVCC는 읽기 비차단</tspan>에 강하다.</text>
 </svg>

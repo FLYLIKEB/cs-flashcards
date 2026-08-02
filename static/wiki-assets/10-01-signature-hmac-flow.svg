@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" role="img" aria-labelledby="title desc">
+  <title id="title">10-01. 전자서명과 HMAC 흐름 비교</title>
+  <desc id="desc">HMAC과 전자서명이 메시지 무결성과 인증을 어떻게 확인하는지, 키 사용 방식과 부인방지 차이를 나눠 보여주는 SVG.</desc>
+  <defs>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#15803d"/>
+    </marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <style>
+      text { font-family: "Pretendard", "Noto Sans KR", sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 16px; font-weight: 800; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 36px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .panelTitle { font-size: 26px; font-weight: 800; }
+      .panelBody { font-size: 17px; font-weight: 600; fill: #334155; }
+      .stepTitle { font-size: 18px; font-weight: 800; }
+      .stepBody { font-size: 16px; font-weight: 600; fill: #334155; }
+      .label { font-size: 15px; font-weight: 800; letter-spacing: 0.06em; }
+      .noteTitle { font-size: 18px; font-weight: 800; }
+      .noteBody { font-size: 16px; font-weight: 600; fill: #334155; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="820" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1224" height="764" rx="34" fill="url(#bg)"/>
+  <rect x="56" y="56" width="1168" height="708" rx="30" fill="#ffffff" opacity="0.97"/>
+
+  <text x="92" y="104" class="eyebrow">INTEGRITY + AUTHENTICATION FLOW</text>
+  <text x="92" y="146" class="title">전자서명과 HMAC는 왜 구분해서 외워야 할까?</text>
+  <text x="92" y="180" class="subtitle">둘 다 메시지 무결성과 인증에 쓰이지만, 키를 누가 공유하는지와 부인방지 가능 여부가 결정적으로 다르다.</text>
+
+  <rect x="88" y="220" width="510" height="396" rx="30" fill="#eff6ff" stroke="#60a5fa" stroke-width="2.5"/>
+  <rect x="682" y="220" width="510" height="396" rx="30" fill="#f0fdf4" stroke="#4ade80" stroke-width="2.5"/>
+
+  <text x="114" y="266" class="panelTitle">HMAC / MAC</text>
+  <text x="114" y="296" class="panelBody">송신자와 수신자가 같은 비밀키를 공유하고 태그를 다시 계산해 일치 여부를 본다.</text>
+
+  <rect x="114" y="334" width="128" height="84" rx="20" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="178" y="366" text-anchor="middle" class="stepTitle">1. 메시지</text>
+  <text x="178" y="390" text-anchor="middle" class="stepBody">order=12000</text>
+
+  <rect x="286" y="328" width="142" height="96" rx="22" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="357" y="360" text-anchor="middle" class="stepTitle">2. HMAC 생성</text>
+  <text x="357" y="384" text-anchor="middle" class="stepBody">공유 비밀키 사용</text>
+  <text x="357" y="406" text-anchor="middle" class="label" fill="#1d4ed8">SHARED KEY</text>
+
+  <rect x="470" y="334" width="100" height="84" rx="20" fill="#1d4ed8"/>
+  <text x="520" y="366" text-anchor="middle" class="stepTitle" fill="#ffffff">3. 태그</text>
+  <text x="520" y="390" text-anchor="middle" class="stepBody" fill="#dbeafe">A94C…</text>
+
+  <line x1="242" y1="376" x2="286" y2="376" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <line x1="428" y1="376" x2="470" y2="376" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+  <rect x="132" y="458" width="422" height="118" rx="22" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="156" y="490" class="noteTitle">수신자 검증</text>
+  <text x="156" y="518" class="noteBody">같은 공유키로 HMAC를 다시 계산해 태그가 같으면</text>
+  <text x="156" y="542" class="noteBody">메시지가 바뀌지 않았고, 공유키를 아는 쪽이 보냈다고 판단한다.</text>
+  <text x="156" y="566" class="noteBody">빠르지만 같은 키를 아는 제3자도 태그를 만들 수 있어 부인방지는 약하다.</text>
+
+  <text x="708" y="266" class="panelTitle">전자서명</text>
+  <text x="708" y="296" class="panelBody">서명자는 개인키로 서명하고, 검증자는 공개키로 확인하므로 부인방지까지 설명할 수 있다.</text>
+
+  <rect x="708" y="334" width="122" height="84" rx="20" fill="#ffffff" stroke="#86efac"/>
+  <text x="769" y="366" text-anchor="middle" class="stepTitle">1. 메시지</text>
+  <text x="769" y="390" text-anchor="middle" class="stepBody">contract.pdf</text>
+
+  <rect x="872" y="328" width="142" height="96" rx="22" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="943" y="360" text-anchor="middle" class="stepTitle">2. 서명 생성</text>
+  <text x="943" y="384" text-anchor="middle" class="stepBody">해시 후 개인키 사용</text>
+  <text x="943" y="406" text-anchor="middle" class="label" fill="#15803d">PRIVATE KEY</text>
+
+  <rect x="1056" y="334" width="100" height="84" rx="20" fill="#15803d"/>
+  <text x="1106" y="366" text-anchor="middle" class="stepTitle" fill="#ffffff">3. 서명</text>
+  <text x="1106" y="390" text-anchor="middle" class="stepBody" fill="#dcfce7">SIG…</text>
+
+  <line x1="830" y1="376" x2="872" y2="376" stroke="#15803d" stroke-width="4" marker-end="url(#arrowGreen)"/>
+  <line x1="1014" y1="376" x2="1056" y2="376" stroke="#15803d" stroke-width="4" marker-end="url(#arrowGreen)"/>
+
+  <rect x="726" y="458" width="422" height="118" rx="22" fill="#ffffff" stroke="#bbf7d0"/>
+  <text x="750" y="490" class="noteTitle">검증 포인트</text>
+  <text x="750" y="518" class="noteBody">공개키로 서명을 검증하면 메시지가 변조되지 않았는지와</text>
+  <text x="750" y="542" class="noteBody">서명자가 해당 개인키를 가진 주체인지 설명할 수 있다.</text>
+  <text x="750" y="566" class="noteBody">서명 키는 본인만 가져야 하므로 계약, 코드 서명, 인증서에 적합하다.</text>
+
+  <rect x="88" y="644" width="1104" height="96" rx="24" fill="#0f172a"/>
+  <text x="118" y="678" class="noteTitle" fill="#e2e8f0">한 줄 비교</text>
+  <text x="118" y="706" class="noteBody" fill="#cbd5e1">HMAC는 공유키 기반이라 빠르고 API 요청 인증에 적합하다. 전자서명은 개인키/공개키 구조라 제3자에게도 검증 가능해 부인방지가 필요할 때 사용한다.</text>
+</svg>

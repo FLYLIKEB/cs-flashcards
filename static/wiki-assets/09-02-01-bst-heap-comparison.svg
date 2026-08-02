@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">09-02-01. BST와 힙 비교 SVG</title>
+  <desc id="desc">BST는 정렬 탐색에 강하고 힙은 루트 우선순위에 강하다는 차이를 나란히 설명하는 페이지 전용 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+    <style>
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .panelTitle { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .label { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .metric { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .node { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="620" fill="url(#bg)" />
+  <rect x="32" y="28" width="1136" height="564" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <text class="title" x="68" y="76">BST vs 힙: 같은 이진트리처럼 보여도 목적이 다르다</text>
+  <text class="subtitle" x="68" y="108">BST는 정렬된 탐색용, 힙은 최댓값·최솟값 즉시 추출용 구조다.</text>
+
+  <rect x="66" y="138" width="500" height="398" rx="24" fill="#f8fafc" stroke="#93c5fd" stroke-width="2" />
+  <rect x="634" y="138" width="500" height="398" rx="24" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2" />
+
+  <text class="panelTitle" x="92" y="178">BST: inorder를 돌리면 정렬 순서가 보인다</text>
+  <text class="body" x="92" y="204">조건: 왼쪽 &lt; 부모 &lt; 오른쪽</text>
+
+  <line x1="244" y1="236" x2="170" y2="304" stroke="#2563eb" stroke-width="3" />
+  <line x1="244" y1="236" x2="318" y2="304" stroke="#2563eb" stroke-width="3" />
+  <line x1="170" y1="304" x2="122" y2="372" stroke="#2563eb" stroke-width="3" />
+  <line x1="170" y1="304" x2="218" y2="372" stroke="#2563eb" stroke-width="3" />
+  <line x1="318" y1="304" x2="366" y2="372" stroke="#2563eb" stroke-width="3" />
+  <circle cx="244" cy="236" r="24" fill="#2563eb" /><text class="node" x="244" y="241" text-anchor="middle">8</text>
+  <circle cx="170" cy="304" r="22" fill="#3b82f6" /><text class="node" x="170" y="309" text-anchor="middle">3</text>
+  <circle cx="318" cy="304" r="22" fill="#3b82f6" /><text class="node" x="318" y="309" text-anchor="middle">10</text>
+  <circle cx="122" cy="372" r="19" fill="#60a5fa" /><text class="node" x="122" y="377" text-anchor="middle">1</text>
+  <circle cx="218" cy="372" r="19" fill="#60a5fa" /><text class="node" x="218" y="377" text-anchor="middle">6</text>
+  <circle cx="366" cy="372" r="19" fill="#60a5fa" /><text class="node" x="366" y="377" text-anchor="middle">14</text>
+
+  <text class="label" x="92" y="424">inorder 결과</text>
+  <g transform="translate(92 438)">
+    <rect x="0" y="0" width="34" height="30" rx="8" fill="#dbeafe" /><text class="chip" x="17" y="20" text-anchor="middle">1</text>
+    <rect x="40" y="0" width="34" height="30" rx="8" fill="#dbeafe" /><text class="chip" x="57" y="20" text-anchor="middle">3</text>
+    <rect x="80" y="0" width="34" height="30" rx="8" fill="#dbeafe" /><text class="chip" x="97" y="20" text-anchor="middle">6</text>
+    <rect x="120" y="0" width="34" height="30" rx="8" fill="#bfdbfe" /><text class="chip" x="137" y="20" text-anchor="middle">8</text>
+    <rect x="160" y="0" width="34" height="30" rx="8" fill="#dbeafe" /><text class="chip" x="177" y="20" text-anchor="middle">10</text>
+    <rect x="200" y="0" width="34" height="30" rx="8" fill="#dbeafe" /><text class="chip" x="217" y="20" text-anchor="middle">14</text>
+  </g>
+  <rect x="92" y="486" width="448" height="34" rx="12" fill="#eff6ff" stroke="#93c5fd" />
+  <text class="metric" x="108" y="508">정렬 탐색·범위 조회에 유리 / 편향되면 최악 O(n)</text>
+
+  <text class="panelTitle" x="660" y="178">힙: 루트 하나만 보면 우선순위를 바로 꺼낸다</text>
+  <text class="body" x="660" y="204">조건: 부모 ≥ 자식(최대 힙 예시)</text>
+
+  <line x1="812" y1="236" x2="738" y2="304" stroke="#7c3aed" stroke-width="3" />
+  <line x1="812" y1="236" x2="886" y2="304" stroke="#7c3aed" stroke-width="3" />
+  <line x1="738" y1="304" x2="690" y2="372" stroke="#7c3aed" stroke-width="3" />
+  <line x1="738" y1="304" x2="786" y2="372" stroke="#7c3aed" stroke-width="3" />
+  <line x1="886" y1="304" x2="838" y2="372" stroke="#7c3aed" stroke-width="3" />
+  <line x1="886" y1="304" x2="934" y2="372" stroke="#7c3aed" stroke-width="3" />
+  <circle cx="812" cy="236" r="24" fill="#7c3aed" /><text class="node" x="812" y="241" text-anchor="middle">90</text>
+  <circle cx="738" cy="304" r="22" fill="#8b5cf6" /><text class="node" x="738" y="309" text-anchor="middle">70</text>
+  <circle cx="886" cy="304" r="22" fill="#8b5cf6" /><text class="node" x="886" y="309" text-anchor="middle">65</text>
+  <circle cx="690" cy="372" r="19" fill="#a78bfa" /><text class="node" x="690" y="377" text-anchor="middle">30</text>
+  <circle cx="786" cy="372" r="19" fill="#a78bfa" /><text class="node" x="786" y="377" text-anchor="middle">50</text>
+  <circle cx="838" cy="372" r="19" fill="#a78bfa" /><text class="node" x="838" y="377" text-anchor="middle">40</text>
+  <circle cx="934" cy="372" r="19" fill="#a78bfa" /><text class="node" x="934" y="377" text-anchor="middle">20</text>
+
+  <text class="label" x="660" y="424">배열 표현</text>
+  <g transform="translate(660 438)">
+    <rect x="0" y="0" width="38" height="32" rx="8" fill="#ede9fe" /><text class="chip" x="19" y="21" text-anchor="middle">90</text>
+    <rect x="42" y="0" width="38" height="32" rx="8" fill="#ede9fe" /><text class="chip" x="61" y="21" text-anchor="middle">70</text>
+    <rect x="84" y="0" width="38" height="32" rx="8" fill="#ede9fe" /><text class="chip" x="103" y="21" text-anchor="middle">65</text>
+    <rect x="126" y="0" width="38" height="32" rx="8" fill="#ede9fe" /><text class="chip" x="145" y="21" text-anchor="middle">30</text>
+    <rect x="168" y="0" width="38" height="32" rx="8" fill="#ede9fe" /><text class="chip" x="187" y="21" text-anchor="middle">50</text>
+    <rect x="210" y="0" width="38" height="32" rx="8" fill="#ede9fe" /><text class="chip" x="229" y="21" text-anchor="middle">40</text>
+    <rect x="252" y="0" width="38" height="32" rx="8" fill="#ede9fe" /><text class="chip" x="271" y="21" text-anchor="middle">20</text>
+  </g>
+  <rect x="660" y="486" width="448" height="34" rx="12" fill="#f5f3ff" stroke="#c4b5fd" />
+  <text class="metric" x="676" y="508">peek O(1), insert/extract O(log n), 임의 탐색은 O(n)</text>
+
+  <line x1="600" y1="154" x2="600" y2="522" stroke="#cbd5e1" stroke-dasharray="8 10" stroke-width="2" />
+  <text class="small" x="510" y="560">같은 이진 모양이어도 BST는 정렬 관계, 힙은 루트 우선순위만 보장</text>
+</svg>

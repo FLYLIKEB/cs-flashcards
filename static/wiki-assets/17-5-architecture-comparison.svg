@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">17-5. 모놀리식과 마이크로서비스 비교</title>
+  <desc id="desc">모놀리식과 마이크로서비스의 배포, 데이터, 장애, 운영 차이를 비교하는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fffaf5"/>
+      <stop offset="100%" stop-color="#f8fbff"/>
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .title { font-size: 32px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 16px; font-weight: 500; fill: #475569; }
+      .section { font-size: 14px; font-weight: 800; fill: #64748b; letter-spacing: 0.08em; }
+      .h2 { font-size: 26px; font-weight: 800; fill: #0f172a; }
+      .h3 { font-size: 19px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 700; fill: #475569; }
+      .cellHead { font-size: 16px; font-weight: 800; fill: #0f172a; }
+      .cellText { font-size: 14px; font-weight: 500; fill: #334155; }
+      .mono { font-size: 13px; font-weight: 700; fill: #991b1b; }
+      .msa { font-size: 13px; font-weight: 700; fill: #065f46; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <rect x="36" y="28" width="1128" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="section" x="80" y="86">COMPARISON</text>
+  <text class="title" x="80" y="124">모놀리식 vs 마이크로서비스</text>
+  <text class="subtitle" x="80" y="154">둘의 차이는 코드 분할보다 배포 단위, 데이터 소유권, 장애 처리, 운영 자동화 수준에서 크게 드러난다.</text>
+
+  <rect x="80" y="190" width="488" height="166" rx="24" fill="#fef2f2" stroke="#fca5a5"/>
+  <text class="section" x="108" y="224">MONOLITH</text>
+  <text class="h2" x="108" y="258">하나의 큰 애플리케이션</text>
+  <text class="body" x="108" y="290">주문·결제·알림이 같은 코드베이스와 같은 배포 묶음에 들어간다.</text>
+  <text class="mono" x="108" y="320">장점: 초기 개발, 단일 트랜잭션, 운영 단순성</text>
+  <text class="mono" x="108" y="344">주의: 일부 수정도 전체 배포로 이어져 영향 범위가 커진다.</text>
+
+  <rect x="632" y="190" width="488" height="166" rx="24" fill="#ecfdf5" stroke="#86efac"/>
+  <text class="section" x="660" y="224">MICROSERVICE</text>
+  <text class="h2" x="660" y="258">기능별로 분리된 서비스 묶음</text>
+  <text class="body" x="660" y="290">주문·결제·알림이 API와 이벤트로 연결되고, 필요한 서비스만 개별 배포한다.</text>
+  <text class="msa" x="660" y="320">장점: 독립 배포, 서비스별 확장, 팀 자율성</text>
+  <text class="msa" x="660" y="344">주의: 네트워크 실패, 관측성, 데이터 일관성 관리가 필수다.</text>
+
+  <rect x="80" y="396" width="1040" height="280" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="104" y="424" width="212" height="56" rx="16" fill="#e2e8f0"/>
+  <rect x="332" y="424" width="356" height="56" rx="16" fill="#fee2e2"/>
+  <rect x="704" y="424" width="392" height="56" rx="16" fill="#dcfce7"/>
+  <text class="cellHead" x="210" y="459" text-anchor="middle">비교 항목</text>
+  <text class="cellHead" x="510" y="459" text-anchor="middle">모놀리식</text>
+  <text class="cellHead" x="900" y="459" text-anchor="middle">MSA</text>
+
+  <rect x="104" y="496" width="212" height="44" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect x="332" y="496" width="356" height="44" rx="14" fill="#ffffff" stroke="#fecaca"/>
+  <rect x="704" y="496" width="392" height="44" rx="14" fill="#ffffff" stroke="#bbf7d0"/>
+  <text class="small" x="210" y="523" text-anchor="middle">배포</text>
+  <text class="cellText" x="510" y="523" text-anchor="middle">전체 애플리케이션을 함께 배포</text>
+  <text class="cellText" x="900" y="523" text-anchor="middle">서비스별 부분 배포와 빠른 롤백 가능</text>
+
+  <rect x="104" y="552" width="212" height="44" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect x="332" y="552" width="356" height="44" rx="14" fill="#ffffff" stroke="#fecaca"/>
+  <rect x="704" y="552" width="392" height="44" rx="14" fill="#ffffff" stroke="#bbf7d0"/>
+  <text class="small" x="210" y="579" text-anchor="middle">데이터</text>
+  <text class="cellText" x="510" y="579" text-anchor="middle">단일 DB와 단일 트랜잭션이 상대적으로 쉬움</text>
+  <text class="cellText" x="900" y="579" text-anchor="middle">서비스별 DB와 Saga, 보상 처리 설계 필요</text>
+
+  <rect x="104" y="608" width="212" height="44" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect x="332" y="608" width="356" height="44" rx="14" fill="#ffffff" stroke="#fecaca"/>
+  <rect x="704" y="608" width="392" height="44" rx="14" fill="#ffffff" stroke="#bbf7d0"/>
+  <text class="small" x="210" y="635" text-anchor="middle">장애와 운영</text>
+  <text class="cellText" x="510" y="635" text-anchor="middle">구조는 단순하지만 장애가 내부 전체로 퍼질 수 있음</text>
+  <text class="cellText" x="900" y="635" text-anchor="middle">격리는 유리하지만 네트워크·관측성 비용이 커짐</text>
+
+  <text class="body" x="80" y="704">면접에서는 "모놀리는 단순성, MSA는 독립성"이라고 시작한 뒤, 데이터 일관성과 운영 복잡도라는 비용까지 함께 말하면 답변이 균형 잡힌다.</text>
+</svg>

@@ -1,148 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">16. 인공지능·기계학습 인포그래픽</title>
-  <desc id="desc">AI, ML, DL의 포함 관계와 학습 유형, 학습 순서, 금융권 답안 포인트를 한 장에 정리한 개요 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">16. 인공지능·기계학습 개요 인포그래픽</title>
+  <desc id="desc">AI, ML, DL의 포함 관계와 학습 유형, 금융권 답안 프레임을 읽기 쉽게 나눈 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="55%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#f5f3ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
     <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#7c3aed"/>
-    </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#38bdf8"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
     </linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#94a3b8" flood-opacity="0.18"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#94a3b8" flood-opacity="0.16"/>
     </filter>
     <style>
-      .title { font: 700 32px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
-      .section { font: 700 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #475569; }
-      .chip { font: 700 13px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #1e293b; }
-      .step { font: 700 15px 'Pretendard', 'Noto Sans KR', sans-serif; fill: white; }
-      .stepSmall { font: 600 12px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #dbeafe; }
+      .title { font: 700 34px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #ffffff; }
+      .subtitle { font: 500 17px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #dbeafe; }
+      .section { font: 700 24px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .label { font: 700 22px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #475569; }
+      .chip { font: 700 15px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #1e293b; }
+      .step { font: 700 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #ffffff; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="30" y="28" width="1140" height="664" rx="28" fill="#ffffff" filter="url(#shadow)"/>
+  <rect width="1200" height="860" fill="url(#bg)"/>
+  <rect x="32" y="28" width="1136" height="804" rx="28" fill="#ffffff" filter="url(#shadow)"/>
 
-  <rect x="60" y="54" width="1080" height="118" rx="24" fill="url(#hero)"/>
-  <text class="small" x="90" y="88">금융공기업 IT · 인공지능·기계학습 장 요약</text>
-  <text class="title" x="90" y="122">AI 개념 구분 → 데이터 검증 → 평가 지표 → 모델 선택 → 운영 통제</text>
-  <text class="subtitle" x="90" y="152">이 페이지는 16장 전체를 훑는 개요다. AI·ML·DL 관계, 학습 유형, 학습 순서, 금융권 답안 포인트를 한 장에 묶는다.</text>
+  <rect x="64" y="56" width="1072" height="126" rx="24" fill="url(#hero)"/>
+  <text class="small" x="96" y="92">금융공기업 IT · 16장 빠른 개요</text>
+  <text class="title" x="96" y="128">AI 개념 구분과 답안 작성 축을 먼저 잡는 페이지</text>
+  <text class="subtitle" x="96" y="158">한 장에서 꼭 기억할 것은 포함 관계, 학습 유형, 그리고 성능·통제·운영을 함께 말하는 답안 구조다.</text>
 
-  <g transform="translate(72 200)">
-    <rect width="356" height="300" rx="26" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text class="section" x="24" y="34">1) AI · ML · DL 포함 관계</text>
+  <g transform="translate(72 214)">
+    <rect width="474" height="580" rx="28" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="28" y="42">1) AI · ML · DL 포함 관계</text>
+    <text class="body" x="28" y="72">용어를 넓은 개념부터 안쪽으로 설명하면 면접 답변이 깔끔해진다.</text>
 
-    <rect x="18" y="56" width="320" height="154" rx="26" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
-    <text class="label" x="40" y="84">AI</text>
-    <text class="body" x="40" y="106">규칙 기반 시스템까지 포함하는 가장 넓은 개념</text>
+    <rect x="28" y="106" width="418" height="250" rx="28" fill="#dbeafe" stroke="#60a5fa" stroke-width="2.5"/>
+    <text class="label" x="56" y="144">AI</text>
+    <text class="body" x="56" y="174">규칙 기반 시스템까지 포함하는 가장 넓은 개념</text>
+    <text class="small" x="56" y="202">예: 전문가 시스템, 추천 엔진, 예측 모델</text>
 
-    <rect x="54" y="96" width="248" height="94" rx="22" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>
-    <text class="label" x="78" y="124">ML</text>
-    <text class="body" x="78" y="146">데이터에서 규칙을 학습하는 방법론</text>
+    <rect x="76" y="196" width="320" height="118" rx="24" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2.5"/>
+    <text class="label" x="104" y="234">ML</text>
+    <text class="body" x="104" y="264">데이터에서 패턴과 규칙을 학습하는 방법론</text>
+    <text class="small" x="104" y="292">예: 회귀, 분류, 군집화, 이상탐지</text>
 
-    <rect x="106" y="130" width="146" height="42" rx="18" fill="#312e81"/>
-    <text class="step" x="179" y="156" text-anchor="middle">DL</text>
-    <text class="stepSmall" x="179" y="170" text-anchor="middle">다층 신경망</text>
+    <rect x="136" y="244" width="184" height="54" rx="18" fill="#312e81"/>
+    <text class="step" x="228" y="278" text-anchor="middle">DL = 다층 신경망</text>
 
-    <text class="chip" x="24" y="244">학습 유형</text>
-    <rect x="22" y="258" width="92" height="26" rx="13" fill="#dbeafe"/>
-    <text class="small" x="68" y="275" text-anchor="middle">지도학습</text>
-    <rect x="126" y="258" width="102" height="26" rx="13" fill="#ede9fe"/>
-    <text class="small" x="177" y="275" text-anchor="middle">비지도학습</text>
-    <rect x="240" y="258" width="92" height="26" rx="13" fill="#dcfce7"/>
-    <text class="small" x="286" y="275" text-anchor="middle">강화학습</text>
+    <text class="chip" x="28" y="406">핵심 비교</text>
+    <rect x="28" y="424" width="418" height="124" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+    <text class="body" x="48" y="454">• AI: 목표 전체를 가리키는 상위 개념</text>
+    <text class="body" x="48" y="484">• ML: 데이터를 이용해 규칙을 스스로 학습</text>
+    <text class="body" x="48" y="514">• DL: 복잡한 비선형 패턴을 신경망으로 학습</text>
+
+    <text class="chip" x="28" y="584">답안 팁</text>
+    <text class="body" x="28" y="612">"AI 안에 ML이 있고, ML 안에 DL이 있다"로 시작하면</text>
+    <text class="body" x="28" y="638">포함 관계와 예시를 30초 안에 정리하기 쉽다.</text>
   </g>
 
-  <g transform="translate(446 200)">
-    <rect width="682" height="300" rx="26" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text class="section" x="24" y="34">2) 16장 학습 순서와 연결 구조</text>
-    <text class="body" x="24" y="58">개념을 외우는 순서가 아니라 답안을 구성하는 흐름대로 공부한다.</text>
+  <g transform="translate(572 214)">
+    <rect width="556" height="264" rx="28" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="28" y="42">2) 학습 유형 3가지</text>
+    <text class="body" x="28" y="72">문제 유형과 금융 사례를 함께 외우면 하위 페이지 연결이 빨라진다.</text>
 
-    <line x1="72" y1="124" x2="612" y2="124" stroke="url(#flow)" stroke-width="10" stroke-linecap="round"/>
+    <rect x="28" y="104" width="152" height="128" rx="22" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+    <text class="label" x="104" y="138" text-anchor="middle">지도학습</text>
+    <text class="body" x="48" y="170">정답 라벨이 있는</text>
+    <text class="body" x="48" y="194">데이터로 예측</text>
+    <text class="small" x="48" y="220">금융 예: 대출 연체 예측</text>
 
-    <g transform="translate(42 86)">
-      <circle cx="30" cy="38" r="30" fill="#2563eb"/>
-      <text class="step" x="30" y="35" text-anchor="middle">16-1</text>
-      <text class="stepSmall" x="30" y="51" text-anchor="middle">기본</text>
-      <text class="body" x="-8" y="96">AI·ML·DL</text>
-      <text class="body" x="-10" y="114">용어 정렬</text>
-    </g>
+    <rect x="202" y="104" width="152" height="128" rx="22" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+    <text class="label" x="278" y="138" text-anchor="middle">비지도학습</text>
+    <text class="body" x="224" y="170">라벨 없이 군집·구조를</text>
+    <text class="body" x="224" y="194">찾아내는 방식</text>
+    <text class="small" x="224" y="220">금융 예: 고객 세분화</text>
 
-    <g transform="translate(174 86)">
-      <circle cx="30" cy="38" r="30" fill="#0ea5e9"/>
-      <text class="step" x="30" y="35" text-anchor="middle">16-2</text>
-      <text class="stepSmall" x="30" y="51" text-anchor="middle">전처리</text>
-      <text class="body" x="-4" y="96">train/val/test</text>
-      <text class="body" x="-2" y="114">누수 방지</text>
-    </g>
-
-    <g transform="translate(306 86)">
-      <circle cx="30" cy="38" r="30" fill="#8b5cf6"/>
-      <text class="step" x="30" y="35" text-anchor="middle">16-3</text>
-      <text class="stepSmall" x="30" y="51" text-anchor="middle">평가</text>
-      <text class="body" x="4" y="96">precision·recall</text>
-      <text class="body" x="16" y="114">혼동행렬</text>
-    </g>
-
-    <g transform="translate(438 86)">
-      <circle cx="30" cy="38" r="30" fill="#7c3aed"/>
-      <text class="step" x="30" y="35" text-anchor="middle">16-4</text>
-      <text class="stepSmall" x="30" y="51" text-anchor="middle">모델</text>
-      <text class="body" x="8" y="96">선형·트리·DL</text>
-      <text class="body" x="8" y="114">장단점 비교</text>
-    </g>
-
-    <g transform="translate(570 86)">
-      <circle cx="30" cy="38" r="30" fill="#4f46e5"/>
-      <text class="step" x="30" y="35" text-anchor="middle">16-5</text>
-      <text class="stepSmall" x="30" y="51" text-anchor="middle">통제</text>
-      <text class="body" x="10" y="96">FDS·AML</text>
-      <text class="body" x="-8" y="114">XAI·drift·공정성</text>
-    </g>
-
-    <rect x="28" y="206" width="626" height="70" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
-    <text class="chip" x="50" y="232">핵심 연결 문장</text>
-    <text class="body" x="50" y="254">모델 선택은 성능 하나로 끝나지 않는다. 데이터 규모, 피처 구조, 규제 요구, 실시간 추론, 운영 가능성을 함께 본다.</text>
+    <rect x="376" y="104" width="152" height="128" rx="22" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+    <text class="label" x="452" y="138" text-anchor="middle">강화학습</text>
+    <text class="body" x="398" y="170">행동 보상을 통해</text>
+    <text class="body" x="398" y="194">정책을 개선</text>
+    <text class="small" x="398" y="220">금융 예: 동적 의사결정</text>
   </g>
 
-  <g transform="translate(72 520)">
-    <rect width="500" height="144" rx="24" fill="#fff7ed" stroke="#fdba74"/>
-    <text class="section" x="24" y="34">3) 금융권 답안 포인트</text>
-    <rect x="24" y="52" width="142" height="72" rx="18" fill="#ffffff" stroke="#fed7aa"/>
-    <text class="label" x="95" y="76" text-anchor="middle">성능 해석</text>
-    <text class="body" x="40" y="98">정확도만 말하지 않고</text>
-    <text class="body" x="40" y="116">오탐·미탐 비용을 함께 적기</text>
+  <g transform="translate(572 506)">
+    <rect width="556" height="288" rx="28" fill="#fff7ed" stroke="#fdba74"/>
+    <text class="section" x="28" y="42">3) 금융권 답안 프레임</text>
+    <text class="body" x="28" y="72">정확도만 말하면 약하다. 지표 해석과 통제를 함께 묶어야 설득력이 생긴다.</text>
 
-    <rect x="178" y="52" width="142" height="72" rx="18" fill="#ffffff" stroke="#fed7aa"/>
-    <text class="label" x="249" y="76" text-anchor="middle">통제 요소</text>
-    <text class="body" x="196" y="98">데이터 누수 방지,</text>
-    <text class="body" x="196" y="116">승인 절차, XAI</text>
+    <rect x="28" y="102" width="238" height="74" rx="18" fill="#ffffff" stroke="#fed7aa"/>
+    <text class="label" x="48" y="132">성능</text>
+    <text class="body" x="48" y="156">accuracy만 보지 말고 precision·recall과 비용을 같이 설명</text>
 
-    <rect x="332" y="52" width="144" height="72" rx="18" fill="#ffffff" stroke="#fed7aa"/>
-    <text class="label" x="404" y="76" text-anchor="middle">운영 관점</text>
-    <text class="body" x="350" y="98">공정성, drift,</text>
-    <text class="body" x="350" y="116">개인정보 보호</text>
-  </g>
+    <rect x="290" y="102" width="238" height="74" rx="18" fill="#ffffff" stroke="#fed7aa"/>
+    <text class="label" x="310" y="132">데이터</text>
+    <text class="body" x="310" y="156">train/validation/test 분리와 데이터 누수 방지를 먼저 점검</text>
 
-  <g transform="translate(596 520)">
-    <rect width="532" height="144" rx="24" fill="#f0fdf4" stroke="#86efac"/>
-    <text class="section" x="24" y="34">4) 시험 체크리스트</text>
-    <g class="body">
-      <text x="24" y="62">□ AI·ML·DL의 관계를 포함 관계와 예시까지 30초 안에 설명</text>
-      <text x="24" y="84">□ 지도·비지도·강화학습을 금융 사례와 함께 구분</text>
-      <text x="24" y="106">□ 데이터 누수와 과적합을 다른 문제로 분리해 설명</text>
-      <text x="24" y="128">□ precision/recall 선택을 업무 비용 기준으로 답변</text>
-    </g>
+    <rect x="28" y="194" width="238" height="74" rx="18" fill="#ffffff" stroke="#fed7aa"/>
+    <text class="label" x="48" y="224">통제</text>
+    <text class="body" x="48" y="248">승인 절차, XAI, 감사 가능성까지 적어 실무성을 보강</text>
+
+    <rect x="290" y="194" width="238" height="74" rx="18" fill="#ffffff" stroke="#fed7aa"/>
+    <text class="label" x="310" y="224">운영</text>
+    <text class="body" x="310" y="248">공정성, drift, 개인정보 보호를 운영 리스크와 연결</text>
   </g>
 </svg>

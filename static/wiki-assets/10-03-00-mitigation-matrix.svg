@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="868" viewBox="0 0 1200 868" role="img" aria-labelledby="title desc">
+  <title id="title">10-03. 웹·네트워크 공격 대응 매트릭스</title>
+  <desc id="desc">대표 공격별로 공격 벡터, 주된 영향, 핵심 방어책을 표 형식으로 정리한 SVG</desc>
+  <defs>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 14px; font-weight: 700; letter-spacing: 0.12em; fill: #475569; }
+      .title { font-size: 32px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .header { font-size: 18px; font-weight: 800; }
+      .attack { font-size: 18px; font-weight: 800; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .center { text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="868" fill="#f8fafc" />
+  <rect x="24" y="24" width="1152" height="820" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <text class="eyebrow" x="64" y="74">MITIGATION MATRIX · ATTACK → IMPACT → CONTROL</text>
+  <text class="title" x="64" y="116">공격별 대응 매트릭스</text>
+  <text class="subtitle" x="64" y="150">답안이나 리뷰 체크리스트를 쓸 때는 공격명만 외우지 말고,</text>
+  <text class="subtitle" x="64" y="176">벡터·영향·핵심 방어책을 한 줄로 묶어서 정리한다.</text>
+
+  <rect x="56" y="210" width="180" height="72" rx="18" fill="#0f172a" />
+  <rect x="236" y="210" width="286" height="72" rx="18" fill="#1d4ed8" />
+  <rect x="522" y="210" width="240" height="72" rx="18" fill="#b45309" />
+  <rect x="762" y="210" width="382" height="72" rx="18" fill="#065f46" />
+  <text class="header center" x="146" y="253" style="fill:#f8fafc;">공격</text>
+  <text class="header center" x="379" y="253" style="fill:#f8fafc;">주된 공격 벡터</text>
+  <text class="header center" x="642" y="253" style="fill:#f8fafc;">대표 영향</text>
+  <text class="header center" x="953" y="253" style="fill:#f8fafc;">핵심 방어책</text>
+
+  <rect x="56" y="298" width="1088" height="96" rx="20" fill="#fff7ed" stroke="#fdba74" stroke-width="2" />
+  <text class="attack" x="84" y="340">XSS</text>
+  <text class="body" x="236" y="330">댓글, 프로필, 검색결과처럼</text>
+  <text class="body" x="236" y="352">사용자 입력이 다시 출력되는 지점</text>
+  <text class="body" x="522" y="330">세션 탈취, 피싱 화면,</text>
+  <text class="body" x="522" y="352">브라우저 내 사용자 행위 조작</text>
+  <text class="body" x="762" y="330">컨텍스트별 출력 인코딩, CSP,</text>
+  <text class="body" x="762" y="352">HTTPOnly·Secure 쿠키, 입력 검증 보조</text>
+
+  <rect x="56" y="410" width="1088" height="96" rx="20" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+  <text class="attack" x="84" y="452">SQLi</text>
+  <text class="body" x="236" y="442">로그인, 검색, 파라미터가</text>
+  <text class="body" x="236" y="464">SQL 쿼리에 직접 섞이는 지점</text>
+  <text class="body" x="522" y="442">인증 우회, 데이터 유출,</text>
+  <text class="body" x="522" y="464">데이터 삭제·수정, 권한 상승</text>
+  <text class="body" x="762" y="442">Prepared Statement, 최소 권한 DB 계정,</text>
+  <text class="body" x="762" y="464">에러 메시지 숨김, 입력 검증</text>
+
+  <rect x="56" y="522" width="1088" height="96" rx="20" fill="#fefce8" stroke="#facc15" stroke-width="2" />
+  <text class="attack" x="84" y="564">CSRF</text>
+  <text class="body" x="236" y="554">로그인된 브라우저가 보내는</text>
+  <text class="body" x="236" y="576">상태 변경 요청(POST·PUT·DELETE)</text>
+  <text class="body" x="522" y="554">송금, 비밀번호 변경,</text>
+  <text class="body" x="522" y="576">권한 있는 상태 변경이 강제됨</text>
+  <text class="body" x="762" y="554">CSRF 토큰, SameSite 쿠키,</text>
+  <text class="body" x="762" y="576">재인증, Referer·Origin 검사 보조</text>
+
+  <rect x="56" y="634" width="1088" height="96" rx="20" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2" />
+  <text class="attack" x="84" y="676">SSRF</text>
+  <text class="body" x="236" y="666">URL 미리보기, 웹훅,</text>
+  <text class="body" x="236" y="688">이미지 가져오기 같은 서버발 요청</text>
+  <text class="body" x="522" y="666">내부망 접근, 메타데이터 탈취,</text>
+  <text class="body" x="522" y="688">내부 포트 스캔</text>
+  <text class="body" x="762" y="666">허용 도메인 allowlist, 내부 IP 차단,</text>
+  <text class="body" x="762" y="688">DNS 재바인딩 대응, 타임아웃·응답 제한</text>
+
+  <rect x="56" y="746" width="1088" height="74" rx="20" fill="#ecfeff" stroke="#67e8f9" stroke-width="2" />
+  <text class="attack" x="84" y="779">파일 업로드</text>
+  <text class="body" x="236" y="773">확장자, MIME, 경로, 실행 권한이 섞인 업로드 기능</text>
+  <text class="body" x="522" y="773">웹쉘 실행, 서비스 변조, 악성코드 확산</text>
+  <text class="body" x="762" y="768">시그니처·MIME 검사, 웹루트 외 저장,</text>
+  <text class="body" x="762" y="790">실행 권한 제거, 랜덤 파일명</text>
+</svg>

@@ -1,161 +1,164 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">11-03. 설계-결합도-응집도 인포그래픽</title>
-  <desc id="desc">좋은 모듈 설계의 기준인 낮은 결합도와 높은 응집도를 비교하고, 결합도와 응집도의 단계별 유형을 한눈에 정리한 SVG 인포그래픽.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="980" viewBox="0 0 1200 980" role="img" aria-labelledby="title desc">
+  <title id="title">11-03. 설계-결합도-응집도 비교 요약</title>
+  <desc id="desc">결합도는 낮을수록 좋고 응집도는 높을수록 좋다는 원칙을 기준으로, 각 유형의 순서와 특징을 좌우 카드로 비교한 SVG 인포그래픽.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
+    <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef4ff"/>
       <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="couplingBar" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#22c55e"/>
-      <stop offset="100%" stop-color="#ef4444"/>
+    <linearGradient id="couplingScale" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#16a34a"/>
+      <stop offset="100%" stop-color="#dc2626"/>
     </linearGradient>
-    <linearGradient id="cohesionBar" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ef4444"/>
-      <stop offset="100%" stop-color="#22c55e"/>
+    <linearGradient id="cohesionScale" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#16a34a"/>
     </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1"/>
-    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .badge { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
-      .rank { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .emphasis { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .scale { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect width="1200" height="980" fill="url(#pageBg)"/>
+  <rect x="28" y="28" width="1144" height="924" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text x="70" y="90" class="small">금융공기업 IT · 모듈 설계 핵심 암기</text>
-  <text x="70" y="130" class="title">11-03. 설계-결합도-응집도</text>
-  <text x="70" y="162" class="subtitle">좋은 설계의 기준은 “결합도는 낮게, 응집도는 높게”. 변경 영향은 줄이고, 모듈 책임은 선명하게 만든다.</text>
+  <text x="72" y="84" class="small">금융공기업 IT · 모듈 설계 암기 지도</text>
+  <text x="72" y="130" class="title">11-03. 설계-결합도-응집도</text>
+  <text x="72" y="165" class="subtitle">정답 문장: 결합도는 낮게, 응집도는 높게. 변경 영향은 줄이고 모듈 책임은 선명하게 유지한다.</text>
 
-  <rect x="60" y="195" width="1080" height="120" rx="24" fill="#f8fafc" stroke="#e2e8f0"/>
-  <text x="88" y="227" class="section">핵심 원리</text>
+  <rect x="60" y="198" width="1080" height="126" rx="24" fill="#f8fafc" stroke="#dbe4f0"/>
+  <text x="92" y="238" class="section">핵심 판단 기준</text>
+  <rect x="92" y="256" width="282" height="44" rx="14" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="233" y="284" text-anchor="middle" class="emphasis">결합도 ↓ : 모듈 간 의존 최소화</text>
+  <rect x="390" y="256" width="282" height="44" rx="14" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="531" y="284" text-anchor="middle" class="emphasis">응집도 ↑ : 모듈 내부 책임 집중</text>
+  <rect x="688" y="244" width="420" height="68" rx="18" fill="#eef2ff" stroke="#6366f1"/>
+  <text x="710" y="272" class="label">시험 답안 연결</text>
+  <text x="710" y="296" class="body">"낮은 결합도 + 높은 응집도 = 변경 용이성·안정성·테스트성 향상"을 함께 적는다.</text>
 
-  <rect x="88" y="248" width="300" height="44" rx="14" fill="#dcfce7" stroke="#22c55e"/>
-  <text x="238" y="276" text-anchor="middle" class="label">결합도 ↓ : 모듈 간 의존 최소화</text>
-  <rect x="450" y="248" width="300" height="44" rx="14" fill="#dcfce7" stroke="#22c55e"/>
-  <text x="600" y="276" text-anchor="middle" class="label">응집도 ↑ : 모듈 내부 책임 집중</text>
-  <rect x="812" y="228" width="290" height="72" rx="18" fill="#eef2ff" stroke="#6366f1"/>
-  <text x="957" y="255" text-anchor="middle" class="label">결론</text>
-  <text x="957" y="278" text-anchor="middle" class="body">변경 용이성↑ · 안정성↑ · 테스트 용이성↑</text>
+  <g transform="translate(60 360)">
+    <rect width="510" height="506" rx="28" fill="#fefefe" stroke="#d1d5db"/>
+    <text x="30" y="40" class="section">결합도 유형</text>
+    <text x="30" y="68" class="small">낮은 순 → 높은 순</text>
+    <rect x="30" y="86" width="450" height="16" rx="8" fill="url(#couplingScale)"/>
+    <text x="30" y="124" class="scale">좋음</text>
+    <text x="480" y="124" text-anchor="end" class="scale">나쁨</text>
 
-  <line x1="388" y1="270" x2="450" y2="270" stroke="#6366f1" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="750" y1="270" x2="812" y2="264" stroke="#6366f1" stroke-width="4" marker-end="url(#arrow)"/>
+    <g transform="translate(30 144)">
+      <rect width="450" height="48" rx="16" fill="#dcfce7"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#15803d"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">1. 자료</text>
+      <text x="112" y="22" class="label">필요한 값만 전달</text>
+      <text x="112" y="40" class="body">매개변수 기반 통신이라 변경 파급이 작다.</text>
+    </g>
 
-  <g transform="translate(60 345)">
-    <rect width="340" height="315" rx="24" fill="#fefefe" stroke="#d1d5db"/>
-    <text x="28" y="34" class="section">결합도 유형</text>
-    <text x="28" y="57" class="small">낮은 순 → 높은 순</text>
-    <rect x="28" y="72" width="284" height="14" rx="7" fill="url(#couplingBar)"/>
-    <text x="28" y="108" class="rank">좋음</text>
-    <text x="292" y="108" text-anchor="end" class="rank">나쁨</text>
+    <g transform="translate(30 202)">
+      <rect width="450" height="48" rx="16" fill="#ecfccb"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#65a30d"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">2. 스탬프</text>
+      <text x="112" y="22" class="label">구조체 단위 전달</text>
+      <text x="112" y="40" class="body">필드 일부만 필요해도 큰 묶음을 넘겨 의존이 늘 수 있다.</text>
+    </g>
 
-    <g transform="translate(28 124)">
-      <rect width="284" height="24" rx="12" fill="#dcfce7"/>
-      <text x="14" y="16" class="label">1. 자료 결합</text>
-      <text x="108" y="16" class="body">필요한 데이터만 매개변수로 전달</text>
+    <g transform="translate(30 260)">
+      <rect width="450" height="48" rx="16" fill="#fef3c7"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#ca8a04"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">3. 제어</text>
+      <text x="112" y="22" class="label">플래그로 흐름 지시</text>
+      <text x="112" y="40" class="body">호출자가 내부 분기까지 간접 제어해 결합이 커진다.</text>
     </g>
-    <g transform="translate(28 156)">
-      <rect width="284" height="24" rx="12" fill="#ecfccb"/>
-      <text x="14" y="16" class="label">2. 스탬프 결합</text>
-      <text x="123" y="16" class="body">구조체·레코드 단위 전달</text>
-    </g>
-    <g transform="translate(28 188)">
-      <rect width="284" height="24" rx="12" fill="#fef9c3"/>
-      <text x="14" y="16" class="label">3. 제어 결합</text>
-      <text x="108" y="16" class="body">플래그 등 제어정보로 흐름 지시</text>
-    </g>
-    <g transform="translate(28 220)">
-      <rect width="284" height="24" rx="12" fill="#ffedd5"/>
-      <text x="14" y="16" class="label">4. 외부 결합</text>
-      <text x="108" y="16" class="body">외부 규약·인터페이스에 의존</text>
-    </g>
-    <g transform="translate(28 252)">
-      <rect width="284" height="24" rx="12" fill="#fee2e2"/>
-      <text x="14" y="16" class="label">5. 공통 결합</text>
-      <text x="108" y="16" class="body">전역 데이터·공유 자원 의존</text>
-    </g>
-    <g transform="translate(28 284)">
-      <rect width="284" height="24" rx="12" fill="#fecaca"/>
-      <text x="14" y="16" class="label">6. 내용 결합</text>
-      <text x="108" y="16" class="body">다른 모듈 내부 구현을 직접 침범</text>
-    </g>
-  </g>
 
-  <g transform="translate(430 345)">
-    <rect width="340" height="315" rx="24" fill="#fefefe" stroke="#d1d5db"/>
-    <text x="28" y="34" class="section">응집도 유형</text>
-    <text x="28" y="57" class="small">높은 순 → 낮은 순</text>
-    <rect x="28" y="72" width="284" height="14" rx="7" fill="url(#cohesionBar)"/>
-    <text x="28" y="108" class="rank">나쁨</text>
-    <text x="292" y="108" text-anchor="end" class="rank">좋음</text>
+    <g transform="translate(30 318)">
+      <rect width="450" height="48" rx="16" fill="#ffedd5"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#ea580c"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">4. 외부</text>
+      <text x="112" y="22" class="label">외부 규약 공동 의존</text>
+      <text x="112" y="40" class="body">파일 형식·통신 규약이 바뀌면 여러 모듈이 함께 흔들린다.</text>
+    </g>
 
-    <g transform="translate(28 124)">
-      <rect width="284" height="24" rx="12" fill="#dcfce7"/>
-      <text x="14" y="16" class="label">1. 기능적 응집</text>
-      <text x="123" y="16" class="body">하나의 핵심 기능만 수행</text>
+    <g transform="translate(30 376)">
+      <rect width="450" height="48" rx="16" fill="#fee2e2"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#ef4444"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">5. 공통</text>
+      <text x="112" y="22" class="label">전역 데이터 공유</text>
+      <text x="112" y="40" class="body">한 모듈 수정이 전체 공유 상태에 연쇄 영향을 만든다.</text>
     </g>
-    <g transform="translate(28 156)">
-      <rect width="284" height="24" rx="12" fill="#ecfccb"/>
-      <text x="14" y="16" class="label">2. 순차적 응집</text>
-      <text x="123" y="16" class="body">앞 단계 출력이 다음 입력</text>
-    </g>
-    <g transform="translate(28 188)">
-      <rect width="284" height="24" rx="12" fill="#fef9c3"/>
-      <text x="14" y="16" class="label">3. 통신적 응집</text>
-      <text x="123" y="16" class="body">같은 데이터에 함께 작용</text>
-    </g>
-    <g transform="translate(28 220)">
-      <rect width="284" height="24" rx="12" fill="#ffedd5"/>
-      <text x="14" y="16" class="label">4. 절차적 응집</text>
-      <text x="123" y="16" class="body">절차 순서만 맞춰 함께 배치</text>
-    </g>
-    <g transform="translate(28 252)">
-      <rect width="284" height="24" rx="12" fill="#fee2e2"/>
-      <text x="14" y="16" class="label">5. 시간적 응집</text>
-      <text x="123" y="16" class="body">초기화·종료처럼 시점만 동일</text>
-    </g>
-    <g transform="translate(28 284)">
-      <rect width="284" height="24" rx="12" fill="#fecaca"/>
-      <text x="14" y="16" class="label">6. 논리/우연적 응집</text>
-      <text x="144" y="16" class="body">관련 약하거나 무관한 기능 집합</text>
+
+    <g transform="translate(30 434)">
+      <rect width="450" height="48" rx="16" fill="#fecaca"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#b91c1c"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">6. 내용</text>
+      <text x="112" y="22" class="label">다른 모듈 내부 침범</text>
+      <text x="112" y="40" class="body">구현 세부를 직접 건드려 가장 위험한 결합 상태가 된다.</text>
     </g>
   </g>
 
-  <g transform="translate(800 345)">
-    <rect width="340" height="315" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="28" y="34" class="section">좋은 설계 예시</text>
-    <text x="28" y="57" class="small">금융 시스템: 거래 처리와 보고서 생성 분리</text>
+  <g transform="translate(630 360)">
+    <rect width="510" height="506" rx="28" fill="#fefefe" stroke="#d1d5db"/>
+    <text x="30" y="40" class="section">응집도 유형</text>
+    <text x="30" y="68" class="small">높은 순 → 낮은 순</text>
+    <rect x="30" y="86" width="450" height="16" rx="8" fill="url(#cohesionScale)"/>
+    <text x="30" y="124" class="scale">나쁨</text>
+    <text x="480" y="124" text-anchor="end" class="scale">좋음</text>
 
-    <rect x="28" y="88" width="124" height="70" rx="16" fill="#dbeafe" stroke="#3b82f6"/>
-    <text x="90" y="116" text-anchor="middle" class="label">거래 처리</text>
-    <text x="90" y="136" text-anchor="middle" class="body">검증·승인·커밋</text>
+    <g transform="translate(30 144)">
+      <rect width="450" height="48" rx="16" fill="#dcfce7"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#15803d"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">1. 기능적</text>
+      <text x="112" y="22" class="label">핵심 기능 1개 수행</text>
+      <text x="112" y="40" class="body">모듈 목적이 가장 선명해 이상적인 응집 상태다.</text>
+    </g>
 
-    <rect x="188" y="88" width="124" height="70" rx="16" fill="#f5d0fe" stroke="#a855f7"/>
-    <text x="250" y="116" text-anchor="middle" class="label">보고서 생성</text>
-    <text x="250" y="136" text-anchor="middle" class="body">조회·집계·출력</text>
+    <g transform="translate(30 202)">
+      <rect width="450" height="48" rx="16" fill="#dcfce7"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#16a34a"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">2. 순차적</text>
+      <text x="112" y="22" class="label">앞 단계 출력이 다음 입력</text>
+      <text x="112" y="40" class="body">처리 흐름이 이어져 있어 업무 단계가 자연스럽게 묶인다.</text>
+    </g>
 
-    <rect x="108" y="194" width="124" height="70" rx="16" fill="#dcfce7" stroke="#22c55e"/>
-    <text x="170" y="222" text-anchor="middle" class="label">계좌 모듈</text>
-    <text x="170" y="242" text-anchor="middle" class="body">잔액 책임 집중</text>
+    <g transform="translate(30 260)">
+      <rect width="450" height="48" rx="16" fill="#ecfccb"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#65a30d"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">3. 통신적</text>
+      <text x="112" y="22" class="label">같은 데이터에 함께 작용</text>
+      <text x="112" y="40" class="body">공통 입력·출력을 중심으로 기능이 모여 있다.</text>
+    </g>
 
-    <line x1="152" y1="123" x2="188" y2="123" stroke="#64748b" stroke-width="3" stroke-dasharray="8 6"/>
-    <text x="170" y="112" text-anchor="middle" class="small">데이터만 전달</text>
+    <g transform="translate(30 318)">
+      <rect width="450" height="48" rx="16" fill="#fef3c7"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#ca8a04"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">4. 절차적</text>
+      <text x="112" y="22" class="label">순서만 맞춰 함께 배치</text>
+      <text x="112" y="40" class="body">절차는 이어지지만 기능 목적은 다소 분산되어 있다.</text>
+    </g>
 
-    <line x1="90" y1="158" x2="140" y2="194" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
-    <line x1="250" y1="158" x2="200" y2="194" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
+    <g transform="translate(30 376)">
+      <rect width="450" height="48" rx="16" fill="#ffedd5"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#ea580c"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">5. 시간적</text>
+      <text x="112" y="22" class="label">같은 시점에만 실행</text>
+      <text x="112" y="40" class="body">초기화·종료처럼 시점이 같을 뿐 목적 일치는 약하다.</text>
+    </g>
 
-    <rect x="28" y="276" width="284" height="24" rx="12" fill="#e0e7ff"/>
-    <text x="170" y="292" text-anchor="middle" class="label">낮은 결합도: 인터페이스로 연결</text>
-    <rect x="28" y="244" width="284" height="24" rx="12" fill="#dcfce7"/>
-    <text x="170" y="260" text-anchor="middle" class="label">높은 응집도: 모듈마다 책임 1개</text>
+    <g transform="translate(30 434)">
+      <rect width="450" height="48" rx="16" fill="#fee2e2"/>
+      <rect x="14" y="12" width="80" height="24" rx="12" fill="#b91c1c"/>
+      <text x="54" y="29" text-anchor="middle" class="chip">6. 논리·우연</text>
+      <text x="112" y="22" class="label">비슷하거나 무관한 기능 혼합</text>
+      <text x="112" y="40" class="body">조건 분기나 무작위 묶음이라 책임 경계가 가장 흐리다.</text>
+    </g>
   </g>
+
+  <rect x="60" y="886" width="1080" height="42" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="86" y="913" class="emphasis">암기 팁</text>
+  <text x="176" y="913" class="body">결합도는 자료→내용 순으로 악화, 응집도는 기능적→논리·우연 순으로 약화된다고 외우면 빠르다.</text>
 </svg>

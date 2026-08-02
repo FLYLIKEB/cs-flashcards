@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="860" viewBox="0 0 1280 860" role="img" aria-labelledby="title desc">
+  <title id="title">07-02-02 함수 종속 읽기와 정규화 판단</title>
+  <desc id="desc">결정자, 완전 함수 종속, 부분 함수 종속, 이행 함수 종속을 예시와 함께 설명하고 2NF와 3NF 판단으로 연결하는 도식</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .hero { fill: #1e293b; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .blueBox { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2; }
+      .amberBox { fill: #fffbeb; stroke: #fbbf24; stroke-width: 2; }
+      .violetBox { fill: #f5f3ff; stroke: #a78bfa; stroke-width: 2; }
+      .greenBox { fill: #ecfdf5; stroke: #6ee7b7; stroke-width: 2; }
+      .title { font: 700 34px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #ffffff; }
+      .subtitle { font: 500 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #cbd5e1; }
+      .section { font: 700 26px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .label { font: 700 21px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
+      .small { font: 500 15px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #475569; }
+      .code { font: 700 22px 'SFMono-Regular', Consolas, monospace; fill: #1e293b; }
+      .step { font: 700 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #ffffff; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed" />
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1280" height="860" rx="28" />
+  <rect class="hero" x="40" y="32" width="1200" height="116" rx="28" />
+  <text class="subtitle" x="76" y="74">Functional Dependency Reading Guide</text>
+  <text class="title" x="76" y="112">함수 종속 표기와 정규화 판단</text>
+
+  <rect class="panel" x="48" y="176" width="1184" height="644" rx="28" />
+
+  <text class="section" x="84" y="226">1. 표기 읽기: X → Y 는 “X를 알면 Y가 하나로 정해진다”는 뜻</text>
+  <rect class="blueBox" x="84" y="252" width="1112" height="130" rx="22" />
+  <text class="code" x="126" y="316">상품ID → 상품명, 단가</text>
+  <text class="body" x="126" y="346">왼쪽의 상품ID가 결정자(determinant)이고, 오른쪽의 상품명·단가는 상품ID 값 하나에 의해 고정된다.</text>
+  <text class="body" x="126" y="372">같은 상품ID가 여러 행에 나타난다면 오른쪽 값도 모두 같아야 하므로, 반복 저장되면 이상현상이 쉽게 생긴다.</text>
+
+  <text class="section" x="84" y="434">2. 시험에서 자주 구분하는 세 가지 종속</text>
+
+  <rect class="greenBox" x="84" y="460" width="344" height="200" rx="22" />
+  <text class="label" x="112" y="498">완전 함수 종속</text>
+  <text class="code" x="112" y="536">(주문ID, 상품ID) → 수량</text>
+  <text class="body" x="112" y="570">복합키 전체가 있어야 수량이 정해진다.</text>
+  <text class="body" x="112" y="598">한쪽만으로는 부족하므로 주문상세에서</text>
+  <text class="body" x="112" y="624">유지해도 되는 정상적인 종속이다.</text>
+
+  <rect class="amberBox" x="468" y="460" width="344" height="200" rx="22" />
+  <text class="label" x="496" y="498">부분 함수 종속</text>
+  <text class="code" x="496" y="536">상품ID → 상품명, 단가</text>
+  <text class="body" x="496" y="570">복합키 일부인 상품ID만으로도</text>
+  <text class="body" x="496" y="598">비키 속성이 결정되므로 2NF 위반이다.</text>
+  <text class="body" x="496" y="624">상품 테이블 분리가 기본 해법이다.</text>
+
+  <rect class="violetBox" x="852" y="460" width="344" height="200" rx="22" />
+  <text class="label" x="880" y="498">이행 함수 종속</text>
+  <text class="code" x="880" y="536">주문ID → 고객ID → 고객명</text>
+  <text class="body" x="880" y="570">키가 아닌 고객ID가 고객명을 다시 결정한다.</text>
+  <text class="body" x="880" y="598">비키 속성이 다른 비키 속성을 결정하므로</text>
+  <text class="body" x="880" y="624">3NF 위반으로 보고 고객 분리를 검토한다.</text>
+
+  <text class="section" x="84" y="718">3. 정규화 판단 흐름</text>
+  <rect x="84" y="742" width="230" height="48" rx="16" fill="#2563eb" />
+  <text class="step" x="199" y="773" text-anchor="middle">후보키 찾기</text>
+  <rect x="356" y="742" width="230" height="48" rx="16" fill="#0f766e" />
+  <text class="step" x="471" y="773" text-anchor="middle">부분 종속 확인</text>
+  <rect x="628" y="742" width="230" height="48" rx="16" fill="#7c3aed" />
+  <text class="step" x="743" y="773" text-anchor="middle">이행 종속 확인</text>
+  <rect x="900" y="742" width="296" height="48" rx="16" fill="#111827" />
+  <text class="step" x="1048" y="773" text-anchor="middle">상품·고객·주문상세로 분해</text>
+
+  <line x1="314" y1="766" x2="356" y2="766" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="586" y1="766" x2="628" y2="766" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="858" y1="766" x2="900" y2="766" stroke="#7c3aed" stroke-width="4" marker-end="url(#arrowPurple)" />
+</svg>

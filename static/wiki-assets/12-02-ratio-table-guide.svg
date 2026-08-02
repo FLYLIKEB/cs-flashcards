@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">12-02. 비율·증감·표 해석 요약</title>
+  <desc id="desc">비율과 증가율 계산, 평균과 가중평균, 표와 그래프 해석 체크포인트를 한 번에 정리한 수리 학습용 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#94a3b8" flood-opacity="0.16"/>
+    </filter>
+    <style>
+      .title { font: 800 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 800 23px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .cardTitle { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .formula { font: 800 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="860" fill="url(#bg)"/>
+  <rect x="44" y="40" width="1112" height="780" rx="30" fill="#ffffff" filter="url(#shadow)"/>
+
+  <text x="88" y="102" class="title">비율·증감·표 해석 핵심 정리</text>
+  <text x="88" y="136" class="subtitle">문제 풀이 전에 기준값, 단위, 헤더를 먼저 고정하면 비율 문제와 도표 문제를 훨씬 빨리 판별할 수 있다.</text>
+
+  <rect x="84" y="176" width="320" height="292" rx="26" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="112" y="220" class="section">자주 쓰는 식</text>
+  <text x="112" y="266" class="small">증가율</text>
+  <text x="112" y="294" class="formula">(새 값 − 기준 값) ÷ 기준 값 × 100</text>
+  <text x="112" y="326" class="body">기준값이 분모다. 비교 대상이 아니라 원래 값을 분모에 둔다.</text>
+  <text x="112" y="374" class="small">평균</text>
+  <text x="112" y="402" class="formula">합계 ÷ 개수</text>
+  <text x="112" y="434" class="body">중앙값 문제인지 평균 문제인지 먼저 구분한다.</text>
+
+  <rect x="424" y="176" width="320" height="292" rx="26" fill="#ecfeff" stroke="#99f6e4" stroke-width="2"/>
+  <text x="452" y="220" class="section">가중평균과 혼합</text>
+  <text x="452" y="266" class="small">가중평균</text>
+  <text x="452" y="294" class="formula">Σ(값 × 가중치) ÷ Σ가중치</text>
+  <text x="452" y="326" class="body">비중이 다른 집단을 단순 평균하면 오답이 된다.</text>
+  <text x="452" y="374" class="cardTitle">빠른 판단</text>
+  <text x="452" y="402" class="body">부분합을 먼저 구하고 마지막에 전체로 나누면 계산 흐름이 깔끔하다.</text>
+  <text x="452" y="434" class="body">가중치 합이 100%인지, 인원수인지부터 확인한다.</text>
+
+  <rect x="764" y="176" width="352" height="292" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="792" y="220" class="section">표·그래프 해석 체크</text>
+  <text x="792" y="266" class="cardTitle">1. 헤더와 주석 읽기</text>
+  <text x="792" y="292" class="body">행·열 제목, 각주, (%) 표시를 먼저 확인한다.</text>
+  <text x="792" y="332" class="cardTitle">2. 축의 단위 확인</text>
+  <text x="792" y="358" class="body">천명, 백만원, 억원처럼 생략된 단위를 반드시 복원한다.</text>
+  <text x="792" y="398" class="cardTitle">3. 축 시작점 확인</text>
+  <text x="792" y="424" class="body">0부터 시작하지 않으면 막대 높이 차이가 실제보다 커 보일 수 있다.</text>
+
+  <rect x="84" y="500" width="1032" height="124" rx="26" fill="#0f172a"/>
+  <text x="116" y="546" class="section" fill="#ffffff">자주 틀리는 포인트</text>
+  <text x="116" y="580" class="body" fill="#e2e8f0">• 증가율인데 절대 차이만 구하고 끝냄</text>
+  <text x="452" y="580" class="body" fill="#e2e8f0">• %와 소수를 섞어 계산함</text>
+  <text x="726" y="580" class="body" fill="#e2e8f0">• 표의 기준연도와 비교연도를 뒤바꿈</text>
+  <text x="116" y="608" class="body" fill="#e2e8f0">• 가중치가 다른데 단순 평균으로 처리함</text>
+  <text x="452" y="608" class="body" fill="#e2e8f0">• 축 단위를 놓쳐 10배·100배 오차를 냄</text>
+
+  <rect x="84" y="652" width="1032" height="128" rx="26" fill="#fffbeb" stroke="#fcd34d" stroke-width="2"/>
+  <text x="112" y="698" class="section">문제 읽기 전에 기억할 한 줄</text>
+  <text x="112" y="732" class="cardTitle">비율 문제는 분모를, 도표 문제는 단위를 먼저 찾는다.</text>
+  <text x="112" y="760" class="body">이 두 가지만 먼저 고정해도 불필요한 계산과 단위 실수를 크게 줄일 수 있다.</text>
+</svg>

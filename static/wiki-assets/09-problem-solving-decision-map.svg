@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="980" viewBox="0 0 1360 980" role="img" aria-labelledby="title desc">
+  <title id="title">09. 자료구조·알고리즘 문제 풀이 선택 지도</title>
+  <desc id="desc">문제를 읽고 먼저 확인할 질문을 기준으로 자료구조, 탐색, 정렬, DP 선택 기준을 네 갈래 카드로 정리한 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#172554" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <style>
+      .title { font: 700 36px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
+      .subtitle { font: 500 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #dbeafe; }
+      .label { font: 700 24px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .body { font: 500 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #475569; }
+      .pill { font: 700 15px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #1d4ed8; }
+      .centerHead { font: 700 28px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #ffffff; }
+      .centerBody { font: 500 19px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #dbeafe; }
+      .noteHead { font: 700 19px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
+      .noteBody { font: 500 17px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #dbeafe; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" />
+    </marker>
+  </defs>
+
+  <rect width="1360" height="980" fill="url(#bg)" />
+  <rect x="32" y="28" width="1296" height="924" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <rect x="60" y="52" width="1240" height="138" rx="24" fill="url(#hero)" />
+  <text class="small" x="94" y="94" fill="#bfdbfe">시험장에서 먼저 묻는 선택 질문</text>
+  <text class="title" x="94" y="136">09. 자료구조·알고리즘 문제 풀이 선택 지도</text>
+  <text class="subtitle" x="94" y="170">입력 구조와 목표를 먼저 분해하면, 자료구조와 알고리즘 후보를 더 빠르게 줄일 수 있다.</text>
+
+  <circle cx="680" cy="466" r="128" fill="#1d4ed8" />
+  <text class="centerHead" x="680" y="440" text-anchor="middle">먼저 확인할 것</text>
+  <text class="centerBody" x="680" y="476" text-anchor="middle">입력 구조 · 요구 연산 ·</text>
+  <text class="centerBody" x="680" y="508" text-anchor="middle">정렬 여부 · 반복 부분문제</text>
+
+  <line x1="680" y1="338" x2="680" y2="246" stroke="#3b82f6" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="552" y1="466" x2="330" y2="466" stroke="#3b82f6" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="808" y1="466" x2="1030" y2="466" stroke="#3b82f6" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="680" y1="594" x2="680" y2="724" stroke="#3b82f6" stroke-width="4" marker-end="url(#arrow)" />
+
+  <rect x="460" y="226" width="440" height="162" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+  <rect x="486" y="250" width="126" height="36" rx="18" fill="#dbeafe" />
+  <text class="pill" x="549" y="274" text-anchor="middle">정렬 여부</text>
+  <text class="label" x="486" y="320">정렬된 입력인가?</text>
+  <text class="body" x="486" y="356">예 → 이분 탐색 후보, 범위 탐색·경계 조건을 먼저 본다.</text>
+  <text class="body" x="486" y="384">아니오 → 먼저 정렬할지, 해시로 바로 찾을지 비교한다.</text>
+
+  <rect x="92" y="358" width="420" height="208" rx="24" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" />
+  <rect x="118" y="382" width="136" height="36" rx="18" fill="#e2e8f0" />
+  <text class="pill" x="186" y="406" text-anchor="middle" fill="#334155">연산 중심</text>
+  <text class="label" x="118" y="450">접근·삽입·삭제 중 무엇이 핵심인가?</text>
+  <text class="body" x="118" y="490">배열: 인덱스 접근이 많을 때 유리</text>
+  <text class="body" x="118" y="524">연결리스트: 중간 삽입·삭제 설명에 유리</text>
+  <text class="body" x="118" y="558">해시/BST: 조회 빈도와 정렬 필요 여부로 고른다</text>
+
+  <rect x="848" y="358" width="420" height="208" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+  <rect x="874" y="382" width="136" height="36" rx="18" fill="#dbeafe" />
+  <text class="pill" x="942" y="406" text-anchor="middle">탐색 중심</text>
+  <text class="label" x="874" y="450">그래프·트리 방문인가?</text>
+  <text class="body" x="874" y="490">BFS: 최단 간선 수, 레벨 탐색, 큐 사용</text>
+  <text class="body" x="874" y="524">DFS: 경로 탐색, 백트래킹, 재귀/스택 사용</text>
+  <text class="body" x="874" y="558">표현은 인접리스트·행렬 중 입력 크기로 결정</text>
+
+  <rect x="430" y="724" width="500" height="164" rx="24" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" />
+  <rect x="456" y="748" width="148" height="36" rx="18" fill="#e2e8f0" />
+  <text class="pill" x="530" y="772" text-anchor="middle" fill="#334155">패턴 중심</text>
+  <text class="label" x="456" y="810">중복 부분문제가 반복되는가?</text>
+  <text class="body" x="456" y="842">예 → DP 후보. 상태, 전이식, 기저 사례를 먼저 적는다.</text>
+  <text class="body" x="456" y="872">아니오 → 단순 재귀인지, 탐색 분기인지부터 구분한다.</text>
+
+  <rect x="60" y="894" width="1240" height="36" rx="16" fill="#0f172a" />
+  <text class="noteHead" x="88" y="918">답안 주의:</text>
+  <text class="noteBody" x="184" y="918">"왜 이 구조를 선택했는지"와 "복잡도 근거"를 함께 쓰고, 이분 탐색은 정렬 전제를 빠뜨리지 않는다.</text>
+</svg>

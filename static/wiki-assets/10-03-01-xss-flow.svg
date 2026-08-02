@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">10-03-01. XSS 공격·방어 흐름</title>
+  <desc id="desc">XSS의 입력, 취약 출력, 브라우저 실행, 피해, 방어 지점을 단계형으로 정리한 SVG다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e11d48"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .title { font-size: 32px; font-weight: 700; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .step { font-size: 19px; font-weight: 700; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 500; fill: #475569; }
+      .chip { font-size: 15px; font-weight: 700; }
+      .mono { font-size: 15px; font-weight: 700; fill: #9f1239; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#fffafc"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" fill="#ffffff" stroke="#fbcfe8" stroke-width="2"/>
+
+  <text x="64" y="84" class="title">XSS 공격 흐름과 방어 체크포인트</text>
+  <text x="64" y="118" class="subtitle">공격자는 입력 칸에 스크립트를 숨기고, 취약한 출력 지점이 그 값을 코드처럼 해석하게 만든다.</text>
+
+  <rect x="72" y="176" width="220" height="140" rx="22" fill="#fff1f2" stroke="#f43f5e" stroke-width="2"/>
+  <text x="96" y="214" class="step">1. 공격 입력</text>
+  <text x="96" y="246" class="body">댓글·검색어·프로필에</text>
+  <text x="96" y="272" class="body">스크립트 구문을 삽입</text>
+  <text x="96" y="300" class="mono">&lt;script&gt;...&lt;/script&gt;</text>
+
+  <rect x="354" y="176" width="220" height="140" rx="22" fill="#fff7ed" stroke="#fb7185" stroke-width="2"/>
+  <text x="378" y="214" class="step">2. 취약 출력</text>
+  <text x="378" y="246" class="body">서버 응답이나 JS 코드가</text>
+  <text x="378" y="272" class="body">입력값을 그대로 DOM에 삽입</text>
+  <text x="378" y="300" class="small">예: innerHTML, document.write()</text>
+
+  <rect x="636" y="176" width="220" height="140" rx="22" fill="#fdf2f8" stroke="#e11d48" stroke-width="2"/>
+  <text x="660" y="214" class="step">3. 브라우저 실행</text>
+  <text x="660" y="246" class="body">피해자 브라우저가</text>
+  <text x="660" y="272" class="body">값을 텍스트가 아닌</text>
+  <text x="660" y="298" class="body">실행 가능한 코드로 해석</text>
+
+  <rect x="918" y="176" width="220" height="140" rx="22" fill="#fff1f2" stroke="#be123c" stroke-width="2"/>
+  <text x="942" y="214" class="step">4. 피해</text>
+  <text x="942" y="246" class="body">세션 탈취, 피싱,</text>
+  <text x="942" y="272" class="body">사용자 대신 요청 전송,</text>
+  <text x="942" y="298" class="body">다른 사용자에게 재전파</text>
+
+  <line x1="292" y1="246" x2="354" y2="246" stroke="#e11d48" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="574" y1="246" x2="636" y2="246" stroke="#e11d48" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="856" y1="246" x2="918" y2="246" stroke="#e11d48" stroke-width="5" marker-end="url(#arrow)"/>
+
+  <rect x="72" y="366" width="520" height="154" rx="24" fill="#ffffff" stroke="#f43f5e" stroke-width="2"/>
+  <text x="100" y="406" class="step">자주 나오는 XSS 종류</text>
+  <text x="100" y="438" class="body">• Reflected: 링크 클릭 직후 요청값이 응답에 반사</text>
+  <text x="100" y="468" class="body">• Stored: 게시글·DB에 저장되어 여러 사용자에게 반복 실행</text>
+  <text x="100" y="498" class="body">• DOM XSS: location.hash 같은 값을 JS가 직접 삽입</text>
+
+  <rect x="608" y="366" width="530" height="154" rx="24" fill="#ffffff" stroke="#f43f5e" stroke-width="2"/>
+  <text x="636" y="406" class="step">방어 체크포인트</text>
+  <text x="636" y="438" class="body">• 출력 문맥별 인코딩: HTML·속성·JS·URL을 따로 처리</text>
+  <text x="636" y="468" class="body">• textContent, createElement, setAttribute 같은 안전한 API 사용</text>
+  <text x="636" y="498" class="body">• CSP, sanitizer, HttpOnly 쿠키로 피해 범위 축소</text>
+
+  <rect x="72" y="562" width="1066" height="122" rx="24" fill="#fdf2f8" stroke="#f9a8d4"/>
+  <text x="100" y="604" class="step">판별 한 줄</text>
+  <text x="100" y="636" class="body">문제 지문에 “다른 사용자의 브라우저에서 스크립트가 실행되었다”가 보이면 XSS를 먼저 의심한다.</text>
+</svg>

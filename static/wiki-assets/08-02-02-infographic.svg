@@ -1,156 +1,118 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">08-02-02. 혼잡제어와 흐름제어 인포그래픽</title>
-  <desc id="desc">흐름제어의 rwnd와 혼잡제어의 cwnd를 비교하고 실제 송신량이 min(rwnd, cwnd)로 결정되는 과정을 설명하는 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">08-02-02. 혼잡제어와 흐름제어 비교 인포그래픽</title>
+  <desc id="desc">흐름제어의 rwnd와 혼잡제어의 cwnd를 비교하고 실제 송신 윈도우가 min(rwnd, cwnd)로 정해지는 과정을 설명하는 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef4ff"/>
     </linearGradient>
-    <linearGradient id="flowPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#eff6ff"/>
-    </linearGradient>
-    <linearGradient id="congPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fee2e2"/>
-      <stop offset="100%" stop-color="#fff7ed"/>
-    </linearGradient>
-    <linearGradient id="formula" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
-    </linearGradient>
-    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
-    </marker>
-    <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ea580c"/>
-    </marker>
     <style>
-      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
-      .kicker { font-size: 15px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
-      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .panelTitle { font-size: 24px; font-weight: 800; fill: #0f172a; }
-      .panelBody { font-size: 15px; font-weight: 500; fill: #334155; }
-      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
-      .small { font-size: 13px; font-weight: 600; fill: #475569; }
-      .tiny { font-size: 12px; font-weight: 600; fill: #64748b; }
-      .metric { font-size: 28px; font-weight: 800; fill: #ffffff; }
-      .metricSub { font-size: 14px; font-weight: 600; fill: #dbeafe; }
-      .axis { stroke: #64748b; stroke-width: 2; }
-      .grid { stroke: #cbd5e1; stroke-width: 1; stroke-dasharray: 5 7; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 35px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .section { font-size: 24px; font-weight: 800; }
+      .body { font-size: 17px; font-weight: 500; fill: #334155; }
+      .label { font-size: 16px; font-weight: 700; }
+      .small { font-size: 14px; font-weight: 600; fill: #475569; }
+      .tiny { font-size: 13px; font-weight: 600; fill: #64748b; }
+      .formulaTitle { font-size: 20px; font-weight: 800; fill: #dbeafe; }
+      .formula { font-size: 34px; font-weight: 800; fill: #ffffff; }
+      .formulaNote { font-size: 16px; font-weight: 600; fill: #dbeafe; }
+      .metric { font-size: 26px; font-weight: 800; fill: #ffffff; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="24" y="24" width="1152" height="672" rx="32" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <rect x="24" y="24" width="1152" height="712" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="kicker" x="72" y="76">NETWORK CONTROL · END-TO-END VS NETWORK-WIDE</text>
+  <text class="eyebrow" x="72" y="76">TCP CONTROL OVERVIEW</text>
   <text class="title" x="72" y="118">혼잡제어와 흐름제어</text>
-  <text class="subtitle" x="72" y="152">흐름제어는 수신 버퍼를 보호하고, 혼잡제어는 네트워크 전체를 보호한다.</text>
-  <text class="subtitle" x="72" y="176">TCP 송신자는 광고 윈도우 rwnd와 혼잡 윈도우 cwnd 중 더 작은 값만큼만 전송한다.</text>
+  <text class="subtitle" x="72" y="152">흐름제어는 수신 버퍼를 보호하고, 혼잡제어는 네트워크 전체의 과부하를 줄인다.</text>
+  <text class="subtitle" x="72" y="180">송신자는 두 제한 중 더 작은 값만큼만 전송한다.</text>
 
-  <rect x="60" y="210" width="510" height="220" rx="26" fill="url(#flowPanel)" stroke="#93c5fd" stroke-width="2"/>
-  <rect x="630" y="210" width="510" height="220" rx="26" fill="url(#congPanel)" stroke="#fdba74" stroke-width="2"/>
+  <rect x="60" y="220" width="500" height="260" rx="28" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="640" y="220" width="500" height="260" rx="28" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
 
-  <text class="panelTitle" x="92" y="250">흐름제어 Flow Control</text>
-  <text class="panelBody" x="92" y="278">수신자가 처리 가능한 버퍼 한계(rwnd)를 광고해 송신 속도를 맞춘다.</text>
-  <text class="tiny" x="92" y="302">핵심: end-to-end · 수신자 보호 · 슬라이딩 윈도우</text>
+  <text class="section" x="92" y="262">흐름제어 Flow Control</text>
+  <text class="body" x="92" y="292">수신자가 감당 가능한 양(rwnd)을 광고해서</text>
+  <text class="body" x="92" y="316">송신 속도를 맞춘다.</text>
+  <text class="tiny" x="92" y="344">대상: 송신자 ↔ 수신자 · 목적: 수신 버퍼 보호 · 기준: rwnd</text>
 
-  <rect x="96" y="326" width="118" height="64" rx="16" fill="#2563eb" opacity="0.12" stroke="#2563eb" stroke-width="2"/>
-  <text class="label" x="155" y="364" text-anchor="middle">송신자</text>
-  <text class="small" x="155" y="384" text-anchor="middle">보낼 데이터 보유</text>
+  <rect x="92" y="372" width="120" height="64" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="152" y="408" text-anchor="middle">송신자</text>
+  <text class="small" x="152" y="428" text-anchor="middle">보낼 데이터</text>
 
-  <rect x="420" y="322" width="114" height="72" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
-  <text class="label" x="477" y="349" text-anchor="middle">수신자</text>
-  <text class="small" x="477" y="369" text-anchor="middle">버퍼 여유 광고</text>
-  <rect x="448" y="380" width="58" height="8" rx="4" fill="#cbd5e1"/>
-  <rect x="448" y="380" width="34" height="8" rx="4" fill="#22c55e"/>
-  <text class="tiny" x="477" y="405" text-anchor="middle">남은 버퍼 ≈ rwnd</text>
+  <rect x="408" y="364" width="120" height="80" rx="16" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <text class="label" x="468" y="396" text-anchor="middle">수신자</text>
+  <text class="small" x="468" y="416" text-anchor="middle">버퍼 여유 광고</text>
+  <rect x="432" y="425" width="72" height="10" rx="5" fill="#cbd5e1"/>
+  <rect x="432" y="425" width="42" height="10" rx="5" fill="#22c55e"/>
 
-  <line x1="214" y1="356" x2="420" y2="356" stroke="#2563eb" stroke-width="6" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
-  <rect x="260" y="342" width="18" height="18" rx="4" fill="#60a5fa">
-    <animate attributeName="x" values="260;332;260" dur="4s" repeatCount="indefinite"/>
-  </rect>
-  <text class="small" x="316" y="336" text-anchor="middle">데이터 전송</text>
+  <line x1="212" y1="404" x2="408" y2="404" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="408,404 392,396 392,412" fill="#2563eb"/>
+  <text class="small" x="310" y="388" text-anchor="middle">데이터 전송</text>
 
-  <line x1="420" y1="386" x2="214" y2="386" stroke="#0f766e" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8" marker-end="url(#arrowBlue)"/>
-  <text class="small" x="317" y="408" text-anchor="middle">ACK + rwnd 광고</text>
+  <line x1="408" y1="438" x2="212" y2="438" stroke="#0f766e" stroke-width="4" stroke-linecap="round" stroke-dasharray="9 8"/>
+  <polygon points="212,438 228,430 228,446" fill="#0f766e"/>
+  <text class="small" x="310" y="462" text-anchor="middle">ACK + rwnd 광고</text>
 
-  <rect x="228" y="322" width="160" height="98" rx="18" fill="#ffffff" opacity="0.82" stroke="#bfdbfe" stroke-width="1.5"/>
-  <text class="label" x="308" y="350" text-anchor="middle">흐름제어 규칙</text>
-  <text class="panelBody" x="246" y="373">• rwnd를 넘기면 안 됨</text>
-  <text class="panelBody" x="246" y="394">• 상대 버퍼가 작은 경우</text>
-  <text class="panelBody" x="260" y="413">네트워크가 여유여도 대기</text>
+  <rect x="232" y="364" width="144" height="92" rx="18" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text class="label" x="304" y="392" text-anchor="middle">핵심 규칙</text>
+  <text class="body" x="248" y="418">• rwnd 초과 전송 금지</text>
+  <text class="body" x="248" y="442">• 수신 버퍼가 작으면</text>
+  <text class="body" x="262" y="464">네트워크가 비어도 대기</text>
 
-  <text class="panelTitle" x="662" y="250">혼잡제어 Congestion Control</text>
-  <text class="panelBody" x="662" y="278">송신자가 네트워크 혼잡을 추정해 cwnd를 늘리거나 줄인다.</text>
-  <text class="tiny" x="662" y="302">핵심: 네트워크 보호 · AIMD · Slow Start / CA / Fast Recovery</text>
+  <text class="section" x="672" y="262">혼잡제어 Congestion Control</text>
+  <text class="body" x="672" y="292">송신자가 네트워크 상태를 추정해</text>
+  <text class="body" x="672" y="316">cwnd를 늘리거나 줄인다.</text>
+  <text class="tiny" x="672" y="344">대상: 네트워크 전체 · 목적: 큐 폭주 완화 · 기준: cwnd, ssthresh</text>
 
-  <rect x="666" y="326" width="116" height="64" rx="16" fill="#ea580c" opacity="0.12" stroke="#ea580c" stroke-width="2"/>
-  <text class="label" x="724" y="364" text-anchor="middle">송신자</text>
-  <text class="small" x="724" y="384" text-anchor="middle">cwnd 자체 유지</text>
+  <rect x="672" y="372" width="120" height="64" rx="16" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+  <text class="label" x="732" y="408" text-anchor="middle">송신자</text>
+  <text class="small" x="732" y="428" text-anchor="middle">cwnd 유지</text>
 
-  <line x1="782" y1="356" x2="856" y2="356" stroke="#ea580c" stroke-width="6" stroke-linecap="round" marker-end="url(#arrowOrange)"/>
-  <line x1="924" y1="356" x2="1000" y2="356" stroke="#ea580c" stroke-width="6" stroke-linecap="round" marker-end="url(#arrowOrange)"/>
+  <rect x="860" y="366" width="84" height="78" rx="16" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+  <text class="label" x="902" y="396" text-anchor="middle">라우터</text>
+  <rect x="878" y="408" width="10" height="20" rx="3" fill="#fdba74"/>
+  <rect x="892" y="400" width="10" height="28" rx="3" fill="#fb923c"/>
+  <rect x="906" y="390" width="10" height="38" rx="3" fill="#f97316"/>
 
-  <rect x="856" y="324" width="68" height="74" rx="16" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
-  <text class="label" x="890" y="350" text-anchor="middle">라우터</text>
-  <rect x="870" y="360" width="12" height="24" rx="3" fill="#fdba74"/>
-  <rect x="886" y="350" width="12" height="34" rx="3" fill="#fb923c"/>
-  <rect x="902" y="340" width="12" height="44" rx="3" fill="#f97316"/>
-  <text class="tiny" x="890" y="410" text-anchor="middle">큐 증가</text>
+  <rect x="1020" y="372" width="90" height="64" rx="16" fill="#ffffff" stroke="#ea580c" stroke-width="2"/>
+  <text class="label" x="1065" y="408" text-anchor="middle">수신자</text>
+  <text class="small" x="1065" y="428" text-anchor="middle">ACK 반환</text>
 
-  <rect x="1000" y="326" width="112" height="64" rx="16" fill="#ffffff" stroke="#ea580c" stroke-width="2"/>
-  <text class="label" x="1056" y="364" text-anchor="middle">수신자</text>
-  <text class="small" x="1056" y="384" text-anchor="middle">ACK 반환</text>
+  <line x1="792" y1="404" x2="860" y2="404" stroke="#ea580c" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="860,404 844,396 844,412" fill="#ea580c"/>
+  <line x1="944" y1="404" x2="1020" y2="404" stroke="#ea580c" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="1020,404 1004,396 1004,412" fill="#ea580c"/>
 
-  <rect x="776" y="320" width="66" height="72" rx="16" fill="#7c2d12"/>
-  <text class="metric" x="809" y="352" text-anchor="middle">cwnd</text>
-  <text class="metricSub" x="809" y="374" text-anchor="middle">네트워크 상태 기반</text>
+  <rect x="804" y="360" width="44" height="72" rx="14" fill="#7c2d12"/>
+  <text class="metric" x="826" y="400" text-anchor="middle">cwnd</text>
 
-  <rect x="774" y="400" width="314" height="18" rx="9" fill="#fed7aa"/>
-  <rect x="774" y="400" width="188" height="18" rx="9" fill="#f97316"/>
-  <text class="tiny" x="774" y="394">혼잡 없으면 증가</text>
-  <text class="tiny" x="972" y="394">손실·ECN·RTT 증가 시 감소</text>
+  <circle cx="966" cy="366" r="14" fill="#dc2626"/>
+  <text x="966" y="371" text-anchor="middle" style="font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:16px;font-weight:800;fill:#ffffff;">!</text>
+  <text class="small" x="966" y="454" text-anchor="middle">손실, ECN, RTT 증가 = 혼잡 신호</text>
 
-  <circle cx="948" cy="334" r="13" fill="#dc2626"/>
-  <text class="small" x="948" y="339" text-anchor="middle" fill="#ffffff">!</text>
-  <text class="small" x="948" y="418" text-anchor="middle">혼잡 신호</text>
+  <rect x="804" y="446" width="276" height="12" rx="6" fill="#fed7aa"/>
+  <rect x="804" y="446" width="164" height="12" rx="6" fill="#f97316"/>
+  <text class="small" x="804" y="438">혼잡이 없으면 증가</text>
+  <text class="small" x="978" y="438">혼잡 신호가 오면 감소</text>
 
-  <rect x="272" y="448" width="656" height="82" rx="22" fill="url(#formula)"/>
-  <text class="label" x="600" y="480" text-anchor="middle" fill="#dbeafe">실제 송신 허용량</text>
-  <text x="600" y="517" text-anchor="middle" style="font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:34px;font-weight:800;fill:#ffffff;">send window = min(rwnd, cwnd)</text>
-  <text class="small" x="600" y="544" text-anchor="middle" fill="#dbeafe">수신 버퍼가 작아도 제한되고, 네트워크가 막혀도 제한된다.</text>
+  <rect x="60" y="510" width="1080" height="102" rx="28" fill="#0f172a"/>
+  <text class="formulaTitle" x="600" y="548" text-anchor="middle">실제 송신 허용량</text>
+  <text class="formula" x="600" y="590" text-anchor="middle">send window = min(rwnd, cwnd)</text>
+  <text class="formulaNote" x="600" y="620" text-anchor="middle">수신 버퍼가 더 작으면 rwnd가, 네트워크가 막히면 cwnd가 병목이 된다.</text>
 
-  <rect x="60" y="552" width="540" height="132" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="panelTitle" x="92" y="588">TCP 혼잡 윈도우 변화</text>
+  <rect x="60" y="636" width="340" height="76" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="label" x="88" y="668">면접 한 줄 요약</text>
+  <text class="body" x="88" y="694">흐름제어 = 수신자 보호, 혼잡제어 = 네트워크 보호</text>
 
-  <line class="axis" x1="108" y1="650" x2="560" y2="650"/>
-  <line class="axis" x1="108" y1="650" x2="108" y2="602"/>
-  <line class="grid" x1="240" y1="602" x2="240" y2="650"/>
-  <line class="grid" x1="368" y1="602" x2="368" y2="650"/>
-  <line class="grid" x1="472" y1="602" x2="472" y2="650"/>
-  <polyline fill="none" stroke="#2563eb" stroke-width="5" points="108,646 152,638 196,622 240,590 284,590 328,584 368,578 404,616 440,612 472,646 528,646"/>
-  <line x1="238" y1="580" x2="238" y2="650" stroke="#0f766e" stroke-width="2" stroke-dasharray="6 6"/>
-  <text class="tiny" x="238" y="574" text-anchor="middle">ssthresh</text>
-  <text class="tiny" x="174" y="666" text-anchor="middle">Slow Start</text>
-  <text class="tiny" x="328" y="666" text-anchor="middle">Congestion Avoidance</text>
-  <text class="tiny" x="404" y="666" text-anchor="middle">dup ACK → 절반</text>
-  <text class="tiny" x="500" y="666" text-anchor="middle">timeout → 1 MSS</text>
-  <text class="tiny" x="92" y="608">cwnd</text>
-  <text class="tiny" x="540" y="666">RTT</text>
+  <rect x="430" y="636" width="330" height="76" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="label" x="458" y="668">시험 포인트</text>
+  <text class="body" x="458" y="694">rwnd와 cwnd를 분리해서 설명하고 min 관계를 말한다.</text>
 
-  <rect x="624" y="552" width="516" height="132" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="panelTitle" x="656" y="588">면접용 압축 정리</text>
-  <text class="panelBody" x="656" y="614">• 흐름제어 = 수신자 보호, rwnd 광고, end-to-end</text>
-  <text class="panelBody" x="656" y="636">• 혼잡제어 = 네트워크 보호, cwnd 조절, 손실/ECN/RTT 증가 반영</text>
-  <text class="panelBody" x="656" y="658">• 처리량 근사: throughput ≈ cwnd / RTT</text>
-
-  <rect x="924" y="566" width="188" height="88" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
-  <text class="label" x="1018" y="592" text-anchor="middle">예시 계산</text>
-  <text class="small" x="1018" y="615" text-anchor="middle">cwnd=20KB, RTT=50ms</text>
-  <text class="small" x="1018" y="637" text-anchor="middle">≈ 20KB / 0.05s</text>
-  <text class="label" x="1018" y="660" text-anchor="middle">≈ 400KB/s ≈ 3.2Mbps</text>
-
-  <text class="tiny" x="72" y="702">08-02-02-infographic.svg</text>
+  <rect x="790" y="636" width="350" height="76" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="label" x="818" y="668">계산 포인트</text>
+  <text class="body" x="818" y="694">처리량 근사 ≈ cwnd / RTT (단위 변환에 주의)</text>
 </svg>

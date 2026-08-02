@@ -1,126 +1,95 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">08-02. TCP와 UDP 인포그래픽</title>
-  <desc id="desc">왼쪽은 TCP의 연결 설정, ACK, 재전송, 연결 종료와 TIME_WAIT를 보여주고 오른쪽은 UDP의 빠른 데이터그램 전송과 애플리케이션 보완 책임을 비교한다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1320" viewBox="0 0 1200 1320" role="img" aria-labelledby="title desc">
+  <title id="title">08-02. TCP 신뢰성 흐름</title>
+  <desc id="desc">TCP의 연결 설정, 데이터 전송과 ACK, 손실 시 재전송, 연결 종료와 TIME_WAIT 이유를 단계별로 설명하는 SVG이다.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff" />
-      <stop offset="100%" stop-color="#f8fafc" />
-    </linearGradient>
-    <linearGradient id="tcpPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe" />
-      <stop offset="100%" stop-color="#eff6ff" />
-    </linearGradient>
-    <linearGradient id="udpPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dcfce7" />
-      <stop offset="100%" stop-color="#f0fdf4" />
-    </linearGradient>
     <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1d4ed8" />
     </marker>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a" />
+    <marker id="arrowSlate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569" />
     </marker>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .panelTitle { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .panelBody { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .compareHead { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .compareText { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
       .tcp { fill: #1d4ed8; }
-      .udp { fill: #15803d; }
-      .muted { fill: #64748b; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" />
+  <rect width="1200" height="1320" fill="#f8fafc"/>
+  <rect x="32" y="32" width="1136" height="1256" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text x="70" y="82" class="small">Transport layer 핵심 비교 · 연결성 · 신뢰성 · 속도</text>
-  <text x="70" y="122" class="title">08-02. TCP와 UDP</text>
-  <text x="70" y="152" class="subtitle">TCP는 연결 설정과 ACK·재전송으로 신뢰성과 순서를 보장하고, UDP는 작은 헤더로 빠르게 보내되 보완 책임이 애플리케이션에 있다.</text>
+  <text x="72" y="92" class="small">Transport layer reliability flow · handshake · ACK · retransmission · TIME_WAIT</text>
+  <text x="72" y="132" class="title">TCP는 왜 신뢰적인가?</text>
+  <text x="72" y="168" class="subtitle">연결을 먼저 만들고, 순서 번호와 ACK로 도착 여부를 확인하며, 손실 시 재전송하고, 종료 뒤에는 TIME_WAIT으로 늦게 온 패킷까지 격리한다.</text>
 
-  <rect x="58" y="186" width="520" height="340" rx="26" fill="url(#tcpPanel)" stroke="#93c5fd" />
-  <rect x="622" y="186" width="520" height="340" rx="26" fill="url(#udpPanel)" stroke="#86efac" />
+  <rect x="72" y="214" width="1048" height="286" rx="26" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="102" y="254" class="section tcp">1. 연결 설정: 3-way handshake</text>
+  <text x="102" y="282" class="small">연결형 프로토콜이라서 전송 전에 양쪽 준비 상태를 먼저 맞춘다.</text>
+  <rect x="118" y="314" width="172" height="54" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="902" y="314" width="172" height="54" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="204" y="347" text-anchor="middle" class="label">Client</text>
+  <text x="988" y="347" text-anchor="middle" class="label">Server</text>
+  <line x1="204" y1="372" x2="204" y2="470" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 6"/>
+  <line x1="988" y1="372" x2="988" y2="470" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 6"/>
 
-  <text x="88" y="226" class="panelTitle tcp">TCP</text>
-  <text x="88" y="249" class="panelBody">연결형 · 순서 보장 · ACK/재전송 · 흐름/혼잡 제어</text>
-  <text x="652" y="226" class="panelTitle udp">UDP</text>
-  <text x="652" y="249" class="panelBody">비연결형 · 8B 헤더 · 지연 작음 · 실시간 서비스에 유리</text>
+  <rect x="316" y="382" width="560" height="32" rx="16" fill="#dbeafe"/>
+  <text x="596" y="403" text-anchor="middle" class="tiny">1) SYN: 클라이언트가 연결을 요청</text>
+  <line x1="226" y1="430" x2="966" y2="430" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
 
-  <rect x="94" y="272" width="138" height="46" rx="16" fill="#ffffff" stroke="#60a5fa" />
-  <rect x="402" y="272" width="138" height="46" rx="16" fill="#ffffff" stroke="#60a5fa" />
-  <text x="163" y="301" text-anchor="middle" class="label">Client</text>
-  <text x="471" y="301" text-anchor="middle" class="label">Server</text>
+  <rect x="316" y="430" width="560" height="32" rx="16" fill="#dbeafe"/>
+  <text x="596" y="451" text-anchor="middle" class="tiny">2) SYN + ACK: 서버가 수락하고 응답을 확인</text>
+  <line x1="966" y1="478" x2="226" y2="478" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
 
-  <line x1="163" y1="325" x2="163" y2="490" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5" />
-  <line x1="471" y1="325" x2="471" y2="490" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5" />
+  <rect x="316" y="478" width="560" height="32" rx="16" fill="#dbeafe"/>
+  <text x="596" y="499" text-anchor="middle" class="tiny">3) ACK: 양쪽 모두 전송 준비 완료</text>
+  <line x1="226" y1="526" x2="966" y2="526" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
 
-  <line x1="178" y1="346" x2="456" y2="346" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)" />
-  <text x="317" y="338" text-anchor="middle" class="small">1. SYN</text>
-  <line x1="456" y1="376" x2="178" y2="376" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)" />
-  <text x="317" y="368" text-anchor="middle" class="small">2. SYN + ACK</text>
-  <line x1="178" y1="406" x2="456" y2="406" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)" />
-  <text x="317" y="398" text-anchor="middle" class="small">3. ACK → 연결 성립</text>
+  <rect x="72" y="530" width="1048" height="500" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="102" y="570" class="section tcp">2. 데이터 전송: 순서 번호 + ACK + 재전송</text>
+  <text x="102" y="598" class="small">시퀀스 번호로 순서를 관리하고, ACK가 없으면 RTO 뒤에 손실 구간을 다시 보낸다.</text>
+  <rect x="118" y="630" width="172" height="54" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="902" y="630" width="172" height="54" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="204" y="663" text-anchor="middle" class="label">송신자</text>
+  <text x="988" y="663" text-anchor="middle" class="label">수신자</text>
 
-  <rect x="109" y="428" width="416" height="48" rx="16" fill="#ffffff" stroke="#bfdbfe" />
-  <text x="128" y="447" class="label">데이터 전송</text>
-  <text x="128" y="467" class="panelBody">seq=1200 세그먼트 전송 → ACK=1400 응답 → 손실 시 RTO 후 재전송</text>
-  <line x1="186" y1="452" x2="448" y2="452" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)">
-    <animate attributeName="stroke-dasharray" values="0 280;140 140;280 0" dur="5s" repeatCount="indefinite" />
-  </line>
-  <line x1="448" y1="464" x2="186" y2="464" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arrowBlue)" stroke-dasharray="8 8" />
+  <rect x="336" y="700" width="520" height="32" rx="16" fill="#dbeafe"/>
+  <text x="596" y="721" text-anchor="middle" class="tiny">손실 예시: 첫 전송 중 일부 세그먼트가 중간에서 사라질 수 있음</text>
+  <line x1="226" y1="748" x2="966" y2="748" stroke="#93c5fd" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#arrowBlue)"/>
+  <circle cx="640" cy="748" r="18" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+  <text x="640" y="754" text-anchor="middle" class="tiny" fill="#991b1b">손실</text>
 
-  <rect x="94" y="490" width="214" height="22" rx="11" fill="#dbeafe" />
-  <text x="201" y="505" text-anchor="middle" class="small">4-way 종료 후 종료 측이 TIME_WAIT 유지</text>
-  <circle cx="452" cy="501" r="26" fill="#ffffff" stroke="#60a5fa" stroke-width="2.5" />
-  <text x="452" y="497" text-anchor="middle" class="label">TIME</text>
-  <text x="452" y="512" text-anchor="middle" class="label">WAIT</text>
-  <text x="88" y="548" class="panelBody">지연 패킷 혼입 방지 + 마지막 ACK 손실 시 재전송 대응</text>
+  <rect x="336" y="786" width="520" height="32" rx="16" fill="#e0f2fe"/>
+  <text x="596" y="807" text-anchor="middle" class="tiny">정상 전송: seq=1200~1399 데이터 전송</text>
+  <line x1="226" y1="854" x2="966" y2="854" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
 
-  <rect x="658" y="272" width="138" height="46" rx="16" fill="#ffffff" stroke="#4ade80" />
-  <rect x="966" y="272" width="138" height="46" rx="16" fill="#ffffff" stroke="#4ade80" />
-  <text x="727" y="301" text-anchor="middle" class="label">Sender</text>
-  <text x="1035" y="301" text-anchor="middle" class="label">Receiver</text>
+  <rect x="336" y="872" width="520" height="32" rx="16" fill="#f1f5f9"/>
+  <text x="596" y="893" text-anchor="middle" class="tiny">ACK=1400: 다음 바이트를 기대</text>
+  <line x1="966" y1="940" x2="226" y2="940" stroke="#475569" stroke-width="4" marker-end="url(#arrowSlate)"/>
 
-  <line x1="742" y1="348" x2="1018" y2="330" stroke="#16a34a" stroke-width="4" marker-end="url(#arrowGreen)" />
-  <line x1="742" y1="384" x2="1018" y2="384" stroke="#16a34a" stroke-width="4" marker-end="url(#arrowGreen)" />
-  <line x1="742" y1="420" x2="1018" y2="440" stroke="#16a34a" stroke-width="4" marker-end="url(#arrowGreen)" />
-  <text x="853" y="337" class="small">datagram A</text>
-  <text x="851" y="377" class="small">datagram B</text>
-  <text x="853" y="454" class="small">datagram C</text>
+  <rect x="336" y="958" width="520" height="32" rx="16" fill="#dbeafe"/>
+  <text x="596" y="979" text-anchor="middle" class="tiny">RTO 경과 후 손실 구간 재전송 → 결국 ACK로 복구</text>
+  <line x1="226" y1="1026" x2="966" y2="1026" stroke="#1d4ed8" stroke-width="4" stroke-dasharray="12 8" marker-end="url(#arrowBlue)"/>
 
-  <circle cx="873" cy="421" r="15" fill="#fef2f2" stroke="#ef4444" stroke-width="2" />
-  <text x="873" y="426" text-anchor="middle" class="label" fill="#b91c1c">손실</text>
-  <circle cx="948" cy="344" r="15" fill="#fefce8" stroke="#eab308" stroke-width="2" />
-  <text x="948" y="349" text-anchor="middle" class="label" fill="#854d0e">역순</text>
-
-  <rect x="664" y="458" width="436" height="58" rx="18" fill="#ffffff" stroke="#bbf7d0" />
-  <text x="686" y="482" class="label">UDP가 하지 않는 일</text>
-  <text x="686" y="503" class="panelBody">연결 설정 없음 · ACK/재전송 없음 · 순서 보장 없음</text>
-  <text x="686" y="523" class="panelBody">필요하면 앱이 ARQ/FEC·시퀀싱·오류 처리 구현</text>
-
-  <rect x="58" y="548" width="1084" height="112" rx="24" fill="#f8fafc" stroke="#cbd5e1" />
-  <text x="88" y="582" class="compareHead">시험용 비교표</text>
-
-  <line x1="248" y1="592" x2="248" y2="644" stroke="#cbd5e1" />
-  <line x1="592" y1="592" x2="592" y2="644" stroke="#cbd5e1" />
-  <line x1="870" y1="592" x2="870" y2="644" stroke="#cbd5e1" />
-
-  <text x="88" y="614" class="compareHead">항목</text>
-  <text x="284" y="614" class="compareHead tcp">TCP</text>
-  <text x="628" y="614" class="compareHead udp">UDP</text>
-  <text x="906" y="614" class="compareHead">대표 사례</text>
-
-  <text x="88" y="638" class="compareText">핵심 특징</text>
-  <text x="284" y="638" class="compareText">신뢰성, 순서 보장, 연결 지향</text>
-  <text x="628" y="638" class="compareText">빠름, 단순 헤더, 비연결형</text>
-  <text x="906" y="638" class="compareText">웹·파일전송 vs DNS·스트리밍·게임</text>
-
-  <text x="88" y="658" class="compareText">헤더 / 제어</text>
-  <text x="284" y="658" class="compareText">최소 20B + 흐름/혼잡 제어</text>
-  <text x="628" y="658" class="compareText">8B + 제어 단순, 앱이 보완</text>
-  <text x="906" y="658" class="compareText">TIME_WAIT는 TCP 종료 후 핵심 포인트</text>
+  <rect x="72" y="1056" width="1048" height="190" rx="26" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="102" y="1096" class="section tcp">3. 연결 종료 후 TIME_WAIT</text>
+  <text x="102" y="1124" class="small">연결을 닫은 뒤에도 잠시 소켓을 유지해 지연 패킷과 마지막 ACK 문제를 처리한다.</text>
+  <line x1="180" y1="1164" x2="430" y2="1164" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <line x1="430" y1="1194" x2="180" y2="1194" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <text x="305" y="1154" text-anchor="middle" class="tiny">FIN</text>
+  <text x="305" y="1218" text-anchor="middle" class="tiny">ACK</text>
+  <line x1="500" y1="1164" x2="750" y2="1164" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <line x1="750" y1="1194" x2="500" y2="1194" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <text x="625" y="1154" text-anchor="middle" class="tiny">FIN</text>
+  <text x="625" y="1218" text-anchor="middle" class="tiny">마지막 ACK</text>
+  <circle cx="900" cy="1180" r="46" fill="#ffffff" stroke="#60a5fa" stroke-width="3"/>
+  <text x="900" y="1172" text-anchor="middle" class="label tcp">TIME</text>
+  <text x="900" y="1196" text-anchor="middle" class="label tcp">WAIT</text>
+  <rect x="958" y="1138" width="136" height="84" rx="18" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="974" y="1164" class="tiny">핵심 이유</text>
+  <text x="974" y="1188" class="tiny">• 지연 패킷 혼입 방지</text>
+  <text x="974" y="1212" class="tiny">• 마지막 ACK 재전송 대비</text>
 </svg>

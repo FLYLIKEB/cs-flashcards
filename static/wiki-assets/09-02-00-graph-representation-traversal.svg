@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">09-02. 그래프 표현과 탐색</title>
+  <desc id="desc">인접 행렬과 인접 리스트의 차이, DFS와 BFS의 방문 순서를 한 장에 정리한 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 600 14px 'SFMono-Regular',Consolas,monospace; fill: #1e293b; }
+      .white { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text x="72" y="84" class="small">그래프 구현 + 탐색 핵심</text>
+  <text x="72" y="126" class="title">인접 행렬·인접 리스트와 DFS·BFS</text>
+  <text x="72" y="156" class="subtitle">표현은 저장 방식의 차이이고, 탐색은 같은 그래프를 어떤 순서로 방문하는지의 차이다.</text>
+
+  <rect x="60" y="190" width="500" height="234" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="640" y="190" width="500" height="234" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="60" y="454" width="1080" height="242" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+
+  <text x="88" y="228" class="section">표현 1: 인접 행렬</text>
+  <text x="88" y="255" class="body">정점 쌍마다 간선 유무를 표의 칸으로 저장한다. 특정 간선 확인은 빠르지만 공간이 많이 든다.</text>
+
+  <g transform="translate(92 286)">
+    <text x="0" y="-10" class="small">예시 간선: A-B, A-C, B-D, C-D</text>
+    <text x="46" y="24" class="mono">A</text>
+    <text x="94" y="24" class="mono">B</text>
+    <text x="142" y="24" class="mono">C</text>
+    <text x="190" y="24" class="mono">D</text>
+    <text x="0" y="60" class="mono">A</text>
+    <text x="0" y="108" class="mono">B</text>
+    <text x="0" y="156" class="mono">C</text>
+    <text x="0" y="204" class="mono">D</text>
+    <rect x="28" y="34" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="76" y="34" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="124" y="34" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="172" y="34" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="28" y="82" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="76" y="82" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="124" y="82" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="172" y="82" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="28" y="130" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="76" y="130" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="124" y="130" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="172" y="130" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="28" y="178" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="76" y="178" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="124" y="178" width="48" height="48" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="172" y="178" width="48" height="48" fill="#ffffff" stroke="#94a3b8"/>
+    <text x="46" y="64" class="mono">0</text>
+    <text x="94" y="64" class="mono">1</text>
+    <text x="142" y="64" class="mono">1</text>
+    <text x="190" y="64" class="mono">0</text>
+    <text x="46" y="112" class="mono">1</text>
+    <text x="94" y="112" class="mono">0</text>
+    <text x="142" y="112" class="mono">0</text>
+    <text x="190" y="112" class="mono">1</text>
+    <text x="46" y="160" class="mono">1</text>
+    <text x="94" y="160" class="mono">0</text>
+    <text x="142" y="160" class="mono">0</text>
+    <text x="190" y="160" class="mono">1</text>
+    <text x="46" y="208" class="mono">0</text>
+    <text x="94" y="208" class="mono">1</text>
+    <text x="142" y="208" class="mono">1</text>
+    <text x="190" y="208" class="mono">0</text>
+  </g>
+
+  <text x="364" y="322" class="label">장점</text>
+  <text x="364" y="348" class="body">• A와 D가 연결됐는지 즉시 확인</text>
+  <text x="364" y="374" class="body">• 구현이 단순함</text>
+  <text x="364" y="406" class="label">주의</text>
+  <text x="364" y="432" class="body">• 정점이 많으면 O(n²) 공간 필요</text>
+
+  <text x="668" y="228" class="section">표현 2: 인접 리스트</text>
+  <text x="668" y="255" class="body">각 정점 옆에 연결된 이웃 목록을 적는다. 희소 그래프에서는 메모리를 아끼기 쉽다.</text>
+
+  <g transform="translate(684 294)">
+    <rect x="0" y="0" width="84" height="32" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="112" y="0" width="64" height="32" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+    <rect x="192" y="0" width="64" height="32" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+    <text x="18" y="21" class="mono">A</text>
+    <text x="130" y="21" class="mono">B</text>
+    <text x="210" y="21" class="mono">C</text>
+    <line x1="84" y1="16" x2="112" y2="16" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+    <line x1="176" y1="16" x2="192" y2="16" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+
+    <rect x="0" y="54" width="84" height="32" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="112" y="54" width="64" height="32" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+    <text x="18" y="75" class="mono">B</text>
+    <text x="130" y="75" class="mono">D</text>
+    <line x1="84" y1="70" x2="112" y2="70" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+
+    <rect x="0" y="108" width="84" height="32" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+    <rect x="112" y="108" width="64" height="32" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+    <text x="18" y="129" class="mono">C</text>
+    <text x="130" y="129" class="mono">D</text>
+    <line x1="84" y1="124" x2="112" y2="124" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+
+    <rect x="0" y="162" width="84" height="32" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+    <text x="18" y="183" class="mono">D</text>
+  </g>
+
+  <text x="980" y="322" class="label">장점</text>
+  <text x="980" y="348" class="body">• 공간 O(n+m)</text>
+  <text x="980" y="374" class="body">• 실제 연결만 저장</text>
+  <text x="980" y="406" class="label">주의</text>
+  <text x="980" y="432" class="body">• 특정 간선 확인은 이웃 탐색 필요</text>
+
+  <text x="88" y="492" class="section">같은 그래프를 탐색하면 방문 순서가 달라진다</text>
+  <text x="88" y="520" class="body">아래 그래프를 A에서 시작한다고 가정하자. DFS는 깊게 내려가고, BFS는 가까운 정점부터 넓게 방문한다.</text>
+
+  <line x1="220" y1="612" x2="340" y2="548" stroke="#2563eb" stroke-width="4"/>
+  <line x1="340" y1="548" x2="460" y2="612" stroke="#2563eb" stroke-width="4"/>
+  <line x1="220" y1="612" x2="340" y2="676" stroke="#2563eb" stroke-width="4"/>
+  <line x1="340" y1="676" x2="460" y2="612" stroke="#2563eb" stroke-width="4"/>
+  <line x1="340" y1="548" x2="560" y2="548" stroke="#2563eb" stroke-width="4"/>
+  <line x1="460" y1="612" x2="560" y2="676" stroke="#2563eb" stroke-width="4"/>
+
+  <circle cx="220" cy="612" r="24" fill="#1d4ed8"/>
+  <circle cx="340" cy="548" r="24" fill="#2563eb"/>
+  <circle cx="460" cy="612" r="24" fill="#2563eb"/>
+  <circle cx="340" cy="676" r="24" fill="#2563eb"/>
+  <circle cx="560" cy="548" r="24" fill="#2563eb"/>
+  <circle cx="560" cy="676" r="24" fill="#2563eb"/>
+  <text x="220" y="617" text-anchor="middle" class="label white">A</text>
+  <text x="340" y="553" text-anchor="middle" class="label white">B</text>
+  <text x="460" y="617" text-anchor="middle" class="label white">C</text>
+  <text x="340" y="681" text-anchor="middle" class="label white">D</text>
+  <text x="560" y="553" text-anchor="middle" class="label white">E</text>
+  <text x="560" y="681" text-anchor="middle" class="label white">F</text>
+
+  <rect x="670" y="548" width="204" height="124" rx="18" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="692" y="580" class="label">DFS 순서 예시</text>
+  <text x="692" y="608" class="body">A → B → E → C → F → D</text>
+  <text x="692" y="636" class="body">핵심: 한 갈래를 끝까지 내려감</text>
+  <text x="692" y="660" class="small">구현: 재귀 또는 스택</text>
+
+  <rect x="898" y="548" width="214" height="124" rx="18" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="920" y="580" class="label">BFS 순서 예시</text>
+  <text x="920" y="608" class="body">A → B → D → C → E → F</text>
+  <text x="920" y="636" class="body">핵심: 거리(레벨) 순서로 확장</text>
+  <text x="920" y="660" class="small">구현: 큐</text>
+
+  <text x="88" y="720" class="small">시험 답안 팁: 표현은 저장 비용을, 탐색은 방문 순서와 사용 자료구조(스택/큐)를 함께 설명하면 된다.</text>
+</svg>

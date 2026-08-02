@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">17장 금융권 클라우드·분산 시스템 통제 레이어</title>
+  <desc id="desc">클라우드와 분산 시스템 운영에서 금융권이 반드시 챙겨야 하는 통제 레이어를 계정·데이터·관측·복구 축으로 정리한 요약 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff" />
+      <stop offset="100%" stop-color="#eff6ff" />
+    </linearGradient>
+    <style>
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .center { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#bg)" />
+  <rect x="42" y="34" width="1116" height="692" rx="28" fill="#ffffff" stroke="#cbd5e1" />
+
+  <text class="small" x="78" y="78">금융권 운영 통제 요약</text>
+  <text class="title" x="78" y="120">클라우드·분산 시스템의 통제 레이어</text>
+  <text class="subtitle" x="78" y="154">기술 스택이 달라도 금융 서비스 답안은 계정, 데이터, 관측, 복구 통제를 함께 설명해야 완성된다.</text>
+
+  <circle cx="600" cy="394" r="126" fill="#0f172a" />
+  <text class="center" x="600" y="382" text-anchor="middle">금융 서비스</text>
+  <text class="center" x="600" y="414" text-anchor="middle">클라우드·분산 운영</text>
+
+  <line x1="600" y1="268" x2="600" y2="214" stroke="#64748b" stroke-width="4" />
+  <line x1="600" y1="520" x2="600" y2="576" stroke="#64748b" stroke-width="4" />
+  <line x1="474" y1="394" x2="356" y2="394" stroke="#64748b" stroke-width="4" />
+  <line x1="726" y1="394" x2="844" y2="394" stroke="#64748b" stroke-width="4" />
+
+  <rect x="434" y="88" width="332" height="108" rx="22" fill="#dbeafe" stroke="#93c5fd" />
+  <text class="section" x="460" y="124">1. 계정·권한 통제</text>
+  <text class="body" x="460" y="152">IAM 역할 분리, 최소 권한, 운영자 행위 로그를 먼저 설계한다.</text>
+  <text class="body" x="460" y="176">클라우드 전환 시 계정 구조와 네트워크 분리를 함께 재정의해야 한다.</text>
+
+  <rect x="430" y="580" width="340" height="110" rx="22" fill="#dcfce7" stroke="#86efac" />
+  <text class="section" x="456" y="616">4. 복구·배포 통제</text>
+  <text class="body" x="456" y="644">백업, DR, 롤백 절차, 장애 훈련이 있어야 짧은 장애도 관리 가능하다.</text>
+  <text class="body" x="456" y="668">자동화만 강조하지 말고 복구 시간 목표와 재시작 절차를 같이 답한다.</text>
+
+  <rect x="84" y="326" width="248" height="136" rx="22" fill="#fef3c7" stroke="#fcd34d" />
+  <text class="section" x="110" y="362">2. 데이터 보호</text>
+  <text class="body" x="110" y="390">암호화와 키 관리를</text>
+  <text class="body" x="110" y="414">스토리지, 메시지, 백업까지</text>
+  <text class="body" x="110" y="438">동일 기준으로 적용한다.</text>
+
+  <rect x="868" y="326" width="248" height="136" rx="22" fill="#fee2e2" stroke="#fca5a5" />
+  <text class="section" x="894" y="362">3. 관측·감사</text>
+  <text class="body" x="894" y="390">중앙 로그, 메트릭, 트레이싱이</text>
+  <text class="body" x="894" y="414">없으면 MSA 장애 원인 추적이</text>
+  <text class="body" x="894" y="438">급격히 어려워진다.</text>
+
+  <rect x="92" y="494" width="284" height="94" rx="18" fill="#fff7ed" stroke="#fdba74" />
+  <text class="label" x="116" y="526">메시지 큐 운영 메모</text>
+  <text class="body" x="116" y="552">중복 소비, 순서 역전, DLQ,</text>
+  <text class="body" x="116" y="574">idempotency key를 통제로 연결한다.</text>
+
+  <rect x="824" y="494" width="292" height="94" rx="18" fill="#f5f3ff" stroke="#c4b5fd" />
+  <text class="label" x="848" y="526">분산 이론 답안 메모</text>
+  <text class="body" x="848" y="552">CAP와 PACELC는 성능이 아니라</text>
+  <text class="body" x="848" y="574">장애 시 선택과 평상시 지연의 균형이다.</text>
+
+  <rect x="88" y="634" width="1024" height="52" rx="20" fill="#0f172a" />
+  <text x="600" y="667" text-anchor="middle" style="font:700 17px 'Pretendard','Noto Sans KR',sans-serif; fill:#f8fafc;">정답 포인트: 기술 스택 설명 뒤에 접근통제, 로그, 암호화, 백업, DR, 롤백을 빠짐없이 붙이면 금융권 답안이 완성된다.</text>
+</svg>

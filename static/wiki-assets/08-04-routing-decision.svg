@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">08-04 라우팅 결정과 Longest Prefix Match</title>
+  <desc id="desc">목적지 10.1.5.45에 대해 /8, /16, /24, 기본 경로 중 가장 긴 프리픽스를 선택하는 순서를 설명하는 SVG</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .soft { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2; }
+      .ink { fill: #0f172a; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .section { font: 700 25px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 19px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .monoSmall { font: 700 15px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #1e293b; }
+      .winner { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+      .result { fill: #1d4ed8; }
+      .resultText { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="760"/>
+  <rect x="36" y="36" width="1128" height="688" rx="30" fill="#e2e8f0"/>
+  <rect x="58" y="58" width="1084" height="644" rx="28" class="panel"/>
+
+  <text x="92" y="116" class="title">라우팅 결정: Longest Prefix Match 예시</text>
+  <text x="92" y="147" class="body">목적지 10.1.5.45가 들어오면 라우터는 일치하는 여러 엔트리 중에서 가장 구체적인 프리픽스를 먼저 고른다.</text>
+
+  <rect x="92" y="194" width="220" height="88" rx="20" class="soft"/>
+  <text x="202" y="229" text-anchor="middle" class="label">입력 패킷</text>
+  <text x="202" y="261" text-anchor="middle" class="mono">DST 10.1.5.45</text>
+
+  <path d="M 312 238 H 382" fill="none" stroke="#2563eb" stroke-width="4"/>
+  <polygon points="382,238 366,228 366,248" fill="#2563eb"/>
+
+  <rect x="402" y="182" width="328" height="238" rx="24" class="soft"/>
+  <text x="430" y="220" class="section">후보 라우팅 엔트리</text>
+  <text x="430" y="258" class="monoSmall">10.0.0.0/8    → eth0</text>
+  <text x="430" y="292" class="monoSmall">10.1.0.0/16   → eth1</text>
+  <rect x="420" y="312" width="292" height="44" rx="12" class="winner"/>
+  <text x="438" y="340" class="monoSmall">10.1.5.0/24   → eth2</text>
+  <text x="430" y="388" class="monoSmall">0.0.0.0/0     → default</text>
+
+  <rect x="768" y="182" width="282" height="238" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="794" y="220" class="section">선택 기준</text>
+  <text x="794" y="258" class="body">1. 가장 긴 프리픽스</text>
+  <text x="794" y="290" class="body">2. 같은 프리픽스면 AD</text>
+  <text x="794" y="322" class="body">3. AD도 같으면 메트릭</text>
+  <text x="794" y="367" class="small">예: OSPF cost, RIP hop count</text>
+
+  <rect x="92" y="462" width="958" height="174" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="120" y="500" class="section">왜 /24가 이기나?</text>
+  <text x="120" y="536" class="body">10.1.5.45는 /8, /16, /24 모두에 포함되지만, /24가 가장 세밀하게 목적지를 가리킨다.</text>
+  <text x="120" y="568" class="body">즉, 넓은 “10대역 전체”보다 “10.1 대역”, 그보다 “10.1.5 대역”이 더 우선한다.</text>
+  <text x="120" y="600" class="body">그래서 라우터는 /24 엔트리의 next hop 또는 인터페이스를 최종 선택한다.</text>
+
+  <rect x="796" y="586" width="254" height="50" rx="25" class="result"/>
+  <text x="923" y="618" text-anchor="middle" class="resultText">선택 결과: next hop eth2</text>
+</svg>

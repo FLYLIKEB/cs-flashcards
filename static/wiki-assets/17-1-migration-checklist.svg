@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">17-1. 클라우드 마이그레이션 체크리스트</title>
+  <desc id="desc">금융권 클라우드 전환 시 확인해야 할 배치 기준, 데이터 보호, 계정 분리, 로그 감사, 복구 절차를 5단계 체크리스트로 정리한 SVG.</desc>
+  <defs>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .mono { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; letter-spacing: 0.08em; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="780" fill="#e2e8f0"/>
+  <rect x="24" y="24" width="1152" height="732" rx="28" fill="#f8fafc" stroke="#cbd5e1"/>
+
+  <text class="mono" x="64" y="72">17-1 MIGRATION CHECKLIST</text>
+  <text class="title" x="64" y="116">클라우드 전환 체크리스트: 옮기기 전에 5가지를 확인</text>
+  <text class="subtitle" x="64" y="152">체크리스트를 순서대로 점검하면 서비스 모델 선택, 규제 대응, 운영 준비, 복구 계획을 한 화면에서 정리할 수 있다.</text>
+
+  <text class="section" x="64" y="208">1 → 5 단계 흐름</text>
+  <line x1="168" y1="294" x2="1030" y2="294" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+
+  <g transform="translate(64 238)">
+    <rect x="0" y="22" width="208" height="326" rx="24" fill="#ffffff" stroke="#bfdbfe"/>
+    <circle cx="40" cy="40" r="24" fill="#2563eb"/>
+    <text class="chip" x="33" y="46">1</text>
+    <text class="label" x="24" y="92">배치 기준</text>
+    <text class="body" x="24" y="126">어떤 자산을</text>
+    <text class="body" x="24" y="152">IaaS · PaaS · SaaS에</text>
+    <text class="body" x="24" y="178">둘지 먼저 정한다.</text>
+    <text class="small" x="24" y="222">- 업무 중요도</text>
+    <text class="small" x="24" y="248">- 커스터마이징 필요성</text>
+    <text class="small" x="24" y="274">- 운영 인력 역량</text>
+    <text class="small" x="24" y="300">- 공급자 종속 허용 범위</text>
+  </g>
+
+  <g transform="translate(288 238)">
+    <rect x="0" y="22" width="208" height="326" rx="24" fill="#ffffff" stroke="#86efac"/>
+    <circle cx="40" cy="40" r="24" fill="#0f766e"/>
+    <text class="chip" x="33" y="46">2</text>
+    <text class="label" x="24" y="92">데이터 보호</text>
+    <text class="body" x="24" y="126">개인정보와 거래 데이터의</text>
+    <text class="body" x="24" y="152">저장 위치와 암호화 정책을</text>
+    <text class="body" x="24" y="178">문서로 남긴다.</text>
+    <text class="small" x="24" y="222">- 저장 위치</text>
+    <text class="small" x="24" y="248">- 키 관리 방식</text>
+    <text class="small" x="24" y="274">- 전송 구간 보호</text>
+    <text class="small" x="24" y="300">- 위탁관리 범위</text>
+  </g>
+
+  <g transform="translate(512 238)">
+    <rect x="0" y="22" width="208" height="326" rx="24" fill="#ffffff" stroke="#fcd34d"/>
+    <circle cx="40" cy="40" r="24" fill="#d97706"/>
+    <text class="chip" x="33" y="46">3</text>
+    <text class="label" x="24" y="92">계정 · 망 분리</text>
+    <text class="body" x="24" y="126">운영 계정과 개발 계정,</text>
+    <text class="body" x="24" y="152">VPC와 서브넷 경계를</text>
+    <text class="body" x="24" y="178">혼합하지 않는다.</text>
+    <text class="small" x="24" y="222">- 최소 권한 IAM</text>
+    <text class="small" x="24" y="248">- 관리자 승인 절차</text>
+    <text class="small" x="24" y="274">- 네트워크 구간 분리</text>
+    <text class="small" x="24" y="300">- 비밀정보 보관소 사용</text>
+  </g>
+
+  <g transform="translate(736 238)">
+    <rect x="0" y="22" width="208" height="326" rx="24" fill="#ffffff" stroke="#c4b5fd"/>
+    <circle cx="40" cy="40" r="24" fill="#7c3aed"/>
+    <text class="chip" x="33" y="46">4</text>
+    <text class="label" x="24" y="92">로그 · 감사</text>
+    <text class="body" x="24" y="126">로그와 모니터링, 알림을</text>
+    <text class="body" x="24" y="152">중앙에서 수집해야</text>
+    <text class="body" x="24" y="178">감사 추적이 가능하다.</text>
+    <text class="small" x="24" y="222">- 중앙 로그 저장소</text>
+    <text class="small" x="24" y="248">- 이상 징후 알림</text>
+    <text class="small" x="24" y="274">- 변경 이력 보존</text>
+    <text class="small" x="24" y="300">- 점검 리포트 자동화</text>
+  </g>
+
+  <g transform="translate(960 238)">
+    <rect x="0" y="22" width="176" height="326" rx="24" fill="#ffffff" stroke="#fca5a5"/>
+    <circle cx="40" cy="40" r="24" fill="#dc2626"/>
+    <text class="chip" x="33" y="46">5</text>
+    <text class="label" x="24" y="92">복구 훈련</text>
+    <text class="body" x="24" y="126">RTO · RPO와</text>
+    <text class="body" x="24" y="152">백업 · 복구 절차를</text>
+    <text class="body" x="24" y="178">반드시 시험한다.</text>
+    <text class="small" x="24" y="222">- 백업 주기</text>
+    <text class="small" x="24" y="248">- 리전 장애 시나리오</text>
+    <text class="small" x="24" y="274">- 복구 책임자 지정</text>
+    <text class="small" x="24" y="300">- 훈련 결과 기록</text>
+  </g>
+
+  <rect x="64" y="624" width="1072" height="86" rx="22" fill="#0f172a"/>
+  <text class="chip" x="92" y="660">시험 답안 팁</text>
+  <text class="body" x="92" y="690" fill="#e2e8f0">"클라우드 도입 가능"에서 끝내지 말고, 서비스 모델 선택 근거와 암호화·로그·복구 체계를 연결해서 쓰면 답안 완성도가 높아진다.</text>
+</svg>

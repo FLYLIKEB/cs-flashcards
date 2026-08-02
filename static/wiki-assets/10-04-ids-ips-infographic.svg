@@ -1,146 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">10-04. IDS·IPS·로그 감사 인포그래픽</title>
-  <desc id="desc">인터넷에서 내부망으로 들어오는 트래픽 경로에서 IPS는 인라인으로 차단하고, IDS는 미러 트래픽을 패시브 탐지하며, 로그 감사와 SIEM은 기록 보존·상관분석·사후 증빙을 담당하는 구조를 설명한다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">10-04. IDS·IPS·로그 감사 비교 인포그래픽</title>
+  <desc id="desc">IDS는 미러 트래픽을 패시브 탐지하고, IPS는 인라인에서 차단하며, 로그 감사는 여러 장비의 기록을 수집·보존·분석한다는 차이를 세 구역으로 비교한 도식이다.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff" />
-      <stop offset="55%" stop-color="#f8fafc" />
-      <stop offset="100%" stop-color="#fefce8" />
-    </linearGradient>
-    <linearGradient id="traffic" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#3b82f6" />
-      <stop offset="100%" stop-color="#0f766e" />
-    </linearGradient>
-    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fca5a5" />
-      <stop offset="100%" stop-color="#ef4444" />
-    </linearGradient>
-    <linearGradient id="sensor" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#c4b5fd" />
-      <stop offset="100%" stop-color="#8b5cf6" />
-    </linearGradient>
-    <linearGradient id="logs" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fde68a" />
-      <stop offset="100%" stop-color="#f59e0b" />
-    </linearGradient>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e" />
-    </marker>
-    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#7c3aed" />
-    </marker>
-    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#d97706" />
-    </marker>
     <style>
+      .bg { fill: #f8fafc; }
+      .frame { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .navy { fill: #0f172a; }
+      .slate { fill: #334155; }
+      .muted { fill: #475569; }
+      .blueFill { fill: #dbeafe; }
+      .blueStroke { stroke: #2563eb; }
+      .redFill { fill: #fee2e2; }
+      .redStroke { stroke: #dc2626; }
+      .amberFill { fill: #fef3c7; }
+      .amberStroke { stroke: #d97706; }
+      .greenFill { fill: #dcfce7; }
+      .greenStroke { stroke: #16a34a; }
+      .purpleFill { fill: #ede9fe; }
+      .purpleStroke { stroke: #7c3aed; }
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .mono { font: 600 12px 'SFMono-Regular',Consolas,monospace; fill: #374151; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .capsule { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .mono { font: 600 13px 'SFMono-Regular',Consolas,monospace; fill: #334155; }
     </style>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#2563eb" />
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#dc2626" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#d97706" />
+    </marker>
   </defs>
 
-  <rect width="1200" height="720" fill="#e2e8f0" />
-  <rect x="24" y="24" width="1152" height="672" rx="30" fill="url(#bg)" stroke="#cbd5e1" />
+  <rect class="bg" x="0" y="0" width="1200" height="820" />
+  <rect class="frame" x="24" y="24" width="1152" height="772" rx="28" />
 
-  <text x="70" y="82" class="small">보안 운영 핵심: 탐지 / 차단 / 기록 보존</text>
-  <text x="70" y="120" class="title">10-04. IDS · IPS · 로그 감사</text>
-  <text x="70" y="154" class="subtitle">같은 보안 이벤트라도 배치 위치와 역할이 다르다: IDS는 본다, IPS는 막는다, 로그 감사는 남기고 연결한다.</text>
+  <text x="64" y="80" class="small">보안 운영 핵심: 보는 장치 / 막는 장치 / 남기는 기록</text>
+  <text x="64" y="124" class="title">10-04. IDS · IPS · 로그 감사</text>
+  <text x="64" y="156" class="subtitle">배치 위치와 운영 목적이 다르므로, 같은 보안 이벤트라도 어디서 탐지하고 무엇을 남기는지 구분해야 한다.</text>
 
-  <rect x="58" y="184" width="1084" height="252" rx="24" fill="#ffffff" stroke="#bfdbfe" />
-  <text x="84" y="220" class="section">1) 트래픽 경로에서의 역할 차이</text>
+  <rect x="64" y="194" width="1072" height="88" rx="22" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2" />
+  <text x="92" y="228" class="section">핵심 비교</text>
+  <text x="92" y="255" class="body">IDS = 패시브 탐지·알림 / IPS = 인라인 탐지·차단 / 로그 감사 = 기록 보존·상관분석·사후 증빙</text>
 
-  <circle cx="148" cy="312" r="48" fill="#dbeafe" stroke="#3b82f6" stroke-width="3" />
-  <path d="M118 308 C130 286, 166 286, 178 308 C194 308, 202 320, 202 333 C202 351, 186 362, 167 362 H126 C107 362, 92 350, 92 332 C92 317, 102 307, 118 308 Z" fill="#60a5fa" opacity="0.85" />
-  <text x="148" y="384" text-anchor="middle" class="label">외부 공격 트래픽</text>
-  <text x="148" y="404" text-anchor="middle" class="body">인터넷 구간</text>
+  <rect x="64" y="308" width="330" height="324" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="88" y="332" width="92" height="30" rx="15" class="purpleFill" />
+  <text x="134" y="352" text-anchor="middle" class="capsule">패시브</text>
+  <text x="88" y="392" class="section">IDS</text>
+  <text x="88" y="420" class="label">미러/SPAN 복제 트래픽만 관찰</text>
+  <rect x="88" y="446" width="280" height="62" rx="18" class="blueFill" stroke="#60a5fa" stroke-width="2" />
+  <text x="108" y="474" class="body">• 실시간 탐지와 경보 생성</text>
+  <text x="108" y="498" class="body">• 수동 대응 또는 별도 절차 연계</text>
+  <rect x="88" y="528" width="280" height="76" rx="18" class="purpleFill" stroke="#a78bfa" stroke-width="2" />
+  <text x="108" y="556" class="body">탐지 기법</text>
+  <text x="108" y="580" class="small">서명 기반: 알려진 패턴 식별</text>
+  <text x="108" y="600" class="small">이상 기반: 정상 이탈 행위 포착</text>
 
-  <line x1="196" y1="312" x2="420" y2="312" stroke="url(#traffic)" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow-blue)" />
-  <text x="252" y="290" class="small">인라인 경로</text>
-  <rect x="432" y="238" width="184" height="146" rx="24" fill="#fff1f2" stroke="#ef4444" stroke-width="3" />
-  <path d="M524 258 L568 276 L562 322 C560 347, 545 363, 524 374 C503 363, 488 347, 486 322 L480 276 Z" fill="url(#shield)" stroke="#b91c1c" stroke-width="2" />
-  <path d="M524 286 L524 334" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
-  <path d="M505 314 L524 334 L546 301" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-  <text x="524" y="220" text-anchor="middle" class="section">IPS</text>
-  <text x="524" y="404" text-anchor="middle" class="body">탐지 + 실시간 차단</text>
-  <text x="524" y="424" text-anchor="middle" class="small">인라인 배치 · 가용성 영향 고려</text>
+  <rect x="434" y="308" width="330" height="324" rx="24" fill="#fff7ed" stroke="#fdba74" stroke-width="2" />
+  <rect x="458" y="332" width="92" height="30" rx="15" fill="#fee2e2" />
+  <text x="504" y="352" text-anchor="middle" class="capsule">인라인</text>
+  <text x="458" y="392" class="section">IPS</text>
+  <text x="458" y="420" class="label">실제 트래픽 경로 위에서 즉시 차단</text>
+  <rect x="458" y="446" width="282" height="62" rx="18" class="redFill" stroke="#f87171" stroke-width="2" />
+  <text x="478" y="474" class="body">• 탐지 후 패킷 차단·세션 종료</text>
+  <text x="478" y="498" class="body">• 악성 요청을 내부망 전에 차단</text>
+  <rect x="458" y="528" width="282" height="76" rx="18" fill="#ffedd5" stroke="#fb923c" stroke-width="2" />
+  <text x="478" y="556" class="body">운영 포인트</text>
+  <text x="478" y="580" class="small">가용성 영향이 있으므로 이중화·우회 설계 필요</text>
+  <text x="478" y="600" class="small">경계 구간·중요 서버 존 앞에 배치</text>
 
-  <line x1="616" y1="312" x2="858" y2="312" stroke="url(#traffic)" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow-blue)" />
-  <text x="676" y="290" class="small">허용된 트래픽만 내부망 통과</text>
+  <rect x="804" y="308" width="332" height="324" rx="24" fill="#fffbeb" stroke="#fcd34d" stroke-width="2" />
+  <rect x="828" y="332" width="112" height="30" rx="15" class="amberFill" />
+  <text x="884" y="352" text-anchor="middle" class="capsule">기록·감사</text>
+  <text x="828" y="392" class="section">로그 감사</text>
+  <text x="828" y="420" class="label">사건 전·중·후 기록을 남기고 연결</text>
+  <rect x="828" y="446" width="284" height="62" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" />
+  <text x="848" y="474" class="body">• 방화벽·서버·DB·앱 로그를 중앙 수집</text>
+  <text x="848" y="498" class="body">• SIEM에서 정규화·상관분석 수행</text>
+  <rect x="828" y="528" width="284" height="76" rx="18" fill="#ecfccb" stroke="#65a30d" stroke-width="2" />
+  <text x="848" y="556" class="body">필수 통제</text>
+  <text x="848" y="580" class="small">시간 동기화, 무결성 보장, 보존 정책, 접근통제</text>
+  <text x="848" y="600" class="small">사후 분석·책임 추적·규제 증빙 지원</text>
 
-  <rect x="872" y="248" width="182" height="128" rx="24" fill="#ecfeff" stroke="#0f766e" stroke-width="3" />
-  <rect x="900" y="274" width="126" height="20" rx="10" fill="#99f6e4" />
-  <rect x="900" y="304" width="96" height="20" rx="10" fill="#5eead4" />
-  <rect x="900" y="334" width="72" height="20" rx="10" fill="#2dd4bf" />
-  <text x="963" y="224" text-anchor="middle" class="section">내부 서비스</text>
-  <text x="963" y="402" text-anchor="middle" class="body">서버 존 · DB 존 · 업무 시스템</text>
+  <rect x="64" y="658" width="1072" height="102" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <text x="92" y="692" class="section">배치 차이 한눈에 보기</text>
+  <circle cx="156" cy="722" r="24" class="blueFill" stroke="#60a5fa" stroke-width="2" />
+  <text x="156" y="728" text-anchor="middle" class="capsule">외부</text>
+  <line x1="180" y1="722" x2="500" y2="722" stroke="#2563eb" stroke-width="8" stroke-linecap="round" marker-end="url(#arrowBlue)" />
+  <rect x="310" y="692" width="82" height="58" rx="14" class="redFill" stroke="#dc2626" stroke-width="2" />
+  <text x="351" y="726" text-anchor="middle" class="label">IPS</text>
+  <rect x="258" y="668" width="88" height="34" rx="17" class="purpleFill" stroke="#7c3aed" stroke-width="2" />
+  <text x="302" y="690" text-anchor="middle" class="capsule">IDS는 옆에서 관찰</text>
+  <line x1="302" y1="702" x2="302" y2="716" stroke="#7c3aed" stroke-width="3" />
+  <line x1="302" y1="716" x2="252" y2="716" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#arrowBlue)" />
+  <rect x="518" y="692" width="120" height="58" rx="14" class="greenFill" stroke="#16a34a" stroke-width="2" />
+  <text x="578" y="726" text-anchor="middle" class="label">내부 서비스</text>
+  <line x1="638" y1="722" x2="800" y2="722" stroke="#d97706" stroke-width="5" stroke-dasharray="10 7" marker-end="url(#arrowAmber)" />
+  <rect x="814" y="692" width="248" height="58" rx="14" class="amberFill" stroke="#d97706" stroke-width="2" />
+  <text x="938" y="716" text-anchor="middle" class="label">로그 수집기 / SIEM</text>
+  <text x="938" y="738" text-anchor="middle" class="small">탐지 결과와 운영 기록을 장기 보존</text>
 
-  <line x1="308" y1="312" x2="308" y2="192" stroke="#7c3aed" stroke-width="5" stroke-dasharray="10 8" marker-end="url(#arrow-purple)" />
-  <text x="320" y="205" class="small">미러/SPAN 복제</text>
-  <rect x="224" y="72" width="170" height="104" rx="22" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="3" />
-  <circle cx="266" cy="123" r="20" fill="url(#sensor)" />
-  <circle cx="266" cy="123" r="8" fill="#ede9fe" />
-  <path d="M286 123 Q308 96 330 123" fill="none" stroke="#8b5cf6" stroke-width="3" />
-  <path d="M286 137 Q308 160 330 137" fill="none" stroke="#8b5cf6" stroke-width="3" />
-  <text x="344" y="115" text-anchor="middle" class="section">IDS</text>
-  <text x="344" y="136" text-anchor="middle" class="body">패시브 탐지</text>
-  <text x="344" y="156" text-anchor="middle" class="small">알림 · 로그 생성</text>
-
-  <path d="M394 124 C450 124, 480 124, 532 144" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrow-purple)" />
-  <text x="448" y="108" class="small">서명 기반 / 이상 기반</text>
-
-  <rect x="58" y="456" width="694" height="218" rx="24" fill="#ffffff" stroke="#cbd5e1" />
-  <text x="84" y="492" class="section">2) 로그 감사와 SIEM: 사건 전·중·후를 연결</text>
-
-  <rect x="84" y="518" width="198" height="124" rx="18" fill="#fffbeb" stroke="#f59e0b" stroke-width="2.5" />
-  <rect x="110" y="544" width="146" height="18" rx="6" fill="#fde68a" />
-  <rect x="110" y="572" width="146" height="18" rx="6" fill="#fcd34d" />
-  <rect x="110" y="600" width="110" height="18" rx="6" fill="#fbbf24" />
-  <text x="183" y="534" text-anchor="middle" class="label">로그 수집기</text>
-  <text x="183" y="661" text-anchor="middle" class="small">방화벽 · 서버 · DB · 앱 · 인증 로그</text>
-
-  <line x1="282" y1="580" x2="412" y2="580" stroke="#d97706" stroke-width="5" marker-end="url(#arrow-amber)" />
-  <text x="314" y="560" class="small">정규화</text>
-
-  <rect x="424" y="510" width="302" height="140" rx="18" fill="#f8fafc" stroke="#64748b" stroke-width="2.5" />
-  <text x="575" y="536" text-anchor="middle" class="label">SIEM 상관분석</text>
-  <text x="448" y="566" class="body">• 실패 로그인 → 성공 로그인 → 대량 조회</text>
-  <text x="448" y="590" class="body">• IDS/IPS 경보와 계정 활동을 결합</text>
-  <text x="448" y="614" class="body">• 우선순위 분류 후 대응 워크플로우 연결</text>
-  <text x="448" y="638" class="small">NTP 동기화가 있어야 타임라인 비교 가능</text>
-
-  <rect x="774" y="184" width="368" height="490" rx="24" fill="#0f172a" />
-  <text x="802" y="220" class="section" fill="#f8fafc">3) 로그 감사 필수 요소</text>
-
-  <rect x="800" y="246" width="316" height="84" rx="18" fill="#111827" stroke="#38bdf8" />
-  <circle cx="836" cy="288" r="20" fill="#0ea5e9" />
-  <path d="M836 276 V289 L846 295" fill="none" stroke="#e0f2fe" stroke-width="4" stroke-linecap="round" />
-  <text x="868" y="281" class="label" fill="#f8fafc">시간 동기화</text>
-  <text x="868" y="304" class="body" fill="#cbd5e1">NTP 기준으로 여러 장비 로그의 순서를 맞춤</text>
-
-  <rect x="800" y="346" width="316" height="84" rx="18" fill="#111827" stroke="#fb7185" />
-  <path d="M836 375 h32 a8 8 0 0 1 8 8 v18 a8 8 0 0 1 -8 8 h-32 a8 8 0 0 1 -8 -8 v-18 a8 8 0 0 1 8 -8 z" fill="#ef4444" />
-  <path d="M842 375 v-12 a10 10 0 0 1 20 0 v12" fill="none" stroke="#fecdd3" stroke-width="4" />
-  <text x="888" y="381" class="label" fill="#f8fafc">무결성 보장</text>
-  <text x="888" y="404" class="body" fill="#cbd5e1">append-only, 해시, 서명으로 위변조 방지</text>
-
-  <rect x="800" y="446" width="316" height="84" rx="18" fill="#111827" stroke="#f59e0b" />
-  <path d="M826 470 h50 v36 h-50 z" fill="#f59e0b" />
-  <path d="M836 470 v-10 h30 v10" fill="none" stroke="#fde68a" stroke-width="4" />
-  <text x="888" y="481" class="label" fill="#f8fafc">보존 정책</text>
-  <text x="888" y="504" class="body" fill="#cbd5e1">보존기간·자동삭제·포렌식 보관 절차 문서화</text>
-
-  <rect x="800" y="546" width="316" height="102" rx="18" fill="#111827" stroke="#34d399" />
-  <path d="M834 575 h42 v34 h-42 z" fill="#10b981" />
-  <circle cx="855" cy="591" r="8" fill="#d1fae5" />
-  <path d="M848 604 q7 -6 14 0" fill="none" stroke="#d1fae5" stroke-width="3" />
-  <text x="888" y="581" class="label" fill="#f8fafc">접근통제·마스킹</text>
-  <text x="888" y="604" class="body" fill="#cbd5e1">개인정보 최소화, 조사 시 승인된 접근만 허용</text>
-  <text x="888" y="626" class="small" fill="#94a3b8">사후 분석 · 책임 추적 · 내부통제 증빙</text>
-
-  <rect x="70" y="654" width="652" height="26" rx="13" fill="#e2e8f0" />
-  <text x="396" y="672" text-anchor="middle" class="mono">기억법: IDS = CCTV, IPS = 경비원, 로그 감사 = 출입기록부</text>
+  <text x="600" y="784" text-anchor="middle" class="mono">기억법: IDS는 본다 · IPS는 막는다 · 로그 감사는 남기고 증명한다</text>
 </svg>

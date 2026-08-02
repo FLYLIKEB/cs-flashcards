@@ -1,119 +1,97 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">17. 클라우드·분산 시스템 심화 인포그래픽</title>
-  <desc id="desc">금융 IT 환경에서 클라우드, 컨테이너, 분산 이론, 메시징, 마이크로서비스가 연결되고 그 아래 보안·감사·복구 통제가 받치는 구조를 설명하는 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title desc">
+  <title id="title">17. 클라우드·분산 시스템 심화 개요</title>
+  <desc id="desc">클라우드 서비스 모델에서 컨테이너, 분산 시스템 이론, 메시지 큐, 마이크로서비스로 이어지는 학습 흐름과 금융권 핵심 체크포인트를 구분해 보여주는 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff" />
-      <stop offset="55%" stop-color="#f8fafc" />
-      <stop offset="100%" stop-color="#ecfeff" />
-    </linearGradient>
-    <linearGradient id="board" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#1e293b" />
-    </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#38bdf8" />
-      <stop offset="100%" stop-color="#818cf8" />
-    </linearGradient>
-    <linearGradient id="risk" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#f59e0b" />
-      <stop offset="100%" stop-color="#ef4444" />
+      <stop offset="0%" stop-color="#f8fbff" />
+      <stop offset="100%" stop-color="#eef4ff" />
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #e2e8f0; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #cbd5e1; }
-      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #f8fafc; }
-      .step { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #e2e8f0; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #cbd5e1; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #94a3b8; }
-      .pill { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #082f49; }
-      .footer { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .cardTitle { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .cardBody { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .pill { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .footer { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .footerBody { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="34" y="30" width="1132" height="660" rx="30" fill="url(#board)" />
-  <rect x="34" y="30" width="1132" height="660" rx="30" fill="none" stroke="#38bdf8" stroke-opacity="0.18" />
+  <rect width="1200" height="840" fill="url(#bg)" />
+  <rect x="40" y="32" width="1120" height="776" rx="28" fill="#ffffff" stroke="#cbd5e1" />
 
-  <text class="small" x="76" y="74">금융공기업 IT · 17장 통합 개요</text>
-  <text class="title" x="76" y="118">클라우드·분산 시스템 심화</text>
-  <text class="subtitle" x="76" y="150">클라우드 서비스 모델에서 시작해 컨테이너, 분산 트레이드오프, 메시징, MSA로 확장되지만</text>
-  <text class="subtitle" x="76" y="174">금융 환경에서는 항상 보안·감사·재해복구 통제가 전체 설계의 바닥판이 된다.</text>
+  <text class="small" x="76" y="78">금융공기업 IT · 17장 큰그림</text>
+  <text class="title" x="76" y="122">클라우드·분산 시스템 심화</text>
+  <text class="subtitle" x="76" y="156">서비스 모델에서 운영 단위를 거쳐 분산 트레이드오프와 비동기 설계, 마이크로서비스 운영까지 단계적으로 연결한다.</text>
+  <text class="subtitle" x="76" y="182">핵심은 기술 이름 암기보다 장애 시 일관성, 관측성, 복구 절차를 함께 설명하는 것이다.</text>
 
-  <rect x="70" y="210" width="1060" height="290" rx="26" fill="#0b1220" stroke="#334155" />
-  <text class="section" x="98" y="244">학습 흐름: 서비스 모델 → 운영 단위 → 이론 → 비동기화 → 서비스 분리</text>
+  <rect x="72" y="222" width="1056" height="346" rx="24" fill="#f8fafc" stroke="#dbe4f0" />
+  <text class="section" x="100" y="260">학습 흐름</text>
+  <line x1="130" y1="392" x2="1068" y2="392" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" />
+  <polygon points="1068,392 1040,378 1040,406" fill="#64748b" />
 
-  <line x1="144" y1="346" x2="1056" y2="346" stroke="url(#flow)" stroke-width="10" stroke-linecap="round" opacity="0.92" />
-  <polygon points="1056,346 1028,332 1028,360" fill="#818cf8" />
+  <rect x="100" y="292" width="184" height="176" rx="22" fill="#dbeafe" stroke="#93c5fd" />
+  <circle cx="136" cy="326" r="22" fill="#2563eb" />
+  <text x="136" y="332" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">1</text>
+  <text class="cardTitle" x="166" y="330">클라우드 기초</text>
+  <text class="cardBody" x="122" y="366">IaaS · PaaS · SaaS</text>
+  <text class="cardBody" x="122" y="392">책임 분담 이해</text>
+  <text class="cardBody" x="122" y="418">금융권 통제 출발점</text>
 
-  <rect x="96" y="274" width="180" height="146" rx="22" fill="#dbeafe" />
-  <circle cx="132" cy="306" r="20" fill="#38bdf8" />
-  <text class="step" x="132" y="311" text-anchor="middle">1</text>
-  <text class="step" x="158" y="309">클라우드 기초</text>
-  <text class="body" x="114" y="338">IaaS·PaaS·SaaS</text>
-  <text class="body" x="114" y="362">책임 분담과</text>
-  <text class="body" x="114" y="386">금융권 통제 설계</text>
+  <rect x="304" y="274" width="184" height="194" rx="22" fill="#dcfce7" stroke="#86efac" />
+  <circle cx="340" cy="308" r="22" fill="#16a34a" />
+  <text x="340" y="314" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">2</text>
+  <text class="cardTitle" x="370" y="312">컨테이너</text>
+  <text class="cardBody" x="326" y="348">이미지와 배포 단위</text>
+  <text class="cardBody" x="326" y="374">쿠버네티스 운영</text>
+  <text class="cardBody" x="326" y="400">격리 · 스케일 · 복구</text>
+  <rect x="326" y="426" width="122" height="26" rx="13" fill="#bbf7d0" />
+  <text class="pill" x="387" y="444" text-anchor="middle">오케스트레이션</text>
 
-  <rect x="300" y="256" width="180" height="164" rx="22" fill="#ccfbf1" />
-  <circle cx="336" cy="288" r="20" fill="#14b8a6" />
-  <text class="step" x="336" y="293" text-anchor="middle">2</text>
-  <text class="step" x="362" y="291">컨테이너</text>
-  <text class="body" x="318" y="320">이미지·배포 단위</text>
-  <text class="body" x="318" y="344">쿠버네티스 운영</text>
-  <text class="body" x="318" y="368">스케일·격리·복구</text>
-  <rect x="318" y="384" width="110" height="20" rx="10" fill="#99f6e4" />
-  <text class="pill" x="373" y="398" text-anchor="middle">orchestration</text>
+  <rect x="508" y="256" width="184" height="212" rx="22" fill="#ede9fe" stroke="#c4b5fd" />
+  <circle cx="544" cy="290" r="22" fill="#7c3aed" />
+  <text x="544" y="296" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">3</text>
+  <text class="cardTitle" x="574" y="294">분산 시스템 이론</text>
+  <text class="cardBody" x="530" y="330">CAP: 장애 시 선택</text>
+  <text class="cardBody" x="530" y="356">PACELC: 평상시 지연</text>
+  <text class="cardBody" x="530" y="382">2PC · Saga로</text>
+  <text class="cardBody" x="530" y="408">일관성 전략 설계</text>
+  <rect x="530" y="426" width="138" height="26" rx="13" fill="#ddd6fe" />
+  <text class="pill" x="599" y="444" text-anchor="middle">트레이드오프</text>
 
-  <rect x="504" y="238" width="192" height="182" rx="22" fill="#ede9fe" />
-  <circle cx="540" cy="270" r="20" fill="#8b5cf6" />
-  <text class="step" x="540" y="275" text-anchor="middle">3</text>
-  <text class="step" x="566" y="273">분산 시스템 이론</text>
-  <text class="body" x="522" y="304">CAP: 장애 시</text>
-  <text class="body" x="522" y="328">PACELC: 평상시</text>
-  <text class="body" x="522" y="352">2PC·Saga로</text>
-  <text class="body" x="522" y="376">일관성 전략 선택</text>
-  <rect x="522" y="388" width="150" height="20" rx="10" fill="#ddd6fe" />
-  <text class="pill" x="597" y="402" text-anchor="middle">consistency tradeoff</text>
+  <rect x="712" y="274" width="184" height="194" rx="22" fill="#fee2e2" stroke="#fca5a5" />
+  <circle cx="748" cy="308" r="22" fill="#dc2626" />
+  <text x="748" y="314" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">4</text>
+  <text class="cardTitle" x="778" y="312">메시지 큐</text>
+  <text class="cardBody" x="734" y="348">비동기화 · 결합도 완화</text>
+  <text class="cardBody" x="734" y="374">순서 역전 · 중복 소비</text>
+  <text class="cardBody" x="734" y="400">idempotency · DLQ</text>
+  <rect x="734" y="426" width="108" height="26" rx="13" fill="#fecaca" />
+  <text class="pill" x="788" y="444" text-anchor="middle">재처리 기준</text>
 
-  <rect x="720" y="256" width="180" height="164" rx="22" fill="#fee2e2" />
-  <circle cx="756" cy="288" r="20" fill="#ef4444" />
-  <text class="step" x="756" y="293" text-anchor="middle">4</text>
-  <text class="step" x="782" y="291">메시지 큐</text>
-  <text class="body" x="738" y="320">비동기화·결합도 완화</text>
-  <text class="body" x="738" y="344">순서 역전·중복 소비</text>
-  <text class="body" x="738" y="368">idempotency·DLQ</text>
-  <rect x="738" y="384" width="98" height="20" rx="10" fill="#fecaca" />
-  <text class="pill" x="787" y="398" text-anchor="middle">reprocess</text>
+  <rect x="916" y="292" width="184" height="176" rx="22" fill="#fef3c7" stroke="#fcd34d" />
+  <circle cx="952" cy="326" r="22" fill="#d97706" />
+  <text x="952" y="332" text-anchor="middle" style="font:700 16px 'Pretendard','Noto Sans KR',sans-serif; fill:#ffffff;">5</text>
+  <text class="cardTitle" x="982" y="330">마이크로서비스</text>
+  <text class="cardBody" x="938" y="366">배포 독립성 확대</text>
+  <text class="cardBody" x="938" y="392">추적성과 운영 복잡도</text>
+  <text class="cardBody" x="938" y="418">Gateway · Mesh</text>
 
-  <rect x="924" y="274" width="180" height="146" rx="22" fill="#fef3c7" />
-  <circle cx="960" cy="306" r="20" fill="#f59e0b" />
-  <text class="step" x="960" y="311" text-anchor="middle">5</text>
-  <text class="step" x="986" y="309">마이크로서비스</text>
-  <text class="body" x="942" y="338">배포 독립성 증가</text>
-  <text class="body" x="942" y="362">추적성·운영 복잡도</text>
-  <text class="body" x="942" y="386">API Gateway·Mesh</text>
+  <rect x="100" y="500" width="1000" height="48" rx="24" fill="#0f172a" />
+  <text x="600" y="531" text-anchor="middle" style="font:700 17px 'Pretendard','Noto Sans KR',sans-serif; fill:#f8fafc;">서비스를 잘게 나눌수록 확장성은 좋아지지만 데이터 일관성, 관측성, 장애 격리 설계 부담은 커진다.</text>
 
-  <rect x="92" y="440" width="1016" height="42" rx="21" fill="#111827" stroke="#475569" />
-  <text class="label" x="600" y="467" text-anchor="middle">서비스를 잘게 나눌수록 배포 속도와 확장성은 좋아지지만 데이터 일관성·관측성·장애 전파 관리 부담은 커진다.</text>
+  <rect x="72" y="596" width="1056" height="176" rx="24" fill="#f8fafc" stroke="#dbe4f0" />
+  <text class="section" x="100" y="634">면접 답안용 핵심 체크포인트</text>
 
-  <text class="small" x="96" y="530">운영 난이도 상승</text>
-  <line x1="172" y1="524" x2="1000" y2="524" stroke="url(#risk)" stroke-width="8" stroke-linecap="round" />
-  <polygon points="1000,524 972,510 972,538" fill="#ef4444" />
-  <text class="small" x="1014" y="530">관측성·트랜잭션·장애 격리 중요</text>
+  <rect x="100" y="658" width="488" height="88" rx="18" fill="#e0f2fe" stroke="#7dd3fc" />
+  <text class="footer" x="124" y="688">장애 시 질문</text>
+  <text class="footerBody" x="124" y="714">CAP, 2PC, Saga를 연결해 어떤 일관성 희생 또는 보완 전략을 택하는지 말한다.</text>
+  <text class="footerBody" x="124" y="736">메시지 유실보다 중복 소비와 재처리 통제가 더 흔한 운영 이슈라는 점도 덧붙인다.</text>
 
-  <rect x="70" y="554" width="1060" height="102" rx="24" fill="#e2e8f0" />
-  <text class="footer" x="96" y="588">금융권 공통 운영 기준</text>
-  <rect x="94" y="604" width="154" height="32" rx="16" fill="#bae6fd" />
-  <text class="pill" x="171" y="625" text-anchor="middle">IAM · 접근통제</text>
-  <rect x="262" y="604" width="154" height="32" rx="16" fill="#bfdbfe" />
-  <text class="pill" x="339" y="625" text-anchor="middle">암호화 · 키 관리</text>
-  <rect x="430" y="604" width="154" height="32" rx="16" fill="#c7d2fe" />
-  <text class="pill" x="507" y="625" text-anchor="middle">로그 · 감사 추적</text>
-  <rect x="598" y="604" width="154" height="32" rx="16" fill="#ddd6fe" />
-  <text class="pill" x="675" y="625" text-anchor="middle">백업 · DR</text>
-  <rect x="766" y="604" width="154" height="32" rx="16" fill="#a7f3d0" />
-  <text class="pill" x="843" y="625" text-anchor="middle">중앙 메트릭 · 트레이싱</text>
-  <rect x="934" y="604" width="172" height="32" rx="16" fill="#fecdd3" />
-  <text class="pill" x="1020" y="625" text-anchor="middle">롤백 · 장애 훈련</text>
+  <rect x="612" y="658" width="488" height="88" rx="18" fill="#ecfccb" stroke="#bef264" />
+  <text class="footer" x="636" y="688">금융권 운영 질문</text>
+  <text class="footerBody" x="636" y="714">IAM, 암호화, 로그, 백업, DR, 중앙 모니터링을 기술 선택과 함께 묶어 답한다.</text>
+  <text class="footerBody" x="636" y="736">짧은 장애도 규제 이슈가 되므로 롤백 절차와 장애 훈련까지 포함해야 점수가 높다.</text>
 </svg>

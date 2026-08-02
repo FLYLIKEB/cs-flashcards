@@ -1,173 +1,177 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">10-02. 인증·인가·접근통제 인포그래픽</title>
-  <desc id="desc">사용자 인증에서 권한 평가와 접근 허용·차단까지의 흐름, PKI 보조 요소, DAC·MAC·RBAC·ABAC 비교를 함께 보여주는 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+  <title id="title">10-02. 인증·인가·접근통제 흐름 인포그래픽</title>
+  <desc id="desc">사용자 인증부터 인가 정책 평가, 접근통제 집행, PKI 보조 검증, 운영 통제 포인트까지를 단계별로 설명하는 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff"/>
       <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="flowLine" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#2563eb"/>
       <stop offset="100%" stop-color="#0f766e"/>
-    </linearGradient>
-    <linearGradient id="allow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#dcfce7"/>
-      <stop offset="100%" stop-color="#bbf7d0"/>
-    </linearGradient>
-    <linearGradient id="deny" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#fee2e2"/>
-      <stop offset="100%" stop-color="#fecaca"/>
     </linearGradient>
     <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
     </marker>
-    <marker id="arrow-soft" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    <marker id="arrowSoft" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
     </marker>
     <style>
-      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
-      .eyebrow { font-size: 14px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
-      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 16px; font-weight: 500; fill: #334155; }
-      .section { font-size: 15px; font-weight: 800; fill: #0f172a; }
-      .stepTitle { font-size: 18px; font-weight: 800; fill: #0f172a; }
-      .body { font-size: 14px; font-weight: 500; fill: #334155; }
-      .small { font-size: 12px; font-weight: 600; fill: #475569; }
-      .chip { font-size: 12px; font-weight: 700; fill: #1e293b; }
-      .modelTitle { font-size: 17px; font-weight: 800; fill: #0f172a; }
-      .modelBody { font-size: 13px; font-weight: 500; fill: #334155; }
-      .white { fill: #ffffff; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 36px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .section { font-size: 18px; font-weight: 800; }
+      .cardTitle { font-size: 22px; font-weight: 800; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 600; fill: #475569; }
+      .chip { font-size: 14px; font-weight: 700; fill: #1e293b; }
+      .note { font-size: 15px; font-weight: 600; fill: #1e293b; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="26" y="24" width="1148" height="672" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect width="1280" height="900" fill="url(#bg)"/>
+  <rect x="28" y="24" width="1224" height="852" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="eyebrow" x="70" y="72">SECURITY FLOW MAP</text>
-  <text id="titleText" class="title" x="70" y="114">인증 → 인가 → 접근통제</text>
-  <text class="subtitle" x="70" y="144">누구인지 확인하고, 무엇을 할 수 있는지 판단한 뒤, 실제 자원 접근을 허용·차단하는 전체 체계</text>
+  <text class="eyebrow" x="72" y="78">SECURITY FLOW MAP</text>
+  <text class="title" x="72" y="122">인증 → 인가 → 접근통제</text>
+  <text class="subtitle" x="72" y="156">신원을 확인하고 권한을 판단한 뒤 실제 자원 접근을 허용·차단하는 전 과정을 단계적으로 정리했다.</text>
 
-  <rect x="70" y="174" width="780" height="288" rx="26" fill="#f8fafc" stroke="#dbeafe"/>
-  <text class="section" x="94" y="205">기본 로그인 + 권한부여 흐름</text>
-  <line x1="190" y1="302" x2="770" y2="302" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <rect x="72" y="192" width="1136" height="356" rx="28" fill="#f8fafc" stroke="#dbeafe" stroke-width="2"/>
+  <text class="section" x="96" y="228">기본 로그인 + 권한부여 흐름</text>
+  <line x1="190" y1="378" x2="1110" y2="378" stroke="url(#flowLine)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
 
-  <g transform="translate(96 228)">
-    <circle cx="56" cy="74" r="42" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
-    <circle cx="56" cy="62" r="13" fill="#2563eb"/>
-    <path d="M 31 104 C 36 84, 76 84, 81 104" fill="none" stroke="#2563eb" stroke-width="8" stroke-linecap="round"/>
-    <text class="stepTitle" x="0" y="146">1. 사용자</text>
-    <text class="body" x="0" y="170">ID·비밀번호, OTP, 인증서, 생체정보 제출</text>
-    <rect x="0" y="186" width="111" height="28" rx="14" fill="#e0f2fe"/>
-    <text class="chip" x="56" y="204" text-anchor="middle">지식·소유·고유 요소</text>
+  <g transform="translate(96 262)">
+    <rect x="0" y="0" width="180" height="232" rx="24" fill="#ffffff" stroke="#93c5fd" stroke-width="2.5"/>
+    <circle cx="90" cy="56" r="28" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="90" cy="48" r="8" fill="#2563eb"/>
+    <path d="M 73 73 C 76 60, 104 60, 107 73" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+    <text class="cardTitle" x="24" y="108">1. 사용자 인증 시도</text>
+    <text class="body" x="24" y="136">
+      <tspan x="24" dy="0">ID·비밀번호, OTP, 인증서,</tspan>
+      <tspan x="24" dy="24">생체정보 같은 자격증명을 제출한다.</tspan>
+    </text>
+    <rect x="24" y="174" width="132" height="34" rx="17" fill="#e0f2fe"/>
+    <text class="chip" x="90" y="196" text-anchor="middle">지식·소유·고유 요소</text>
   </g>
 
-  <g transform="translate(294 214)">
-    <rect x="0" y="24" width="140" height="126" rx="22" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
-    <rect x="16" y="40" width="108" height="16" rx="8" fill="#bfdbfe"/>
-    <rect x="16" y="66" width="76" height="12" rx="6" fill="#93c5fd"/>
-    <rect x="16" y="88" width="92" height="12" rx="6" fill="#93c5fd"/>
-    <circle cx="109" cy="100" r="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-    <path d="M 109 91 L 109 104" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="109" cy="108" r="3" fill="#2563eb"/>
-    <text class="stepTitle" x="0" y="176">2. 인증</text>
-    <text class="body" x="0" y="200">자격증명 검증, 필요시 MFA 추가</text>
-    <rect x="0" y="216" width="115" height="28" rx="14" fill="#dbeafe"/>
-    <text class="chip" x="57" y="234" text-anchor="middle">성공 시 토큰 발급</text>
+  <g transform="translate(314 262)">
+    <rect x="0" y="0" width="180" height="232" rx="24" fill="#ffffff" stroke="#60a5fa" stroke-width="2.5"/>
+    <rect x="40" y="28" width="100" height="72" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <rect x="56" y="44" width="68" height="10" rx="5" fill="#93c5fd"/>
+    <rect x="56" y="62" width="44" height="10" rx="5" fill="#93c5fd"/>
+    <circle cx="118" cy="78" r="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <path d="M 118 71 V 82" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="118" cy="85" r="2.5" fill="#2563eb"/>
+    <text class="cardTitle" x="24" y="130">2. 인증</text>
+    <text class="body" x="24" y="158">
+      <tspan x="24" dy="0">인증 서버가 자격증명을 검증하고</tspan>
+      <tspan x="24" dy="24">필요하면 MFA를 추가로 요구한다.</tspan>
+    </text>
+    <rect x="24" y="196" width="120" height="34" rx="17" fill="#dbeafe"/>
+    <text class="chip" x="84" y="218" text-anchor="middle">성공 시 토큰 발급</text>
   </g>
 
-  <g transform="translate(506 214)">
-    <rect x="0" y="24" width="156" height="126" rx="22" fill="#ffffff" stroke="#0f766e" stroke-width="2.5"/>
-    <rect x="18" y="40" width="120" height="24" rx="12" fill="#ccfbf1"/>
-    <text class="chip" x="78" y="56" text-anchor="middle">정책 엔진</text>
-    <rect x="18" y="76" width="48" height="22" rx="11" fill="#dbeafe"/>
-    <text class="small" x="42" y="91" text-anchor="middle">역할</text>
-    <rect x="72" y="76" width="48" height="22" rx="11" fill="#dcfce7"/>
-    <text class="small" x="96" y="91" text-anchor="middle">속성</text>
-    <rect x="126" y="76" width="12" height="22" rx="6" fill="#99f6e4"/>
-    <rect x="18" y="106" width="120" height="14" rx="7" fill="#99f6e4"/>
-    <text class="stepTitle" x="0" y="176">3. 인가</text>
-    <text class="body" x="0" y="200">토큰·역할·속성·정책으로 허용 범위 결정</text>
-    <rect x="0" y="216" width="108" height="28" rx="14" fill="#ccfbf1"/>
-    <text class="chip" x="54" y="234" text-anchor="middle">최소권한 적용</text>
+  <g transform="translate(532 262)">
+    <rect x="0" y="0" width="200" height="232" rx="24" fill="#ffffff" stroke="#14b8a6" stroke-width="2.5"/>
+    <rect x="32" y="28" width="136" height="30" rx="15" fill="#ccfbf1"/>
+    <text class="chip" x="100" y="48" text-anchor="middle">정책 엔진</text>
+    <rect x="32" y="72" width="42" height="26" rx="13" fill="#dbeafe"/>
+    <text class="small" x="53" y="89" text-anchor="middle">역할</text>
+    <rect x="82" y="72" width="42" height="26" rx="13" fill="#dcfce7"/>
+    <text class="small" x="103" y="89" text-anchor="middle">속성</text>
+    <rect x="132" y="72" width="36" height="26" rx="13" fill="#fef3c7"/>
+    <text class="small" x="150" y="89" text-anchor="middle">조건</text>
+    <rect x="32" y="110" width="136" height="14" rx="7" fill="#99f6e4"/>
+    <text class="cardTitle" x="24" y="154">3. 인가</text>
+    <text class="body" x="24" y="182">
+      <tspan x="24" dy="0">토큰, 역할, 속성, 정책을 묶어</tspan>
+      <tspan x="24" dy="24">허용 범위와 작업 가능 여부를 결정한다.</tspan>
+    </text>
+    <rect x="24" y="196" width="126" height="34" rx="17" fill="#ccfbf1"/>
+    <text class="chip" x="87" y="218" text-anchor="middle">최소권한 적용</text>
   </g>
 
-  <g transform="translate(726 214)">
-    <path d="M 24 86 L 92 24 L 160 86 L 160 136 L 24 136 Z" fill="#ffffff" stroke="#0f766e" stroke-width="2.5"/>
-    <rect x="78" y="74" width="28" height="44" rx="10" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
-    <path d="M 85 74 V 61 C 85 49, 99 42, 109 48 C 116 52, 120 58, 120 67 V 74" fill="none" stroke="#0f766e" stroke-width="5" stroke-linecap="round"/>
-    <text class="stepTitle" x="0" y="176">4. 접근통제</text>
-    <text class="body" x="0" y="200">문을 열지 닫을지 실제 메커니즘이 집행</text>
-    <rect x="0" y="216" width="118" height="28" rx="14" fill="#dcfce7"/>
-    <text class="chip" x="59" y="234" text-anchor="middle">허용 또는 차단</text>
+  <g transform="translate(770 262)">
+    <rect x="0" y="0" width="180" height="232" rx="24" fill="#ffffff" stroke="#10b981" stroke-width="2.5"/>
+    <path d="M 38 102 L 90 42 L 142 102 L 142 144 L 38 144 Z" fill="#ecfdf5" stroke="#0f766e" stroke-width="2.5"/>
+    <rect x="76" y="96" width="28" height="48" rx="10" fill="#d1fae5" stroke="#0f766e" stroke-width="2"/>
+    <path d="M 82 96 V 84 C 82 72, 96 65, 106 71 C 113 75, 118 82, 118 91 V 96" fill="none" stroke="#0f766e" stroke-width="5" stroke-linecap="round"/>
+    <text class="cardTitle" x="24" y="174">4. 접근통제 집행</text>
+    <text class="body" x="24" y="202">
+      <tspan x="24" dy="0">애플리케이션, API, DB가</tspan>
+      <tspan x="24" dy="24">문을 열지 닫을지 실제로 집행한다.</tspan>
+    </text>
   </g>
 
-  <g transform="translate(922 214)">
-    <rect x="0" y="24" width="172" height="126" rx="22" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
-    <rect x="18" y="42" width="136" height="34" rx="12" fill="url(#allow)" stroke="#16a34a"/>
-    <text class="chip" x="86" y="64" text-anchor="middle">허용: 조회·승인·이체</text>
-    <rect x="18" y="88" width="136" height="34" rx="12" fill="url(#deny)" stroke="#dc2626"/>
-    <text class="chip" x="86" y="110" text-anchor="middle">거부: 범위 밖 요청</text>
-    <text class="stepTitle" x="0" y="176">5. 자원 접근 결과</text>
-    <text class="body" x="0" y="200">메뉴, API, 파일, 금융거래 화면 접근이 결정됨</text>
-    <rect x="0" y="216" width="136" height="28" rx="14" fill="#e2e8f0"/>
-    <text class="chip" x="68" y="234" text-anchor="middle">로그·감사 추적 기록</text>
+  <g transform="translate(988 262)">
+    <rect x="0" y="0" width="180" height="232" rx="24" fill="#ffffff" stroke="#64748b" stroke-width="2.5"/>
+    <rect x="24" y="30" width="132" height="44" rx="14" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text class="chip" x="90" y="58" text-anchor="middle">허용: 조회·승인·이체</text>
+    <rect x="24" y="90" width="132" height="44" rx="14" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text class="chip" x="90" y="118" text-anchor="middle">차단: 범위 밖 요청</text>
+    <text class="cardTitle" x="24" y="174">5. 결과와 기록</text>
+    <text class="body" x="24" y="202">
+      <tspan x="24" dy="0">허용·차단 결과와 감사로그가</tspan>
+      <tspan x="24" dy="24">남아 사후 추적과 모니터링에 쓰인다.</tspan>
+    </text>
   </g>
 
-  <rect x="874" y="174" width="256" height="288" rx="26" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="section" x="898" y="205">PKI / 인증서 검증 보조축</text>
-  <g transform="translate(898 220)">
-    <rect x="0" y="0" width="96" height="52" rx="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
-    <text class="stepTitle" x="48" y="31" text-anchor="middle">CA</text>
-    <text class="small" x="48" y="46" text-anchor="middle">인증서 발급</text>
-    <rect x="0" y="76" width="96" height="52" rx="18" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
-    <text class="stepTitle" x="48" y="107" text-anchor="middle">RA</text>
-    <text class="small" x="48" y="122" text-anchor="middle">신원 등록 확인</text>
-    <rect x="132" y="18" width="96" height="52" rx="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-    <text class="small" x="180" y="40" text-anchor="middle">인증서 + 공개키</text>
-    <text class="small" x="180" y="55" text-anchor="middle">신뢰연쇄 확인</text>
-    <rect x="132" y="94" width="96" height="52" rx="18" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
-    <text class="small" x="180" y="116" text-anchor="middle">CRL / OCSP</text>
-    <text class="small" x="180" y="131" text-anchor="middle">폐기 여부 확인</text>
-    <line x1="96" y1="26" x2="132" y2="40" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow-soft)"/>
-    <line x1="96" y1="102" x2="132" y2="120" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow-soft)"/>
-  </g>
-  <path d="M 954 404 C 918 404, 886 394, 856 370" fill="none" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6 8" marker-end="url(#arrow-soft)"/>
-  <text class="small" x="897" y="432">TLS·인증서 로그인에서는 신뢰연쇄와 폐기 확인이 추가된다.</text>
+  <rect x="72" y="576" width="736" height="244" rx="28" fill="#f8fafc" stroke="#ddd6fe" stroke-width="2"/>
+  <text class="section" x="96" y="612">PKI / 인증서 검증 보조 흐름</text>
 
-  <rect x="70" y="486" width="1060" height="164" rx="26" fill="#f8fafc" stroke="#dbeafe"/>
-  <text class="section" x="94" y="518">접근통제 모델 비교 + 금융권 운영 포인트</text>
-
-  <g transform="translate(94 540)">
-    <rect x="0" y="0" width="232" height="88" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
-    <text class="modelTitle" x="18" y="26">DAC</text>
-    <text class="modelBody" x="18" y="48">소유자가 권한을 정하는 재량형</text>
-    <text class="modelBody" x="18" y="67">유연하지만 권한 전파 통제가 약함</text>
-  </g>
-  <g transform="translate(350 540)">
-    <rect x="0" y="0" width="232" height="88" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
-    <text class="modelTitle" x="18" y="26">MAC</text>
-    <text class="modelBody" x="18" y="48">보안등급과 중앙정책으로 강제</text>
-    <text class="modelBody" x="18" y="67">엄격하지만 운영 유연성은 낮음</text>
-  </g>
-  <g transform="translate(606 540)">
-    <rect x="0" y="0" width="232" height="88" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
-    <text class="modelTitle" x="18" y="26">RBAC</text>
-    <text class="modelBody" x="18" y="48">역할에 권한을 매핑하는 조직형</text>
-    <text class="modelBody" x="18" y="67">금융권 권한표·승인 절차와 잘 맞음</text>
-  </g>
-  <g transform="translate(862 540)">
-    <rect x="0" y="0" width="244" height="88" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
-    <text class="modelTitle" x="18" y="26">ABAC</text>
-    <text class="modelBody" x="18" y="48">사용자·자원·환경 속성까지 평가</text>
-    <text class="modelBody" x="18" y="67">세밀하지만 정책 설계·운영이 복잡</text>
+  <g transform="translate(96 640)">
+    <rect x="0" y="0" width="150" height="104" rx="22" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+    <text class="cardTitle" x="26" y="42">CA</text>
+    <text class="body" x="26" y="70">
+      <tspan x="26" dy="0">인증서 발급과</tspan>
+      <tspan x="26" dy="22">신뢰의 출발점</tspan>
+    </text>
   </g>
 
-  <rect x="898" y="228" width="110" height="28" rx="14" fill="#ffffff" stroke="#7c3aed"/>
-  <text class="small" x="953" y="246" text-anchor="middle">PKI 구성요소</text>
-  <rect x="130" y="620" width="254" height="22" rx="11" fill="#dbeafe"/>
-  <text class="small" x="257" y="635" text-anchor="middle">최소권한 · 직무분리 · 권한회수</text>
-  <rect x="460" y="620" width="264" height="22" rx="11" fill="#dcfce7"/>
-  <text class="small" x="592" y="635" text-anchor="middle">세션 타임아웃 · 재인증 · MFA 강화</text>
-  <rect x="800" y="620" width="236" height="22" rx="11" fill="#fef3c7"/>
-  <text class="small" x="918" y="635" text-anchor="middle">감사로그 · 관리자 접근 모니터링</text>
+  <g transform="translate(286 640)">
+    <rect x="0" y="0" width="150" height="104" rx="22" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2.5"/>
+    <text class="cardTitle" x="26" y="42">RA</text>
+    <text class="body" x="26" y="70">
+      <tspan x="26" dy="0">신청자 신원 확인과</tspan>
+      <tspan x="26" dy="22">등록 절차 보조</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(476 640)">
+    <rect x="0" y="0" width="150" height="104" rx="22" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
+    <text class="cardTitle" x="26" y="42">인증서 검증</text>
+    <text class="body" x="26" y="70">
+      <tspan x="26" dy="0">전자서명, 유효기간,</tspan>
+      <tspan x="26" dy="22">신뢰연쇄를 확인</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(666 640)">
+    <rect x="0" y="0" width="118" height="104" rx="22" fill="#fff7ed" stroke="#f59e0b" stroke-width="2.5"/>
+    <text class="cardTitle" x="20" y="42">CRL / OCSP</text>
+    <text class="body" x="20" y="70">
+      <tspan x="20" dy="0">폐기 여부를</tspan>
+      <tspan x="20" dy="22">추가 확인</tspan>
+    </text>
+  </g>
+
+  <line x1="246" y1="692" x2="286" y2="692" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowSoft)"/>
+  <line x1="436" y1="692" x2="476" y2="692" stroke="#475569" stroke-width="3" marker-end="url(#arrowSoft)"/>
+  <line x1="626" y1="692" x2="666" y2="692" stroke="#475569" stroke-width="3" marker-end="url(#arrowSoft)"/>
+  <text class="small" x="96" y="778">TLS·인증서 로그인에서는 인증서 유효성 검증과 폐기 확인이 인증 단계에 추가된다.</text>
+
+  <rect x="836" y="576" width="372" height="244" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="860" y="612">운영 통제 체크포인트</text>
+
+  <g transform="translate(860 642)">
+    <rect x="0" y="0" width="324" height="40" rx="20" fill="#dbeafe"/>
+    <text class="note" x="20" y="26">최소권한 · 직무분리 · 권한 승인/회수</text>
+    <rect x="0" y="58" width="324" height="40" rx="20" fill="#dcfce7"/>
+    <text class="note" x="20" y="84">세션 타임아웃 · 재인증 · MFA 강화</text>
+    <rect x="0" y="116" width="324" height="40" rx="20" fill="#fef3c7"/>
+    <text class="note" x="20" y="142">감사로그 · 관리자 접근 모니터링</text>
+    <rect x="0" y="174" width="324" height="40" rx="20" fill="#fee2e2"/>
+    <text class="note" x="20" y="200">이상 징후 탐지 · 비상 계정 사용 사후 감사</text>
+  </g>
 </svg>

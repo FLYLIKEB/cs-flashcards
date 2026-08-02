@@ -1,141 +1,133 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img" aria-labelledby="title desc">
   <title id="title">12-03 문제해결 인포그래픽</title>
-  <desc id="desc">문장형 조건을 표와 기호로 바꾸고, 확정 조건과 가능 조건을 분리한 뒤, 반례로 후보를 제거해 정답을 좁히는 문제해결 절차를 설명한다.</desc>
+  <desc id="desc">문장형 조건을 표와 기호로 바꾸고, 확정 조건과 가능 조건을 분리한 뒤, 가능한 경우를 줄이고 반례로 후보를 제거하는 문제해결 절차를 설명한다.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef4ff"/>
     </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#0f766e"/>
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M1,1 L11,6 L1,11 Z" fill="#0f766e"/>
-    </marker>
     <style>
-      .title { font: 700 34px sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px sans-serif; fill: #334155; }
-      .section { font: 700 19px sans-serif; fill: #0f172a; }
-      .label { font: 700 15px sans-serif; fill: #0f172a; }
-      .body { font: 500 14px sans-serif; fill: #334155; }
-      .small { font: 600 12px sans-serif; fill: #475569; }
-      .mono { font: 600 14px monospace; fill: #0f172a; }
-      .monoSmall { font: 600 12px monospace; fill: #0f172a; }
-      .white { fill: #ffffff; }
-      .muted { fill: #e2e8f0; }
-      .bad { fill: #fee2e2; }
-      .good { fill: #dcfce7; }
-      .fixed { fill: #dbeafe; }
-      .possible { fill: #fef3c7; }
-      .stroke { stroke: #cbd5e1; stroke-width: 1.5; }
+      .title { font: 700 38px sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px sans-serif; fill: #334155; }
+      .section { font: 700 22px sans-serif; fill: #0f172a; }
+      .label { font: 700 16px sans-serif; fill: #0f172a; }
+      .body { font: 500 15px sans-serif; fill: #334155; }
+      .small { font: 500 13px sans-serif; fill: #475569; }
+      .mono { font: 600 15px monospace; fill: #0f172a; }
+      .monoSmall { font: 600 13px monospace; fill: #0f172a; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .softBlue { fill: #dbeafe; }
+      .softAmber { fill: #fef3c7; }
+      .softGreen { fill: #dcfce7; }
+      .softRed { fill: #fee2e2; }
+      .softSlate { fill: #e2e8f0; }
+      .ink { fill: #0f172a; }
+      .divider { stroke: #cbd5e1; stroke-width: 1.5; }
+      .flow { stroke: #2563eb; stroke-width: 4; stroke-linecap: round; }
+      .arrow { fill: #2563eb; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+  <rect width="1200" height="920" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="864" rx="28" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
 
   <text x="72" y="88" class="small">NCS 문제해결 · 조건 정리 → 경우 축소 → 반례 검증</text>
-  <text x="72" y="128" class="title">12-03. 문제해결</text>
-  <text x="72" y="158" class="subtitle">문장형 조건을 표와 기호로 바꿔 사고를 고정하고, 확정 조건과 가능 조건을 분리한 뒤 반례로 선지를 제거한다.</text>
+  <text x="72" y="132" class="title">12-03. 문제해결</text>
+  <text x="72" y="164" class="subtitle">머릿속 추측 대신 조건을 적어 두고, 확정 조건과 분기 조건을 분리해 후보를 줄이는 풀이 루틴</text>
 
-  <rect x="64" y="196" width="320" height="258" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="88" y="228" class="section">1. 조건 추출과 재표현</text>
-  <text x="88" y="258" class="label">예시 문제</text>
-  <text x="88" y="284" class="body">A, B, C는 빨강·파랑·초록을 하나씩 입는다.</text>
-  <text x="88" y="310" class="body">① A는 파랑이 아니다</text>
-  <text x="88" y="334" class="body">② B는 빨강이거나 초록이다</text>
-  <text x="88" y="358" class="body">③ C가 초록이면 B는 파랑이다</text>
+  <rect x="64" y="206" width="332" height="294" rx="24" class="card"/>
+  <text x="88" y="244" class="section">1. 조건을 문장에서 표기로 바꾼다</text>
+  <text x="88" y="276" class="label">예시 조건</text>
+  <text x="88" y="304" class="body">• A는 파랑이 아니다</text>
+  <text x="88" y="332" class="body">• B는 빨강 또는 초록이다</text>
+  <text x="88" y="360" class="body">• C가 초록이면 B는 파랑이다</text>
+  <rect x="88" y="386" width="284" height="78" rx="16" class="softBlue"/>
+  <text x="108" y="416" class="mono">A ≠ Blue</text>
+  <text x="108" y="442" class="mono">B ∈ {Red, Green}</text>
+  <text x="108" y="468" class="mono">C = Green → B = Blue</text>
+  <text x="88" y="490" class="small">긴 문장을 짧은 기호와 표로 바꾸면 누락과 착각이 줄어든다.</text>
 
-  <rect x="88" y="382" width="272" height="50" rx="14" fill="#dbeafe"/>
-  <text x="104" y="412" class="mono">A ≠ Blue   /   B ∈ {Red, Green}</text>
-  <text x="88" y="448" class="small">조건을 기호·표로 바꾸면 추론 누락이 줄어든다.</text>
+  <rect x="434" y="206" width="332" height="294" rx="24" class="card"/>
+  <text x="458" y="244" class="section">2. 확정 조건과 가능 조건을 분리한다</text>
+  <rect x="458" y="276" width="128" height="36" rx="12" class="softBlue"/>
+  <text x="522" y="299" text-anchor="middle" class="label">확정 조건</text>
+  <rect x="606" y="276" width="136" height="36" rx="12" class="softAmber"/>
+  <text x="674" y="299" text-anchor="middle" class="label">가능 조건</text>
+  <rect x="458" y="328" width="284" height="58" rx="16" class="card"/>
+  <text x="478" y="352" class="small">항상 적용</text>
+  <text x="478" y="376" class="body">A ≠ Blue, 색은 중복 없이 하나씩 사용</text>
+  <rect x="458" y="402" width="284" height="72" rx="16" class="card"/>
+  <text x="478" y="426" class="small">케이스마다 확인</text>
+  <text x="478" y="450" class="body">B = Red 또는 Green</text>
+  <text x="478" y="472" class="body">C = Green 이면 B = Blue</text>
+  <text x="458" y="492" class="small">섞어 쓰면 임시 가정을 확정 사실처럼 착각하기 쉽다.</text>
 
-  <rect x="410" y="196" width="336" height="258" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="434" y="228" class="section">2. 확정 조건 vs 가능 조건</text>
-  <rect x="434" y="250" width="132" height="36" rx="12" class="fixed"/>
-  <rect x="580" y="250" width="142" height="36" rx="12" class="possible"/>
-  <text x="500" y="273" text-anchor="middle" class="label">확정 조건</text>
-  <text x="651" y="273" text-anchor="middle" class="label">가능 조건</text>
+  <rect x="804" y="206" width="332" height="294" rx="24" class="card"/>
+  <text x="828" y="244" class="section">3. 경우의 수를 줄이며 후보를 남긴다</text>
+  <text x="828" y="276" class="small">순열 6개를 만든 뒤 조건 위배 항목을 바로 지운다.</text>
+  <rect x="828" y="296" width="62" height="34" rx="10" class="softSlate"/>
+  <rect x="896" y="296" width="112" height="34" rx="10" class="softSlate"/>
+  <rect x="1014" y="296" width="98" height="34" rx="10" class="softSlate"/>
+  <text x="859" y="318" text-anchor="middle" class="label">번호</text>
+  <text x="952" y="318" text-anchor="middle" class="label">A,B,C</text>
+  <text x="1063" y="318" text-anchor="middle" class="label">판정</text>
 
-  <rect x="434" y="300" width="288" height="48" rx="14" class="white stroke"/>
-  <text x="452" y="321" class="small">항상 적용</text>
-  <text x="452" y="340" class="body">A ≠ Blue, 색은 중복 불가</text>
+  <rect x="828" y="342" width="284" height="30" rx="10" class="softRed"/>
+  <text x="846" y="362" class="monoSmall">1   R,B,G</text>
+  <text x="1063" y="362" text-anchor="middle" class="small">② 위배</text>
 
-  <rect x="434" y="358" width="288" height="78" rx="14" class="white stroke"/>
-  <text x="452" y="379" class="small">케이스별 검토</text>
-  <text x="452" y="399" class="body">B = Red 또는 Green</text>
-  <text x="452" y="420" class="body">C = Green 이면 B = Blue</text>
+  <rect x="828" y="380" width="284" height="30" rx="10" class="softGreen"/>
+  <text x="846" y="400" class="monoSmall">2   R,G,B</text>
+  <text x="1063" y="400" text-anchor="middle" class="small">유지</text>
 
-  <line x1="566" y1="286" x2="566" y2="436" stroke="#94a3b8" stroke-dasharray="6 6"/>
-  <text x="434" y="448" class="small">필수 조건과 분기 조건을 섞지 않아야 잘못된 전제를 막는다.</text>
+  <rect x="828" y="418" width="284" height="30" rx="10" class="softRed"/>
+  <text x="846" y="438" class="monoSmall">3   B,R,G</text>
+  <text x="1063" y="438" text-anchor="middle" class="small">① 위배</text>
 
-  <rect x="772" y="196" width="364" height="258" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="796" y="228" class="section">3. 경우의 수 표로 후보 제거</text>
-  <text x="796" y="252" class="small">순열 6개를 만들고 조건을 하나씩 적용한다.</text>
+  <rect x="828" y="456" width="284" height="30" rx="10" class="softGreen"/>
+  <text x="846" y="476" class="monoSmall">5   G,R,B</text>
+  <text x="1063" y="476" text-anchor="middle" class="small">유지</text>
 
-  <rect x="796" y="270" width="78" height="34" rx="10" fill="#e2e8f0"/>
-  <rect x="876" y="270" width="150" height="34" rx="10" fill="#e2e8f0"/>
-  <rect x="1028" y="270" width="84" height="34" rx="10" fill="#e2e8f0"/>
-  <text x="835" y="292" text-anchor="middle" class="label">번호</text>
-  <text x="951" y="292" text-anchor="middle" class="label">A,B,C</text>
-  <text x="1070" y="292" text-anchor="middle" class="label">판정</text>
+  <text x="828" y="498" class="small">남는 후보가 여러 개면 반례와 추가 조건으로 마지막 확인을 한다.</text>
 
-  <rect x="796" y="314" width="316" height="24" rx="8" class="bad"/>
-  <text x="820" y="331" class="monoSmall">1   R,B,G</text>
-  <text x="1069" y="331" text-anchor="middle" class="small">② 위배</text>
-  <line x1="882" y1="326" x2="1018" y2="326" stroke="#dc2626" stroke-width="2"/>
+  <rect x="64" y="532" width="1072" height="184" rx="24" fill="#0f172a"/>
+  <text x="92" y="572" class="section" fill="#ffffff">4. 시험장에서 쓰는 고정 풀이 흐름</text>
 
-  <rect x="796" y="344" width="316" height="24" rx="8" class="good"/>
-  <text x="820" y="361" class="monoSmall">2   R,G,B</text>
-  <text x="1069" y="361" text-anchor="middle" class="small">유지</text>
+  <rect x="102" y="604" width="168" height="72" rx="20" class="softBlue"/>
+  <text x="186" y="632" text-anchor="middle" class="label">1) 조건 추출</text>
+  <text x="186" y="656" text-anchor="middle" class="small">밑줄 치고 한 줄씩 분리</text>
 
-  <rect x="796" y="374" width="316" height="24" rx="8" class="bad"/>
-  <text x="820" y="391" class="monoSmall">3   B,R,G</text>
-  <text x="1069" y="391" text-anchor="middle" class="small">① 위배</text>
-  <line x1="882" y1="386" x2="1018" y2="386" stroke="#dc2626" stroke-width="2"/>
+  <rect x="306" y="604" width="168" height="72" rx="20" class="softAmber"/>
+  <text x="390" y="632" text-anchor="middle" class="label">2) 재표현</text>
+  <text x="390" y="656" text-anchor="middle" class="small">표·기호·간단한 도식으로 변환</text>
 
-  <rect x="796" y="404" width="316" height="24" rx="8" class="bad"/>
-  <text x="820" y="421" class="monoSmall">4   B,G,R</text>
-  <text x="1069" y="421" text-anchor="middle" class="small">① 위배</text>
-  <line x1="882" y1="416" x2="1018" y2="416" stroke="#dc2626" stroke-width="2"/>
+  <rect x="510" y="604" width="168" height="72" rx="20" class="softBlue"/>
+  <text x="594" y="632" text-anchor="middle" class="label">3) 조건 분리</text>
+  <text x="594" y="656" text-anchor="middle" class="small">확정 조건과 분기 조건 구분</text>
 
-  <rect x="796" y="434" width="316" height="24" rx="8" class="good"/>
-  <text x="820" y="451" class="monoSmall">5   G,R,B</text>
-  <text x="1069" y="451" text-anchor="middle" class="small">유지</text>
+  <rect x="714" y="604" width="168" height="72" rx="20" class="softGreen"/>
+  <text x="798" y="632" text-anchor="middle" class="label">4) 후보 제거</text>
+  <text x="798" y="656" text-anchor="middle" class="small">경우의 수를 하나씩 지우기</text>
 
-  <rect x="796" y="464" width="316" height="24" rx="8" class="bad"/>
-  <text x="820" y="481" class="monoSmall">6   G,B,R</text>
-  <text x="1069" y="481" text-anchor="middle" class="small">② 위배</text>
-  <line x1="882" y1="476" x2="1018" y2="476" stroke="#dc2626" stroke-width="2"/>
+  <rect x="918" y="604" width="168" height="72" rx="20" class="softGreen"/>
+  <text x="1002" y="632" text-anchor="middle" class="label">5) 반례 검증</text>
+  <text x="1002" y="656" text-anchor="middle" class="small">유일성·최대/최소 요구 재확인</text>
 
-  <rect x="64" y="484" width="1072" height="166" rx="24" fill="#0f172a"/>
-  <text x="92" y="520" class="section" fill="#ffffff">4. 시험장에서 쓰는 고정 루틴</text>
+  <line x1="270" y1="640" x2="306" y2="640" class="flow"/>
+  <polygon points="306,640 294,634 294,646" class="arrow"/>
+  <line x1="474" y1="640" x2="510" y2="640" class="flow"/>
+  <polygon points="510,640 498,634 498,646" class="arrow"/>
+  <line x1="678" y1="640" x2="714" y2="640" class="flow"/>
+  <polygon points="714,640 702,634 702,646" class="arrow"/>
+  <line x1="882" y1="640" x2="918" y2="640" class="flow"/>
+  <polygon points="918,640 906,634 906,646" class="arrow"/>
 
-  <circle cx="176" cy="566" r="34" fill="#dbeafe"/>
-  <text x="176" y="559" text-anchor="middle" class="label">조건</text>
-  <text x="176" y="577" text-anchor="middle" class="small">밑줄·분리</text>
+  <rect x="64" y="744" width="1072" height="112" rx="24" class="card"/>
+  <text x="92" y="782" class="section">빠른 체크포인트</text>
+  <text x="92" y="812" class="body">• 모든 조건을 빠짐없이 추출했는가</text>
+  <text x="92" y="838" class="body">• ‘또는’이 포함적 의미인지, 배타적 의미인지 확인했는가</text>
+  <text x="574" y="812" class="body">• 확정 조건과 임시 가정을 섞지 않았는가</text>
+  <text x="574" y="838" class="body">• 남은 후보를 반례와 문제 요구사항으로 최종 검증했는가</text>
 
-  <circle cx="420" cy="566" r="34" fill="#fef3c7"/>
-  <text x="420" y="559" text-anchor="middle" class="label">표/기호</text>
-  <text x="420" y="577" text-anchor="middle" class="small">재표현</text>
-
-  <circle cx="664" cy="566" r="34" fill="#dbeafe"/>
-  <text x="664" y="559" text-anchor="middle" class="label">경우</text>
-  <text x="664" y="577" text-anchor="middle" class="small">하나씩 제거</text>
-
-  <circle cx="908" cy="566" r="34" fill="#dcfce7"/>
-  <text x="908" y="559" text-anchor="middle" class="label">반례</text>
-  <text x="908" y="577" text-anchor="middle" class="small">후보 검증</text>
-
-  <line x1="212" y1="566" x2="384" y2="566" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <line x1="456" y1="566" x2="628" y2="566" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <line x1="700" y1="566" x2="872" y2="566" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
-
-  <rect x="970" y="534" width="132" height="64" rx="18" fill="#ffffff"/>
-  <text x="1036" y="558" text-anchor="middle" class="label">최종 후보</text>
-  <text x="1036" y="582" text-anchor="middle" class="mono">#2, #5</text>
-
-  <text x="92" y="620" class="small" fill="#cbd5e1">체크: 모든 조건 추출 → 확정/가능 분리 → 상호배타 해석 → 반례로 선지 제거 → 문제 요구사항 최종 확인</text>
-  <text x="1088" y="676" text-anchor="end" class="small">12-03-infographic.svg</text>
+  <text x="1088" y="876" text-anchor="end" class="small">12-03-infographic.svg</text>
 </svg>

@@ -1,152 +1,114 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">13-02. 구현 인포그래픽</title>
-  <desc id="desc">구현 문제를 입력, 처리, 출력으로 분해하고 경계 조건과 시간 복잡도를 함께 점검하는 과정을 보여주는 인포그래픽.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">13-02 구현 핵심 흐름 인포그래픽</title>
+  <desc id="desc">구현 문제를 입력, 처리, 출력 세 단계로 나누고 함께 점검할 경계 조건과 시간 복잡도 기준을 정리한 인포그래픽.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="55%" stop-color="#ecfeff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
+      <stop offset="50%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ecfeff"/>
     </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#06b6d4"/>
-    </linearGradient>
-    <linearGradient id="warn" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fef3c7"/>
-      <stop offset="100%" stop-color="#fde68a"/>
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M1 1L11 6L1 11Z" fill="#0f172a"/>
-    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .mono { font: 600 14px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
-      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .mono { font: 700 15px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .light { fill: #f8fafc; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="32" y="28" width="1136" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect width="1200" height="860" fill="url(#bg)"/>
+  <rect x="28" y="24" width="1144" height="812" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="small" x="76" y="78">금융공기업 IT · 구현 문제 해결 프레임</text>
-  <text class="title" x="76" y="120">13-02. 구현</text>
-  <text class="subtitle" x="76" y="155">입력 → 처리 → 출력의 흐름을 먼저 고정하고, 경계 조건과 시간 복잡도로 실수를 줄인다.</text>
+  <text class="small" x="70" y="74">금융공기업 IT · 구현형 문제 풀이 프레임</text>
+  <text class="title" x="70" y="118">13-02. 구현</text>
+  <text class="subtitle" x="70" y="152">입력 형식을 먼저 고정하고, 처리 중에는 경계 조건을 추적하며, 출력 전에 포맷을 다시 맞춘다.</text>
 
-  <rect x="72" y="198" width="676" height="292" rx="26" fill="#f8fafc" stroke="#bfdbfe" stroke-width="2"/>
-  <text class="section" x="100" y="236">1. 요구사항을 코드 흐름으로 번역</text>
-
-  <path d="M250 344H394" fill="none" stroke="url(#flow)" stroke-width="10" stroke-linecap="round" opacity="0.28"/>
-  <path d="M472 344H616" fill="none" stroke="url(#flow)" stroke-width="10" stroke-linecap="round" opacity="0.28"/>
-  <path d="M250 344H394" fill="none" stroke="#0f172a" stroke-width="2.5" marker-end="url(#arrow)"/>
-  <path d="M472 344H616" fill="none" stroke="#0f172a" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect x="64" y="190" width="760" height="430" rx="28" fill="#f8fafc" stroke="#bfdbfe" stroke-width="2"/>
+  <text class="section" x="94" y="230">1. 요구사항을 코드 흐름으로 번역</text>
+  <text class="small" x="94" y="258">문제를 읽을 때 입력 → 처리 → 출력 순서로 메모하면 구현 실수가 크게 줄어든다.</text>
 
   <g>
-    <rect x="100" y="270" width="150" height="148" rx="22" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-    <text class="label" x="175" y="306" text-anchor="middle">입력</text>
-    <text class="body" x="122" y="336">• 공백/개행 규칙</text>
-    <text class="body" x="122" y="360">• 여러 값 파싱 순서</text>
-    <text class="body" x="122" y="384">• stdin 최적화 필요성</text>
-    <rect x="124" y="283" width="52" height="24" rx="12" fill="#ffffff" opacity="0.9"/>
-    <text class="chip" x="150" y="300" text-anchor="middle">parse</text>
+    <rect x="94" y="290" width="204" height="272" rx="24" fill="#dbeafe" stroke="#2563eb" stroke-width="2.2"/>
+    <rect x="116" y="308" width="70" height="28" rx="14" fill="#ffffff"/>
+    <text class="chip" x="151" y="328" text-anchor="middle">INPUT</text>
+    <text class="label" x="196" y="366" text-anchor="middle">입력 고정</text>
+    <text class="body" x="122" y="404">• 줄 수와 값 개수를 먼저 확인</text>
+    <text class="body" x="122" y="438">• 공백, 개행, 구분자 규칙 메모</text>
+    <text class="body" x="122" y="472">• 빠른 입출력이 필요한지 판단</text>
+    <text class="body" x="122" y="506">• 파싱 순서를 코드와 같게 적기</text>
+    <text class="small" x="122" y="540">예: n, 이어서 n개의 명령어</text>
   </g>
 
   <g>
-    <rect x="394" y="248" width="78" height="192" rx="22" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
-    <text class="label" x="433" y="285" text-anchor="middle">처리</text>
-    <text class="small" x="433" y="322" text-anchor="middle">조건 분기</text>
-    <text class="small" x="433" y="350" text-anchor="middle">반복 경계</text>
-    <text class="small" x="433" y="378" text-anchor="middle">상태 갱신</text>
-    <text class="small" x="433" y="406" text-anchor="middle">예외 처리</text>
-    <circle cx="433" cy="426" r="8" fill="#06b6d4"/>
+    <rect x="342" y="290" width="204" height="272" rx="24" fill="#cffafe" stroke="#0891b2" stroke-width="2.2"/>
+    <rect x="364" y="308" width="84" height="28" rx="14" fill="#ffffff"/>
+    <text class="chip" x="406" y="328" text-anchor="middle">PROCESS</text>
+    <text class="label" x="444" y="366" text-anchor="middle">처리 추적</text>
+    <text class="body" x="370" y="404">• 조건 분기를 표처럼 나누기</text>
+    <text class="body" x="370" y="438">• 반복문 시작·끝 인덱스 점검</text>
+    <text class="body" x="370" y="472">• 상태 갱신 순서를 한 줄씩 확인</text>
+    <text class="body" x="370" y="506">• 빈 상태와 예외 입력 대비</text>
+    <text class="small" x="370" y="540">예: POP 전에 stack이 비었는지 검사</text>
   </g>
 
   <g>
-    <rect x="616" y="270" width="120" height="148" rx="22" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-    <text class="label" x="676" y="306" text-anchor="middle">출력</text>
-    <text class="body" x="638" y="336">• 공백/개행</text>
-    <text class="body" x="638" y="360">• 형식 정확성</text>
-    <text class="body" x="638" y="384">• EMPTY 같은 예외값</text>
-    <rect x="642" y="283" width="58" height="24" rx="12" fill="#ffffff" opacity="0.9"/>
-    <text class="chip" x="671" y="300" text-anchor="middle">print</text>
+    <rect x="590" y="290" width="204" height="272" rx="24" fill="#dcfce7" stroke="#16a34a" stroke-width="2.2"/>
+    <rect x="612" y="308" width="84" height="28" rx="14" fill="#ffffff"/>
+    <text class="chip" x="654" y="328" text-anchor="middle">OUTPUT</text>
+    <text class="label" x="692" y="366" text-anchor="middle">출력 검증</text>
+    <text class="body" x="618" y="404">• 공백과 개행 위치를 맞추기</text>
+    <text class="body" x="618" y="438">• EMPTY 같은 예외값 규칙 확인</text>
+    <text class="body" x="618" y="472">• 정수형 범위와 출력 형식 점검</text>
+    <text class="body" x="618" y="506">• 샘플과 직접 대조해 마무리</text>
+    <text class="small" x="618" y="540">예: join 결과가 비면 EMPTY 출력</text>
   </g>
 
-  <g>
-    <rect x="96" y="438" width="616" height="36" rx="18" fill="#e2e8f0"/>
-    <rect x="104" y="444" width="188" height="24" rx="12" fill="#2563eb" opacity="0.82"/>
-    <rect x="304" y="444" width="164" height="24" rx="12" fill="#06b6d4" opacity="0.7"/>
-    <rect x="480" y="444" width="220" height="24" rx="12" fill="#22c55e" opacity="0.68"/>
-    <text class="small" x="198" y="461" text-anchor="middle" fill="#ffffff">입력 고정</text>
-    <text class="small" x="386" y="461" text-anchor="middle" fill="#ffffff">작은 예제 추적</text>
-    <text class="small" x="590" y="461" text-anchor="middle" fill="#ffffff">출력 검증</text>
-  </g>
+  <path d="M298 426H342" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="342,426 326,418 326,434" fill="#0f172a"/>
+  <path d="M546 426H590" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="590,426 574,418 574,434" fill="#0f172a"/>
 
-  <rect x="776" y="198" width="352" height="292" rx="26" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
-  <text class="section" x="804" y="236">2. 구현형 체크포인트</text>
+  <rect x="64" y="646" width="1070" height="148" rx="28" fill="#0f172a"/>
+  <text class="section light" x="94" y="692">3. 작은 예제로 상태 변화를 확인</text>
+  <text class="body" x="94" y="724" fill="#cbd5e1">명령을 손으로 한 줄씩 실행해 보면 오프바이원, 빈 상태, 갱신 순서 오류를 빠르게 발견할 수 있다.</text>
 
   <g>
-    <rect x="804" y="264" width="144" height="88" rx="18" fill="url(#warn)" stroke="#f59e0b" stroke-width="1.5"/>
-    <text class="label" x="876" y="295" text-anchor="middle">시간 복잡도</text>
-    <text class="body" x="822" y="322">n ≤ 1e5면</text>
-    <text class="body" x="822" y="344">O(n²) 위험</text>
-  </g>
-  <g>
-    <rect x="956" y="264" width="144" height="88" rx="18" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
-    <text class="label" x="1028" y="295" text-anchor="middle">경계 조건</text>
-    <text class="body" x="974" y="322">빈 입력</text>
-    <text class="body" x="974" y="344">최소/최대값</text>
-  </g>
-  <g>
-    <rect x="804" y="364" width="144" height="88" rx="18" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
-    <text class="label" x="876" y="395" text-anchor="middle">인덱스 경계</text>
-    <text class="body" x="822" y="422">inclusive /</text>
-    <text class="body" x="822" y="444">exclusive</text>
-  </g>
-  <g>
-    <rect x="956" y="364" width="144" height="88" rx="18" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
-    <text class="label" x="1028" y="395" text-anchor="middle">자료형 선택</text>
-    <text class="body" x="974" y="422">합·곱 커지면</text>
-    <text class="body" x="974" y="444">long 계열 점검</text>
+    <rect x="96" y="742" width="138" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+    <text class="mono" x="165" y="764" text-anchor="middle" fill="#f8fafc">PUSH 3</text>
+    <rect x="248" y="742" width="138" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+    <text class="mono" x="317" y="764" text-anchor="middle" fill="#f8fafc">PUSH 7</text>
+    <rect x="400" y="742" width="138" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+    <text class="mono" x="469" y="764" text-anchor="middle" fill="#f8fafc">INC 1 2</text>
+    <rect x="552" y="742" width="138" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+    <text class="mono" x="621" y="764" text-anchor="middle" fill="#f8fafc">POP</text>
+    <text class="body" x="724" y="764" fill="#cbd5e1">→ [ ] → [3] → [3,7] → [5,7] → [5]</text>
   </g>
 
-  <rect x="72" y="518" width="1056" height="142" rx="26" fill="#0f172a"/>
-  <text class="section" x="100" y="556" fill="#f8fafc">3. 작은 예제로 상태 전이 확인</text>
+  <rect x="850" y="190" width="284" height="430" rx="28" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text class="section" x="882" y="230">2. 빠른 점검 질문</text>
 
   <g>
-    <text class="mono" x="102" y="590" fill="#93c5fd">명령</text>
-    <rect x="150" y="570" width="120" height="34" rx="10" fill="#1e293b" stroke="#475569"/>
-    <text class="mono" x="210" y="592" text-anchor="middle" fill="#f8fafc">PUSH 3</text>
-    <rect x="288" y="570" width="120" height="34" rx="10" fill="#1e293b" stroke="#475569"/>
-    <text class="mono" x="348" y="592" text-anchor="middle" fill="#f8fafc">PUSH 7</text>
-    <rect x="426" y="570" width="120" height="34" rx="10" fill="#1e293b" stroke="#475569"/>
-    <text class="mono" x="486" y="592" text-anchor="middle" fill="#f8fafc">INC 1 2</text>
-    <rect x="564" y="570" width="120" height="34" rx="10" fill="#1e293b" stroke="#475569"/>
-    <text class="mono" x="624" y="592" text-anchor="middle" fill="#f8fafc">POP</text>
+    <rect x="882" y="264" width="220" height="64" rx="18" fill="#fef3c7" stroke="#f59e0b"/>
+    <text class="label" x="902" y="290">시간 복잡도</text>
+    <text class="body" x="902" y="314">n이 1e5 이상이면 O(n²) 반복을 의심한다.</text>
   </g>
-
   <g>
-    <text class="small" x="102" y="635" fill="#cbd5e1">스택 상태 추적</text>
-    <rect x="214" y="614" width="60" height="28" rx="8" fill="#2563eb"/>
-    <text class="mono" x="244" y="633" text-anchor="middle" fill="#ffffff">[3]</text>
-    <path d="M275 628H308" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-    <rect x="314" y="614" width="74" height="28" rx="8" fill="#0ea5e9"/>
-    <text class="mono" x="351" y="633" text-anchor="middle" fill="#ffffff">[3,7]</text>
-    <path d="M389 628H422" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-    <rect x="428" y="614" width="84" height="28" rx="8" fill="#14b8a6"/>
-    <text class="mono" x="470" y="633" text-anchor="middle" fill="#ffffff">[5,7]</text>
-    <path d="M513 628H546" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-    <rect x="552" y="614" width="60" height="28" rx="8" fill="#22c55e"/>
-    <text class="mono" x="582" y="633" text-anchor="middle" fill="#ffffff">[5]</text>
+    <rect x="882" y="346" width="220" height="64" rx="18" fill="#fee2e2" stroke="#ef4444"/>
+    <text class="label" x="902" y="372">경계 조건</text>
+    <text class="body" x="902" y="396">빈 입력, 최소값, 최대값, 동률을 따로 적는다.</text>
   </g>
-
   <g>
-    <rect x="720" y="566" width="372" height="74" rx="18" fill="#111827" stroke="#334155"/>
-    <text class="label" x="744" y="594" fill="#f8fafc">핵심 습관</text>
-    <text class="body" x="744" y="617" fill="#cbd5e1">1) 먼저 입출력 형식을 적고 2) 작은 케이스를 손으로 돌린 뒤</text>
-    <text class="body" x="744" y="638" fill="#cbd5e1">3) 오프바이원, 빈 상태, 오버플로우를 마지막에 다시 점검한다.</text>
+    <rect x="882" y="428" width="220" height="64" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
+    <text class="label" x="902" y="454">인덱스 경계</text>
+    <text class="body" x="902" y="478">inclusive와 exclusive를 코드에 맞게 통일한다.</text>
+  </g>
+  <g>
+    <rect x="882" y="510" width="220" height="64" rx="18" fill="#dcfce7" stroke="#16a34a"/>
+    <text class="label" x="902" y="536">자료형 선택</text>
+    <text class="body" x="902" y="560">합과 곱이 커지면 long 계열을 먼저 떠올린다.</text>
   </g>
 </svg>

@@ -1,170 +1,154 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="960" viewBox="0 0 1280 960" role="img" aria-labelledby="title desc">
   <title id="title">06. 운영체제 인포그래픽</title>
-  <desc id="desc">운영체제의 목적, 커널 메커니즘, 성능·안정성 trade-off와 네 가지 학습 축을 한 장에 정리한 SVG</desc>
+  <desc id="desc">운영체제의 핵심 목적과 네 개 학습 축, 서술형 답안 프레임을 높은 대비의 카드 레이아웃으로 정리한 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="55%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#eef2ff"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef4ff"/>
     </linearGradient>
-    <linearGradient id="kernel" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="center" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#1d4ed8"/>
-      <stop offset="100%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#4338ca"/>
     </linearGradient>
-    <linearGradient id="panelBlue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#eff6ff"/>
-    </linearGradient>
-    <linearGradient id="panelMint" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dcfce7"/>
-      <stop offset="100%" stop-color="#f0fdf4"/>
-    </linearGradient>
-    <linearGradient id="panelAmber" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fef3c7"/>
-      <stop offset="100%" stop-color="#fffbeb"/>
-    </linearGradient>
-    <linearGradient id="panelViolet" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ede9fe"/>
-      <stop offset="100%" stop-color="#f5f3ff"/>
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
-    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .tiny { font: 700 11px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; letter-spacing: 0.2px; }
-      .kernelTitle { font: 700 28px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
-      .kernelBody { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .title { font: 700 38px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .centerTitle { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .centerBody { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .centerChip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #eff6ff; }
+      .footer { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="24" y="24" width="1152" height="672" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect width="1280" height="960" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1224" height="904" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <rect x="64" y="56" width="152" height="34" rx="17" fill="#dbeafe"/>
-  <text class="small" x="140" y="78" text-anchor="middle">CS 핵심 한눈정리</text>
-  <text class="title" x="64" y="128">06. 운영체제</text>
-  <text class="subtitle" x="64" y="158">자원 관리 목적 → 커널 메커니즘 → 성능·안정성 trade-off를 네 축으로 연결</text>
+  <rect x="64" y="56" width="164" height="36" rx="18" fill="#dbeafe"/>
+  <text class="small" x="146" y="80" text-anchor="middle">CS 핵심 한눈정리</text>
+  <text class="title" x="64" y="138">06. 운영체제</text>
+  <text class="subtitle" x="64" y="172">자원 관리 목적, 커널 메커니즘, 성능·안정성 trade-off를 한 장에서 연결</text>
 
-  <rect x="420" y="180" width="360" height="190" rx="34" fill="url(#kernel)"/>
-  <text class="kernelTitle" x="600" y="226" text-anchor="middle">Operating System</text>
-  <text class="kernelBody" x="600" y="252" text-anchor="middle">하드웨어와 사용자 프로그램 사이에서 자원을 관리하는 핵심 계층</text>
+  <rect x="440" y="198" width="400" height="176" rx="32" fill="url(#center)"/>
+  <text class="centerTitle" x="640" y="252" text-anchor="middle">Operating System</text>
+  <text class="centerBody" x="640" y="284" text-anchor="middle">하드웨어와 응용 프로그램 사이에서 CPU, 메모리, I/O를 조정하는 핵심 계층</text>
+  <rect x="500" y="312" width="102" height="34" rx="17" fill="#93c5fd" opacity="0.95"/>
+  <text class="centerChip" x="551" y="334" text-anchor="middle">자원 관리</text>
+  <rect x="613" y="312" width="118" height="34" rx="17" fill="#c4b5fd" opacity="0.95"/>
+  <text class="centerChip" x="672" y="334" text-anchor="middle">커널 메커니즘</text>
+  <rect x="742" y="312" width="98" height="34" rx="17" fill="#fde68a" opacity="0.95"/>
+  <text class="chip" x="791" y="334" text-anchor="middle">성능·안정성</text>
 
-  <rect x="454" y="274" width="292" height="34" rx="17" fill="#ffffff" opacity="0.16"/>
-  <text class="label" x="600" y="296" text-anchor="middle" fill="#ffffff">목적 · mechanism · trade-off</text>
-
-  <rect x="454" y="322" width="84" height="30" rx="15" fill="#bfdbfe"/>
-  <text class="tiny" x="496" y="341" text-anchor="middle">자원 관리</text>
-  <rect x="558" y="322" width="84" height="30" rx="15" fill="#c4b5fd"/>
-  <text class="tiny" x="600" y="341" text-anchor="middle">커널 메커니즘</text>
-  <rect x="662" y="322" width="84" height="30" rx="15" fill="#fde68a"/>
-  <text class="tiny" x="704" y="341" text-anchor="middle">성능·안정성</text>
-
-  <line x1="420" y1="275" x2="285" y2="230" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="780" y1="275" x2="915" y2="230" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="420" y1="328" x2="285" y2="500" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="780" y1="328" x2="915" y2="500" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="440" y1="286" x2="368" y2="286" stroke="#94a3b8" stroke-width="3"/>
+  <line x1="840" y1="286" x2="912" y2="286" stroke="#94a3b8" stroke-width="3"/>
+  <line x1="520" y1="374" x2="420" y2="466" stroke="#94a3b8" stroke-width="3"/>
+  <line x1="760" y1="374" x2="860" y2="466" stroke="#94a3b8" stroke-width="3"/>
 
   <g>
-    <rect x="66" y="190" width="330" height="210" rx="28" fill="url(#panelBlue)" stroke="#93c5fd" stroke-width="2"/>
-    <text class="section" x="92" y="226">06-01. 프로세스와 스레드</text>
-    <text class="body" x="92" y="250">실행 단위와 문맥교환의 기본 구조</text>
+    <rect x="64" y="214" width="320" height="264" rx="26" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+    <text class="section" x="92" y="252">06-01. 프로세스와 스레드</text>
+    <text class="body" x="92" y="282">실행 단위, PCB, 문맥교환 비용 구조를 구분</text>
 
-    <rect x="92" y="272" width="144" height="102" rx="18" fill="#ffffff" stroke="#60a5fa"/>
-    <text class="label" x="164" y="298" text-anchor="middle">프로세스</text>
-    <text class="body" x="106" y="322">• 독립 주소공간</text>
-    <text class="body" x="106" y="344">• PCB로 상태 저장</text>
-    <text class="body" x="106" y="366">• 문맥교환 비용 큼</text>
+    <rect x="92" y="308" width="126" height="116" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+    <text class="label" x="155" y="338" text-anchor="middle">프로세스</text>
+    <text class="body" x="108" y="364">• 독립 주소공간</text>
+    <text class="body" x="108" y="388">• PCB에 상태 저장</text>
+    <text class="body" x="108" y="412">• 전환 비용 큼</text>
 
-    <rect x="254" y="272" width="116" height="44" rx="14" fill="#eff6ff" stroke="#60a5fa"/>
-    <text class="label" x="312" y="299" text-anchor="middle">스레드 A</text>
-    <rect x="254" y="324" width="116" height="44" rx="14" fill="#eff6ff" stroke="#60a5fa"/>
-    <text class="label" x="312" y="351" text-anchor="middle">스레드 B</text>
-    <line x1="236" y1="322" x2="254" y2="322" stroke="#60a5fa" stroke-width="2"/>
-    <text class="small" x="312" y="386" text-anchor="middle">코드·데이터 공유, 스택은 분리</text>
+    <rect x="240" y="308" width="116" height="44" rx="14" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+    <text class="label" x="298" y="336" text-anchor="middle">스레드 A</text>
+    <rect x="240" y="366" width="116" height="44" rx="14" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+    <text class="label" x="298" y="394" text-anchor="middle">스레드 B</text>
+    <line x1="218" y1="360" x2="240" y2="360" stroke="#60a5fa" stroke-width="2"/>
+    <text class="small" x="92" y="452">공유: 코드·데이터·파일 / 분리: 각 스레드의 스택</text>
   </g>
 
   <g>
-    <rect x="804" y="190" width="330" height="210" rx="28" fill="url(#panelMint)" stroke="#86efac" stroke-width="2"/>
-    <text class="section" x="830" y="226">06-02. CPU 스케줄링</text>
-    <text class="body" x="830" y="250">대기시간·응답시간·공정성의 균형</text>
+    <rect x="896" y="214" width="320" height="264" rx="26" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+    <text class="section" x="924" y="252">06-02. CPU 스케줄링</text>
+    <text class="body" x="924" y="282">응답성, 대기시간, 공정성 사이의 균형</text>
 
-    <rect x="834" y="280" width="74" height="40" rx="14" fill="#ffffff" stroke="#22c55e"/>
-    <text class="label" x="871" y="305" text-anchor="middle">준비</text>
-    <rect x="932" y="280" width="74" height="40" rx="14" fill="#ffffff" stroke="#22c55e"/>
-    <text class="label" x="969" y="305" text-anchor="middle">실행</text>
-    <rect x="1030" y="280" width="74" height="40" rx="14" fill="#ffffff" stroke="#22c55e"/>
-    <text class="label" x="1067" y="305" text-anchor="middle">대기</text>
-    <line x1="908" y1="300" x2="932" y2="300" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)"/>
-    <line x1="1006" y1="300" x2="1030" y2="300" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="926" y="320" width="76" height="42" rx="14" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+    <text class="label" x="964" y="347" text-anchor="middle">준비</text>
+    <rect x="1018" y="320" width="76" height="42" rx="14" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+    <text class="label" x="1056" y="347" text-anchor="middle">실행</text>
+    <rect x="1110" y="320" width="76" height="42" rx="14" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
+    <text class="label" x="1148" y="347" text-anchor="middle">대기</text>
+    <line x1="1002" y1="341" x2="1018" y2="341" stroke="#16a34a" stroke-width="3"/>
+    <line x1="1094" y1="341" x2="1110" y2="341" stroke="#16a34a" stroke-width="3"/>
 
-    <rect x="834" y="338" width="54" height="28" rx="14" fill="#dcfce7"/>
-    <text class="tiny" x="861" y="356" text-anchor="middle">FCFS</text>
-    <rect x="896" y="338" width="54" height="28" rx="14" fill="#dcfce7"/>
-    <text class="tiny" x="923" y="356" text-anchor="middle">SJF</text>
-    <rect x="958" y="338" width="54" height="28" rx="14" fill="#dcfce7"/>
-    <text class="tiny" x="985" y="356" text-anchor="middle">HRN</text>
-    <rect x="1020" y="338" width="54" height="28" rx="14" fill="#dcfce7"/>
-    <text class="tiny" x="1047" y="356" text-anchor="middle">RR</text>
-    <text class="small" x="834" y="386">선점/비선점, starvation과 aging까지 함께 비교</text>
+    <rect x="926" y="386" width="58" height="30" rx="15" fill="#dcfce7"/>
+    <text class="chip" x="955" y="406" text-anchor="middle">FCFS</text>
+    <rect x="992" y="386" width="58" height="30" rx="15" fill="#dcfce7"/>
+    <text class="chip" x="1021" y="406" text-anchor="middle">SJF</text>
+    <rect x="1058" y="386" width="58" height="30" rx="15" fill="#dcfce7"/>
+    <text class="chip" x="1087" y="406" text-anchor="middle">HRN</text>
+    <rect x="1124" y="386" width="58" height="30" rx="15" fill="#dcfce7"/>
+    <text class="chip" x="1153" y="406" text-anchor="middle">RR</text>
+    <text class="small" x="926" y="452">선점·비선점 비교, starvation과 aging 보완책까지 함께 학습</text>
   </g>
 
   <g>
-    <rect x="66" y="436" width="330" height="220" rx="28" fill="url(#panelAmber)" stroke="#fbbf24" stroke-width="2"/>
-    <text class="section" x="92" y="472">06-03. 동기화와 교착상태</text>
-    <text class="body" x="92" y="496">공유자원 보호와 deadlock 조건 관리</text>
+    <rect x="64" y="512" width="320" height="264" rx="26" fill="#fffbeb" stroke="#fbbf24" stroke-width="2"/>
+    <text class="section" x="92" y="550">06-03. 동기화와 교착상태</text>
+    <text class="body" x="92" y="580">공유자원 보호와 deadlock 발생 조건을 함께 점검</text>
 
-    <circle cx="158" cy="558" r="42" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/>
-    <rect x="143" y="540" width="30" height="36" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
-    <path d="M146 540 v-10 a12 12 0 0 1 24 0 v10" fill="none" stroke="#d97706" stroke-width="3"/>
-    <text class="tiny" x="158" y="595" text-anchor="middle">mutex / semaphore</text>
+    <circle cx="152" cy="658" r="42" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/>
+    <rect x="137" y="640" width="30" height="34" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
+    <path d="M140 640 v-10 a12 12 0 0 1 24 0 v10" fill="none" stroke="#d97706" stroke-width="3"/>
+    <text class="small" x="152" y="716" text-anchor="middle">mutex · semaphore</text>
 
-    <rect x="222" y="520" width="146" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
-    <text class="tiny" x="295" y="538" text-anchor="middle">상호배제</text>
-    <rect x="222" y="556" width="146" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
-    <text class="tiny" x="295" y="574" text-anchor="middle">점유와 대기</text>
-    <rect x="222" y="592" width="146" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
-    <text class="tiny" x="295" y="610" text-anchor="middle">비선점</text>
-    <rect x="222" y="628" width="146" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
-    <text class="tiny" x="295" y="646" text-anchor="middle">순환대기</text>
+    <rect x="214" y="614" width="138" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
+    <text class="chip" x="283" y="633" text-anchor="middle">상호배제</text>
+    <rect x="214" y="650" width="138" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
+    <text class="chip" x="283" y="669" text-anchor="middle">점유와 대기</text>
+    <rect x="214" y="686" width="138" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
+    <text class="chip" x="283" y="705" text-anchor="middle">비선점</text>
+    <rect x="214" y="722" width="138" height="28" rx="14" fill="#fff7ed" stroke="#f59e0b"/>
+    <text class="chip" x="283" y="741" text-anchor="middle">순환대기</text>
   </g>
 
   <g>
-    <rect x="804" y="436" width="330" height="220" rx="28" fill="url(#panelViolet)" stroke="#c4b5fd" stroke-width="2"/>
-    <text class="section" x="830" y="472">06-04. 메모리와 가상메모리</text>
-    <text class="body" x="830" y="496">물리 메모리 한계를 페이지 단위로 확장</text>
+    <rect x="896" y="512" width="320" height="264" rx="26" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2"/>
+    <text class="section" x="924" y="550">06-04. 메모리와 가상메모리</text>
+    <text class="body" x="924" y="580">페이지 단위 주소 변환으로 물리 메모리 한계를 완화</text>
 
-    <rect x="834" y="522" width="118" height="106" rx="18" fill="#ffffff" stroke="#8b5cf6"/>
-    <text class="label" x="893" y="548" text-anchor="middle">RAM</text>
-    <rect x="854" y="564" width="78" height="18" rx="6" fill="#ddd6fe"/>
-    <rect x="854" y="588" width="78" height="18" rx="6" fill="#c4b5fd"/>
-    <text class="small" x="893" y="620" text-anchor="middle">frame</text>
+    <rect x="926" y="620" width="110" height="96" rx="18" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>
+    <text class="label" x="981" y="648" text-anchor="middle">RAM</text>
+    <rect x="948" y="668" width="66" height="14" rx="5" fill="#ddd6fe"/>
+    <rect x="948" y="690" width="66" height="14" rx="5" fill="#c4b5fd"/>
+    <text class="small" x="981" y="736" text-anchor="middle">frame</text>
 
-    <rect x="988" y="522" width="118" height="106" rx="18" fill="#ffffff" stroke="#8b5cf6"/>
-    <text class="label" x="1047" y="548" text-anchor="middle">Disk</text>
-    <rect x="1008" y="564" width="78" height="18" rx="6" fill="#ede9fe"/>
-    <rect x="1008" y="588" width="78" height="18" rx="6" fill="#ddd6fe"/>
-    <text class="small" x="1047" y="620" text-anchor="middle">page</text>
+    <rect x="1074" y="620" width="110" height="96" rx="18" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>
+    <text class="label" x="1129" y="648" text-anchor="middle">Disk</text>
+    <rect x="1096" y="668" width="66" height="14" rx="5" fill="#ede9fe"/>
+    <rect x="1096" y="690" width="66" height="14" rx="5" fill="#ddd6fe"/>
+    <text class="small" x="1129" y="736" text-anchor="middle">page</text>
 
-    <line x1="952" y1="575" x2="988" y2="575" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow)"/>
-    <text class="tiny" x="970" y="564" text-anchor="middle">page fault</text>
-    <text class="small" x="834" y="648">TLB · replacement · thrashing 개념까지 확장</text>
+    <line x1="1036" y1="674" x2="1074" y2="674" stroke="#7c3aed" stroke-width="3"/>
+    <text class="small" x="1055" y="658" text-anchor="middle">page fault</text>
+    <text class="small" x="926" y="760">TLB, replacement, thrashing까지 연결해 서술형 확장</text>
   </g>
 
-  <rect x="438" y="404" width="324" height="228" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="section" x="600" y="438" text-anchor="middle">서술형 답안 프레임</text>
-  <line x1="470" y1="468" x2="730" y2="468" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="label" x="484" y="500">1. 왜 필요한가</text>
-  <text class="body" x="484" y="522">CPU, 메모리, I/O 같은 한정된 자원을 효율적으로 배분</text>
-  <text class="label" x="484" y="558">2. 어떻게 구현하는가</text>
-  <text class="body" x="484" y="580">시스템 콜, 커널 모드, IPC, TLB, 페이지 교체 같은 메커니즘 설명</text>
-  <text class="label" x="484" y="616">3. 어떤 trade-off가 있는가</text>
-  <text class="body" x="484" y="638">응답성, 공정성, 오버헤드, 안정성 사이의 균형으로 마무리</text>
+  <g>
+    <rect x="420" y="430" width="440" height="346" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text class="section" x="640" y="470" text-anchor="middle">서술형 답안 프레임</text>
+    <line x1="454" y1="494" x2="826" y2="494" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="small" x="64" y="684">06-infographic.svg · 운영체제 전체 흐름을 네 학습 축과 답안 구조로 압축한 페이지 전용 인포그래픽</text>
+    <text class="label" x="462" y="538">1. 왜 필요한가</text>
+    <text class="body" x="462" y="566">CPU, 메모리, I/O 같은 한정 자원을 효율적으로 배분해야 한다.</text>
+
+    <text class="label" x="462" y="620">2. 어떻게 구현하는가</text>
+    <text class="body" x="462" y="648">시스템 콜, 커널 모드, IPC, 문맥교환, TLB, 페이지 교체 같은</text>
+    <text class="body" x="462" y="672">메커니즘을 대표 사례와 함께 설명한다.</text>
+
+    <text class="label" x="462" y="726">3. 어떤 trade-off가 있는가</text>
+    <text class="body" x="462" y="754">응답성, 공정성, 오버헤드, 안정성 사이의 균형으로 결론을 맺는다.</text>
+  </g>
+
+  <text class="footer" x="64" y="892">06-infographic.svg · 운영체제 전체 흐름을 네 학습 축과 답안 구조로 압축한 페이지 전용 인포그래픽</text>
 </svg>

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">웹 접속 패킷 여정 SVG</title>
+  <desc id="desc">사용자가 URL을 입력한 뒤 DNS 조회, TCP 연결, TLS 핸드셰이크, HTTP 요청, 라우팅된 응답까지 이어지는 흐름을 단계별로 보여주는 다이어그램</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff" />
+      <stop offset="100%" stop-color="#eef8ff" />
+    </linearGradient>
+    <style>
+      .title { font: 700 34px sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px sans-serif; fill: #334155; }
+      .stepTitle { font: 700 22px sans-serif; fill: #0f172a; }
+      .body { font: 500 14px sans-serif; fill: #334155; }
+      .mini { font: 600 13px sans-serif; fill: #1d4ed8; }
+      .bandTitle { font: 700 16px sans-serif; fill: #0f172a; }
+      .bandText { font: 500 13px sans-serif; fill: #334155; }
+      .pill { font: 700 12px sans-serif; fill: #075985; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#dbe7f5" />
+  <rect x="24" y="24" width="1152" height="712" rx="32" fill="url(#bg)" />
+  <rect x="56" y="52" width="1088" height="120" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="88" y="82" width="156" height="30" rx="15" fill="#dbeafe" />
+  <text class="pill" x="166" y="102" text-anchor="middle">패킷 여정 요약</text>
+  <text class="title" x="88" y="142">브라우저가 서버까지 도달하는 5단계</text>
+  <text class="subtitle" x="88" y="164">이 순서를 기억하면 DNS, TCP, TLS, HTTP, 라우팅 문제가 한 흐름으로 연결된다.</text>
+
+  <path d="M 126 328 H 1070" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" />
+  <polygon points="1070,318 1098,328 1070,338" fill="#0284c7" />
+
+  <circle cx="140" cy="328" r="40" fill="#dbeafe" stroke="#3b82f6" stroke-width="3" />
+  <text x="140" y="336" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#1d4ed8">1</text>
+  <rect x="80" y="380" width="180" height="168" rx="22" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <text class="stepTitle" x="102" y="416">URL 입력</text>
+  <text class="body" x="102" y="446">사용자가 https://example.com</text>
+  <text class="body" x="102" y="468">같은 주소를 입력한다.</text>
+  <text class="mini" x="102" y="500">시험 포인트</text>
+  <text class="body" x="102" y="526">응용 계층에서 시작한다.</text>
+
+  <circle cx="350" cy="328" r="40" fill="#e0f2fe" stroke="#0891b2" stroke-width="3" />
+  <text x="350" y="336" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#0f766e">2</text>
+  <rect x="290" y="380" width="180" height="168" rx="22" fill="#ffffff" stroke="#67e8f9" stroke-width="2" />
+  <text class="stepTitle" x="312" y="416">DNS 조회</text>
+  <text class="body" x="312" y="446">도메인 이름을 IP 주소로</text>
+  <text class="body" x="312" y="468">바꿔 목적지를 찾는다.</text>
+  <text class="mini" x="312" y="500">기억할 것</text>
+  <text class="body" x="312" y="526">A · AAAA · CNAME 레코드</text>
+
+  <circle cx="560" cy="328" r="40" fill="#dcfce7" stroke="#16a34a" stroke-width="3" />
+  <text x="560" y="336" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#15803d">3</text>
+  <rect x="500" y="380" width="180" height="168" rx="22" fill="#ffffff" stroke="#86efac" stroke-width="2" />
+  <text class="stepTitle" x="522" y="416">TCP 연결</text>
+  <text class="body" x="522" y="446">SYN → SYN/ACK → ACK로</text>
+  <text class="body" x="522" y="468">전송 경로를 연다.</text>
+  <text class="mini" x="522" y="500">기억할 것</text>
+  <text class="body" x="522" y="526">신뢰성, 순서 보장, 포트</text>
+
+  <circle cx="770" cy="328" r="40" fill="#fef3c7" stroke="#d97706" stroke-width="3" />
+  <text x="770" y="336" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#b45309">4</text>
+  <rect x="710" y="380" width="180" height="168" rx="22" fill="#ffffff" stroke="#fbbf24" stroke-width="2" />
+  <text class="stepTitle" x="732" y="416">TLS 보안</text>
+  <text class="body" x="732" y="446">인증서를 확인하고 키를</text>
+  <text class="body" x="732" y="468">교환해 암호화 세션을 만든다.</text>
+  <text class="mini" x="732" y="500">기억할 것</text>
+  <text class="body" x="732" y="526">기밀성 · 무결성 · 인증</text>
+
+  <circle cx="980" cy="328" r="40" fill="#fee2e2" stroke="#dc2626" stroke-width="3" />
+  <text x="980" y="336" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#b91c1c">5</text>
+  <rect x="920" y="380" width="180" height="168" rx="22" fill="#ffffff" stroke="#fca5a5" stroke-width="2" />
+  <text class="stepTitle" x="942" y="416">HTTP 요청/응답</text>
+  <text class="body" x="942" y="446">GET/POST와 상태 코드가</text>
+  <text class="body" x="942" y="468">목적지 서버와 오간다.</text>
+  <text class="mini" x="942" y="500">함께 떠올리기</text>
+  <text class="body" x="942" y="526">IP 라우팅이 패킷을 전달</text>
+
+  <rect x="80" y="590" width="1030" height="94" rx="24" fill="#0f172a" />
+  <rect x="106" y="616" width="184" height="42" rx="14" fill="#dbeafe" />
+  <text class="bandTitle" x="128" y="643">계층 매핑</text>
+  <text class="bandText" x="310" y="634" fill="#dbeafe">응용 계층: URL, DNS, HTTP</text>
+  <text class="bandText" x="310" y="657" fill="#dbeafe">전송 계층: TCP handshake, 포트</text>
+  <text class="bandText" x="638" y="634" fill="#dbeafe">표현/보안: TLS 핸드셰이크</text>
+  <text class="bandText" x="638" y="657" fill="#dbeafe">네트워크 계층: IP 주소와 라우팅</text>
+</svg>

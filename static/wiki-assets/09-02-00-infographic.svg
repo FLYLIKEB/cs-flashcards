@@ -1,129 +1,113 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-02. 트리와 그래프 인포그래픽</title>
-  <desc id="desc">트리의 계층 구조와 그래프의 일반 연결 구조, 표현 방식, DFS와 BFS 차이를 비교하는 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">09-02. 트리와 그래프 개요</title>
+  <desc id="desc">트리의 계층 구조와 그래프의 일반 연결 구조, 핵심 용어, 시험 포인트를 대비해서 보여주는 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="treePanel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#dcfce7"/>
-      <stop offset="100%" stop-color="#f0fdf4"/>
-    </linearGradient>
-    <linearGradient id="graphPanel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ede9fe"/>
-      <stop offset="100%" stop-color="#f5f3ff"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
     </linearGradient>
     <style>
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .mono { font: 600 13px 'SFMono-Regular',Consolas,monospace; fill: #1e293b; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .white { fill: #ffffff; }
+      .treeLine { stroke: #15803d; stroke-width: 4; stroke-linecap: round; }
+      .graphLine { stroke: #7c3aed; stroke-width: 4; stroke-linecap: round; }
     </style>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
-    </marker>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
 
-  <text x="72" y="84" class="small">자료구조 핵심 비교</text>
+  <text x="72" y="84" class="small">자료구조 핵심 대비</text>
   <text x="72" y="126" class="title">09-02. 트리와 그래프</text>
-  <text x="72" y="156" class="subtitle">트리는 연결 + 무사이클 + 간선 n-1인 계층 구조, 그래프는 정점과 간선으로 이루어진 일반 네트워크다.</text>
+  <text x="72" y="156" class="subtitle">트리는 루트에서 아래로 펼쳐지는 계층 구조이고, 그래프는 정점과 간선이 자유롭게 연결되는 일반 네트워크다.</text>
 
-  <rect x="60" y="190" width="500" height="278" rx="24" fill="url(#treePanel)" stroke="#86efac"/>
-  <rect x="640" y="190" width="500" height="278" rx="24" fill="url(#graphPanel)" stroke="#c4b5fd"/>
+  <rect x="60" y="190" width="500" height="310" rx="24" fill="#f0fdf4" stroke="#86efac"/>
+  <rect x="640" y="190" width="500" height="310" rx="24" fill="#f5f3ff" stroke="#c4b5fd"/>
 
-  <text x="84" y="228" class="section">트리: 위아래가 분명한 계층</text>
-  <text x="84" y="252" class="body">루트·부모·자식·리프가 보이며 사이클이 없다.</text>
-  <line x1="208" y1="285" x2="144" y2="348" stroke="#16a34a" stroke-width="4"/>
-  <line x1="208" y1="285" x2="272" y2="348" stroke="#16a34a" stroke-width="4"/>
-  <line x1="144" y1="348" x2="112" y2="410" stroke="#16a34a" stroke-width="4"/>
-  <line x1="144" y1="348" x2="176" y2="410" stroke="#16a34a" stroke-width="4"/>
-  <line x1="272" y1="348" x2="240" y2="410" stroke="#16a34a" stroke-width="4"/>
-  <line x1="272" y1="348" x2="304" y2="410" stroke="#16a34a" stroke-width="4"/>
-  <circle cx="208" cy="285" r="26" fill="#166534"/>
-  <circle cx="144" cy="348" r="22" fill="#22c55e"/>
-  <circle cx="272" cy="348" r="22" fill="#22c55e"/>
-  <circle cx="112" cy="410" r="18" fill="#bbf7d0" stroke="#16a34a" stroke-width="3"/>
-  <circle cx="176" cy="410" r="18" fill="#bbf7d0" stroke="#16a34a" stroke-width="3"/>
-  <circle cx="240" cy="410" r="18" fill="#bbf7d0" stroke="#16a34a" stroke-width="3"/>
-  <circle cx="304" cy="410" r="18" fill="#bbf7d0" stroke="#16a34a" stroke-width="3"/>
-  <text x="208" y="291" text-anchor="middle" class="label" fill="#ffffff">Root</text>
-  <text x="346" y="310" class="body">• 간선 수 = n-1</text>
-  <text x="346" y="334" class="body">• 연결되어 있어야 함</text>
-  <text x="346" y="358" class="body">• 사이클이 생기면 트리 아님</text>
-  <text x="346" y="393" class="small">리프</text>
-  <text x="94" y="442" class="small">조직도·디렉터리처럼 계층이 명확</text>
+  <text x="88" y="228" class="section">트리: 부모-자식 관계가 보이는 구조</text>
+  <text x="88" y="255" class="body">루트에서 시작해 아래로 갈수록 레벨이 늘어난다. 연결되어 있지만 되돌아오는 사이클은 없다.</text>
 
-  <text x="664" y="228" class="section">그래프: 자유롭게 얽힌 연결</text>
-  <text x="664" y="252" class="body">방향성·연결성·사이클 존재 가능성을 함께 본다.</text>
-  <line x1="744" y1="302" x2="848" y2="274" stroke="#7c3aed" stroke-width="4"/>
-  <line x1="848" y1="274" x2="940" y2="330" stroke="#7c3aed" stroke-width="4"/>
-  <line x1="940" y1="330" x2="910" y2="414" stroke="#7c3aed" stroke-width="4"/>
-  <line x1="910" y1="414" x2="794" y2="420" stroke="#7c3aed" stroke-width="4"/>
-  <line x1="794" y1="420" x2="744" y2="302" stroke="#7c3aed" stroke-width="4"/>
-  <line x1="848" y1="274" x2="794" y2="420" stroke="#7c3aed" stroke-width="4" opacity="0.7"/>
-  <line x1="744" y1="302" x2="910" y2="414" stroke="#7c3aed" stroke-width="4" opacity="0.7"/>
-  <circle cx="744" cy="302" r="22" fill="#8b5cf6"/>
-  <circle cx="848" cy="274" r="22" fill="#8b5cf6"/>
-  <circle cx="940" cy="330" r="22" fill="#8b5cf6"/>
-  <circle cx="910" cy="414" r="22" fill="#8b5cf6"/>
-  <circle cx="794" cy="420" r="22" fill="#8b5cf6"/>
-  <text x="1010" y="296" class="body">• cycle 가능</text>
-  <text x="1010" y="320" class="body">• directed / undirected</text>
-  <text x="1010" y="344" class="body">• 가중치·최단경로 문제로 확장</text>
-  <path d="M 940 330 Q 1015 360 1000 430" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrow)">
-    <animate attributeName="stroke-dashoffset" from="0" to="-32" dur="3s" repeatCount="indefinite"/>
-  </path>
-  <text x="1016" y="438" class="small" fill="#b91c1c">되돌아오는 경로 = 사이클</text>
+  <line x1="208" y1="300" x2="138" y2="368" class="treeLine"/>
+  <line x1="208" y1="300" x2="278" y2="368" class="treeLine"/>
+  <line x1="138" y1="368" x2="98" y2="432" class="treeLine"/>
+  <line x1="138" y1="368" x2="178" y2="432" class="treeLine"/>
+  <line x1="278" y1="368" x2="238" y2="432" class="treeLine"/>
+  <line x1="278" y1="368" x2="318" y2="432" class="treeLine"/>
 
-  <rect x="60" y="492" width="520" height="170" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text x="84" y="526" class="section">표현 방식 선택</text>
-  <text x="84" y="554" class="label">인접 행렬</text>
-  <text x="84" y="576" class="body">간선 확인 O(1), 공간 O(n²)</text>
-  <g transform="translate(84 592)">
-    <rect width="108" height="48" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
-    <path d="M36 0 V48 M72 0 V48 M0 16 H108 M0 32 H108" stroke="#60a5fa"/>
-    <text x="14" y="29" class="mono">0 1 0</text>
-  </g>
-  <text x="274" y="554" class="label">인접 리스트</text>
-  <text x="274" y="576" class="body">공간 O(n+m), 희소 그래프에 효율적</text>
-  <g transform="translate(274 594)">
-    <rect x="0" y="0" width="52" height="18" rx="8" fill="#ede9fe"/>
-    <rect x="76" y="0" width="52" height="18" rx="8" fill="#ede9fe"/>
-    <rect x="152" y="0" width="52" height="18" rx="8" fill="#ede9fe"/>
-    <line x1="52" y1="9" x2="76" y2="9" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow)"/>
-    <line x1="128" y1="9" x2="152" y2="9" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow)"/>
-    <text x="14" y="13" class="mono">A</text>
-    <text x="90" y="13" class="mono">B</text>
-    <text x="166" y="13" class="mono">D</text>
-  </g>
+  <circle cx="208" cy="300" r="28" fill="#166534"/>
+  <circle cx="138" cy="368" r="24" fill="#16a34a"/>
+  <circle cx="278" cy="368" r="24" fill="#16a34a"/>
+  <circle cx="98" cy="432" r="20" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+  <circle cx="178" cy="432" r="20" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+  <circle cx="238" cy="432" r="20" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+  <circle cx="318" cy="432" r="20" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
 
-  <rect x="606" y="492" width="534" height="170" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text x="630" y="526" class="section">탐색 알고리즘 포인트</text>
-  <text x="630" y="554" class="label">DFS</text>
-  <text x="630" y="576" class="body">한 경로를 끝까지: 재귀 또는 스택, O(n+m)</text>
-  <line x1="636" y1="612" x2="692" y2="612" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="692" y1="612" x2="748" y2="612" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="748" y1="612" x2="804" y2="612" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
-  <text x="829" y="616" class="small">깊게 내려갔다가 backtrack</text>
-  <text x="630" y="642" class="label">BFS</text>
-  <text x="630" y="662" class="body">거리 순서로 넓게: 큐 사용, 최단 경로(무가중치)</text>
-  <g transform="translate(864 546)">
-    <rect x="0" y="0" width="56" height="30" rx="10" fill="#bfdbfe"/>
-    <rect x="62" y="0" width="56" height="30" rx="10" fill="#bfdbfe"/>
-    <rect x="124" y="0" width="56" height="30" rx="10" fill="#bfdbfe"/>
-    <text x="15" y="20" class="mono">A</text>
-    <text x="77" y="20" class="mono">B</text>
-    <text x="139" y="20" class="mono">C</text>
-    <text x="58" y="20" class="small">→</text>
-    <text x="120" y="20" class="small">→</text>
-  </g>
+  <text x="208" y="306" text-anchor="middle" class="label white">Root</text>
+  <text x="138" y="373" text-anchor="middle" class="label white">L</text>
+  <text x="278" y="373" text-anchor="middle" class="label white">R</text>
+  <text x="98" y="437" text-anchor="middle" class="small">A</text>
+  <text x="178" y="437" text-anchor="middle" class="small">B</text>
+  <text x="238" y="437" text-anchor="middle" class="small">C</text>
+  <text x="318" y="437" text-anchor="middle" class="small">D</text>
 
-  <text x="72" y="684" class="small">핵심 기억: 무향 그래프가 연결되어 있고 간선 수가 n-1이면 트리로 판정할 수 있다.</text>
+  <rect x="354" y="286" width="178" height="144" rx="16" fill="#ffffff" stroke="#bbf7d0"/>
+  <text x="374" y="317" class="label">시험 답안 키워드</text>
+  <text x="374" y="345" class="body">• 루트, 부모, 자식, 리프</text>
+  <text x="374" y="371" class="body">• 연결되어 있고 사이클 없음</text>
+  <text x="374" y="397" class="body">• 정점 n개면 간선은 n-1개</text>
+  <text x="88" y="474" class="small">예: 조직도, 폴더 구조, 의사결정 트리</text>
+
+  <text x="668" y="228" class="section">그래프: 연결 방식이 더 자유로운 구조</text>
+  <text x="668" y="255" class="body">같은 정점 집합이라도 방향, 가중치, 연결성, 사이클 여부를 함께 봐야 한다.</text>
+
+  <line x1="760" y1="306" x2="862" y2="278" class="graphLine"/>
+  <line x1="862" y1="278" x2="956" y2="332" class="graphLine"/>
+  <line x1="956" y1="332" x2="918" y2="426" class="graphLine"/>
+  <line x1="918" y1="426" x2="802" y2="430" class="graphLine"/>
+  <line x1="802" y1="430" x2="760" y2="306" class="graphLine"/>
+  <line x1="862" y1="278" x2="802" y2="430" class="graphLine" stroke="#8b5cf6"/>
+  <line x1="760" y1="306" x2="918" y2="426" class="graphLine" stroke="#8b5cf6"/>
+
+  <circle cx="760" cy="306" r="24" fill="#6d28d9"/>
+  <circle cx="862" cy="278" r="24" fill="#7c3aed"/>
+  <circle cx="956" cy="332" r="24" fill="#7c3aed"/>
+  <circle cx="918" cy="426" r="24" fill="#7c3aed"/>
+  <circle cx="802" cy="430" r="24" fill="#7c3aed"/>
+
+  <text x="760" y="311" text-anchor="middle" class="label white">A</text>
+  <text x="862" y="283" text-anchor="middle" class="label white">B</text>
+  <text x="956" y="337" text-anchor="middle" class="label white">C</text>
+  <text x="918" y="431" text-anchor="middle" class="label white">D</text>
+  <text x="802" y="435" text-anchor="middle" class="label white">E</text>
+
+  <rect x="1000" y="286" width="118" height="164" rx="16" fill="#ffffff" stroke="#ddd6fe"/>
+  <text x="1018" y="317" class="label">그래프 체크포인트</text>
+  <text x="1018" y="345" class="body">• cycle 가능</text>
+  <text x="1018" y="371" class="body">• directed / undirected</text>
+  <text x="1018" y="397" class="body">• 가중치 부여 가능</text>
+  <text x="1018" y="423" class="body">• 최단 경로 문제로 확장</text>
+  <text x="668" y="474" class="small">예: 도로망, SNS, 컴퓨터 네트워크</text>
+
+  <rect x="60" y="532" width="1080" height="164" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="88" y="570" class="section">한 줄 비교</text>
+
+  <rect x="88" y="590" width="318" height="80" rx="18" fill="#ffffff" stroke="#bbf7d0"/>
+  <text x="108" y="621" class="label">트리를 보면</text>
+  <text x="108" y="648" class="body">루트가 있는지, 부모-자식 레벨이 보이는지,</text>
+  <text x="108" y="669" class="body">사이클 없이 연결되었는지를 먼저 본다.</text>
+
+  <rect x="440" y="590" width="318" height="80" rx="18" fill="#ffffff" stroke="#ddd6fe"/>
+  <text x="460" y="621" class="label">그래프를 보면</text>
+  <text x="460" y="648" class="body">정점과 간선의 연결 방식, 방향성, 가중치,</text>
+  <text x="460" y="669" class="body">연결성·사이클 여부를 함께 확인한다.</text>
+
+  <rect x="792" y="590" width="320" height="80" rx="18" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="812" y="621" class="label">시험장에서 바로 쓰는 문장</text>
+  <text x="812" y="648" class="body">"트리는 그래프의 특수한 형태로, 연결되어 있고</text>
+  <text x="812" y="669" class="body">사이클이 없으며 간선 수가 n-1이다."</text>
 </svg>

@@ -1,122 +1,123 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
   <title id="title">13. SQL/코딩 인포그래픽</title>
-  <desc id="desc">SQL 실행 순서, JOIN·서브쿼리 판단 기준, 구현·BFS/DFS·출력 문제 대비 포인트를 한 장에 정리한 인포그래픽</desc>
+  <desc id="desc">SQL 해석 순서, JOIN과 서브쿼리 판단 기준, 구현과 BFS/DFS 및 출력 문제 풀이 루틴을 구분해 보여주는 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#ecfeff"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef8ff"/>
     </linearGradient>
-    <linearGradient id="sqlFlow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#06b6d4"/>
+    <linearGradient id="sqlBand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
     </linearGradient>
-    <linearGradient id="codeFlow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0891b2"/>
+    <linearGradient id="codeBand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f766e"/>
       <stop offset="100%" stop-color="#14b8a6"/>
     </linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10"/>
     </filter>
     <style>
       .title { font: 700 34px sans-serif; fill: #0f172a; }
       .subtitle { font: 500 17px sans-serif; fill: #334155; }
-      .section { font: 700 20px sans-serif; fill: #0f172a; }
-      .label { font: 700 16px sans-serif; fill: #0f172a; }
-      .body { font: 500 14px sans-serif; fill: #334155; }
-      .small { font: 600 12px sans-serif; fill: #475569; }
-      .mono { font: 700 15px monospace; fill: #0f172a; }
-      .chip { font: 700 13px sans-serif; fill: #0f172a; }
+      .eyebrow { font: 700 15px sans-serif; fill: #475569; }
+      .section { font: 700 23px sans-serif; fill: #0f172a; }
+      .label { font: 700 18px sans-serif; fill: #0f172a; }
+      .body { font: 500 15px sans-serif; fill: #334155; }
+      .small { font: 600 13px sans-serif; fill: #475569; }
+      .mono { font: 700 16px monospace; fill: #0f172a; }
+      .chip { font: 700 14px sans-serif; fill: #0f172a; }
+      .reverse { fill: #e2e8f0; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="#e2e8f0"/>
-  <rect x="24" y="24" width="1152" height="672" rx="32" fill="url(#bg)"/>
-  <rect x="40" y="40" width="1120" height="640" rx="28" fill="#ffffff" filter="url(#shadow)"/>
+  <rect width="1200" height="860" fill="#dbe7f3"/>
+  <rect x="24" y="24" width="1152" height="812" rx="32" fill="url(#bg)"/>
+  <rect x="42" y="42" width="1116" height="776" rx="28" fill="#ffffff" filter="url(#shadow)"/>
 
-  <text x="76" y="92" class="small">금융공기업 IT · 13장 개요</text>
-  <text x="76" y="132" class="title">SQL/코딩: 쿼리 해석 + 구현 습관 + 그래프 탐색 + 출력 정확도</text>
-  <text x="76" y="164" class="subtitle">이 페이지는 13-01 SQL 기본부터 13-04 코드 출력 문제까지, 시험에서 자주 엮이는 판단 기준을 한 장으로 압축한다.</text>
+  <text x="78" y="92" class="eyebrow">금융공기업 IT · 13장 개요</text>
+  <text x="78" y="132" class="title">SQL/코딩은 “쿼리 해석”과 “풀이 루틴”을 분리해 익힌다</text>
+  <text x="78" y="162" class="subtitle">왼쪽은 SQL 결과를 손으로 추적하는 기준, 오른쪽은 구현·BFS/DFS·출력 문제를 안정적으로 푸는 체크 흐름이다.</text>
 
-  <rect x="68" y="198" width="706" height="250" rx="26" fill="#f8fbff" stroke="#bfdbfe" stroke-width="2"/>
-  <text x="92" y="234" class="section">1. SQL 문제는 “논리적 실행 순서”로 손추적한다</text>
-  <text x="92" y="259" class="body">SELECT 문은 보이는 순서가 아니라 FROM부터 LIMIT까지 단계적으로 해석된다.</text>
+  <rect x="72" y="194" width="1056" height="96" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="96" y="228" class="label">이 페이지의 학습 로드맵</text>
+  <text x="96" y="254" class="body">1) SQL 기본과 SELECT 실행 순서를 익힌다 → 2) 구현 문제에서 입출력과 경계값을 고정한다 → 3) BFS/DFS 상태 추적을 자동화한다 → 4) 출력 포맷 오차를 없앤다.</text>
 
-  <rect x="92" y="285" width="74" height="112" rx="18" fill="#dbeafe"/>
-  <text x="129" y="325" text-anchor="middle" class="mono">FROM</text>
-  <text x="129" y="350" text-anchor="middle" class="small">소스 결정</text>
+  <rect x="72" y="318" width="660" height="420" rx="28" fill="#f8fbff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="96" y="356" class="section">1. SQL 문제는 보이는 문장보다 실행 순서로 읽는다</text>
+  <text x="96" y="383" class="body">FROM부터 LIMIT까지 단계를 나눠 추적하면 GROUP BY·HAVING·JOIN 함정을 덜 놓친다.</text>
 
-  <rect x="174" y="285" width="74" height="112" rx="18" fill="#dbeafe"/>
-  <text x="211" y="325" text-anchor="middle" class="mono">WHERE</text>
-  <text x="211" y="350" text-anchor="middle" class="small">행 필터</text>
+  <rect x="96" y="412" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="161" y="448" text-anchor="middle" class="mono">FROM</text>
+  <text x="161" y="472" text-anchor="middle" class="small">테이블 결합·소스 결정</text>
 
-  <rect x="256" y="285" width="92" height="112" rx="18" fill="#dbeafe"/>
-  <text x="302" y="325" text-anchor="middle" class="mono">GROUP BY</text>
-  <text x="302" y="350" text-anchor="middle" class="small">그룹화</text>
+  <rect x="242" y="412" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="307" y="448" text-anchor="middle" class="mono">WHERE</text>
+  <text x="307" y="472" text-anchor="middle" class="small">행 필터링</text>
 
-  <rect x="356" y="285" width="84" height="112" rx="18" fill="#dbeafe"/>
-  <text x="398" y="325" text-anchor="middle" class="mono">HAVING</text>
-  <text x="398" y="350" text-anchor="middle" class="small">그룹 필터</text>
+  <rect x="388" y="412" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="453" y="448" text-anchor="middle" class="mono">GROUP BY</text>
+  <text x="453" y="472" text-anchor="middle" class="small">그룹화</text>
 
-  <rect x="448" y="285" width="78" height="112" rx="18" fill="#dbeafe"/>
-  <text x="487" y="325" text-anchor="middle" class="mono">SELECT</text>
-  <text x="487" y="350" text-anchor="middle" class="small">열 계산</text>
+  <rect x="534" y="412" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="599" y="448" text-anchor="middle" class="mono">HAVING</text>
+  <text x="599" y="472" text-anchor="middle" class="small">그룹 조건</text>
 
-  <rect x="534" y="285" width="88" height="112" rx="18" fill="#dbeafe"/>
-  <text x="578" y="325" text-anchor="middle" class="mono">DISTINCT</text>
-  <text x="578" y="350" text-anchor="middle" class="small">중복 제거</text>
+  <rect x="96" y="518" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="161" y="554" text-anchor="middle" class="mono">SELECT</text>
+  <text x="161" y="578" text-anchor="middle" class="small">열 선택·계산</text>
 
-  <rect x="630" y="285" width="88" height="112" rx="18" fill="#dbeafe"/>
-  <text x="674" y="325" text-anchor="middle" class="mono">ORDER BY</text>
-  <text x="674" y="350" text-anchor="middle" class="small">정렬</text>
+  <rect x="242" y="518" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="307" y="554" text-anchor="middle" class="mono">DISTINCT</text>
+  <text x="307" y="578" text-anchor="middle" class="small">중복 제거</text>
 
-  <rect x="92" y="406" width="626" height="24" rx="12" fill="url(#sqlFlow)" opacity="0.9"/>
-  <circle cx="129" cy="418" r="8" fill="#1d4ed8"/>
-  <circle cx="211" cy="418" r="8" fill="#2563eb"/>
-  <circle cx="302" cy="418" r="8" fill="#2563eb"/>
-  <circle cx="398" cy="418" r="8" fill="#0ea5e9"/>
-  <circle cx="487" cy="418" r="8" fill="#0ea5e9"/>
-  <circle cx="578" cy="418" r="8" fill="#06b6d4"/>
-  <circle cx="674" cy="418" r="8" fill="#06b6d4"/>
-  <rect x="727" y="285" width="47" height="112" rx="18" fill="#dbeafe"/>
-  <text x="751" y="325" text-anchor="middle" class="mono">…</text>
-  <text x="751" y="350" text-anchor="middle" class="small">LIMIT</text>
+  <rect x="388" y="518" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="453" y="554" text-anchor="middle" class="mono">ORDER BY</text>
+  <text x="453" y="578" text-anchor="middle" class="small">정렬</text>
 
-  <rect x="92" y="454" width="326" height="112" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
-  <text x="112" y="484" class="label">집계 문제 핵심</text>
-  <text x="112" y="510" class="body">• AVG, SUM, COUNT와 DISTINCT 차이를 분리한다</text>
-  <text x="112" y="533" class="body">• 집계 결과와 일반 열을 같이 쓰면 GROUP BY 필요</text>
-  <text x="112" y="556" class="body">• HAVING은 GROUP BY 뒤, WHERE는 그 전</text>
+  <rect x="534" y="518" width="130" height="88" rx="18" fill="#dbeafe"/>
+  <text x="599" y="554" text-anchor="middle" class="mono">LIMIT</text>
+  <text x="599" y="578" text-anchor="middle" class="small">행 수 제한</text>
 
-  <rect x="436" y="454" width="338" height="112" rx="22" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
-  <text x="456" y="484" class="label">JOIN · 서브쿼리 해석 포인트</text>
-  <text x="456" y="510" class="body">• INNER: 양쪽 일치 행만, LEFT: 왼쪽 전체 + 없으면 NULL</text>
-  <text x="456" y="533" class="body">• LEFT JOIN 뒤 WHERE b.col = 'x'를 쓰면 NULL 행이 사라져 의도가 깨질 수 있다</text>
-  <text x="456" y="556" class="body">• IN은 단순 매칭, EXISTS는 존재 확인, 상관 서브쿼리는 성능 비용을 의식</text>
+  <rect x="112" y="626" width="536" height="18" rx="9" fill="url(#sqlBand)"/>
+  <circle cx="161" cy="635" r="8" fill="#1d4ed8"/>
+  <circle cx="307" cy="635" r="8" fill="#2563eb"/>
+  <circle cx="453" cy="635" r="8" fill="#0ea5e9"/>
+  <circle cx="599" cy="635" r="8" fill="#06b6d4"/>
 
-  <rect x="798" y="198" width="334" height="368" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="822" y="234" class="section">2. 코딩 문제는 “풀이 루틴”을 고정한다</text>
-  <text x="822" y="259" class="body">구현 → BFS/DFS → 출력 문제를 같은 체크리스트로 안정화한다.</text>
+  <rect x="96" y="664" width="272" height="52" rx="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="116" y="690" class="chip">집계 함정</text>
+  <text x="116" y="709" class="small">COUNT·SUM·AVG와 일반 열을 같이 쓰면 GROUP BY 필요</text>
 
-  <rect x="826" y="286" width="278" height="64" rx="18" fill="#ccfbf1"/>
-  <text x="846" y="312" class="label">구현</text>
-  <text x="846" y="334" class="body">입력 파싱, 경계값, 시간복잡도부터 확인</text>
+  <rect x="382" y="664" width="326" height="52" rx="16" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="402" y="690" class="chip">JOIN / 서브쿼리 함정</text>
+  <text x="402" y="709" class="small">LEFT JOIN 뒤 WHERE b.col = 'x'는 NULL 행을 지워 의도를 바꿀 수 있음</text>
 
-  <rect x="826" y="362" width="278" height="64" rx="18" fill="#ccfbf1"/>
-  <text x="846" y="388" class="label">BFS / DFS</text>
-  <text x="846" y="410" class="body">visited, parent, dist와 큐·스택 상태를 추적</text>
+  <rect x="760" y="318" width="368" height="420" rx="28" fill="#f7fffd" stroke="#99f6e4" stroke-width="2"/>
+  <text x="784" y="356" class="section">2. 코딩 문제는 풀이 루틴을 고정해 실수를 줄인다</text>
+  <text x="784" y="383" class="body">문제 유형이 달라도 입력 확인 → 상태 관리 → 출력 검증 순서가 흔들리지 않게 만든다.</text>
 
-  <rect x="826" y="438" width="278" height="64" rx="18" fill="#ccfbf1"/>
-  <text x="846" y="464" class="label">코드 출력</text>
-  <text x="846" y="486" class="body">줄바꿈·공백·소수점 자리까지 예제와 완전 일치</text>
+  <rect x="792" y="420" width="304" height="76" rx="20" fill="#ccfbf1"/>
+  <text x="816" y="450" class="label">구현</text>
+  <text x="816" y="472" class="body">입력 파싱, 경계값, 시간복잡도를 먼저 점검</text>
 
-  <path d="M 964 350 L 964 362" stroke="#0f766e" stroke-width="6" stroke-linecap="round"/>
-  <path d="M 964 426 L 964 438" stroke="#0f766e" stroke-width="6" stroke-linecap="round"/>
-  <rect x="844" y="522" width="242" height="24" rx="12" fill="url(#codeFlow)"/>
-  <circle cx="872" cy="534" r="8" fill="#0f766e"/>
-  <circle cx="964" cy="534" r="8" fill="#0891b2"/>
-  <circle cx="1058" cy="534" r="8" fill="#14b8a6"/>
+  <rect x="792" y="516" width="304" height="76" rx="20" fill="#ccfbf1"/>
+  <text x="816" y="546" class="label">BFS / DFS</text>
+  <text x="816" y="568" class="body">visited·parent·dist와 큐·스택 상태를 추적</text>
 
-  <rect x="68" y="584" width="1064" height="72" rx="24" fill="#0f172a"/>
-  <text x="96" y="613" class="chip" style="fill:#bfdbfe">시험장에서 기억할 한 줄</text>
-  <text x="96" y="639" class="body" style="fill:#e2e8f0">SQL은 실행 순서로 결과를 추적하고, 코딩 문제는 입력·상태·출력의 3축 체크리스트로 실수를 줄인다. 이 장은 그 두 습관을 묶어 훈련시키는 페이지다.</text>
+  <rect x="792" y="612" width="304" height="76" rx="20" fill="#ccfbf1"/>
+  <text x="816" y="642" class="label">코드 출력</text>
+  <text x="816" y="664" class="body">공백·줄바꿈·소수점 자리까지 예제와 일치</text>
+
+  <path d="M 944 496 L 944 516" stroke="#0f766e" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 944 592 L 944 612" stroke="#0f766e" stroke-width="6" stroke-linecap="round"/>
+
+  <rect x="792" y="702" width="304" height="16" rx="8" fill="url(#codeBand)"/>
+  <circle cx="840" cy="710" r="8" fill="#0f766e"/>
+  <circle cx="944" cy="710" r="8" fill="#0d9488"/>
+  <circle cx="1048" cy="710" r="8" fill="#14b8a6"/>
+
+  <rect x="72" y="760" width="1056" height="46" rx="18" fill="#0f172a"/>
+  <text x="96" y="790" class="label reverse">시험장에서 기억할 한 줄</text>
+  <text x="404" y="790" class="body reverse">SQL은 단계별로 손추적하고, 코딩은 입력·상태·출력 체크리스트로 고정하면 실수를 크게 줄일 수 있다.</text>
 </svg>

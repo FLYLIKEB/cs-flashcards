@@ -1,154 +1,189 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">11-01. 개발방법론 인포그래픽</title>
-  <desc id="desc">폭포수, 애자일, 나선형, UP·RAD·XP를 요구사항 안정성, 피드백, 위험관리 관점에서 비교하는 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1120" viewBox="0 0 1200 1120" role="img" aria-labelledby="title desc">
+  <title id="title">11-01. 개발방법론 핵심 흐름 인포그래픽</title>
+  <desc id="desc">폭포수, 애자일, 나선형 모델의 흐름과 선택 기준, 스크럼·칸반·UP·RAD·XP의 핵심 연결점을 분리해 보여주는 고가독성 인포그래픽</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="titleBar" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
-    </linearGradient>
     <style>
-      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
-      .title { font-size: 34px; font-weight: 800; fill: #f8fafc; }
-      .subtitle { font-size: 16px; font-weight: 500; fill: #dbeafe; }
-      .section { font-size: 22px; font-weight: 800; fill: #0f172a; }
-      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
-      .body { font-size: 14px; font-weight: 500; fill: #334155; }
-      .small { font-size: 12px; font-weight: 600; fill: #475569; }
-      .chip { font-size: 13px; font-weight: 700; fill: #1e3a8a; }
-      .mono { font-size: 13px; font-weight: 700; fill: #0f172a; }
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; fill: #0f172a; }
+      .title { font-size: 34px; font-weight: 800; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 24px; font-weight: 800; }
+      .label { font-size: 17px; font-weight: 700; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .chipText { font-size: 14px; font-weight: 700; }
+      .cardTitle { font-size: 19px; font-weight: 800; }
+      .cardBody { font-size: 14px; font-weight: 500; fill: #334155; }
+      .white { fill: #ffffff; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="36" y="28" width="1128" height="110" rx="28" fill="url(#titleBar)"/>
-  <text class="title" x="72" y="74">11-01. 개발방법론</text>
-  <text class="subtitle" x="72" y="104">요구사항 안정성, 피드백 속도, 위험관리 방식에 따라 폭포수·애자일·나선형·UP/RAD/XP를 구분한다.</text>
+  <rect width="1200" height="1120" fill="#f8fafc"/>
+  <rect x="32" y="28" width="1136" height="120" rx="28" fill="#e0f2fe"/>
+  <text class="title" x="68" y="78">11-01. 개발방법론</text>
+  <text class="subtitle" x="68" y="108">순차 진행, 반복 피드백, 위험 관리라는 세 축으로 방법론을 구분하면 비교가 쉬워진다.</text>
 
-  <rect x="760" y="48" width="118" height="34" rx="17" fill="#dbeafe"/>
-  <text class="chip" x="819" y="70" text-anchor="middle">안정 요구</text>
-  <rect x="888" y="48" width="118" height="34" rx="17" fill="#bfdbfe"/>
-  <text class="chip" x="947" y="70" text-anchor="middle">반복·증분</text>
-  <rect x="1016" y="48" width="118" height="34" rx="17" fill="#93c5fd"/>
-  <text class="chip" x="1075" y="70" text-anchor="middle">위험 중심</text>
-  <rect x="760" y="92" width="374" height="26" rx="13" fill="#1e40af" opacity="0.24"/>
-  <text class="small" x="947" y="109" text-anchor="middle">선택 기준: 요구 변경 가능성 · 조직 성숙도 · 규제/감사 · 프로젝트 위험</text>
+  <rect x="770" y="50" width="110" height="34" rx="17" fill="#dbeafe"/>
+  <text class="chipText" x="825" y="72" text-anchor="middle">안정 요구</text>
+  <rect x="892" y="50" width="110" height="34" rx="17" fill="#bbf7d0"/>
+  <text class="chipText" x="947" y="72" text-anchor="middle">빠른 피드백</text>
+  <rect x="1014" y="50" width="120" height="34" rx="17" fill="#ede9fe"/>
+  <text class="chipText" x="1074" y="72" text-anchor="middle">위험 우선</text>
+  <rect x="770" y="96" width="364" height="30" rx="15" fill="#0f172a"/>
+  <text class="small" x="952" y="116" text-anchor="middle" fill="#e2e8f0">선택 기준: 요구 변경 빈도 · 규제/감사 · 팀 성숙도 · 프로젝트 위험</text>
 
-  <rect x="44" y="154" width="272" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="section" x="70" y="192">폭포수</text>
-  <text class="body" x="70" y="216">요구 → 설계 → 구현 → 테스트 → 운영을 순차 진행</text>
-  <rect x="72" y="240" width="170" height="34" rx="10" fill="#dbeafe"/>
-  <text class="label" x="157" y="262" text-anchor="middle">요구사항 분석</text>
-  <rect x="102" y="286" width="170" height="34" rx="10" fill="#bfdbfe"/>
-  <text class="label" x="187" y="308" text-anchor="middle">설계</text>
-  <rect x="132" y="332" width="170" height="34" rx="10" fill="#93c5fd"/>
-  <text class="label" x="217" y="354" text-anchor="middle">구현</text>
-  <rect x="162" y="378" width="170" height="34" rx="10" fill="#60a5fa"/>
-  <text class="label" x="247" y="400" text-anchor="middle">테스트</text>
-  <rect x="192" y="424" width="96" height="34" rx="10" fill="#2563eb"/>
-  <text x="240" y="446" text-anchor="middle" font-size="15" font-weight="800" fill="#eff6ff">운영</text>
-  <text class="mono" x="70" y="480">장점</text>
-  <text class="body" x="70" y="502">• 일정·문서·산출물 관리가 명확</text>
-  <text class="body" x="70" y="524">• 규제·감사 환경에서 추적성 확보 유리</text>
-  <text class="mono" x="70" y="548">주의</text>
-  <text class="body" x="70" y="570">• 후반 변경 비용 큼</text>
-  <text class="body" x="70" y="592">• 사용자 피드백 반영이 늦음</text>
+  <rect x="40" y="172" width="350" height="500" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="68" y="214">폭포수 모델</text>
+  <text class="body" x="68" y="242">
+    <tspan x="68" dy="0">단계를 순서대로 통과하며</tspan>
+    <tspan x="68" dy="20">문서와 승인 절차를 중시한다.</tspan>
+  </text>
 
-  <rect x="332" y="154" width="272" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="section" x="358" y="192">애자일 · 스크럼 · 칸반</text>
-  <text class="body" x="358" y="216">짧은 반복과 사용자 피드백으로 요구 변화를 흡수</text>
-  <circle cx="430" cy="320" r="58" fill="#ecfeff" stroke="#0891b2" stroke-width="3"/>
-  <path d="M430 254 A66 66 0 0 1 490 320" fill="none" stroke="#0891b2" stroke-width="8" stroke-linecap="round"/>
-  <polygon points="486,306 503,319 482,325" fill="#0891b2"/>
-  <path d="M490 320 A66 66 0 0 1 430 386" fill="none" stroke="#06b6d4" stroke-width="8" stroke-linecap="round"/>
-  <polygon points="439,380 422,394 444,398" fill="#06b6d4"/>
-  <path d="M430 386 A66 66 0 0 1 370 320" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round"/>
-  <polygon points="374,334 357,321 378,315" fill="#22c55e"/>
-  <path d="M370 320 A66 66 0 0 1 430 254" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
-  <polygon points="421,261 439,247 418,243" fill="#f59e0b"/>
-  <text class="small" x="430" y="302" text-anchor="middle">계획</text>
-  <text class="small" x="474" y="324" text-anchor="middle">개발</text>
-  <text class="small" x="430" y="350" text-anchor="middle">검토</text>
-  <text class="small" x="386" y="324" text-anchor="middle">회고</text>
-  <rect x="507" y="254" width="74" height="170" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-  <rect x="515" y="286" width="58" height="34" rx="8" fill="#dbeafe"/>
-  <rect x="515" y="330" width="58" height="34" rx="8" fill="#bae6fd"/>
-  <rect x="515" y="374" width="58" height="34" rx="8" fill="#bbf7d0"/>
-  <text class="small" x="544" y="276" text-anchor="middle">칸반 보드</text>
-  <text class="small" x="544" y="308" text-anchor="middle">To Do</text>
-  <text class="small" x="544" y="352" text-anchor="middle">Doing</text>
-  <text class="small" x="544" y="396" text-anchor="middle">Done</text>
-  <text class="mono" x="358" y="480">핵심</text>
-  <text class="body" x="358" y="502">• 반복·증분, 빠른 배포, 고객 참여</text>
-  <text class="body" x="358" y="524">• 스크럼: 스프린트·백로그·리뷰·회고</text>
-  <text class="body" x="358" y="546">• 칸반: 흐름 시각화, WIP 제한</text>
-  <text class="mono" x="358" y="570">주의</text>
-  <text class="body" x="358" y="592">• 범위 통제와 추적성 보완 필요</text>
+  <rect x="68" y="286" width="294" height="46" rx="14" fill="#dbeafe"/>
+  <text class="label" x="215" y="315" text-anchor="middle">요구사항 분석</text>
+  <line x1="215" y1="332" x2="215" y2="352" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="215,363 207,350 223,350" fill="#2563eb"/>
+  <rect x="68" y="366" width="294" height="46" rx="14" fill="#bfdbfe"/>
+  <text class="label" x="215" y="395" text-anchor="middle">설계</text>
+  <line x1="215" y1="412" x2="215" y2="432" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="215,443 207,430 223,430" fill="#2563eb"/>
+  <rect x="68" y="446" width="294" height="46" rx="14" fill="#93c5fd"/>
+  <text class="label" x="215" y="475" text-anchor="middle">구현</text>
+  <line x1="215" y1="492" x2="215" y2="512" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="215,523 207,510 223,510" fill="#2563eb"/>
+  <rect x="68" y="526" width="294" height="46" rx="14" fill="#60a5fa"/>
+  <text class="label white" x="215" y="555" text-anchor="middle">테스트</text>
+  <line x1="215" y1="572" x2="215" y2="592" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="215,603 207,590 223,590" fill="#2563eb"/>
+  <rect x="68" y="606" width="294" height="46" rx="14" fill="#1d4ed8"/>
+  <text class="label white" x="215" y="635" text-anchor="middle">운영 · 유지보수</text>
 
-  <rect x="620" y="154" width="272" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="section" x="646" y="192">나선형</text>
-  <text class="body" x="646" y="216">반복마다 위험을 식별·분석·완화하며 전진</text>
-  <path d="M756 284 C794 284 814 312 814 334 C814 372 780 400 744 400 C694 400 664 356 664 324 C664 270 716 242 772 242" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-linecap="round"/>
-  <circle cx="772" cy="242" r="7" fill="#8b5cf6"/>
-  <circle cx="814" cy="334" r="7" fill="#ef4444"/>
-  <circle cx="744" cy="400" r="7" fill="#22c55e"/>
-  <circle cx="664" cy="324" r="7" fill="#f59e0b"/>
-  <text class="small" x="774" y="226" text-anchor="middle">계획</text>
-  <text class="small" x="844" y="338">위험 분석</text>
-  <text class="small" x="744" y="424" text-anchor="middle">개발·검증</text>
-  <text class="small" x="602" y="328">고객 평가</text>
-  <rect x="650" y="438" width="210" height="34" rx="17" fill="#f3e8ff"/>
-  <text class="label" x="755" y="460" text-anchor="middle">프로토타입으로 불확실성 축소</text>
-  <text class="mono" x="646" y="490">적합</text>
-  <text class="body" x="646" y="512">• 고위험·대규모·외부연동 많은 프로젝트</text>
-  <text class="body" x="646" y="534">• 성능/보안/사업성 검증을 선행해야 할 때</text>
-  <text class="mono" x="646" y="558">주의</text>
-  <text class="body" x="646" y="580">• 관리 복잡도와 비용 부담 증가</text>
+  <text class="label" x="68" y="698">언제 유리한가</text>
+  <text class="body" x="68" y="726">
+    <tspan x="68" dy="0">• 요구사항이 안정적이고 계약·감사 문서가 중요한 프로젝트</tspan>
+    <tspan x="68" dy="22">• 단계별 승인과 산출물 관리가 필요한 금융·공공 환경</tspan>
+  </text>
+  <text class="label" x="68" y="790">주의할 점</text>
+  <text class="body" x="68" y="818">
+    <tspan x="68" dy="0">• 후반부에 변경이 생기면</tspan>
+    <tspan x="68" dy="22">수정 비용이 급격히 커진다.</tspan>
+  </text>
 
-  <rect x="908" y="154" width="248" height="348" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="section" x="934" y="192">UP · RAD · XP</text>
-  <text class="body" x="934" y="216">반복 개발을 세분화한 대표 프로세스·실천 묶음</text>
-  <rect x="934" y="244" width="196" height="28" rx="8" fill="#dbeafe"/>
-  <text class="small" x="1032" y="263" text-anchor="middle">UP: Inception → Elaboration → Construction → Transition</text>
-  <rect x="934" y="286" width="92" height="70" rx="14" fill="#ecfccb" stroke="#84cc16"/>
-  <text class="label" x="980" y="314" text-anchor="middle">RAD</text>
-  <text class="small" x="980" y="336" text-anchor="middle">빠른</text>
-  <text class="small" x="980" y="352" text-anchor="middle">프로토타입</text>
-  <rect x="1038" y="286" width="92" height="70" rx="14" fill="#fee2e2" stroke="#ef4444"/>
-  <text class="label" x="1084" y="314" text-anchor="middle">XP</text>
-  <text class="small" x="1084" y="336" text-anchor="middle">TDD·CI</text>
-  <text class="small" x="1084" y="352" text-anchor="middle">Pair·Refactor</text>
-  <rect x="934" y="376" width="196" height="28" rx="14" fill="#e0f2fe"/>
-  <text class="small" x="1032" y="395" text-anchor="middle">UP = 유스케이스·아키텍처·위험 중심</text>
-  <rect x="934" y="412" width="196" height="28" rx="14" fill="#fef3c7"/>
-  <text class="small" x="1032" y="431" text-anchor="middle">RAD = 사용자 참여로 개발기간 단축</text>
-  <rect x="934" y="448" width="196" height="28" rx="14" fill="#fee2e2"/>
-  <text class="small" x="1032" y="467" text-anchor="middle">XP = 코드 품질과 변경 대응성 강화</text>
-  <text class="mono" x="934" y="500">시험 연결</text>
-  <text class="body" x="934" y="522">• UP 단계 목표 구분</text>
-  <text class="body" x="934" y="544">• RAD 장단점과 적용 상황</text>
-  <text class="body" x="934" y="566">• XP 실천: TDD, CI, 짝 프로그래밍</text>
+  <rect x="424" y="172" width="350" height="500" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="452" y="214">애자일 · 스크럼 · 칸반</text>
+  <text class="body" x="452" y="242">
+    <tspan x="452" dy="0">짧은 반복 주기마다 결과물을 확인하고</tspan>
+    <tspan x="452" dy="20">피드백을 바로 다음 반복에 반영한다.</tspan>
+  </text>
 
-  <rect x="44" y="522" width="1112" height="158" rx="26" fill="#0f172a"/>
-  <text x="72" y="558" font-size="22" font-weight="800" fill="#f8fafc">상황별 선택 힌트</text>
-  <line x1="84" y1="592" x2="1118" y2="592" stroke="#334155" stroke-width="2"/>
-  <text class="small" x="140" y="615" text-anchor="middle" fill="#93c5fd">요구사항 안정</text>
-  <text class="small" x="344" y="615" text-anchor="middle" fill="#93c5fd">규제·감사 강함</text>
-  <text class="small" x="564" y="615" text-anchor="middle" fill="#93c5fd">변화·피드백 빈번</text>
-  <text class="small" x="786" y="615" text-anchor="middle" fill="#93c5fd">고위험·대규모</text>
-  <text class="small" x="1008" y="615" text-anchor="middle" fill="#93c5fd">운영 흐름 개선</text>
-  <rect x="96" y="632" width="126" height="26" rx="13" fill="#dbeafe"/>
-  <text class="small" x="159" y="649" text-anchor="middle" fill="#0f172a">폭포수</text>
-  <rect x="272" y="632" width="180" height="26" rx="13" fill="#bfdbfe"/>
-  <text class="small" x="362" y="649" text-anchor="middle" fill="#0f172a">폭포수 + 추적성 통제</text>
-  <rect x="502" y="632" width="162" height="26" rx="13" fill="#86efac"/>
-  <text class="small" x="583" y="649" text-anchor="middle" fill="#0f172a">애자일 / 스크럼</text>
-  <rect x="726" y="632" width="146" height="26" rx="13" fill="#c4b5fd"/>
-  <text class="small" x="799" y="649" text-anchor="middle" fill="#0f172a">나선형 / UP</text>
-  <rect x="932" y="632" width="132" height="26" rx="13" fill="#67e8f9"/>
-  <text class="small" x="998" y="649" text-anchor="middle" fill="#0f172a">칸반</text>
-  <text class="small" x="1078" y="648" text-anchor="end" fill="#cbd5e1">현업에서는 혼합형 적용이 흔함</text>
+  <circle cx="598" cy="418" r="112" fill="#ecfeff" stroke="#0891b2" stroke-width="3"/>
+  <path d="M598 306 A112 112 0 0 1 701 382" fill="none" stroke="#0ea5e9" stroke-width="10" stroke-linecap="round"/>
+  <polygon points="691,370 713,384 688,392" fill="#0ea5e9"/>
+  <path d="M701 382 A112 112 0 0 1 648 506" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round"/>
+  <polygon points="638,492 659,516 666,488" fill="#22c55e"/>
+  <path d="M648 506 A112 112 0 0 1 495 462" fill="none" stroke="#f59e0b" stroke-width="10" stroke-linecap="round"/>
+  <polygon points="504,450 482,466 510,473" fill="#f59e0b"/>
+  <path d="M495 462 A112 112 0 0 1 520 334" fill="none" stroke="#8b5cf6" stroke-width="10" stroke-linecap="round"/>
+  <polygon points="529,347 512,323 505,351" fill="#8b5cf6"/>
+
+  <text class="label" x="598" y="362" text-anchor="middle">계획</text>
+  <text class="label" x="665" y="416" text-anchor="middle">개발</text>
+  <text class="label" x="598" y="474" text-anchor="middle">검토</text>
+  <text class="label" x="530" y="416" text-anchor="middle">회고</text>
+
+  <rect x="452" y="558" width="140" height="48" rx="14" fill="#e0f2fe"/>
+  <text class="label" x="522" y="587" text-anchor="middle">스크럼</text>
+  <text class="small" x="522" y="604" text-anchor="middle">스프린트 · 백로그 · 리뷰</text>
+  <rect x="606" y="558" width="140" height="48" rx="14" fill="#dcfce7"/>
+  <text class="label" x="676" y="587" text-anchor="middle">칸반</text>
+  <text class="small" x="676" y="604" text-anchor="middle">흐름 시각화 · WIP 제한</text>
+
+  <text class="label" x="452" y="698">언제 유리한가</text>
+  <text class="body" x="452" y="726">
+    <tspan x="452" dy="0">• 요구사항 변화가 잦고</tspan>
+    <tspan x="452" dy="22">사용자 피드백이 빠르게 필요한 프로젝트</tspan>
+    <tspan x="452" dy="22">• 동작 결과물을 자주 배포하며</tspan>
+    <tspan x="452" dy="22">점진적으로 품질을 높일 때</tspan>
+  </text>
+  <text class="label" x="452" y="834">주의할 점</text>
+  <text class="body" x="452" y="862">
+    <tspan x="452" dy="0">• 범위 통제, 추적성, 승인 이력을</tspan>
+    <tspan x="452" dy="22">별도 장치로 보완해야 한다.</tspan>
+  </text>
+
+  <rect x="808" y="172" width="352" height="500" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="836" y="214">나선형 모델</text>
+  <text class="body" x="836" y="242">
+    <tspan x="836" dy="0">반복 자체보다 위험 식별과 완화 순서를 먼저 설계하는</tspan>
+    <tspan x="836" dy="20">고위험 프로젝트용 접근이다.</tspan>
+  </text>
+
+  <path d="M988 332 C1048 332 1072 378 1072 416 C1072 478 1016 530 952 530 C868 530 822 458 822 402 C822 312 902 262 996 262" fill="none" stroke="#7c3aed" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="996" cy="262" r="8" fill="#1d4ed8"/>
+  <circle cx="1072" cy="416" r="8" fill="#ef4444"/>
+  <circle cx="952" cy="530" r="8" fill="#16a34a"/>
+  <circle cx="822" cy="402" r="8" fill="#f59e0b"/>
+  <text class="label" x="996" y="244" text-anchor="middle">계획 수립</text>
+  <text class="label" x="1098" y="421">위험 분석</text>
+  <text class="label" x="952" y="558" text-anchor="middle">개발 · 검증</text>
+  <text class="label" x="742" y="408">고객 평가</text>
+
+  <rect x="842" y="576" width="284" height="40" rx="20" fill="#ede9fe"/>
+  <text class="label" x="984" y="602" text-anchor="middle">프로토타입으로 불확실성 축소</text>
+
+  <text class="label" x="836" y="698">언제 유리한가</text>
+  <text class="body" x="836" y="726">
+    <tspan x="836" dy="0">• 대규모 연동, 높은 보안 요구,</tspan>
+    <tspan x="836" dy="22">성능 리스크가 큰 프로젝트</tspan>
+    <tspan x="836" dy="22">• 기술 타당성과 사업성을</tspan>
+    <tspan x="836" dy="22">반복마다 검증해야 하는 과제</tspan>
+  </text>
+  <text class="label" x="836" y="834">주의할 점</text>
+  <text class="body" x="836" y="862">
+    <tspan x="836" dy="0">• 위험 분석 활동이 많아</tspan>
+    <tspan x="836" dy="22">관리 비용과 일정 부담이 커질 수 있다.</tspan>
+  </text>
+
+  <rect x="40" y="708" width="1120" height="372" rx="28" fill="#0f172a"/>
+  <text x="68" y="752" font-size="24" font-weight="800" fill="#f8fafc">대표 실천/파생 방법론 요약</text>
+  <text class="small" x="68" y="778" fill="#cbd5e1">상위 접근(폭포수·애자일·나선형) 위에 실무 프레임워크와 실천 기법이 얹힌다.</text>
+
+  <rect x="68" y="804" width="250" height="224" rx="20" fill="#e0f2fe"/>
+  <text class="cardTitle" x="90" y="840">스크럼</text>
+  <text class="cardBody" x="90" y="868">
+    <tspan x="90" dy="0">• 스프린트 단위</tspan>
+    <tspan x="90" dy="22">  계획·개발·리뷰·회고</tspan>
+    <tspan x="90" dy="22">• 역할: 제품 책임자,</tspan>
+    <tspan x="90" dy="22">  스크럼 마스터, 개발팀</tspan>
+    <tspan x="90" dy="22">• 팀 단위 반복 개발 운영</tspan>
+    <tspan x="90" dy="22">  프레임워크</tspan>
+  </text>
+
+  <rect x="340" y="804" width="250" height="224" rx="20" fill="#dcfce7"/>
+  <text class="cardTitle" x="362" y="840">칸반</text>
+  <text class="cardBody" x="362" y="868">
+    <tspan x="362" dy="0">• To Do / Doing / Done</tspan>
+    <tspan x="362" dy="22">  흐름을 시각화</tspan>
+    <tspan x="362" dy="22">• WIP 제한으로 병목과</tspan>
+    <tspan x="362" dy="22">  대기시간을 제어</tspan>
+    <tspan x="362" dy="22">• 운영·유지보수 업무에 적합</tspan>
+  </text>
+
+  <rect x="612" y="804" width="250" height="224" rx="20" fill="#ede9fe"/>
+  <text class="cardTitle" x="634" y="840">UP · RAD</text>
+  <text class="cardBody" x="634" y="868">
+    <tspan x="634" dy="0">• UP: 유스케이스·아키텍처 중심</tspan>
+    <tspan x="634" dy="22">• RAD: 빠른 프로토타입</tspan>
+    <tspan x="634" dy="22">  과 사용자 참여</tspan>
+    <tspan x="634" dy="22">• 장기 구조 검증과</tspan>
+    <tspan x="634" dy="22">  단기 화면 개발에 활용</tspan>
+  </text>
+
+  <rect x="884" y="804" width="250" height="224" rx="20" fill="#fee2e2"/>
+  <text class="cardTitle" x="906" y="840">XP</text>
+  <text class="cardBody" x="906" y="868">
+    <tspan x="906" dy="0">• TDD · 짝 프로그래밍 · CI</tspan>
+    <tspan x="906" dy="22">• 리팩터링과 단순 설계로</tspan>
+    <tspan x="906" dy="22">  변경 대응성 강화</tspan>
+    <tspan x="906" dy="22">• 팀 규율과 테스트 문화가 핵심</tspan>
+  </text>
 </svg>

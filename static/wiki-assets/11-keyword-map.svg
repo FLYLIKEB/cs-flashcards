@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">11. 소프트웨어공학 빠른 비교 암기표</title>
+  <desc id="desc">소프트웨어공학 페이지의 빠른 비교 암기표를 핵심 분류, 애자일 실행, 테스트 판별, 확장 방법론의 네 묶음으로 정리한 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 16px; font-weight: 800; fill: #475569; letter-spacing: 0.06em; }
+      .title { font-size: 34px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 600; fill: #334155; }
+      .boxTitle { font-size: 22px; font-weight: 800; }
+      .itemKey { font-size: 16px; font-weight: 800; }
+      .itemVal { font-size: 15px; font-weight: 700; fill: #334155; }
+      .footer { font-size: 15px; font-weight: 700; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="780" fill="url(#bg)" />
+  <rect x="28" y="24" width="1144" height="732" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <text x="72" y="82" class="eyebrow">EXAM QUICK MATCH</text>
+  <text x="72" y="126" class="title">소프트웨어공학 빠른 비교 암기표</text>
+  <text x="72" y="164" class="subtitle">문제 키워드를 네 묶음으로 나누면 긴 지문도 빠르게 정답 후보에 연결할 수 있다.</text>
+
+  <g>
+    <rect x="72" y="206" width="500" height="236" rx="26" fill="#eef2ff" stroke="#818cf8" stroke-width="2.5" />
+    <text x="102" y="246" class="boxTitle">핵심 1차 분류</text>
+    <text x="102" y="286" class="itemKey">순차 단계, 문서화, 변경에 약함</text>
+    <text x="102" y="310" class="itemVal">→ 폭포수 모델</text>
+    <text x="102" y="348" class="itemKey">반복 개발, 고객 피드백, 변화 대응</text>
+    <text x="102" y="372" class="itemVal">→ 애자일</text>
+    <text x="102" y="410" class="itemKey">위험 분석, 프로토타입, 대규모 고위험</text>
+    <text x="102" y="434" class="itemVal">→ 나선형 모델</text>
+  </g>
+
+  <g>
+    <rect x="628" y="206" width="500" height="236" rx="26" fill="#ecfdf5" stroke="#22c55e" stroke-width="2.5" />
+    <text x="658" y="246" class="boxTitle">애자일 실행 키워드</text>
+    <text x="658" y="286" class="itemKey">스프린트, 제품 백로그, 스크럼 마스터</text>
+    <text x="658" y="310" class="itemVal">→ 스크럼</text>
+    <text x="658" y="348" class="itemKey">WIP 제한, 작업 흐름 시각화</text>
+    <text x="658" y="372" class="itemVal">→ 칸반</text>
+    <text x="658" y="410" class="itemKey">TDD, 짝 프로그래밍, 지속적 통합</text>
+    <text x="658" y="434" class="itemVal">→ XP</text>
+  </g>
+
+  <g>
+    <rect x="72" y="474" width="500" height="216" rx="26" fill="#fffbeb" stroke="#f59e0b" stroke-width="2.5" />
+    <text x="102" y="514" class="boxTitle">테스트 판별 키워드</text>
+    <text x="102" y="554" class="itemKey">입출력 명세 기반 / 경계 근처 값</text>
+    <text x="102" y="578" class="itemVal">→ 블랙박스 테스트 / 경계값 분석</text>
+    <text x="102" y="616" class="itemKey">코드 구조, 분기, 경로, 커버리지</text>
+    <text x="102" y="640" class="itemVal">→ 화이트박스 테스트</text>
+  </g>
+
+  <g>
+    <rect x="628" y="474" width="500" height="216" rx="26" fill="#fff7ed" stroke="#f97316" stroke-width="2.5" />
+    <text x="658" y="514" class="boxTitle">확장 방법론·실무 용어</text>
+    <text x="658" y="554" class="itemKey">유스케이스 중심, 아키텍처 중심</text>
+    <text x="658" y="578" class="itemVal">→ UP</text>
+    <text x="658" y="616" class="itemKey">빠른 프로토타입, CASE 도구</text>
+    <text x="658" y="640" class="itemVal">→ RAD</text>
+  </g>
+
+  <text x="72" y="726" class="footer">읽는 순서: 1차 분류 → 애자일 세부 구분 → 테스트 관점 → 확장 방법론.</text>
+</svg>

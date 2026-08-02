@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">10-03-02. SYN Flood handshake flow</title>
+  <desc id="desc">정상 TCP 3-way handshake와 SYN Flood 상황을 비교해, ACK 미도착으로 half-open 큐가 가득 차는 과정을 설명하는 SVG 다이어그램</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <marker id="arrowRed" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#c2410c"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#1d4ed8"/>
+    </marker>
+    <marker id="arrowSlate" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .tiny { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .white { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#dbe4ee"/>
+  <rect x="24" y="24" width="1152" height="712" rx="28" fill="url(#bg)"/>
+  <rect x="46" y="46" width="1108" height="668" rx="24" fill="#ffffff" opacity="0.94"/>
+
+  <text class="title" x="80" y="108">SYN Flood: 정상 handshake vs ACK 미도착</text>
+  <text class="subtitle" x="80" y="142">핵심은 트래픽 양보다도 서버가 half-open 연결 상태를 오래 붙잡게 만드는 점이다.</text>
+
+  <rect x="80" y="188" width="492" height="372" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="110" y="230">A. 정상 TCP 3-way handshake</text>
+  <rect x="120" y="274" width="118" height="76" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
+  <text class="label" x="179" y="307" text-anchor="middle">정상 클라이언트</text>
+  <text class="tiny" x="179" y="329" text-anchor="middle">연결 완료 목적</text>
+  <rect x="410" y="274" width="118" height="76" rx="18" fill="#e2e8f0" stroke="#475569" stroke-width="2.5"/>
+  <text class="label" x="469" y="307" text-anchor="middle">서버</text>
+  <text class="tiny" x="469" y="329" text-anchor="middle">정상 연결 수락</text>
+
+  <line x1="238" y1="296" x2="410" y2="296" stroke="#c2410c" stroke-width="4" marker-end="url(#arrowRed)"/>
+  <text class="tiny" x="324" y="280" text-anchor="middle">1) SYN</text>
+  <line x1="410" y1="334" x2="238" y2="334" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <text class="tiny" x="324" y="357" text-anchor="middle">2) SYN-ACK</text>
+  <line x1="238" y1="388" x2="410" y2="388" stroke="#475569" stroke-width="4" marker-end="url(#arrowSlate)"/>
+  <text class="tiny" x="324" y="372" text-anchor="middle">3) ACK</text>
+
+  <rect x="132" y="432" width="396" height="92" rx="18" fill="#dcfce7" stroke="#22c55e" stroke-width="2.5"/>
+  <text class="label" x="154" y="468">결과</text>
+  <text class="body" x="154" y="494">• 서버는 대기 상태를 빠르게 종료하고 정상 연결로 전환한다.</text>
+  <text class="body" x="154" y="518">• backlog 큐가 오래 점유되지 않아 다음 요청을 받을 수 있다.</text>
+
+  <rect x="628" y="188" width="492" height="372" rx="24" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text class="section" x="658" y="230">B. SYN Flood 상황</text>
+  <rect x="668" y="274" width="118" height="76" rx="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"/>
+  <text class="label" x="727" y="307" text-anchor="middle">공격자</text>
+  <text class="tiny" x="727" y="329" text-anchor="middle">SYN만 반복</text>
+  <rect x="958" y="274" width="118" height="76" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
+  <text class="label" x="1017" y="307" text-anchor="middle">서버</text>
+  <text class="tiny" x="1017" y="329" text-anchor="middle">SYN-ACK 후 대기</text>
+
+  <line x1="786" y1="296" x2="958" y2="296" stroke="#c2410c" stroke-width="4" marker-end="url(#arrowRed)"/>
+  <text class="tiny" x="872" y="280" text-anchor="middle">1) SYN</text>
+  <line x1="958" y1="334" x2="786" y2="334" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <text class="tiny" x="872" y="357" text-anchor="middle">2) SYN-ACK</text>
+  <text class="tiny" x="872" y="392" text-anchor="middle">3) ACK 없음 → half-open 상태 유지</text>
+
+  <rect x="680" y="432" width="396" height="92" rx="18" fill="#fee2e2" stroke="#ef4444" stroke-width="2.5"/>
+  <text class="label" x="702" y="468">결과</text>
+  <text class="body" x="702" y="494">• 대기 중인 연결 엔트리가 backlog 큐를 계속 점유한다.</text>
+  <text class="body" x="702" y="518">• 정상 사용자의 SYN이 와도 새 연결을 받지 못할 수 있다.</text>
+
+  <rect x="80" y="594" width="1040" height="94" rx="22" fill="#0f172a"/>
+  <text class="section" x="110" y="632" fill="#ffffff">backlog 큐가 차는 이유</text>
+  <rect x="434" y="614" width="430" height="48" rx="14" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+  <rect x="446" y="623" width="70" height="30" rx="10" fill="#dc2626"/>
+  <rect x="524" y="623" width="70" height="30" rx="10" fill="#dc2626"/>
+  <rect x="602" y="623" width="70" height="30" rx="10" fill="#dc2626"/>
+  <rect x="680" y="623" width="70" height="30" rx="10" fill="#dc2626"/>
+  <rect x="758" y="623" width="70" height="30" rx="10" fill="#dc2626"/>
+  <rect x="836" y="623" width="16" height="30" rx="8" fill="#fca5a5"/>
+  <text class="tiny white" x="481" y="643" text-anchor="middle">대기</text>
+  <text class="tiny white" x="559" y="643" text-anchor="middle">대기</text>
+  <text class="tiny white" x="637" y="643" text-anchor="middle">대기</text>
+  <text class="tiny white" x="715" y="643" text-anchor="middle">대기</text>
+  <text class="tiny white" x="793" y="643" text-anchor="middle">대기</text>
+  <text class="tiny" x="894" y="643">빈 공간 거의 없음</text>
+  <text class="body" x="110" y="668" fill="#e2e8f0">방어 포인트: SYN cookies, backlog 튜닝, 접속 속도 제한, 프록시/로드밸런서 앞단 완충</text>
+</svg>

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">08-03 DNS lookup flow</title>
+  <desc id="desc">stub resolver부터 recursive resolver, root, TLD, authoritative name server까지 이어지는 DNS 조회 흐름과 TTL, 주요 레코드 의미를 정리한 도표</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fbff; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .node { fill: #ffffff; stroke: #60a5fa; stroke-width: 2.5; }
+      .accent { fill: #dbeafe; stroke: #60a5fa; stroke-width: 2.5; }
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .tiny { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 600 15px 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+      .num { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+    </style>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1200" height="760"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" class="card"/>
+
+  <text class="title" x="72" y="92">DNS 조회 흐름</text>
+  <text class="subtitle" x="72" y="124">브라우저의 stub resolver가 최종 IP 주소를 얻기까지 어떤 서버를 순서대로 거치는지 정리</text>
+
+  <rect x="72" y="168" width="760" height="324" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text class="section" x="104" y="208">1. 조회 경로</text>
+  <text class="tiny" x="104" y="236">recursive resolver가 캐시에 없으면 단계별로 권한 있는 정보를 찾아 올라간다.</text>
+
+  <circle cx="122" cy="316" r="24" fill="#2563eb"/>
+  <text class="num" x="122" y="322" text-anchor="middle">1</text>
+  <rect x="160" y="284" width="150" height="72" rx="16" class="node"/>
+  <text class="label" x="235" y="312" text-anchor="middle">stub resolver</text>
+  <text class="tiny" x="235" y="334" text-anchor="middle">브라우저/OS</text>
+
+  <circle cx="348" cy="316" r="24" fill="#2563eb"/>
+  <text class="num" x="348" y="322" text-anchor="middle">2</text>
+  <rect x="386" y="284" width="176" height="72" rx="16" class="node"/>
+  <text class="label" x="474" y="312" text-anchor="middle">recursive resolver</text>
+  <text class="tiny" x="474" y="334" text-anchor="middle">ISP / public DNS</text>
+
+  <circle cx="600" cy="316" r="24" fill="#2563eb"/>
+  <text class="num" x="600" y="322" text-anchor="middle">3</text>
+  <rect x="638" y="284" width="126" height="72" rx="16" class="node"/>
+  <text class="label" x="701" y="312" text-anchor="middle">root</text>
+  <text class="tiny" x="701" y="334" text-anchor="middle">.com 위치 안내</text>
+
+  <line x1="310" y1="320" x2="386" y2="320" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <line x1="562" y1="320" x2="638" y2="320" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+  <circle cx="238" cy="418" r="24" fill="#2563eb"/>
+  <text class="num" x="238" y="424" text-anchor="middle">4</text>
+  <rect x="276" y="386" width="126" height="72" rx="16" class="node"/>
+  <text class="label" x="339" y="414" text-anchor="middle">TLD</text>
+  <text class="tiny" x="339" y="436" text-anchor="middle">NS 위치 안내</text>
+
+  <circle cx="490" cy="418" r="24" fill="#2563eb"/>
+  <text class="num" x="490" y="424" text-anchor="middle">5</text>
+  <rect x="528" y="386" width="236" height="72" rx="16" class="node"/>
+  <text class="label" x="646" y="414" text-anchor="middle">authoritative name server</text>
+  <text class="tiny" x="646" y="436" text-anchor="middle">A / AAAA / CNAME 등 실제 답</text>
+
+  <line x1="701" y1="356" x2="701" y2="386" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <line x1="528" y1="422" x2="402" y2="422" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+  <text class="body" x="104" y="474">응답은 recursive resolver를 거쳐 클라이언트로 돌아오며, 같은 TTL 동안 캐시에 재사용된다.</text>
+  <text class="mono" x="104" y="504">example.com  →  93.184.216.34</text>
+
+  <rect x="862" y="168" width="266" height="196" rx="24" class="accent"/>
+  <text class="section" x="894" y="208">2. TTL 의미</text>
+  <text class="body" x="894" y="242">TTL(Time-To-Live)은 캐시 유지 시간이다.</text>
+  <text class="body" x="894" y="274">• TTL이 길면 조회 수가 줄어든다.</text>
+  <text class="body" x="894" y="304">• TTL이 짧으면 변경 반영은 빠르다.</text>
+  <text class="body" x="894" y="334">• 운영 중에는 전파 속도와 비용을 함께 본다.</text>
+
+  <rect x="862" y="390" width="266" height="248" rx="24" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text class="section" x="894" y="430">3. 자주 나오는 레코드</text>
+  <text class="body" x="894" y="466">• A / AAAA: IPv4, IPv6 주소</text>
+  <text class="body" x="894" y="498">• CNAME: 별칭</text>
+  <text class="body" x="894" y="530">• MX: 메일 서버</text>
+  <text class="body" x="894" y="562">• TXT: 정책, 소유 검증</text>
+  <text class="body" x="894" y="594">• NS: 권한 네임서버</text>
+  <text class="tiny" x="894" y="622">면접 포인트: 캐시 포이즈닝과 DNSSEC도 함께 설명</text>
+
+  <text class="tiny" x="72" y="688">핵심 기억: DNS는 이름을 IP로 바꾸는 분산 조회 체계이며, recursive resolver의 캐시와 authoritative 응답이 성능·정확도를 좌우한다.</text>
+</svg>

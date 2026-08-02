@@ -1,165 +1,145 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-03 SQL 인포그래픽</title>
-  <desc id="desc">SQL 조회문의 작성 순서와 실제 실행 순서, WHERE와 HAVING의 차이, JOIN과 GROUP BY 흐름을 설명하는 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img" aria-labelledby="title desc">
+  <title id="title">07-03 SQL 실행 순서와 절 역할 인포그래픽</title>
+  <desc id="desc">SQL의 작성 순서, 실제 실행 순서 8단계, WHERE와 HAVING 차이, JOIN과 GROUP BY 해석 포인트를 정리한 인포그래픽</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff" />
-      <stop offset="100%" stop-color="#f8fafc" />
-    </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb" />
-      <stop offset="100%" stop-color="#0891b2" />
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
-    </marker>
     <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
       .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .sql { font: 600 15px 'SFMono-Regular',Consolas,'Liberation Mono',monospace; fill: #e2e8f0; }
-      .stepNo { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: white; }
-      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chipText { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
+      .stepNo { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .sql { font: 600 16px 'SFMono-Regular',Consolas,'Liberation Mono',monospace; fill: #e2e8f0; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="28" y="28" width="1144" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" />
+  <rect class="bg" width="1200" height="920" />
+  <rect x="28" y="28" width="1144" height="864" rx="28" class="card" />
 
-  <text x="70" y="90" class="title">07-03. SQL</text>
-  <text x="70" y="122" class="subtitle">핵심 포인트: 작성 순서와 실행 순서는 다르며, WHERE는 행을, HAVING은 그룹을 필터링한다.</text>
+  <text x="68" y="90" class="title">07-03. SQL</text>
+  <text x="68" y="122" class="subtitle">작성 순서와 실행 순서를 분리해서 기억하면 WHERE, HAVING, GROUP BY 문제를 훨씬 안정적으로 푼다.</text>
 
-  <rect x="70" y="152" width="1060" height="64" rx="18" fill="#dbeafe" stroke="#93c5fd" />
-  <text x="92" y="180" class="section">작성 순서</text>
-  <g transform="translate(220 168)">
-    <rect x="0" y="0" width="86" height="32" rx="16" fill="#ffffff" stroke="#60a5fa" /><text x="43" y="21" text-anchor="middle" class="chip">SELECT</text>
-    <rect x="98" y="0" width="76" height="32" rx="16" fill="#ffffff" stroke="#60a5fa" /><text x="136" y="21" text-anchor="middle" class="chip">FROM</text>
-    <rect x="186" y="0" width="86" height="32" rx="16" fill="#ffffff" stroke="#60a5fa" /><text x="229" y="21" text-anchor="middle" class="chip">WHERE</text>
-    <rect x="284" y="0" width="102" height="32" rx="16" fill="#ffffff" stroke="#60a5fa" /><text x="335" y="21" text-anchor="middle" class="chip">GROUP BY</text>
-    <rect x="398" y="0" width="92" height="32" rx="16" fill="#ffffff" stroke="#60a5fa" /><text x="444" y="21" text-anchor="middle" class="chip">HAVING</text>
-    <rect x="502" y="0" width="96" height="32" rx="16" fill="#ffffff" stroke="#60a5fa" /><text x="550" y="21" text-anchor="middle" class="chip">ORDER BY</text>
+  <rect x="68" y="154" width="1064" height="92" rx="20" fill="#dbeafe" stroke="#93c5fd" stroke-width="2" />
+  <text x="92" y="188" class="section">작성 순서</text>
+  <text x="92" y="214" class="body">문장을 쓰는 순서는 SELECT부터 시작하지만, 데이터는 FROM부터 준비된다.</text>
+  <g transform="translate(330 176)">
+    <rect x="0" y="0" width="92" height="34" rx="17" fill="#ffffff" stroke="#60a5fa" /><text x="46" y="22" text-anchor="middle" class="chipText">SELECT</text>
+    <rect x="106" y="0" width="82" height="34" rx="17" fill="#ffffff" stroke="#60a5fa" /><text x="147" y="22" text-anchor="middle" class="chipText">FROM</text>
+    <rect x="202" y="0" width="90" height="34" rx="17" fill="#ffffff" stroke="#60a5fa" /><text x="247" y="22" text-anchor="middle" class="chipText">WHERE</text>
+    <rect x="306" y="0" width="112" height="34" rx="17" fill="#ffffff" stroke="#60a5fa" /><text x="362" y="22" text-anchor="middle" class="chipText">GROUP BY</text>
+    <rect x="432" y="0" width="98" height="34" rx="17" fill="#ffffff" stroke="#60a5fa" /><text x="481" y="22" text-anchor="middle" class="chipText">HAVING</text>
+    <rect x="544" y="0" width="108" height="34" rx="17" fill="#ffffff" stroke="#60a5fa" /><text x="598" y="22" text-anchor="middle" class="chipText">ORDER BY</text>
   </g>
 
-  <rect x="70" y="240" width="302" height="386" rx="24" fill="#0f172a" />
-  <text x="94" y="276" class="section" fill="#ffffff">예시 쿼리</text>
-  <text x="94" y="304" class="small" fill="#94a3b8">고객별 주문 건수 조회 후 5건 이상만 정렬</text>
-  <text x="94" y="342" class="sql">SELECT c.customer_id, c.name,</text>
-  <text x="94" y="366" class="sql">       COUNT(o.order_id) AS order_count</text>
-  <text x="94" y="390" class="sql">FROM customers c</text>
-  <text x="94" y="414" class="sql">JOIN orders o</text>
-  <text x="94" y="438" class="sql">  ON c.customer_id = o.customer_id</text>
-  <text x="94" y="462" class="sql">WHERE c.active = TRUE</text>
-  <text x="94" y="486" class="sql">GROUP BY c.customer_id, c.name</text>
-  <text x="94" y="510" class="sql">HAVING COUNT(o.order_id) &gt;= 5</text>
-  <text x="94" y="534" class="sql">ORDER BY order_count DESC;</text>
+  <rect x="68" y="274" width="330" height="344" rx="24" fill="#0f172a" />
+  <text x="92" y="314" class="section" fill="#ffffff">예시 쿼리</text>
+  <text x="92" y="342" class="small" fill="#94a3b8">활성 고객의 주문 수를 집계해 5건 이상만 출력</text>
+  <text x="92" y="382" class="sql">SELECT c.customer_id, c.name,</text>
+  <text x="92" y="408" class="sql">       COUNT(o.order_id) AS order_count</text>
+  <text x="92" y="434" class="sql">FROM customers c</text>
+  <text x="92" y="460" class="sql">JOIN orders o ON c.customer_id =</text>
+  <text x="92" y="486" class="sql">     o.customer_id</text>
+  <text x="92" y="512" class="sql">WHERE c.active = TRUE</text>
+  <text x="92" y="538" class="sql">GROUP BY c.customer_id, c.name</text>
+  <text x="92" y="564" class="sql">HAVING COUNT(o.order_id) &gt;= 5</text>
+  <text x="92" y="590" class="sql">ORDER BY order_count DESC;</text>
 
-  <rect x="94" y="564" width="254" height="42" rx="14" fill="#1e293b" stroke="#334155" />
-  <text x="110" y="590" class="body" fill="#e2e8f0">SELECT는 나중에 계산되고,</text>
-  <text x="110" y="608" class="body" fill="#e2e8f0">WHERE/HAVING 위치가 점수 포인트다.</text>
+  <rect x="92" y="622" width="282" height="66" rx="16" fill="#1e293b" stroke="#475569" stroke-width="2" />
+  <text x="110" y="650" class="body" fill="#e2e8f0">채점 포인트:</text>
+  <text x="110" y="674" class="small" fill="#cbd5e1">WHERE는 행을, HAVING은 집계가 끝난 그룹을 걸러낸다.</text>
 
-  <text x="404" y="264" class="section">실행 순서</text>
-  <text x="404" y="290" class="body">FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT/OFFSET</text>
+  <text x="430" y="304" class="section">실행 순서 8단계</text>
+  <text x="430" y="330" class="body">왼쪽에서 오른쪽, 위에서 아래 순서로 읽는다.</text>
 
-  <g transform="translate(396 320)">
-    <line x1="24" y1="58" x2="706" y2="58" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)" />
-    <line x1="24" y1="58" x2="706" y2="58" stroke="#7dd3fc" stroke-width="2" stroke-dasharray="8 10" opacity="0.7">
-      <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite" />
-    </line>
-    <circle cx="24" cy="58" r="7" fill="#0ea5e9">
-      <animate attributeName="cx" values="24;706" dur="4s" repeatCount="indefinite" />
-    </circle>
-
+  <g transform="translate(430 356)">
     <g transform="translate(0 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">1</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#eff6ff" stroke="#93c5fd" />
-      <text x="18" y="114" class="label">FROM</text>
-      <text x="18" y="136" class="body">기준 테이블 선택</text>
-      <text x="18" y="156" class="small">customers</text>
-      <rect x="18" y="168" width="52" height="16" rx="4" fill="#bfdbfe" />
-      <rect x="78" y="168" width="54" height="16" rx="4" fill="#dbeafe" />
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#2563eb" /><text x="30" y="36" text-anchor="middle" class="stepNo">1</text>
+      <text x="30" y="68" class="label">FROM</text>
+      <text x="30" y="94" class="body">기준 테이블을 선택한다.</text>
+      <text x="30" y="116" class="small">예: customers</text>
+      <text x="30" y="136" class="small">서브쿼리도 이 단계에서 준비</text>
+    </g>
+    <g transform="translate(178 0)">
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#ecfeff" stroke="#67e8f9" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#0891b2" /><text x="30" y="36" text-anchor="middle" class="stepNo">2</text>
+      <text x="30" y="68" class="label">JOIN</text>
+      <text x="30" y="94" class="body">관련 행을 결합한다.</text>
+      <text x="30" y="116" class="small">예: customers ⨝ orders</text>
+      <text x="30" y="136" class="small">조인 조건이 결과 행 수를 좌우</text>
+    </g>
+    <g transform="translate(356 0)">
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#f0fdf4" stroke="#86efac" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#16a34a" /><text x="30" y="36" text-anchor="middle" class="stepNo">3</text>
+      <text x="30" y="68" class="label">WHERE</text>
+      <text x="30" y="94" class="body">개별 행을 먼저 줄인다.</text>
+      <text x="30" y="116" class="small">예: active = TRUE</text>
+      <text x="30" y="136" class="small">집계 함수는 여기서 못 쓴다.</text>
+    </g>
+    <g transform="translate(534 0)">
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#fffbeb" stroke="#fcd34d" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#d97706" /><text x="30" y="36" text-anchor="middle" class="stepNo">4</text>
+      <text x="30" y="68" class="label">GROUP BY</text>
+      <text x="30" y="94" class="body">남은 행을 묶어 그룹을 만든다.</text>
+      <text x="30" y="116" class="small">예: customer_id, name</text>
+      <text x="30" y="136" class="small">집계 기준이 여기서 확정</text>
     </g>
 
-    <g transform="translate(92 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">2</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#ecfeff" stroke="#67e8f9" />
-      <text x="18" y="114" class="label">JOIN</text>
-      <text x="18" y="136" class="body">관련 행 결합</text>
-      <text x="18" y="156" class="small">customers ⨝ orders</text>
-      <path d="M22 182 h30 l10 -10 l12 12 h42" fill="none" stroke="#0891b2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <g transform="translate(0 176)">
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#fff7ed" stroke="#fdba74" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#ea580c" /><text x="30" y="36" text-anchor="middle" class="stepNo">5</text>
+      <text x="30" y="68" class="label">HAVING</text>
+      <text x="30" y="94" class="body">그룹 조건을 적용한다.</text>
+      <text x="30" y="116" class="small">예: COUNT(order_id) ≥ 5</text>
+      <text x="30" y="136" class="small">집계 결과를 기준으로 판별</text>
     </g>
-
-    <g transform="translate(184 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">3</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#f0fdf4" stroke="#86efac" />
-      <text x="18" y="114" class="label">WHERE</text>
-      <text x="18" y="136" class="body">행 단위 필터링</text>
-      <text x="18" y="156" class="small">active = TRUE</text>
-      <path d="M20 180 h32 l8 10 l14 -22 l12 14 h40" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <g transform="translate(178 176)">
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#7c3aed" /><text x="30" y="36" text-anchor="middle" class="stepNo">6</text>
+      <text x="30" y="68" class="label">SELECT</text>
+      <text x="30" y="94" class="body">보여줄 컬럼을 계산한다.</text>
+      <text x="30" y="116" class="small">id, name, COUNT(...)</text>
+      <text x="30" y="136" class="small">별칭과 표현식 결과가 확정</text>
     </g>
-
-    <g transform="translate(276 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">4</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#fffbeb" stroke="#fcd34d" />
-      <text x="18" y="114" class="label">GROUP BY</text>
-      <text x="18" y="136" class="body">고객별 묶기</text>
-      <text x="18" y="156" class="small">customer_id, name</text>
-      <circle cx="36" cy="180" r="10" fill="#fde68a" /><circle cx="68" cy="180" r="10" fill="#fde68a" /><circle cx="100" cy="180" r="10" fill="#fde68a" />
-      <rect x="24" y="172" width="88" height="16" rx="8" fill="none" stroke="#d97706" stroke-width="3" />
+    <g transform="translate(356 176)">
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#fdf2f8" stroke="#f9a8d4" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#db2777" /><text x="30" y="36" text-anchor="middle" class="stepNo">7</text>
+      <text x="30" y="68" class="label">ORDER BY</text>
+      <text x="30" y="94" class="body">정렬 기준을 적용한다.</text>
+      <text x="30" y="116" class="small">예: order_count DESC</text>
+      <text x="30" y="136" class="small">오름차순이 기본값</text>
     </g>
-
-    <g transform="translate(368 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">5</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#fff7ed" stroke="#fdba74" />
-      <text x="18" y="114" class="label">HAVING</text>
-      <text x="18" y="136" class="body">그룹 조건 필터</text>
-      <text x="18" y="156" class="small">COUNT(order_id) ≥ 5</text>
-      <text x="18" y="184" class="small">남는 고객 그룹만 통과</text>
-    </g>
-
-    <g transform="translate(460 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">6</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#f5f3ff" stroke="#c4b5fd" />
-      <text x="18" y="114" class="label">SELECT</text>
-      <text x="18" y="136" class="body">보여줄 컬럼 계산</text>
-      <text x="18" y="156" class="small">id, name, COUNT(...)</text>
-      <rect x="18" y="168" width="114" height="20" rx="6" fill="#ddd6fe" />
-      <text x="26" y="182" class="small">result columns</text>
-    </g>
-
-    <g transform="translate(552 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">7</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#fdf2f8" stroke="#f9a8d4" />
-      <text x="18" y="114" class="label">ORDER BY</text>
-      <text x="18" y="136" class="body">정렬</text>
-      <text x="18" y="156" class="small">order_count DESC</text>
-      <path d="M28 188 h68" stroke="#db2777" stroke-width="4" stroke-linecap="round" />
-      <path d="M28 178 h52" stroke="#db2777" stroke-width="4" stroke-linecap="round" />
-      <path d="M28 168 h34" stroke="#db2777" stroke-width="4" stroke-linecap="round" />
-    </g>
-
-    <g transform="translate(644 0)">
-      <circle cx="24" cy="24" r="18" fill="#2563eb" /><text x="24" y="29" text-anchor="middle" class="stepNo">8</text>
-      <rect x="0" y="86" width="150" height="120" rx="20" fill="#f8fafc" stroke="#cbd5e1" />
-      <text x="18" y="114" class="label">LIMIT / OFFSET</text>
-      <text x="18" y="136" class="body">결과 개수 제한</text>
-      <text x="18" y="156" class="small">상위 N개, 페이지 분할</text>
-      <rect x="18" y="170" width="94" height="18" rx="9" fill="#e2e8f0" />
-      <rect x="18" y="170" width="44" height="18" rx="9" fill="#94a3b8" />
+    <g transform="translate(534 176)">
+      <rect x="0" y="0" width="160" height="150" rx="20" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+      <circle cx="30" cy="30" r="18" fill="#475569" /><text x="30" y="36" text-anchor="middle" class="stepNo">8</text>
+      <text x="30" y="68" class="label">LIMIT / OFFSET</text>
+      <text x="30" y="94" class="body">필요한 개수만 남긴다.</text>
+      <text x="30" y="116" class="small">상위 N개, 페이지 분할</text>
+      <text x="30" y="136" class="small">맨 마지막에 잘라낸다.</text>
     </g>
   </g>
 
-  <rect x="404" y="556" width="350" height="96" rx="20" fill="#f8fafc" stroke="#cbd5e1" />
-  <text x="428" y="586" class="section">WHERE vs HAVING</text>
-  <text x="428" y="612" class="body">WHERE: GROUP BY 이전, 개별 행 기준 필터</text>
-  <text x="428" y="632" class="body">HAVING: GROUP BY 이후, 집계된 그룹 기준 필터</text>
+  <line x1="510" y1="430" x2="590" y2="430" stroke="#94a3b8" stroke-width="3" />
+  <line x1="688" y1="430" x2="768" y2="430" stroke="#94a3b8" stroke-width="3" />
+  <line x1="866" y1="430" x2="946" y2="430" stroke="#94a3b8" stroke-width="3" />
+  <line x1="1024" y1="514" x2="1024" y2="548" stroke="#94a3b8" stroke-width="3" />
+  <line x1="946" y1="606" x2="866" y2="606" stroke="#94a3b8" stroke-width="3" />
+  <line x1="768" y1="606" x2="688" y2="606" stroke="#94a3b8" stroke-width="3" />
+  <line x1="590" y1="606" x2="510" y2="606" stroke="#94a3b8" stroke-width="3" />
 
-  <rect x="778" y="556" width="352" height="96" rx="20" fill="#f8fafc" stroke="#cbd5e1" />
-  <text x="802" y="586" class="section">JOIN 시험 포인트</text>
-  <text x="802" y="612" class="body">INNER JOIN = 양쪽에 모두 있는 행만 결합</text>
-  <text x="802" y="632" class="body">LEFT JOIN = 왼쪽 전체 유지, 없으면 오른쪽은 NULL</text>
+  <rect x="68" y="724" width="514" height="124" rx="20" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <text x="92" y="760" class="section">WHERE vs HAVING</text>
+  <text x="92" y="790" class="body">WHERE: GROUP BY 이전에 개별 행을 줄인다. 그래서 COUNT 같은 집계 함수는 쓸 수 없다.</text>
+  <text x="92" y="816" class="body">HAVING: GROUP BY 이후에 묶인 그룹을 걸러낸다. 따라서 COUNT, SUM 같은 집계 조건이 가능하다.</text>
 
-  <text x="70" y="676" class="small">07-03-sql-infographic.svg · SQL 조회문의 해석 순서와 절 역할을 한 화면에 정리</text>
+  <rect x="606" y="724" width="526" height="124" rx="20" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <text x="630" y="760" class="section">JOIN과 GROUP BY 해석 포인트</text>
+  <text x="630" y="790" class="body">JOIN은 행을 늘리거나 결합하는 단계이고, GROUP BY는 그 행들을 같은 기준으로 다시 묶는 단계다.</text>
+  <text x="630" y="816" class="body">문제에서 결과 행 수가 왜 바뀌는지 묻는다면 조인 조건과 그룹 기준을 따로 설명하면 된다.</text>
+
+  <text x="68" y="874" class="small">07-03-sql-infographic.svg · SQL 문장을 읽을 때의 작성 순서와 실제 처리 순서를 넉넉한 간격으로 재구성</text>
 </svg>

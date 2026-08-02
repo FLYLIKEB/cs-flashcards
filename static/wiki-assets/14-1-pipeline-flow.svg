@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">14-1. 명령어 실행과 파이프라인 흐름</title>
+  <desc id="desc">CPU가 fetch, decode, execute, memory access, write back 단계를 거치며 여러 명령어를 겹쳐 처리하는 흐름을 설명하는 SVG</desc>
+  <defs>
+    <style>
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="560" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="504" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="86" class="title">명령어는 5단계를 지나고, 파이프라인은 이 단계를 겹쳐 쓴다</text>
+  <text x="72" y="118" class="subtitle">같은 하드웨어를 단계별로 나누면 단일 명령어의 여정은 그대로 두면서도 처리량을 높일 수 있다.</text>
+
+  <rect x="72" y="154" width="1056" height="146" rx="24" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="96" y="190" class="section">한 명령어의 fetch → decode → execute → memory → write back</text>
+
+  <rect x="96" y="214" width="176" height="56" rx="16" fill="#2563eb"/>
+  <rect x="300" y="214" width="176" height="56" rx="16" fill="#3b82f6"/>
+  <rect x="504" y="214" width="176" height="56" rx="16" fill="#0ea5e9"/>
+  <rect x="708" y="214" width="176" height="56" rx="16" fill="#14b8a6"/>
+  <rect x="912" y="214" width="176" height="56" rx="16" fill="#8b5cf6"/>
+
+  <text x="184" y="248" text-anchor="middle" class="label">IF</text>
+  <text x="388" y="248" text-anchor="middle" class="label">ID</text>
+  <text x="592" y="248" text-anchor="middle" class="label">EX</text>
+  <text x="796" y="248" text-anchor="middle" class="label">MEM</text>
+  <text x="1000" y="248" text-anchor="middle" class="label">WB</text>
+
+  <line x1="272" y1="242" x2="300" y2="242" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="476" y1="242" x2="504" y2="242" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="680" y1="242" x2="708" y2="242" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="884" y1="242" x2="912" y2="242" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <text x="110" y="289" class="body">명령어를 읽고 PC를 다음 주소로 이동</text>
+  <text x="314" y="289" class="body">opcode 해독, 소스 레지스터 읽기</text>
+  <text x="518" y="289" class="body">ALU 연산, 주소 계산, 분기 조건 판단</text>
+  <text x="722" y="289" class="body">load/store가 데이터 메모리에 접근</text>
+  <text x="926" y="289" class="body">최종 결과를 목적 레지스터에 기록</text>
+
+  <rect x="72" y="326" width="1056" height="174" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="96" y="362" class="section">파이프라인 관점: 사이클마다 다른 명령어가 각 단계를 점유</text>
+  <text x="96" y="386" class="small">지연시간을 5배 줄이는 것이 아니라, 빈 하드웨어 시간을 줄여 throughput을 높인다.</text>
+
+  <text x="128" y="430" class="small">명령어 A</text>
+  <text x="128" y="466" class="small">명령어 B</text>
+  <text x="128" y="502" class="small">명령어 C</text>
+
+  <rect x="236" y="410" width="92" height="28" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+  <rect x="346" y="410" width="92" height="28" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+  <rect x="456" y="410" width="92" height="28" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+  <rect x="566" y="410" width="92" height="28" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+  <rect x="676" y="410" width="92" height="28" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+
+  <rect x="346" y="446" width="92" height="28" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="456" y="446" width="92" height="28" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="566" y="446" width="92" height="28" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="676" y="446" width="92" height="28" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+  <rect x="786" y="446" width="92" height="28" rx="10" fill="#e0f2fe" stroke="#38bdf8"/>
+
+  <rect x="456" y="482" width="92" height="28" rx="10" fill="#dcfce7" stroke="#4ade80"/>
+  <rect x="566" y="482" width="92" height="28" rx="10" fill="#dcfce7" stroke="#4ade80"/>
+  <rect x="676" y="482" width="92" height="28" rx="10" fill="#dcfce7" stroke="#4ade80"/>
+  <rect x="786" y="482" width="92" height="28" rx="10" fill="#dcfce7" stroke="#4ade80"/>
+  <rect x="896" y="482" width="92" height="28" rx="10" fill="#dcfce7" stroke="#4ade80"/>
+
+  <text x="282" y="429" text-anchor="middle" class="tiny">IF</text>
+  <text x="392" y="429" text-anchor="middle" class="tiny">ID</text>
+  <text x="502" y="429" text-anchor="middle" class="tiny">EX</text>
+  <text x="612" y="429" text-anchor="middle" class="tiny">MEM</text>
+  <text x="722" y="429" text-anchor="middle" class="tiny">WB</text>
+
+  <text x="392" y="465" text-anchor="middle" class="tiny">IF</text>
+  <text x="502" y="465" text-anchor="middle" class="tiny">ID</text>
+  <text x="612" y="465" text-anchor="middle" class="tiny">EX</text>
+  <text x="722" y="465" text-anchor="middle" class="tiny">MEM</text>
+  <text x="832" y="465" text-anchor="middle" class="tiny">WB</text>
+
+  <text x="502" y="501" text-anchor="middle" class="tiny">IF</text>
+  <text x="612" y="501" text-anchor="middle" class="tiny">ID</text>
+  <text x="722" y="501" text-anchor="middle" class="tiny">EX</text>
+  <text x="832" y="501" text-anchor="middle" class="tiny">MEM</text>
+  <text x="942" y="501" text-anchor="middle" class="tiny">WB</text>
+</svg>

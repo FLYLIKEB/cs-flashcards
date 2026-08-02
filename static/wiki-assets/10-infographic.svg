@@ -1,115 +1,113 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
   <title id="title">10. 보안 인포그래픽</title>
-  <desc id="desc">암호화와 해시, 인증과 인가, 웹·네트워크 공격, IDS·IPS·로그 감사를 하나의 방어 체계로 연결한 보안 학습 지도</desc>
+  <desc id="desc">보안 과목의 네 축인 데이터 보호, 접근 통제, 공격 대응, 탐지와 감사를 중앙 보안 목표와 연결해 보여주는 개요 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff"/>
       <stop offset="55%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#fef2f2"/>
+      <stop offset="100%" stop-color="#fff7ed"/>
     </linearGradient>
-    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="core" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#1d4ed8"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#ef4444"/>
-    </linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.12"/>
     </filter>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .label { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .mini { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; letter-spacing: 0.08em; fill: #1e3a8a; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 38px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .cardTitle { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 17px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; fill: #1e3a8a; }
+      .note { font-size: 15px; font-weight: 600; fill: #475569; }
+      .line { stroke: #94a3b8; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 10 12; }
       .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
-      .line { stroke: #94a3b8; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 8 10; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="32" y="32" width="1136" height="656" rx="30" fill="#ffffff" opacity="0.78"/>
-  <rect x="32" y="32" width="1136" height="656" rx="30" fill="none" stroke="#dbeafe" stroke-width="2"/>
+  <rect width="1280" height="900" fill="url(#bg)"/>
+  <rect x="32" y="28" width="1216" height="844" rx="30" fill="#ffffff" opacity="0.9"/>
+  <rect x="32" y="28" width="1216" height="844" rx="30" fill="none" stroke="#dbeafe" stroke-width="2"/>
 
-  <text class="small" x="76" y="84">금융공기업 IT · 보안 전체 구조</text>
-  <text class="title" x="76" y="120">10. 보안</text>
-  <text class="subtitle" x="76" y="154">기밀성·무결성·접근권한·탐지 대응을 하나의 방어 체계로 묶어 이해하는 페이지</text>
+  <text class="eyebrow" x="78" y="84">SECURITY LEARNING MAP</text>
+  <text class="title" x="78" y="128">10. 보안</text>
+  <text class="subtitle" x="78" y="164">기밀성·무결성·권한 통제·공격 대응·감사 증적을 한 장에서 훑는 메인 페이지 개요</text>
 
-  <line class="line" x1="600" y1="210" x2="600" y2="284"/>
-  <line class="line" x1="431" y1="360" x2="288" y2="360"/>
-  <line class="line" x1="769" y1="360" x2="912" y2="360"/>
-  <line class="line" x1="600" y1="436" x2="600" y2="520"/>
+  <line class="line" x1="640" y1="250" x2="640" y2="334"/>
+  <line class="line" x1="450" y1="450" x2="274" y2="450"/>
+  <line class="line" x1="830" y1="450" x2="1006" y2="450"/>
+  <line class="line" x1="640" y1="566" x2="640" y2="650"/>
 
   <g filter="url(#shadow)">
-    <path d="M600 232 L714 274 V366 C714 442 666 507 600 536 C534 507 486 442 486 366 V274 Z" fill="url(#shieldGrad)"/>
-    <path d="M600 262 L685 293 V364 C685 424 649 475 600 500 C551 475 515 424 515 364 V293 Z" fill="#eff6ff" opacity="0.18"/>
+    <path d="M640 268 L770 314 V418 C770 510 716 588 640 622 C564 588 510 510 510 418 V314 Z" fill="url(#core)"/>
+    <path d="M640 302 L735 338 V416 C735 487 693 548 640 580 C587 548 545 487 545 416 V338 Z" fill="#eff6ff" opacity="0.16"/>
   </g>
-  <circle cx="600" cy="338" r="60" fill="#ffffff"/>
-  <path d="M569 338 l20 20 42 -48" fill="none" stroke="#2563eb" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-  <text class="mini" x="600" y="392" text-anchor="middle">SECURITY CORE</text>
-  <text class="label" x="600" y="565" text-anchor="middle">보안 = 보호 + 신뢰검증 + 공격대응 + 감사추적</text>
-  <text class="body" x="600" y="592" text-anchor="middle">중앙 개념은 단일 기술이 아니라 여러 통제 축이 동시에 맞물려야 성립한다.</text>
+  <circle cx="640" cy="388" r="68" fill="#ffffff"/>
+  <path d="M605 390 l24 24 50 -58" fill="none" stroke="#2563eb" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text class="small" x="640" y="458" text-anchor="middle">SECURITY CORE</text>
+  <text class="cardTitle" x="640" y="664" text-anchor="middle">보안 = 데이터 보호 + 권한 통제 + 공격 대응 + 감사 가능성</text>
+  <text class="body" x="640" y="694" text-anchor="middle">한 기술로 끝나는 문제가 아니라 예방·검증·차단·추적이 함께 돌아가야 한다.</text>
 
-  <g transform="translate(390 176)">
-    <rect class="card" width="420" height="104" rx="26"/>
-    <rect x="20" y="18" width="74" height="68" rx="18" fill="#dbeafe"/>
-    <path d="M44 52 h26 M57 39 v26 M44 68 h26" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-    <text class="mini" x="115" y="35">10-01 PROTECT DATA</text>
-    <text class="label" x="115" y="58">암호화와 해시</text>
-    <text class="body" x="115" y="83">암호화는 복호화 가능한 기밀성 보호, 해시는 역산이 어려운 무결성 검증.</text>
-  </g>
-
-  <g transform="translate(86 296)">
-    <rect class="card" width="330" height="128" rx="26"/>
-    <circle cx="58" cy="64" r="34" fill="#dcfce7"/>
-    <circle cx="58" cy="54" r="10" fill="none" stroke="#15803d" stroke-width="5"/>
-    <path d="M40 86 q18 -18 36 0" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round"/>
-    <text class="mini" x="106" y="35">10-02 VERIFY ACCESS</text>
-    <text class="label" x="106" y="58">인증 · 인가 · 접근통제</text>
-    <text class="body" x="106" y="84">인증은 누구인지 확인하고, 인가는 무엇을 해도 되는지 결정한다.</text>
-    <text class="body" x="106" y="106">DAC·MAC·RBAC와 최소 권한 원칙이 실제 권한 설계의 기준이 된다.</text>
+  <g transform="translate(382 186)">
+    <rect class="card" width="516" height="118" rx="28"/>
+    <rect x="24" y="22" width="84" height="74" rx="20" fill="#dbeafe"/>
+    <path d="M50 58 h32 M66 42 v32 M50 76 h32" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+    <text class="small" x="132" y="40">10-01 DATA PROTECTION</text>
+    <text class="cardTitle" x="132" y="68">암호화와 해시</text>
+    <text class="body" x="132" y="96">암호화는 복호화 가능한 기밀성 보호, 해시는 역산이 어려운 무결성 검증과 비밀번호 저장에 쓴다.</text>
   </g>
 
-  <g transform="translate(784 296)">
-    <rect class="card" width="330" height="128" rx="26"/>
-    <rect x="22" y="24" width="72" height="80" rx="16" fill="#fee2e2"/>
-    <path d="M40 82 l14 -16 16 8 12 -20" fill="none" stroke="#dc2626" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="40" cy="82" r="5" fill="#dc2626"/>
-    <circle cx="54" cy="66" r="5" fill="#dc2626"/>
-    <circle cx="70" cy="74" r="5" fill="#dc2626"/>
-    <circle cx="82" cy="54" r="5" fill="#dc2626"/>
-    <text class="mini" x="112" y="35">10-04 WATCH &amp; AUDIT</text>
-    <text class="label" x="112" y="58">IDS · IPS · 로그 감사</text>
-    <text class="body" x="112" y="84">이상 징후를 탐지하고, 차단하고, 로그를 남겨 사고 대응 근거를 만든다.</text>
-    <text class="body" x="112" y="106">타임스탬프·정합성·접근 제어가 감사 품질을 좌우한다.</text>
+  <g transform="translate(76 366)">
+    <rect class="card" width="374" height="168" rx="28"/>
+    <circle cx="62" cy="64" r="34" fill="#dcfce7"/>
+    <circle cx="62" cy="54" r="10" fill="none" stroke="#15803d" stroke-width="5"/>
+    <path d="M44 86 q18 -18 36 0" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round"/>
+    <text class="small" x="112" y="40">10-02 VERIFY ACCESS</text>
+    <text class="cardTitle" x="112" y="68">인증 · 인가 · 접근통제</text>
+    <text class="body" x="112" y="96">인증은 누구인지 확인하고, 인가는 무엇을 할 수 있는지 결정한다.</text>
+    <text class="body" x="112" y="124">DAC·MAC·RBAC 같은 모델과 최소 권한 원칙이 실제 권한 설계 기준이 된다.</text>
   </g>
 
-  <g transform="translate(356 510)">
-    <rect class="card" width="488" height="126" rx="26"/>
-    <rect x="24" y="26" width="84" height="74" rx="18" fill="#fef3c7"/>
-    <path d="M48 82 l18 -28 16 12 16 -22" fill="none" stroke="#d97706" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M42 48 h30" fill="none" stroke="#d97706" stroke-width="6" stroke-linecap="round"/>
-    <text class="mini" x="130" y="38">10-03 ATTACK SURFACE</text>
-    <text class="label" x="130" y="62">웹 공격 + 네트워크 공격</text>
-    <text class="body" x="130" y="88">SQL Injection·XSS는 입력 검증과 출력 인코딩 실패를 노린다.</text>
-    <text class="body" x="130" y="110">DDoS·스니핑·세션 하이재킹은 필터링, 레이트 리미팅, 암호화로 방어한다.</text>
+  <g transform="translate(830 366)">
+    <rect class="card" width="374" height="168" rx="28"/>
+    <rect x="24" y="22" width="78" height="84" rx="18" fill="#fee2e2"/>
+    <path d="M42 86 l16 -18 18 10 14 -24" fill="none" stroke="#dc2626" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="42" cy="86" r="5" fill="#dc2626"/>
+    <circle cx="58" cy="68" r="5" fill="#dc2626"/>
+    <circle cx="76" cy="78" r="5" fill="#dc2626"/>
+    <circle cx="90" cy="54" r="5" fill="#dc2626"/>
+    <text class="small" x="124" y="40">10-04 DETECT &amp; AUDIT</text>
+    <text class="cardTitle" x="124" y="68">IDS · IPS · 로그 감사</text>
+    <text class="body" x="124" y="96">이상 징후를 탐지하고 차단하며, 로그를 남겨 사고 대응 근거와 책임 추적성을 만든다.</text>
+    <text class="body" x="124" y="124">타임스탬프·정합성·접근 제어가 감사 로그의 품질을 좌우한다.</text>
   </g>
 
-  <g>
-    <path d="M982 226 C1030 246 1054 274 1054 312 C1054 350 1030 378 982 398" fill="none" stroke="url(#accent)" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
-    <path d="M997 236 C1031 251 1048 275 1048 312 C1048 349 1031 373 997 388" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.65"/>
-    <text class="mini" x="1058" y="254">THREATS</text>
-    <text class="body" x="1072" y="282">웹 취약점</text>
-    <text class="body" x="1072" y="308">네트워크 공격</text>
-    <text class="body" x="1072" y="334">권한 오남용</text>
-    <text class="body" x="1072" y="360">로그 부재</text>
+  <g transform="translate(312 648)">
+    <rect class="card" width="656" height="144" rx="28"/>
+    <rect x="24" y="26" width="84" height="84" rx="20" fill="#fef3c7"/>
+    <path d="M46 88 l18 -28 16 12 18 -24" fill="none" stroke="#d97706" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M42 54 h34" fill="none" stroke="#d97706" stroke-width="6" stroke-linecap="round"/>
+    <text class="small" x="132" y="42">10-03 ATTACK SURFACE</text>
+    <text class="cardTitle" x="132" y="70">웹 공격 + 네트워크 공격</text>
+    <text class="body" x="132" y="98">SQL Injection·XSS는 입력 검증과 출력 인코딩 실패를 노리고, DDoS·스니핑·세션 하이재킹은 네트워크 운영을 흔든다.</text>
+    <text class="body" x="132" y="126">필터링, 레이트 리미팅, 암호화, 세션 보호가 대표 방어 축이다.</text>
   </g>
 
   <g>
-    <rect x="78" y="620" width="1044" height="42" rx="21" fill="#eff6ff" stroke="#bfdbfe"/>
-    <text class="small" x="104" y="647">시험 포인트: 암호화 vs 해시, 인증 vs 인가, 공격 유형별 방어, 로그의 증적 가치, TLS·인증서 체계의 신뢰 사슬</text>
+    <rect x="1010" y="214" width="170" height="228" rx="26" fill="#ffffff" stroke="#fecaca" stroke-width="2"/>
+    <text class="small" x="1040" y="248">THREATS TO WATCH</text>
+    <text class="body" x="1040" y="284">• 웹 취약점</text>
+    <text class="body" x="1040" y="318">• 네트워크 공격</text>
+    <text class="body" x="1040" y="352">• 권한 오남용</text>
+    <text class="body" x="1040" y="386">• 로그 부재</text>
+    <text class="note" x="1040" y="424">대응은 예방 + 탐지 + 증적</text>
+  </g>
+
+  <g>
+    <rect x="78" y="818" width="1124" height="32" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text class="note" x="100" y="840">시험 포인트: 암호화 vs 해시, 인증 vs 인가, 공격별 방어, TLS·인증서 체계, 로그의 증적 가치</text>
   </g>
 </svg>

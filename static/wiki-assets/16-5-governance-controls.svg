@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">16-5. 모델 리스크 거버넌스 통제 흐름</title>
+  <desc id="desc">금융권 AI 모델이 개발부터 모니터링과 재승인까지 어떤 통제를 거쳐야 하는지 단계별로 정리한 다이어그램</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 32px 'Pretendard','Noto Sans KR',sans-serif;fill:#0f172a}
+      .subtitle{font:500 17px 'Pretendard','Noto Sans KR',sans-serif;fill:#334155}
+      .section{font:700 20px 'Pretendard','Noto Sans KR',sans-serif;fill:#0f172a}
+      .cardTitle{font:700 17px 'Pretendard','Noto Sans KR',sans-serif;fill:#0f172a}
+      .body{font:500 15px 'Pretendard','Noto Sans KR',sans-serif;fill:#334155}
+      .small{font:600 14px 'Pretendard','Noto Sans KR',sans-serif;fill:#475569}
+      .gate{font:700 18px 'Pretendard','Noto Sans KR',sans-serif;fill:#ffffff}
+    </style>
+  </defs>
+
+  <rect width="1200" height="640" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="584" rx="28" fill="#ffffff" stroke="#dbe4f0" stroke-width="2"/>
+
+  <text class="title" x="68" y="88">모델 리스크 거버넌스 통제 흐름</text>
+  <text class="subtitle" x="68" y="122">금융권에서는 성능이 아니라 통제 체계를 통과했는지가 운영 배포의 핵심 조건이다.</text>
+
+  <rect x="68" y="170" width="246" height="286" rx="24" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text class="section" x="92" y="208">1. 개발 전·중 통제</text>
+  <text class="body" x="92" y="244">• 데이터 출처, 목적 제한, 민감정보 축소</text>
+  <text class="body" x="92" y="278">• 결측·오류 점검과 표본 대표성 확인</text>
+  <text class="body" x="92" y="312">• 데이터 누수, 과적합, 설명 부족 사전 점검</text>
+  <text class="body" x="92" y="346">• 성능 수치만 아니라 한계와 가정 기록</text>
+  <rect x="92" y="376" width="198" height="58" rx="16" fill="#ffffff" stroke="#93c5fd"/>
+  <text class="cardTitle" x="110" y="401">산출물</text>
+  <text class="small" x="110" y="423">학습 데이터 정의서, 변수 목록, 초기 설명자료</text>
+
+  <line x1="314" y1="313" x2="368" y2="313" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="376" y="170" width="246" height="286" rx="24" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+  <text class="section" x="400" y="208">2. 독립 검증</text>
+  <text class="body" x="400" y="244">• 별도 검증자가 지표 재현과 가정 점검</text>
+  <text class="body" x="400" y="278">• 집단별 precision, recall, FPR 차이 확인</text>
+  <text class="body" x="400" y="312">• XAI 결과와 거절 사유 설명 가능성 검토</text>
+  <text class="body" x="400" y="346">• 문서화 수준과 승인 근거 충분성 확인</text>
+  <rect x="400" y="376" width="198" height="58" rx="16" fill="#ffffff" stroke="#fdba74"/>
+  <text class="cardTitle" x="418" y="401">산출물</text>
+  <text class="small" x="418" y="423">검증 보고서, 리스크 의견, 보완 요구사항</text>
+
+  <line x1="622" y1="313" x2="676" y2="313" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="684" y="160" width="250" height="306" rx="24" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
+  <text class="section" x="708" y="198">3. 승인 후 배포</text>
+  <text class="body" x="708" y="234">• 승인권자가 목적, 한계, 보완 계획 확인</text>
+  <text class="body" x="708" y="268">• 운영 접근권한, 키 관리, 로그 정책 설정</text>
+  <text class="body" x="708" y="302">• 배포 버전, 피처 정의, 롤백 기준 고정</text>
+  <text class="body" x="708" y="336">• 인간 검토가 필요한 예외 케이스 연결</text>
+  <rect x="708" y="366" width="202" height="76" rx="18" fill="#2563eb"/>
+  <text class="gate" x="758" y="398">운영 배포</text>
+  <text class="body" x="730" y="423" fill="#ffffff">이력 관리와 감사 추적이 남아야 한다</text>
+
+  <line x1="934" y1="313" x2="988" y2="313" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="996" y="170" width="140" height="286" rx="24" fill="#ecfeff" stroke="#14b8a6" stroke-width="2"/>
+  <text class="section" x="1018" y="208">4. 운영 감시</text>
+  <text class="body" x="1018" y="244">• drift</text>
+  <text class="body" x="1018" y="274">• 성능 저하</text>
+  <text class="body" x="1018" y="304">• 민원 증가</text>
+  <text class="body" x="1018" y="334">• 규제 변경</text>
+  <text class="body" x="1018" y="364">• 예외 케이스</text>
+  <rect x="1018" y="388" width="96" height="46" rx="14" fill="#ffffff" stroke="#5eead4"/>
+  <text class="small" x="1036" y="417">재승인</text>
+
+  <path d="M 1066 456 C 1066 522, 808 540, 498 540 C 250 540, 142 516, 142 466" fill="none" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
+  <text class="small" x="480" y="574">임계치 초과 시 재학습과 재검증, 재승인 절차로 되돌아간다.</text>
+</svg>

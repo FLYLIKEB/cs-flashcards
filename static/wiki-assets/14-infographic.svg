@@ -1,135 +1,104 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">14. 컴퓨터구조 심화 인포그래픽</title>
-  <desc id="desc">CPU time과 AMAT 공식을 중심으로 CPU, 메모리 계층, 명령어 세트, 입출력 병목을 한 흐름으로 정리한 컴퓨터구조 심화 개념도</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">14. 컴퓨터구조 심화 개요 SVG</title>
+  <desc id="desc">컴퓨터구조 심화 페이지의 학습 축을 CPU 설계, 메모리 계층, ISA, 입출력 시스템으로 나누고 시험 답안 연결 포인트를 함께 보여주는 개요 SVG</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="55%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#eef2ff"/>
-    </linearGradient>
-    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
-    </linearGradient>
-    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#f59e0b"/>
-      <stop offset="100%" stop-color="#f97316"/>
-    </linearGradient>
-    <linearGradient id="cool" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#06b6d4"/>
-      <stop offset="100%" stop-color="#2563eb"/>
-    </linearGradient>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
-    </marker>
-    <marker id="arrow-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
-    </marker>
     <style>
-      text { font-family: "Pretendard", "Noto Sans KR", sans-serif; }
-      .eyebrow { font-size: 16px; font-weight: 700; fill: #475569; letter-spacing: 0.04em; }
-      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .section { font-size: 14px; font-weight: 800; fill: #1e293b; letter-spacing: 0.04em; }
-      .label { font-size: 22px; font-weight: 800; fill: #0f172a; }
-      .body { font-size: 16px; font-weight: 500; fill: #334155; }
-      .small { font-size: 14px; font-weight: 600; fill: #475569; }
-      .formula { font-size: 21px; font-weight: 800; fill: #0f172a; }
-      .metric { font-size: 15px; font-weight: 700; fill: #0f172a; }
+      text { font-family: "Pretendard", "Noto Sans KR", sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 18px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 38px; font-weight: 800; }
+      .subtitle { font-size: 19px; font-weight: 500; fill: #334155; }
+      .section { font-size: 17px; font-weight: 800; letter-spacing: 0.04em; fill: #1e293b; }
+      .cardTitle { font-size: 27px; font-weight: 800; }
+      .cardBody { font-size: 17px; font-weight: 500; fill: #334155; }
+      .chip { font-size: 15px; font-weight: 700; fill: #1e293b; }
+      .small { font-size: 16px; font-weight: 600; fill: #475569; }
       .white { fill: #ffffff; }
     </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
   </defs>
 
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="24" y="24" width="1152" height="672" rx="32" fill="url(#bg)" stroke="#cbd5e1"/>
+  <rect width="1200" height="900" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="844" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text x="72" y="82" class="eyebrow">FINANCE IT · COMPUTER ARCHITECTURE</text>
-  <text x="72" y="124" class="title">14. 컴퓨터구조 심화</text>
-  <text x="72" y="154" class="subtitle">CPU 실행 구조에서 메모리 계층, ISA, I/O까지 이어지는 병목을 두 공식으로 묶어 보는 페이지</text>
+  <text x="72" y="88" class="eyebrow">FINANCE IT · COMPUTER ARCHITECTURE OVERVIEW</text>
+  <text x="72" y="136" class="title">14. 컴퓨터구조 심화</text>
+  <text x="72" y="172" class="subtitle">CPU 실행 구조에서 메모리 계층, ISA, I/O로 이어지는 병목을 단계별로 정리한 학습 개요</text>
 
-  <rect x="60" y="188" width="300" height="470" rx="28" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
-  <text x="88" y="224" class="section">학습 흐름</text>
+  <rect x="72" y="220" width="274" height="598" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="104" y="264" class="section">시험에서 먼저 보는 질문</text>
+  <rect x="104" y="292" width="210" height="74" rx="18" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
+  <text x="126" y="324" class="cardBody">어느 지점이 느린가?</text>
+  <text x="126" y="348" class="small">CPU · 메모리 · I/O 구분</text>
+  <rect x="104" y="388" width="210" height="74" rx="18" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="126" y="420" class="cardBody">왜 느린가?</text>
+  <text x="126" y="444" class="small">해저드 · 캐시 미스 · 인터럽트</text>
+  <rect x="104" y="484" width="210" height="74" rx="18" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="126" y="516" class="cardBody">무엇을 줄였는가?</text>
+  <text x="126" y="540" class="small">CPI · miss penalty · CPU 점유율</text>
+  <rect x="104" y="580" width="210" height="196" rx="18" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+  <text x="126" y="616" class="cardTitle" style="font-size:23px;">답안 프레임</text>
+  <text x="126" y="648" class="cardBody">1. 병목 위치를 먼저 말한다</text>
+  <text x="126" y="676" class="cardBody">2. 원인 지표를 식과 연결한다</text>
+  <text x="126" y="704" class="cardBody">3. 개선 수단을 한 줄로 정리한다</text>
+  <text x="126" y="744" class="small">예: 캐시 미스로 AMAT 증가 →</text>
+  <text x="126" y="768" class="small">캐시 적중률 개선 또는 penalty 완화</text>
 
-  <rect x="88" y="246" width="244" height="74" rx="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-  <circle cx="122" cy="283" r="18" fill="#2563eb"/>
-  <text x="122" y="289" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">1</text>
-  <text x="154" y="277" class="metric">CPU 설계</text>
-  <text x="154" y="299" class="small">파이프라인 5단계 · CPI 감소</text>
+  <rect x="378" y="220" width="458" height="598" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="410" y="264" class="section">핵심 개념을 쌓는 4단계</text>
 
-  <line x1="210" y1="320" x2="210" y2="343" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow-slate)"/>
+  <rect x="420" y="292" width="374" height="112" rx="24" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="462" cy="348" r="22" fill="#2563eb"/>
+  <text x="462" y="356" text-anchor="middle" class="white" style="font-size:18px;font-weight:800;">1</text>
+  <text x="500" y="336" class="cardTitle">CPU 설계</text>
+  <text x="500" y="366" class="cardBody">파이프라인 5단계, 해저드, 분기 예측으로</text>
+  <text x="500" y="390" class="cardBody">Instruction Count와 CPI를 해석한다.</text>
 
-  <rect x="88" y="346" width="244" height="74" rx="20" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
-  <circle cx="122" cy="383" r="18" fill="#0891b2"/>
-  <text x="122" y="389" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">2</text>
-  <text x="154" y="377" class="metric">캐시 · 메모리 계층</text>
-  <text x="154" y="399" class="small">L1/L2/TLB · AMAT 감소</text>
+  <line x1="607" y1="404" x2="607" y2="434" stroke="#94a3b8" stroke-width="4" marker-end="url(#arrow)"/>
 
-  <line x1="210" y1="420" x2="210" y2="443" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow-slate)"/>
+  <rect x="420" y="438" width="374" height="112" rx="24" fill="#cffafe" stroke="#0891b2" stroke-width="2"/>
+  <circle cx="462" cy="494" r="22" fill="#0891b2"/>
+  <text x="462" y="502" text-anchor="middle" class="white" style="font-size:18px;font-weight:800;">2</text>
+  <text x="500" y="482" class="cardTitle">메모리 계층</text>
+  <text x="500" y="512" class="cardBody">L1/L2 캐시, TLB, DRAM 구조를 통해</text>
+  <text x="500" y="536" class="cardBody">AMAT와 체감 지연을 설명한다.</text>
 
-  <rect x="88" y="446" width="244" height="74" rx="20" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-  <circle cx="122" cy="483" r="18" fill="#7c3aed"/>
-  <text x="122" y="489" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">3</text>
-  <text x="154" y="477" class="metric">명령어 세트</text>
-  <text x="154" y="499" class="small">RISC/CISC · 주소 지정 방식</text>
+  <line x1="607" y1="550" x2="607" y2="580" stroke="#94a3b8" stroke-width="4" marker-end="url(#arrow)"/>
 
-  <line x1="210" y1="520" x2="210" y2="543" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow-slate)"/>
+  <rect x="420" y="584" width="374" height="112" rx="24" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <circle cx="462" cy="640" r="22" fill="#7c3aed"/>
+  <text x="462" y="648" text-anchor="middle" class="white" style="font-size:18px;font-weight:800;">3</text>
+  <text x="500" y="628" class="cardTitle">명령어 세트 ISA</text>
+  <text x="500" y="658" class="cardBody">RISC/CISC, 주소 지정 방식, 코드 밀도와</text>
+  <text x="500" y="682" class="cardBody">파이프라인 친화성을 함께 비교한다.</text>
 
-  <rect x="88" y="546" width="244" height="74" rx="20" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
-  <circle cx="122" cy="583" r="18" fill="#f97316"/>
-  <text x="122" y="589" text-anchor="middle" class="white" style="font-size:16px;font-weight:800;">4</text>
-  <text x="154" y="577" class="metric">입출력 시스템</text>
-  <text x="154" y="599" class="small">인터럽트 · DMA · 저장장치</text>
+  <line x1="607" y1="696" x2="607" y2="726" stroke="#94a3b8" stroke-width="4" marker-end="url(#arrow)"/>
 
-  <rect x="390" y="188" width="750" height="220" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="422" y="224" class="section">성능을 설명하는 두 공식</text>
+  <rect x="420" y="730" width="374" height="56" rx="24" fill="#ffedd5" stroke="#f97316" stroke-width="2"/>
+  <text x="448" y="765" class="cardTitle" style="font-size:25px;">4</text>
+  <text x="492" y="765" class="cardTitle" style="font-size:25px;">입출력 시스템</text>
+  <text x="664" y="765" class="small">인터럽트 · DMA · 저장장치 병목</text>
 
-  <rect x="424" y="250" width="320" height="128" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
-  <text x="454" y="287" class="label">CPU 내부 병목</text>
-  <text x="454" y="327" class="formula">CPU time = IC × CPI × Clock</text>
-  <text x="454" y="355" class="body">명령어 수, 명령어당 사이클, 클럭 주기 중</text>
-  <text x="454" y="377" class="body">어느 항을 줄였는지 구분해 설명</text>
+  <rect x="868" y="220" width="260" height="598" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="900" y="264" class="section">기관별 연결 포인트</text>
 
-  <rect x="786" y="250" width="320" height="128" rx="24" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
-  <text x="816" y="287" class="label">메모리 계층 병목</text>
-  <text x="816" y="327" class="formula">AMAT = Hit + Miss × Penalty</text>
-  <text x="816" y="355" class="body">캐시 적중시간, 미스율, 미스 패널티가</text>
-  <text x="816" y="377" class="body">체감 지연을 어떻게 바꾸는지 해석</text>
+  <rect x="900" y="292" width="196" height="136" rx="20" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="924" y="328" class="cardTitle" style="font-size:24px;">금융결제원</text>
+  <text x="924" y="358" class="cardBody">인터럽트, DMA,</text>
+  <text x="924" y="382" class="cardBody">캐시 일관성, 장애 대응</text>
+  <text x="924" y="410" class="small">결제 지연 원인을 시스템 관점으로 설명</text>
 
-  <line x1="744" y1="314" x2="786" y2="314" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow-blue)"/>
-  <text x="764" y="302" text-anchor="middle" class="small">메모리 접근</text>
+  <rect x="900" y="450" width="196" height="136" rx="20" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="924" y="486" class="cardTitle" style="font-size:24px;">산업은행</text>
+  <text x="924" y="516" class="cardBody">파이프라인, 메모리 계층,</text>
+  <text x="924" y="540" class="cardBody">RISC/CISC 비교</text>
+  <text x="924" y="568" class="small">성능 개선 논리를 묻는 문제에 자주 연결</text>
 
-  <rect x="390" y="434" width="750" height="224" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="422" y="470" class="section">병목 지도: 실행 → 메모리 → I/O</text>
-
-  <rect x="432" y="505" width="180" height="108" rx="24" fill="url(#core)"/>
-  <text x="522" y="550" text-anchor="middle" class="white" style="font-size:28px;font-weight:800;">CPU</text>
-  <text x="522" y="578" text-anchor="middle" class="white" style="font-size:15px;font-weight:600;">파이프라인 · 분기 예측</text>
-
-  <rect x="676" y="505" width="180" height="108" rx="24" fill="url(#cool)"/>
-  <text x="766" y="550" text-anchor="middle" class="white" style="font-size:28px;font-weight:800;">Memory</text>
-  <text x="766" y="578" text-anchor="middle" class="white" style="font-size:15px;font-weight:600;">Cache · TLB · DRAM</text>
-
-  <rect x="920" y="505" width="180" height="108" rx="24" fill="url(#warm)"/>
-  <text x="1010" y="550" text-anchor="middle" class="white" style="font-size:28px;font-weight:800;">I/O</text>
-  <text x="1010" y="578" text-anchor="middle" class="white" style="font-size:15px;font-weight:600;">Interrupt · DMA · Storage</text>
-
-  <line x1="612" y1="559" x2="676" y2="559" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow-blue)"/>
-  <line x1="856" y1="559" x2="920" y2="559" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow-blue)"/>
-
-  <rect x="430" y="454" width="190" height="38" rx="19" fill="#dbeafe"/>
-  <text x="525" y="478" text-anchor="middle" class="small">CPI ↓ 파이프라인 개선</text>
-
-  <rect x="671" y="454" width="190" height="38" rx="19" fill="#cffafe"/>
-  <text x="766" y="478" text-anchor="middle" class="small">AMAT ↓ 캐시/TLB 개선</text>
-
-  <rect x="913" y="454" width="194" height="38" rx="19" fill="#fed7aa"/>
-  <text x="1010" y="478" text-anchor="middle" class="small">CPU 점유율 ↓ DMA 활용</text>
-
-  <rect x="90" y="638" width="1010" height="18" rx="9" fill="#e2e8f0"/>
-  <rect x="90" y="638" width="280" height="18" rx="9" fill="#2563eb"/>
-  <rect x="370" y="638" width="250" height="18" rx="0" fill="#06b6d4"/>
-  <rect x="620" y="638" width="240" height="18" rx="0" fill="#7c3aed"/>
-  <rect x="860" y="638" width="240" height="18" rx="9" fill="#f97316"/>
-
-  <text x="90" y="684" class="small">금융공기업 필기 포인트: 분기 예측 실패, 캐시 미스, 인터럽트 폭주를 각각 다른 병목으로 구분하고 CPU→메모리→I/O 흐름으로 연결해 답안화</text>
+  <rect x="900" y="608" width="196" height="168" rx="20" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="924" y="644" class="cardTitle" style="font-size:24px;">코스콤</text>
+  <text x="924" y="674" class="cardBody">저지연 처리, 캐시,</text>
+  <text x="924" y="698" class="cardBody">분기 예측 실패</text>
+  <text x="924" y="726" class="small">거래 처리량과 응답시간을 함께 설명</text>
+  <text x="924" y="752" class="small">하는 문항에 대비</text>
 </svg>

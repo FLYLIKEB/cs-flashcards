@@ -1,106 +1,107 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">06-02-02. 선점형과 비선점형 인포그래픽</title>
-  <desc id="desc">CPU를 강제로 회수할 수 있는지에 따라 비선점형과 선점형을 비교하고, P1·P2 타임라인으로 응답성과 문맥교환 차이를 보여주는 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img" aria-labelledby="title desc">
+  <title id="title">06-02-02. 선점형과 비선점형 비교 인포그래픽</title>
+  <desc id="desc">선점형과 비선점형 스케줄링의 판단 기준, CPU 전환 시점, 장단점, 대표 선점 조건을 대비해 보여주는 SVG</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="leftPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#eff6ff"/>
-    </linearGradient>
-    <linearGradient id="rightPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ede9fe"/>
-      <stop offset="100%" stop-color="#f5f3ff"/>
-    </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .tick { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .bg { fill: #f8fafc; }
+      .frame { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .title { font-size: 36px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .eyebrow { font-size: 15px; font-weight: 700; fill: #475569; }
+      .section { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .cardTitle { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .label { font-size: 16px; font-weight: 700; fill: #1e293b; }
+      .small { font-size: 14px; font-weight: 600; fill: #475569; }
       .white { fill: #ffffff; }
-      .p1 { fill: #2563eb; }
-      .p2 { fill: #8b5cf6; }
-      .swap { fill: #f97316; }
-      .good { fill: #047857; }
-      .warn { fill: #b45309; }
+      .leftBg { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2; }
+      .rightBg { fill: #f5f3ff; stroke: #c4b5fd; stroke-width: 2; }
+      .chipBlue { fill: #dbeafe; stroke: #60a5fa; stroke-width: 1.5; }
+      .chipViolet { fill: #ede9fe; stroke: #a78bfa; stroke-width: 1.5; }
+      .chipAmber { fill: #fff7ed; stroke: #fb923c; stroke-width: 1.5; }
+      .barBlue { fill: #2563eb; }
+      .barViolet { fill: #7c3aed; }
+      .ok { fill: #065f46; }
+      .warn { fill: #9a3412; }
+      .line { stroke: #94a3b8; stroke-width: 3; stroke-linecap: round; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="24" y="24" width="1152" height="672" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect class="bg" width="1200" height="920" />
+  <rect class="frame" x="24" y="24" width="1152" height="872" rx="28" />
 
-  <text class="small" x="64" y="66">운영체제 · CPU 스케줄링</text>
-  <text class="title" x="64" y="108">선점형 vs 비선점형: CPU를 빼앗을 수 있는가?</text>
-  <text class="subtitle" x="64" y="140">같은 작업 P1(도착 0, 실행 8)·P2(도착 2, 실행 2)라도, 중간 강제 교체 가능 여부에 따라 응답시간과 문맥교환 수가 달라진다.</text>
+  <text class="eyebrow" x="64" y="72">운영체제 · CPU 스케줄링</text>
+  <text class="title" x="64" y="118">선점형 vs 비선점형: CPU를 강제로 빼앗을 수 있는가?</text>
+  <text class="subtitle" x="64" y="154">알고리즘 이름보다 CPU가 바뀌는 순간을 먼저 본다. 종료·I/O 때만 바뀌면 비선점형, 실행 중 강제 교체가 가능하면 선점형이다.</text>
 
-  <rect x="64" y="176" width="496" height="336" rx="24" fill="url(#leftPanel)" stroke="#93c5fd"/>
-  <rect x="640" y="176" width="496" height="336" rx="24" fill="url(#rightPanel)" stroke="#c4b5fd"/>
+  <rect class="leftBg" x="64" y="194" width="508" height="396" rx="28" />
+  <rect class="rightBg" x="628" y="194" width="508" height="396" rx="28" />
 
-  <text class="section" x="96" y="220">비선점형</text>
-  <text class="body" x="96" y="246">CPU는 종료 또는 I/O 요청 때만 넘어간다.</text>
-  <text class="small" x="96" y="274">긴 작업이 먼저 잡으면 뒤 작업은 Ready여도 기다린다.</text>
+  <text class="cardTitle" x="96" y="238">비선점형</text>
+  <text class="body" x="96" y="270">
+    <tspan x="96" dy="0">실행 중인 프로세스가 스스로 CPU를 놓을 때까지 기다린다.</tspan>
+    <tspan x="96" dy="24">긴 작업이 먼저 잡히면 뒤 작업은 Ready 상태여도 대기한다.</tspan>
+  </text>
 
-  <rect x="96" y="302" width="432" height="48" rx="16" fill="#ffffff" stroke="#bfdbfe"/>
-  <text class="label" x="120" y="332">실행 중 P1</text>
-  <circle cx="256" cy="326" r="6" fill="#2563eb"/>
-  <text class="body" x="272" y="332">P2 도착</text>
-  <path d="M 348 326 H 504" stroke="#94a3b8" stroke-width="4" stroke-dasharray="8 8"/>
-  <text class="body" x="360" y="332">교체 없음 → P1 계속 실행</text>
+  <rect class="chipBlue" x="96" y="312" width="444" height="74" rx="18" />
+  <text class="label" x="120" y="340">CPU 전환 시점</text>
+  <text class="body" x="120" y="366">종료, I/O 요청, 자발적 양보</text>
 
-  <text class="label" x="96" y="384">타임라인</text>
-  <line x1="124" y1="434" x2="500" y2="434" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
-  <rect x="124" y="410" width="300" height="48" rx="14" class="p1"/>
-  <rect x="424" y="410" width="76" height="48" rx="14" class="p2"/>
-  <text x="274" y="440" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="18" font-weight="700" fill="#ffffff">P1 실행 0~8</text>
-  <text x="462" y="440" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="18" font-weight="700" fill="#ffffff">P2 8~10</text>
-  <text class="tick" x="120" y="484">0</text>
-  <text class="tick" x="196" y="484">2</text>
-  <text class="tick" x="420" y="484">8</text>
-  <text class="tick" x="496" y="484">10</text>
-  <text class="body" x="96" y="502">응답시간: P1=0, P2=8 · 문맥교환 적음 · 구현 단순</text>
+  <rect class="chipBlue" x="96" y="402" width="444" height="74" rx="18" />
+  <text class="label" x="120" y="430">대표 알고리즘</text>
+  <text class="body" x="120" y="456">FCFS · 비선점 SJF · HRN</text>
 
-  <text class="section" x="672" y="220">선점형</text>
-  <text class="body" x="672" y="246">time quantum 만료, 더 높은 우선순위, 더 짧은 잔여시간 도착 시 강제 회수 가능</text>
-  <text class="small" x="672" y="274">새 작업이 더 급하면 현재 작업을 중단하고 PCB에 문맥 저장 후 교체한다.</text>
+  <rect class="chipBlue" x="96" y="492" width="206" height="72" rx="18" />
+  <text class="label" x="118" y="520">장점</text>
+  <text class="body" x="118" y="546">문맥교환이 적고 구현이 단순하다.</text>
 
-  <rect x="672" y="302" width="432" height="48" rx="16" fill="#ffffff" stroke="#ddd6fe"/>
-  <text class="label" x="696" y="332">실행 중 P1</text>
-  <circle cx="832" cy="326" r="6" fill="#8b5cf6"/>
-  <text class="body" x="848" y="332">P2 도착</text>
-  <path d="M 924 326 H 1016" stroke="#f97316" stroke-width="4" stroke-linecap="round"/>
-  <polygon points="1016,326 1002,318 1002,334" fill="#f97316"/>
-  <text class="body" x="924" y="312">즉시 선점</text>
+  <rect class="chipBlue" x="334" y="492" width="206" height="72" rx="18" />
+  <text class="label" x="356" y="520">단점</text>
+  <text class="body" x="356" y="546">긴 작업 독점으로 응답시간이 악화된다.</text>
 
-  <text class="label" x="672" y="384">타임라인</text>
-  <line x1="700" y1="434" x2="1076" y2="434" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
-  <rect x="700" y="410" width="76" height="48" rx="14" class="p1"/>
-  <rect x="776" y="410" width="76" height="48" rx="14" class="p2"/>
-  <rect x="852" y="410" width="224" height="48" rx="14" class="p1"/>
-  <rect x="770" y="398" width="12" height="72" rx="6" class="swap"/>
-  <rect x="846" y="398" width="12" height="72" rx="6" class="swap"/>
-  <text x="738" y="440" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="17" font-weight="700" fill="#ffffff">P1 0~2</text>
-  <text x="814" y="440" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="17" font-weight="700" fill="#ffffff">P2 2~4</text>
-  <text x="964" y="440" text-anchor="middle" font-family="Pretendard, Noto Sans KR, sans-serif" font-size="18" font-weight="700" fill="#ffffff">P1 4~10</text>
-  <text class="tick" x="696" y="484">0</text>
-  <text class="tick" x="772" y="484">2</text>
-  <text class="tick" x="848" y="484">4</text>
-  <text class="tick" x="1072" y="484">10</text>
-  <text class="body" x="672" y="502">응답시간: P1=0, P2=0 · 평균 반환시간 개선 가능 · 문맥교환 오버헤드 증가</text>
+  <text class="cardTitle" x="660" y="238">선점형</text>
+  <text class="body" x="660" y="270">
+    <tspan x="660" dy="0">운영체제가 실행 중인 프로세스를 멈추고 CPU를 회수할 수 있다.</tspan>
+    <tspan x="660" dy="24">새 작업이 더 급하면 현재 작업을 중단한 뒤 바로 교체한다.</tspan>
+  </text>
 
-  <rect x="64" y="540" width="1072" height="124" rx="24" fill="#0f172a"/>
-  <text class="section white" x="96" y="580">빠른 판단 기준</text>
-  <text class="label white" x="96" y="612">CPU가 아직 안 끝났는데 다른 프로세스로 바뀌었다?</text>
-  <text class="body" x="96" y="636" fill="#cbd5e1">→ 선점형이다. 원인은 time quantum 만료, 더 높은 우선순위, 더 짧은 잔여시간 도착일 가능성이 크다.</text>
+  <rect class="chipViolet" x="660" y="312" width="444" height="98" rx="18" />
+  <text class="label" x="684" y="340">CPU 전환 시점</text>
+  <text class="body" x="684" y="366">
+    <tspan x="684" dy="0">time quantum 만료</tspan>
+    <tspan x="684" dy="22">더 높은 우선순위 도착</tspan>
+    <tspan x="684" dy="22">더 짧은 잔여시간 도착</tspan>
+  </text>
 
-  <circle cx="744" cy="594" r="8" class="good"/>
-  <text class="label white" x="762" y="600">선점형 장점: 응답성↑, 대화형 시스템 적합</text>
-  <circle cx="744" cy="626" r="8" class="warn"/>
-  <text class="label white" x="762" y="632">주의점: 문맥교환 비용↑, 우선순위 설계 미흡 시 기아 발생</text>
+  <rect class="chipViolet" x="660" y="426" width="444" height="74" rx="18" />
+  <text class="label" x="684" y="454">대표 알고리즘</text>
+  <text class="body" x="684" y="480">RR · SRTF · 선점 우선순위</text>
 
-  <text class="small" x="1048" y="664">06-02-02-infographic.svg</text>
+  <rect class="chipViolet" x="660" y="516" width="206" height="72" rx="18" />
+  <text class="label" x="682" y="544">장점</text>
+  <text class="body" x="682" y="570">짧은 작업과 대화형 요청에 빠르게 반응한다.</text>
+
+  <rect class="chipViolet" x="898" y="516" width="206" height="72" rx="18" />
+  <text class="label" x="920" y="544">단점</text>
+  <text class="body" x="920" y="570">문맥교환 비용과 우선순위 설계 부담이 커진다.</text>
+
+  <text class="section" x="64" y="648">빠른 판단 체크</text>
+  <rect class="frame" x="64" y="668" width="1072" height="100" rx="24" />
+  <line class="line" x1="332" y1="718" x2="408" y2="718" />
+  <polygon points="408,718 392,708 392,728" fill="#64748b" />
+  <text class="label" x="96" y="706">질문</text>
+  <text class="body" x="96" y="734">실행 중인 프로세스가 아직 끝나지 않았는데 CPU가 다른 프로세스로 바뀌었는가?</text>
+  <text class="label" x="444" y="706">판정</text>
+  <text class="body" x="444" y="734">그렇다면 선점형이다. CPU가 바뀌는 이유가 종료·I/O뿐이면 비선점형이다.</text>
+
+  <text class="section" x="64" y="816">선점이 자주 발생하는 대표 조건</text>
+  <rect class="chipAmber" x="64" y="836" width="328" height="50" rx="18" />
+  <text class="label" x="88" y="867">1. time quantum 만료</text>
+  <rect class="chipAmber" x="436" y="836" width="328" height="50" rx="18" />
+  <text class="label" x="460" y="867">2. 더 짧은 잔여시간 도착</text>
+  <rect class="chipAmber" x="808" y="836" width="328" height="50" rx="18" />
+  <text class="label" x="832" y="867">3. 더 높은 우선순위 도착</text>
+
+  <text class="small" x="1040" y="872">06-02-02-infographic.svg</text>
 </svg>

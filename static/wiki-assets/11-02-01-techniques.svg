@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">11-02-01. 대표 기법과 커버리지 예시</title>
+  <desc id="desc">블랙박스 테스트의 대표 기법 예시와 화이트박스 테스트의 커버리지 기준 예시를 분리해 보여 주는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 32px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .panelTitle { font-size: 26px; font-weight: 800; }
+      .cardTitle { font-size: 18px; font-weight: 800; }
+      .body { font-size: 16px; font-weight: 500; fill: #1e293b; }
+      .small { font-size: 15px; font-weight: 500; fill: #334155; }
+      .mono { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 15px; font-weight: 700; fill: #0f172a; }
+      .badge { font-size: 14px; font-weight: 800; fill: #0f172a; }
+      .ladder { font-size: 16px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="820" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="764" rx="30" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="eyebrow" x="72" y="88">METHODS AND COVERAGE EXAMPLES</text>
+  <text class="title" x="72" y="130">대표 기법과 커버리지 예시</text>
+  <text class="subtitle" x="72" y="166">비교 그림과 분리해, 시험에 자주 나오는 블랙박스 예시와 화이트박스 커버리지 기준만 따로 정리했다.</text>
+
+  <rect x="72" y="206" width="500" height="536" rx="28" fill="#f8fafc" stroke="#94a3b8"/>
+  <rect x="628" y="206" width="500" height="536" rx="28" fill="#f8fafc" stroke="#94a3b8"/>
+  <rect x="72" y="206" width="500" height="70" rx="28" fill="#dbeafe"/>
+  <rect x="628" y="206" width="500" height="70" rx="28" fill="#e9d5ff"/>
+
+  <text class="panelTitle" x="104" y="250">블랙박스 대표 기법</text>
+  <text class="panelTitle" x="660" y="250">화이트박스 커버리지 기준</text>
+
+  <rect x="104" y="300" width="436" height="126" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="cardTitle" x="128" y="332">동치분할 + 경계값 분석</text>
+  <text class="body" x="128" y="362">입력 범위 1~100이면 유효/무효 집합을 먼저 나눈다.</text>
+  <rect x="128" y="382" width="70" height="30" rx="15" fill="#fecaca"/>
+  <text class="badge" x="163" y="402" text-anchor="middle">0 이하</text>
+  <rect x="206" y="382" width="178" height="30" rx="15" fill="#bbf7d0"/>
+  <text class="badge" x="295" y="402" text-anchor="middle">1 ~ 100 유효 구간</text>
+  <rect x="392" y="382" width="128" height="30" rx="15" fill="#fecaca"/>
+  <text class="badge" x="456" y="402" text-anchor="middle">101 이상</text>
+  <text class="small" x="128" y="446">대표값: 50 / 경계값: 0, 1, 2, 99, 100, 101</text>
+
+  <rect x="104" y="446" width="436" height="118" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="cardTitle" x="128" y="478">결정 테이블</text>
+  <text class="body" x="128" y="508">조건 조합이 결과를 바꿀 때 규칙 표로 정리한다.</text>
+  <text class="small" x="128" y="538">예: 회원 등급, 쿠폰 여부, 행사 기간 → 할인율 결정</text>
+  <text class="small" x="128" y="560">핵심: 조합 누락 없이 결과 규칙을 확인</text>
+
+  <rect x="104" y="584" width="436" height="126" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="cardTitle" x="128" y="616">상태 전이 + 유스케이스 테스트</text>
+  <text class="body" x="128" y="646">상태 변화와 사용자 흐름을 기준으로 케이스를 만든다.</text>
+  <text class="small" x="128" y="676">상태 전이 예: 로그인 실패 5회 → 계정 잠금</text>
+  <text class="small" x="128" y="698">유스케이스 예: 회원 가입 → 본인 인증 → 가입 완료</text>
+
+  <rect x="660" y="300" width="196" height="168" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="cardTitle" x="684" y="332">코드 예시</text>
+  <text class="mono" x="684" y="366">if (score &gt;= 60) {</text>
+  <text class="mono" x="704" y="392">pass = true;</text>
+  <text class="mono" x="684" y="418">} else {</text>
+  <text class="mono" x="704" y="444">pass = false;</text>
+  <text class="mono" x="684" y="470">}</text>
+
+  <rect x="880" y="300" width="216" height="356" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="cardTitle" x="904" y="332">포괄성 증가 방향</text>
+  <rect x="904" y="356" width="168" height="40" rx="20" fill="#dbeafe"/>
+  <text class="ladder" x="988" y="382" text-anchor="middle">문장</text>
+  <text class="small" x="904" y="418">모든 문장이 1번 이상 실행</text>
+  <rect x="904" y="446" width="176" height="40" rx="20" fill="#bfdbfe"/>
+  <text class="ladder" x="992" y="472" text-anchor="middle">분기</text>
+  <text class="small" x="904" y="508">if의 참·거짓 모두 실행</text>
+  <rect x="904" y="536" width="184" height="40" rx="20" fill="#ddd6fe"/>
+  <text class="ladder" x="996" y="562" text-anchor="middle">조건</text>
+  <text class="small" x="904" y="598">복합 조건의 각 원자 조건 점검</text>
+  <rect x="904" y="626" width="192" height="40" rx="20" fill="#c7d2fe"/>
+  <text class="ladder" x="1000" y="652" text-anchor="middle">경로</text>
+  <text class="small" x="904" y="688">가능 실행 경로 전체, 비용 가장 큼</text>
+
+  <rect x="660" y="492" width="196" height="218" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="cardTitle" x="684" y="524">이 코드에 적용하면</text>
+  <text class="small" x="684" y="556">• 문장: pass=true와 false 모두 실행 여부</text>
+  <text class="small" x="684" y="588">• 분기: 조건 참/거짓 두 방향 모두 통과</text>
+  <text class="small" x="684" y="620">• 조건: 복합식이면 각 조건의 진리값 점검</text>
+  <text class="small" x="684" y="652">• 경로: 중첩 분기가 늘수록 조합 수 급증</text>
+
+  <rect x="72" y="756" width="1056" height="20" rx="10" fill="#e2e8f0"/>
+  <rect x="72" y="756" width="520" height="20" rx="10" fill="#93c5fd"/>
+  <rect x="608" y="756" width="520" height="20" rx="10" fill="#c4b5fd"/>
+</svg>

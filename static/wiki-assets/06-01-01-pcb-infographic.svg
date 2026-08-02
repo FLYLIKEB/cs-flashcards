@@ -1,142 +1,115 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
   <title id="title">06-01-01 프로세스 상태와 PCB 인포그래픽</title>
-  <desc id="desc">프로세스의 5가지 상태 전이와 문맥교환 시 PCB에 저장되는 핵심 정보를 함께 설명하는 SVG 인포그래픽</desc>
+  <desc id="desc">프로세스 상태 전이와 PCB 핵심 저장 항목을 넓은 간격과 높은 대비로 정리한 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff" />
       <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#eef4ff" />
-    </linearGradient>
-    <linearGradient id="pcbGlow" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe" />
-      <stop offset="100%" stop-color="#ede9fe" />
-    </linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
       <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10" />
     </filter>
     <marker id="arrowBlue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M1 1 L11 6 L1 11 Z" fill="#2563eb" />
+      <path d="M1 1 L11 6 L1 11 Z" fill="#1d4ed8" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#b45309" />
     </marker>
     <marker id="arrowViolet" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M1 1 L11 6 L1 11 Z" fill="#7c3aed" />
+      <path d="M1 1 L11 6 L1 11 Z" fill="#6d28d9" />
     </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .stateTitle { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e3a8a; }
-      .pcbKey { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #312e81; }
-      .pcbVal { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #4338ca; }
-      .caption { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #7c2d12; }
-      .legend { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #374151; }
+      .eyebrow { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .title { font: 700 38px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .stateTitle { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 600 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e3a8a; }
+      .pcbKey { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e1b4b; }
+      .pcbVal { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #312e81; }
+      .footer { font: 600 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="32" y="28" width="1136" height="664" rx="28" fill="#ffffff" filter="url(#shadow)" />
-  <rect x="32" y="28" width="1136" height="664" rx="28" fill="url(#bg)" opacity="0.6" />
+  <rect width="1200" height="860" fill="url(#bg)" />
+  <rect x="30" y="30" width="1140" height="800" rx="28" fill="#ffffff" filter="url(#shadow)" />
 
-  <text class="small" x="76" y="78">운영체제 · 상태 전이 + 문맥교환 핵심 구조</text>
-  <text class="title" x="76" y="118">06-01-01. 프로세스 상태와 PCB</text>
-  <text class="subtitle" x="76" y="154">프로세스는 상태를 오가고, CPU를 떠날 때 현재 실행 문맥은 PCB에 저장된다.</text>
+  <text class="eyebrow" x="72" y="88">운영체제 · 상태 전이와 PCB 저장 정보</text>
+  <text class="title" x="72" y="134">06-01-01. 프로세스 상태와 PCB</text>
+  <text class="subtitle" x="72" y="174">프로세스는 상태를 오가며, CPU를 떠날 때 현재 문맥을 PCB에 저장해 나중에 이어서 실행한다.</text>
 
-  <rect x="64" y="188" width="620" height="468" rx="24" fill="url(#panel)" stroke="#bfdbfe" />
-  <rect x="716" y="188" width="420" height="468" rx="24" fill="url(#panel)" stroke="#ddd6fe" />
+  <rect x="60" y="212" width="1080" height="348" rx="26" fill="#f8fbff" stroke="#bfdbfe" stroke-width="2" />
+  <text class="section" x="92" y="258">① 프로세스 상태 전이</text>
+  <text class="small" x="92" y="288">실행 중에는 준비 상태로 되돌아가거나, I/O를 기다리며 대기로 이동하고, 작업을 마치면 종료된다.</text>
 
-  <text class="section" x="96" y="228">① 프로세스 상태 전이</text>
-  <text class="section" x="748" y="228">② PCB가 기억하는 실행 문맥</text>
+  <rect x="104" y="350" width="144" height="84" rx="20" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" />
+  <text class="stateTitle" x="176" y="385" text-anchor="middle">생성</text>
+  <text class="label" x="176" y="412" text-anchor="middle">프로세스 시작</text>
 
-  <rect x="108" y="278" width="126" height="68" rx="18" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" />
-  <text class="stateTitle" x="171" y="306" text-anchor="middle">생성</text>
-  <text class="body" x="171" y="329" text-anchor="middle">프로세스 시작</text>
+  <rect x="316" y="320" width="172" height="108" rx="22" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" />
+  <text class="stateTitle" x="402" y="360" text-anchor="middle">준비</text>
+  <text class="label" x="402" y="388" text-anchor="middle">CPU 할당 대기</text>
+  <text class="chip" x="402" y="412" text-anchor="middle">Ready Queue</text>
 
-  <rect x="280" y="248" width="154" height="88" rx="22" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" />
-  <text class="stateTitle" x="357" y="282" text-anchor="middle">준비</text>
-  <text class="body" x="357" y="305" text-anchor="middle">CPU 할당 대기</text>
-  <text class="chip" x="357" y="326" text-anchor="middle">Ready Queue</text>
+  <rect x="526" y="320" width="172" height="108" rx="22" fill="#dcfce7" stroke="#22c55e" stroke-width="2" />
+  <text class="stateTitle" x="612" y="360" text-anchor="middle">실행</text>
+  <text class="label" x="612" y="388" text-anchor="middle">명령 수행 중</text>
+  <text class="chip" x="612" y="412" text-anchor="middle">CPU 사용</text>
 
-  <rect x="474" y="248" width="154" height="88" rx="22" fill="#dcfce7" stroke="#34d399" stroke-width="2" />
-  <text class="stateTitle" x="551" y="282" text-anchor="middle">실행</text>
-  <text class="body" x="551" y="305" text-anchor="middle">명령 수행 중</text>
-  <text class="chip" x="551" y="326" text-anchor="middle">CPU 사용</text>
+  <rect x="736" y="320" width="172" height="108" rx="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" />
+  <text class="stateTitle" x="822" y="360" text-anchor="middle">대기</text>
+  <text class="label" x="822" y="388" text-anchor="middle">I/O · 이벤트 대기</text>
+  <text class="chip" x="822" y="412" text-anchor="middle">Blocked</text>
 
-  <rect x="280" y="414" width="154" height="88" rx="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" />
-  <text class="stateTitle" x="357" y="448" text-anchor="middle">대기</text>
-  <text class="body" x="357" y="471" text-anchor="middle">I/O · 이벤트 대기</text>
-  <text class="chip" x="357" y="492" text-anchor="middle">Blocked</text>
+  <rect x="946" y="320" width="144" height="108" rx="22" fill="#fee2e2" stroke="#ef4444" stroke-width="2" />
+  <text class="stateTitle" x="1018" y="360" text-anchor="middle">종료</text>
+  <text class="label" x="1018" y="388" text-anchor="middle">자원 해제</text>
+  <text class="chip" x="1018" y="412" text-anchor="middle">Done</text>
 
-  <rect x="474" y="414" width="154" height="88" rx="22" fill="#fee2e2" stroke="#f87171" stroke-width="2" />
-  <text class="stateTitle" x="551" y="448" text-anchor="middle">종료</text>
-  <text class="body" x="551" y="471" text-anchor="middle">자원 해제 완료</text>
-  <text class="chip" x="551" y="492" text-anchor="middle">Terminated</text>
+  <path d="M248 392 C274 392, 286 374, 316 374" fill="none" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)" />
+  <text class="small" x="282" y="350">생성 완료</text>
 
-  <path d="M234 312 C250 312, 262 294, 280 292" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)" />
-  <text class="legend" x="255" y="276">생성 완료</text>
+  <path d="M488 374 H526" fill="none" stroke="#1d4ed8" stroke-width="4" marker-end="url(#arrowBlue)" />
+  <text class="small" x="507" y="350" text-anchor="middle">디스패치</text>
 
-  <path d="M434 292 H474" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)" />
-  <text class="legend" x="454" y="278" text-anchor="middle">디스패치</text>
+  <path d="M698 374 H736" fill="none" stroke="#b45309" stroke-width="4" marker-end="url(#arrowAmber)" />
+  <text class="small" x="717" y="350" text-anchor="middle">I/O 요청</text>
 
-  <path d="M531 336 C508 364, 454 383, 420 414" fill="none" stroke="#d97706" stroke-width="4" marker-end="url(#arrowViolet)" />
-  <text class="legend" x="463" y="381">I/O 요청</text>
+  <path d="M822 428 C822 476, 696 490, 612 428" fill="none" stroke="#6d28d9" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#arrowViolet)" />
+  <text class="small" x="752" y="505">이벤트 완료 → 준비 가능 상태로 복귀</text>
 
-  <path d="M434 458 C458 430, 504 397, 534 338" fill="none" stroke="#7c3aed" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrowViolet)" />
-  <text class="legend" x="468" y="426">이벤트 완료</text>
+  <path d="M612 428 C572 482, 472 490, 402 428" fill="none" stroke="#6d28d9" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#arrowViolet)" />
+  <text class="small" x="510" y="530">타임슬라이스 만료 · 선점 → 다시 준비</text>
 
-  <path d="M551 336 V414" fill="none" stroke="#dc2626" stroke-width="4" marker-end="url(#arrowViolet)" />
-  <text class="legend" x="569" y="379">실행 종료</text>
+  <path d="M698 392 C790 392, 904 392, 946 392" fill="none" stroke="#b91c1c" stroke-width="4" marker-end="url(#arrowAmber)" />
+  <text class="small" x="842" y="370">실행 종료</text>
 
-  <path d="M474 320 C448 345, 410 352, 372 336" fill="none" stroke="#7c3aed" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrowViolet)" />
-  <text class="legend" x="429" y="360">타임슬라이스 만료</text>
+  <rect x="60" y="588" width="1080" height="206" rx="26" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2" />
+  <text class="section" x="92" y="634">② PCB가 기억하는 정보</text>
+  <text class="small" x="92" y="664">문맥교환 시 프로세스의 현재 상태를 저장해 두면 CPU가 나중에 같은 지점에서 작업을 재개할 수 있다.</text>
 
-  <rect x="108" y="548" width="520" height="76" rx="18" fill="#ffffff" stroke="#cbd5e1" />
-  <circle cx="140" cy="586" r="10" fill="#2563eb" />
-  <text class="legend" x="160" y="591">실행 가능한 흐름: 생성 → 준비 → 실행 → 종료</text>
-  <circle cx="399" cy="586" r="10" fill="#7c3aed" />
-  <text class="legend" x="419" y="591">상태 복귀: 선점 또는 I/O 완료 후 다시 준비/실행</text>
+  <rect x="102" y="698" width="332" height="60" rx="16" fill="#ffffff" stroke="#ddd6fe" />
+  <text class="pcbKey" x="126" y="734">PID</text>
+  <text class="pcbVal" x="220" y="734">프로세스 식별자</text>
 
-  <rect x="748" y="256" width="356" height="192" rx="24" fill="url(#pcbGlow)" stroke="#8b5cf6" stroke-width="2" />
-  <text class="stateTitle" x="780" y="294">PCB(Process Control Block)</text>
-  <text class="body" x="780" y="318">CPU가 프로세스를 다시 이어서 실행하기 위해 남기는 기록</text>
+  <rect x="448" y="698" width="286" height="60" rx="16" fill="#ffffff" stroke="#ddd6fe" />
+  <text class="pcbKey" x="472" y="734">상태</text>
+  <text class="pcbVal" x="556" y="734">Ready / Running</text>
 
-  <rect x="774" y="338" width="138" height="32" rx="10" fill="#ffffff" opacity="0.88" />
-  <text class="pcbKey" x="790" y="359">PID</text>
-  <text class="pcbVal" x="854" y="359">P-103</text>
+  <rect x="748" y="698" width="350" height="60" rx="16" fill="#ffffff" stroke="#ddd6fe" />
+  <text class="pcbKey" x="772" y="734">PC</text>
+  <text class="pcbVal" x="856" y="734">다음 명령 주소</text>
 
-  <rect x="928" y="338" width="150" height="32" rx="10" fill="#ffffff" opacity="0.88" />
-  <text class="pcbKey" x="944" y="359">상태</text>
-  <text class="pcbVal" x="1001" y="359">Running</text>
+  <rect x="102" y="772" width="486" height="60" rx="16" fill="#ffffff" stroke="#ddd6fe" />
+  <text class="pcbKey" x="126" y="808">레지스터</text>
+  <text class="pcbVal" x="244" y="808">AX, BX, SP 등 CPU 값</text>
 
-  <rect x="774" y="380" width="304" height="32" rx="10" fill="#ffffff" opacity="0.88" />
-  <text class="pcbKey" x="790" y="401">PC</text>
-  <text class="pcbVal" x="842" y="401">다음 명령 주소 0x8048</text>
+  <rect x="604" y="772" width="494" height="60" rx="16" fill="#ffffff" stroke="#ddd6fe" />
+  <text class="pcbKey" x="628" y="808">스케줄링 정보</text>
+  <text class="pcbVal" x="794" y="808">우선순위, 큐 위치, 남은 시간</text>
 
-  <rect x="774" y="422" width="304" height="32" rx="10" fill="#ffffff" opacity="0.88" />
-  <text class="pcbKey" x="790" y="443">레지스터</text>
-  <text class="pcbVal" x="874" y="443">AX, BX, SP 등 현재 값</text>
-
-  <rect x="748" y="480" width="356" height="146" rx="24" fill="#fff7ed" stroke="#fdba74" />
-  <text class="caption" x="780" y="518">문맥교환 한 장면</text>
-  <text class="body" x="780" y="545">1. 실행 중인 프로세스가 CPU를 떠남</text>
-  <text class="body" x="780" y="570">2. PC와 레지스터 값을 자기 PCB에 저장</text>
-  <text class="body" x="780" y="595">3. 다음 프로세스의 PCB에서 값 복원</text>
-
-  <g transform="translate(972 529)">
-    <rect x="0" y="0" width="90" height="44" rx="12" fill="#dbeafe" stroke="#60a5fa" />
-    <text class="legend" x="45" y="27" text-anchor="middle">프로세스 A</text>
-    <animateTransform attributeName="transform" type="translate" values="972 529;972 517;972 529" dur="3.2s" repeatCount="indefinite" />
-  </g>
-
-  <path d="M628 292 C698 292, 706 330, 748 352" fill="none" stroke="#2563eb" stroke-width="5" marker-end="url(#arrowBlue)" />
-  <text class="legend" x="689" y="284">CPU를 떠날 때 저장</text>
-
-  <path d="M748 584 C694 584, 659 521, 628 336" fill="none" stroke="#7c3aed" stroke-width="5" marker-end="url(#arrowViolet)" />
-  <text class="legend" x="673" y="554">복원 후 다시 실행</text>
-
-  <text class="small" x="76" y="680">핵심 암기: 상태 전이 흐름 + PCB(PID, 상태, PC, 레지스터, 스케줄링 정보) + 문맥교환의 저장/복원</text>
+  <text class="footer" x="72" y="816">핵심 암기: 생성 → 준비 → 실행 → 대기/준비 → 종료, 그리고 문맥교환 시 PCB에 PID·상태·PC·레지스터·스케줄링 정보가 저장된다.</text>
 </svg>

@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880" role="img" aria-labelledby="title desc">
+  <title id="title">06-02-01. FCFS · SJF · HRN · RR 비교표</title>
+  <desc id="desc">FCFS, SJF, HRN, RR의 선택 기준, 선점 여부, 장점, 주의점을 4개 카드와 계산 메모로 나눠 비교한다.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; }
+      .fcfs { fill: #eff6ff; stroke: #93c5fd; stroke-width: 1.2; }
+      .sjf { fill: #f5f3ff; stroke: #c4b5fd; stroke-width: 1.2; }
+      .hrn { fill: #ecfeff; stroke: #99f6e4; stroke-width: 1.2; }
+      .rr { fill: #fff1f2; stroke: #fda4af; stroke-width: 1.2; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 15px 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #0f172a; }
+      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="880" rx="28" />
+  <text class="title" x="56" y="70">알고리즘 비교: 선택 기준 · 선점 여부 · 계산 포인트</text>
+  <text class="subtitle" x="56" y="104">같은 표를 글로만 읽을 때 생기던 밀집감을 줄이기 위해 알고리즘별 카드와 하단 메모로 다시 정리했다.</text>
+
+  <rect class="fcfs" x="40" y="138" width="540" height="248" rx="22" />
+  <text class="section" x="64" y="176">FCFS</text>
+  <text class="chip" x="518" y="176" text-anchor="end" fill="#1d4ed8">비선점</text>
+  <text class="label" x="64" y="214">선택 기준</text>
+  <text class="body" x="64" y="240">먼저 도착한 프로세스를 그대로 실행</text>
+  <text class="label" x="64" y="278">장점</text>
+  <text class="body" x="64" y="304">구현이 단순하고 계산 실수가 적다.</text>
+  <text class="label" x="64" y="342">주의점</text>
+  <text class="body" x="64" y="368">긴 작업이 앞에 오면 뒤의 짧은 작업까지 같이 늦어진다.</text>
+
+  <rect class="sjf" x="620" y="138" width="540" height="248" rx="22" />
+  <text class="section" x="644" y="176">SJF</text>
+  <text class="chip" x="1098" y="176" text-anchor="end" fill="#6d28d9">비선점</text>
+  <text class="label" x="644" y="214">선택 기준</text>
+  <text class="body" x="644" y="240">현재 Ready Queue에서 실행시간이 가장 짧은 작업</text>
+  <text class="label" x="644" y="278">장점</text>
+  <text class="body" x="644" y="304">평균 대기시간을 줄이는 경향이 크다.</text>
+  <text class="label" x="644" y="342">주의점</text>
+  <text class="body" x="644" y="368">아직 도착하지 않은 작업은 후보가 아니며 긴 작업 기아가 생길 수 있다.</text>
+
+  <rect class="hrn" x="40" y="414" width="540" height="248" rx="22" />
+  <text class="section" x="64" y="452">HRN</text>
+  <text class="chip" x="518" y="452" text-anchor="end" fill="#0f766e">비선점</text>
+  <text class="label" x="64" y="490">선택 기준</text>
+  <text class="body" x="64" y="516">응답률 = (대기 + 실행) / 실행 이 가장 큰 작업</text>
+  <text class="label" x="64" y="554">장점</text>
+  <text class="body" x="64" y="580">기다린 시간이 길수록 점수가 올라 SJF의 기아를 완화한다.</text>
+  <text class="label" x="64" y="618">주의점</text>
+  <text class="body" x="64" y="644">선택 시점마다 후보별 응답률을 다시 계산해야 한다.</text>
+
+  <rect class="rr" x="620" y="414" width="540" height="248" rx="22" />
+  <text class="section" x="644" y="452">RR</text>
+  <text class="chip" x="1098" y="452" text-anchor="end" fill="#b91c1c">선점</text>
+  <text class="label" x="644" y="490">선택 기준</text>
+  <text class="body" x="644" y="516">time quantum마다 CPU를 끊고 Ready Queue를 순환</text>
+  <text class="label" x="644" y="554">장점</text>
+  <text class="body" x="644" y="580">응답성이 좋아 대화형 시스템에 잘 맞는다.</text>
+  <text class="label" x="644" y="618">주의점</text>
+  <text class="body" x="644" y="644">quantum이 너무 작으면 문맥교환 비용이 커지고 너무 크면 FCFS와 닮는다.</text>
+
+  <rect class="panel" x="40" y="692" width="1120" height="150" rx="22" />
+  <text class="section" x="64" y="728">시험용 계산 포인트</text>
+  <text class="body" x="64" y="762">• FCFS: 도착 순서대로 완료시간을 먼저 적고 반환시간, 대기시간을 순서대로 계산한다.</text>
+  <text class="body" x="64" y="792">• SJF/HRN: 그 시점의 후보만 비교한다. HRN은 응답률 값을 표 옆에 함께 적는다.</text>
+  <text class="body" x="64" y="822">• RR: quantum 경계마다 남은 실행시간과 Ready Queue 순서를 함께 기록해야 한다.</text>
+
+  <text class="small" x="56" y="866">06-02-01-fcfs-sjf-hrn-rr-comparison.svg · page-specific comparison chart</text>
+</svg>

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">09-01-02. 배열과 연결리스트의 연산 비용 비교</title>
+  <desc id="desc">배열과 연결리스트의 접근, 탐색, 삽입, 삭제 비용 차이와 tail 포인터 유무를 비교하는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 18px; font-weight: 700; fill: #1d4ed8; }
+      .title { font-size: 34px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .section { font-size: 22px; font-weight: 800; }
+      .label { font-size: 17px; font-weight: 700; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 600; fill: #475569; }
+      .mono { font-size: 15px; font-weight: 700; fill: #1e293b; }
+      .chipBlue { font-size: 14px; font-weight: 800; fill: #1d4ed8; }
+      .chipAmber { font-size: 14px; font-weight: 800; fill: #b45309; }
+      .good { font-size: 15px; font-weight: 800; fill: #166534; }
+      .warn { font-size: 15px; font-weight: 800; fill: #b45309; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="eyebrow" x="72" y="82">시간 복잡도 비교</text>
+  <text class="title" x="72" y="124">배열 vs 연결리스트</text>
+  <text class="subtitle" x="72" y="158">접근은 배열이 강하고, 포인터를 이미 알고 있는 삽입·삭제는 연결리스트가 강하다.</text>
+
+  <rect x="64" y="194" width="498" height="474" rx="24" fill="#f8fafc" stroke="#bfdbfe" stroke-width="2"/>
+  <rect x="638" y="194" width="498" height="474" rx="24" fill="#fffbeb" stroke="#fde68a" stroke-width="2"/>
+
+  <text class="section" x="92" y="232">배열 관점</text>
+  <text class="small" x="92" y="258">인덱스로 바로 접근하지만, 중간 삽입·삭제 때는 뒤 원소를 밀거나 당겨야 한다.</text>
+  <text class="chipBlue" x="92" y="296">강점</text>
+  <rect x="92" y="314" width="442" height="88" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text class="label" x="116" y="346">접근 (read by index)</text>
+  <text class="good" x="116" y="374">O(1)</text>
+  <text class="body" x="196" y="374">arr[i]처럼 바로 점프 가능</text>
+
+  <text class="chipAmber" x="92" y="438">주의</text>
+  <rect x="92" y="456" width="442" height="170" rx="18" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text class="label" x="116" y="490">중간 삽입·삭제</text>
+  <text class="warn" x="116" y="518">원소 이동 비용 발생</text>
+  <text class="body" x="116" y="546">새 칸을 넣으려면 뒤 원소를 한 칸씩 민다.</text>
+  <text class="body" x="116" y="572">지우면 빈칸을 메우기 위해 한 칸씩 당긴다.</text>
+  <text class="mono" x="116" y="606">따라서 일반적으로 O(n)</text>
+
+  <text class="section" x="666" y="232">연결리스트 관점</text>
+  <text class="small" x="666" y="258">head부터 next를 따라가므로 접근은 느리지만, 연결만 바꾸는 연산은 가볍다.</text>
+  <text class="chipAmber" x="666" y="296">주의</text>
+  <rect x="666" y="314" width="442" height="128" rx="18" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text class="label" x="690" y="346">접근 / 탐색</text>
+  <text class="warn" x="690" y="374">O(n)</text>
+  <text class="body" x="742" y="374">head부터 순서대로 따라가야 함</text>
+  <text class="body" x="690" y="404">특정 i번째 원소도 중간으로 바로 점프할 수 없다.</text>
+
+  <text class="chipBlue" x="666" y="478">강점</text>
+  <rect x="666" y="496" width="442" height="130" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text class="label" x="690" y="528">삽입·삭제 (포인터를 이미 아는 경우)</text>
+  <text class="good" x="690" y="556">O(1)</text>
+  <text class="body" x="742" y="556">노드 이동보다 next 연결 변경이 핵심</text>
+  <text class="body" x="690" y="586">단, 삭제에는 보통 이전 노드(prev) 정보가 필요하다.</text>
+
+  <rect x="64" y="688" width="1072" height="20" rx="10" fill="#eff6ff"/>
+  <text class="small" x="80" y="703">tail 포인터를 유지하면 꼬리 삽입은 O(1)로 줄일 수 있지만, 랜덤 접근은 여전히 O(n)이다.</text>
+</svg>

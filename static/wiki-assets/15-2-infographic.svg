@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img" aria-labelledby="title desc">
   <title id="title">15-2. 결제 인프라 인포그래픽</title>
-  <desc id="desc">거액결제 RTGS, 소액결제 FPS, 국제 메시징 SWIFT, 그리고 청산·결제·최종성 및 운영 통제를 함께 설명하는 결제 인프라 도식</desc>
+  <desc id="desc">거액결제 RTGS, 소액결제 FPS, 국제 메시징 SWIFT, 청산과 결제와 최종성, RTGS와 DNS 비교, 운영 체크리스트와 기관 연결을 읽기 쉽게 구분한 결제 인프라 도식</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
       <stop offset="55%" stop-color="#f8fafc"/>
       <stop offset="100%" stop-color="#ecfeff"/>
     </linearGradient>
@@ -11,116 +11,123 @@
       <stop offset="0%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#155e75"/>
     </linearGradient>
-    <linearGradient id="railA" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1d4ed8"/>
-      <stop offset="100%" stop-color="#0891b2"/>
-    </linearGradient>
-    <linearGradient id="railB" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#ec4899"/>
-    </linearGradient>
     <style>
-      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
-      .kicker { font-size: 14px; font-weight: 700; letter-spacing: 0.04em; fill: #cffafe; }
-      .title { font-size: 34px; font-weight: 800; fill: #f8fafc; }
-      .subtitle { font-size: 16px; font-weight: 500; fill: #cbd5e1; }
-      .section { font-size: 15px; font-weight: 800; fill: #0f172a; }
-      .label { font-size: 20px; font-weight: 800; fill: #0f172a; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .kicker { font-size: 14px; font-weight: 800; letter-spacing: 0.08em; fill: #a5f3fc; }
+      .title { font-size: 35px; font-weight: 800; fill: #f8fafc; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #dbeafe; }
+      .panelTitle { font-size: 20px; font-weight: 800; }
+      .section { font-size: 16px; font-weight: 800; }
+      .label { font-size: 16px; font-weight: 800; }
       .body { font-size: 14px; font-weight: 500; fill: #334155; }
+      .caption { font-size: 13px; font-weight: 600; fill: #475569; }
       .small { font-size: 12px; font-weight: 700; fill: #475569; }
-      .whiteLabel { font-size: 16px; font-weight: 800; fill: #f8fafc; }
-      .whiteBody { font-size: 13px; font-weight: 500; fill: #e2e8f0; }
-      .chip { font-size: 12px; font-weight: 800; fill: #0f172a; }
+      .heroChip { font-size: 13px; font-weight: 800; fill: #082f49; }
+      .pillText { font-size: 13px; font-weight: 800; }
       .center { text-anchor: middle; }
+      .right { text-anchor: end; }
     </style>
     <marker id="arrowBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9"/>
-    </marker>
-    <marker id="arrowPink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#db2777"/>
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
     </marker>
     <marker id="arrowSlate" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
     </marker>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect width="1200" height="920" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="864" rx="32" fill="#ffffff" stroke="#cbd5e1"/>
 
-  <rect x="52" y="48" width="1096" height="124" rx="28" fill="url(#hero)"/>
-  <text class="kicker" x="84" y="82">PAYMENT INFRASTRUCTURE MAP</text>
-  <text class="title" x="84" y="122">15-2. 결제 인프라</text>
-  <text class="subtitle" x="84" y="150">거액결제는 최종성과 안정성, 소액결제는 처리량과 UX, 국제결제는 메시징과 실제 자금 이동의 분리가 핵심이다.</text>
+  <rect x="52" y="48" width="1096" height="138" rx="28" fill="url(#hero)"/>
+  <text class="kicker" x="84" y="84">PAYMENT INFRASTRUCTURE MAP</text>
+  <text class="title" x="84" y="126">15-2. 결제 인프라</text>
+  <text class="subtitle" x="84" y="156">거액결제는 최종성과 안정성, 소액결제는 처리량과 멱등성, 국제결제는 메시지와 자금 이동의 분리가 핵심이다.</text>
+  <rect x="836" y="72" width="272" height="84" rx="18" fill="#f8fafc" opacity="0.96"/>
+  <text class="heroChip" x="860" y="100">기관 연결</text>
+  <text class="caption" x="860" y="122">한국은행 = 거액결제 안정성</text>
+  <text class="caption" x="860" y="142">금융결제원 = 소액결제·공동망</text>
+  <text class="caption" x="860" y="162">코스콤·거래소 = 자본시장 주문·체결·청산·결제</text>
 
-  <rect x="72" y="194" width="656" height="278" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="section" x="96" y="226">1) 결제 레일별 목적이 다르다</text>
+  <rect x="72" y="214" width="332" height="278" rx="24" fill="#eff6ff" stroke="#93c5fd"/>
+  <text class="panelTitle" x="96" y="248">1) BOK-Wire+ · RTGS</text>
+  <rect x="96" y="266" width="284" height="44" rx="14" fill="#dbeafe"/>
+  <text class="pillText" x="116" y="294" fill="#1d4ed8">건별 실시간 총액결제</text>
+  <text class="label" x="96" y="336">왜 필요한가</text>
+  <text class="body" x="96" y="360">• 금융기관 간 대규모 이체를 즉시 확정한다.</text>
+  <text class="body" x="96" y="384">• 실패 1건이 연쇄 유동성 문제로 번지는 위험을 줄인다.</text>
+  <text class="body" x="96" y="408">• 처리 속도보다 최종성·가용성·무결성이 더 중요하다.</text>
+  <line x1="112" y1="438" x2="360" y2="438" stroke="#2563eb" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
+  <circle cx="150" cy="438" r="5" fill="#2563eb"/>
+  <circle cx="236" cy="438" r="5" fill="#2563eb"/>
+  <circle cx="322" cy="438" r="5" fill="#2563eb"/>
+  <text class="small" x="96" y="468">결제 지연 리스크 축소 → 시스템 리스크 축소</text>
 
-  <rect x="96" y="246" width="610" height="78" rx="20" fill="url(#railA)"/>
-  <text class="whiteLabel" x="122" y="276">BOK-Wire+ · 거액결제 RTGS</text>
-  <text class="whiteBody" x="122" y="298">금융기관 간 대규모 이체를 건별 실시간 총액결제로 처리 → 결제 지연과 연쇄 리스크 축소</text>
-  <line x1="120" y1="311" x2="678" y2="311" stroke="#bae6fd" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
-  <circle cx="192" cy="311" r="5" fill="#ffffff"/>
-  <circle cx="372" cy="311" r="5" fill="#ffffff"/>
-  <circle cx="552" cy="311" r="5" fill="#ffffff"/>
+  <rect x="434" y="214" width="332" height="278" rx="24" fill="#faf5ff" stroke="#c4b5fd"/>
+  <text class="panelTitle" x="458" y="248">2) 소액결제 · FPS</text>
+  <rect x="458" y="266" width="284" height="44" rx="14" fill="#f3e8ff"/>
+  <text class="pillText" x="478" y="294" fill="#7c3aed">실시간 처리 + 대량 동시 요청 대응</text>
+  <text class="label" x="458" y="336">기술 쟁점</text>
+  <text class="body" x="458" y="360">• 급여일·점심시간 피크에도 응답시간 SLA를 지켜야 한다.</text>
+  <text class="body" x="458" y="384">• 네트워크 재시도와 중복 클릭에도 한 번만 승인돼야 한다.</text>
+  <text class="body" x="458" y="408">• 장애 복구 뒤에도 정산 결과가 어긋나지 않아야 한다.</text>
+  <rect x="458" y="428" width="132" height="36" rx="12" fill="#ffffff" stroke="#c4b5fd"/>
+  <text class="small center" x="524" y="451">Idempotency-Key</text>
+  <rect x="604" y="428" width="138" height="36" rx="12" fill="#ffffff" stroke="#c4b5fd"/>
+  <text class="small center" x="673" y="451">Retry + 상태 관리</text>
 
-  <rect x="96" y="340" width="610" height="78" rx="20" fill="url(#railB)"/>
-  <text class="whiteLabel" x="122" y="370">FPS · 실시간 소액결제</text>
-  <text class="whiteBody" x="122" y="392">급여일·점심시간 피크를 버티는 TPS, 재시도 처리, 중복 승인 방지, 사용자 체감 속도가 중요</text>
-  <line x1="120" y1="405" x2="678" y2="405" stroke="#fbcfe8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowPink)"/>
-  <circle cx="252" cy="405" r="5" fill="#ffffff"/>
-  <circle cx="462" cy="405" r="5" fill="#ffffff"/>
+  <rect x="796" y="214" width="328" height="278" rx="24" fill="#fff7ed" stroke="#fdba74"/>
+  <text class="panelTitle" x="820" y="248">3) SWIFT</text>
+  <text class="label" x="820" y="282">메시지망과 자금 레일을 구분한다</text>
+  <rect x="820" y="304" width="280" height="56" rx="16" fill="#ffffff" stroke="#fdba74"/>
+  <text class="label center" x="960" y="329">SWIFT 전문</text>
+  <text class="body center" x="960" y="349">지급 지시 · 상태 통지 · 정정 메시지</text>
+  <line x1="960" y1="360" x2="960" y2="392" stroke="#475569" stroke-width="3" marker-end="url(#arrowSlate)"/>
+  <rect x="820" y="398" width="126" height="70" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect x="974" y="398" width="126" height="70" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="small center" x="883" y="425">해외은행 A</text>
+  <text class="body center" x="883" y="445">코레스 계좌</text>
+  <text class="small center" x="1037" y="425">해외은행 B</text>
+  <text class="body center" x="1037" y="445">현지 결제시스템</text>
+  <line x1="946" y1="433" x2="974" y2="433" stroke="#ea580c" stroke-width="3" marker-end="url(#arrowSlate)"/>
+  <text class="caption" x="820" y="486">SWIFT는 지시를 표준화하고, 실제 결제는 통화권 계정·결제시스템에서 이뤄진다.</text>
 
-  <rect x="756" y="194" width="368" height="278" rx="24" fill="#fff7ed" stroke="#fdba74"/>
-  <text class="section" x="780" y="226">2) SWIFT는 돈의 레일이 아니라 메시지망</text>
-  <rect x="780" y="248" width="320" height="72" rx="18" fill="#ffffff" stroke="#fdba74"/>
-  <text class="label" x="940" y="277" text-anchor="middle">SWIFT 전문</text>
-  <text class="body center" x="940" y="300">지급 지시 · 상태 통지 · 정정 메시지</text>
-  <line x1="940" y1="320" x2="940" y2="350" stroke="#475569" stroke-width="3" marker-end="url(#arrowSlate)"/>
-  <rect x="780" y="350" width="150" height="88" rx="18" fill="#fff" stroke="#cbd5e1"/>
-  <rect x="950" y="350" width="150" height="88" rx="18" fill="#fff" stroke="#cbd5e1"/>
-  <text class="small center" x="855" y="378">해외은행 A</text>
-  <text class="body center" x="855" y="400">코레스 계좌</text>
-  <text class="small center" x="1025" y="378">해외은행 B</text>
-  <text class="body center" x="1025" y="400">현지 결제시스템</text>
-  <line x1="930" y1="394" x2="950" y2="394" stroke="#fb923c" stroke-width="4" marker-end="url(#arrowPink)"/>
-  <text class="body" x="780" y="458">핵심 구분: 메시지는 SWIFT가, 실제 자금 결제는 해당 통화권 계정·결제시스템이 담당한다.</text>
+  <rect x="72" y="522" width="504" height="170" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="panelTitle" x="96" y="556">4) 청산 → 결제 → 최종성</text>
+  <rect x="96" y="582" width="132" height="76" rx="18" fill="#ffffff" stroke="#93c5fd"/>
+  <rect x="256" y="582" width="132" height="76" rx="18" fill="#ffffff" stroke="#93c5fd"/>
+  <rect x="416" y="582" width="132" height="76" rx="18" fill="#dbeafe" stroke="#60a5fa"/>
+  <text class="label center" x="162" y="612">청산</text>
+  <text class="body center" x="162" y="634">채권·채무 계산</text>
+  <text class="label center" x="322" y="612">결제</text>
+  <text class="body center" x="322" y="634">실제 자금 이전</text>
+  <text class="label center" x="482" y="612">최종성</text>
+  <text class="body center" x="482" y="634">취소되지 않는 확정</text>
+  <line x1="228" y1="620" x2="256" y2="620" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <line x1="388" y1="620" x2="416" y2="620" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text class="small" x="96" y="680">면접 포인트: 청산과 결제를 같은 뜻으로 말하지 않는다.</text>
 
-  <rect x="72" y="492" width="468" height="172" rx="24" fill="#eff6ff" stroke="#93c5fd"/>
-  <text class="section" x="96" y="524">3) 청산·결제·최종성</text>
-  <rect x="98" y="546" width="126" height="86" rx="18" fill="#ffffff" stroke="#93c5fd"/>
-  <text class="label center" x="161" y="579">청산</text>
-  <text class="body center" x="161" y="601">채권·채무 계산</text>
-  <rect x="244" y="546" width="126" height="86" rx="18" fill="#ffffff" stroke="#93c5fd"/>
-  <text class="label center" x="307" y="579">결제</text>
-  <text class="body center" x="307" y="601">실제 자금 이전</text>
-  <rect x="390" y="546" width="126" height="86" rx="18" fill="#dbeafe" stroke="#60a5fa"/>
-  <text class="label center" x="453" y="579">최종성</text>
-  <text class="body center" x="453" y="601">취소되지 않는 확정</text>
-  <line x1="224" y1="589" x2="244" y2="589" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
-  <line x1="370" y1="589" x2="390" y2="589" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
-  <text class="small" x="96" y="652">면접 포인트: 청산과 결제를 같은 뜻으로 말하면 안 된다.</text>
+  <rect x="604" y="522" width="252" height="170" rx="24" fill="#eef2ff" stroke="#a5b4fc"/>
+  <text class="panelTitle" x="628" y="556">5) RTGS vs DNS</text>
+  <line x1="730" y1="582" x2="730" y2="664" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="680" y="590">RTGS</text>
+  <text class="body" x="628" y="616">• 건별 즉시 결제</text>
+  <text class="body" x="628" y="640">• 결제 위험 낮음</text>
+  <text class="body" x="628" y="664">• 유동성 소요 큼</text>
+  <text class="section" x="780" y="590">DNS</text>
+  <text class="body" x="748" y="616">• 일정 기간 순액 상계</text>
+  <text class="body" x="748" y="640">• 유동성 절감</text>
+  <text class="body" x="748" y="664">• 결제 전 위험 누적</text>
 
-  <rect x="560" y="492" width="272" height="172" rx="24" fill="#faf5ff" stroke="#c4b5fd"/>
-  <text class="section" x="584" y="524">4) RTGS vs DNS</text>
-  <rect x="586" y="546" width="104" height="92" rx="18" fill="#ffffff" stroke="#c4b5fd"/>
-  <text class="label center" x="638" y="578">RTGS</text>
-  <text class="body center" x="638" y="600">위험 낮음</text>
-  <text class="body center" x="638" y="618">유동성 부담 큼</text>
-  <rect x="706" y="546" width="104" height="92" rx="18" fill="#ffffff" stroke="#c4b5fd"/>
-  <text class="label center" x="758" y="578">DNS</text>
-  <text class="body center" x="758" y="600">유동성 절감</text>
-  <text class="body center" x="758" y="618">위험 누적 가능</text>
+  <rect x="884" y="522" width="240" height="170" rx="24" fill="#f0fdf4" stroke="#86efac"/>
+  <text class="panelTitle" x="908" y="556">6) 운영 체크리스트</text>
+  <text class="body" x="908" y="584">• API 인증·암호화·감사 로그</text>
+  <text class="body" x="908" y="608">• 멱등성 키와 재시도 정책</text>
+  <text class="body" x="908" y="632">• 원장·정산·대사 기준 데이터 일치</text>
+  <text class="body" x="908" y="656">• TPS·지연·오류율·큐 적체 모니터링</text>
 
-  <rect x="852" y="492" width="272" height="172" rx="24" fill="#f0fdf4" stroke="#86efac"/>
-  <text class="section" x="876" y="524">5) 운영 체크리스트</text>
-  <text class="body" x="876" y="554">• Idempotency-Key로 중복 승인 방지</text>
-  <text class="body" x="876" y="580">• 원장·정산·대사 기준 데이터 일치</text>
-  <text class="body" x="876" y="606">• 재처리 절차와 승인 체계 문서화</text>
-  <text class="body" x="876" y="632">• TPS·지연·오류율·큐 적체 모니터링</text>
-
-  <rect x="820" y="76" width="292" height="68" rx="18" fill="#0f172a" opacity="0.22"/>
-  <rect x="812" y="68" width="292" height="68" rx="18" fill="#ffffff" opacity="0.14"/>
-  <text class="chip" x="836" y="96" fill="#ecfeff">기관 연결</text>
-  <text class="whiteBody" x="836" y="116">한국은행 = 거액결제 · 금융결제원 = 소액결제</text>
-  <text class="whiteBody" x="836" y="132">코스콤·거래소 = 자본시장 주문·체결·청산·결제 인프라</text>
+  <rect x="72" y="720" width="1052" height="136" rx="24" fill="#fffaf0" stroke="#fdba74"/>
+  <text class="panelTitle" x="96" y="754">7) 기억할 한 줄</text>
+  <text class="label" x="96" y="786">거액결제는 최종성, 소액결제는 처리량과 UX, 국제결제는 메시지/자금 레일 분리가 핵심이다.</text>
+  <text class="caption" x="96" y="816">실무에서는 여기에 멱등성, 재처리 절차, 정산 정합성, 대사 기준 데이터, 장애 승인 체계까지 묶어서 설명해야 한다.</text>
+  <text class="caption" x="96" y="838">한 시스템을 설명할 때 결제 흐름과 운영 통제를 함께 말하면 면접 답변의 완성도가 올라간다.</text>
 </svg>

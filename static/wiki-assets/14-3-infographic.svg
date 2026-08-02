@@ -1,118 +1,86 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
   <title id="title">14-3. 명령어 세트 인포그래픽</title>
-  <desc id="desc">ISA의 의미, RISC와 CISC 비교, 주소 지정 방식, SIMD/MIMD와 Amdahl의 법칙을 한 장에 정리한 인포그래픽</desc>
+  <desc id="desc">ISA가 정하는 실행 계약, RISC와 CISC의 차이, SIMD와 MIMD 및 Amdahl의 법칙을 구분해 보여주는 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef4ff"/>
     </linearGradient>
-    <linearGradient id="isaBand" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#1d4ed8"/>
       <stop offset="100%" stop-color="#0f766e"/>
     </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
-    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .mono { font: 600 14px 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #0f172a; }
-      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: white; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .mono { font: 600 16px 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #0f172a; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect width="1200" height="780" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="724" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="small" x="72" y="78">컴퓨터구조 · 하드웨어와 소프트웨어의 약속</text>
-  <text class="title" x="72" y="118">14-3. 명령어 세트(ISA)</text>
-  <text class="subtitle" x="72" y="154">무엇을 실행할 수 있는지, 어디서 피연산자를 읽는지, 병렬화의 한계까지 정의하는 실행 계약</text>
+  <text class="small" x="72" y="80">컴퓨터구조 · 하드웨어와 소프트웨어가 공유하는 실행 규칙</text>
+  <text class="title" x="72" y="122">14-3. 명령어 세트(ISA)</text>
+  <text class="subtitle" x="72" y="156">명령어 종류, 피연산자 위치, 예외 복귀 규칙, 병렬 실행의 확장 방식까지 묶어 정의하는 약속</text>
 
-  <rect x="72" y="188" width="690" height="156" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <rect x="322" y="212" width="190" height="108" rx="22" fill="url(#isaBand)"/>
-  <text class="chip" x="417" y="247" text-anchor="middle">ISA</text>
-  <text class="label" x="417" y="271" text-anchor="middle">Instruction Set</text>
-  <text class="label" x="417" y="293" text-anchor="middle">Architecture</text>
+  <rect x="72" y="188" width="1056" height="248" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="98" y="226">ISA의 의미: 소프트웨어와 하드웨어 사이의 실행 계약</text>
 
-  <rect x="96" y="218" width="184" height="96" rx="18" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
-  <text class="section" x="188" y="250" text-anchor="middle">소프트웨어</text>
-  <text class="body" x="112" y="277">• 컴파일러의 코드 생성</text>
-  <text class="body" x="112" y="299">• 운영체제의 예외 복귀 규칙</text>
+  <rect x="108" y="264" width="240" height="120" rx="20" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text class="label" x="228" y="298" text-anchor="middle">소프트웨어 관점</text>
+  <text class="body" x="132" y="328">• 컴파일러가 어떤 코드를 생성할지</text>
+  <text class="body" x="132" y="354">• 운영체제가 예외 후 어떻게 복귀할지</text>
 
-  <rect x="554" y="218" width="184" height="96" rx="18" fill="#ccfbf1" stroke="#14b8a6" stroke-width="2"/>
-  <text class="section" x="646" y="250" text-anchor="middle">하드웨어</text>
-  <text class="body" x="570" y="277">• CPU가 이해하는 명령어</text>
-  <text class="body" x="570" y="299">• 레지스터·데이터 형식</text>
+  <rect x="420" y="246" width="360" height="156" rx="24" fill="url(#band)"/>
+  <text class="chip" x="600" y="292" text-anchor="middle">ISA = Instruction Set Architecture</text>
+  <text class="chip" x="600" y="326" text-anchor="middle">무엇을 실행하고 어디서 읽고</text>
+  <text class="chip" x="600" y="356" text-anchor="middle">어디에 저장하는지 정하는 기준</text>
 
-  <line x1="280" y1="266" x2="322" y2="266" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="512" y1="266" x2="554" y2="266" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="852" y="264" width="240" height="120" rx="20" fill="#ccfbf1" stroke="#14b8a6" stroke-width="2"/>
+  <text class="label" x="972" y="298" text-anchor="middle">하드웨어 관점</text>
+  <text class="body" x="876" y="328">• CPU가 이해하는 명령어 형식</text>
+  <text class="body" x="876" y="354">• 레지스터, 데이터 크기, 예외 규칙</text>
 
-  <rect x="786" y="188" width="330" height="156" rx="24" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
-  <text class="section" x="812" y="224">ISA가 함께 정하는 것</text>
-  <text class="body" x="812" y="254">1. 가능한 연산 종류</text>
-  <text class="body" x="812" y="280">2. 피연산자 위치와 저장 위치</text>
-  <text class="body" x="812" y="306">3. 주소 지정 방식과 예외 처리 규칙</text>
-  <text class="body" x="812" y="332">4. 컴파일러·OS가 의존하는 실행 전제</text>
+  <rect x="108" y="404" width="984" height="40" rx="14" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+  <text class="small" x="138" y="430">ISA가 함께 정하는 것: 가능한 연산 종류 · 피연산자 위치 · 주소 지정 방식 · 예외/인터럽트 복귀 규칙</text>
 
-  <rect x="72" y="370" width="510" height="172" rx="24" fill="#eef2ff" stroke="#a5b4fc" stroke-width="2"/>
-  <text class="section" x="98" y="406">RISC vs CISC</text>
+  <rect x="72" y="470" width="520" height="232" rx="26" fill="#eef2ff" stroke="#a5b4fc" stroke-width="2"/>
+  <text class="section" x="98" y="508">RISC vs CISC</text>
 
-  <rect x="98" y="426" width="218" height="92" rx="18" fill="#ffffff" stroke="#818cf8" stroke-width="2"/>
-  <text class="label" x="207" y="452" text-anchor="middle">RISC</text>
-  <text class="body" x="116" y="476">• 고정 길이·단순 명령어</text>
-  <text class="body" x="116" y="498">• load/store 구조, 파이프라인 친화</text>
-  <text class="body" x="116" y="520">• 예: ARM, RISC-V</text>
+  <rect x="104" y="534" width="220" height="138" rx="20" fill="#ffffff" stroke="#6366f1" stroke-width="2"/>
+  <text class="label" x="214" y="568" text-anchor="middle">RISC</text>
+  <text class="body" x="128" y="600">• 고정 길이, 단순 명령어</text>
+  <text class="body" x="128" y="626">• load/store 구조로 파이프라인 친화</text>
+  <text class="body" x="128" y="652">• 예: ARM, RISC-V</text>
 
-  <rect x="338" y="426" width="218" height="92" rx="18" fill="#ffffff" stroke="#818cf8" stroke-width="2"/>
-  <text class="label" x="447" y="452" text-anchor="middle">CISC</text>
-  <text class="body" x="356" y="476">• 다양한 길이·복잡한 명령어</text>
-  <text class="body" x="356" y="498">• 코드 밀도·하위 호환성 강점</text>
-  <text class="body" x="356" y="520">• 예: x86 계열</text>
+  <rect x="340" y="534" width="220" height="138" rx="20" fill="#ffffff" stroke="#6366f1" stroke-width="2"/>
+  <text class="label" x="450" y="568" text-anchor="middle">CISC</text>
+  <text class="body" x="364" y="600">• 다양한 길이, 복잡한 명령어</text>
+  <text class="body" x="364" y="626">• 코드 밀도와 하위 호환성 강점</text>
+  <text class="body" x="364" y="652">• 예: x86 계열</text>
 
-  <text class="small" x="98" y="564">시험 포인트: RISC = 전력 효율·파이프라인, CISC = 코드 밀도·호환성</text>
+  <text class="small" x="104" y="692">시험 포인트: RISC는 전력 효율·파이프라인, CISC는 코드 밀도·호환성으로 비교한다.</text>
 
-  <rect x="606" y="370" width="510" height="172" rx="24" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
-  <text class="section" x="632" y="406">어드레싱 모드와 메모리 접근</text>
+  <rect x="608" y="470" width="520" height="232" rx="26" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <text class="section" x="634" y="508">병렬 처리로 이어지는 확장 관점</text>
 
-  <rect x="632" y="426" width="86" height="88" rx="16" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
-  <text class="label" x="675" y="451" text-anchor="middle">즉시</text>
-  <text class="mono" x="675" y="477" text-anchor="middle">#10</text>
-  <text class="small" x="675" y="501" text-anchor="middle">추가 메모리</text>
-  <text class="small" x="675" y="518" text-anchor="middle">접근 없음</text>
+  <rect x="640" y="534" width="208" height="108" rx="18" fill="#ffffff" stroke="#0891b2" stroke-width="2"/>
+  <text class="label" x="744" y="568" text-anchor="middle">SIMD</text>
+  <text class="body" x="664" y="598">하나의 명령으로</text>
+  <text class="body" x="664" y="622">여러 데이터에 같은 연산</text>
 
-  <rect x="732" y="426" width="86" height="88" rx="16" fill="#ffffff" stroke="#22c55e" stroke-width="2"/>
-  <text class="label" x="775" y="451" text-anchor="middle">레지스터</text>
-  <text class="mono" x="775" y="477" text-anchor="middle">r2</text>
-  <text class="small" x="775" y="501" text-anchor="middle">추가 메모리</text>
-  <text class="small" x="775" y="518" text-anchor="middle">접근 없음</text>
+  <rect x="880" y="534" width="208" height="108" rx="18" fill="#ffffff" stroke="#0891b2" stroke-width="2"/>
+  <text class="label" x="984" y="568" text-anchor="middle">MIMD</text>
+  <text class="body" x="904" y="598">여러 코어가 서로 다른</text>
+  <text class="body" x="904" y="622">명령과 데이터를 처리</text>
 
-  <rect x="832" y="426" width="86" height="88" rx="16" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
-  <text class="label" x="875" y="451" text-anchor="middle">직접</text>
-  <text class="mono" x="875" y="477" text-anchor="middle">[1000]</text>
-  <text class="small" x="875" y="501" text-anchor="middle">주소가 곧</text>
-  <text class="small" x="875" y="518" text-anchor="middle">메모리 위치</text>
-
-  <rect x="932" y="426" width="86" height="88" rx="16" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
-  <text class="label" x="975" y="451" text-anchor="middle">간접</text>
-  <text class="mono" x="975" y="477" text-anchor="middle">[r2]</text>
-  <text class="small" x="975" y="501" text-anchor="middle">주소를 한 번</text>
-  <text class="small" x="975" y="518" text-anchor="middle">더 따라감</text>
-
-  <rect x="1032" y="426" width="58" height="88" rx="16" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
-  <text class="label" x="1061" y="451" text-anchor="middle">베이스</text>
-  <text class="mono" x="1061" y="477" text-anchor="middle">+8</text>
-  <text class="small" x="1061" y="501" text-anchor="middle">배열</text>
-  <text class="small" x="1061" y="518" text-anchor="middle">스택</text>
-
-  <text class="mono" x="632" y="535">ADD r1, r2, #10   LD r1, [1000]   LD r1, [r2]   LD r1, [r2 + 8]</text>
-
-  <rect x="72" y="568" width="1044" height="94" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="section" x="98" y="604">병렬 처리까지 연결되는 확장 포인트</text>
-  <text class="body" x="98" y="631">SIMD: 하나의 명령으로 여러 데이터 처리 · MIMD: 여러 코어가 서로 다른 명령/데이터 처리</text>
-  <text class="mono" x="670" y="631">Speedup = 1 / ((1 - P) + P / N)</text>
-  <text class="small" x="98" y="651">Amdahl의 법칙: 병렬화되지 않는 부분(1-P)이 전체 속도 향상의 상한을 만든다.</text>
+  <rect x="640" y="654" width="448" height="30" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text class="mono" x="864" y="675" text-anchor="middle">Speedup = 1 / ((1 - P) + P / N)</text>
+  <text class="small" x="640" y="702">Amdahl의 법칙: 병렬화되지 않는 부분이 남아 있으면 코어 수를 늘려도 속도 향상에는 상한이 생긴다.</text>
 </svg>

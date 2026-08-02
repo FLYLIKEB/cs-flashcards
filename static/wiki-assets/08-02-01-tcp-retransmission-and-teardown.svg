@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">08-02-01. 재전송과 연결 종료 비교</title>
+  <desc id="desc">TCP 3-Way Handshake에서 SYN 재전송 직관과 연결 수립 3단계, 연결 종료 4단계를 비교하는 SVG</desc>
+  <defs>
+    <style>
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .tiny { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
+    </style>
+    <marker id="arrowSlate" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0L12 6L0 12Z" fill="#475569" />
+    </marker>
+    <marker id="arrowRose" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0L12 6L0 12Z" fill="#e11d48" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0L12 6L0 12Z" fill="#15803d" />
+    </marker>
+  </defs>
+
+  <rect width="1280" height="760" fill="#e2e8f0" />
+  <rect x="24" y="24" width="1232" height="712" rx="32" fill="#ffffff" />
+  <text x="88" y="96" class="title">재전송 직관 + 연결 수립/종료 구분</text>
+  <text x="88" y="130" class="subtitle">손실되면 같은 단계가 다시 시도되고, 연결 종료는 수립보다 1단계 더 많다는 점을 함께 기억하면 시험 실수가 줄어든다.</text>
+
+  <rect x="72" y="172" width="544" height="516" rx="26" fill="#f8fafc" stroke="#cbd5e1" />
+  <text x="104" y="218" class="section">1) SYN 또는 SYN-ACK 손실 시 재전송</text>
+  <text x="104" y="252" class="body">타이머가 만료되면 같은 요청을 다시 보낸다.</text>
+
+  <rect x="110" y="290" width="128" height="48" rx="16" fill="#dbeafe" stroke="#60a5fa" />
+  <text x="174" y="321" text-anchor="middle" class="label">클라이언트</text>
+  <rect x="444" y="290" width="128" height="48" rx="16" fill="#e0f2fe" stroke="#38bdf8" />
+  <text x="508" y="321" text-anchor="middle" class="label">서버</text>
+
+  <line x1="174" y1="352" x2="174" y2="604" stroke="#94a3b8" stroke-width="4" stroke-dasharray="10 10" />
+  <line x1="508" y1="352" x2="508" y2="604" stroke="#94a3b8" stroke-width="4" stroke-dasharray="10 10" />
+
+  <line x1="198" y1="390" x2="480" y2="390" stroke="#475569" stroke-width="7" stroke-linecap="round" marker-end="url(#arrowSlate)" />
+  <text x="340" y="374" text-anchor="middle" class="label">SYN 전송</text>
+
+  <line x1="480" y1="450" x2="198" y2="450" stroke="#e11d48" stroke-width="7" stroke-dasharray="12 10" stroke-linecap="round" marker-end="url(#arrowRose)" />
+  <text x="340" y="434" text-anchor="middle" class="label">SYN-ACK 손실</text>
+  <text x="340" y="474" text-anchor="middle" class="body">응답이 안 보이면 클라이언트는 타이머 만료를 기다린다.</text>
+
+  <line x1="198" y1="534" x2="480" y2="534" stroke="#15803d" stroke-width="7" stroke-linecap="round" marker-end="url(#arrowGreen)" />
+  <text x="340" y="518" text-anchor="middle" class="label">SYN 재전송</text>
+  <text x="340" y="572" text-anchor="middle" class="body">같은 SYN을 다시 보내 연결 수립을 이어 간다.</text>
+
+  <rect x="104" y="616" width="480" height="48" rx="16" fill="#fef3c7" stroke="#f59e0b" />
+  <text x="344" y="647" text-anchor="middle" class="label">핵심: 손실이 나도 단계가 바뀌는 것이 아니라, 같은 패킷을 다시 보낸다.</text>
+
+  <rect x="664" y="172" width="544" height="516" rx="26" fill="#f8fafc" stroke="#cbd5e1" />
+  <text x="696" y="218" class="section">2) 연결 수립 3단계 vs 연결 종료 4단계</text>
+  <text x="696" y="252" class="body">수립은 시작 확인, 종료는 양방향 종료 확인이라 단계 수가 다르다.</text>
+
+  <rect x="696" y="292" width="224" height="316" rx="22" fill="#eff6ff" stroke="#93c5fd" />
+  <text x="728" y="332" class="section">수립: 3-Way</text>
+  <text x="728" y="380" class="body">1. SYN</text>
+  <text x="728" y="428" class="body">2. SYN + ACK</text>
+  <text x="728" y="476" class="body">3. ACK</text>
+  <text x="728" y="540" class="label">마지막 ACK 뒤 ESTABLISHED</text>
+
+  <rect x="952" y="292" width="224" height="316" rx="22" fill="#f0fdf4" stroke="#86efac" />
+  <text x="984" y="332" class="section">종료: 4-Way</text>
+  <text x="984" y="380" class="body">1. FIN</text>
+  <text x="984" y="428" class="body">2. ACK</text>
+  <text x="984" y="476" class="body">3. FIN</text>
+  <text x="984" y="524" class="body">4. ACK</text>
+  <text x="984" y="572" class="label">양쪽 종료 의사를 따로 확인</text>
+
+  <rect x="696" y="626" width="480" height="38" rx="14" fill="#e2e8f0" />
+  <text x="936" y="651" text-anchor="middle" class="label">시험 함정: 3-Way Handshake와 4-Way Termination을 서로 바꿔 외우지 말 것</text>
+
+  <text x="88" y="716" class="tiny">08-02-01-tcp-retransmission-and-teardown.svg</text>
+</svg>

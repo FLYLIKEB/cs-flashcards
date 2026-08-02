@@ -1,161 +1,120 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-02-02. DFS·BFS·최단경로 인포그래픽</title>
-  <desc id="desc">깊이 우선 탐색, 너비 우선 탐색, 그리고 최단경로 알고리즘 선택 기준을 한 화면에 정리한 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">09-02-02 DFS와 BFS 비교</title>
+  <desc id="desc">DFS와 BFS의 탐색 순서, 사용하는 자료구조, 적합한 문제 유형을 분리된 카드와 그래프로 비교한 인포그래픽</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="dfsGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#bfdbfe"/>
-    </linearGradient>
-    <linearGradient id="bfsGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ede9fe"/>
-      <stop offset="100%" stop-color="#ddd6fe"/>
-    </linearGradient>
-    <linearGradient id="pathGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#14b8a6"/>
-      <stop offset="100%" stop-color="#0f766e"/>
-    </linearGradient>
     <style>
-      .title { font: 800 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .panelTitle { font: 800 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .sectionLabel { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .node { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .cardTitle { font: 800 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .cardBody { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .complexity { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f766e; }
+      .bg { fill: #f8fafc; }
+      .frame { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .title { font: 800 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 800 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .cardTitle { font: 800 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .chipText { font: 800 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .nodeText { font: 800 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tableHead { font: 800 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .tableBody { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="24" y="24" width="1152" height="672" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect class="bg" width="1200" height="860"/>
+  <rect class="frame" x="24" y="24" width="1152" height="812" rx="30"/>
 
-  <text class="small" x="72" y="72">그래프 탐색과 최단경로 선택 기준</text>
-  <text class="title" x="72" y="116">DFS · BFS · 최단경로</text>
-  <text class="subtitle" x="72" y="148">무가중치 최단거리는 BFS, 가중치 조건이 붙으면 Dijkstra · Bellman-Ford · Floyd-Warshall로 분기한다.</text>
+  <rect x="64" y="56" width="118" height="32" rx="16" fill="#dbeafe"/>
+  <text class="chipText" x="123" y="77" text-anchor="middle">09-02-02</text>
+  <text class="title" x="64" y="126">DFS · BFS 탐색 비교</text>
+  <text class="subtitle" x="64" y="158">깊이 우선은 한 갈래를 끝까지 파고들고, 너비 우선은 가까운 정점부터 레벨 순서로 확장한다.</text>
 
-  <rect x="56" y="182" width="520" height="478" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <rect x="600" y="182" width="544" height="478" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="64" y="198" width="516" height="382" rx="26" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="620" y="198" width="516" height="382" rx="26" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
 
-  <text class="panelTitle" x="84" y="220">탐색 방식 비교</text>
-  <text class="panelTitle" x="628" y="220">최단경로 알고리즘 선택표</text>
+  <text class="cardTitle" x="96" y="238">DFS: 깊이 우선 탐색</text>
+  <text class="body" x="96" y="268">스택 또는 재귀로 현재 경로를 기억하고, 더 갈 수 없을 때 되돌아온다.</text>
+  <rect x="96" y="288" width="148" height="34" rx="17" fill="#ffffff" stroke="#bfdbfe"/>
+  <text class="chipText" x="170" y="310" text-anchor="middle">방문 예: 1→2→4→6</text>
 
-  <rect x="84" y="244" width="224" height="214" rx="22" fill="url(#dfsGrad)" stroke="#60a5fa" stroke-width="2"/>
-  <rect x="324" y="244" width="224" height="214" rx="22" fill="url(#bfsGrad)" stroke="#8b5cf6" stroke-width="2"/>
+  <line x1="166" y1="390" x2="254" y2="330" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+  <line x1="254" y1="330" x2="254" y2="450" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+  <line x1="254" y1="450" x2="342" y2="450" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+  <line x1="166" y1="390" x2="254" y2="510" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7" stroke-linecap="round"/>
+  <line x1="254" y1="330" x2="342" y2="330" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7" stroke-linecap="round"/>
+  <line x1="254" y1="510" x2="342" y2="450" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7" stroke-linecap="round"/>
 
-  <text class="cardTitle" x="108" y="278">DFS</text>
-  <text class="body" x="108" y="302">한 경로를 끝까지 추적</text>
-  <text class="small" x="108" y="322">재귀 또는 스택으로 상태 관리</text>
-  <rect x="100" y="336" width="84" height="28" rx="14" fill="#ffffff" opacity="0.92"/>
-  <text class="chip" x="142" y="355" text-anchor="middle">순서 1→2→4→6</text>
+  <circle cx="166" cy="390" r="28" fill="#ffffff" stroke="#2563eb" stroke-width="4"/>
+  <circle cx="254" cy="330" r="28" fill="#ffffff" stroke="#2563eb" stroke-width="4"/>
+  <circle cx="254" cy="510" r="28" fill="#ffffff" stroke="#94a3b8" stroke-width="3"/>
+  <circle cx="342" cy="330" r="28" fill="#ffffff" stroke="#94a3b8" stroke-width="3"/>
+  <circle cx="254" cy="450" r="28" fill="#ffffff" stroke="#2563eb" stroke-width="4"/>
+  <circle cx="342" cy="450" r="28" fill="#ffffff" stroke="#2563eb" stroke-width="4"/>
 
-  <line x1="146" y1="396" x2="214" y2="356" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
-  <line x1="214" y1="356" x2="214" y2="416" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
-  <line x1="214" y1="416" x2="266" y2="416" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
-  <line x1="146" y1="396" x2="214" y2="446" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6"/>
-  <line x1="214" y1="356" x2="266" y2="356" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6"/>
-  <line x1="214" y1="446" x2="266" y2="416" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="6 6"/>
+  <text class="nodeText" x="166" y="396" text-anchor="middle">1</text>
+  <text class="nodeText" x="254" y="336" text-anchor="middle">2</text>
+  <text class="nodeText" x="254" y="516" text-anchor="middle">3</text>
+  <text class="nodeText" x="342" y="336" text-anchor="middle">5</text>
+  <text class="nodeText" x="254" y="456" text-anchor="middle">4</text>
+  <text class="nodeText" x="342" y="456" text-anchor="middle">6</text>
 
-  <circle cx="146" cy="396" r="22" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
-  <circle cx="214" cy="356" r="22" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
-  <circle cx="214" cy="446" r="22" fill="#ffffff" stroke="#94a3b8" stroke-width="2.5"/>
-  <circle cx="266" cy="356" r="22" fill="#ffffff" stroke="#94a3b8" stroke-width="2.5"/>
-  <circle cx="214" cy="416" r="22" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
-  <circle cx="266" cy="416" r="22" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
+  <rect x="390" y="312" width="156" height="194" rx="18" fill="#ffffff" stroke="#bfdbfe"/>
+  <text class="label" x="414" y="346">언제 자연스러운가</text>
+  <text class="body" x="414" y="378">• 경로 존재 여부 확인</text>
+  <text class="body" x="414" y="408">• 백트래킹 / 완전탐색</text>
+  <text class="body" x="414" y="438">• 사이클 검사, 위상 정렬</text>
+  <text class="body" x="414" y="468">• 재귀 구조 문제 풀이</text>
+  <text class="small" x="414" y="498">핵심 기억: 먼저 깊게 들어간다.</text>
 
-  <text class="node" x="146" y="401" text-anchor="middle">1</text>
-  <text class="node" x="214" y="361" text-anchor="middle">2</text>
-  <text class="node" x="214" y="451" text-anchor="middle">3</text>
-  <text class="node" x="266" y="361" text-anchor="middle">5</text>
-  <text class="node" x="214" y="421" text-anchor="middle">4</text>
-  <text class="node" x="266" y="421" text-anchor="middle">6</text>
+  <text class="cardTitle" x="652" y="238">BFS: 너비 우선 탐색</text>
+  <text class="body" x="652" y="268">큐로 같은 거리의 정점을 묶어서 처리하므로 무가중치 최단거리를 바로 구할 수 있다.</text>
+  <rect x="652" y="288" width="142" height="34" rx="17" fill="#ffffff" stroke="#ddd6fe"/>
+  <text class="chipText" x="723" y="310" text-anchor="middle">거리 레벨: 0→1→2</text>
 
-  <text class="cardTitle" x="348" y="278">BFS</text>
-  <text class="body" x="348" y="302">레벨 단위로 넓게 확장</text>
-  <text class="small" x="348" y="322">큐를 사용해 간선 수 최단거리 보장</text>
-  <rect x="340" y="336" width="90" height="28" rx="14" fill="#ffffff" opacity="0.92"/>
-  <text class="chip" x="385" y="355" text-anchor="middle">거리 0→1→2</text>
+  <line x1="728" y1="390" x2="816" y2="330" stroke="#7c3aed" stroke-width="5" stroke-linecap="round"/>
+  <line x1="728" y1="390" x2="816" y2="510" stroke="#7c3aed" stroke-width="5" stroke-linecap="round"/>
+  <line x1="816" y1="330" x2="904" y2="330" stroke="#7c3aed" stroke-width="5" stroke-linecap="round"/>
+  <line x1="816" y1="330" x2="816" y2="450" stroke="#7c3aed" stroke-width="5" stroke-linecap="round"/>
+  <line x1="816" y1="510" x2="904" y2="450" stroke="#7c3aed" stroke-width="5" stroke-linecap="round"/>
 
-  <line x1="386" y1="396" x2="438" y2="356" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
-  <line x1="386" y1="396" x2="438" y2="446" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
-  <line x1="438" y1="356" x2="490" y2="356" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
-  <line x1="438" y1="356" x2="438" y2="416" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
-  <line x1="438" y1="446" x2="490" y2="416" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="728" cy="390" r="28" fill="#ffffff" stroke="#7c3aed" stroke-width="4"/>
+  <circle cx="816" cy="330" r="28" fill="#ffffff" stroke="#7c3aed" stroke-width="4"/>
+  <circle cx="816" cy="510" r="28" fill="#ffffff" stroke="#7c3aed" stroke-width="4"/>
+  <circle cx="904" cy="330" r="28" fill="#ffffff" stroke="#7c3aed" stroke-width="4"/>
+  <circle cx="816" cy="450" r="28" fill="#ffffff" stroke="#7c3aed" stroke-width="4"/>
+  <circle cx="904" cy="450" r="28" fill="#ffffff" stroke="#7c3aed" stroke-width="4"/>
 
-  <circle cx="386" cy="396" r="22" fill="#ffffff" stroke="#7c3aed" stroke-width="3"/>
-  <circle cx="438" cy="356" r="22" fill="#ffffff" stroke="#7c3aed" stroke-width="3"/>
-  <circle cx="438" cy="446" r="22" fill="#ffffff" stroke="#7c3aed" stroke-width="3"/>
-  <circle cx="490" cy="356" r="22" fill="#ffffff" stroke="#7c3aed" stroke-width="3"/>
-  <circle cx="438" cy="416" r="22" fill="#ffffff" stroke="#7c3aed" stroke-width="3"/>
-  <circle cx="490" cy="416" r="22" fill="#ffffff" stroke="#7c3aed" stroke-width="3"/>
+  <text class="nodeText" x="728" y="396" text-anchor="middle">1</text>
+  <text class="nodeText" x="816" y="336" text-anchor="middle">2</text>
+  <text class="nodeText" x="816" y="516" text-anchor="middle">3</text>
+  <text class="nodeText" x="904" y="336" text-anchor="middle">4</text>
+  <text class="nodeText" x="816" y="456" text-anchor="middle">5</text>
+  <text class="nodeText" x="904" y="456" text-anchor="middle">6</text>
 
-  <text class="node" x="386" y="401" text-anchor="middle">1</text>
-  <text class="node" x="438" y="361" text-anchor="middle">2</text>
-  <text class="node" x="438" y="451" text-anchor="middle">3</text>
-  <text class="node" x="490" y="361" text-anchor="middle">4</text>
-  <text class="node" x="438" y="421" text-anchor="middle">5</text>
-  <text class="node" x="490" y="421" text-anchor="middle">6</text>
+  <rect x="948" y="312" width="156" height="194" rx="18" fill="#ffffff" stroke="#ddd6fe"/>
+  <text class="label" x="972" y="346">언제 정답인가</text>
+  <text class="body" x="972" y="378">• 무가중치 최단거리</text>
+  <text class="body" x="972" y="408">• 최소 이동 횟수 계산</text>
+  <text class="body" x="972" y="438">• 레벨 순서 방문 출력</text>
+  <text class="body" x="972" y="468">• 가까운 후보부터 확장</text>
+  <text class="small" x="972" y="498">핵심 기억: 가까운 곳부터 넓힌다.</text>
 
-  <rect x="84" y="486" width="464" height="142" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="sectionLabel" x="108" y="518">선택 기준 요약</text>
-  <text class="body" x="108" y="546">• 모든 정점 방문 / 백트래킹 필요 → DFS가 자연스럽다.</text>
-  <text class="body" x="108" y="572">• 무가중치 그래프 최단거리 → BFS가 정답이다.</text>
-  <text class="body" x="108" y="598">• DFS는 깊이, BFS는 레벨을 먼저 기억하면 시험 문제 분기가 빨라진다.</text>
+  <rect x="64" y="612" width="1072" height="180" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="96" y="652">한눈에 비교</text>
 
-  <rect x="628" y="246" width="488" height="70" rx="18" fill="#ecfeff" stroke="#14b8a6" stroke-width="2"/>
-  <text class="sectionLabel" x="654" y="274">1단계: 먼저 간선 조건을 확인</text>
-  <text class="body" x="654" y="298">무가중치인지, 비음수 가중치인지, 음수 간선/음수 사이클 여부가 있는지부터 본다.</text>
+  <line x1="96" y1="678" x2="1104" y2="678" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="338" y1="678" x2="338" y2="772" stroke="#e2e8f0" stroke-width="2"/>
+  <line x1="632" y1="678" x2="632" y2="772" stroke="#e2e8f0" stroke-width="2"/>
+  <line x1="850" y1="678" x2="850" y2="772" stroke="#e2e8f0" stroke-width="2"/>
+  <line x1="96" y1="724" x2="1104" y2="724" stroke="#e2e8f0" stroke-width="2"/>
 
-  <line x1="872" y1="316" x2="872" y2="350" stroke="#14b8a6" stroke-width="3"/>
-  <line x1="708" y1="350" x2="1036" y2="350" stroke="#14b8a6" stroke-width="3"/>
-  <line x1="708" y1="350" x2="708" y2="370" stroke="#14b8a6" stroke-width="3"/>
-  <line x1="872" y1="350" x2="872" y2="370" stroke="#14b8a6" stroke-width="3"/>
-  <line x1="1036" y1="350" x2="1036" y2="370" stroke="#14b8a6" stroke-width="3"/>
+  <text class="tableHead" x="116" y="708">구분</text>
+  <text class="tableHead" x="368" y="708">DFS</text>
+  <text class="tableHead" x="662" y="708">BFS</text>
+  <text class="tableHead" x="880" y="708">시험에서 바로 찾는 단서</text>
 
-  <rect x="636" y="370" width="144" height="116" rx="18" fill="#ffffff" stroke="#6366f1" stroke-width="2"/>
-  <rect x="800" y="370" width="144" height="116" rx="18" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
-  <rect x="964" y="370" width="144" height="116" rx="18" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+  <text class="tableBody" x="116" y="756">탐색 순서 / 자료구조</text>
+  <text class="tableBody" x="368" y="756">깊게 전진, 스택·재귀</text>
+  <text class="tableBody" x="662" y="756">레벨 확장, 큐</text>
+  <text class="tableBody" x="880" y="756">무가중 최단거리면 BFS, 경로 탐색·백트래킹이면 DFS</text>
 
-  <text class="cardTitle" x="708" y="400" text-anchor="middle">BFS</text>
-  <text class="cardBody" x="656" y="424">무가중치</text>
-  <text class="cardBody" x="656" y="444">단일 시작점</text>
-  <text class="cardBody" x="656" y="464">간선 수 기준 최단거리</text>
-  <text class="complexity" x="656" y="482">Queue · O(V+E)</text>
-
-  <text class="cardTitle" x="872" y="400" text-anchor="middle">Dijkstra</text>
-  <text class="cardBody" x="820" y="424">가중치 ≥ 0</text>
-  <text class="cardBody" x="820" y="444">단일 시작점</text>
-  <text class="cardBody" x="820" y="464">희소 그래프에 강함</text>
-  <text class="complexity" x="820" y="482">PQ · O((V+E) log V)</text>
-
-  <text class="cardTitle" x="1036" y="400" text-anchor="middle">Bellman-Ford</text>
-  <text class="cardBody" x="984" y="424">음수 간선 허용</text>
-  <text class="cardBody" x="984" y="444">음수 사이클 탐지 가능</text>
-  <text class="cardBody" x="984" y="464">느리지만 조건 대응</text>
-  <text class="complexity" x="984" y="482">O(V×E)</text>
-
-  <rect x="636" y="510" width="472" height="118" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-  <rect x="660" y="534" width="180" height="70" rx="16" fill="#f8fafc" stroke="#22c55e" stroke-width="2"/>
-  <text class="cardTitle" x="750" y="562" text-anchor="middle">Floyd-Warshall</text>
-  <text class="cardBody" x="680" y="584">모든 쌍 최단경로</text>
-  <text class="complexity" x="680" y="602">작은 정점 수 · O(V³)</text>
-
-  <path d="M 860 570 H 932" fill="none" stroke="url(#pathGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="16 10">
-    <animate attributeName="stroke-dashoffset" from="0" to="-52" dur="3s" repeatCount="indefinite"/>
-  </path>
-  <rect x="932" y="534" width="152" height="70" rx="16" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text class="sectionLabel" x="1008" y="562" text-anchor="middle">시험 포인트</text>
-  <text class="cardBody" x="950" y="584">정점 수가 작고</text>
-  <text class="cardBody" x="950" y="600">모든 쌍이면 선택</text>
-
-  <rect x="72" y="72" width="112" height="26" rx="13" fill="#dbeafe"/>
-  <text class="chip" x="128" y="90" text-anchor="middle">09-02-02</text>
-
-  <text class="small" x="72" y="680">같은 그래프라도 DFS는 깊이를, BFS는 레벨을 따라가며 최단경로는 가중치 조건으로 알고리즘이 갈린다.</text>
+  <text class="small" x="64" y="822">같은 그래프라도 DFS는 경로를 깊게 따라가고, BFS는 간선 수가 짧은 정점부터 차례대로 방문한다.</text>
 </svg>

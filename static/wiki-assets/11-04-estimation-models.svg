@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">11-04. 비용산정 모델 비교</title>
+  <desc id="desc">COCOMO, Function Point, Man-Month와 비용산정 시 추가 고려사항을 비교하는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#faf5ff"/>
+      <stop offset="100%" stop-color="#fff7ed"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="704" rx="30" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+
+  <text class="small" x="72" y="82">소프트웨어공학 · 비용산정 핵심 비교</text>
+  <text class="title" x="72" y="124">비용산정은 규모 지표와 프로젝트 환경을 함께 본다</text>
+  <text class="subtitle" x="72" y="158">시험에서는 COCOMO, Function Point, Man-Month의 관점 차이와 요구변경·품질규제 같은 조정 요인을 구분해 설명하면 된다.</text>
+
+  <rect x="64" y="204" width="320" height="300" rx="26" fill="#faf5ff" stroke="#a855f7" stroke-width="2"/>
+  <text class="section" x="92" y="244">COCOMO</text>
+  <rect x="92" y="266" width="264" height="48" rx="14" fill="#ede9fe" stroke="#c4b5fd" stroke-width="1.5"/>
+  <text class="label" x="224" y="296" text-anchor="middle">코드 규모 기반 추정</text>
+  <text class="body" x="92" y="340">• KLOC 같은 규모 지표로</text>
+  <text class="body" x="92" y="364">  기본 노력치를 계산</text>
+  <text class="body" x="92" y="394">• 경험식 계수로 인력·기간을 추정</text>
+  <text class="body" x="92" y="424">• 프로젝트 특성은 EAF 같은</text>
+  <text class="body" x="92" y="448">  조정계수로 반영</text>
+  <text class="small" x="92" y="482">적합: 과거 데이터가 있고</text>
+  <text class="small" x="92" y="500">구현 규모를 가늠할 수 있을 때</text>
+
+  <rect x="440" y="204" width="320" height="300" rx="26" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text class="section" x="468" y="244">Function Point</text>
+  <rect x="468" y="266" width="264" height="48" rx="14" fill="#ffedd5" stroke="#fdba74" stroke-width="1.5"/>
+  <text class="label" x="600" y="296" text-anchor="middle">기능 요구사항 기반 추정</text>
+  <text class="body" x="468" y="340">• EI · EO · EQ · ILF · EIF를 계수화</text>
+  <text class="body" x="468" y="370">• 요구사항 중심으로</text>
+  <text class="body" x="468" y="394">  기능 규모를 점수화</text>
+  <text class="body" x="468" y="424">• 비즈니스 기능 비교와</text>
+  <text class="body" x="468" y="448">  초기 산정에 유리</text>
+  <text class="small" x="468" y="482">적합: 업무기능이 먼저 정리된</text>
+  <text class="small" x="468" y="500">정보시스템 프로젝트</text>
+
+  <rect x="816" y="204" width="320" height="300" rx="26" fill="#f8fafc" stroke="#475569" stroke-width="2"/>
+  <text class="section" x="844" y="244">Man-Month</text>
+  <rect x="844" y="266" width="264" height="48" rx="14" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text class="label" x="976" y="296" text-anchor="middle">작업량 표현 단위</text>
+  <text class="body" x="844" y="340">• 인력 수 × 기간(월)로</text>
+  <text class="body" x="844" y="364">  총 작업량을 표시</text>
+  <text class="body" x="844" y="394">• 일정 계획과 WBS의 기준 단위</text>
+  <text class="body" x="844" y="424">• 생산성이 인원수에</text>
+  <text class="body" x="844" y="448">  선형 비례하지는 않음</text>
+  <text class="small" x="844" y="482">주의: 회의·교육·휴가 시간을 빼면</text>
+  <text class="small" x="844" y="500">과대평가되기 쉽다</text>
+
+  <rect x="64" y="534" width="736" height="152" rx="26" fill="#fffaf5" stroke="#fdba74" stroke-width="2"/>
+  <text class="section" x="92" y="574">산정 시 함께 넣어야 할 조정 요인</text>
+  <text class="body" x="92" y="610">• 요구사항 불확실성  • 재사용 수준  • 외부 인터페이스 복잡도</text>
+  <text class="body" x="92" y="638">• 보안·감사 규제 수준  • 테스트·인수인계 기간  • 품질 요구 수준</text>
+  <text class="small" x="92" y="670">같은 규모라도 규제와 품질 요구가 높을수록 노력치와 일정은 커진다.</text>
+
+  <rect x="832" y="534" width="304" height="152" rx="26" fill="#0f172a"/>
+  <text class="section" x="860" y="574" fill="#f8fafc">시험 함정</text>
+  <text class="body" x="860" y="610" fill="#cbd5e1">Brooks 법칙: 늦어진 프로젝트에</text>
+  <text class="body" x="860" y="636" fill="#cbd5e1">사람만 더 넣으면 교육·소통 비용으로</text>
+  <text class="body" x="860" y="662" fill="#cbd5e1">오히려 더 늦어질 수 있다.</text>
+</svg>

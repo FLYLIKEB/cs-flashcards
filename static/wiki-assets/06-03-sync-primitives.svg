@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">06-03 동기화 도구 비교</title>
+  <desc id="desc">임계구역 보호를 위한 뮤텍스, 세마포어, 모니터의 목적과 주의점을 비교하고 올바른 사용 습관을 정리한 SVG</desc>
+  <defs>
+    <style>
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; fill: #0f172a; }
+      .title { font-size: 34px; font-weight: 800; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 22px; font-weight: 800; }
+      .cardTitle { font-size: 22px; font-weight: 800; }
+      .body { font-size: 18px; font-weight: 500; fill: #334155; }
+      .small { font-size: 16px; font-weight: 500; fill: #475569; }
+      .label { font-size: 15px; font-weight: 700; fill: #1e293b; }
+      .white { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="860" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="804" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="70" y="88" class="title">06-03. 동기화 도구: 누가 언제 임계구역에 들어갈까</text>
+  <text x="70" y="120" class="subtitle">공유 자원 보호 목적은 같지만, 제어 단위와 대기 방식이 다르다. 도구별 역할과 주의점을 분리해서 기억한다.</text>
+
+  <rect x="70" y="160" width="1060" height="116" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="96" y="198" class="section">임계구역 핵심</text>
+  <text x="96" y="230" class="body">여러 스레드가 같은 데이터를 동시에 바꾸면 경쟁 상태가 생긴다. 동기화 도구는 “지금 들어가도 되는가”를 통제해 일관성을 지킨다.</text>
+  <text x="96" y="256" class="small">시험에서는 목적·허용 개수·실수 포인트를 함께 묻는 경우가 많다.</text>
+
+  <rect x="70" y="316" width="320" height="290" rx="24" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="98" y="360" class="cardTitle">Mutex</text>
+  <text x="98" y="392" class="body">한 번에 1개 스레드만 임계구역 진입</text>
+  <rect x="98" y="420" width="112" height="72" rx="14" fill="#2563eb"/>
+  <text x="154" y="463" text-anchor="middle" class="cardTitle white">LOCK</text>
+  <text x="98" y="530" class="label">언제 쓰나</text>
+  <text x="98" y="554" class="small">공유 변수, 리스트, 캐시처럼</text>
+  <text x="98" y="576" class="small">"소유권"이 중요한 단일 자원 보호</text>
+  <text x="98" y="610" class="label">주의</text>
+  <text x="98" y="634" class="small">획득한 스레드가 반드시 해제해야 한다.</text>
+  <text x="98" y="656" class="small">예외 경로 누락 시 교착과 자원 고착이 난다.</text>
+
+  <rect x="440" y="316" width="320" height="290" rx="24" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="468" y="360" class="cardTitle">Semaphore</text>
+  <text x="468" y="392" class="body">카운터만큼 여러 실행 흐름을 통과시킴</text>
+  <rect x="468" y="420" width="120" height="72" rx="14" fill="#16a34a"/>
+  <text x="528" y="448" text-anchor="middle" class="label white">P / wait</text>
+  <text x="528" y="474" text-anchor="middle" class="label white">V / signal</text>
+  <text x="468" y="530" class="label">언제 쓰나</text>
+  <text x="468" y="554" class="small">버퍼 빈 칸 N개, 연결 풀 M개처럼</text>
+  <text x="468" y="576" class="small">허용 가능한 동시 접근 개수를 셀 때</text>
+  <text x="468" y="610" class="label">주의</text>
+  <text x="468" y="634" class="small">P/V 짝이 틀리면 카운터 불일치가 생긴다.</text>
+  <text x="468" y="656" class="small">기아나 교착으로 이어질 수 있다.</text>
+
+  <rect x="810" y="316" width="320" height="290" rx="24" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="838" y="360" class="cardTitle">Monitor</text>
+  <text x="838" y="392" class="body">상호배제 + 조건 대기를 한 추상화로 묶음</text>
+  <rect x="838" y="420" width="164" height="72" rx="14" fill="#d97706"/>
+  <text x="920" y="448" text-anchor="middle" class="label white">condition</text>
+  <text x="920" y="474" text-anchor="middle" class="label white">wait / signal</text>
+  <text x="838" y="530" class="label">언제 쓰나</text>
+  <text x="838" y="554" class="small">생산자-소비자처럼 조건이 중요할 때</text>
+  <text x="838" y="576" class="small">언어/런타임이 고수준 동기화를 제공할 때</text>
+  <text x="838" y="610" class="label">주의</text>
+  <text x="838" y="634" class="small">깨어난 뒤에는 조건을 while로 다시 검사한다.</text>
+  <text x="838" y="656" class="small">if 한 번만 검사하면 논리 오류가 날 수 있다.</text>
+
+  <rect x="70" y="650" width="1060" height="132" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="96" y="690" class="section">실무 기억 장치</text>
+  <text x="96" y="722" class="body">1) 직접 락을 새로 만들기보다 언어가 제공하는 검증된 프리미티브를 우선 사용한다.</text>
+  <text x="96" y="748" class="body">2) 여러 락이 필요하면 획득 순서를 고정해 순환 대기를 예방한다.</text>
+  <text x="96" y="774" class="body">3) I/O나 긴 작업을 락 안에서 수행하지 말고, 조건변수는 항상 while 재검사 패턴을 지킨다.</text>
+
+  <text x="70" y="814" class="small">asset: static/wiki-assets/06-03-sync-primitives.svg</text>
+</svg>

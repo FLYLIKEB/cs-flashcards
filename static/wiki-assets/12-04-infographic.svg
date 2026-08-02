@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">12-04. 실전 오답노트 인포그래픽</title>
-  <desc id="desc">오답 원인 분류, 기록 템플릿, 재풀이 시간 측정, 복습 주기, 전략 수정까지 이어지는 실전 오답노트 운영 흐름을 설명하는 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+  <title id="title">12-04. 실전 오답노트 운영 루프</title>
+  <desc id="desc">오답을 원인 분류, 시간 판별, 개선 조치, 복습 스케줄, 전략 수정으로 연결하는 실전 오답노트 운영 루프를 설명하는 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff"/>
@@ -10,105 +10,105 @@
       <stop offset="0%" stop-color="#1d4ed8"/>
       <stop offset="100%" stop-color="#0f766e"/>
     </linearGradient>
-    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M1 1 L11 6 L1 11 Z" fill="#0f766e"/>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#0f766e"/>
     </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
       .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
-      .paper-line { stroke: #cbd5e1; stroke-width: 1.5; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .soft-blue { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2; }
+      .soft-green { fill: #f0fdf4; stroke: #86efac; stroke-width: 2; }
+      .soft-amber { fill: #fffbeb; stroke: #fcd34d; stroke-width: 2; }
+      .soft-slate { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .pill { fill: #dbeafe; stroke: #60a5fa; stroke-width: 1.5; }
       .loop { fill: none; stroke: #0f766e; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .dash { fill: none; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 7 7; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="32" y="28" width="1136" height="664" rx="28" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
-  <rect x="56" y="48" width="1088" height="98" rx="22" fill="url(#header)"/>
-  <text class="small" x="88" y="82">NCS 학습 문서 · 재발 방지형 오답 관리</text>
-  <text class="title" x="88" y="118">12-04. 실전 오답노트</text>
-  <text class="subtitle" x="88" y="142">오답을 모으는 메모가 아니라 원인·시간·개선 행동을 남겨 다음 시험 루틴을 바꾸는 작업 문서</text>
+  <rect width="1280" height="900" fill="url(#bg)"/>
+  <rect x="28" y="24" width="1224" height="852" rx="30" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+  <rect x="52" y="46" width="1176" height="110" rx="24" fill="url(#header)"/>
+  <text x="86" y="84" class="small" fill="#e2e8f0">NCS 학습 문서 · 재발 방지형 오답 관리</text>
+  <text x="86" y="122" class="title" fill="#ffffff">12-04. 실전 오답노트</text>
+  <text x="86" y="148" class="subtitle" fill="#e2e8f0">오답을 적어 두는 메모가 아니라, 원인과 시간을 남기고 다음 시험 루틴을 바꾸는 작업 문서</text>
 
-  <rect x="70" y="178" width="360" height="472" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text class="section" x="96" y="214">1) 한 문제를 이렇게 기록</text>
-  <rect x="96" y="234" width="308" height="386" rx="18" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-  <rect x="96" y="234" width="308" height="44" rx="18" fill="#dbeafe"/>
-  <text class="label" x="118" y="262">오답노트 템플릿</text>
-  <line class="paper-line" x1="118" y1="302" x2="382" y2="302"/>
-  <line class="paper-line" x1="118" y1="342" x2="382" y2="342"/>
-  <line class="paper-line" x1="118" y1="382" x2="382" y2="382"/>
-  <line class="paper-line" x1="118" y1="422" x2="382" y2="422"/>
-  <line class="paper-line" x1="118" y1="462" x2="382" y2="462"/>
-  <line class="paper-line" x1="118" y1="502" x2="382" y2="502"/>
-  <line class="paper-line" x1="118" y1="542" x2="382" y2="542"/>
-  <text class="body" x="118" y="296">문제번호 · 주제 · 내가 고른 답 / 정답</text>
-  <text class="body" x="118" y="336">틀린 유형: 개념 / 계산·표기 / 시간 부족</text>
-  <text class="body" x="118" y="376">원인(구체적): 왜 그렇게 판단했는가</text>
-  <text class="body" x="118" y="416">재풀이 날짜: YYYY-MM-DD</text>
-  <text class="body" x="118" y="456">소요시간: 다시 푸는 데 몇 분 걸렸는가</text>
-  <text class="body" x="118" y="496">개선 조치: 개념 요약 · 유사문항 · 순서 변경</text>
-  <text class="body" x="118" y="536">복습 주기: D+1 → D+3 → D+7 → D+30</text>
-  <text class="tiny" x="118" y="582">관련 기출 링크까지 남기면 원문 문제로 즉시 복귀 가능</text>
-  <rect x="96" y="592" width="308" height="28" rx="14" fill="#e0f2fe"/>
-  <text class="small" x="250" y="611" text-anchor="middle">핵심: 기록 자체보다 재발 방지 행동이 남아야 함</text>
+  <rect x="72" y="190" width="1136" height="126" rx="24" class="soft-slate"/>
+  <text x="102" y="228" class="section">핵심 원칙</text>
+  <text x="102" y="258" class="body">1. 틀린 이유를 개념·실수·시간 중 무엇이었는지 먼저 분리한다.</text>
+  <text x="102" y="286" class="body">2. 재풀이 날짜와 소요시간을 적어야 “몰라서 틀림”과 “급해서 틀림”이 구분된다.</text>
+  <text x="640" y="258" class="body">3. 개선 조치는 행동 단위로 적는다: 개념 요약, 유사문항 추가, 검산 체크리스트, 풀이 순서 수정.</text>
+  <text x="640" y="286" class="body">4. 같은 실수가 반복되면 더 오래 공부하는 대신 루틴 자체를 바꾼다.</text>
 
-  <rect x="454" y="178" width="314" height="220" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
-  <text class="section" x="480" y="214">2) 먼저 오답 원인을 분류</text>
-  <circle cx="530" cy="286" r="42" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <text class="label" x="530" y="282" text-anchor="middle">개념</text>
-  <text class="tiny" x="530" y="300" text-anchor="middle">정의·이론 부족</text>
-  <circle cx="612" cy="332" r="42" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
-  <text class="label" x="612" y="328" text-anchor="middle">계산·표기</text>
-  <text class="tiny" x="612" y="346" text-anchor="middle">산술·단위·오타</text>
-  <circle cx="694" cy="286" r="42" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-  <text class="label" x="694" y="282" text-anchor="middle">시간</text>
-  <text class="tiny" x="694" y="300" text-anchor="middle">풀다 멈춤·속도 부족</text>
-  <path d="M530 286 Q612 236 694 286" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 6"/>
-  <path d="M530 286 Q566 354 612 332" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 6"/>
-  <path d="M612 332 Q658 354 694 286" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 6"/>
-  <text class="small" x="480" y="382">반복 유형이 보이면 체크리스트나 풀이 순서를 바꾼다.</text>
+  <rect x="72" y="340" width="360" height="234" rx="24" class="soft-blue"/>
+  <text x="100" y="378" class="section">1) 오답 원인 분류</text>
+  <circle cx="162" cy="454" r="42" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
+  <text x="162" y="450" text-anchor="middle" class="label">개념</text>
+  <text x="162" y="471" text-anchor="middle" class="tiny">정의·원리 이해 부족</text>
+  <circle cx="252" cy="506" r="42" fill="#ffffff" stroke="#0284c7" stroke-width="3"/>
+  <text x="252" y="502" text-anchor="middle" class="label">실수</text>
+  <text x="252" y="523" text-anchor="middle" class="tiny">산술·단위·표기 누락</text>
+  <circle cx="342" cy="454" r="42" fill="#ffffff" stroke="#16a34a" stroke-width="3"/>
+  <text x="342" y="450" text-anchor="middle" class="label">시간</text>
+  <text x="342" y="471" text-anchor="middle" class="tiny">속도 부족·중도 포기</text>
+  <path d="M162 454 Q252 396 342 454" class="dash"/>
+  <path d="M162 454 Q202 540 252 506" class="dash"/>
+  <path d="M252 506 Q302 540 342 454" class="dash"/>
+  <text x="100" y="556" class="small">반복 유형이 보이면 원인 기록 칸에 같은 표현을 남겨 패턴을 보이게 한다.</text>
 
-  <rect x="792" y="178" width="338" height="220" rx="24" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
-  <text class="section" x="818" y="214">3) 시간 데이터로 진짜 원인 판별</text>
-  <rect x="824" y="244" width="274" height="54" rx="16" fill="#ffffff" stroke="#bbf7d0" stroke-width="2"/>
-  <text class="label" x="844" y="268">재풀이 12분</text>
-  <text class="body" x="844" y="288">개념 설명을 다시 쓰며 해결됨 → 개념 보강형</text>
-  <rect x="824" y="314" width="274" height="54" rx="16" fill="#ffffff" stroke="#bbf7d0" stroke-width="2"/>
-  <text class="label" x="844" y="338">재풀이 4분</text>
-  <text class="body" x="844" y="358">정답은 아는데 단위·검산 누락 → 실수 관리형</text>
-  <text class="small" x="818" y="388">같은 주제라도 시간을 재면 ‘몰라서 틀림’과 ‘급해서 틀림’이 분리된다.</text>
+  <rect x="460" y="340" width="360" height="234" rx="24" class="soft-green"/>
+  <text x="488" y="378" class="section">2) 시간 데이터로 진짜 원인 판별</text>
+  <rect x="488" y="404" width="304" height="64" rx="18" class="panel"/>
+  <text x="510" y="430" class="label">재풀이 12분</text>
+  <text x="510" y="451" class="body">개념 설명을 다시 써야 풀림</text>
+  <text x="510" y="470" class="tiny">→ 개념 보강형: 정의·예시 다시 정리</text>
+  <rect x="488" y="484" width="304" height="64" rx="18" class="panel"/>
+  <text x="510" y="510" class="label">재풀이 4분</text>
+  <text x="510" y="531" class="body">정답은 알았지만 단위·검산 누락</text>
+  <text x="510" y="550" class="tiny">→ 실수 관리형: 체크리스트 추가</text>
+  <text x="488" y="566" class="small">시간을 재면 같은 오답도 “몰라서 틀림”과 “급해서 틀림”이 갈라진다.</text>
 
-  <rect x="454" y="422" width="676" height="228" rx="24" fill="#fffbeb" stroke="#fcd34d" stroke-width="2"/>
-  <text class="section" x="480" y="458">4) 운영 루프: 재풀이 → 개선 조치 → 복습 스케줄 → 전략 수정</text>
+  <rect x="848" y="340" width="360" height="234" rx="24" class="soft-amber"/>
+  <text x="876" y="378" class="section">3) 개선 조치를 행동으로 번역</text>
+  <rect x="876" y="404" width="304" height="34" rx="17" class="pill"/>
+  <text x="1028" y="427" text-anchor="middle" class="small">개념 부족 → 정의 요약 + 예시 2개 작성</text>
+  <rect x="876" y="452" width="304" height="34" rx="17" class="pill"/>
+  <text x="1028" y="475" text-anchor="middle" class="small">실수 반복 → 단위 확인 + 검산 체크</text>
+  <rect x="876" y="500" width="304" height="34" rx="17" class="pill"/>
+  <text x="1028" y="523" text-anchor="middle" class="small">시간 부족 → 쉬운 문제 먼저 + 제한시간 재풀이</text>
+  <text x="876" y="560" class="small">개선 조치는 “더 열심히”가 아니라 다음 시험에서 그대로 실행할 루틴이어야 한다.</text>
 
-  <circle cx="570" cy="540" r="54" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/>
-  <text class="label" x="570" y="532" text-anchor="middle">재풀이</text>
-  <text class="body" x="570" y="552" text-anchor="middle">날짜·분 단위 기록</text>
+  <rect x="72" y="606" width="1136" height="224" rx="24" class="panel"/>
+  <text x="102" y="646" class="section">4) 운영 루프: 재풀이 → 개선 조치 → 복습 스케줄 → 전략 수정</text>
 
-  <circle cx="730" cy="540" r="54" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/>
-  <text class="label" x="730" y="532" text-anchor="middle">개선 조치</text>
-  <text class="body" x="730" y="552" text-anchor="middle">요약·유사문항·검산표</text>
+  <circle cx="214" cy="726" r="58" fill="#ffffff" stroke="#f59e0b" stroke-width="4"/>
+  <text x="214" y="718" text-anchor="middle" class="label">재풀이</text>
+  <text x="214" y="741" text-anchor="middle" class="body">날짜·분 단위 기록</text>
 
-  <circle cx="890" cy="540" r="54" fill="#ffffff" stroke="#f59e0b" stroke-width="3"/>
-  <text class="label" x="890" y="532" text-anchor="middle">복습 주기</text>
-  <text class="body" x="890" y="552" text-anchor="middle">D+1 · D+3 · D+7 · D+30</text>
+  <circle cx="442" cy="726" r="58" fill="#ffffff" stroke="#f59e0b" stroke-width="4"/>
+  <text x="442" y="718" text-anchor="middle" class="label">개선 조치</text>
+  <text x="442" y="741" text-anchor="middle" class="body">요약·유사문항·검산표</text>
 
-  <path class="loop" d="M624 540 H676"/>
-  <path class="loop" d="M784 540 H836"/>
-  <path class="loop" d="M890 486 C890 450 818 430 742 430 C654 430 570 456 570 486"/>
+  <circle cx="670" cy="726" r="58" fill="#ffffff" stroke="#f59e0b" stroke-width="4"/>
+  <text x="670" y="718" text-anchor="middle" class="label">복습 스케줄</text>
+  <text x="670" y="741" text-anchor="middle" class="body">D+1 · D+3 · D+7 · D+30</text>
 
-  <rect x="974" y="488" width="132" height="104" rx="18" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
-  <text class="label" x="1040" y="514" text-anchor="middle">전략 수정</text>
-  <text class="body" x="992" y="538">• 쉬운 문제부터</text>
-  <text class="body" x="992" y="560">• 단위 확인 체크</text>
-  <text class="body" x="992" y="582">• 반복 오답 통계</text>
+  <rect x="858" y="674" width="290" height="104" rx="22" fill="#fff7ed" stroke="#fb923c" stroke-width="3"/>
+  <text x="1003" y="708" text-anchor="middle" class="label">전략 수정</text>
+  <text x="884" y="734" class="body">• 쉬운 문제부터 훑기</text>
+  <text x="884" y="756" class="body">• 단위 확인 체크 추가</text>
+  <text x="884" y="778" class="body">• 반복 오답 통계로 우선순위 재조정</text>
 
-  <path class="loop" d="M944 540 C970 540 978 540 992 540"/>
-  <path class="loop" d="M1040 488 C1038 448 990 430 936 430"/>
+  <path d="M272 726 H376" class="loop"/>
+  <path d="M500 726 H604" class="loop"/>
+  <path d="M728 726 H840" class="loop"/>
+  <path d="M1004 674 C996 638 934 620 856 620 C714 620 562 620 214 668" class="loop"/>
 
-  <text class="small" x="480" y="626">동일 유형이 3회 이상 반복되면 ‘더 열심히’가 아니라 루틴 자체를 수정해야 한다.</text>
+  <text x="102" y="806" class="small">동일 유형이 3회 이상 반복되면 지식 부족이 아니라 루틴 결함으로 보고 풀이 순서와 체크리스트를 수정한다.</text>
 </svg>

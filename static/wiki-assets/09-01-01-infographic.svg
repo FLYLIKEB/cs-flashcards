@@ -1,113 +1,141 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-01-01. 스택과 큐 인포그래픽</title>
-  <desc id="desc">스택의 LIFO와 큐의 FIFO를 연산 방향, 활용 예시, 구현 포인트로 비교한 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="980" viewBox="0 0 1200 980" role="img" aria-labelledby="title desc">
+  <title id="title">09-01-01. 스택과 큐 핵심 비교</title>
+  <desc id="desc">스택의 LIFO와 큐의 FIFO를 연산 방향, 자료 흐름, 구현 포인트로 비교한 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f8fbff"/>
-      <stop offset="100%" stop-color="#eef2ff"/>
+      <stop offset="100%" stop-color="#eef4ff"/>
     </linearGradient>
     <linearGradient id="stackGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#8b5cf6"/>
-      <stop offset="100%" stop-color="#6366f1"/>
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
     </linearGradient>
     <linearGradient id="queueGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#06b6d4"/>
-      <stop offset="100%" stop-color="#0ea5e9"/>
+      <stop offset="0%" stop-color="#0891b2"/>
+      <stop offset="100%" stop-color="#0369a1"/>
     </linearGradient>
-    <marker id="arrowViolet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#7c3aed"/>
+    <marker id="arrowViolet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#6d28d9"/>
     </marker>
-    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#0284c7"/>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#0369a1"/>
     </marker>
     <style>
-      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .title { font: 700 38px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .eyebrow { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; letter-spacing: 0.04em; }
+      .section { font: 700 26px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
       .mono { font: 700 15px 'SFMono-Regular',Consolas,monospace; fill: #0f172a; }
-      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .valueDark { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="32" fill="#ffffff" stroke="#dbe4ff" stroke-width="2"/>
+  <rect width="1200" height="980" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="924" rx="32" fill="#ffffff" stroke="#dbe4ff" stroke-width="2"/>
 
-  <text x="74" y="88" class="small">자료구조 핵심 비교 · 연산 대부분 O(1)</text>
-  <text x="74" y="132" class="title">스택과 큐</text>
-  <text x="74" y="166" class="subtitle">스택은 가장 나중에 들어온 값이 먼저 나가고, 큐는 먼저 들어온 값이 먼저 나간다.</text>
+  <text x="74" y="90" class="eyebrow">자료구조 핵심 비교 · 적절한 구현이면 기본 연산 대부분 O(1)</text>
+  <text x="74" y="140" class="title">스택과 큐</text>
+  <text x="74" y="178" class="subtitle">스택은 top 한 곳에서 넣고 꺼내는 LIFO 구조, 큐는 rear로 넣고 front에서 꺼내는 FIFO 구조다.</text>
 
-  <g transform="translate(62 208)">
-    <rect x="0" y="0" width="498" height="340" rx="28" fill="#faf5ff" stroke="#d8b4fe" stroke-width="2"/>
-    <rect x="24" y="24" width="92" height="28" rx="14" fill="url(#stackGrad)"/>
-    <text x="70" y="43" text-anchor="middle" class="chip">LIFO</text>
-    <text x="24" y="84" class="section">Stack</text>
-    <text x="24" y="112" class="body">접시를 쌓듯이 top에서만 넣고 꺼낸다.</text>
+  <g transform="translate(62 228)">
+    <rect x="0" y="0" width="498" height="474" rx="30" fill="#faf5ff" stroke="#d8b4fe" stroke-width="2"/>
+    <rect x="24" y="24" width="108" height="34" rx="17" fill="url(#stackGrad)"/>
+    <text x="78" y="46" text-anchor="middle" class="chip">LIFO</text>
+    <text x="24" y="98" class="section">Stack</text>
+    <text x="24" y="128" class="body">접시를 쌓듯이 마지막에 올린 값을 가장 먼저 꺼낸다.</text>
 
-    <rect x="154" y="78" width="188" height="212" rx="20" fill="#ede9fe" stroke="#8b5cf6" stroke-width="3"/>
-    <rect x="184" y="230" width="128" height="38" rx="12" fill="#c4b5fd"/>
-    <rect x="184" y="184" width="128" height="38" rx="12" fill="#a78bfa"/>
-    <rect x="184" y="138" width="128" height="38" rx="12" fill="#8b5cf6"/>
-    <text x="248" y="255" text-anchor="middle" class="label">A</text>
-    <text x="248" y="209" text-anchor="middle" class="label">B</text>
-    <text x="248" y="163" text-anchor="middle" class="chip">C = top</text>
+    <rect x="158" y="122" width="182" height="244" rx="22" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/>
+    <rect x="184" y="300" width="130" height="42" rx="12" fill="#c4b5fd"/>
+    <rect x="184" y="248" width="130" height="42" rx="12" fill="#a78bfa"/>
+    <rect x="184" y="196" width="130" height="42" rx="12" fill="#6d28d9"/>
+    <text x="249" y="326" text-anchor="middle" class="label">A</text>
+    <text x="249" y="274" text-anchor="middle" class="label">B</text>
+    <text x="249" y="222" text-anchor="middle" class="valueDark">C = top</text>
 
-    <line x1="248" y1="50" x2="248" y2="126" stroke="#7c3aed" stroke-width="5" marker-end="url(#arrowViolet)"/>
-    <text x="272" y="68" class="label">push(x)</text>
-    <text x="272" y="92" class="body">새 원소는 맨 위로</text>
+    <line x1="249" y1="88" x2="249" y2="184" stroke="#6d28d9" stroke-width="5" marker-end="url(#arrowViolet)"/>
+    <text x="278" y="106" class="label">push(x)</text>
+    <text x="278" y="132" class="body">새 원소는 맨 위에 추가</text>
 
-    <line x1="374" y1="138" x2="430" y2="138" stroke="#7c3aed" stroke-width="5" marker-end="url(#arrowViolet)"/>
-    <text x="350" y="128" text-anchor="end" class="label">pop()</text>
-    <text x="350" y="152" text-anchor="end" class="body">top 제거·반환</text>
+    <line x1="354" y1="216" x2="430" y2="216" stroke="#6d28d9" stroke-width="5" marker-end="url(#arrowViolet)"/>
+    <text x="338" y="206" text-anchor="end" class="label">pop()</text>
+    <text x="338" y="232" text-anchor="end" class="body">top 제거 후 반환</text>
 
-    <rect x="24" y="244" width="96" height="34" rx="12" fill="#ffffff" stroke="#c4b5fd"/>
-    <text x="72" y="266" text-anchor="middle" class="mono">peek()</text>
-    <text x="24" y="314" class="body">활용: 재귀, DFS, 괄호 검사, 후위식 계산</text>
+    <rect x="24" y="170" width="110" height="42" rx="12" fill="#ffffff" stroke="#c4b5fd" stroke-width="2"/>
+    <text x="79" y="197" text-anchor="middle" class="mono">peek()</text>
+
+    <line x1="79" y1="212" x2="79" y2="242" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6 6"/>
+    <line x1="79" y1="242" x2="178" y2="242" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6 6" marker-end="url(#arrowViolet)"/>
+    <text x="24" y="268" class="small">top 값을 확인만 하고 제거하지 않는다.</text>
+
+    <rect x="24" y="390" width="450" height="62" rx="18" fill="#ffffff" stroke="#d8b4fe"/>
+    <text x="42" y="417" class="label">핵심 기억</text>
+    <text x="42" y="442" class="body">삽입과 삭제가 모두 top에서 일어나므로 방향이 한쪽으로 고정된다.</text>
   </g>
 
-  <g transform="translate(640 208)">
-    <rect x="0" y="0" width="498" height="340" rx="28" fill="#f0fdfa" stroke="#99f6e4" stroke-width="2"/>
-    <rect x="24" y="24" width="92" height="28" rx="14" fill="url(#queueGrad)"/>
-    <text x="70" y="43" text-anchor="middle" class="chip">FIFO</text>
-    <text x="24" y="84" class="section">Queue</text>
-    <text x="24" y="112" class="body">줄서기처럼 rear로 넣고 front에서 꺼낸다.</text>
+  <g transform="translate(640 228)">
+    <rect x="0" y="0" width="498" height="474" rx="30" fill="#f0fdfa" stroke="#99f6e4" stroke-width="2"/>
+    <rect x="24" y="24" width="108" height="34" rx="17" fill="url(#queueGrad)"/>
+    <text x="78" y="46" text-anchor="middle" class="chip">FIFO</text>
+    <text x="24" y="98" class="section">Queue</text>
+    <text x="24" y="128" class="body">줄서기처럼 먼저 들어온 값이 먼저 빠져나간다.</text>
 
-    <rect x="66" y="168" width="348" height="84" rx="22" fill="#cffafe" stroke="#0ea5e9" stroke-width="3"/>
-    <rect x="86" y="188" width="72" height="44" rx="12" fill="#67e8f9"/>
-    <rect x="168" y="188" width="72" height="44" rx="12" fill="#5eead4"/>
-    <rect x="250" y="188" width="72" height="44" rx="12" fill="#22d3ee"/>
-    <rect x="332" y="188" width="62" height="44" rx="12" fill="#a5f3fc" stroke="#0891b2" stroke-dasharray="7 6"/>
-    <text x="122" y="214" text-anchor="middle" class="label">A</text>
-    <text x="204" y="214" text-anchor="middle" class="label">B</text>
-    <text x="286" y="214" text-anchor="middle" class="label">C</text>
-    <text x="363" y="214" text-anchor="middle" class="small">rear</text>
+    <rect x="66" y="206" width="350" height="92" rx="24" fill="#cffafe" stroke="#0891b2" stroke-width="3"/>
+    <rect x="86" y="230" width="76" height="44" rx="12" fill="#67e8f9"/>
+    <rect x="170" y="230" width="76" height="44" rx="12" fill="#5eead4"/>
+    <rect x="254" y="230" width="76" height="44" rx="12" fill="#22d3ee"/>
+    <rect x="338" y="230" width="58" height="44" rx="12" fill="#ecfeff" stroke="#0891b2" stroke-width="2" stroke-dasharray="7 6"/>
+    <text x="124" y="257" text-anchor="middle" class="label">A</text>
+    <text x="208" y="257" text-anchor="middle" class="label">B</text>
+    <text x="292" y="257" text-anchor="middle" class="label">C</text>
+    <text x="367" y="258" text-anchor="middle" class="small">rear</text>
 
-    <line x1="16" y1="210" x2="72" y2="210" stroke="#0284c7" stroke-width="5" marker-end="url(#arrowBlue)"/>
-    <text x="18" y="184" class="label">dequeue()</text>
-    <text x="18" y="236" class="small">front</text>
+    <line x1="16" y1="252" x2="72" y2="252" stroke="#0369a1" stroke-width="5" marker-end="url(#arrowBlue)"/>
+    <text x="18" y="226" class="label">dequeue()</text>
+    <text x="18" y="278" class="small">front에서 제거</text>
 
-    <line x1="420" y1="210" x2="480" y2="210" stroke="#0284c7" stroke-width="5" marker-end="url(#arrowBlue)"/>
-    <text x="362" y="152" class="label">enqueue(x)</text>
-    <text x="362" y="176" class="body">새 원소는 뒤에 연결</text>
+    <line x1="420" y1="252" x2="482" y2="252" stroke="#0369a1" stroke-width="5" marker-end="url(#arrowBlue)"/>
+    <text x="342" y="176" class="label">enqueue(x)</text>
+    <text x="342" y="202" class="body">새 원소는 rear 뒤에 연결</text>
 
-    <rect x="24" y="264" width="150" height="48" rx="14" fill="#ffffff" stroke="#7dd3fc"/>
-    <text x="99" y="285" text-anchor="middle" class="mono">front / peek()</text>
-    <text x="200" y="298" class="body">활용: BFS, 레벨 순회, 비가중치 최단거리</text>
+    <rect x="24" y="154" width="134" height="42" rx="12" fill="#ffffff" stroke="#7dd3fc" stroke-width="2"/>
+    <text x="91" y="181" text-anchor="middle" class="mono">front / peek()</text>
+
+    <line x1="91" y1="196" x2="91" y2="218" stroke="#0891b2" stroke-width="3" stroke-dasharray="6 6"/>
+    <line x1="91" y1="218" x2="124" y2="218" stroke="#0891b2" stroke-width="3" stroke-dasharray="6 6" marker-end="url(#arrowBlue)"/>
+    <text x="24" y="334" class="small">입구(rear)와 출구(front)가 분리되어 순서가 보존된다.</text>
+
+    <rect x="24" y="390" width="450" height="62" rx="18" fill="#ffffff" stroke="#99f6e4"/>
+    <text x="42" y="417" class="label">핵심 기억</text>
+    <text x="42" y="442" class="body">삽입은 뒤에서, 삭제는 앞에서 일어나므로 먼저 들어온 값이 먼저 처리된다.</text>
   </g>
 
-  <g transform="translate(62 574)">
-    <rect x="0" y="0" width="1076" height="90" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-    <text x="28" y="34" class="label">구현 포인트</text>
-    <text x="28" y="61" class="body">스택: 배열 끝을 top으로 쓰면 push/pop O(1)</text>
-    <text x="410" y="61" class="body">큐: 단순 배열 앞 제거는 O(n) → 원형 버퍼·deque로 O(1)</text>
-    <text x="846" y="61" class="body">공통: 빈 구조 pop/dequeue는 언더플로우 주의</text>
+  <g transform="translate(62 730)">
+    <rect x="0" y="0" width="1076" height="176" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="28" y="40" class="section">구현 포인트</text>
+
+    <rect x="28" y="60" width="320" height="88" rx="18" fill="#ffffff" stroke="#ddd6fe"/>
+    <text x="48" y="88" class="label">스택</text>
+    <text x="48" y="114" class="body">배열 끝을 top으로 쓰면</text>
+    <text x="48" y="138" class="body">push/pop이 모두 O(1)이다.</text>
+
+    <rect x="378" y="60" width="360" height="88" rx="18" fill="#ffffff" stroke="#bae6fd"/>
+    <text x="398" y="88" class="label">큐</text>
+    <text x="398" y="114" class="body">배열 앞 제거는 O(n)이라서 비효율적이다.</text>
+    <text x="398" y="138" class="body">원형 버퍼나 deque를 쓰면 O(1)로 유지된다.</text>
+
+    <rect x="768" y="60" width="280" height="88" rx="18" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="788" y="88" class="label">공통 주의</text>
+    <text x="788" y="114" class="body">비어 있을 때 pop/dequeue하면</text>
+    <text x="788" y="138" class="body">언더플로우가 발생한다.</text>
   </g>
 
   <g>
-    <line x1="530" y1="184" x2="530" y2="200" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round"/>
-    <line x1="670" y1="184" x2="670" y2="200" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"/>
-    <text x="600" y="196" text-anchor="middle" class="small">문제 연결: DFS ↔ 스택 / BFS ↔ 큐</text>
+    <line x1="528" y1="194" x2="528" y2="214" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+    <line x1="672" y1="194" x2="672" y2="214" stroke="#0891b2" stroke-width="4" stroke-linecap="round"/>
+    <text x="600" y="210" text-anchor="middle" class="small">문제 연결: DFS·재귀는 스택, BFS는 큐로 연결해 기억</text>
   </g>
 </svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">08-01. 캡슐화와 대표 프로토콜 흐름</title>
+  <desc id="desc">응용에서 링크 계층까지 데이터가 메시지, 세그먼트, 패킷, 프레임으로 감싸지는 과정과 각 계층의 대표 예시를 보여주는 고대비 SVG</desc>
+  <style>
+    .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+    .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+    .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+    .layer { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+    .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+    .strong { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+    .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+    .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+  </style>
+
+  <rect width="1280" height="760" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1224" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="subtitle" x="72" y="86">하향식 발신 흐름 기준</text>
+  <text class="title" x="72" y="128">캡슐화: 메시지 → 세그먼트 → 패킷 → 프레임</text>
+  <text class="subtitle" x="72" y="160">위 계층의 데이터가 아래 계층 헤더를 덧붙이며 전달 단위를 바꾼다. 수신 측에서는 역순으로 벗긴다.</text>
+
+  <g transform="translate(72 208)">
+    <rect x="0" y="0" width="256" height="288" rx="24" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text class="section" x="24" y="40">1. 응용</text>
+    <rect x="24" y="64" width="208" height="44" rx="16" fill="#ffffff" stroke="#38bdf8"/>
+    <text class="layer" x="128" y="93" text-anchor="middle">메시지</text>
+    <text class="body" x="24" y="144">예: HTTP 요청, DNS 질의</text>
+    <text class="body" x="24" y="172">사용자에게 보이는 데이터</text>
+    <rect x="24" y="204" width="90" height="28" rx="14" fill="#ffffff" stroke="#0284c7"/>
+    <text class="chip" x="69" y="223" text-anchor="middle">HTTP</text>
+    <rect x="126" y="204" width="90" height="28" rx="14" fill="#ffffff" stroke="#0284c7"/>
+    <text class="chip" x="171" y="223" text-anchor="middle">DNS</text>
+  </g>
+
+  <g transform="translate(368 208)">
+    <rect x="0" y="0" width="256" height="288" rx="24" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text class="section" x="24" y="40">2. 전송</text>
+    <rect x="24" y="64" width="208" height="44" rx="16" fill="#ffffff" stroke="#22c55e"/>
+    <text class="layer" x="128" y="93" text-anchor="middle">세그먼트</text>
+    <text class="small" x="128" y="117" text-anchor="middle">+ Source/Destination Port</text>
+    <text class="body" x="24" y="156">프로세스를 포트 번호로 식별</text>
+    <text class="body" x="24" y="184">TCP는 순서·재전송·ACK 관리</text>
+    <rect x="24" y="214" width="90" height="28" rx="14" fill="#ffffff" stroke="#16a34a"/>
+    <text class="chip" x="69" y="233" text-anchor="middle">TCP</text>
+    <rect x="126" y="214" width="90" height="28" rx="14" fill="#ffffff" stroke="#16a34a"/>
+    <text class="chip" x="171" y="233" text-anchor="middle">UDP</text>
+  </g>
+
+  <g transform="translate(664 208)">
+    <rect x="0" y="0" width="256" height="288" rx="24" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text class="section" x="24" y="40">3. 인터넷</text>
+    <rect x="24" y="64" width="208" height="44" rx="16" fill="#ffffff" stroke="#f59e0b"/>
+    <text class="layer" x="128" y="93" text-anchor="middle">패킷</text>
+    <text class="small" x="128" y="117" text-anchor="middle">+ Source/Destination IP, TTL</text>
+    <text class="body" x="24" y="156">라우터가 목적지 IP를 보고 전달</text>
+    <text class="body" x="24" y="184">TTL은 홉마다 1씩 감소</text>
+    <rect x="24" y="214" width="90" height="28" rx="14" fill="#ffffff" stroke="#d97706"/>
+    <text class="chip" x="69" y="233" text-anchor="middle">IP</text>
+    <rect x="126" y="214" width="90" height="28" rx="14" fill="#ffffff" stroke="#d97706"/>
+    <text class="chip" x="171" y="233" text-anchor="middle">ICMP</text>
+  </g>
+
+  <g transform="translate(960 208)">
+    <rect x="0" y="0" width="248" height="288" rx="24" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+    <text class="section" x="24" y="40">4. 링크</text>
+    <rect x="24" y="64" width="200" height="44" rx="16" fill="#ffffff" stroke="#ef4444"/>
+    <text class="layer" x="124" y="93" text-anchor="middle">프레임</text>
+    <text class="small" x="124" y="117" text-anchor="middle">+ Source/Destination MAC, CRC</text>
+    <text class="body" x="24" y="156">같은 링크에서 실제 전달 수행</text>
+    <text class="body" x="24" y="184">목적지 MAC이 없으면 ARP 선행</text>
+    <rect x="24" y="214" width="90" height="28" rx="14" fill="#ffffff" stroke="#dc2626"/>
+    <text class="chip" x="69" y="233" text-anchor="middle">Ethernet</text>
+    <rect x="126" y="214" width="90" height="28" rx="14" fill="#ffffff" stroke="#dc2626"/>
+    <text class="chip" x="171" y="233" text-anchor="middle">ARP</text>
+  </g>
+
+  <g>
+    <line x1="330" y1="350" x2="360" y2="350" stroke="#0f766e" stroke-width="4"/>
+    <polygon points="360,350 344,342 344,358" fill="#0f766e"/>
+    <line x1="626" y1="350" x2="656" y2="350" stroke="#0f766e" stroke-width="4"/>
+    <polygon points="656,350 640,342 640,358" fill="#0f766e"/>
+    <line x1="922" y1="350" x2="952" y2="350" stroke="#0f766e" stroke-width="4"/>
+    <polygon points="952,350 936,342 936,358" fill="#0f766e"/>
+  </g>
+
+  <g transform="translate(72 540)">
+    <rect x="0" y="0" width="1136" height="152" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text class="section" x="24" y="38">빠른 암기 포인트</text>
+    <text class="strong" x="24" y="72">포트는 전송 계층, IP는 인터넷 계층, MAC은 링크 계층에서 사용한다.</text>
+    <text class="body" x="24" y="102">• TCP 3-way handshake는 전송 계층 개념이다.</text>
+    <text class="body" x="24" y="128">• TTL이 0이 되면 패킷은 폐기되고 ICMP Time Exceeded가 돌아온다.</text>
+    <text class="body" x="24" y="154">• 같은 서브넷에서 프레임을 보내기 전에는 ARP로 목적지 MAC을 알아내야 한다.</text>
+  </g>
+</svg>

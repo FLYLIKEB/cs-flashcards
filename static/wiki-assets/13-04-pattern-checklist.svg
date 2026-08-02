@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">13-04 빈출 패턴 체크리스트</title>
+  <desc id="desc">코드 출력 문제에서 자주 출제되는 스코프, 인자 전달, 증감 연산, 반복 경계, 출력 시점, 부작용 패턴을 한눈에 정리한 SVG</desc>
+  <defs>
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#14532d" />
+    </linearGradient>
+    <style>
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
+      .title { font-size: 32px; font-weight: 800; fill: #f8fafc; }
+      .subtitle { font-size: 16px; font-weight: 500; fill: #dcfce7; }
+      .section { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 18px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .badge { font-size: 14px; font-weight: 800; fill: #166534; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f8fafc" />
+  <rect x="30" y="28" width="1140" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="30" y="28" width="1140" height="110" rx="28" fill="url(#header)" />
+  <rect x="30" y="98" width="1140" height="40" fill="url(#header)" />
+
+  <text class="title" x="68" y="80">빈출 패턴 체크리스트</text>
+  <text class="subtitle" x="68" y="112">문제를 보기 시작할 때 아래 여섯 칸을 위에서 아래로 훑으면 실수가 크게 줄어든다.</text>
+
+  <rect x="68" y="172" width="324" height="154" rx="18" fill="#ecfeff" stroke="#67e8f9" />
+  <rect x="92" y="192" width="94" height="28" rx="14" fill="#ccfbf1" />
+  <text class="badge" x="139" y="211" text-anchor="middle">패턴 1</text>
+  <text class="label" x="92" y="252">스코프 구분</text>
+  <text class="body" x="92" y="282">전역과 지역이 같은 이름이면</text>
+  <text class="body" x="92" y="304">같은 변수로 보지 말고 칸을 나눈다.</text>
+
+  <rect x="438" y="172" width="324" height="154" rx="18" fill="#eff6ff" stroke="#93c5fd" />
+  <rect x="462" y="192" width="94" height="28" rx="14" fill="#dbeafe" />
+  <text class="badge" x="509" y="211" text-anchor="middle">패턴 2</text>
+  <text class="label" x="462" y="252">인자 전달 방식</text>
+  <text class="body" x="462" y="282">값 복사인지, 참조·포인터인지</text>
+  <text class="body" x="462" y="304">호출 순간에 바로 적어 둔다.</text>
+
+  <rect x="808" y="172" width="324" height="154" rx="18" fill="#fefce8" stroke="#facc15" />
+  <rect x="832" y="192" width="94" height="28" rx="14" fill="#fde68a" />
+  <text class="badge" x="879" y="211" text-anchor="middle">패턴 3</text>
+  <text class="label" x="832" y="252">증감 연산 위치</text>
+  <text class="body" x="832" y="282">i++, ++i는 값을 읽는 시점이 달라</text>
+  <text class="body" x="832" y="304">한 줄 안에서도 결과가 바뀐다.</text>
+
+  <rect x="68" y="362" width="324" height="154" rx="18" fill="#fef2f2" stroke="#fca5a5" />
+  <rect x="92" y="382" width="94" height="28" rx="14" fill="#fecaca" />
+  <text class="badge" x="139" y="401" text-anchor="middle">패턴 4</text>
+  <text class="label" x="92" y="442">반복문 경계</text>
+  <text class="body" x="92" y="472">초기값, 조건식, 증감식이</text>
+  <text class="body" x="92" y="494">몇 번 도는지를 먼저 계산한다.</text>
+
+  <rect x="438" y="362" width="324" height="154" rx="18" fill="#f5f3ff" stroke="#c4b5fd" />
+  <rect x="462" y="382" width="94" height="28" rx="14" fill="#ddd6fe" />
+  <text class="badge" x="509" y="401" text-anchor="middle">패턴 5</text>
+  <text class="label" x="462" y="442">출력 시점</text>
+  <text class="body" x="462" y="472">print가 호출 전인지, 재귀 뒤인지</text>
+  <text class="body" x="462" y="494">원 안으로 표시하면 순서가 보인다.</text>
+
+  <rect x="808" y="362" width="324" height="154" rx="18" fill="#f0fdf4" stroke="#86efac" />
+  <rect x="832" y="382" width="94" height="28" rx="14" fill="#bbf7d0" />
+  <text class="badge" x="879" y="401" text-anchor="middle">패턴 6</text>
+  <text class="label" x="832" y="442">함수 부작용</text>
+  <text class="body" x="832" y="472">함수 안에서 전역 상태를 바꾸면</text>
+  <text class="body" x="832" y="494">출력값이 뒤에서 달라질 수 있다.</text>
+
+  <rect x="68" y="552" width="1064" height="132" rx="20" fill="#0f172a" />
+  <text x="94" y="592" font-size="24" font-weight="800" fill="#f8fafc">시험장 사용법</text>
+  <text class="body" x="94" y="626" fill="#cbd5e1">1) 문제를 읽으며 여섯 패턴 중 걸리는 항목에 체크한다.</text>
+  <text class="body" x="94" y="650" fill="#cbd5e1">2) 스코프·인자 전달·출력 시점을 먼저 적고, 그다음 변수표나 호출 스택을 채운다.</text>
+</svg>

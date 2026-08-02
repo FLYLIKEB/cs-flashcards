@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">15-1. 마이데이터 동의와 통제 구조</title>
+  <desc id="desc">마이데이터에서 동의 관리, 데이터 표준화, 최소 권한, 감사 로그, 철회 및 보안 통제를 설명하는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#f0fdfa" />
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#164e63" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#0f766e" />
+    </marker>
+    <style>
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .eyebrow { font-size: 16px; font-weight: 700; fill: #ccfbf1; }
+      .title { font-size: 33px; font-weight: 800; fill: #f8fafc; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #e6fffb; }
+      .section { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .cardTitle { font-size: 21px; font-weight: 800; fill: #0f172a; }
+      .cardBody { font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-size: 15px; font-weight: 600; fill: #475569; }
+      .flowLabel { font-size: 15px; font-weight: 800; fill: #0f172a; }
+      .calloutTitle { font-size: 18px; font-weight: 800; fill: #0f172a; }
+      .calloutBody { font-size: 15px; font-weight: 500; fill: #334155; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#bg)" />
+  <rect x="34" y="30" width="1132" height="700" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <rect x="60" y="54" width="1080" height="122" rx="24" fill="url(#hero)" />
+  <text class="eyebrow" x="86" y="89">금융공기업 IT · 15-1 페이지 전용 개념도</text>
+  <text class="title" x="86" y="127">마이데이터가 요구하는 동의와 거버넌스</text>
+  <text class="subtitle" x="86" y="157">데이터를 많이 모으는 것이 목적이 아니라 적법하게 받고, 설명 가능하게 쓰고, 철회 가능하게 운영하는 것이 핵심이다.</text>
+
+  <text class="section" x="88" y="224">1. 사용자 동의가 기록되는 흐름</text>
+  <rect x="74" y="246" width="1052" height="212" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+
+  <rect x="102" y="286" width="214" height="132" rx="20" fill="#ecfeff" stroke="#0891b2" stroke-width="2.5" />
+  <text class="cardTitle" x="209" y="327" text-anchor="middle">1) 동의 수집</text>
+  <text class="cardBody" x="209" y="354" text-anchor="middle">어떤 데이터를 어떤 목적과</text>
+  <text class="cardBody" x="209" y="377" text-anchor="middle">보유기간으로 쓸지 명시</text>
+
+  <rect x="358" y="286" width="214" height="132" rx="20" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5" />
+  <text class="cardTitle" x="465" y="327" text-anchor="middle">2) 표준 스키마 변환</text>
+  <text class="cardBody" x="465" y="354" text-anchor="middle">계좌·카드·대출 데이터를</text>
+  <text class="cardBody" x="465" y="377" text-anchor="middle">공통 필드 구조로 정리</text>
+
+  <rect x="614" y="286" width="214" height="132" rx="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5" />
+  <text class="cardTitle" x="721" y="327" text-anchor="middle">3) 최소 권한 적용</text>
+  <text class="cardBody" x="721" y="354" text-anchor="middle">필요한 scope만 요청하고</text>
+  <text class="cardBody" x="721" y="377" text-anchor="middle">목적 변경 시 재동의 수행</text>
+
+  <rect x="870" y="286" width="214" height="132" rx="20" fill="#fefce8" stroke="#d97706" stroke-width="2.5" />
+  <text class="cardTitle" x="977" y="327" text-anchor="middle">4) 이력 보존</text>
+  <text class="cardBody" x="977" y="354" text-anchor="middle">조회·전송·정정 이력을 남겨</text>
+  <text class="cardBody" x="977" y="377" text-anchor="middle">민원과 감사에 대비</text>
+
+  <line x1="316" y1="352" x2="358" y2="352" stroke="#0f766e" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="572" y1="352" x2="614" y2="352" stroke="#0f766e" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="828" y1="352" x2="870" y2="352" stroke="#0f766e" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)" />
+  <text class="flowLabel" x="337" y="336" text-anchor="middle">명시</text>
+  <text class="flowLabel" x="593" y="336" text-anchor="middle">정규화</text>
+  <text class="flowLabel" x="849" y="336" text-anchor="middle">통제</text>
+
+  <text class="section" x="88" y="512">2. 운영 단계에서 반드시 붙는 통제 장치</text>
+  <rect x="74" y="534" width="1052" height="166" rx="24" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.5" />
+
+  <rect x="100" y="560" width="226" height="112" rx="18" fill="#ffffff" stroke="#5eead4" />
+  <text class="calloutTitle" x="124" y="593">동의 철회</text>
+  <text class="calloutBody" x="124" y="620">철회 즉시 추가 수집과 제3자 제공을 중단하고</text>
+  <text class="calloutBody" x="124" y="642">보유기간, 파기, 재동의 기준을 함께 갱신한다.</text>
+
+  <rect x="348" y="560" width="226" height="112" rx="18" fill="#ffffff" stroke="#5eead4" />
+  <text class="calloutTitle" x="372" y="593">감사 로그</text>
+  <text class="calloutBody" x="372" y="620">누가 어떤 scope와 목적 코드로 접근했는지</text>
+  <text class="calloutBody" x="372" y="642">시간순으로 남겨 추적 가능성을 확보한다.</text>
+
+  <rect x="596" y="560" width="226" height="112" rx="18" fill="#ffffff" stroke="#5eead4" />
+  <text class="calloutTitle" x="620" y="593">보안 통제</text>
+  <text class="calloutBody" x="620" y="620">전송 구간 암호화, 저장 구간 암호화, 접근통제를</text>
+  <text class="calloutBody" x="620" y="642">기본값으로 두고 이상 접근을 탐지한다.</text>
+
+  <rect x="844" y="560" width="256" height="112" rx="18" fill="#ffffff" stroke="#5eead4" />
+  <text class="calloutTitle" x="868" y="593">면접 한 줄 정리</text>
+  <text class="calloutBody" x="868" y="620">마이데이터는 동의 기반 데이터 통제 체계이고,</text>
+  <text class="calloutBody" x="868" y="642">운영 책임은 철회·로그·보안까지 포함한다.</text>
+</svg>

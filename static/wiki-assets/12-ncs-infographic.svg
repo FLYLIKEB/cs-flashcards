@@ -1,132 +1,87 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">12. NCS 인포그래픽</title>
-  <desc id="desc">NCS 학습 구조를 4대 역량, 시험 전략, 오답관리 루틴으로 정리한 페이지 전용 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="940" viewBox="0 0 1280 940" role="img" aria-labelledby="title desc">
+  <title id="title">12. NCS overview infographic</title>
+  <desc id="desc">NCS의 학습 목표, 4대 핵심 역량, 실무 연결 포인트를 큰 카드형 레이아웃으로 정리한 인포그래픽</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
-    </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#06b6d4"/>
-    </linearGradient>
     <style>
-      .kicker { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #2563eb; letter-spacing: 0.08em; }
-      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .heroTitle { font: 700 30px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
-      .heroBody { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
-      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .white { fill: #ffffff; }
-      .muted { fill: #cbd5e1; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .eyebrow { font-size: 20px; font-weight: 700; letter-spacing: 0.08em; fill: #1d4ed8; }
+      .title { font-size: 44px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 21px; font-weight: 500; fill: #334155; }
+      .heroTitle { font-size: 28px; font-weight: 800; fill: #eff6ff; }
+      .heroBody { font-size: 18px; font-weight: 500; fill: #dbeafe; }
+      .sectionTitle { font-size: 28px; font-weight: 800; fill: #0f172a; }
+      .cardTitle { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .cardTag { font-size: 16px; font-weight: 700; fill: #1e3a8a; }
+      .body { font-size: 17px; font-weight: 500; fill: #334155; }
+      .bullet { font-size: 16px; font-weight: 500; fill: #1f2937; }
+      .small { font-size: 15px; font-weight: 600; fill: #475569; }
+      .heroChip { font-size: 16px; font-weight: 700; fill: #ffffff; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="24" y="24" width="1152" height="672" rx="30" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+  <rect width="1280" height="940" fill="#f8fbff"/>
+  <rect x="30" y="30" width="1220" height="880" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="kicker" x="72" y="74">NCS LEARNING MAP</text>
-  <text class="title" x="72" y="116">12. NCS</text>
-  <text class="subtitle" x="72" y="146">의사소통·수리·문제해결을 시험 전략과 오답관리 루틴으로 묶는 국가직무능력표준 학습 구조</text>
+  <text class="eyebrow" x="88" y="88">NCS LEARNING OVERVIEW</text>
+  <text class="title" x="88" y="140">12. NCS</text>
+  <text class="subtitle" x="88" y="178">의사소통·수리·문제해결·오답 관리를 한 흐름으로 묶어 시험 성과와 실무 역량을 함께 올리는 학습 지도</text>
 
-  <rect x="72" y="180" width="1056" height="142" rx="28" fill="url(#hero)"/>
-  <text class="heroTitle" x="104" y="228">핵심: 정답 찾기보다 정보 해석 + 논리적 사고 + 실수 관리</text>
-  <text class="heroBody" x="104" y="264">단기: 유형 분류와 풀이 순서 고정</text>
-  <text class="heroBody" x="104" y="290">중기: 오답 원인 분류와 재학습 루틴 완성</text>
-  <text class="heroBody" x="104" y="316">장기: 문서화·자료해석·문제해결 역량을 실제 직무 성과로 연결</text>
+  <rect x="88" y="218" width="1104" height="168" rx="28" fill="#0f172a"/>
+  <text class="heroTitle" x="128" y="272">핵심 메시지</text>
+  <text class="heroBody" x="128" y="316">정답만 찾지 말고 정보 해석, 논리적 분해, 실수 관리 루틴을 같이 훈련한다.</text>
+  <text class="heroBody" x="128" y="348">단기: 문제유형을 빠르게 분류하고 풀이 순서를 고정한다.</text>
+  <text class="heroBody" x="128" y="380">중기·장기: 오답 원인을 누적 기록해 재학습과 실제 직무 성과로 연결한다.</text>
 
-  <g transform="translate(820 196)">
-    <circle cx="118" cy="56" r="40" fill="#1e3a8a" opacity="0.9"/>
-    <circle cx="58" cy="98" r="30" fill="#2563eb" opacity="0.85"/>
-    <circle cx="176" cy="102" r="30" fill="#06b6d4" opacity="0.85"/>
-    <circle cx="118" cy="126" r="30" fill="#0ea5e9" opacity="0.85"/>
-    <text class="small white" x="118" y="60" text-anchor="middle">NCS</text>
-    <text class="small white" x="58" y="102" text-anchor="middle">의사</text>
-    <text class="small white" x="176" y="106" text-anchor="middle">수리</text>
-    <text class="small white" x="118" y="130" text-anchor="middle">해결</text>
+  <rect x="910" y="248" width="112" height="40" rx="20" fill="#2563eb"/>
+  <text class="heroChip" x="966" y="274" text-anchor="middle">의사소통</text>
+  <rect x="1040" y="248" width="92" height="40" rx="20" fill="#16a34a"/>
+  <text class="heroChip" x="1086" y="274" text-anchor="middle">수리</text>
+  <rect x="910" y="302" width="112" height="40" rx="20" fill="#ea580c"/>
+  <text class="heroChip" x="966" y="328" text-anchor="middle">문제해결</text>
+  <rect x="1040" y="302" width="118" height="40" rx="20" fill="#db2777"/>
+  <text class="heroChip" x="1099" y="328" text-anchor="middle">오답관리</text>
+
+  <text class="sectionTitle" x="88" y="452">4대 핵심 역량</text>
+
+  <g transform="translate(88 486)">
+    <rect width="520" height="168" rx="24" fill="#eef5ff" stroke="#93c5fd" stroke-width="2"/>
+    <rect x="24" y="24" width="90" height="90" rx="22" fill="#2563eb"/>
+    <path d="M46 56h46M46 76h46M46 96h30" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+    <text class="cardTitle" x="142" y="56">의사소통</text>
+    <text class="cardTag" x="142" y="84">지문 핵심을 짧고 정확하게 압축</text>
+    <text class="bullet" x="32" y="136">• 시험: 주제 한 문장 찾기, 강조·부정 어휘 구분</text>
+    <text class="bullet" x="32" y="160">• 실무: 보고서 요약, 이메일 핵심 전달, 회의 요지 정리</text>
   </g>
 
-  <text class="section" x="72" y="366">4대 학습 축</text>
-
-  <g transform="translate(72 388)">
-    <rect width="246" height="158" rx="22" fill="#eff6ff" stroke="#93c5fd"/>
-    <rect x="18" y="18" width="54" height="54" rx="16" fill="#2563eb"/>
-    <path d="M35 58h21M35 46h32M35 34h32" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-    <text class="label" x="88" y="40">의사소통</text>
-    <text class="body" x="88" y="62">주제 한 문장 요약</text>
-    <text class="body" x="24" y="104">• 선택지의 강조·부정 표현 판별</text>
-    <text class="body" x="24" y="128">• 보고서·이메일 핵심 전달과 직결</text>
-    <text class="body" x="24" y="152">• 빠른 읽기보다 정확한 의미 압축</text>
+  <g transform="translate(672 486)">
+    <rect width="520" height="168" rx="24" fill="#f1fbf3" stroke="#86efac" stroke-width="2"/>
+    <rect x="24" y="24" width="90" height="90" rx="22" fill="#16a34a"/>
+    <path d="M46 96l18-28 18 14 22-34" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="cardTitle" x="142" y="56">수리</text>
+    <text class="cardTag" x="142" y="84">단위·비율·근사값을 빠르게 검증</text>
+    <text class="bullet" x="32" y="136">• 시험: 계산 전에 조건과 단위를 먼저 확인</text>
+    <text class="bullet" x="32" y="160">• 실무: 예산·비용 검토, 수치 보고서 검증 습관</text>
   </g>
 
-  <g transform="translate(336 388)">
-    <rect width="246" height="158" rx="22" fill="#f0fdf4" stroke="#86efac"/>
-    <rect x="18" y="18" width="54" height="54" rx="16" fill="#16a34a"/>
-    <path d="M34 58l11-20 9 14 11-24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <text class="label" x="88" y="40">수리</text>
-    <text class="body" x="88" y="62">단위·비율·근사값</text>
-    <text class="body" x="24" y="104">• 계산 전 조건과 단위를 먼저 확인</text>
-    <text class="body" x="24" y="128">• 예산·비용 검토 같은 수치 검증 훈련</text>
-    <text class="body" x="24" y="152">• 오래 걸리면 근사값으로 후보 축소</text>
+  <g transform="translate(88 684)">
+    <rect width="520" height="168" rx="24" fill="#fff5ec" stroke="#fdba74" stroke-width="2"/>
+    <rect x="24" y="24" width="90" height="90" rx="22" fill="#ea580c"/>
+    <path d="M44 94l20-20 18 16 28-34" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="cardTitle" x="142" y="56">문제해결</text>
+    <text class="cardTag" x="142" y="84">분해 → 우선순위 → 가설 검증 순서 유지</text>
+    <text class="bullet" x="32" y="136">• 시험: 주어지지 않은 정보는 유효 가정으로 처리</text>
+    <text class="bullet" x="32" y="160">• 실무: RCA, 프로세스 개선안 작성과 직접 연결</text>
   </g>
 
-  <g transform="translate(600 388)">
-    <rect width="246" height="158" rx="22" fill="#fff7ed" stroke="#fdba74"/>
-    <rect x="18" y="18" width="54" height="54" rx="16" fill="#ea580c"/>
-    <path d="M34 56l11-11 9 9 18-21" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <text class="label" x="88" y="40">문제해결</text>
-    <text class="body" x="88" y="62">분해 → 우선순위 → 가설 검증</text>
-    <text class="body" x="24" y="104">• 주어지지 않은 정보는 유효 가정 처리</text>
-    <text class="body" x="24" y="128">• 복합 문제를 작은 단위로 쪼개 접근</text>
-    <text class="body" x="24" y="152">• 실무의 RCA·프로세스 개선과 연결</text>
+  <g transform="translate(672 684)">
+    <rect width="520" height="168" rx="24" fill="#fff1f7" stroke="#f9a8d4" stroke-width="2"/>
+    <rect x="24" y="24" width="90" height="90" rx="22" fill="#db2777"/>
+    <path d="M50 48h38v48H50zM98 58h22M98 78h22" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="cardTitle" x="142" y="56">실전 오답 관리</text>
+    <text class="cardTag" x="142" y="84">실수 원인을 유형화해 재발 방지 루틴으로 전환</text>
+    <text class="bullet" x="32" y="136">• 시험: 표현 착오·계산 실수·개념 오류를 분리 기록</text>
+    <text class="bullet" x="32" y="160">• 실무: 체크리스트와 재발방지 문서화 습관으로 이어짐</text>
   </g>
 
-  <g transform="translate(864 388)">
-    <rect width="264" height="158" rx="22" fill="#fdf2f8" stroke="#f9a8d4"/>
-    <rect x="18" y="18" width="54" height="54" rx="16" fill="#db2777"/>
-    <path d="M36 34h18v24H36zM63 42h10M63 52h10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <text class="label" x="88" y="40">실전 오답 관리</text>
-    <text class="body" x="88" y="62">유형화 + 재학습 일정화</text>
-    <text class="body" x="24" y="104">• 표현 착오·계산 실수·개념 오류 분리</text>
-    <text class="body" x="24" y="128">• 재풀이 일자와 유사문제 링크 기록</text>
-    <text class="body" x="24" y="152">• 실수 보고서처럼 재발 방지 체크리스트화</text>
-  </g>
-
-  <text class="section" x="72" y="590">시험 당일 루틴</text>
-
-  <g transform="translate(74 610)">
-    <rect x="0" y="0" width="168" height="58" rx="20" fill="#dbeafe"/>
-    <text class="label" x="84" y="25" text-anchor="middle">1. 전체 훑기</text>
-    <text class="small" x="84" y="43" text-anchor="middle">난이도·유형 파악</text>
-    <text class="small" x="84" y="57" text-anchor="middle">쉬운 문제 우선</text>
-
-    <rect x="214" y="0" width="168" height="58" rx="20" fill="#dcfce7"/>
-    <text class="label" x="298" y="25" text-anchor="middle">2. 시간 배분</text>
-    <text class="small" x="298" y="43" text-anchor="middle">1문제당 목표 시간</text>
-    <text class="small" x="298" y="57" text-anchor="middle">1/3 지점 진도 체크</text>
-
-    <rect x="428" y="0" width="168" height="58" rx="20" fill="#ffedd5"/>
-    <text class="label" x="512" y="25" text-anchor="middle">3. 오답 배제</text>
-    <text class="small" x="512" y="43" text-anchor="middle">선택지 비교로 제거</text>
-    <text class="small" x="512" y="57" text-anchor="middle">계산은 근사값 활용</text>
-
-    <rect x="642" y="0" width="168" height="58" rx="20" fill="#fce7f3"/>
-    <text class="label" x="726" y="25" text-anchor="middle">4. 재검토</text>
-    <text class="small" x="726" y="43" text-anchor="middle">표시 문제 우선 복기</text>
-    <text class="small" x="726" y="57" text-anchor="middle">자리수·오타 최종 확인</text>
-
-    <path d="M170 29H202M384 29H416M598 29H630" fill="none" stroke="url(#flow)" stroke-width="8" stroke-linecap="round"/>
-    <path d="M170 29H202M384 29H416M598 29H630" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 8">
-      <animate attributeName="stroke-dashoffset" from="0" to="-36" dur="3s" repeatCount="indefinite"/>
-    </path>
-  </g>
-
-  <text class="small" x="72" y="690">오답노트 권장 항목: 문제번호 · 유형 · 오답원인 · 정답 풀이 요약 · 재풀이 일자 · 비고</text>
+  <text class="small" x="88" y="888">학습 흐름: 핵심 역량 이해 → 시험 전략 고정 → 오답노트 누적 → 실무형 역량으로 연결</text>
 </svg>

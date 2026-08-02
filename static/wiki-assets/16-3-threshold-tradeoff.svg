@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">16-3. 임계값과 지표 트레이드오프</title>
+  <desc id="desc">임계값을 낮추거나 높일 때 recall, precision, FP, FN이 어떻게 달라지는지 설명하는 고대비 SVG</desc>
+  <defs>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .title { font-size: 32px; font-weight: 800; fill: #f8fafc; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #dbeafe; }
+      .section { font-size: 22px; font-weight: 800; }
+      .body { font-size: 18px; font-weight: 500; fill: #334155; }
+      .small { font-size: 16px; font-weight: 600; fill: #475569; }
+      .chip { font-size: 17px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="520" fill="#e2e8f0"/>
+  <rect x="28" y="28" width="1144" height="464" rx="28" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="28" y="28" width="1144" height="108" rx="28" fill="#0f172a"/>
+  <rect x="28" y="88" width="1144" height="48" fill="#0f172a"/>
+
+  <text class="title" x="72" y="82">임계값과 운영 기준</text>
+  <text class="subtitle" x="72" y="114">점수 모델은 숫자만 내고, 실제 운영은 어느 선에서 차단·심사할지 정하는 정책 문제까지 포함한다.</text>
+
+  <g transform="translate(72 176)">
+    <text class="section" x="0" y="0">임계값 슬라이더</text>
+    <line x1="40" y1="96" x2="980" y2="96" stroke="#94a3b8" stroke-width="14" stroke-linecap="round"/>
+    <circle cx="360" cy="96" r="24" fill="#2563eb" stroke="#ffffff" stroke-width="6"/>
+
+    <rect x="0" y="136" width="452" height="182" rx="24" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+    <text class="section" x="28" y="172">임계값을 낮추면</text>
+    <text class="body" x="28" y="208">• 더 많은 건을 양성으로 분류</text>
+    <text class="body" x="28" y="242">• Recall은 올라가기 쉽다</text>
+    <text class="body" x="28" y="276">• 대신 FP가 늘어 조사 비용이 커질 수 있다</text>
+    <rect x="28" y="292" width="146" height="34" rx="17" fill="#dbeafe"/>
+    <text class="chip" x="101" y="314" text-anchor="middle" fill="#1d4ed8">Recall ↑</text>
+    <rect x="188" y="292" width="146" height="34" rx="17" fill="#fee2e2"/>
+    <text class="chip" x="261" y="314" text-anchor="middle" fill="#b91c1c">FP ↑</text>
+
+    <rect x="520" y="136" width="452" height="182" rx="24" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+    <text class="section" x="548" y="172">임계값을 높이면</text>
+    <text class="body" x="548" y="208">• 더 엄격하게 양성을 판정</text>
+    <text class="body" x="548" y="242">• Precision은 좋아질 수 있다</text>
+    <text class="body" x="548" y="276">• 대신 FN이 늘어 놓치는 사건이 커질 수 있다</text>
+    <rect x="548" y="292" width="146" height="34" rx="17" fill="#dcfce7"/>
+    <text class="chip" x="621" y="314" text-anchor="middle" fill="#15803d">Precision ↑</text>
+    <rect x="708" y="292" width="146" height="34" rx="17" fill="#fef3c7"/>
+    <text class="chip" x="781" y="314" text-anchor="middle" fill="#b45309">FN ↑</text>
+
+    <text class="small" x="40" y="84">느슨한 운영</text>
+    <text class="small" x="900" y="84">엄격한 운영</text>
+  </g>
+</svg>

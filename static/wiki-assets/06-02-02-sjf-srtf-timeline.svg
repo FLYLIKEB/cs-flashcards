@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">06-02-02. 비선점 SJF와 선점형 SRTF 타임라인 비교</title>
+  <desc id="desc">P1 도착 0 실행 8, P2 도착 2 실행 2 예제로 비선점 SJF와 선점형 SRTF의 실행 순서, 응답시간, 평균 반환시간 차이를 보여주는 SVG</desc>
+  <defs>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .bg { fill: #f8fafc; }
+      .frame { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .section { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 17px; font-weight: 700; fill: #1e293b; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 600; fill: #475569; }
+      .tick { font-size: 14px; font-weight: 700; fill: #475569; }
+      .white { fill: #ffffff; }
+      .cardBlue { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2; }
+      .cardViolet { fill: #f5f3ff; stroke: #c4b5fd; stroke-width: 2; }
+      .p1 { fill: #2563eb; }
+      .p2 { fill: #7c3aed; }
+      .swap { fill: #ea580c; }
+      .axis { stroke: #64748b; stroke-width: 4; stroke-linecap: round; }
+      .marker { stroke: #94a3b8; stroke-width: 2; }
+      .pillBlue { fill: #dbeafe; stroke: #60a5fa; stroke-width: 1.5; }
+      .pillViolet { fill: #ede9fe; stroke: #a78bfa; stroke-width: 1.5; }
+      .pillAmber { fill: #fff7ed; stroke: #fb923c; stroke-width: 1.5; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="760" />
+  <rect class="frame" x="24" y="24" width="1152" height="712" rx="28" />
+
+  <text class="small" x="64" y="72">운영체제 · worked example</text>
+  <text class="title" x="64" y="116">비선점 SJF vs 선점형 SRTF: 같은 입력, 다른 응답</text>
+  <text class="subtitle" x="64" y="150">예제 입력: P1(도착 0, 실행 8), P2(도착 2, 실행 2). P2가 도착했을 때 CPU를 빼앗을 수 있는지에 따라 타임라인과 평균 반환시간이 달라진다.</text>
+
+  <rect class="pillBlue" x="64" y="184" width="232" height="42" rx="21" />
+  <text class="label" x="88" y="211">P1: arrival 0 · burst 8</text>
+  <rect class="pillViolet" x="320" y="184" width="232" height="42" rx="21" />
+  <text class="label" x="344" y="211">P2: arrival 2 · burst 2</text>
+  <rect class="pillAmber" x="576" y="184" width="392" height="42" rx="21" />
+  <text class="label" x="600" y="211">핵심 질문: 시각 2에 도착한 P2가 즉시 CPU를 받는가?</text>
+
+  <rect class="cardBlue" x="64" y="258" width="1072" height="194" rx="26" />
+  <text class="section" x="96" y="302">비선점 SJF</text>
+  <text class="body" x="96" y="332">P1이 먼저 CPU를 잡으면 종료 전까지 계속 실행된다. P2는 짧아도 Ready 큐에서 기다린다.</text>
+  <line class="axis" x1="176" y1="392" x2="1016" y2="392" />
+  <rect class="p1" x="176" y="362" width="672" height="60" rx="18" />
+  <rect class="p2" x="848" y="362" width="168" height="60" rx="18" />
+  <text class="label white" x="512" y="400" text-anchor="middle">P1 실행 0~8</text>
+  <text class="label white" x="932" y="400" text-anchor="middle">P2 실행 8~10</text>
+  <line class="marker" x1="176" y1="434" x2="176" y2="454" />
+  <line class="marker" x1="344" y1="434" x2="344" y2="454" />
+  <line class="marker" x1="848" y1="434" x2="848" y2="454" />
+  <line class="marker" x1="1016" y1="434" x2="1016" y2="454" />
+  <text class="tick" x="171" y="474">0</text>
+  <text class="tick" x="339" y="474">2</text>
+  <text class="tick" x="842" y="474">8</text>
+  <text class="tick" x="1004" y="474">10</text>
+  <text class="body" x="96" y="506">응답시간: P1=0, P2=8 · 반환시간: P1=8, P2=8 · 평균 반환시간: 8</text>
+
+  <rect class="cardViolet" x="64" y="484" width="1072" height="206" rx="26" />
+  <text class="section" x="96" y="528">선점형 SRTF</text>
+  <text class="body" x="96" y="558">시각 2에 더 짧은 P2가 도착하면 P1을 중단하고 P2를 먼저 실행한다. P2 종료 후 P1이 재개된다.</text>
+  <line class="axis" x1="176" y1="618" x2="1016" y2="618" />
+  <rect class="p1" x="176" y="588" width="168" height="60" rx="18" />
+  <rect class="p2" x="344" y="588" width="168" height="60" rx="18" />
+  <rect class="p1" x="512" y="588" width="504" height="60" rx="18" />
+  <rect class="swap" x="338" y="578" width="12" height="80" rx="6" />
+  <rect class="swap" x="506" y="578" width="12" height="80" rx="6" />
+  <text class="label white" x="260" y="626" text-anchor="middle">P1 0~2</text>
+  <text class="label white" x="428" y="626" text-anchor="middle">P2 2~4</text>
+  <text class="label white" x="764" y="626" text-anchor="middle">P1 4~10</text>
+  <line class="marker" x1="176" y1="660" x2="176" y2="680" />
+  <line class="marker" x1="344" y1="660" x2="344" y2="680" />
+  <line class="marker" x1="512" y1="660" x2="512" y2="680" />
+  <line class="marker" x1="1016" y1="660" x2="1016" y2="680" />
+  <text class="tick" x="171" y="700">0</text>
+  <text class="tick" x="339" y="700">2</text>
+  <text class="tick" x="507" y="700">4</text>
+  <text class="tick" x="1004" y="700">10</text>
+  <text class="body" x="96" y="718">응답시간: P1=0, P2=0 · 반환시간: P1=10, P2=2 · 평균 반환시간: 6</text>
+
+  <text class="small" x="973" y="716">06-02-02-sjf-srtf-timeline.svg</text>
+</svg>

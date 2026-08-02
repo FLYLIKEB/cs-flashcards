@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">08-02. TCP와 UDP 비교표</title>
+  <desc id="desc">TCP와 UDP를 연결 방식, 신뢰성, 순서 보장, 제어 방식, 헤더 크기, 대표 사용 사례로 나눠 비교한 SVG이다.</desc>
+  <defs>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tcp { fill: #1d4ed8; }
+      .udp { fill: #15803d; }
+      .white { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="860" fill="#f8fafc"/>
+  <rect x="32" y="32" width="1136" height="796" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="92" class="small">Transport layer comparison · 연결성 · 신뢰성 · 사용 사례</text>
+  <text x="72" y="132" class="title">TCP vs UDP 한눈에 비교</text>
+  <text x="72" y="168" class="subtitle">시험에서는 TCP=신뢰성·순서·연결형, UDP=속도·단순 헤더·비연결형으로 바로 연결하면 된다.</text>
+
+  <rect x="72" y="206" width="306" height="72" rx="24" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="446" y="206" width="306" height="72" rx="24" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+  <rect x="820" y="206" width="298" height="72" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="225" y="250" text-anchor="middle" class="section tcp">TCP</text>
+  <text x="225" y="272" text-anchor="middle" class="small">연결형 · 신뢰성 제공 · 순서 보장</text>
+  <text x="599" y="250" text-anchor="middle" class="section udp">UDP</text>
+  <text x="599" y="272" text-anchor="middle" class="small">비연결형 · 빠름 · 앱이 보완</text>
+  <text x="969" y="250" text-anchor="middle" class="section">암기 키워드</text>
+  <text x="969" y="272" text-anchor="middle" class="small">신뢰성 vs 지연 최소화</text>
+
+  <rect x="72" y="312" width="1046" height="420" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="320" y1="312" x2="320" y2="732" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="672" y1="312" x2="672" y2="732" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="72" y1="382" x2="1118" y2="382" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="72" y1="452" x2="1118" y2="452" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="72" y1="522" x2="1118" y2="522" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="72" y1="592" x2="1118" y2="592" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="72" y1="662" x2="1118" y2="662" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="104" y="356" class="label">비교 항목</text>
+  <text x="352" y="356" class="label tcp">TCP</text>
+  <text x="704" y="356" class="label udp">UDP</text>
+
+  <text x="104" y="426" class="label">연결 방식</text>
+  <text x="352" y="412" class="body">연결형</text>
+  <text x="352" y="436" class="small">3-way handshake 후 전송 시작</text>
+  <text x="704" y="412" class="body">비연결형</text>
+  <text x="704" y="436" class="small">세션 설정 없이 바로 데이터그램 전송</text>
+
+  <text x="104" y="496" class="label">신뢰성 / 순서</text>
+  <text x="352" y="482" class="body">ACK, 재전송, 순서 보장</text>
+  <text x="352" y="506" class="small">손실·중복·역순을 시퀀스 번호로 복구</text>
+  <text x="704" y="482" class="body">기본 보장 없음</text>
+  <text x="704" y="506" class="small">필요하면 애플리케이션이 직접 구현</text>
+
+  <text x="104" y="566" class="label">흐름 / 혼잡 제어</text>
+  <text x="352" y="552" class="body">송신 속도를 조절</text>
+  <text x="352" y="576" class="small">수신 윈도우와 혼잡 윈도우를 함께 고려</text>
+  <text x="704" y="552" class="body">전송계층 기본 기능 없음</text>
+  <text x="704" y="576" class="small">앱 또는 상위 프로토콜 정책에 의존</text>
+
+  <text x="104" y="636" class="label">헤더 / 지연</text>
+  <text x="352" y="622" class="body">최소 20바이트</text>
+  <text x="352" y="646" class="small">제어 정보가 많아 오버헤드가 더 큼</text>
+  <text x="704" y="622" class="body">8바이트</text>
+  <text x="704" y="646" class="small">헤더가 단순해 지연에 유리</text>
+
+  <text x="104" y="706" class="label">대표 사용 사례</text>
+  <text x="352" y="692" class="body">웹, 파일 전송, 이메일</text>
+  <text x="352" y="716" class="small">정확성과 순서가 중요한 서비스</text>
+  <text x="704" y="692" class="body">DNS, 스트리밍, 실시간 게임</text>
+  <text x="704" y="716" class="small">약간의 손실보다 지연이 더 치명적인 서비스</text>
+
+  <rect x="72" y="756" width="1046" height="48" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="96" y="786" class="body">정리: TCP는 “정확하게, 순서대로”, UDP는 “빠르게, 필요하면 앱이 보완”으로 기억하면 비교 문항을 빠르게 풀 수 있다.</text>
+</svg>

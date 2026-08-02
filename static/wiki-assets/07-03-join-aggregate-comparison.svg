@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">07-03 JOIN과 집계 비교 SVG</title>
+  <desc id="desc">INNER JOIN과 LEFT JOIN의 결과 차이, 그리고 GROUP BY와 HAVING이 행을 그룹으로 바꾸는 과정을 비교하는 인포그래픽</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 600 14px 'SFMono-Regular',Consolas,'Liberation Mono',monospace; fill: #0f172a; }
+      .cell { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .badge { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="760" />
+  <rect x="28" y="28" width="1144" height="704" rx="28" class="card" />
+
+  <text x="68" y="88" class="title">JOIN 결과와 집계 흐름 비교</text>
+  <text x="68" y="118" class="subtitle">JOIN은 행을 결합하고, GROUP BY는 결합된 행을 다시 묶는다. 두 단계의 역할을 분리해서 보면 문제 풀이가 쉬워진다.</text>
+
+  <rect x="68" y="154" width="506" height="534" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <text x="92" y="194" class="section">1. INNER JOIN vs LEFT JOIN</text>
+  <text x="92" y="222" class="body">예시 데이터: 고객 3명, 주문은 2명만 보유</text>
+
+  <rect x="92" y="248" width="184" height="126" rx="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+  <text x="110" y="276" class="label">customers</text>
+  <text x="110" y="304" class="cell">1  Kim</text>
+  <text x="110" y="330" class="cell">2  Lee</text>
+  <text x="110" y="356" class="cell">3  Park</text>
+
+  <rect x="298" y="248" width="184" height="126" rx="16" fill="#ecfeff" stroke="#67e8f9" stroke-width="2" />
+  <text x="316" y="276" class="label">orders</text>
+  <text x="316" y="304" class="cell">101  cust=1</text>
+  <text x="316" y="330" class="cell">102  cust=1</text>
+  <text x="316" y="356" class="cell">103  cust=2</text>
+
+  <rect x="92" y="402" width="184" height="212" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="108" y="420" width="82" height="28" rx="14" fill="#2563eb" /><text x="149" y="439" text-anchor="middle" class="badge">INNER JOIN</text>
+  <text x="110" y="476" class="cell">Kim  - 101</text>
+  <text x="110" y="502" class="cell">Kim  - 102</text>
+  <text x="110" y="528" class="cell">Lee  - 103</text>
+  <text x="110" y="566" class="body">일치하는 행만 남는다.</text>
+  <text x="110" y="590" class="small">주문이 없는 Park는 결과에서 사라진다.</text>
+
+  <rect x="298" y="402" width="184" height="212" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="314" y="420" width="78" height="28" rx="14" fill="#0891b2" /><text x="353" y="439" text-anchor="middle" class="badge">LEFT JOIN</text>
+  <text x="316" y="476" class="cell">Kim  - 101</text>
+  <text x="316" y="502" class="cell">Kim  - 102</text>
+  <text x="316" y="528" class="cell">Lee  - 103</text>
+  <text x="316" y="554" class="cell">Park - NULL</text>
+  <text x="316" y="590" class="small">왼쪽 고객은 모두 유지되고,</text>
+  <text x="316" y="612" class="small">매칭이 없으면 오른쪽 값이 NULL이다.</text>
+
+  <text x="92" y="650" class="body">시험 서술: INNER JOIN은 교집합, LEFT JOIN은 왼쪽 기준 전체 유지라고 쓰면 안전하다.</text>
+
+  <rect x="598" y="154" width="534" height="534" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <text x="622" y="194" class="section">2. JOIN 후 GROUP BY와 HAVING</text>
+  <text x="622" y="222" class="body">행 → 그룹 → 조건 통과 그룹의 흐름을 한 번에 본다.</text>
+
+  <rect x="622" y="256" width="150" height="300" rx="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+  <text x="640" y="286" class="label">JOIN 결과 행</text>
+  <text x="640" y="320" class="cell">Kim  - 101</text>
+  <text x="640" y="346" class="cell">Kim  - 102</text>
+  <text x="640" y="372" class="cell">Lee  - 103</text>
+  <text x="640" y="398" class="cell">Park - NULL</text>
+  <text x="640" y="442" class="small">LEFT JOIN이면</text>
+  <text x="640" y="464" class="small">주문이 없는 고객도 남는다.</text>
+
+  <rect x="792" y="256" width="160" height="300" rx="16" fill="#fffbeb" stroke="#fcd34d" stroke-width="2" />
+  <text x="810" y="286" class="label">GROUP BY 고객</text>
+  <text x="810" y="320" class="cell">Kim  → COUNT = 2</text>
+  <text x="810" y="346" class="cell">Lee  → COUNT = 1</text>
+  <text x="810" y="372" class="cell">Park → COUNT = 0</text>
+  <text x="810" y="416" class="small">여기서부터는 행이 아니라</text>
+  <text x="810" y="438" class="small">고객별 그룹이 비교 대상이다.</text>
+
+  <rect x="972" y="256" width="136" height="300" rx="16" fill="#fff7ed" stroke="#fdba74" stroke-width="2" />
+  <text x="990" y="286" class="label">HAVING</text>
+  <text x="990" y="320" class="cell">COUNT ≥ 2</text>
+  <text x="990" y="360" class="cell">Kim만 통과</text>
+  <text x="990" y="416" class="small">HAVING은</text>
+  <text x="990" y="438" class="small">집계된 그룹을</text>
+  <text x="990" y="460" class="small">걸러낸다.</text>
+
+  <line x1="772" y1="406" x2="792" y2="406" stroke="#94a3b8" stroke-width="3" />
+  <line x1="952" y1="406" x2="972" y2="406" stroke="#94a3b8" stroke-width="3" />
+  <text x="620" y="598" class="body">WHERE 조건은 JOIN 결과 행을 줄이는 단계이고, HAVING 조건은 그룹화가 끝난 뒤 남길 그룹을 정하는 단계다.</text>
+  <text x="620" y="626" class="body">그래서 COUNT(order_id) 같은 조건은 HAVING에 넣어야 맞다.</text>
+
+  <text x="68" y="712" class="small">07-03-join-aggregate-comparison.svg · JOIN 결과 차이와 집계 단계 전환을 분리해서 보여 주는 보조 시각 자료</text>
+</svg>

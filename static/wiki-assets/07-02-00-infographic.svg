@@ -1,147 +1,113 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">07-02. 정규화 인포그래픽</title>
-  <desc id="desc">주문상세원본 테이블이 함수 종속을 기준으로 주문, 고객, 상품, 주문상세로 분해되며 2NF와 3NF, 무손실 조인과 종속성 보존을 설명하는 다이어그램</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="940" viewBox="0 0 1280 940" role="img" aria-labelledby="title desc">
+  <title id="title">07-02. 정규화 개요 인포그래픽</title>
+  <desc id="desc">정규화의 목적, 주문상세원본의 반복 정보, 핵심 함수 종속, 분해 후 점검 항목을 나눈 고가독성 요약 다이어그램</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="55%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#ecfeff"/>
-    </linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
       <stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
-    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .tiny { font: 600 11px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
-      .mono { font: 700 13px 'SFMono-Regular','Menlo',monospace; fill: #0f766e; }
-      .table-head { fill: #dbeafe; }
-      .badge { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f766e; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 17px 'SFMono-Regular','Menlo',monospace; fill: #0f766e; }
+      .badge { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f766e; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect width="1280" height="940" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1224" height="884" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="small" x="66" y="74">데이터베이스 · 정규화 핵심 흐름</text>
-  <text class="title" x="66" y="116">07-02. 정규화</text>
-  <text class="subtitle" x="66" y="146">함수 종속을 보고 중복과 이상현상을 찾은 뒤, 부분 종속과 이행 종속을 제거해 무손실 분해와 종속성 보존을 확인한다.</text>
+  <text class="small" x="72" y="82">데이터베이스 · 정규화 핵심 요약</text>
+  <text class="title" x="72" y="126">07-02. 정규화</text>
+  <text class="subtitle" x="72" y="160">정규화는 반복 저장을 줄이고 이상현상을 막기 위해 함수 종속을 기준으로 릴레이션을 나누는 과정이다.</text>
 
-  <rect x="56" y="182" width="330" height="426" rx="24" fill="url(#panel)" stroke="#bfdbfe"/>
-  <text class="section" x="80" y="220">1) 원본 릴레이션과 이상현상</text>
-  <rect x="80" y="238" width="282" height="38" rx="10" fill="#e0f2fe"/>
-  <text class="label" x="94" y="262">주문상세원본</text>
-  <text class="tiny" x="235" y="262">후보키 = (주문ID, 상품ID)</text>
+  <rect x="64" y="202" width="1152" height="160" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="92" y="240">왜 정규화하는가</text>
 
-  <rect x="80" y="290" width="282" height="28" class="table-head" rx="8"/>
-  <text class="tiny" x="92" y="308">주문ID</text>
-  <text class="tiny" x="146" y="308">고객ID</text>
-  <text class="tiny" x="196" y="308">고객명</text>
-  <text class="tiny" x="246" y="308">등급</text>
-  <text class="tiny" x="288" y="308">상품</text>
-  <text class="tiny" x="328" y="308">수량</text>
+  <rect x="92" y="264" width="332" height="70" rx="18" fill="#fee2e2" stroke="#fca5a5"/>
+  <text class="label" x="116" y="292">갱신 이상</text>
+  <text class="body" x="116" y="316">김하나의 고객등급이 바뀌면</text>
+  <text class="body" x="116" y="338">주문 행 여러 개를 함께 수정해야 한다.</text>
 
-  <rect x="80" y="320" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-  <text class="tiny" x="92" y="341">O1001</text><text class="tiny" x="146" y="341">C01</text><text class="tiny" x="196" y="341">김하나</text><text class="tiny" x="246" y="341">GOLD</text><text class="tiny" x="288" y="341">P10</text><text class="tiny" x="328" y="341">1</text>
-  <rect x="80" y="358" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-  <text class="tiny" x="92" y="379">O1001</text><text class="tiny" x="146" y="379">C01</text><text class="tiny" x="196" y="379">김하나</text><text class="tiny" x="246" y="379">GOLD</text><text class="tiny" x="288" y="379">P20</text><text class="tiny" x="328" y="379">2</text>
-  <rect x="80" y="396" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-  <text class="tiny" x="92" y="417">O1002</text><text class="tiny" x="146" y="417">C02</text><text class="tiny" x="196" y="417">이두리</text><text class="tiny" x="246" y="417">SILVER</text><text class="tiny" x="288" y="417">P20</text><text class="tiny" x="328" y="417">1</text>
-  <rect x="80" y="434" width="282" height="34" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
-  <text class="tiny" x="92" y="455">O1003</text><text class="tiny" x="146" y="455">C01</text><text class="tiny" x="196" y="455">김하나</text><text class="tiny" x="246" y="455">GOLD</text><text class="tiny" x="288" y="455">P30</text><text class="tiny" x="328" y="455">1</text>
+  <rect x="474" y="264" width="332" height="70" rx="18" fill="#fef3c7" stroke="#fcd34d"/>
+  <text class="label" x="498" y="292">삽입 이상</text>
+  <text class="body" x="498" y="316">아직 주문하지 않은 새 상품은</text>
+  <text class="body" x="498" y="338">주문 행이 없으면 등록이 어색해진다.</text>
 
-  <rect x="80" y="490" width="282" height="42" rx="12" fill="#fee2e2"/>
-  <text class="label" x="95" y="516">갱신 이상</text>
-  <text class="body" x="162" y="516">김하나 등급 변경 시 여러 행을 동시에 수정</text>
-  <rect x="80" y="540" width="282" height="48" rx="12" fill="#fef3c7"/>
-  <text class="label" x="95" y="568">중복 원인</text>
-  <text class="body" x="162" y="560">고객명·고객등급, 상품명·단가가</text>
-  <text class="body" x="162" y="578">주문 행마다 반복 저장</text>
+  <rect x="856" y="264" width="332" height="70" rx="18" fill="#dbeafe" stroke="#93c5fd"/>
+  <text class="label" x="880" y="292">삭제 이상</text>
+  <text class="body" x="880" y="316">주문 한 건을 지우는 순간</text>
+  <text class="body" x="880" y="338">고객·상품 정보까지 함께 사라질 수 있다.</text>
 
-  <rect x="408" y="182" width="340" height="426" rx="24" fill="url(#panel)" stroke="#99f6e4"/>
-  <text class="section" x="432" y="220">2) 함수 종속으로 문제 위치 찾기</text>
+  <rect x="64" y="390" width="560" height="370" rx="24" fill="#f8fafc" stroke="#bfdbfe"/>
+  <text class="section" x="92" y="430">반복 저장되는 원본 테이블</text>
+  <rect x="92" y="452" width="504" height="44" rx="12" fill="#dbeafe"/>
+  <text class="label" x="112" y="480">주문상세원본</text>
+  <text class="small" x="360" y="480">후보키 = (주문ID, 상품ID)</text>
 
-  <rect x="432" y="246" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
-  <text class="mono" x="452" y="269">주문ID → 고객ID</text>
-  <text class="body" x="452" y="287">주문 하나는 한 고객에 대응</text>
+  <rect x="92" y="516" width="504" height="40" rx="10" fill="#e2e8f0"/>
+  <text class="tiny" x="108" y="541">주문ID</text>
+  <text class="tiny" x="176" y="541">고객ID</text>
+  <text class="tiny" x="244" y="541">고객명</text>
+  <text class="tiny" x="322" y="541">고객등급</text>
+  <text class="tiny" x="426" y="541">상품ID</text>
+  <text class="tiny" x="500" y="541">수량</text>
 
-  <rect x="432" y="316" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
-  <text class="mono" x="452" y="339">고객ID → 고객명, 고객등급</text>
-  <text class="body" x="452" y="357">고객 정보는 주문이 아니라 고객에 종속</text>
+  <rect x="92" y="566" width="504" height="42" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text class="tiny" x="108" y="592">O1001</text>
+  <text class="tiny" x="176" y="592">C01</text>
+  <text class="tiny" x="244" y="592">김하나</text>
+  <text class="tiny" x="322" y="592">GOLD</text>
+  <text class="tiny" x="426" y="592">P10</text>
+  <text class="tiny" x="500" y="592">1</text>
 
-  <rect x="432" y="386" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
-  <text class="mono" x="452" y="409">상품ID → 상품명, 단가</text>
-  <text class="body" x="452" y="427">상품 정보도 주문과 분리 가능</text>
+  <rect x="92" y="618" width="504" height="42" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text class="tiny" x="108" y="644">O1001</text>
+  <text class="tiny" x="176" y="644">C01</text>
+  <text class="tiny" x="244" y="644">김하나</text>
+  <text class="tiny" x="322" y="644">GOLD</text>
+  <text class="tiny" x="426" y="644">P20</text>
+  <text class="tiny" x="500" y="644">2</text>
 
-  <rect x="432" y="456" width="292" height="54" rx="14" fill="#ecfeff" stroke="#99f6e4"/>
-  <text class="mono" x="452" y="479">주문ID, 상품ID → 수량</text>
-  <text class="body" x="452" y="497">수량만 복합키 전체에 직접 의존</text>
+  <rect x="92" y="670" width="504" height="42" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text class="tiny" x="108" y="696">O1002</text>
+  <text class="tiny" x="176" y="696">C02</text>
+  <text class="tiny" x="244" y="696">이두리</text>
+  <text class="tiny" x="322" y="696">SILVER</text>
+  <text class="tiny" x="426" y="696">P20</text>
+  <text class="tiny" x="500" y="696">1</text>
 
-  <path d="M 578 300 C 580 308, 580 308, 578 316" fill="none" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
-  <path d="M 578 370 C 580 378, 580 378, 578 386" fill="none" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
-  <path d="M 578 440 C 580 448, 580 448, 578 456" fill="none" stroke="#0f766e" stroke-width="3" marker-end="url(#arrow)"/>
+  <text class="badge" x="108" y="734">반복 포인트</text>
+  <text class="body" x="210" y="734">고객명·고객등급·상품 정보가 주문 행마다 다시 저장된다.</text>
 
-  <rect x="432" y="530" width="292" height="54" rx="14" fill="#dcfce7" stroke="#86efac"/>
-  <text class="badge" x="450" y="554">판단</text>
-  <text class="body" x="500" y="554">복합키 일부만으로 정해지는 속성은 2NF 대상</text>
-  <text class="body" x="500" y="574">비키 속성이 다른 비키 속성을 정하면 3NF 대상</text>
+  <rect x="656" y="390" width="560" height="370" rx="24" fill="#f8fafc" stroke="#99f6e4"/>
+  <text class="section" x="684" y="430">핵심 함수 종속과 분해 기준</text>
 
-  <rect x="770" y="182" width="374" height="426" rx="24" fill="url(#panel)" stroke="#c7d2fe"/>
-  <text class="section" x="794" y="220">3) 정규화 분해 결과</text>
+  <rect x="684" y="454" width="504" height="64" rx="16" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="mono" x="708" y="482">주문ID → 고객ID</text>
+  <text class="body" x="708" y="506">주문 하나는 한 고객에 대응하므로 주문 정보와 고객 정보를 구분한다.</text>
 
-  <rect x="794" y="246" width="324" height="84" rx="18" fill="#ede9fe" stroke="#c4b5fd"/>
-  <text class="label" x="814" y="272">2NF: 부분 함수 종속 제거</text>
-  <text class="body" x="814" y="296">주문ID → 고객ID, 상품ID → 상품명·단가를 떼어내</text>
-  <text class="body" x="814" y="316">주문 / 상품 / 주문상세로 1차 분해</text>
+  <rect x="684" y="534" width="504" height="64" rx="16" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="mono" x="708" y="562">고객ID → 고객명, 고객등급</text>
+  <text class="body" x="708" y="586">고객의 일반 속성은 고객ID가 정하므로 고객 테이블로 분리한다.</text>
 
-  <rect x="794" y="346" width="98" height="116" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
-  <text class="label" x="843" y="372" text-anchor="middle">주문</text>
-  <text class="tiny" x="810" y="396">PK 주문ID</text>
-  <text class="body" x="810" y="416">주문ID</text>
-  <text class="body" x="810" y="436">고객ID</text>
+  <rect x="684" y="614" width="504" height="64" rx="16" fill="#ecfeff" stroke="#99f6e4"/>
+  <text class="mono" x="708" y="642">상품ID → 상품명, 단가</text>
+  <text class="body" x="708" y="666">상품 속성도 상품ID에만 달려 있으므로 상품 테이블이 따로 필요하다.</text>
 
-  <rect x="907" y="346" width="98" height="116" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
-  <text class="label" x="956" y="372" text-anchor="middle">상품</text>
-  <text class="tiny" x="923" y="396">PK 상품ID</text>
-  <text class="body" x="923" y="416">상품ID</text>
-  <text class="body" x="923" y="436">상품명</text>
-  <text class="body" x="923" y="456">단가</text>
+  <rect x="684" y="694" width="504" height="64" rx="16" fill="#dcfce7" stroke="#86efac"/>
+  <text class="mono" x="708" y="722">주문ID, 상품ID → 수량</text>
+  <text class="body" x="708" y="746">수량만 복합키 전체에 직접 의존하므로 주문상세에 남긴다.</text>
 
-  <rect x="1020" y="346" width="98" height="116" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
-  <text class="label" x="1069" y="372" text-anchor="middle">주문상세</text>
-  <text class="tiny" x="1031" y="396">PK 주문ID+상품ID</text>
-  <text class="body" x="1036" y="416">주문ID</text>
-  <text class="body" x="1036" y="436">상품ID</text>
-  <text class="body" x="1036" y="456">수량</text>
-
-  <path d="M 843 468 L 843 494 L 956 494 L 956 468" fill="none" stroke="#94a3b8" stroke-width="2"/>
-  <path d="M 1069 468 L 1069 494 L 956 494 L 956 468" fill="none" stroke="#94a3b8" stroke-width="2"/>
-  <text class="tiny" x="956" y="510" text-anchor="middle">주문상세가 주문·상품 키를 참조</text>
-
-  <rect x="794" y="528" width="324" height="56" rx="18" fill="#dbeafe" stroke="#93c5fd"/>
-  <text class="label" x="814" y="552">3NF: 이행 함수 종속 제거</text>
-  <text class="body" x="814" y="572">주문ID → 고객ID → 고객명·고객등급 이므로 고객 테이블 분리</text>
-
-  <path d="M 842 462 C 824 492, 810 506, 794 542" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
-  <rect x="930" y="518" width="188" height="74" rx="16" fill="#ffffff" stroke="#93c5fd"/>
-  <text class="label" x="950" y="544">고객</text>
-  <text class="tiny" x="950" y="564">PK 고객ID</text>
-  <text class="body" x="1014" y="544">고객ID, 고객명, 고객등급</text>
-  <text class="body" x="950" y="582">고객등급 변경은 여기 한 행만 수정</text>
-
-  <rect x="56" y="624" width="1088" height="44" rx="18" fill="#0f172a"/>
-  <text class="small" x="80" y="651" fill="#e2e8f0">최종 체크:</text>
-  <text class="body" x="160" y="651" fill="#e2e8f0">무손실 조인</text>
-  <circle cx="243" cy="645" r="4" fill="#5eead4"/>
-  <text class="body" x="260" y="651" fill="#e2e8f0">공통 속성(고객ID, 상품ID 등)이 분해 릴레이션의 키와 연결</text>
-  <circle cx="597" cy="645" r="4" fill="#5eead4"/>
-  <text class="body" x="614" y="651" fill="#e2e8f0">종속성 보존: 원래 FD를 각 테이블에서 조인 없이 검사 가능</text>
+  <rect x="64" y="786" width="1152" height="94" rx="24" fill="#0f172a"/>
+  <text class="section" x="92" y="826" fill="#f8fafc">분해 후 최종 점검</text>
+  <circle cx="116" cy="850" r="6" fill="#5eead4"/>
+  <text class="body" x="136" y="856" fill="#e2e8f0">무손실 분해: 공통 속성이 한쪽 릴레이션의 키와 연결되어 조인해도 원래 정보가 유지된다.</text>
+  <circle cx="116" cy="880" r="6" fill="#5eead4"/>
+  <text class="body" x="136" y="886" fill="#e2e8f0">종속성 보존: 원래 함수 종속을 분해된 각 테이블에서 조인 없이 점검할 수 있다.</text>
 </svg>

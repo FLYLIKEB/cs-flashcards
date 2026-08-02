@@ -1,113 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">13-01-02. JOIN-서브쿼리 인포그래픽</title>
-  <desc id="desc">INNER JOIN과 OUTER JOIN의 차이, 비상관·상관 서브쿼리의 실행 흐름, 실행 계획 체크 포인트를 함께 설명하는 SVG</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="joinGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#06b6d4"/>
-    </linearGradient>
-    <linearGradient id="subGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f766e"/>
-      <stop offset="100%" stop-color="#22c55e"/>
-    </linearGradient>
-    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#2563eb"/>
-    </marker>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#0f766e"/>
-    </marker>
-    <style>
-      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
-      .title { font-size: 33px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .section { font-size: 20px; font-weight: 800; fill: #0f172a; }
-      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
-      .body { font-size: 15px; font-weight: 500; fill: #334155; }
-      .small { font-size: 13px; font-weight: 600; fill: #475569; }
-      .mono { font-size: 13px; font-weight: 700; fill: #1e293b; }
-      .chip { font-size: 12px; font-weight: 800; fill: #ffffff; }
-    </style>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">13-01-02. JOIN 유형 비교</title>
+  <desc id="desc">customers와 orders 예시로 INNER JOIN, LEFT OUTER JOIN, FULL OUTER JOIN의 보존 행 차이와 1대N 중복 주의점을 비교하는 SVG</desc>
+  <style>
+    text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; fill: #0f172a; }
+    .eyebrow { font-size: 17px; font-weight: 700; fill: #475569; }
+    .title { font-size: 34px; font-weight: 800; }
+    .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+    .section { font-size: 22px; font-weight: 800; }
+    .label { font-size: 18px; font-weight: 700; }
+    .body { font-size: 16px; font-weight: 500; fill: #334155; }
+    .small { font-size: 14px; font-weight: 600; fill: #475569; }
+    .mono { font-size: 15px; font-weight: 700; fill: #1e293b; font-family: "SFMono-Regular", "Menlo", monospace; }
+    .pill { font-size: 14px; font-weight: 800; fill: #ffffff; }
+  </style>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="32" y="28" width="1136" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect width="1200" height="860" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="804" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text x="72" y="84" class="small">데이터베이스 · JOIN / SUBQUERY</text>
-  <text x="72" y="124" class="title">13-01-02. JOIN-서브쿼리</text>
-  <text x="72" y="156" class="subtitle">JOIN은 표를 옆으로 결합하고, 서브쿼리는 안쪽 결과를 바깥 조건으로 공급한다.</text>
+  <text x="72" y="82" class="eyebrow">데이터베이스 · JOIN</text>
+  <text x="72" y="126" class="title">JOIN 유형 비교: 어떤 행이 결과에 남는가</text>
+  <text x="72" y="160" class="subtitle">JOIN은 공통 키로 표를 결합한다. 시험에서는 “매칭만 남는지, 한쪽 미매칭도 보존하는지”를 먼저 구분한다.</text>
 
-  <rect x="64" y="188" width="514" height="356" rx="24" fill="#f8fbff" stroke="#93c5fd" stroke-width="2"/>
-  <rect x="622" y="188" width="514" height="356" rx="24" fill="#f7fef9" stroke="#86efac" stroke-width="2"/>
+  <rect x="64" y="196" width="314" height="212" rx="22" fill="#f8fbff" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="410" y="196" width="314" height="212" rx="22" fill="#f8fbff" stroke="#67e8f9" stroke-width="2"/>
+  <rect x="756" y="196" width="380" height="212" rx="22" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
 
-  <text x="88" y="226" class="section">1) JOIN: 공통 키로 두 표를 결합</text>
-  <text x="646" y="226" class="section">2) 서브쿼리: 안쪽 결과를 바깥 쿼리가 사용</text>
+  <text x="88" y="234" class="section">입력 1: customers</text>
+  <text x="434" y="234" class="section">입력 2: orders</text>
+  <text x="780" y="234" class="section">핵심 해석</text>
 
-  <rect x="94" y="252" width="132" height="188" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
-  <rect x="242" y="252" width="132" height="188" rx="18" fill="#ffffff" stroke="#06b6d4" stroke-width="2"/>
-  <text x="160" y="284" text-anchor="middle" class="label">customers</text>
-  <text x="308" y="284" text-anchor="middle" class="label">orders</text>
-  <text x="110" y="318" class="mono">id | name</text>
-  <text x="110" y="343" class="body">1  | Kim</text>
-  <text x="110" y="366" class="body">2  | Lee</text>
-  <text x="110" y="389" class="body">3  | Park</text>
-  <text x="258" y="318" class="mono">cid | amt</text>
-  <text x="258" y="343" class="body">1   | 80</text>
-  <text x="258" y="366" class="body">1   | 120</text>
-  <text x="258" y="389" class="body">2   | 60</text>
+  <line x1="88" y1="258" x2="354" y2="258" stroke="#2563eb" stroke-width="2"/>
+  <line x1="434" y1="258" x2="700" y2="258" stroke="#0891b2" stroke-width="2"/>
+  <text x="92" y="286" class="mono">customer_id | name</text>
+  <text x="92" y="316" class="body">1 | Kim</text>
+  <text x="92" y="344" class="body">2 | Lee</text>
+  <text x="92" y="372" class="body">3 | Park</text>
+  <text x="438" y="286" class="mono">customer_id | amount</text>
+  <text x="438" y="316" class="body">1 | 80</text>
+  <text x="438" y="344" class="body">1 | 120</text>
+  <text x="438" y="372" class="body">2 | 60</text>
 
-  <line x1="226" y1="346" x2="242" y2="346" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
-  <line x1="226" y1="369" x2="242" y2="369" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
-  <line x1="226" y1="392" x2="242" y2="392" stroke="#94a3b8" stroke-width="3" stroke-dasharray="5 5"/>
+  <rect x="780" y="266" width="332" height="54" rx="14" fill="#ffffff" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="804" y="289" class="label">공통 키</text>
+  <text x="804" y="310" class="body">customers.customer_id = orders.customer_id</text>
+  <rect x="780" y="334" width="332" height="54" rx="14" fill="#ffffff" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="804" y="357" class="label">1:N 주의</text>
+  <text x="804" y="378" class="body">Kim은 주문이 2건이라 JOIN 결과도 2행이 된다.</text>
 
-  <rect x="396" y="252" width="156" height="84" rx="18" fill="url(#joinGrad)"/>
-  <text x="474" y="281" text-anchor="middle" class="chip">INNER JOIN</text>
-  <text x="474" y="304" text-anchor="middle" class="body" fill="#eff6ff">매칭되는 행만 반환</text>
-  <text x="474" y="323" text-anchor="middle" class="small" fill="#dbeafe">Kim·Lee만 결과에 남음</text>
+  <rect x="64" y="438" width="1072" height="114" rx="24" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="88" y="462" width="148" height="34" rx="17" fill="#2563eb"/>
+  <text x="162" y="485" text-anchor="middle" class="pill">INNER JOIN</text>
+  <text x="264" y="480" class="label">매칭되는 행만 남는다</text>
+  <text x="264" y="507" class="body">결과 예: (Kim,80), (Kim,120), (Lee,60)</text>
+  <text x="264" y="533" class="small">Park는 주문이 없으므로 제외된다.</text>
+  <rect x="894" y="458" width="214" height="72" rx="16" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="914" y="482" class="small">시험 포인트</text>
+  <text x="914" y="505" class="body">“교집합만 남는다”로 기억.</text>
 
-  <rect x="396" y="348" width="156" height="84" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <text x="474" y="377" text-anchor="middle" class="label">LEFT OUTER JOIN</text>
-  <text x="474" y="400" text-anchor="middle" class="body">왼쪽 행 보존 +</text>
-  <text x="474" y="419" text-anchor="middle" class="body">미매칭은 NULL</text>
+  <rect x="64" y="572" width="1072" height="114" rx="24" fill="#f0fdf4" stroke="#4ade80" stroke-width="2"/>
+  <rect x="88" y="596" width="194" height="34" rx="17" fill="#15803d"/>
+  <text x="185" y="619" text-anchor="middle" class="pill">LEFT OUTER JOIN</text>
+  <text x="310" y="614" class="label">왼쪽 테이블 행은 모두 보존한다</text>
+  <text x="310" y="641" class="body">결과 예: Kim 2행 + Lee 1행 + Park는 order 값이 NULL</text>
+  <text x="310" y="667" class="small">FROM 왼쪽에 둔 표가 기준이다. RIGHT JOIN은 방향만 반대다.</text>
+  <rect x="894" y="592" width="214" height="72" rx="16" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+  <text x="914" y="616" class="small">시험 포인트</text>
+  <text x="914" y="639" class="body">“기준 표 보존 + 미매칭은 NULL”.</text>
 
-  <path d="M374 294 C388 294, 388 294, 396 294" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
-  <path d="M374 390 C388 390, 388 390, 396 390" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
-
-  <rect x="94" y="456" width="458" height="66" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-  <text x="114" y="483" class="label">시험 함정</text>
-  <text x="114" y="506" class="body">JOIN으로 바꾸면 1:N 관계에서 행이 늘 수 있다 → DISTINCT 또는 GROUP BY 필요</text>
-
-  <rect x="650" y="252" width="204" height="106" rx="18" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
-  <rect x="904" y="252" width="204" height="106" rx="18" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
-  <text x="752" y="282" text-anchor="middle" class="label">비상관 서브쿼리</text>
-  <text x="752" y="305" text-anchor="middle" class="body">한 번 실행</text>
-  <text x="752" y="326" text-anchor="middle" class="mono">IN (SELECT customer_id</text>
-  <text x="752" y="344" text-anchor="middle" class="mono">FROM orders WHERE amt &gt; 100)</text>
-  <text x="1006" y="282" text-anchor="middle" class="label">상관 서브쿼리</text>
-  <text x="1006" y="305" text-anchor="middle" class="body">바깥 행마다 평가 가능</text>
-  <text x="1006" y="326" text-anchor="middle" class="mono">WHERE EXISTS (SELECT 1</text>
-  <text x="1006" y="344" text-anchor="middle" class="mono">... o.customer_id = c.customer_id)</text>
-
-  <rect x="690" y="392" width="124" height="72" rx="18" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-  <text x="752" y="420" text-anchor="middle" class="label">중간 결과</text>
-  <text x="752" y="444" text-anchor="middle" class="body">{1}</text>
-  <rect x="944" y="392" width="124" height="72" rx="18" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-  <text x="1006" y="420" text-anchor="middle" class="label">반복 판정</text>
-  <text x="1006" y="444" text-anchor="middle" class="body">Kim ✓ Lee ✗ Park ✗</text>
-
-  <line x1="752" y1="358" x2="752" y2="392" stroke="#0f766e" stroke-width="3" marker-end="url(#arrowGreen)"/>
-  <line x1="1006" y1="358" x2="1006" y2="392" stroke="#0f766e" stroke-width="3" marker-end="url(#arrowGreen)"/>
-
-  <rect x="650" y="480" width="458" height="42" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-  <text x="670" y="507" class="body">IN vs EXISTS는 결과가 같아도 실행 계획이 다를 수 있고, NULL 처리에서는 특히 NOT IN을 조심한다.</text>
-
-  <rect x="64" y="568" width="1072" height="94" rx="22" fill="#0f172a"/>
-  <text x="92" y="602" class="section" fill="#f8fafc">3) 실행 계획에서 확인할 것</text>
-  <text x="92" y="628" class="body" fill="#cbd5e1">• join type: Nested Loop / Hash Join / Sort-Merge</text>
-  <text x="442" y="628" class="body" fill="#cbd5e1">• index seek/scan과 조인 순서</text>
-  <text x="760" y="628" class="body" fill="#cbd5e1">• estimated rows vs actual rows 차이</text>
-  <text x="92" y="650" class="body" fill="#cbd5e1">• Hash spill, 정렬, 반복 실행이 보이면 비용 증가 신호 → 인덱스·재작성·통계 점검</text>
+  <rect x="64" y="706" width="1072" height="96" rx="24" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+  <rect x="88" y="730" width="190" height="34" rx="17" fill="#c2410c"/>
+  <text x="183" y="753" text-anchor="middle" class="pill">FULL OUTER JOIN</text>
+  <text x="306" y="748" class="label">양쪽의 미매칭 행까지 모두 보존한다</text>
+  <text x="306" y="775" class="body">Park도 남고, 반대로 주문만 있고 고객이 없는 행도 NULL과 함께 남는다.</text>
+  <rect x="894" y="722" width="214" height="58" rx="16" fill="#ffffff" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="914" y="746" class="small">시험 포인트</text>
+  <text x="914" y="769" class="body">합집합에 가장 가깝다.</text>
 </svg>

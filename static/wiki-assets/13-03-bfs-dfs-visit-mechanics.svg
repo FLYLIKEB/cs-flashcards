@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">13-03. BFS와 DFS 방문 처리 메커니즘</title>
+  <desc id="desc">BFS는 큐에 넣을 때, DFS는 스택에 넣거나 재귀로 진입할 때 방문 표시를 해야 중복 삽입을 막는다는 점을 비교하는 SVG</desc>
+  <defs>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 32px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .sectionTitle { font-size: 24px; font-weight: 800; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .strong { font-size: 17px; font-weight: 800; }
+      .small { font-size: 14px; font-weight: 600; fill: #475569; }
+      .tiny { font-size: 13px; font-weight: 700; fill: #475569; }
+      .chip { font-size: 16px; font-weight: 800; }
+    </style>
+    <marker id="blueArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" viewBox="0 0 12 12">
+      <path d="M0 0 L12 6 L0 12 Z" fill="#0284c7"/>
+    </marker>
+    <marker id="orangeArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" viewBox="0 0 12 12">
+      <path d="M0 0 L12 6 L0 12 Z" fill="#c2410c"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f8fafc"/>
+  <rect x="30" y="30" width="1140" height="700" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="82" class="eyebrow">VISITED TIMING</text>
+  <text x="72" y="124" class="title">방문 처리의 위치를 따로 기억해야 실수를 줄인다</text>
+  <text x="72" y="158" class="subtitle">자료구조에 넣을 때 바로 visited = true 를 해야 같은 노드가 큐·스택에 여러 번 들어가는 비효율을 막을 수 있다.</text>
+
+  <rect x="64" y="202" width="510" height="398" rx="26" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="2"/>
+  <rect x="626" y="202" width="510" height="398" rx="26" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+
+  <text x="96" y="244" class="sectionTitle" fill="#075985">BFS: enqueue 할 때 방문 표시</text>
+  <text x="96" y="272" class="body">큐에 넣기 전에 visited를 검사하고, 넣는 순간 true 로 바꾼다.</text>
+
+  <rect x="96" y="306" width="446" height="70" rx="18" fill="#ffffff" stroke="#7dd3fc" stroke-width="2"/>
+  <text x="120" y="334" class="strong" fill="#075985">1) 현재 노드 A에서 이웃 B, C를 발견</text>
+  <text x="120" y="357" class="small">아직 방문하지 않았다면 큐에 넣고 즉시 visited[B], visited[C] = true</text>
+
+  <rect x="96" y="394" width="446" height="84" rx="18" fill="#ffffff" stroke="#7dd3fc" stroke-width="2"/>
+  <text x="120" y="422" class="strong" fill="#075985">2) 큐 상태</text>
+  <rect x="120" y="438" width="64" height="26" rx="13" fill="#e0f2fe" stroke="#0284c7"/>
+  <rect x="192" y="438" width="64" height="26" rx="13" fill="#e0f2fe" stroke="#0284c7"/>
+  <rect x="264" y="438" width="64" height="26" rx="13" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="152" y="456" text-anchor="middle" class="chip">B</text>
+  <text x="224" y="456" text-anchor="middle" class="chip">C</text>
+  <text x="296" y="456" text-anchor="middle" class="chip">D</text>
+  <text x="348" y="456" class="small">front → 먼저 들어온 노드부터 꺼낸다</text>
+
+  <path d="M352 519 L502 519" fill="none" stroke="#0284c7" stroke-width="6" stroke-linecap="round" marker-end="url(#blueArrow)"/>
+  <text x="120" y="524" class="strong" fill="#075985">결과</text>
+  <text x="120" y="548" class="small">같은 노드가 큐에 중복 삽입되지 않아 O(V+E) 흐름을 깔끔하게 유지한다.</text>
+  <rect x="420" y="494" width="100" height="48" rx="14" fill="#dbeafe"/>
+  <text x="470" y="514" text-anchor="middle" class="tiny">중복 삽입</text>
+  <text x="470" y="532" text-anchor="middle" class="tiny">미리 차단</text>
+
+  <text x="658" y="244" class="sectionTitle" fill="#9a3412">DFS: push / 진입할 때 방문 표시</text>
+  <text x="658" y="272" class="body">재귀든 반복 스택이든, 들어가는 순간 visited = true 로 두는 것이 기본이다.</text>
+
+  <rect x="658" y="306" width="446" height="70" rx="18" fill="#ffffff" stroke="#fdba74" stroke-width="2"/>
+  <text x="682" y="334" class="strong" fill="#9a3412">1) A → B → D 로 깊게 진입</text>
+  <text x="682" y="357" class="small">호출하거나 push 하는 순간 방문 표시를 해 두어 같은 가지 재진입을 막는다.</text>
+
+  <rect x="658" y="394" width="446" height="84" rx="18" fill="#ffffff" stroke="#fdba74" stroke-width="2"/>
+  <text x="682" y="422" class="strong" fill="#9a3412">2) 스택 / 호출 스택 상태</text>
+  <rect x="682" y="438" width="64" height="26" rx="13" fill="#ffedd5" stroke="#c2410c"/>
+  <rect x="754" y="438" width="64" height="26" rx="13" fill="#ffedd5" stroke="#c2410c"/>
+  <rect x="826" y="438" width="64" height="26" rx="13" fill="#ffedd5" stroke="#c2410c"/>
+  <text x="714" y="456" text-anchor="middle" class="chip">A</text>
+  <text x="786" y="456" text-anchor="middle" class="chip">B</text>
+  <text x="858" y="456" text-anchor="middle" class="chip">D</text>
+  <text x="910" y="456" class="small">top → 가장 깊은 노드부터 확인</text>
+
+  <path d="M914 519 L1064 519" fill="none" stroke="#c2410c" stroke-width="6" stroke-linecap="round" marker-end="url(#orangeArrow)"/>
+  <text x="682" y="524" class="strong" fill="#9a3412">결과</text>
+  <text x="682" y="548" class="small">막히면 pop / return 하며 되돌아오고, 이미 표시된 노드는 다시 쌓지 않는다.</text>
+  <rect x="984" y="494" width="96" height="48" rx="14" fill="#fed7aa"/>
+  <text x="1032" y="514" text-anchor="middle" class="tiny">막히면</text>
+  <text x="1032" y="532" text-anchor="middle" class="tiny">되돌아옴</text>
+
+  <rect x="64" y="624" width="1072" height="74" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="92" y="653" class="strong">시험장에서 바로 쓰는 요약</text>
+  <text x="92" y="678" class="body">BFS는 enqueue 시 방문 처리, DFS는 push/호출 시 방문 처리. 예외적으로 모든 경로 탐색은 backtracking 때문에 되돌아올 때 visited 를 해제할 수 있다.</text>
+</svg>

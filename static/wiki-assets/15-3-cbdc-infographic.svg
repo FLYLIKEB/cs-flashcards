@@ -1,143 +1,125 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img" aria-labelledby="title desc">
   <title id="title">15-3. CBDC 심화 인포그래픽</title>
-  <desc id="desc">CBDC의 정의, 소매형과 도매형의 차이, 한국은행 파일럿의 이중운영 구조와 핵심 통제 지점을 설명하는 SVG</desc>
+  <desc id="desc">CBDC의 정의, 소매형과 도매형의 차이, 한국은행 파일럿의 이중운영 구조를 읽기 쉬운 카드형 레이아웃으로 정리한 SVG</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
-    </linearGradient>
-    <linearGradient id="retail" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dcfce7"/>
-      <stop offset="100%" stop-color="#ecfeff"/>
-    </linearGradient>
-    <linearGradient id="wholesale" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ede9fe"/>
-      <stop offset="100%" stop-color="#dbeafe"/>
-    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .title { font-size: 36px; font-weight: 800; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #dbeafe; }
+      .section { font-size: 24px; font-weight: 800; }
+      .label { font-size: 18px; font-weight: 700; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 700; fill: #475569; letter-spacing: 0.2px; }
+      .heroSmall { font-size: 14px; font-weight: 700; fill: #e2e8f0; letter-spacing: 0.2px; }
+      .white { fill: #ffffff; }
+      .mutedWhite { fill: #dbeafe; }
+      .center { text-anchor: middle; }
+    </style>
     <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
       <path d="M1 1 L11 6 L1 11 Z" fill="#2563eb"/>
     </marker>
-    <style>
-      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
-      .title { font-size: 34px; font-weight: 800; fill: #f8fafc; }
-      .subtitle { font-size: 16px; font-weight: 500; fill: #dbeafe; }
-      .section { font-size: 22px; font-weight: 800; fill: #0f172a; }
-      .label { font-size: 17px; font-weight: 700; fill: #0f172a; }
-      .body { font-size: 14px; font-weight: 500; fill: #334155; }
-      .small { font-size: 12px; font-weight: 700; fill: #475569; letter-spacing: 0.2px; }
-      .chip { font-size: 13px; font-weight: 700; fill: #0f172a; }
-      .white { fill: #ffffff; }
-      .center { text-anchor: middle; }
-    </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="30" y="28" width="1140" height="664" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect width="1200" height="920" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="864" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <rect x="54" y="48" width="1092" height="118" rx="26" fill="url(#hero)"/>
-  <text x="86" y="95" class="small white">중앙은행 디지털화폐 · 금융정책 + 지급결제 + 통제설계</text>
-  <text x="86" y="132" class="title">15-3. CBDC 심화</text>
-  <text x="86" y="158" class="subtitle">현금의 디지털 대응물이지만, 실제 논점은 ‘누가 쓰는가·어떻게 결제되는가·어디서 통제하는가’에 있다.</text>
+  <rect x="56" y="52" width="1088" height="132" rx="26" fill="#0f3d91"/>
+  <text x="88" y="96" class="heroSmall">중앙은행 디지털화폐 · 정의 + 유형 비교 + 파일럿 구조</text>
+  <text x="88" y="136" class="title white">15-3. CBDC 심화</text>
+  <text x="88" y="164" class="subtitle">CBDC는 현금의 디지털 대응물이지만, 실무에서는 누가 사용하고 어디에서 통제하는지까지 함께 설계해야 합니다.</text>
 
-  <rect x="72" y="188" width="280" height="44" rx="22" fill="#ecfeff" stroke="#99f6e4"/>
-  <circle cx="98" cy="210" r="10" fill="#14b8a6"/>
-  <text x="118" y="215" class="chip">정의: 중앙은행이 발행·보증하는 디지털 법정화폐</text>
+  <rect x="72" y="212" width="1056" height="126" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="98" y="246" class="section">핵심 정의와 정책 논점</text>
+  <rect x="96" y="264" width="244" height="56" rx="18" fill="#dcfce7" stroke="#86efac"/>
+  <text x="114" y="287" class="small">정의</text>
+  <text x="114" y="308" class="body">중앙은행이 발행·보증하는</text>
+  <text x="114" y="328" class="body">디지털 법정화폐</text>
+  <rect x="356" y="264" width="232" height="56" rx="18" fill="#dbeafe" stroke="#93c5fd"/>
+  <text x="374" y="287" class="small">정책</text>
+  <text x="374" y="308" class="body">통화정책 전파 수단과</text>
+  <text x="374" y="328" class="body">최종결제성 확보</text>
+  <rect x="604" y="264" width="232" height="56" rx="18" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="622" y="287" class="small">안정성</text>
+  <text x="622" y="308" class="body">예금 이탈과 시스템 리스크</text>
+  <text x="622" y="328" class="body">완충 장치 필요</text>
+  <rect x="852" y="264" width="252" height="56" rx="18" fill="#ede9fe" stroke="#c4b5fd"/>
+  <text x="870" y="287" class="small">규제</text>
+  <text x="870" y="308" class="body">개인정보 최소화와</text>
+  <text x="870" y="328" class="body">AML/CFT 준수의 균형</text>
 
-  <rect x="364" y="188" width="218" height="44" rx="22" fill="#eff6ff" stroke="#bfdbfe"/>
-  <circle cx="390" cy="210" r="10" fill="#2563eb"/>
-  <text x="410" y="215" class="chip">통화정책 전파·최종결제·법정통화성</text>
+  <rect x="72" y="350" width="360" height="452" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="98" y="388" class="section">소매형 vs 도매형</text>
 
-  <rect x="594" y="188" width="192" height="44" rx="22" fill="#fef3c7" stroke="#fcd34d"/>
-  <circle cx="620" cy="210" r="10" fill="#d97706"/>
-  <text x="640" y="215" class="chip">핵심 위험: 예금 이탈·시스템 리스크</text>
+  <rect x="96" y="412" width="312" height="166" rx="20" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+  <text x="120" y="442" class="small">RETAIL CBDC</text>
+  <text x="120" y="470" class="label">개인·기업이 사용하는 디지털 현금</text>
+  <text x="120" y="498" class="body">• 목적: 현금 대체, 접근성 향상, 금융포용</text>
+  <text x="120" y="524" class="body">• 설계 관심사: 익명성 수준, 오프라인 결제, UX</text>
+  <text x="120" y="550" class="body">• 면접 키워드: “누가 쓰고 어디서 쓰는가”</text>
 
-  <rect x="798" y="188" width="312" height="44" rx="22" fill="#f5f3ff" stroke="#c4b5fd"/>
-  <circle cx="824" cy="210" r="10" fill="#7c3aed"/>
-  <text x="844" y="215" class="chip">쟁점: 개인정보 최소화 ↔ AML/CFT 준수 균형</text>
+  <rect x="96" y="598" width="312" height="166" rx="20" fill="#eef2ff" stroke="#818cf8" stroke-width="2"/>
+  <text x="120" y="628" class="small">WHOLESALE CBDC</text>
+  <text x="120" y="656" class="label">금융기관 간 결제와 청산 효율화</text>
+  <text x="120" y="684" class="body">• 목적: 대량·고빈도 결제, 담보·유동성 관리</text>
+  <text x="120" y="710" class="body">• 설계 관심사: 동시결제, 최종결제성, 상호운용</text>
+  <text x="120" y="736" class="body">• 면접 키워드: “결제 인프라 효율이 핵심”</text>
 
-  <rect x="58" y="254" width="334" height="366" rx="28" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text x="86" y="292" class="section">소매형 vs 도매형</text>
+  <text x="96" y="790" class="body">소매형은 대중 사용성과 개인정보 설계가 중심이고,</text>
+  <text x="96" y="812" class="body">도매형은 기관 간 결제 finality와 유동성 최적화가 중심입니다.</text>
 
-  <rect x="82" y="314" width="286" height="124" rx="22" fill="url(#retail)" stroke="#34d399"/>
-  <text x="106" y="344" class="small">RETAIL CBDC</text>
-  <text x="106" y="370" class="label">개인·기업 대상, 현금 대체</text>
-  <text x="106" y="394" class="body">• 목표: 지급 편의, 접근성, 금융포용</text>
-  <text x="106" y="416" class="body">• 쟁점: 익명성 수준, 오프라인 결제, 예금 대체</text>
-  <text x="106" y="438" class="body">• 면접 키워드: “누가 쓰고, 어디서 쓰며, 얼마나 익명인가”</text>
+  <rect x="456" y="350" width="672" height="452" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="482" y="388" class="section">한국은행 파일럿의 이중운영(two-tier) 구조</text>
 
-  <rect x="82" y="454" width="286" height="124" rx="22" fill="url(#wholesale)" stroke="#818cf8"/>
-  <text x="106" y="484" class="small">WHOLESALE CBDC</text>
-  <text x="106" y="510" class="label">금융기관 대상, 기관 간 결제</text>
-  <text x="106" y="534" class="body">• 목표: 대량·고빈도 결제와 청산 효율화</text>
-  <text x="106" y="556" class="body">• 쟁점: 증권·외환 결제, 담보·유동성 관리</text>
-  <text x="106" y="578" class="body">• 면접 키워드: “최종결제성·동시결제·유동성 최적화”</text>
+  <rect x="700" y="418" width="184" height="86" rx="22" fill="#0f766e"/>
+  <text x="792" y="448" class="small white center">CENTRAL BANK</text>
+  <text x="792" y="474" class="label white center">발행 · 소각 · 최종결제</text>
+  <text x="792" y="494" class="body mutedWhite center">정책 도구와 법적 근거를 함께 검증</text>
 
-  <rect x="82" y="592" width="286" height="16" rx="8" fill="#e2e8f0"/>
-  <rect x="82" y="592" width="148" height="16" rx="8" fill="#10b981"/>
-  <rect x="220" y="592" width="148" height="16" rx="8" fill="#6366f1"/>
-  <text x="82" y="640" class="body">대중 사용성 중심이면 소매형, 결제 인프라 효율 중심이면 도매형 설계가 된다.</text>
+  <rect x="500" y="568" width="204" height="92" rx="22" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="602" y="598" class="small center">INTERMEDIARY A</text>
+  <text x="602" y="624" class="label center">은행 · 결제사업자</text>
+  <text x="602" y="646" class="body center">KYC, 지갑관리, 컴플라이언스</text>
 
-  <rect x="416" y="254" width="728" height="366" rx="28" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text x="444" y="292" class="section">한국은행 파일럿: 이중운영(two-tier) 구조 + 통제 지점</text>
+  <rect x="878" y="568" width="204" height="92" rx="22" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="980" y="598" class="small center">INTERMEDIARY B</text>
+  <text x="980" y="624" class="label center">은행 · 결제사업자</text>
+  <text x="980" y="646" class="body center">예금 이관 충격, 대량 인출 테스트</text>
 
-  <rect x="674" y="316" width="212" height="72" rx="22" fill="#0f766e"/>
-  <text x="780" y="344" class="small white center">CENTRAL BANK</text>
-  <text x="780" y="367" class="label white center">발행·소각·최종결제</text>
-  <text x="780" y="384" class="body center" fill="#d1fae5">정책 도구와 법적 근거를 함께 검증</text>
+  <rect x="484" y="700" width="170" height="66" rx="18" fill="#ecfeff" stroke="#14b8a6" stroke-width="2"/>
+  <text x="569" y="730" class="small center">USER WALLET</text>
+  <text x="569" y="752" class="body center">오프라인 결제, 재동기화, 키관리</text>
 
-  <rect x="478" y="434" width="216" height="82" rx="24" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
-  <text x="586" y="462" class="small center">INTERMEDIARY</text>
-  <text x="586" y="485" class="label center">은행·결제사업자</text>
-  <text x="586" y="507" class="body center">KYC, 지갑관리, 컴플라이언스</text>
+  <rect x="708" y="700" width="186" height="66" rx="18" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="801" y="730" class="small center">LEDGER</text>
+  <text x="801" y="752" class="body center">TPS, 정합성, 이중지급 방지, 로그</text>
 
-  <rect x="866" y="434" width="216" height="82" rx="24" fill="#ffffff" stroke="#60a5fa" stroke-width="2"/>
-  <text x="974" y="462" class="small center">INTERMEDIARY</text>
-  <text x="974" y="485" class="label center">은행·결제사업자</text>
-  <text x="974" y="507" class="body center">예금 이관 충격·대량 인출 시뮬레이션</text>
+  <rect x="948" y="700" width="148" height="66" rx="18" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="1022" y="730" class="small center">PAYMENT APP</text>
+  <text x="1022" y="752" class="body center">P2P, 상업 결제, 민간망 연계</text>
 
-  <rect x="484" y="540" width="170" height="56" rx="18" fill="#ecfeff" stroke="#22c55e"/>
-  <text x="569" y="565" class="small center">USER WALLET</text>
-  <text x="569" y="584" class="body center">오프라인 결제·재동기화·키관리</text>
+  <line x1="792" y1="504" x2="792" y2="560" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="792" y1="504" x2="602" y2="560" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="792" y1="504" x2="980" y2="560" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="602" y1="660" x2="569" y2="692" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="602" y1="660" x2="801" y2="692" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="980" y1="660" x2="1022" y2="692" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
 
-  <rect x="676" y="540" width="208" height="56" rx="18" fill="#eff6ff" stroke="#3b82f6"/>
-  <text x="780" y="565" class="small center">LEDGER</text>
-  <text x="780" y="584" class="body center">TPS·정합성·이중지급 방지·로그 보존</text>
+  <rect x="484" y="416" width="178" height="110" rx="20" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+  <text x="506" y="446" class="small">CONTROL 1</text>
+  <text x="506" y="474" class="label">정책·법무 점검</text>
+  <text x="506" y="500" class="body">법적 근거, 감독 체계,</text>
+  <text x="506" y="522" class="body">중앙은행 긴급대응 책임</text>
 
-  <rect x="906" y="540" width="160" height="56" rx="18" fill="#f5f3ff" stroke="#8b5cf6"/>
-  <text x="986" y="565" class="small center">PAYMENT APP</text>
-  <text x="986" y="584" class="body center">P2P·상업결제·민간망 연계</text>
+  <rect x="930" y="416" width="166" height="110" rx="20" fill="#fef2f2" stroke="#f87171" stroke-width="2"/>
+  <text x="952" y="446" class="small">CONTROL 2</text>
+  <text x="952" y="474" class="label">프라이버시·AML</text>
+  <text x="952" y="500" class="body">최소수집 원칙과</text>
+  <text x="952" y="522" class="body">규제준수 로그 설계</text>
 
-  <line x1="780" y1="388" x2="780" y2="428" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="780" y1="388" x2="586" y2="428" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="780" y1="388" x2="974" y2="428" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="586" y1="516" x2="569" y2="536" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="586" y1="516" x2="780" y2="536" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="974" y1="516" x2="986" y2="536" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="662" y1="472" x2="700" y2="460" stroke="#f97316" stroke-width="2.5" stroke-dasharray="6 6"/>
+  <line x1="884" y1="460" x2="930" y2="472" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="6 6"/>
 
-  <rect x="438" y="320" width="190" height="100" rx="22" fill="#fff7ed" stroke="#fb923c"/>
-  <text x="458" y="348" class="small">CONTROL POINT 1</text>
-  <text x="458" y="372" class="label">정책·법무 점검</text>
-  <text x="458" y="394" class="body">법적 근거, 감독 체계, 중앙은행 긴급대응</text>
-
-  <rect x="932" y="320" width="182" height="100" rx="22" fill="#fef2f2" stroke="#f87171"/>
-  <text x="952" y="348" class="small">CONTROL POINT 2</text>
-  <text x="952" y="372" class="label">프라이버시·AML 균형</text>
-  <text x="952" y="394" class="body">최소수집 원칙과 규제준수 로그 설계</text>
-
-  <line x1="628" y1="370" x2="672" y2="356" stroke="#f97316" stroke-width="2.5" stroke-dasharray="6 6"/>
-  <line x1="886" y1="356" x2="932" y2="370" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="6 6"/>
-
-  <rect x="58" y="638" width="1086" height="34" rx="17" fill="#0f172a"/>
-  <text x="82" y="660" class="small white">설계 축</text>
-  <text x="170" y="660" class="body" fill="#e2e8f0">계좌형(KYC 중심)</text>
-  <line x1="274" y1="654" x2="344" y2="654" stroke="#94a3b8" stroke-width="3"/>
-  <text x="354" y="660" class="body" fill="#e2e8f0">토큰형(오프라인·프라이버시 강점)</text>
-  <line x1="572" y1="654" x2="642" y2="654" stroke="#94a3b8" stroke-width="3"/>
-  <text x="652" y="660" class="body" fill="#e2e8f0">익명성 ↔ AML/CFT</text>
-  <line x1="788" y1="654" x2="858" y2="654" stroke="#94a3b8" stroke-width="3"/>
-  <text x="868" y="660" class="body" fill="#e2e8f0">통제 ↔ 탄력성 ↔ 확장성</text>
+  <rect x="72" y="826" width="1056" height="38" rx="19" fill="#0f172a"/>
+  <text x="96" y="850" class="small white">핵심 기억 포인트</text>
+  <text x="220" y="850" class="body" fill="#e2e8f0">소매형은 사용자 경험, 도매형은 결제 finality, 파일럿은 기술 검증과 정책 통제를 함께 본다.</text>
 </svg>

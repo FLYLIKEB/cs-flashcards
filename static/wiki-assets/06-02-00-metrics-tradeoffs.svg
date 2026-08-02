@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">06-02. CPU 스케줄링 평가 지표와 정책 트레이드오프</title>
+  <desc id="desc">CPU 스케줄링의 평가 지표와 대표 알고리즘의 장점, 위험, 적합한 상황을 표와 카드로 분리해 보여주는 인포그래픽.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="844" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="small" x="72" y="80">운영체제 · 평가 지표 + 알고리즘 선택 기준</text>
+  <text class="title" x="72" y="120">06-02. CPU 스케줄링의 지표와 정책 트레이드오프</text>
+  <text class="subtitle" x="72" y="152">무엇을 좋게 만들고 싶은지 먼저 정한 뒤, 그 목표에 맞는 정책과 위험을 함께 읽는다.</text>
+
+  <g transform="translate(64 188)">
+    <rect width="1072" height="256" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text class="section" x="28" y="40">1. 평가 지표: 시험에서 바로 연결해야 할 방향</text>
+
+    <rect x="28" y="68" width="1016" height="156" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <line x1="252" y1="68" x2="252" y2="224" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="516" y1="68" x2="516" y2="224" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="748" y1="68" x2="748" y2="224" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="28" y1="108" x2="1044" y2="108" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="28" y1="146" x2="1044" y2="146" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="28" y1="184" x2="1044" y2="184" stroke="#e2e8f0" stroke-width="2"/>
+
+    <text class="label" x="48" y="95">지표</text>
+    <text class="label" x="272" y="95">무엇을 본다?</text>
+    <text class="label" x="536" y="95">좋은 방향</text>
+    <text class="label" x="768" y="95">주로 중시하는 상황</text>
+
+    <text class="body" x="48" y="133">CPU 이용률</text>
+    <text class="body" x="272" y="133">CPU가 놀지 않고 일한 비율</text>
+    <text class="body" x="536" y="133">클수록 좋음</text>
+    <text class="body" x="768" y="133">시스템 자원 활용을 보고 싶을 때</text>
+
+    <text class="body" x="48" y="171">처리량</text>
+    <text class="body" x="272" y="171">단위 시간당 완료한 작업 수</text>
+    <text class="body" x="536" y="171">클수록 좋음</text>
+    <text class="body" x="768" y="171">배치 작업을 많이 끝내야 할 때</text>
+
+    <text class="body" x="48" y="209">반환시간 · 대기시간</text>
+    <text class="body" x="272" y="209">도착 후 완료까지, 큐에서 민 시간</text>
+    <text class="body" x="536" y="209">작을수록 좋음</text>
+    <text class="body" x="768" y="209">짧은 작업을 빨리 끝내고 싶을 때</text>
+
+    <text class="body" x="48" y="247">응답시간</text>
+    <text class="body" x="272" y="247">첫 반응이 나오기까지 걸린 시간</text>
+    <text class="body" x="536" y="247">작을수록 좋음</text>
+    <text class="body" x="768" y="247">대화형 서비스, 사용자 체감이 중요할 때</text>
+  </g>
+
+  <g transform="translate(64 472)">
+    <rect width="1072" height="340" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text class="section" x="28" y="40">2. 정책별 강점과 위험: 같은 목표를 보더라도 비용이 다르다</text>
+
+    <g transform="translate(28 68)">
+      <rect width="188" height="116" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+      <text class="label" x="18" y="32">FCFS</text>
+      <text class="body" x="18" y="58">먼저 온 순서대로 실행</text>
+      <text class="small" x="18" y="82">장점: 단순하고 구현이 쉬움</text>
+      <text class="small" x="18" y="102">위험: 긴 작업이 convoy effect 유발</text>
+    </g>
+
+    <g transform="translate(234 68)">
+      <rect width="188" height="116" rx="18" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+      <text class="label" x="18" y="32">SJF / SRTF</text>
+      <text class="body" x="18" y="58">짧은 작업을 먼저 실행</text>
+      <text class="small" x="18" y="82">장점: 평균 대기시간 감소</text>
+      <text class="small" x="18" y="102">위험: 긴 작업 starvation 가능</text>
+    </g>
+
+    <g transform="translate(440 68)">
+      <rect width="188" height="116" rx="18" fill="#ecfccb" stroke="#84cc16" stroke-width="2"/>
+      <text class="label" x="18" y="32">HRN</text>
+      <text class="body" x="18" y="58">짧음 + 오래 기다림 함께 반영</text>
+      <text class="small" x="18" y="82">장점: SJF의 기아를 완화</text>
+      <text class="small" x="18" y="102">위험: 응답률 계산이 필요</text>
+    </g>
+
+    <g transform="translate(646 68)">
+      <rect width="188" height="116" rx="18" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/>
+      <text class="label" x="18" y="32">RR</text>
+      <text class="body" x="18" y="58">time quantum만큼 번갈아 실행</text>
+      <text class="small" x="18" y="82">장점: 응답성이 좋음</text>
+      <text class="small" x="18" y="102">위험: 문맥교환 오버헤드 증가</text>
+    </g>
+
+    <g transform="translate(852 68)">
+      <rect width="188" height="116" rx="18" fill="#fee2e2" stroke="#f87171" stroke-width="2"/>
+      <text class="label" x="18" y="32">Priority</text>
+      <text class="body" x="18" y="58">중요도가 높은 작업 우선</text>
+      <text class="small" x="18" y="82">장점: 정책 반영이 쉬움</text>
+      <text class="small" x="18" y="102">위험: 낮은 우선순위 기아 가능</text>
+    </g>
+
+    <rect x="28" y="214" width="1016" height="92" rx="18" fill="#0f172a"/>
+    <text x="48" y="244" style="font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #f8fafc;">빠른 선택 기준</text>
+    <text x="48" y="272" style="font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #e2e8f0;">배치 작업이면 처리량·반환시간을, 대화형 시스템이면 응답시간을 먼저 본다.</text>
+    <text x="48" y="296" style="font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #e2e8f0;">기아가 보이면 HRN이나 aging 같은 보정 장치를 떠올리고, 응답성이 중요하면 RR의 time quantum과 오버헤드 균형을 같이 본다.</text>
+  </g>
+
+  <text class="small" x="72" y="846">06-02-00-metrics-tradeoffs.svg · page-specific asset for 06-02-00-CPU-스케줄링.md</text>
+</svg>

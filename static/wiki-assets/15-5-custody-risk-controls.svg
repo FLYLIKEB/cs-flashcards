@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">15-5. 수탁 및 리스크 통제 구조도</title>
+  <desc id="desc">디지털자산 수탁 통제를 기술, 운영, 규제, 사고대응 네 축으로 나눠 설명하는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#ecfeff"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <style>
+    text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+    .h1 { font-size: 30px; font-weight: 800; }
+    .lead { font-size: 16px; font-weight: 500; fill: #334155; }
+    .section { font-size: 21px; font-weight: 800; }
+    .boxTitle { font-size: 18px; font-weight: 800; }
+    .body { font-size: 14px; font-weight: 500; fill: #334155; }
+    .note { font-size: 13px; font-weight: 500; fill: #475569; }
+    .centerLabel { font-size: 22px; font-weight: 800; fill: #ffffff; }
+  </style>
+  <rect width="1200" height="820" fill="url(#bg)"/>
+  <rect x="40" y="34" width="1120" height="124" rx="28" fill="#ffffff" filter="url(#shadow)"/>
+  <text class="h1" x="76" y="84">수탁(Custody)과 리스크 통제는 기술·운영·규제·사고대응이 함께 움직여야 합니다.</text>
+  <text class="lead" x="76" y="118">개인키 보관만으로 끝나지 않고, 자산 이동 승인과 모니터링, 복구와 보고 체계까지 연결해야 금융권 통제가 완성됩니다.</text>
+
+  <circle cx="600" cy="430" r="108" fill="#0f766e" filter="url(#shadow)"/>
+  <text class="centerLabel" x="600" y="420" text-anchor="middle">수탁 통제</text>
+  <text class="centerLabel" x="600" y="452" text-anchor="middle">Control Hub</text>
+
+  <rect x="84" y="240" width="284" height="168" rx="24" fill="#dcfce7" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
+  <text class="section" x="112" y="280">기술 통제</text>
+  <text class="body" x="112" y="316">• Hot / Cold 지갑 분리</text>
+  <text class="body" x="112" y="342">• 멀티시그와 HSM 사용</text>
+  <text class="body" x="112" y="368">• 키 백업·복구 절차 마련</text>
+  <text class="note" x="112" y="396">핵심 질문: 키 탈취나 단일 실패지점을 제거했는가</text>
+
+  <rect x="832" y="240" width="284" height="168" rx="24" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text class="section" x="860" y="280">운영 통제</text>
+  <text class="body" x="860" y="316">• 권한 분리와 승인 워크플로우</text>
+  <text class="body" x="860" y="342">• 출금 한도·예외 승인 절차</text>
+  <text class="body" x="860" y="368">• 감사로그와 장부 대사</text>
+  <text class="note" x="860" y="396">핵심 질문: 내부자 오남용을 추적하고 차단할 수 있는가</text>
+
+  <rect x="84" y="520" width="284" height="168" rx="24" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+  <text class="section" x="112" y="560">규제 통제</text>
+  <text class="body" x="112" y="596">• KYC, AML, Travel Rule 이행</text>
+  <text class="body" x="112" y="622">• 제재 목록 자동 점검</text>
+  <text class="body" x="112" y="648">• 의심거래보고와 기록 보관</text>
+  <text class="note" x="112" y="676">핵심 질문: 주소 모니터링과 고객확인이 거래 흐름에 붙어 있는가</text>
+
+  <rect x="832" y="520" width="284" height="168" rx="24" fill="#fee2e2" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
+  <text class="section" x="860" y="560">사고 대응</text>
+  <text class="body" x="860" y="596">• 이상 출금·해킹 징후 탐지</text>
+  <text class="body" x="860" y="622">• 격리, 보고, 고객 공지 절차</text>
+  <text class="body" x="860" y="648">• 자금 회수·보상 정책 준비</text>
+  <text class="note" x="860" y="676">핵심 질문: 탐지 후 누가 언제 무엇을 할지 명확한가</text>
+
+  <path d="M368 324 C430 324 472 352 514 386" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M832 324 C770 324 728 352 686 386" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+  <path d="M368 604 C430 604 472 548 514 474" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round"/>
+  <path d="M832 604 C770 604 728 548 686 474" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+
+  <rect x="412" y="718" width="376" height="54" rx="18" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+  <text class="note" x="444" y="750">면접 답변 팁: 수탁은 지갑 보관 기능이 아니라 “자산 이동 통제와 사고 대응 체계”라고 설명하면 좋습니다.</text>
+</svg>

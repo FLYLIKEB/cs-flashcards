@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">14-3. 어드레싱 모드 요약</title>
+  <desc id="desc">즉시, 레지스터, 직접, 간접, 베이스 플러스 오프셋 주소 지정 방식을 메모리 접근 횟수와 대표 사용처로 비교한 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eefaf6"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 16px 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #0f172a; }
+      .pill { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="860" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="804" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="small" x="72" y="80">14-3. 명령어 세트 · 주소 계산 방식 비교</text>
+  <text class="title" x="72" y="120">어드레싱 모드 한눈에 보기</text>
+  <text class="subtitle" x="72" y="154">핵심 비교 기준은 피연산자를 어디에서 찾는지와 추가 메모리 접근이 필요한지다.</text>
+
+  <rect x="72" y="186" width="320" height="206" rx="24" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="96" y="208" width="150" height="28" rx="14" fill="#2563eb"/>
+  <text class="pill" x="171" y="227" text-anchor="middle">추가 메모리 없음</text>
+  <text class="label" x="96" y="270">즉시 주소 지정</text>
+  <text class="mono" x="96" y="302">ADD r1, r2, #10</text>
+  <text class="body" x="96" y="334">• 상수 값이 명령어 안에 직접 들어 있다.</text>
+  <text class="body" x="96" y="360">• 값을 읽기 위해 별도 메모리 참조가 필요 없다.</text>
+  <text class="small" x="96" y="388">대표 용도: 상수 더하기, 즉시 비교</text>
+
+  <rect x="440" y="186" width="320" height="206" rx="24" fill="#eefaf4" stroke="#4ade80" stroke-width="2"/>
+  <rect x="464" y="208" width="150" height="28" rx="14" fill="#16a34a"/>
+  <text class="pill" x="539" y="227" text-anchor="middle">추가 메모리 없음</text>
+  <text class="label" x="464" y="270">레지스터 주소 지정</text>
+  <text class="mono" x="464" y="302">ADD r1, r2, r3</text>
+  <text class="body" x="464" y="334">• 피연산자가 CPU 내부 레지스터에 있다.</text>
+  <text class="body" x="464" y="360">• 메모리보다 빠르지만 레지스터 수가 한정된다.</text>
+  <text class="small" x="464" y="388">대표 용도: 산술 연산, 임시 값 보관</text>
+
+  <rect x="808" y="186" width="320" height="206" rx="24" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+  <rect x="832" y="208" width="110" height="28" rx="14" fill="#ea580c"/>
+  <text class="pill" x="887" y="227" text-anchor="middle">메모리 1회</text>
+  <text class="label" x="832" y="270">직접 주소 지정</text>
+  <text class="mono" x="832" y="302">LD r1, [1000]</text>
+  <text class="body" x="832" y="334">• 명령어가 실제 메모리 주소를 바로 적어 준다.</text>
+  <text class="body" x="832" y="360">• 구조는 단순하지만 주소 범위 표현이 제한될 수 있다.</text>
+  <text class="small" x="832" y="388">대표 용도: 고정 위치 데이터 접근</text>
+
+  <rect x="72" y="430" width="504" height="214" rx="24" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="96" y="452" width="126" height="28" rx="14" fill="#d97706"/>
+  <text class="pill" x="159" y="471" text-anchor="middle">주소 추적 필요</text>
+  <text class="label" x="96" y="514">간접 / 레지스터 간접 주소 지정</text>
+  <text class="mono" x="96" y="546">LD r1, [r2]</text>
+  <text class="body" x="96" y="578">• r2나 지정된 메모리 칸에 들어 있는 주소를 따라간다.</text>
+  <text class="body" x="96" y="604">• 포인터, 연결 구조, 동적 데이터 접근에서 자주 쓰인다.</text>
+  <text class="small" x="96" y="632">핵심 포인트: 값이 아니라 "주소를 담은 위치"를 먼저 읽는다.</text>
+
+  <rect x="624" y="430" width="504" height="214" rx="24" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <rect x="648" y="452" width="126" height="28" rx="14" fill="#2563eb"/>
+  <text class="pill" x="711" y="471" text-anchor="middle">주소 계산 포함</text>
+  <text class="label" x="648" y="514">베이스 + 오프셋 주소 지정</text>
+  <text class="mono" x="648" y="546">LD r1, [r2 + 8]</text>
+  <text class="body" x="648" y="578">• 기준 주소(r2)에 상수 오프셋을 더해 대상 위치를 찾는다.</text>
+  <text class="body" x="648" y="604">• 배열 원소, 스택 프레임, 구조체 필드 접근에 적합하다.</text>
+  <text class="small" x="648" y="632">시험 포인트: 주소 계산은 필요하지만 패턴이 규칙적이라 활용 빈도가 높다.</text>
+
+  <rect x="72" y="688" width="1056" height="104" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="98" y="724">빠른 비교</text>
+  <text class="body" x="98" y="752">즉시·레지스터 방식은 추가 메모리 접근이 없어서 빠르다. 직접 방식은 주소를 바로 주고, 간접 방식은 주소를 한 번 더 따라간다.</text>
+  <text class="body" x="98" y="778">베이스+오프셋은 배열과 스택처럼 규칙적인 데이터 구조를 설명할 때 가장 자주 등장한다.</text>
+</svg>

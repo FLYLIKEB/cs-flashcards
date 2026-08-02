@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">폴링, 인터럽트, DMA 비교</title>
+  <desc id="desc">세 가지 입출력 처리 방식의 CPU 역할, 적합한 상황, 대표적인 부담을 비교한 표 형식 SVG</desc>
+  <defs>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .head { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .cell { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .chip { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="760" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1224" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="title" x="70" y="92">폴링 · 인터럽트 · DMA 비교</text>
+  <text class="subtitle" x="70" y="126">시험 답안과 실무 설명에서 자주 쓰는 비교 축만 남겨, CPU 관점의 차이를 한 번에 읽을 수 있게 정리했다.</text>
+
+  <g transform="translate(70 176)">
+    <rect x="0" y="0" width="1140" height="72" rx="18" fill="#e2e8f0"/>
+    <rect x="0" y="0" width="168" height="72" rx="18" fill="#cbd5e1"/>
+    <text class="head" x="84" y="44" text-anchor="middle">방식</text>
+    <text class="head" x="294" y="44" text-anchor="middle">CPU가 하는 일</text>
+    <text class="head" x="570" y="44" text-anchor="middle">잘 맞는 상황</text>
+    <text class="head" x="858" y="44" text-anchor="middle">대표 장점</text>
+    <text class="head" x="1072" y="44" text-anchor="middle">대표 부담</text>
+
+    <rect x="0" y="96" width="1140" height="132" rx="22" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+    <rect x="16" y="114" width="136" height="40" rx="20" fill="#dbeafe"/>
+    <text class="chip" x="84" y="140" text-anchor="middle">폴링</text>
+    <text class="cell" x="184" y="138">준비됐는지 반복 확인하며 CPU가 루프를 돈다</text>
+    <text class="cell" x="184" y="168">짧은 간격으로 즉시 확인해야 하는 단순 장치</text>
+    <text class="cell" x="732" y="138">구현이 단순하고 동작이 예측 가능하다</text>
+    <text class="cell" x="732" y="168">장치가 늦으면 busy waiting으로 CPU를 낭비한다</text>
+    <text class="small" x="184" y="200">키워드: 계속 확인, 단순, CPU 낭비</text>
+
+    <rect x="0" y="248" width="1140" height="132" rx="22" fill="#ecfdf5" stroke="#bbf7d0" stroke-width="1.5"/>
+    <rect x="16" y="266" width="136" height="40" rx="20" fill="#dcfce7"/>
+    <text class="chip" x="84" y="292" text-anchor="middle">인터럽트</text>
+    <text class="cell" x="184" y="290">평소에는 다른 일을 하다가, 이벤트가 생기면 ISR로 진입한다</text>
+    <text class="cell" x="184" y="320">중간 빈도의 일반 I/O 이벤트, 응답성과 효율이 모두 필요한 경우</text>
+    <text class="cell" x="732" y="290">이벤트 기반이라 CPU 시간을 아껴 쓸 수 있다</text>
+    <text class="cell" x="732" y="320">빈도가 높아지면 인터럽트 폭주와 전환 비용이 커진다</text>
+    <text class="small" x="184" y="352">키워드: 이벤트 기반, ISR, 오버헤드</text>
+
+    <rect x="0" y="400" width="1140" height="132" rx="22" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+    <rect x="16" y="418" width="136" height="40" rx="20" fill="#fde68a"/>
+    <text class="chip" x="84" y="444" text-anchor="middle">DMA</text>
+    <text class="cell" x="184" y="442">CPU는 버퍼와 길이만 설정하고, 복사는 DMA 컨트롤러가 맡는다</text>
+    <text class="cell" x="184" y="472">디스크 블록, 대량 파일, 고속 네트워크처럼 큰 전송</text>
+    <text class="cell" x="732" y="442">CPU가 데이터 복사에서 빠져 처리량이 좋아진다</text>
+    <text class="cell" x="732" y="472">설정 비용, 캐시 일관성, 완료 동기화를 함께 관리해야 한다</text>
+    <text class="small" x="184" y="504">키워드: 직접 전송, 대용량, 일관성 관리</text>
+  </g>
+</svg>

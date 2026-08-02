@@ -1,139 +1,109 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
   <title id="title">08. 네트워크 개요 인포그래픽</title>
-  <desc id="desc">OSI 7계층, TCP와 UDP, HTTP·DNS·TLS, 라우팅과 서브넷을 하나의 패킷 여정으로 요약한 인포그래픽</desc>
+  <desc id="desc">네트워크 페이지의 핵심 주제인 OSI 7계층, TCP와 UDP, HTTP·DNS·TLS, 라우팅과 서브넷을 네 개의 카드로 정리한 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff" />
-      <stop offset="100%" stop-color="#ecfeff" />
+      <stop offset="0%" stop-color="#f8fbff" />
+      <stop offset="100%" stop-color="#eef6ff" />
     </linearGradient>
-    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#1d4ed8" />
-      <stop offset="100%" stop-color="#0891b2" />
+      <stop offset="100%" stop-color="#0f766e" />
     </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#60a5fa" />
-      <stop offset="100%" stop-color="#22d3ee" />
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.10"/>
-    </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9" />
-    </marker>
     <style>
       .title { font: 700 34px sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px sans-serif; fill: #334155; }
-      .section { font: 700 20px sans-serif; fill: #0f172a; }
-      .label { font: 700 15px sans-serif; fill: #0f172a; }
-      .body { font: 500 13px sans-serif; fill: #334155; }
-      .mini { font: 600 12px sans-serif; fill: #475569; }
-      .tiny { font: 700 11px sans-serif; fill: #475569; letter-spacing: 0.04em; }
-      .chip { font: 700 12px sans-serif; fill: #075985; }
-      .light { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1; }
+      .subtitle { font: 500 17px sans-serif; fill: #334155; }
+      .eyebrow { font: 700 13px sans-serif; fill: #0b5cab; letter-spacing: 0.08em; }
+      .cardTitle { font: 700 24px sans-serif; fill: #0f172a; }
+      .cardLead { font: 600 14px sans-serif; fill: #1e40af; }
+      .label { font: 700 16px sans-serif; fill: #0f172a; }
+      .body { font: 500 14px sans-serif; fill: #334155; }
+      .tiny { font: 600 12px sans-serif; fill: #475569; }
+      .footerTitle { font: 700 18px sans-serif; fill: #ffffff; }
+      .footerText { font: 500 14px sans-serif; fill: #dbeafe; }
+      .pill { font: 700 12px sans-serif; fill: #075985; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="#e2e8f0" />
-  <rect x="20" y="20" width="1160" height="680" rx="30" fill="url(#bg)" />
-  <rect x="44" y="44" width="1112" height="632" rx="28" fill="#ffffff" filter="url(#shadow)" />
+  <rect width="1200" height="900" fill="#dbe7f5" />
+  <rect x="24" y="24" width="1152" height="852" rx="32" fill="url(#bg)" />
+  <rect x="56" y="52" width="1088" height="176" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="88" y="84" width="220" height="32" rx="16" fill="#dbeafe" />
+  <text class="pill" x="198" y="105" text-anchor="middle">금융공기업 IT · 네트워크 메인</text>
+  <text class="title" x="88" y="154">08. 네트워크를 4개의 시험 축으로 나누어 보기</text>
+  <text class="subtitle" x="88" y="190">문제는 보통 계층, 전송 방식, 웹 보안 절차, 경로 계산 중 어디를 묻는지부터 구분하면 빠르게 풀린다.</text>
+  <rect x="842" y="88" width="256" height="104" rx="22" fill="url(#hero)" />
+  <text x="870" y="123" font-family="sans-serif" font-size="16" font-weight="700" fill="#e0f2fe">빠른 분류법</text>
+  <text x="870" y="151" font-family="sans-serif" font-size="25" font-weight="700" fill="#ffffff">계층 → 전송 → 웹 보안 → 경로</text>
+  <text x="870" y="176" font-family="sans-serif" font-size="14" font-weight="500" fill="#dbeafe">시험 문장을 읽을 때 이 순서로 분류</text>
 
-  <rect x="76" y="72" width="220" height="32" rx="16" fill="#dbeafe" />
-  <text class="chip" x="186" y="93" text-anchor="middle">금융공기업 IT · 네트워크 전체 지도</text>
-  <text class="title" x="76" y="136">08. 네트워크: 패킷이 지나가는 4개의 시험 축</text>
-  <text class="subtitle" x="76" y="166">계층을 따라 캡슐화되고, 전송 방식을 고르고, 웹 보안 절차를 거쳐, 라우팅·서브넷 규칙으로 목적지에 도달한다.</text>
+  <rect x="56" y="258" width="510" height="248" rx="26" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <text class="eyebrow" x="88" y="298">AXIS 1</text>
+  <text class="cardTitle" x="88" y="332">OSI 7계층 / TCP-IP 묶음</text>
+  <text class="cardLead" x="88" y="356">기능이 어느 계층에 속하는지 구별하는 파트</text>
+  <rect x="88" y="382" width="212" height="38" rx="12" fill="#dbeafe" />
+  <text class="label" x="104" y="406">상위 계층 7~5</text>
+  <text class="body" x="220" y="406">응용 · 표현 · 세션</text>
+  <rect x="88" y="430" width="212" height="38" rx="12" fill="#dcfce7" />
+  <text class="label" x="104" y="454">전송 계층 4</text>
+  <text class="body" x="220" y="454">TCP · UDP · 포트</text>
+  <rect x="88" y="478" width="212" height="38" rx="12" fill="#fef3c7" />
+  <text class="label" x="104" y="502">하위 계층 3~1</text>
+  <text class="body" x="220" y="502">IP · Ethernet · 물리 신호</text>
+  <rect x="324" y="382" width="210" height="134" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <text class="label" x="344" y="410">시험 포인트</text>
+  <text class="body" x="344" y="438">• 라우팅은 3계층</text>
+  <text class="body" x="344" y="464">• 포트 번호는 4계층</text>
+  <text class="body" x="344" y="490">• HTTP는 7계층</text>
 
-  <path id="journey" d="M 120 240 C 220 208, 320 208, 420 240 S 620 272, 720 240 S 920 208, 1040 248" fill="none" stroke="url(#flow)" stroke-width="10" stroke-linecap="round" opacity="0.9" marker-end="url(#arrow)" />
-  <path d="M 120 240 C 220 208, 320 208, 420 240 S 620 272, 720 240 S 920 208, 1040 248" fill="none" stroke="#bae6fd" stroke-width="18" stroke-linecap="round" opacity="0.35" />
-  <circle cx="120" cy="240" r="8" fill="#0ea5e9">
-    <animateMotion dur="5s" repeatCount="indefinite" rotate="auto">
-      <mpath href="#journey" />
-    </animateMotion>
-  </circle>
+  <rect x="634" y="258" width="510" height="248" rx="26" fill="#ffffff" stroke="#7dd3fc" stroke-width="2" />
+  <text class="eyebrow" x="666" y="298">AXIS 2</text>
+  <text class="cardTitle" x="666" y="332">TCP vs UDP</text>
+  <text class="cardLead" x="666" y="356">신뢰성을 택할지, 지연 감소를 택할지 비교하는 파트</text>
+  <rect x="666" y="382" width="218" height="116" rx="18" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5" />
+  <text class="label" x="688" y="410">TCP</text>
+  <text class="body" x="688" y="438">• 연결형, 3-way handshake</text>
+  <text class="body" x="688" y="464">• 재전송 · ACK · 순서 보장</text>
+  <text class="body" x="688" y="490">• 웹, 파일전송처럼 신뢰성 중시</text>
+  <rect x="902" y="382" width="210" height="116" rx="18" fill="#ecfeff" stroke="#22d3ee" stroke-width="1.5" />
+  <text class="label" x="924" y="410">UDP</text>
+  <text class="body" x="924" y="438">• 비연결형, 작은 헤더</text>
+  <text class="body" x="924" y="464">• 순서 · 재전송 보장 없음</text>
+  <text class="body" x="924" y="490">• DNS, VoIP, 스트리밍에 적합</text>
 
-  <rect x="72" y="212" width="246" height="326" rx="24" fill="#f8fbff" stroke="#93c5fd" stroke-width="2" />
-  <rect x="96" y="232" width="120" height="30" rx="15" fill="url(#header)" />
-  <text class="section" x="236" y="254" text-anchor="end" fill="#ffffff">OSI 7계층</text>
-  <text class="mini" x="236" y="275" text-anchor="end">기능이 어느 계층인지 묻는 문제 대비</text>
+  <rect x="56" y="536" width="510" height="248" rx="26" fill="#ffffff" stroke="#67e8f9" stroke-width="2" />
+  <text class="eyebrow" x="88" y="576">AXIS 3</text>
+  <text class="cardTitle" x="88" y="610">HTTP · DNS · TLS</text>
+  <text class="cardLead" x="88" y="634">웹 접속 순서를 단계별로 묻는 파트</text>
+  <rect x="88" y="656" width="142" height="92" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <text class="label" x="110" y="684">1 DNS</text>
+  <text class="body" x="110" y="710">이름을 IP로 변환</text>
+  <text class="tiny" x="110" y="732">A · AAAA · CNAME</text>
+  <rect x="240" y="656" width="142" height="92" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <text class="label" x="262" y="684">2 TLS</text>
+  <text class="body" x="262" y="710">인증서 확인, 키 교환</text>
+  <text class="tiny" x="262" y="732">기밀성 · 무결성 · 인증</text>
+  <rect x="392" y="656" width="142" height="92" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <text class="label" x="414" y="684">3 HTTP</text>
+  <text class="body" x="414" y="710">GET/POST와 상태 코드</text>
+  <text class="tiny" x="414" y="732">헤더 · 쿠키 · Host</text>
+  <path d="M 230 702 H 240" stroke="#0891b2" stroke-width="3" />
+  <path d="M 382 702 H 392" stroke="#0891b2" stroke-width="3" />
 
-  <rect x="94" y="294" width="202" height="26" rx="8" fill="#dbeafe" /><text class="label" x="110" y="312">7 응용</text><text class="body" x="182" y="312">HTTP, FTP, SMTP</text>
-  <rect x="94" y="322" width="202" height="26" rx="8" fill="#e0f2fe" /><text class="label" x="110" y="340">6 표현</text><text class="body" x="182" y="340">인코딩·암호화</text>
-  <rect x="94" y="350" width="202" height="26" rx="8" fill="#ecfeff" /><text class="label" x="110" y="368">5 세션</text><text class="body" x="182" y="368">통신 세션 관리</text>
-  <rect x="94" y="378" width="202" height="30" rx="8" fill="#dcfce7" /><text class="label" x="110" y="398">4 전송</text><text class="body" x="182" y="398">TCP·UDP, 포트</text>
-  <rect x="94" y="410" width="202" height="30" rx="8" fill="#fef3c7" /><text class="label" x="110" y="430">3 네트워크</text><text class="body" x="182" y="430">IP, 라우팅</text>
-  <rect x="94" y="442" width="202" height="30" rx="8" fill="#fee2e2" /><text class="label" x="110" y="462">2 데이터링크</text><text class="body" x="182" y="462">Ethernet, MAC</text>
-  <rect x="94" y="474" width="202" height="30" rx="8" fill="#ede9fe" /><text class="label" x="110" y="494">1 물리</text><text class="body" x="182" y="494">비트·전기/광 신호</text>
-  <text class="tiny" x="94" y="522">TCP/IP로 묶으면</text>
-  <text class="body" x="94" y="539">응용 / 전송 / 인터넷 / 네트워크 접근</text>
+  <rect x="634" y="536" width="510" height="248" rx="26" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <text class="eyebrow" x="666" y="576">AXIS 4</text>
+  <text class="cardTitle" x="666" y="610">라우팅 · 서브넷</text>
+  <text class="cardLead" x="666" y="634">경로 선택과 주소 범위 계산을 묻는 파트</text>
+  <rect x="666" y="656" width="206" height="94" rx="18" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5" />
+  <text class="label" x="688" y="684">라우팅 테이블</text>
+  <text class="body" x="688" y="710">0.0.0.0/0 → 기본 게이트웨이</text>
+  <text class="body" x="688" y="734">가장 구체적인 목적지 경로 선택</text>
+  <rect x="892" y="656" width="220" height="94" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <text class="label" x="914" y="684">CIDR 예시</text>
+  <text class="body" x="914" y="710">192.168.1.10/28</text>
+  <text class="body" x="914" y="734">네트워크 .0 / 브로드캐스트 .15</text>
 
-  <rect x="338" y="212" width="246" height="326" rx="24" fill="#fbfdff" stroke="#7dd3fc" stroke-width="2" />
-  <rect x="362" y="232" width="134" height="30" rx="15" fill="url(#header)" />
-  <text class="section" x="548" y="254" text-anchor="end" fill="#ffffff">TCP vs UDP</text>
-  <text class="mini" x="548" y="275" text-anchor="end">연결성·신뢰성·오버헤드 비교</text>
-
-  <rect x="360" y="300" width="202" height="98" rx="18" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5" />
-  <text class="label" x="378" y="324">TCP</text>
-  <text class="body" x="378" y="346">• 3-way handshake(SYN → SYN/ACK → ACK)</text>
-  <text class="body" x="378" y="366">• 재전송·ACK·순서 보장</text>
-  <text class="body" x="378" y="386">• 흐름·혼잡 제어, 신뢰성 중시</text>
-
-  <rect x="360" y="414" width="202" height="90" rx="18" fill="#ecfeff" stroke="#22d3ee" stroke-width="1.5" />
-  <text class="label" x="378" y="438">UDP</text>
-  <text class="body" x="378" y="460">• 비연결형, 헤더가 작아 지연이 작음</text>
-  <text class="body" x="378" y="480">• 순서·재전송 보장 없음</text>
-  <text class="body" x="378" y="500">• 스트리밍, DNS, VoIP에 적합</text>
-
-  <path d="M 458 286 L 458 294" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round" />
-  <circle cx="418" cy="286" r="7" fill="#bfdbfe" stroke="#3b82f6" /><circle cx="458" cy="286" r="7" fill="#bfdbfe" stroke="#3b82f6" /><circle cx="498" cy="286" r="7" fill="#bfdbfe" stroke="#3b82f6" />
-  <text class="tiny" x="418" y="289" text-anchor="middle">S</text><text class="tiny" x="458" y="289" text-anchor="middle">SA</text><text class="tiny" x="498" y="289" text-anchor="middle">A</text>
-  <path d="M 425 286 H 451" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)" />
-  <path d="M 465 286 H 491" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)" />
-
-  <rect x="604" y="212" width="246" height="326" rx="24" fill="#fbfdff" stroke="#67e8f9" stroke-width="2" />
-  <rect x="628" y="232" width="146" height="30" rx="15" fill="url(#header)" />
-  <text class="section" x="814" y="254" text-anchor="end" fill="#ffffff">HTTP · DNS · TLS</text>
-  <text class="mini" x="814" y="275" text-anchor="end">웹 요청이 실제로 도착하는 순서</text>
-
-  <rect x="626" y="302" width="200" height="52" rx="16" class="light" />
-  <text class="label" x="644" y="324">1 DNS</text>
-  <text class="body" x="644" y="343">도메인 이름을 IP 주소로 변환</text>
-
-  <rect x="626" y="370" width="200" height="68" rx="16" class="light" />
-  <text class="label" x="644" y="392">2 TLS</text>
-  <text class="body" x="644" y="411">ClientHello → ServerHello/Certificate</text>
-  <text class="body" x="644" y="428">키 교환 후 암호화 세션 수립</text>
-
-  <rect x="626" y="454" width="200" height="58" rx="16" class="light" />
-  <text class="label" x="644" y="476">3 HTTP</text>
-  <text class="body" x="644" y="495">GET/POST, 상태 코드, 헤더 처리</text>
-
-  <path d="M 726 354 V 370" stroke="#06b6d4" stroke-width="3" marker-end="url(#arrow)" />
-  <path d="M 726 438 V 454" stroke="#06b6d4" stroke-width="3" marker-end="url(#arrow)" />
-  <text class="tiny" x="790" y="327">A · AAAA · CNAME</text>
-  <text class="tiny" x="790" y="396">인증 · 키 교환</text>
-  <text class="tiny" x="790" y="479">요청/응답 · 상태코드</text>
-
-  <rect x="870" y="212" width="246" height="326" rx="24" fill="#fbfdff" stroke="#93c5fd" stroke-width="2" />
-  <rect x="894" y="232" width="154" height="30" rx="15" fill="url(#header)" />
-  <text class="section" x="1080" y="254" text-anchor="end" fill="#ffffff">라우팅 · 서브넷</text>
-  <text class="mini" x="1080" y="275" text-anchor="end">목적지 선택과 CIDR 계산</text>
-
-  <rect x="892" y="302" width="202" height="96" rx="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5" />
-  <text class="label" x="910" y="324">Routing Table</text>
-  <text class="body" x="910" y="346">0.0.0.0/0      → 10.0.0.1</text>
-  <text class="body" x="910" y="366">192.168.1.0/24 → directly connected</text>
-  <text class="body" x="910" y="386">10.10.0.0/16   → 172.16.0.254</text>
-
-  <rect x="892" y="414" width="202" height="98" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
-  <text class="label" x="910" y="436">CIDR 계산 예시</text>
-  <text class="body" x="910" y="458">192.168.1.10/28</text>
-  <text class="body" x="910" y="478">네트워크 192.168.1.0</text>
-  <text class="body" x="910" y="496">브로드캐스트 192.168.1.15</text>
-
-  <rect x="72" y="566" width="1044" height="78" rx="24" fill="#0f172a" />
-  <text class="section" x="98" y="596" fill="#ffffff">시험 직전 암기 포인트</text>
-  <text class="body" x="98" y="619" fill="#cbd5e1">① 포트 번호·흐름 제어는 전송 계층 ② TCP는 신뢰성, UDP는 저지연 ③ DNS → TLS → HTTP 순서 ④ /26은 64개 주소, 사용 가능 호스트 62개</text>
-
-  <rect x="924" y="566" width="172" height="54" rx="18" fill="#111827" stroke="#334155" stroke-width="1.5" />
-  <text class="label" x="1010" y="590" text-anchor="middle" fill="#ffffff">한 줄 복습</text>
-  <text class="body" x="1010" y="609" text-anchor="middle" fill="#cbd5e1">계층 → 전송 → 보안/웹 → 경로</text>
+  <rect x="56" y="810" width="1088" height="42" rx="18" fill="#0f172a" />
+  <text class="footerTitle" x="82" y="837">시험 직전 한 줄:</text>
+  <text class="footerText" x="222" y="837">어느 계층 문제인지 먼저 구분하고, 그다음 전송 방식·웹 절차·경로 계산으로 좁히면 된다.</text>
 </svg>

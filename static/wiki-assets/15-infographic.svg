@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
   <title id="title">15. 금융 도메인 지식 인포그래픽</title>
-  <desc id="desc">금융공기업 IT 관점에서 지급결제, 금융데이터, 규제·보안, CBDC, 디지털자산이 신뢰성 있는 금융 인프라로 연결되는 구조를 설명하는 SVG</desc>
+  <desc id="desc">금융공기업 IT 관점에서 지급결제, 데이터·규제·보안, CBDC, 디지털자산, 면접 답변 포인트가 어떻게 하나의 금융 인프라 이해로 연결되는지 보여주는 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff"/>
@@ -21,114 +21,109 @@
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
     </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
-      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .centerTitle { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .centerBody { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
-      .compareHead { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .title { font-size: 34px; font-weight: 800; fill: #ffffff; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #dbeafe; }
+      .kicker { font-size: 13px; font-weight: 700; fill: #d1fae5; letter-spacing: 0.04em; }
+      .section { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .label { font-size: 18px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 700; fill: #475569; }
+      .chip { font-size: 13px; font-weight: 700; fill: #0f172a; }
+      .center { text-anchor: middle; }
+      .white { fill: #ffffff; }
+      .heroBody { font-size: 16px; font-weight: 500; fill: #e2e8f0; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="32" y="28" width="1136" height="664" rx="30" fill="#ffffff" filter="url(#shadow)"/>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <rect x="32" y="28" width="1136" height="844" rx="30" fill="#ffffff" filter="url(#shadow)"/>
 
-  <rect x="32" y="28" width="1136" height="118" rx="30" fill="url(#hero)"/>
-  <path d="M 890 28 C 1010 80, 1090 70, 1168 38 L 1168 146 L 836 146 C 855 110, 870 72, 890 28 Z" fill="#60a5fa" opacity="0.18"/>
-  <text class="small" x="76" y="68">금융공기업 IT 관점 · 지급결제 + 데이터 + 규제 + 신기술</text>
-  <text class="title" x="76" y="104">15. 금융 도메인 지식</text>
-  <text class="subtitle" x="76" y="132">기능 구현보다 거래 확정성, 감사 가능성, 장애 복구 가능성을 먼저 만족해야 금융 인프라가 설득력을 갖는다.</text>
+  <rect x="32" y="28" width="1136" height="132" rx="30" fill="url(#hero)"/>
+  <path d="M 904 28 C 1016 78, 1094 72, 1168 40 L 1168 160 L 846 160 C 866 118, 884 76, 904 28 Z" fill="#93c5fd" opacity="0.18"/>
+  <text class="kicker" x="76" y="70">금융공기업 IT 관점 · 지급결제 · 데이터 · 규제 · 신기술</text>
+  <text class="title" x="76" y="108">15. 금융 도메인 지식</text>
+  <text class="subtitle" x="76" y="136">기능 구현보다 거래 확정성, 감사 가능성, 장애 복구 가능성을 먼저 만족해야 금융 인프라가 설득력을 갖습니다.</text>
 
-  <rect x="68" y="170" width="1064" height="148" rx="26" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="section" x="92" y="205">지급결제 흐름: clearing → settlement → finality</text>
-  <text class="body" x="92" y="229">면접 핵심: 청산은 계산, 결제는 자금 이동, 최종성은 취소되지 않는 확정성이다.</text>
+  <rect x="68" y="184" width="1064" height="180" rx="26" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="92" y="222">1. 지급결제 흐름을 먼저 짚는다</text>
+  <text class="body" x="92" y="248">청산은 계산, 결제는 실제 자금 이동, 최종성은 취소되지 않는 확정성입니다. 이 구분이 금융 IT 설명의 출발점입니다.</text>
 
-  <rect x="96" y="248" width="180" height="50" rx="18" fill="#ccfbf1" stroke="#14b8a6"/>
-  <text class="label" x="186" y="278" text-anchor="middle">거래 요청·검증</text>
-  <text class="small" x="186" y="294" text-anchor="middle">인증·인가, 멱등성</text>
+  <rect x="96" y="280" width="184" height="60" rx="20" fill="#ccfbf1" stroke="#14b8a6"/>
+  <text class="label center" x="188" y="304">거래 요청·검증</text>
+  <text class="small center" x="188" y="326">인증 · 인가 · 멱등성</text>
 
-  <line x1="276" y1="273" x2="354" y2="273" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <line x1="276" y1="273" x2="354" y2="273" stroke="#93c5fd" stroke-width="3" stroke-dasharray="10 8" opacity="0.8">
-    <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/>
-  </line>
+  <line x1="280" y1="310" x2="360" y2="310" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
 
-  <rect x="354" y="238" width="202" height="70" rx="18" fill="#dbeafe" stroke="#3b82f6"/>
-  <text class="label" x="455" y="267" text-anchor="middle">청산 Clearing</text>
-  <text class="small" x="455" y="286" text-anchor="middle">채권·채무 계산, 정산 금액 확정</text>
+  <rect x="360" y="270" width="210" height="80" rx="20" fill="#dbeafe" stroke="#3b82f6"/>
+  <text class="label center" x="465" y="300">청산 Clearing</text>
+  <text class="body center" x="465" y="322">채권·채무 계산</text>
+  <text class="body center" x="465" y="342">정산 금액 확정</text>
 
-  <line x1="556" y1="273" x2="634" y2="273" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <line x1="556" y1="273" x2="634" y2="273" stroke="#93c5fd" stroke-width="3" stroke-dasharray="10 8" opacity="0.8">
-    <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/>
-  </line>
+  <line x1="570" y1="310" x2="650" y2="310" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
 
-  <rect x="634" y="238" width="202" height="70" rx="18" fill="#e0e7ff" stroke="#6366f1"/>
-  <text class="label" x="735" y="267" text-anchor="middle">결제 Settlement</text>
-  <text class="small" x="735" y="286" text-anchor="middle">실제 자금 이동, 채무 소멸</text>
+  <rect x="650" y="270" width="210" height="80" rx="20" fill="#e0e7ff" stroke="#6366f1"/>
+  <text class="label center" x="755" y="300">결제 Settlement</text>
+  <text class="body center" x="755" y="322">실제 자금 이동</text>
+  <text class="body center" x="755" y="342">채무 소멸</text>
 
-  <line x1="836" y1="273" x2="914" y2="273" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <line x1="836" y1="273" x2="914" y2="273" stroke="#93c5fd" stroke-width="3" stroke-dasharray="10 8" opacity="0.8">
-    <animate attributeName="stroke-dashoffset" from="0" to="-72" dur="4s" repeatCount="indefinite"/>
-  </line>
+  <line x1="860" y1="310" x2="940" y2="310" stroke="url(#flow)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
 
-  <rect x="914" y="238" width="190" height="70" rx="18" fill="#ede9fe" stroke="#8b5cf6"/>
-  <text class="label" x="1009" y="267" text-anchor="middle">최종성 Finality</text>
-  <text class="small" x="1009" y="286" text-anchor="middle">취소되지 않는 확정성과 신뢰</text>
+  <rect x="940" y="270" width="164" height="80" rx="20" fill="#ede9fe" stroke="#8b5cf6"/>
+  <text class="label center" x="1022" y="300">최종성 Finality</text>
+  <text class="body center" x="1022" y="322">취소되지 않는</text>
+  <text class="body center" x="1022" y="342">확정성과 신뢰</text>
 
-  <circle cx="600" cy="470" r="106" fill="#f8fafc" stroke="#0f766e" stroke-width="3"/>
-  <circle cx="600" cy="470" r="88" fill="#ecfeff" stroke="#99f6e4"/>
-  <text class="centerTitle" x="600" y="448" text-anchor="middle">신뢰성 있는</text>
-  <text class="centerTitle" x="600" y="480" text-anchor="middle">금융 인프라</text>
-  <text class="centerBody" x="600" y="510" text-anchor="middle">거래 확정성 · 감사 가능성</text>
-  <text class="centerBody" x="600" y="532" text-anchor="middle">운영 통제 · 장애 복구</text>
+  <rect x="68" y="392" width="312" height="182" rx="24" fill="#fff7ed" stroke="#fb923c"/>
+  <text class="section" x="92" y="428">2. 왜 중요한가</text>
+  <text class="body" x="92" y="458">• 조회 → 이체 → 정산 → 보고</text>
+  <text class="body" x="92" y="482">  흐름을 알아야 장애 영향을 설명할 수 있다.</text>
+  <text class="body" x="92" y="514">• 중복 거래, 정산 불일치, 지연 전파는</text>
+  <text class="body" x="92" y="538">  기관 신뢰와 직접 연결된다.</text>
 
-  <path d="M 600 364 L 600 324" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
-  <path d="M 525 410 L 418 352" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
-  <path d="M 675 410 L 786 352" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
-  <path d="M 506 515 L 390 556" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
-  <path d="M 694 515 L 810 556" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <rect x="436" y="386" width="328" height="198" rx="28" fill="#f8fafc" stroke="#0f766e" stroke-width="2.5"/>
+  <circle cx="600" cy="485" r="84" fill="#ecfeff" stroke="#99f6e4" stroke-width="2"/>
+  <text class="section center" x="600" y="452">신뢰성 있는</text>
+  <text class="section center" x="600" y="480">금융 인프라</text>
+  <text class="body center" x="600" y="510">거래 확정성 · 감사 가능성</text>
+  <text class="body center" x="600" y="534">운영 통제 · 장애 복구</text>
+  <text class="small center" x="600" y="560">기술 설명을 금융 리스크 언어로 연결해야 설득력이 높아진다.</text>
 
-  <rect x="370" y="330" width="180" height="72" rx="22" fill="#ffffff" stroke="#14b8a6"/>
-  <text class="label" x="396" y="356">금융데이터</text>
-  <text class="body" x="396" y="377">최소수집, 보존주기,</text>
-  <text class="body" x="396" y="395">마스킹, 접근기록</text>
+  <rect x="820" y="392" width="312" height="182" rx="24" fill="#fdf4ff" stroke="#d946ef"/>
+  <text class="section" x="844" y="428">3. 면접 답변 구조화</text>
+  <text class="body" x="844" y="458">장애 대응은</text>
+  <text class="body" x="844" y="482">탐지 → 격리 → 복구 → 사후 분석</text>
+  <text class="body" x="844" y="514">데이터 활용은</text>
+  <text class="body" x="844" y="538">동의 · 최소수집 · 보존정책까지 묶어 설명</text>
 
-  <rect x="650" y="330" width="180" height="72" rx="22" fill="#ffffff" stroke="#3b82f6"/>
-  <text class="label" x="676" y="356">규제·보안</text>
-  <text class="body" x="676" y="377">감사 로그, 승인 이력,</text>
-  <text class="body" x="676" y="395">암호화, 키 관리</text>
+  <path d="M 540 401 L 420 332" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <path d="M 660 401 L 780 332" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <path d="M 518 548 L 378 560" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
+  <path d="M 682 548 L 820 560" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8 7"/>
 
-  <rect x="316" y="528" width="190" height="76" rx="22" fill="#ffffff" stroke="#0f766e"/>
-  <text class="label" x="342" y="555">운영 통제</text>
-  <text class="body" x="342" y="576">변경관리, 재처리 절차,</text>
-  <text class="body" x="342" y="594">RTO·RPO, 모니터링</text>
+  <rect x="68" y="612" width="1064" height="176" rx="26" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="92" y="648">4. 금융 도메인을 이루는 주변 축</text>
 
-  <rect x="694" y="528" width="190" height="76" rx="22" fill="#ffffff" stroke="#2563eb"/>
-  <text class="label" x="720" y="555">면접 연결 포인트</text>
-  <text class="body" x="720" y="576">API도 호출 한도·로그·</text>
-  <text class="body" x="720" y="594">장애 재처리까지 설명</text>
+  <rect x="92" y="676" width="230" height="82" rx="20" fill="#ffffff" stroke="#14b8a6"/>
+  <text class="label" x="116" y="706">금융데이터</text>
+  <text class="body" x="116" y="730">최소수집 · 보존주기</text>
+  <text class="body" x="116" y="750">마스킹 · 접근기록</text>
 
-  <rect x="68" y="350" width="250" height="140" rx="24" fill="#fff7ed" stroke="#fb923c"/>
-  <text class="section" x="92" y="384">왜 중요한가</text>
-  <text class="body" x="92" y="410">• 조회→이체→정산→보고</text>
-  <text class="body" x="92" y="431">  전체 흐름을 알아야 영향 판단</text>
-  <text class="body" x="92" y="454">• 중복 거래·정산 불일치·지연 전파는</text>
-  <text class="body" x="92" y="475">  기관 신뢰와 직접 연결</text>
+  <rect x="344" y="676" width="230" height="82" rx="20" fill="#ffffff" stroke="#3b82f6"/>
+  <text class="label" x="368" y="706">규제·보안</text>
+  <text class="body" x="368" y="730">감사 로그 · 승인 이력</text>
+  <text class="body" x="368" y="750">암호화 · 키 관리</text>
 
-  <rect x="882" y="350" width="250" height="140" rx="24" fill="#fdf4ff" stroke="#d946ef"/>
-  <text class="section" x="906" y="384">답변 구조화</text>
-  <text class="body" x="906" y="410">장애 대응은</text>
-  <text class="body" x="906" y="431">탐지 → 격리 → 복구 → 사후 분석</text>
-  <text class="body" x="906" y="454">데이터 활용은</text>
-  <text class="body" x="906" y="475">동의·최소수집·보존정책까지 연결</text>
+  <rect x="596" y="676" width="230" height="82" rx="20" fill="#ffffff" stroke="#0f766e"/>
+  <text class="label" x="620" y="706">CBDC</text>
+  <text class="body" x="620" y="730">중앙은행 발행 · 법적 안정성</text>
+  <text class="body" x="620" y="750">기존 지급결제 인프라 연계</text>
 
-  <rect x="68" y="624" width="1064" height="48" rx="20" fill="#0f172a"/>
-  <text class="small" x="92" y="653" fill="#cbd5e1">비교 포인트</text>
-  <text class="compareHead" x="240" y="654" fill="#93c5fd">CBDC</text>
-  <text class="body" x="294" y="654" fill="#e2e8f0">중앙은행 발행 · 법적 안정성 · 기존 지급결제 인프라 연계</text>
-  <text class="compareHead" x="760" y="654" fill="#f0abfc">디지털자산</text>
-  <text class="body" x="856" y="654" fill="#e2e8f0">거래·보관 구조 다양 · 규제 지위 · 키 유출·변동성 리스크 점검</text>
+  <rect x="848" y="676" width="260" height="82" rx="20" fill="#ffffff" stroke="#8b5cf6"/>
+  <text class="label" x="872" y="706">디지털자산</text>
+  <text class="body" x="872" y="730">거래·보관 구조 다양</text>
+  <text class="body" x="872" y="750">키 유출 · 변동성 · 규제 지위 점검</text>
+
+  <rect x="68" y="804" width="1064" height="44" rx="18" fill="#0f172a"/>
+  <text class="heroBody" x="92" y="831">핵심 메시지: 기술 요소를 따로 나열하지 말고 ‘결제 확정성 + 데이터 통제 + 운영 복구’라는 금융 인프라 언어로 연결해 설명합니다.</text>
 </svg>

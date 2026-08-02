@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">06-01-02. 멀티코어에서의 스레드 실행 비교</title>
+  <desc id="desc">단일 코어의 시분할 실행과 듀얼 코어의 동시 실행을 비교해 멀티스레딩이 언제 병렬 처리 이점을 얻는지 설명하는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 16px; font-weight: 700; fill: #475569; }
+      .title { font-size: 34px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .panelTitle { font-size: 23px; font-weight: 800; }
+      .label { font-size: 17px; font-weight: 700; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 700; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1224" height="584" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text x="72" y="84" class="eyebrow">운영체제 · 06-01-02</text>
+  <text x="72" y="128" class="title">스레드는 항상 동시에 도는가?</text>
+  <text x="72" y="164" class="subtitle">멀티스레딩은 작업을 나누는 방식이고, 실제 동시 실행 여부는 코어 수와 스케줄링 방식에 달려 있다.</text>
+
+  <g transform="translate(68 214)">
+    <rect x="0" y="0" width="540" height="318" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="28" y="42" class="panelTitle">단일 코어: 번갈아 실행</text>
+    <text x="28" y="68" class="body">한 순간에는 한 스레드만 CPU를 쓰고, 운영체제가 아주 빠르게 교대시켜 동시에 도는 것처럼 보이게 한다.</text>
+
+    <text x="28" y="126" class="label">CPU Core 1</text>
+    <rect x="150" y="98" width="330" height="56" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="150" y="98" width="92" height="56" rx="18" fill="#93c5fd"/>
+    <rect x="242" y="98" width="86" height="56" fill="#c4b5fd"/>
+    <rect x="328" y="98" width="82" height="56" fill="#93c5fd"/>
+    <rect x="410" y="98" width="70" height="56" rx="18" fill="#c4b5fd"/>
+    <text x="196" y="132" text-anchor="middle" class="label">T1</text>
+    <text x="285" y="132" text-anchor="middle" class="label">T2</text>
+    <text x="369" y="132" text-anchor="middle" class="label">T1</text>
+    <text x="445" y="132" text-anchor="middle" class="label">T2</text>
+
+    <text x="150" y="188" class="small">시간축</text>
+    <line x1="150" y1="200" x2="480" y2="200" stroke="#64748b" stroke-width="2"/>
+    <line x1="150" y1="194" x2="150" y2="206" stroke="#64748b" stroke-width="2"/>
+    <line x1="260" y1="194" x2="260" y2="206" stroke="#64748b" stroke-width="2"/>
+    <line x1="370" y1="194" x2="370" y2="206" stroke="#64748b" stroke-width="2"/>
+    <line x1="480" y1="194" x2="480" y2="206" stroke="#64748b" stroke-width="2"/>
+
+    <rect x="28" y="234" width="480" height="60" rx="18" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="24" y="260" class="body">핵심 해석</text>
+    <text x="24" y="284" class="body">• 응답성은 좋아질 수 있지만, 순수 계산은 실제 병렬보다 제한적이다.</text>
+  </g>
+
+  <g transform="translate(672 214)">
+    <rect x="0" y="0" width="540" height="318" rx="28" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+    <text x="28" y="42" class="panelTitle">멀티 코어: 실제 동시 실행 가능</text>
+    <text x="28" y="68" class="body">코어가 둘 이상이면 서로 다른 스레드를 각 코어에 배치해 같은 시간대에 처리할 수 있다.</text>
+
+    <text x="28" y="126" class="label">CPU Core 1</text>
+    <rect x="150" y="98" width="330" height="56" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="150" y="98" width="330" height="56" rx="18" fill="#93c5fd"/>
+    <text x="315" y="132" text-anchor="middle" class="label">Thread T1</text>
+
+    <text x="28" y="212" class="label">CPU Core 2</text>
+    <rect x="150" y="184" width="330" height="56" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+    <rect x="150" y="184" width="330" height="56" rx="18" fill="#c4b5fd"/>
+    <text x="315" y="218" text-anchor="middle" class="label">Thread T2</text>
+
+    <rect x="28" y="262" width="480" height="32" rx="16" fill="#ffffff" stroke="#bbf7d0"/>
+    <text x="268" y="283" text-anchor="middle" class="body">두 스레드가 같은 시간 구간에 다른 코어에서 함께 실행된다.</text>
+  </g>
+</svg>

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">10-03-01. SQL Injection 공격·방어 흐름</title>
+  <desc id="desc">SQL Injection에서 입력값이 문자열 결합을 통해 질의 구조를 바꾸고, Prepared Statement가 이를 막는 과정을 단계형으로 정리한 SVG다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .title { font-size: 32px; font-weight: 700; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .step { font-size: 19px; font-weight: 700; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 500; fill: #475569; }
+      .mono { font-size: 15px; font-weight: 700; fill: #1e3a8a; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f8fbff"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
+
+  <text x="64" y="84" class="title">SQL Injection 공격 흐름과 방어 체크포인트</text>
+  <text x="64" y="118" class="subtitle">문제의 핵심은 입력값이 데이터가 아니라 SQL 문장의 일부처럼 해석된다는 점이다.</text>
+
+  <rect x="72" y="176" width="220" height="140" rx="22" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="96" y="214" class="step">1. 공격 입력</text>
+  <text x="96" y="246" class="body">로그인 폼 등에</text>
+  <text x="96" y="272" class="body">조건식·주석문자를 삽입</text>
+  <text x="96" y="298" class="mono">admin' --</text>
+  <text x="96" y="320" class="mono">' OR '1'='1</text>
+
+  <rect x="354" y="176" width="220" height="140" rx="22" fill="#f8fafc" stroke="#60a5fa" stroke-width="2"/>
+  <text x="378" y="214" class="step">2. 문자열 결합</text>
+  <text x="378" y="246" class="body">서버 코드가 입력값을</text>
+  <text x="378" y="272" class="body">SQL 문자열 안에 직접 연결</text>
+  <text x="378" y="300" class="small">WHERE id='... ' AND pw='...'</text>
+
+  <rect x="636" y="176" width="220" height="140" rx="22" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="660" y="214" class="step">3. 질의 구조 변형</text>
+  <text x="660" y="246" class="body">DB가 입력값을</text>
+  <text x="660" y="272" class="body">조건문·주석·추가 SELECT로</text>
+  <text x="660" y="298" class="body">오해하여 실행</text>
+
+  <rect x="918" y="176" width="220" height="140" rx="22" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="942" y="214" class="step">4. 피해</text>
+  <text x="942" y="246" class="body">인증 우회, 데이터 조회,</text>
+  <text x="942" y="272" class="body">변조·삭제, 구조 노출,</text>
+  <text x="942" y="298" class="body">시간 기반 추론</text>
+
+  <line x1="292" y1="246" x2="354" y2="246" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="574" y1="246" x2="636" y2="246" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="856" y1="246" x2="918" y2="246" stroke="#2563eb" stroke-width="5" marker-end="url(#arrow)"/>
+
+  <rect x="72" y="366" width="520" height="154" rx="24" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="100" y="406" class="step">대표 공격 패턴</text>
+  <text x="100" y="438" class="body">• 인증 우회: 항상 참 조건 삽입</text>
+  <text x="100" y="468" class="body">• UNION: 다른 테이블 결과를 이어 붙여 조회</text>
+  <text x="100" y="498" class="body">• Error / Blind / Time: 오류·반응·지연으로 구조 추론</text>
+
+  <rect x="608" y="366" width="530" height="154" rx="24" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="636" y="406" class="step">방어 체크포인트</text>
+  <text x="636" y="438" class="body">• Prepared Statement로 쿼리 구조와 값을 분리</text>
+  <text x="636" y="468" class="body">• 입력 타입·범위 검증과 허용목록 적용</text>
+  <text x="636" y="498" class="body">• 최소 권한 DB 계정, 내부 오류 숨김, 동적 SQL 금지</text>
+
+  <rect x="72" y="562" width="1066" height="122" rx="24" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="100" y="604" class="step">판별 한 줄</text>
+  <text x="100" y="636" class="body">문제 지문에 “질의 조건이 바뀌었다”, “오류 메시지로 구조를 추정했다”, “응답 시간으로 데이터를 맞혔다”가 보이면 SQL Injection을 먼저 의심한다.</text>
+</svg>

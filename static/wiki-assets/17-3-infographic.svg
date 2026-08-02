@@ -1,147 +1,112 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
   <title id="title">17-3. 분산 시스템 이론 인포그래픽</title>
-  <desc id="desc">CAP, PACELC, 2PC, Saga, 합의 알고리즘과 운영 기법의 관계를 설명하는 분산 시스템 이론 인포그래픽</desc>
+  <desc id="desc">CAP와 PACELC의 선택 기준, CP와 AP 설계 방향, 금융 시스템 운영 원칙을 요약한 인포그래픽</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#e0f2fe"/>
-    </linearGradient>
-    <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#8b5cf6"/>
-      <stop offset="100%" stop-color="#0ea5e9"/>
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
-    </marker>
     <style>
-      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .eyebrow { font-size: 14px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
-      .title { font-size: 34px; font-weight: 800; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .section { font-size: 17px; font-weight: 800; }
-      .label { font-size: 15px; font-weight: 700; }
-      .body { font-size: 14px; font-weight: 500; fill: #334155; }
-      .tiny { font-size: 12px; font-weight: 600; fill: #475569; }
-      .mono { font-size: 13px; font-weight: 800; letter-spacing: 0.04em; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 36px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .section { font-size: 22px; font-weight: 800; }
+      .label { font-size: 18px; font-weight: 700; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .mono { font-size: 24px; font-weight: 800; letter-spacing: 0.06em; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="28" y="28" width="1144" height="664" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect width="1200" height="860" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="804" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text x="72" y="78" class="eyebrow">DISTRIBUTED SYSTEM THEORY</text>
-  <text x="72" y="118" class="title">17-3. 분산 시스템 이론</text>
-  <text x="72" y="150" class="subtitle">장애가 생기면 CAP에서 C/A를 고르고, 평상시엔 PACELC에서 지연/일관성 균형을 잡는다.</text>
+  <text x="72" y="82" class="eyebrow">DISTRIBUTED SYSTEM THEORY</text>
+  <text x="72" y="124" class="title">17-3. 분산 시스템 이론</text>
+  <text x="72" y="160" class="subtitle">장애가 생기면 CAP에서 C/A를 고르고, 평상시에는 PACELC로 지연과 일관성의 균형을 정한다.</text>
 
-  <g transform="translate(62 184)">
-    <rect width="516" height="248" rx="26" fill="url(#capGrad)" stroke="#93c5fd" stroke-width="2"/>
-    <text x="26" y="36" class="section">1) CAP · PACELC 의사결정 지도</text>
+  <g transform="translate(64 198)">
+    <rect width="516" height="286" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+    <text x="28" y="40" class="section">1) CAP: 분할 상황의 우선순위 결정</text>
 
-    <polygon points="258,54 112,198 404,198" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
-    <circle cx="258" cy="54" r="36" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-    <circle cx="112" cy="198" r="36" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-    <circle cx="404" cy="198" r="36" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
-    <text x="258" y="59" text-anchor="middle" class="mono">P</text>
-    <text x="112" y="203" text-anchor="middle" class="mono">C</text>
-    <text x="404" y="203" text-anchor="middle" class="mono">A</text>
-    <text x="258" y="18" text-anchor="middle" class="tiny">Partition tolerance</text>
-    <text x="112" y="247" text-anchor="middle" class="tiny">Consistency</text>
-    <text x="404" y="247" text-anchor="middle" class="tiny">Availability</text>
+    <polygon points="258,88 124,224 392,224" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
+    <circle cx="258" cy="88" r="42" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="124" cy="224" r="40" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+    <circle cx="392" cy="224" r="40" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"/>
 
-    <path d="M 258 92 L 258 128" stroke="#6366f1" stroke-width="4" stroke-dasharray="8 8">
-      <animate attributeName="stroke-dashoffset" from="0" to="-32" dur="2.8s" repeatCount="indefinite"/>
-    </path>
-    <rect x="188" y="126" width="140" height="54" rx="16" fill="#312e81"/>
-    <text x="258" y="148" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">분할 발생</text>
-    <text x="258" y="166" text-anchor="middle" font-size="13" font-weight="700" fill="#c7d2fe">P는 포기 어렵다 → C 또는 A 선택</text>
+    <text x="258" y="96" text-anchor="middle" class="mono">P</text>
+    <text x="124" y="232" text-anchor="middle" class="mono">C</text>
+    <text x="392" y="232" text-anchor="middle" class="mono">A</text>
+    <text x="258" y="28" text-anchor="middle" class="small">Partition tolerance</text>
+    <text x="124" y="276" text-anchor="middle" class="small">Consistency</text>
+    <text x="392" y="276" text-anchor="middle" class="small">Availability</text>
 
-    <rect x="26" y="70" width="148" height="64" rx="18" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
-    <text x="100" y="94" text-anchor="middle" class="label">CP 쪽 선택</text>
-    <text x="100" y="114" text-anchor="middle" class="body">합의·리더 복제</text>
-    <text x="100" y="131" text-anchor="middle" class="body">원장 정합성 우선</text>
+    <rect x="150" y="118" width="216" height="72" rx="16" fill="#312e81"/>
+    <text x="258" y="145" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">분할이 오면 P는 사실상 유지해야 한다</text>
+    <text x="258" y="167" text-anchor="middle" font-size="14" font-weight="700" fill="#c7d2fe">그래서 장애 시점에는</text>
+    <text x="258" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#c7d2fe">C 또는 A 중 우선순위를 선택한다</text>
 
-    <rect x="342" y="70" width="148" height="64" rx="18" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
-    <text x="416" y="94" text-anchor="middle" class="label">AP 쪽 선택</text>
-    <text x="416" y="114" text-anchor="middle" class="body">응답성 유지</text>
-    <text x="416" y="131" text-anchor="middle" class="body">나중에 정합화</text>
+    <rect x="22" y="78" width="140" height="82" rx="18" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+    <text x="92" y="104" text-anchor="middle" class="label">CP 선택</text>
+    <text x="92" y="126" text-anchor="middle" class="body">합의 · 리더 복제</text>
+    <text x="92" y="146" text-anchor="middle" class="body">핵심 원장 정합성 우선</text>
 
-    <path d="M 174 102 C 198 96, 220 92, 240 84" fill="none" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arrow)"/>
-    <path d="M 342 102 C 318 96, 296 92, 276 84" fill="none" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <rect x="354" y="78" width="140" height="82" rx="18" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+    <text x="424" y="104" text-anchor="middle" class="label">AP 선택</text>
+    <text x="424" y="126" text-anchor="middle" class="body">응답성 · 가용성 유지</text>
+    <text x="424" y="146" text-anchor="middle" class="body">사후 정합화 허용</text>
 
-    <rect x="26" y="208" width="464" height="28" rx="14" fill="#e2e8f0"/>
-    <rect x="26" y="208" width="210" height="28" rx="14" fill="url(#flowGrad)"/>
-    <text x="36" y="202" class="tiny">PACELC: 평상시(Else)는 Latency ↔ Consistency 균형</text>
-    <text x="40" y="227" font-size="12" font-weight="800" fill="#ffffff">Latency 우선</text>
-    <text x="448" y="227" text-anchor="end" font-size="12" font-weight="800" fill="#0f172a">Consistency 우선</text>
+    <path d="M 162 122 C 184 118, 206 112, 222 104" fill="none" stroke="#16a34a" stroke-width="3"/>
+    <path d="M 354 122 C 332 118, 310 112, 294 104" fill="none" stroke="#dc2626" stroke-width="3"/>
   </g>
 
-  <g transform="translate(606 184)">
-    <rect width="532" height="248" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-    <text x="24" y="36" class="section">2) 분산 트랜잭션 선택: 2PC vs Saga</text>
+  <g transform="translate(604 198)">
+    <rect width="532" height="286" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="28" y="40" class="section">2) PACELC: 평상시에도 trade-off가 남는다</text>
 
-    <rect x="22" y="56" width="226" height="170" rx="22" fill="#eef2ff" stroke="#818cf8" stroke-width="2"/>
-    <text x="38" y="84" class="label">2PC : prepare → commit</text>
-    <rect x="42" y="102" width="54" height="46" rx="12" fill="#ffffff" stroke="#6366f1"/>
-    <rect x="108" y="102" width="54" height="46" rx="12" fill="#ffffff" stroke="#6366f1"/>
-    <rect x="174" y="102" width="54" height="46" rx="12" fill="#ffffff" stroke="#6366f1"/>
-    <text x="69" y="129" text-anchor="middle" class="tiny">Coord</text>
-    <text x="135" y="129" text-anchor="middle" class="tiny">P1</text>
-    <text x="201" y="129" text-anchor="middle" class="tiny">P2</text>
-    <path d="M 96 125 L 108 125" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
-    <path d="M 162 125 L 174 125" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
-    <text x="42" y="170" class="body">• 모두 준비되면 일괄 commit</text>
-    <text x="42" y="190" class="body">• 장점: 강한 원자성</text>
-    <text x="42" y="210" class="body">• 한계: coordinator 장애 시 blocking</text>
+    <rect x="28" y="66" width="476" height="84" rx="18" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="52" y="96" class="label">Partition 있을 때 (P/E)</text>
+    <text x="52" y="120" class="body">장애 구간에서는 Availability 와 Consistency 중 어느 쪽을 지킬지 결정한다.</text>
+    <text x="52" y="141" class="body">즉 CAP의 선택이 그대로 드러나는 순간이다.</text>
 
-    <rect x="284" y="56" width="226" height="170" rx="22" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/>
-    <text x="300" y="84" class="label">Saga : local tx + compensation</text>
-    <rect x="304" y="102" width="48" height="46" rx="12" fill="#ffffff" stroke="#0891b2"/>
-    <rect x="372" y="102" width="48" height="46" rx="12" fill="#ffffff" stroke="#0891b2"/>
-    <rect x="440" y="102" width="48" height="46" rx="12" fill="#ffffff" stroke="#0891b2"/>
-    <text x="328" y="129" text-anchor="middle" class="tiny">T1</text>
-    <text x="396" y="129" text-anchor="middle" class="tiny">T2</text>
-    <text x="464" y="129" text-anchor="middle" class="tiny">T3</text>
-    <path d="M 352 125 L 372 125" stroke="#0891b2" stroke-width="3" marker-end="url(#arrow)"/>
-    <path d="M 420 125 L 440 125" stroke="#0891b2" stroke-width="3" marker-end="url(#arrow)"/>
-    <path d="M 464 154 C 448 178, 390 188, 352 158" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
-    <text x="42" y="170" class="body"> </text>
-    <text x="304" y="170" class="body">• 실패 시 보상 트랜잭션으로 되돌림</text>
-    <text x="304" y="190" class="body">• 장점: 느슨한 결합, 확장성</text>
-    <text x="304" y="210" class="body">• 한계: 최종 일관성, 보상 설계 복잡</text>
+    <rect x="28" y="168" width="476" height="106" rx="18" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/>
+    <text x="52" y="198" class="label">Else: 분할이 없을 때 (L/C)</text>
+    <text x="52" y="222" class="body">평상시에는 낮은 지연과 강한 일관성 사이의 비용을 맞춘다.</text>
+    <text x="52" y="243" class="body">복제 거리가 길고 확인 단계가 많을수록 응답은 느려지지만 정합성은 강해진다.</text>
+
+    <rect x="52" y="250" width="164" height="14" rx="7" fill="#38bdf8"/>
+    <rect x="216" y="250" width="132" height="14" rx="7" fill="#cbd5e1"/>
+    <rect x="348" y="250" width="128" height="14" rx="7" fill="#1d4ed8"/>
+    <text x="52" y="294" class="small">빠른 응답이 중요한 서비스</text>
+    <text x="468" y="294" text-anchor="end" class="small">정합성 증명이 중요한 원장 시스템</text>
   </g>
 
-  <g transform="translate(62 456)">
-    <rect width="1076" height="194" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-    <text x="24" y="36" class="section">3) 실무 설계 원칙: 합의 + 운영 안전장치</text>
+  <g transform="translate(64 516)">
+    <rect width="1072" height="276" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="28" y="40" class="section">3) 설계 힌트: 시스템 특성에 따라 선택지를 조합한다</text>
 
-    <g transform="translate(28 60)">
-      <rect width="276" height="104" rx="22" fill="#fefce8" stroke="#eab308" stroke-width="2"/>
-      <text x="18" y="28" class="label">Consensus (Raft/Paxos)</text>
-      <text x="18" y="50" class="body">리더 선출 · 로그 복제 · quorum</text>
-      <text x="18" y="70" class="body">Partition 시 C를 택하는 대표 수단</text>
-      <circle cx="214" cy="56" r="20" fill="#facc15" opacity="0.25"/>
-      <circle cx="236" cy="40" r="12" fill="#facc15" opacity="0.45"/>
-      <circle cx="242" cy="72" r="10" fill="#facc15" opacity="0.35"/>
+    <g transform="translate(28 66)">
+      <rect width="312" height="170" rx="20" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+      <text x="20" y="30" class="label">CP 성향 시스템</text>
+      <text x="20" y="58" class="body">• 합의와 quorum으로 이중 기록을 막는다</text>
+      <text x="20" y="84" class="body">• 계좌 잔액, 주문 원장처럼</text>
+      <text x="20" y="104" class="body">  오류 비용이 큰 업무에 적합하다</text>
+      <text x="20" y="130" class="body">• 운영 포인트: 리더 전환 시간과 타임아웃</text>
     </g>
 
-    <g transform="translate(330 60)">
-      <rect width="330" height="104" rx="22" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
-      <text x="18" y="28" class="label">필수 운영 기법</text>
-      <text x="18" y="50" class="body">타임아웃 · 재시도 · 멱등성 · 분산 락</text>
-      <text x="18" y="70" class="body">벡프레셔 · 회로 차단기로 장애 전파 억제</text>
-      <text x="18" y="90" class="body">거래 ID와 감사 로그로 복구 가능성 확보</text>
+    <g transform="translate(380 66)">
+      <rect width="312" height="170" rx="20" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+      <text x="20" y="30" class="label">AP / 최종 일관성 성향</text>
+      <text x="20" y="58" class="body">• 우선 응답하고 나중에 동기화·보상한다</text>
+      <text x="20" y="84" class="body">• 알림, 통계, 분석처럼</text>
+      <text x="20" y="104" class="body">  처리량이 중요한 업무에 적합하다</text>
+      <text x="20" y="130" class="body">• 운영 포인트: 재시도, 멱등성 키, 보상 로직</text>
     </g>
 
-    <g transform="translate(688 60)">
-      <rect width="360" height="104" rx="22" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
-      <text x="18" y="28" class="label">금융권 예시</text>
-      <text x="18" y="50" class="body">핵심 원장/잔액: CP 성향, 강한 정합성 우선</text>
-      <text x="18" y="70" class="body">정산·알림·분석: Saga 기반 최종 일관성 허용</text>
-      <text x="18" y="90" class="body">SLA와 허용 불일치 시간을 먼저 정의</text>
+    <g transform="translate(732 66)">
+      <rect width="312" height="170" rx="20" fill="#fefce8" stroke="#eab308" stroke-width="2"/>
+      <text x="20" y="30" class="label">공통 안전장치</text>
+      <text x="20" y="58" class="body">• 타임아웃, 회로 차단기, 벡프레셔</text>
+      <text x="20" y="84" class="body">  로 장애 전파를 늦춘다</text>
+      <text x="20" y="104" class="body">• 거래 ID, 감사 로그, 재처리 경로를 남긴다</text>
+      <text x="20" y="130" class="body">• 금융권은 허용 불일치 시간부터 정한다</text>
     </g>
   </g>
 </svg>

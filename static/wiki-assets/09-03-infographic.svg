@@ -1,134 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-03. 정렬과 탐색 인포그래픽</title>
-  <desc id="desc">정렬 알고리즘의 복잡도 비교와 정렬된 배열에서 이진 탐색이 범위를 절반씩 줄이는 과정을 함께 보여준다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">09-03. 정렬 비교 요약</title>
+  <desc id="desc">퀵, 병합, 힙, 삽입 정렬의 평균 시간, 최악 시간, 안정성, 추가 공간과 적합한 사용 상황을 읽기 쉽게 비교한 인포그래픽이다.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-    <linearGradient id="sortPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#e0f2fe"/>
-    </linearGradient>
-    <linearGradient id="searchPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ede9fe"/>
-      <stop offset="100%" stop-color="#fae8ff"/>
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#7c3aed"/>
-    </marker>
     <style>
-      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
-      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 16px; font-weight: 600; fill: #334155; }
-      .section { font-size: 24px; font-weight: 800; fill: #0f172a; }
-      .label { font-size: 17px; font-weight: 700; fill: #0f172a; }
-      .body { font-size: 15px; font-weight: 500; fill: #334155; }
-      .small { font-size: 13px; font-weight: 600; fill: #475569; }
-      .tiny { font-size: 12px; font-weight: 600; fill: #64748b; }
-      .mono { font-size: 13px; font-weight: 700; fill: #1e293b; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 18px; font-weight: 700; fill: #475569; }
+      .title { font-size: 36px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .section { font-size: 23px; font-weight: 800; }
+      .label { font-size: 21px; font-weight: 800; }
+      .body { font-size: 17px; font-weight: 500; fill: #334155; }
+      .small { font-size: 15px; font-weight: 600; fill: #475569; }
+      .mono { font-size: 17px; font-weight: 700; fill: #1e293b; }
+      .cellHead { font-size: 15px; font-weight: 700; fill: #475569; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="24" y="24" width="1152" height="672" rx="32" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect width="1200" height="760" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="small" x="72" y="78">자료구조 · 알고리즘 · 복잡도 비교</text>
-  <text class="title" x="72" y="118">09-03. 정렬과 탐색</text>
-  <text class="subtitle" x="72" y="150">정렬 비용을 감수하면 탐색은 빨라진다 — 이진 탐색은 O(log n), 퀵정렬 평균은 O(n log n)</text>
+  <text class="eyebrow" x="72" y="84">자료구조 · 알고리즘 · 시간복잡도 비교</text>
+  <text class="title" x="72" y="128">정렬 알고리즘을 고를 때 보는 4가지</text>
+  <text class="subtitle" x="72" y="162">평균/최악 시간만 보지 말고 안정성, 추가 공간, 데이터 특성까지 함께 판단한다.</text>
 
-  <rect x="60" y="186" width="504" height="372" rx="28" fill="url(#sortPanel)" stroke="#93c5fd"/>
-  <rect x="588" y="186" width="552" height="372" rx="28" fill="url(#searchPanel)" stroke="#c4b5fd"/>
-  <rect x="60" y="578" width="1080" height="98" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="72" y="206" width="1056" height="60" rx="18" fill="#e2e8f0"/>
+  <text class="cellHead" x="104" y="244">알고리즘</text>
+  <text class="cellHead" x="286" y="244">평균 시간</text>
+  <text class="cellHead" x="460" y="244">최악 시간</text>
+  <text class="cellHead" x="622" y="244">안정성</text>
+  <text class="cellHead" x="766" y="244">추가 공간</text>
+  <text class="cellHead" x="936" y="244">언제 기억할까</text>
 
-  <text class="section" x="88" y="224">정렬 알고리즘 비교</text>
-  <text class="small" x="88" y="248">평균/최악 시간, 안정성, 메모리 특성을 함께 기억</text>
+  <rect x="72" y="284" width="1056" height="88" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text class="label" x="104" y="336">Quick</text>
+  <text class="mono" x="286" y="336">O(n log n)</text>
+  <text class="mono" x="460" y="336">O(n²)</text>
+  <text class="body" x="622" y="336">기본 구현은 불안정</text>
+  <text class="body" x="766" y="336">재귀 스택 O(log n) 평균</text>
+  <text class="body" x="936" y="324">평균 성능이 좋아 실무에서 자주 쓴다.</text>
+  <text class="small" x="936" y="347">단, pivot이 한쪽으로 치우치면 최악 O(n²).</text>
 
-  <line x1="96" y1="286" x2="528" y2="286" stroke="#94a3b8" stroke-width="1.5"/>
-  <text class="tiny" x="96" y="276">알고리즘</text>
-  <text class="tiny" x="222" y="276">평균</text>
-  <text class="tiny" x="316" y="276">최악</text>
-  <text class="tiny" x="402" y="276">안정성</text>
-  <text class="tiny" x="472" y="276">특징</text>
+  <rect x="72" y="388" width="1056" height="88" rx="22" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <text class="label" x="104" y="440">Merge</text>
+  <text class="mono" x="286" y="440">O(n log n)</text>
+  <text class="mono" x="460" y="440">O(n log n)</text>
+  <text class="body" x="622" y="440">안정</text>
+  <text class="body" x="766" y="440">추가 배열 O(n)</text>
+  <text class="body" x="936" y="428">최악도 일정하고 다중 키 정렬에 강하다.</text>
+  <text class="small" x="936" y="451">외부 정렬, stable sort 설명용으로 자주 등장.</text>
 
-  <rect x="92" y="300" width="440" height="48" rx="14" fill="#ffffff" opacity="0.9"/>
-  <text class="label" x="108" y="330">Quick</text>
-  <text class="mono" x="220" y="330">O(n log n)</text>
-  <text class="mono" x="314" y="330">O(n²)</text>
-  <text class="body" x="400" y="330">불안정</text>
-  <text class="body" x="472" y="330">pivot 편향 주의</text>
+  <rect x="72" y="492" width="1056" height="88" rx="22" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text class="label" x="104" y="544">Heap</text>
+  <text class="mono" x="286" y="544">O(n log n)</text>
+  <text class="mono" x="460" y="544">O(n log n)</text>
+  <text class="body" x="622" y="544">불안정</text>
+  <text class="body" x="766" y="544">제자리 가능, 추가 O(1)</text>
+  <text class="body" x="936" y="532">메모리는 아끼지만 접근 패턴 때문에</text>
+  <text class="small" x="936" y="555">실제 체감 성능은 퀵·병합보다 덜 유리할 수 있다.</text>
 
-  <rect x="92" y="358" width="440" height="48" rx="14" fill="#ffffff" opacity="0.9"/>
-  <text class="label" x="108" y="388">Merge</text>
-  <text class="mono" x="220" y="388">O(n log n)</text>
-  <text class="mono" x="314" y="388">O(n log n)</text>
-  <text class="body" x="400" y="388">안정</text>
-  <text class="body" x="472" y="388">추가 공간 O(n)</text>
+  <rect x="72" y="596" width="1056" height="88" rx="22" fill="#fefce8" stroke="#facc15" stroke-width="2"/>
+  <text class="label" x="104" y="648">Insertion</text>
+  <text class="mono" x="286" y="648">O(n²)</text>
+  <text class="mono" x="460" y="648">O(n²)</text>
+  <text class="body" x="622" y="648">안정</text>
+  <text class="body" x="766" y="648">추가 O(1)</text>
+  <text class="body" x="936" y="636">거의 정렬된 입력, 작은 배열에서 강하다.</text>
+  <text class="small" x="936" y="659">퀵정렬의 작은 구간 마무리용으로도 자주 결합된다.</text>
 
-  <rect x="92" y="416" width="440" height="48" rx="14" fill="#ffffff" opacity="0.9"/>
-  <text class="label" x="108" y="446">Heap</text>
-  <text class="mono" x="220" y="446">O(n log n)</text>
-  <text class="mono" x="314" y="446">O(n log n)</text>
-  <text class="body" x="400" y="446">불안정</text>
-  <text class="body" x="472" y="446">제자리 가능</text>
-
-  <rect x="92" y="474" width="440" height="48" rx="14" fill="#ffffff" opacity="0.9"/>
-  <text class="label" x="108" y="504">Insertion</text>
-  <text class="mono" x="220" y="504">O(n²)</text>
-  <text class="mono" x="314" y="504">O(n²)</text>
-  <text class="body" x="400" y="504">안정</text>
-  <text class="body" x="472" y="504">거의 정렬된 입력에 유리</text>
-
-  <text class="small" x="92" y="544">비교 기반 정렬의 핵심: 안정성, 추가 공간, pivot/입력 분포에 따라 체감 성능이 달라진다.</text>
-
-  <text class="section" x="616" y="224">정렬 후 이진 탐색</text>
-  <text class="small" x="616" y="248">정렬된 배열에서 mid 비교 → 절반 제거 → O(log n)</text>
-
-  <rect x="626" y="278" width="476" height="66" rx="18" fill="#ffffff" opacity="0.95"/>
-  <rect x="642" y="294" width="52" height="34" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
-  <rect x="698" y="294" width="52" height="34" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
-  <rect x="754" y="294" width="52" height="34" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
-  <rect x="810" y="294" width="52" height="34" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
-  <rect x="866" y="294" width="52" height="34" rx="10" fill="#fecdd3" stroke="#f43f5e" stroke-width="2"/>
-  <rect x="922" y="294" width="52" height="34" rx="10" fill="#e9d5ff" stroke="#a855f7"/>
-  <rect x="978" y="294" width="52" height="34" rx="10" fill="#e9d5ff" stroke="#a855f7"/>
-  <rect x="1034" y="294" width="52" height="34" rx="10" fill="#e9d5ff" stroke="#a855f7"/>
-  <text class="mono" x="668" y="316" text-anchor="middle">3</text>
-  <text class="mono" x="724" y="316" text-anchor="middle">8</text>
-  <text class="mono" x="780" y="316" text-anchor="middle">14</text>
-  <text class="mono" x="836" y="316" text-anchor="middle">21</text>
-  <text class="mono" x="892" y="316" text-anchor="middle">27</text>
-  <text class="mono" x="948" y="316" text-anchor="middle">33</text>
-  <text class="mono" x="1004" y="316" text-anchor="middle">41</text>
-  <text class="mono" x="1060" y="316" text-anchor="middle">56</text>
-  <text class="tiny" x="642" y="272">정렬 완료된 배열</text>
-  <text class="tiny" x="888" y="272">target = 27</text>
-
-  <line x1="836" y1="344" x2="836" y2="384" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6 6"/>
-  <line x1="892" y1="344" x2="892" y2="384" stroke="#f43f5e" stroke-width="3" stroke-dasharray="6 6"/>
-
-  <rect x="626" y="388" width="476" height="140" rx="22" fill="#ffffff" opacity="0.95"/>
-  <text class="label" x="650" y="422">1단계</text>
-  <text class="body" x="716" y="422">mid = 21, target 27이 더 크므로 오른쪽 절반만 남긴다.</text>
-  <line x1="646" y1="438" x2="916" y2="438" stroke="#7c3aed" stroke-width="4" marker-end="url(#arrow)"/>
-  <text class="small" x="650" y="462">남는 구간: [27, 33, 41, 56]</text>
-  <text class="label" x="650" y="494">2단계</text>
-  <text class="body" x="716" y="494">새 mid = 33, target 27이 더 작으므로 왼쪽 절반으로 축소.</text>
-  <text class="small" x="650" y="518">남는 구간: [27]</text>
-  <circle cx="1028" cy="454" r="22" fill="#f43f5e">
-    <animate attributeName="r" values="22;26;22" dur="2.4s" repeatCount="indefinite"/>
-  </circle>
-  <text x="1028" y="460" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">찾음</text>
-
-  <rect x="82" y="594" width="332" height="66" rx="18" fill="#e0f2fe" stroke="#7dd3fc"/>
-  <text class="label" x="104" y="620">핵심 1 · 정렬 비용 vs 탐색 이득</text>
-  <text class="body" x="104" y="644">한 번만 찾으면 선형 탐색이 나을 수 있고, 반복 탐색이면 정렬 후 이진 탐색이 유리하다.</text>
-
-  <rect x="434" y="594" width="332" height="66" rx="18" fill="#ede9fe" stroke="#c4b5fd"/>
-  <text class="label" x="456" y="620">핵심 2 · 안정성과 공간</text>
-  <text class="body" x="456" y="644">병합·삽입은 안정, 힙은 제자리 가능. 시험 답안에는 공간 복잡도도 같이 적는다.</text>
-
-  <rect x="786" y="594" width="332" height="66" rx="18" fill="#fef3c7" stroke="#fcd34d"/>
-  <text class="label" x="808" y="620">핵심 3 · 자주 묻는 함정</text>
-  <text class="body" x="808" y="644">binary search는 lo, hi, mid 경계와 종료 조건, quicksort는 pivot 편향에 따른 최악 O(n²).</text>
+  <rect x="72" y="702" width="1056" height="1" fill="#e2e8f0"/>
 </svg>

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">16-1. 회귀·분류와 핵심 용어 정리</title>
+  <desc id="desc">회귀와 분류의 차이, feature, label, parameter의 역할을 분리해 보여주는 보조 인포그래픽.</desc>
+  <defs>
+    <style>
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; fill: #0f172a; }
+      .section { font-size: 15px; font-weight: 800; letter-spacing: 1.4px; fill: #475569; }
+      .title { font-size: 31px; font-weight: 800; }
+      .h2 { font-size: 23px; font-weight: 800; }
+      .label { font-size: 18px; font-weight: 700; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 600; fill: #475569; }
+      .chip { font-size: 14px; font-weight: 700; }
+      .white { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f8fafc" />
+  <rect x="36" y="32" width="1128" height="696" rx="30" fill="#ffffff" stroke="#dbeafe" stroke-width="2" />
+
+  <text class="section" x="76" y="92">PREDICTION TAXONOMY</text>
+  <text class="title" x="76" y="132">회귀·분류와 feature, label, parameter 구분</text>
+  <text class="body" x="76" y="162">예측 대상은 회귀와 분류를 가르고, 학습에 쓰이는 용어는 데이터와 모델 내부 역할로 나눠 기억하면 덜 헷갈린다.</text>
+
+  <g transform="translate(76 214)">
+    <rect x="0" y="0" width="498" height="224" rx="28" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+    <text class="h2" x="28" y="42">회귀: 연속값 예측</text>
+    <text class="body" x="28" y="74">금액, 시간, 확률 점수처럼 끊기지 않는 값을 출력한다.</text>
+    <rect x="28" y="98" width="132" height="34" rx="17" fill="#2563eb" />
+    <text class="chip white" x="94" y="120" text-anchor="middle">예측값 예시</text>
+    <text class="label" x="28" y="164">승인 확률 0.82</text>
+    <text class="label" x="28" y="194">예상 손실액 120만 원</text>
+    <text class="small" x="28" y="218">질문: “얼마나?” “몇 점인가?”에 답하는 문제</text>
+  </g>
+
+  <g transform="translate(626 214)">
+    <rect x="0" y="0" width="498" height="224" rx="28" fill="#fff7ed" stroke="#fdba74" stroke-width="2" />
+    <text class="h2" x="28" y="42">분류: 범주 예측</text>
+    <text class="body" x="28" y="74">정상/사기, 승인/거절처럼 미리 정한 범주 중 하나를 고른다.</text>
+    <rect x="28" y="98" width="132" height="34" rx="17" fill="#ea580c" />
+    <text class="chip white" x="94" y="120" text-anchor="middle">예측값 예시</text>
+    <text class="label" x="28" y="164">사기 거래</text>
+    <text class="label" x="28" y="194">대출 거절</text>
+    <text class="small" x="28" y="218">질문: “어느 범주인가?”에 답하는 문제</text>
+  </g>
+
+  <g transform="translate(76 478)">
+    <text class="section" x="0" y="0">KEY TERMS</text>
+    <text class="h2" x="0" y="38">핵심 용어는 데이터 역할과 모델 내부 값으로 나눈다</text>
+
+    <rect x="0" y="64" width="316" height="174" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+    <text class="label" x="24" y="102">Feature</text>
+    <text class="body" x="24" y="130">모델 입력으로 쓰는 변수</text>
+    <text class="small" x="24" y="158">예: 소득, 연체 횟수, 거래 시각</text>
+    <path d="M24 184 H286" fill="none" stroke="#94a3b8" stroke-width="1.5" />
+    <text class="small" x="24" y="212">데이터가 모델에 들어가기 전 관측한 정보</text>
+
+    <rect x="356" y="64" width="316" height="174" rx="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+    <text class="label" x="380" y="102">Label</text>
+    <text class="body" x="380" y="130">정답 또는 목표 값</text>
+    <text class="small" x="380" y="158">예: 실제 부도 여부, 실제 민원 유형</text>
+    <path d="M380 184 H642" fill="none" stroke="#94a3b8" stroke-width="1.5" />
+    <text class="small" x="380" y="212">지도학습에서 모델이 맞히려는 대상</text>
+
+    <rect x="712" y="64" width="340" height="174" rx="24" fill="#0f172a" stroke="#1e293b" stroke-width="2" />
+    <text class="label white" x="736" y="102">Parameter</text>
+    <text class="body" x="736" y="130" fill="#e2e8f0">학습 과정에서 조정되는 모델 내부 값</text>
+    <text class="small" x="736" y="158" fill="#cbd5e1">예: 가중치, 편향, 트리 분기 기준</text>
+    <path d="M736 184 H1022" fill="none" stroke="#475569" stroke-width="1.5" />
+    <text class="small" x="736" y="212" fill="#cbd5e1">사용자가 직접 주는 값이 아니라 학습으로 바뀌는 값</text>
+  </g>
+</svg>

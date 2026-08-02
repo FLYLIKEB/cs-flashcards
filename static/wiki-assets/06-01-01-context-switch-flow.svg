@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">06-01-01 문맥교환 저장·복원 흐름</title>
+  <desc id="desc">프로세스 A의 문맥을 PCB에 저장하고 프로세스 B의 문맥을 복원해 CPU가 전환되는 과정을 보여주는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#2563eb" />
+    </marker>
+    <style>
+      .eyebrow { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .step { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .chip { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e3a8a; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="560" fill="url(#bg)" />
+  <rect x="30" y="30" width="1140" height="500" rx="28" fill="#ffffff" filter="url(#shadow)" />
+
+  <text class="eyebrow" x="72" y="86">운영체제 · 문맥교환 한눈에 보기</text>
+  <text class="title" x="72" y="132">실행 문맥은 PCB에 저장하고, 다음 PCB에서 복원한다</text>
+  <text class="subtitle" x="72" y="172">CPU는 한 번에 한 프로세스만 실행하므로, 교대할 때 현재 위치와 레지스터 값을 PCB에 남겨 둔다.</text>
+
+  <rect x="82" y="232" width="242" height="220" rx="24" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" />
+  <text class="step" x="112" y="276">1. 프로세스 A 실행 중</text>
+  <text class="body" x="112" y="316">CPU가 A의 명령을 수행한다.</text>
+  <text class="body" x="112" y="346">현재 PC와 레지스터 값은</text>
+  <text class="body" x="112" y="372">CPU 안에 살아 있다.</text>
+  <rect x="112" y="392" width="162" height="36" rx="12" fill="#ffffff" />
+  <text class="chip" x="193" y="416" text-anchor="middle">A: Running</text>
+
+  <rect x="370" y="232" width="242" height="220" rx="24" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2" />
+  <text class="step" x="400" y="276">2. PCB A에 저장</text>
+  <text class="body" x="400" y="316">타임슬라이스 종료나 I/O 요청이</text>
+  <text class="body" x="400" y="342">발생하면 현재 문맥을 적어 둔다.</text>
+  <rect x="400" y="366" width="182" height="58" rx="14" fill="#ffffff" />
+  <text class="chip" x="420" y="392">PID A</text>
+  <text class="small" x="420" y="416">PC, 레지스터, 상태 저장</text>
+
+  <rect x="658" y="232" width="242" height="220" rx="24" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" />
+  <text class="step" x="688" y="276">3. PCB B에서 복원</text>
+  <text class="body" x="688" y="316">스케줄러가 다음 차례인 B를 고르면</text>
+  <text class="body" x="688" y="342">B의 저장값을 CPU로 다시 읽는다.</text>
+  <rect x="688" y="366" width="182" height="58" rx="14" fill="#ffffff" />
+  <text class="chip" x="708" y="392">PID B</text>
+  <text class="small" x="708" y="416">PC, 레지스터, 상태 복원</text>
+
+  <rect x="946" y="232" width="172" height="220" rx="24" fill="#dcfce7" stroke="#22c55e" stroke-width="2" />
+  <text class="step" x="976" y="276">4. 프로세스 B 실행</text>
+  <text class="body" x="976" y="316">CPU는 복원된 지점부터</text>
+  <text class="body" x="976" y="342">B의 명령을 이어서 수행한다.</text>
+  <rect x="976" y="392" width="112" height="36" rx="12" fill="#ffffff" />
+  <text class="chip" x="1032" y="416" text-anchor="middle">B: Running</text>
+
+  <path d="M324 342 H370" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)" />
+  <path d="M612 342 H658" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)" />
+  <path d="M900 342 H946" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)" />
+
+  <text class="small" x="72" y="496">요점: 문맥교환은 프로세스를 통째로 복사하는 작업이 아니라, 다음에 이어서 실행할 최소 실행 문맥을 PCB에 저장하고 꺼내 오는 과정이다.</text>
+</svg>

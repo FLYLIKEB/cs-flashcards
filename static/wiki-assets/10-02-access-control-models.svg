@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="860" viewBox="0 0 1280 860" role="img" aria-labelledby="title desc">
+  <title id="title">10-02. 접근통제 모델 비교 인포그래픽</title>
+  <desc id="desc">DAC, MAC, RBAC, ABAC의 기준, 장점, 한계, 대표 적용 환경을 비교하는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 34px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .section { font-size: 18px; font-weight: 800; }
+      .model { font-size: 28px; font-weight: 800; }
+      .label { font-size: 14px; font-weight: 800; fill: #475569; letter-spacing: 0.04em; }
+      .body { font-size: 16px; font-weight: 500; fill: #334155; }
+      .chip { font-size: 14px; font-weight: 700; fill: #1e293b; }
+      .note { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="860" fill="url(#bg)"/>
+  <rect x="28" y="24" width="1224" height="812" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="eyebrow" x="72" y="78">ACCESS CONTROL MODELS</text>
+  <text class="title" x="72" y="120">DAC · MAC · RBAC · ABAC 비교</text>
+  <text class="subtitle" x="72" y="154">기준이 무엇인지, 왜 쓰는지, 운영 시 어떤 trade-off가 생기는지 한 장에서 바로 비교한다.</text>
+
+  <rect x="72" y="194" width="548" height="248" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="model" x="104" y="242">DAC</text>
+  <rect x="104" y="262" width="110" height="32" rx="16" fill="#dbeafe"/>
+  <text class="chip" x="159" y="283" text-anchor="middle">기준: 소유자 재량</text>
+  <text class="body" x="104" y="324">
+    <tspan x="104" dy="0">파일이나 자원의 소유자가 직접 권한을 나눠 주는 방식이다.</tspan>
+    <tspan x="104" dy="26">공유와 위임이 쉬워 유연하지만, 권한이 연쇄적으로 퍼지기 쉽다.</tspan>
+  </text>
+  <text class="label" x="104" y="390">대표 환경</text>
+  <text class="body" x="104" y="414">개인 파일 공유, 협업 폴더, 소규모 시스템</text>
+  <text class="label" x="342" y="390">주의점</text>
+  <text class="body" x="342" y="414">권한 전파 추적과 회수가 어렵다.</text>
+
+  <rect x="660" y="194" width="548" height="248" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="model" x="692" y="242">MAC</text>
+  <rect x="692" y="262" width="118" height="32" rx="16" fill="#fee2e2"/>
+  <text class="chip" x="751" y="283" text-anchor="middle">기준: 보안 등급</text>
+  <text class="body" x="692" y="324">
+    <tspan x="692" dy="0">중앙 정책과 보안 등급이 접근 여부를 강제한다.</tspan>
+    <tspan x="692" dy="26">사용자 재량보다 기밀성 유지가 중요할 때 적합하다.</tspan>
+  </text>
+  <text class="label" x="692" y="390">대표 환경</text>
+  <text class="body" x="692" y="414">군사·정부·고보안 망분리 환경</text>
+  <text class="label" x="930" y="390">주의점</text>
+  <text class="body" x="930" y="414">예외 처리와 업무 유연성이 낮다.</text>
+
+  <rect x="72" y="474" width="548" height="248" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="model" x="104" y="522">RBAC</text>
+  <rect x="104" y="542" width="96" height="32" rx="16" fill="#dcfce7"/>
+  <text class="chip" x="152" y="563" text-anchor="middle">기준: 역할</text>
+  <text class="body" x="104" y="604">
+    <tspan x="104" dy="0">권한을 사용자에게 직접 주지 않고 역할에 묶어 관리한다.</tspan>
+    <tspan x="104" dy="26">입사·이동·퇴사 같은 조직 변화에 대응하기 쉽다.</tspan>
+  </text>
+  <text class="label" x="104" y="670">대표 환경</text>
+  <text class="body" x="104" y="694">기업 전산, 금융권 권한표, 승인 프로세스</text>
+  <text class="label" x="342" y="670">주의점</text>
+  <text class="body" x="342" y="694">예외 정책이 많아지면 역할 수가 급증한다.</text>
+
+  <rect x="660" y="474" width="548" height="248" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="model" x="692" y="522">ABAC</text>
+  <rect x="692" y="542" width="124" height="32" rx="16" fill="#fef3c7"/>
+  <text class="chip" x="754" y="563" text-anchor="middle">기준: 속성·조건</text>
+  <text class="body" x="692" y="604">
+    <tspan x="692" dy="0">사용자, 자원, 시간, 위치, 행위 같은 속성을 함께 평가한다.</tspan>
+    <tspan x="692" dy="26">세밀한 정책에 강하지만 규칙 설계와 운영 복잡도가 높다.</tspan>
+  </text>
+  <text class="label" x="692" y="670">대표 환경</text>
+  <text class="body" x="692" y="694">제로트러스트, API 정책 엔진, 컨텍스트 기반 통제</text>
+  <text class="label" x="930" y="670">주의점</text>
+  <text class="body" x="930" y="694">속성 품질과 정책 테스트 체계가 중요하다.</text>
+
+  <rect x="72" y="746" width="1136" height="54" rx="18" fill="#f8fafc" stroke="#dbeafe" stroke-width="2"/>
+  <text class="note" x="96" y="779">빠른 선택 기준: 공유 유연성은 DAC, 강제 기밀성은 MAC, 조직 권한 관리는 RBAC, 상황기반 세밀 정책은 ABAC가 유리하다.</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">13. SQL/코딩 시험 체크리스트</title>
+  <desc id="desc">SQL, 구현, BFS/DFS, 출력 문제를 시험장에서 점검할 핵심 항목으로 나눈 체크리스트 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eef7ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .title { font: 700 32px sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px sans-serif; fill: #334155; }
+      .section { font: 700 21px sans-serif; fill: #0f172a; }
+      .body { font: 500 15px sans-serif; fill: #334155; }
+      .small { font: 600 13px sans-serif; fill: #475569; }
+      .chip { font: 700 14px sans-serif; fill: #0f172a; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="820" fill="#dde7f2"/>
+  <rect x="24" y="24" width="1152" height="772" rx="32" fill="url(#bg)"/>
+  <rect x="42" y="42" width="1116" height="736" rx="28" fill="#ffffff" filter="url(#shadow)"/>
+
+  <text x="78" y="96" class="title">13장 시험 포인트 체크리스트</text>
+  <text x="78" y="128" class="subtitle">문제를 풀기 직전, 아래 네 영역을 빠르게 확인하면 SQL과 코딩 실수를 동시에 줄일 수 있다.</text>
+
+  <rect x="72" y="170" width="244" height="556" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="96" y="208" class="section">SQL</text>
+  <text x="96" y="238" class="body">□ FROM→WHERE→GROUP BY→</text>
+  <text x="96" y="261" class="body">  HAVING→SELECT 순서를 손으로 추적</text>
+  <text x="96" y="300" class="body">□ JOIN 결과를 표로 그려</text>
+  <text x="96" y="323" class="body">  NULL이 생기는 위치를 확인</text>
+  <text x="96" y="362" class="body">□ WHERE와 HAVING의 적용 시점을</text>
+  <text x="96" y="385" class="body">  헷갈리지 않는다</text>
+  <text x="96" y="424" class="body">□ COUNT(col)와 COUNT(*)의</text>
+  <text x="96" y="447" class="body">  NULL 처리 차이를 기억</text>
+  <text x="96" y="486" class="body">□ LEFT JOIN 뒤 조건식이</text>
+  <text x="96" y="509" class="body">  INNER JOIN처럼 바뀌지 않는지 점검</text>
+  <text x="96" y="562" class="small">핵심 질문: "이 조건은 그룹화 전인가, 후인가?"</text>
+
+  <rect x="332" y="170" width="244" height="556" rx="24" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <text x="356" y="208" class="section">구현</text>
+  <text x="356" y="238" class="body">□ 표준 입력 형식과 자료형을</text>
+  <text x="356" y="261" class="body">  먼저 확정한다</text>
+  <text x="356" y="300" class="body">□ 빈 입력·단일 값·최대 크기 등</text>
+  <text x="356" y="323" class="body">  경계 케이스를 적는다</text>
+  <text x="356" y="362" class="body">□ 초기 정답을 만든 뒤</text>
+  <text x="356" y="385" class="body">  시간복잡도 개선 순서로 간다</text>
+  <text x="356" y="424" class="body">□ 반복문 종료 조건과</text>
+  <text x="356" y="447" class="body">  인덱스 범위를 확인한다</text>
+  <text x="356" y="500" class="small">핵심 질문: "지금 틀리면 로직 때문인가, 입출력 때문인가?"</text>
+
+  <rect x="592" y="170" width="244" height="556" rx="24" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="616" y="208" class="section">BFS / DFS</text>
+  <text x="616" y="238" class="body">□ visited를 언제 True로 바꾸는지</text>
+  <text x="616" y="261" class="body">  일관되게 유지한다</text>
+  <text x="616" y="300" class="body">□ BFS는 큐, DFS는 재귀 또는</text>
+  <text x="616" y="323" class="body">  스택이라는 구조를 흔들지 않는다</text>
+  <text x="616" y="362" class="body">□ 거리·레벨 문제가 보이면</text>
+  <text x="616" y="385" class="body">  BFS를 먼저 의심한다</text>
+  <text x="616" y="424" class="body">□ 큐·스택 상태를 적어</text>
+  <text x="616" y="447" class="body">  중복 방문과 누락을 잡는다</text>
+  <text x="616" y="500" class="small">핵심 질문: "방문 처리와 자료구조가 문제 요구와 맞는가?"</text>
+
+  <rect x="852" y="170" width="276" height="556" rx="24" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="876" y="208" class="section">코드 출력</text>
+  <text x="876" y="238" class="body">□ 줄바꿈, 공백, 구분자 위치를</text>
+  <text x="876" y="261" class="body">  예제 출력과 한 줄씩 비교</text>
+  <text x="876" y="300" class="body">□ 소수점 자리수, 대소문자,</text>
+  <text x="876" y="323" class="body">  마지막 공백까지 확인</text>
+  <text x="876" y="362" class="body">□ 여러 테스트를 돌릴 때</text>
+  <text x="876" y="385" class="body">  이전 결과가 섞이지 않는지 점검</text>
+  <text x="876" y="424" class="body">□ WA가 나면 로직보다</text>
+  <text x="876" y="447" class="body">  출력 형식부터 다시 본다</text>
+  <text x="876" y="500" class="small">핵심 질문: "정답 값은 맞아도 출력 형식 때문에 틀리지는 않는가?"</text>
+
+  <rect x="72" y="748" width="1056" height="30" rx="15" fill="#0f172a"/>
+  <text x="96" y="768" class="chip" style="fill:#e2e8f0">한 줄 요약: SQL은 순서를, 코딩은 체크리스트를, 출력은 형식을 끝까지 붙잡는다.</text>
+</svg>

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">17-5. 마이크로서비스 배포와 관측성 운영 패턴</title>
+  <desc id="desc">CI/CD, 카나리 배포, 서비스 메시, 로그·메트릭·트레이싱, 감사 로그를 묶어 보여주는 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#f6fffb"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .title { font-size: 32px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 16px; font-weight: 500; fill: #475569; }
+      .section { font-size: 14px; font-weight: 800; fill: #64748b; letter-spacing: 0.08em; }
+      .h2 { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .h3 { font-size: 18px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 700; fill: #475569; }
+      .chip { font-size: 12px; font-weight: 800; fill: #0f172a; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="780" fill="url(#bg)"/>
+  <rect x="36" y="28" width="1128" height="724" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="section" x="80" y="86">OPERATIONS</text>
+  <text class="title" x="80" y="124">배포 자동화와 관측성은 MSA 운영의 핵심</text>
+  <text class="subtitle" x="80" y="154">금융권에서는 빠른 배포보다도 추적 가능성, 감사 대응, 안전한 롤백까지 함께 설명해야 설득력이 생긴다.</text>
+
+  <rect x="80" y="194" width="1040" height="188" rx="24" fill="#eff6ff" stroke="#93c5fd"/>
+  <text class="section" x="108" y="228">DEPLOYMENT FLOW</text>
+  <text class="h2" x="108" y="260">서비스 단위 배포 파이프라인</text>
+
+  <rect x="120" y="286" width="180" height="62" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+  <text class="h3" x="210" y="323" text-anchor="middle">코드 변경</text>
+  <text class="small" x="210" y="342" text-anchor="middle">서비스별 수정</text>
+
+  <rect x="364" y="286" width="180" height="62" rx="18" fill="#ffffff" stroke="#2563eb"/>
+  <text class="h3" x="454" y="323" text-anchor="middle">CI/CD</text>
+  <text class="small" x="454" y="342" text-anchor="middle">테스트·이미지 빌드</text>
+
+  <rect x="608" y="286" width="180" height="62" rx="18" fill="#ffffff" stroke="#16a34a"/>
+  <text class="h3" x="698" y="323" text-anchor="middle">Canary / Blue-Green</text>
+  <text class="small" x="698" y="342" text-anchor="middle">점진 배포와 빠른 롤백</text>
+
+  <rect x="852" y="286" width="220" height="62" rx="18" fill="#ffffff" stroke="#7c3aed"/>
+  <text class="h3" x="962" y="323" text-anchor="middle">Kubernetes 운영</text>
+  <text class="small" x="962" y="342" text-anchor="middle">필요 서비스만 확장</text>
+
+  <line x1="300" y1="317" x2="364" y2="317" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="544" y1="317" x2="608" y2="317" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="788" y1="317" x2="852" y2="317" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="80" y="414" width="500" height="278" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="section" x="108" y="448">OBSERVABILITY STACK</text>
+  <text class="h2" x="108" y="480">로그·지표·트레이싱</text>
+  <text class="body" x="108" y="510">장애가 나면 어떤 서비스에서, 어떤 요청이, 어떤 지연을 만들었는지 빠르게 연결해야 한다.</text>
+
+  <rect x="118" y="536" width="130" height="110" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+  <text class="h3" x="183" y="572" text-anchor="middle">로그</text>
+  <text class="small" x="183" y="596" text-anchor="middle">에러와 감사 기록</text>
+  <text class="small" x="183" y="616" text-anchor="middle">재생 근거 확보</text>
+
+  <rect x="266" y="536" width="130" height="110" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+  <text class="h3" x="331" y="572" text-anchor="middle">메트릭</text>
+  <text class="small" x="331" y="596" text-anchor="middle">지연·오류율·SLA</text>
+  <text class="small" x="331" y="616" text-anchor="middle">경보 자동화</text>
+
+  <rect x="414" y="536" width="130" height="110" rx="18" fill="#ffffff" stroke="#94a3b8"/>
+  <text class="h3" x="479" y="572" text-anchor="middle">트레이싱</text>
+  <text class="small" x="479" y="596" text-anchor="middle">서비스 호출 경로</text>
+  <text class="small" x="479" y="616" text-anchor="middle">병목 지점 추적</text>
+
+  <rect x="620" y="414" width="500" height="278" rx="24" fill="#f0fdf4" stroke="#86efac"/>
+  <text class="section" x="648" y="448">FINANCIAL CONTROL</text>
+  <text class="h2" x="648" y="480">금융권 운영 체크포인트</text>
+  <text class="body" x="648" y="510">핵심 원장은 강한 일관성을 유지하고, 주변 서비스는 이벤트 기반으로 분리하되 모든 흐름을 추적 가능하게 남긴다.</text>
+  <rect x="650" y="540" width="440" height="42" rx="14" fill="#ffffff" stroke="#bbf7d0"/>
+  <text class="body" x="870" y="566" text-anchor="middle">mTLS + 중앙 인증·인가 + API Gateway 정책 적용</text>
+  <rect x="650" y="594" width="440" height="42" rx="14" fill="#ffffff" stroke="#bbf7d0"/>
+  <text class="body" x="870" y="620" text-anchor="middle">비가역 감사 로그 + 타임스탬프 + 재생 가능한 이벤트 기록</text>
+  <rect x="650" y="648" width="440" height="42" rx="14" fill="#ffffff" stroke="#bbf7d0"/>
+  <text class="body" x="870" y="674" text-anchor="middle">장애 격리, 롤백 절차, 의존성 맵으로 복원력 검증</text>
+
+  <text class="body" x="80" y="722">실무 답변에서는 "배포 자동화, 관측성, 감사 로그"를 한 묶음으로 말하면 운영 관점이 선명해진다.</text>
+</svg>

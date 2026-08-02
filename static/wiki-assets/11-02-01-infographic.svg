@@ -1,129 +1,79 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">11-02-01. 블랙박스와 화이트박스 인포그래픽</title>
-  <desc id="desc">요구사항과 입출력을 검증하는 블랙박스 테스트와 코드 구조와 커버리지를 확인하는 화이트박스 테스트를 대비한 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title desc">
+  <title id="title">11-02-01. 블랙박스와 화이트박스 비교 인포그래픽</title>
+  <desc id="desc">블랙박스 테스트와 화이트박스 테스트의 관점, 확인 대상, 강점, 대표 기준을 여유 있게 비교한 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
     </linearGradient>
-    <linearGradient id="blackPanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#334155"/>
-    </linearGradient>
-    <linearGradient id="whitePanel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <linearGradient id="bridge" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#8b5cf6"/>
-      <stop offset="100%" stop-color="#06b6d4"/>
-    </linearGradient>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#475569"/>
-    </marker>
     <style>
-      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
-      .eyebrow { font-size: 14px; font-weight: 700; fill: #475569; letter-spacing: 0.08em; }
-      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .panelTitleDark { font-size: 28px; font-weight: 800; fill: #f8fafc; }
-      .panelTitleLight { font-size: 28px; font-weight: 800; fill: #0f172a; }
-      .panelTextDark { font-size: 16px; font-weight: 500; fill: #e2e8f0; }
-      .panelTextLight { font-size: 16px; font-weight: 500; fill: #334155; }
-      .chipDark { font-size: 14px; font-weight: 700; fill: #0f172a; }
-      .chipLight { font-size: 14px; font-weight: 700; fill: #f8fafc; }
-      .label { font-size: 15px; font-weight: 700; fill: #0f172a; }
-      .small { font-size: 13px; font-weight: 600; fill: #64748b; }
-      .mono { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 14px; font-weight: 700; fill: #e2e8f0; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 34px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .panelTitle { font-size: 28px; font-weight: 800; }
+      .panelIntro { font-size: 17px; font-weight: 600; fill: #1e293b; }
+      .sectionLabel { font-size: 14px; font-weight: 800; letter-spacing: 0.06em; fill: #475569; }
+      .body { font-size: 17px; font-weight: 500; fill: #1e293b; }
+      .small { font-size: 15px; font-weight: 500; fill: #334155; }
+      .chip { font-size: 15px; font-weight: 700; fill: #0f172a; }
+      .bottomTitle { font-size: 16px; font-weight: 800; }
+      .bottomText { font-size: 15px; font-weight: 500; fill: #334155; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="24" y="24" width="1152" height="672" rx="28" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect width="1200" height="840" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="784" rx="30" fill="#ffffff" stroke="#cbd5e1"/>
 
-  <text class="eyebrow" x="72" y="78">TEST DESIGN VIEWPOINT</text>
-  <text class="title" x="72" y="120">11-02-01. 블랙박스와 화이트박스</text>
-  <text class="subtitle" x="72" y="156">블랙박스는 “무엇을 검증할까”, 화이트박스는 “어떻게 실행되는가”에 초점을 둔다.</text>
+  <text class="eyebrow" x="72" y="88">TEST DESIGN VIEWPOINT</text>
+  <text class="title" x="72" y="132">11-02-01. 블랙박스와 화이트박스</text>
+  <text class="subtitle" x="72" y="170">블랙박스는 기능과 결과를, 화이트박스는 내부 로직과 커버리지를 본다.</text>
 
-  <rect x="60" y="190" width="500" height="400" rx="28" fill="url(#blackPanel)"/>
-  <rect x="640" y="190" width="500" height="400" rx="28" fill="url(#whitePanel)" stroke="#cbd5e1"/>
+  <rect x="72" y="214" width="500" height="474" rx="28" fill="#f8fafc" stroke="#94a3b8"/>
+  <rect x="628" y="214" width="500" height="474" rx="28" fill="#f8fafc" stroke="#94a3b8"/>
 
-  <text class="panelTitleDark" x="92" y="238">블랙박스 테스트</text>
-  <text class="panelTextDark" x="92" y="266">요구사항·명세·입출력을 보고 기능이 맞는지 검증</text>
+  <rect x="72" y="214" width="500" height="74" rx="28" fill="#dbeafe"/>
+  <rect x="628" y="214" width="500" height="74" rx="28" fill="#e9d5ff"/>
 
-  <rect x="92" y="298" width="116" height="40" rx="20" fill="#fde68a"/>
-  <text class="chipDark" x="150" y="323" text-anchor="middle">사용자 관점</text>
-  <rect x="220" y="298" width="126" height="40" rx="20" fill="#bfdbfe"/>
-  <text class="chipDark" x="283" y="323" text-anchor="middle">내부 코드 미확인</text>
+  <text class="panelTitle" x="104" y="260">블랙박스 테스트</text>
+  <text class="panelTitle" x="660" y="260">화이트박스 테스트</text>
 
-  <rect x="110" y="372" width="110" height="76" rx="18" fill="#e2e8f0"/>
-  <text class="label" x="165" y="404" text-anchor="middle">입력</text>
-  <text class="small" x="165" y="428" text-anchor="middle">경계값·대표값</text>
+  <text class="panelIntro" x="104" y="320">요구사항·입출력·명세 기준으로 결과가 맞는지 확인</text>
+  <text class="panelIntro" x="660" y="320">코드의 분기·조건·반복·경로를 분석해 구조 결함 확인</text>
 
-  <rect x="255" y="352" width="110" height="116" rx="18" fill="#111827" stroke="#94a3b8" stroke-dasharray="8 7"/>
-  <text class="panelTitleDark" x="310" y="400" text-anchor="middle" font-size="22">?</text>
-  <text class="panelTextDark" x="310" y="430" text-anchor="middle">내부 로직</text>
+  <text class="sectionLabel" x="104" y="374">관점</text>
+  <rect x="104" y="392" width="112" height="40" rx="20" fill="#fde68a"/>
+  <text class="chip" x="160" y="418" text-anchor="middle">사용자 중심</text>
+  <rect x="228" y="392" width="150" height="40" rx="20" fill="#bfdbfe"/>
+  <text class="chip" x="303" y="418" text-anchor="middle">내부 코드 미확인</text>
 
-  <rect x="400" y="372" width="110" height="76" rx="18" fill="#e2e8f0"/>
-  <text class="label" x="455" y="404" text-anchor="middle">출력</text>
-  <text class="small" x="455" y="428" text-anchor="middle">명세 일치 확인</text>
+  <text class="sectionLabel" x="660" y="374">관점</text>
+  <rect x="660" y="392" width="112" height="40" rx="20" fill="#dbeafe"/>
+  <text class="chip" x="716" y="418" text-anchor="middle">개발자 중심</text>
+  <rect x="784" y="392" width="160" height="40" rx="20" fill="#ddd6fe"/>
+  <text class="chip" x="864" y="418" text-anchor="middle">코드 구조 직접 확인</text>
 
-  <line x1="220" y1="410" x2="255" y2="410" stroke="#f8fafc" stroke-width="4" marker-end="url(#arrow)"/>
-  <line x1="365" y1="410" x2="400" y2="410" stroke="#f8fafc" stroke-width="4" marker-end="url(#arrow)"/>
+  <text class="sectionLabel" x="104" y="474">무엇을 확인하나</text>
+  <text class="body" x="104" y="502">• 기능 누락, 명세 불일치, 경계 처리 오류</text>
+  <text class="body" x="104" y="532">• 입력을 넣었을 때 기대한 출력이 나오는지</text>
+  <text class="body" x="104" y="562">• 상태 변화와 사용자 시나리오가 요구사항대로 흐르는지</text>
 
-  <rect x="92" y="494" width="436" height="72" rx="20" fill="#1e293b" stroke="#475569"/>
-  <text class="chipLight" x="120" y="521">대표 기법</text>
-  <text class="panelTextDark" x="120" y="547">동치분할 · 경계값 분석 · 결정 테이블 · 상태 전이 · 유스케이스</text>
+  <text class="sectionLabel" x="660" y="474">무엇을 확인하나</text>
+  <text class="body" x="660" y="502">• 분기 누락, 잘못된 조건식, 예외 처리 누락</text>
+  <text class="body" x="660" y="532">• 모든 문장과 참·거짓 경로가 실행되는지</text>
+  <text class="body" x="660" y="562">• 복합 조건의 각 원자 조건이 모두 검토됐는지</text>
 
-  <text class="panelTitleLight" x="672" y="238">화이트박스 테스트</text>
-  <text class="panelTextLight" x="672" y="266">코드의 분기·조건·반복·경로를 분석해 구조적 결함을 찾음</text>
+  <text class="sectionLabel" x="104" y="604">대표 기법 / 기준</text>
+  <text class="small" x="104" y="632">동치분할 · 경계값 분석 · 결정 테이블</text>
+  <text class="small" x="104" y="658">상태 전이 테스트 · 유스케이스 테스트</text>
 
-  <rect x="672" y="298" width="108" height="40" rx="20" fill="#dbeafe"/>
-  <text class="chipDark" x="726" y="323" text-anchor="middle">개발자 관점</text>
-  <rect x="792" y="298" width="144" height="40" rx="20" fill="#e9d5ff"/>
-  <text class="chipDark" x="864" y="323" text-anchor="middle">코드 구조 직접 확인</text>
+  <text class="sectionLabel" x="660" y="604">대표 기준</text>
+  <text class="small" x="660" y="632">문장 커버리지 → 분기 커버리지</text>
+  <text class="small" x="660" y="658">조건 커버리지 → 경로 커버리지</text>
 
-  <rect x="672" y="360" width="220" height="162" rx="20" fill="#0f172a"/>
-  <text class="mono" x="692" y="392">if (amount &gt; limit) {</text>
-  <text class="mono" x="712" y="418">alert();</text>
-  <text class="mono" x="692" y="444">} else if (vip &amp;&amp; ok) {</text>
-  <text class="mono" x="712" y="470">approve();</text>
-  <text class="mono" x="692" y="496">}</text>
-  <circle cx="862" cy="392" r="9" fill="#22c55e"/>
-  <circle cx="846" cy="444" r="9" fill="#f59e0b"/>
-  <circle cx="878" cy="444" r="9" fill="#38bdf8"/>
-  <text class="small" x="782" y="544">조건과 분기 참·거짓을 모두 설계</text>
-
-  <g transform="translate(924 360)">
-    <rect width="180" height="34" rx="17" fill="#e2e8f0"/>
-    <rect x="0" y="0" width="72" height="34" rx="17" fill="#bfdbfe"/>
-    <text class="label" x="14" y="22">문장</text>
-    <text class="small" x="92" y="22">모든 문장 1회 실행</text>
-
-    <rect y="42" width="180" height="34" rx="17" fill="#e2e8f0"/>
-    <rect y="42" width="108" height="34" rx="17" fill="#93c5fd"/>
-    <text class="label" x="14" y="64">분기</text>
-    <text class="small" x="92" y="64">참/거짓 모두 통과</text>
-
-    <rect y="84" width="180" height="34" rx="17" fill="#e2e8f0"/>
-    <rect y="84" width="136" height="34" rx="17" fill="#c4b5fd"/>
-    <text class="label" x="14" y="106">조건</text>
-    <text class="small" x="92" y="106">원자 조건 진리값 확인</text>
-
-    <rect y="126" width="180" height="34" rx="17" fill="#e2e8f0"/>
-    <rect y="126" width="168" height="34" rx="17" fill="#a5f3fc"/>
-    <text class="label" x="14" y="148">경로</text>
-    <text class="small" x="92" y="148">가능 경로 폭발로 비용 큼</text>
-  </g>
-
-  <path d="M560 390C600 390 600 390 640 390" fill="none" stroke="url(#bridge)" stroke-width="12" stroke-linecap="round"/>
-  <circle cx="600" cy="390" r="42" fill="#ffffff" stroke="#cbd5e1" stroke-width="6"/>
-  <text class="label" x="600" y="384" text-anchor="middle">프로그램</text>
-  <text class="small" x="600" y="406" text-anchor="middle">동일 대상</text>
-
-  <rect x="60" y="612" width="1080" height="56" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="label" x="88" y="646">핵심 비교</text>
-  <text class="small" x="196" y="646">블랙박스 = 기능·명세 검증</text>
-  <text class="small" x="458" y="646">화이트박스 = 로직·커버리지 검증</text>
-  <text class="small" x="756" y="646">실무에서는 두 방식을 함께 사용해야 누락 기능과 구조 결함을 모두 잡을 수 있다.</text>
+  <rect x="72" y="724" width="1056" height="56" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="bottomTitle" x="102" y="758">핵심 비교</text>
+  <text class="bottomText" x="212" y="758">블랙박스 = 무엇이 보여야 하는가</text>
+  <text class="bottomText" x="520" y="758">화이트박스 = 내부가 어떻게 실행되는가</text>
+  <text class="bottomText" x="852" y="758">실무에서는 두 방식을 함께 써야 누락 기능과 구조 결함을 모두 잡는다.</text>
 </svg>

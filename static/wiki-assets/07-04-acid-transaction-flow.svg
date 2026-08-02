@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">07-04. ACID와 트랜잭션 흐름 SVG</title>
+  <desc id="desc">은행 이체 예시를 따라 BEGIN부터 COMMIT 또는 ROLLBACK까지의 흐름과 ACID 네 가지 약속을 분리해 보여주는 SVG</desc>
+  <defs>
+    <style>
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 500 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
+    </marker>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f8fafc" />
+  <rect x="24" y="24" width="1152" height="712" rx="28" fill="#ffffff" stroke="#cbd5e1" />
+
+  <text class="small" x="56" y="66">금융공기업 IT · 데이터베이스</text>
+  <text class="title" x="56" y="108">ACID와 은행 이체 트랜잭션 흐름</text>
+  <text class="subtitle" x="56" y="140">시험 답안에서는 흐름과 약어를 함께 묶어 쓰면 원자성·격리성·지속성이 한 번에 정리된다.</text>
+
+  <rect x="48" y="178" width="620" height="514" rx="24" fill="#f8fafc" stroke="#bfdbfe" />
+  <text class="section" x="72" y="216">1. 은행 이체를 하나의 트랜잭션으로 묶는 이유</text>
+  <text class="small" x="72" y="240">A 계좌 차감과 B 계좌 입금이 분리되면 부분 반영이 생긴다.</text>
+
+  <rect x="78" y="284" width="150" height="108" rx="18" fill="#ecfeff" stroke="#0f766e" stroke-width="2" />
+  <text class="label" x="153" y="320" text-anchor="middle">BEGIN</text>
+  <text class="body" x="153" y="346" text-anchor="middle">T1 시작</text>
+  <text class="body" x="153" y="368" text-anchor="middle">A=1000, B=500</text>
+
+  <rect x="286" y="284" width="180" height="108" rx="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+  <text class="label" x="376" y="320" text-anchor="middle">1) 출금</text>
+  <text class="body" x="376" y="346" text-anchor="middle">A 계좌 -100</text>
+  <text class="body" x="376" y="368" text-anchor="middle">중간 상태는 외부에 확정 금지</text>
+
+  <rect x="524" y="284" width="116" height="108" rx="18" fill="#f0fdf4" stroke="#16a34a" stroke-width="2" />
+  <text class="label" x="582" y="320" text-anchor="middle">2) 입금</text>
+  <text class="body" x="582" y="346" text-anchor="middle">B +100</text>
+  <text class="body" x="582" y="368" text-anchor="middle">A=900, B=600</text>
+
+  <line x1="228" y1="338" x2="286" y2="338" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="466" y1="338" x2="524" y2="338" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)" />
+
+  <rect x="78" y="438" width="262" height="142" rx="20" fill="#dcfce7" stroke="#16a34a" stroke-width="2" />
+  <text class="label" x="106" y="474">성공 경로 → COMMIT</text>
+  <text class="body" x="106" y="500">두 연산이 모두 끝났고 제약조건도 유지된다.</text>
+  <text class="body" x="106" y="524">커밋 후에는 거래 결과를 되살릴 수 있어야 한다.</text>
+  <text class="small" x="106" y="552">예: 총 잔액, 계좌 규칙, 로그 기록까지 모두 정상</text>
+
+  <rect x="368" y="438" width="272" height="142" rx="20" fill="#fee2e2" stroke="#dc2626" stroke-width="2" />
+  <text class="label" x="396" y="474">실패 경로 → ROLLBACK</text>
+  <text class="body" x="396" y="500">입금 전 장애, 제약조건 위반, 오류 발생 시</text>
+  <text class="body" x="396" y="524">이미 수행된 출금도 함께 취소해 원래 상태로 돌린다.</text>
+  <text class="small" x="396" y="552">예: A만 줄어든 상태를 남기지 않음</text>
+
+  <rect x="78" y="602" width="562" height="66" rx="18" fill="#e2e8f0" stroke="#94a3b8" />
+  <text class="body" x="106" y="640">답안 포인트: “트랜잭션은 부분 성공을 허용하지 않는 논리적 작업 단위다.”</text>
+
+  <rect x="696" y="178" width="456" height="514" rx="24" fill="#f8fafc" stroke="#c7d2fe" />
+  <text class="section" x="720" y="216">2. ACID를 이체 예시에 붙여 읽기</text>
+  <text class="small" x="720" y="240">각 약어를 예시와 연결하면 암기와 서술형 답안이 쉬워진다.</text>
+
+  <rect x="724" y="282" width="400" height="82" rx="18" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
+  <text class="chip" x="748" y="314">A · Atomicity</text>
+  <text class="body" x="748" y="338">출금과 입금은 함께 성공하거나 함께 취소된다.</text>
+  <text class="body" x="748" y="358">→ 부분 반영 금지</text>
+
+  <rect x="724" y="380" width="400" height="82" rx="18" fill="#ecfccb" stroke="#65a30d" stroke-width="2" />
+  <text class="chip" x="748" y="412">C · Consistency</text>
+  <text class="body" x="748" y="436">트랜잭션 전후에 데이터 제약조건과 업무 규칙이 유지된다.</text>
+  <text class="body" x="748" y="456">→ 잘못된 잔액, 무결성 위반 금지</text>
+
+  <rect x="724" y="478" width="400" height="82" rx="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" />
+  <text class="chip" x="748" y="510">I · Isolation</text>
+  <text class="body" x="748" y="534">다른 트랜잭션은 T1의 중간 상태(A만 감소한 상태)를 보면 안 된다.</text>
+  <text class="body" x="748" y="554">→ Dirty read 방지</text>
+
+  <rect x="724" y="576" width="400" height="92" rx="18" fill="#fee2e2" stroke="#dc2626" stroke-width="2" />
+  <text class="chip" x="748" y="608">D · Durability</text>
+  <text class="body" x="748" y="632">COMMIT 뒤에는 시스템 장애가 나도 결과가 남아 있어야 한다.</text>
+  <text class="body" x="748" y="652">→ WAL과 회복 절차가 지속성을 뒷받침한다</text>
+
+  <text class="small" x="56" y="718">자산: 07-04-acid-transaction-flow.svg · 핵심: BEGIN → 출금 → 입금 → COMMIT/ROLLBACK, ACID 연결</text>
+</svg>

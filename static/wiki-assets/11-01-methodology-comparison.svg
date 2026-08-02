@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-labelledby="title desc">
+  <title id="title">11-01. 개발방법론 비교 요약표</title>
+  <desc id="desc">폭포수, 애자일, 나선형, 스크럼, 칸반, UP, RAD, XP를 핵심 키워드, 적합한 상황, 주의할 단점으로 비교한 고가독성 SVG 표</desc>
+  <defs>
+    <style>
+      text { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; fill: #0f172a; }
+      .title { font-size: 32px; font-weight: 800; }
+      .subtitle { font-size: 16px; font-weight: 500; fill: #cbd5e1; }
+      .header { font-size: 18px; font-weight: 800; }
+      .cell { font-size: 14px; font-weight: 500; fill: #1e293b; }
+      .label { font-size: 15px; font-weight: 800; }
+      .note { font-size: 13px; font-weight: 600; fill: #475569; }
+      .white { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="960" fill="#f8fafc"/>
+  <rect x="34" y="28" width="1132" height="100" rx="24" fill="#0f172a"/>
+  <text class="title white" x="66" y="72">방법론 비교 한눈 요약</text>
+  <text class="subtitle" x="66" y="101">시험 답안에서는 핵심 키워드 + 적합한 상황 + 주의점의 3단 구조로 비교하면 정리가 쉽다.</text>
+
+  <rect x="34" y="154" width="180" height="62" rx="14" fill="#dbeafe"/>
+  <rect x="214" y="154" width="260" height="62" rx="14" fill="#bfdbfe"/>
+  <rect x="474" y="154" width="356" height="62" rx="14" fill="#93c5fd"/>
+  <rect x="830" y="154" width="336" height="62" rx="14" fill="#60a5fa"/>
+  <text class="header" x="124" y="192" text-anchor="middle">방법론</text>
+  <text class="header" x="344" y="192" text-anchor="middle">핵심 키워드</text>
+  <text class="header" x="652" y="192" text-anchor="middle">적합한 상황</text>
+  <text class="header white" x="998" y="192" text-anchor="middle">주의할 단점</text>
+
+  <rect x="34" y="228" width="1132" height="92" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="label" x="54" y="264">폭포수</text>
+  <text class="cell" x="234" y="254"><tspan x="234" dy="0">순차 진행 · 문서화 ·</tspan><tspan x="234" dy="20">단계별 산출물</tspan></text>
+  <text class="cell" x="494" y="254"><tspan x="494" dy="0">요구사항이 안정적이고</tspan><tspan x="494" dy="20">승인 문서가 중요한 프로젝트</tspan></text>
+  <text class="cell" x="850" y="254"><tspan x="850" dy="0">요구 변경이 늦게 반영되어</tspan><tspan x="850" dy="20">후반 수정 비용이 크다.</tspan></text>
+  <text class="note" x="234" y="298">금융·공공처럼 계약·감사 추적성이 중요한 환경에 강함</text>
+
+  <rect x="34" y="332" width="1132" height="92" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="label" x="54" y="368">애자일</text>
+  <text class="cell" x="234" y="358"><tspan x="234" dy="0">반복 · 피드백 ·</tspan><tspan x="234" dy="20">변화 대응</tspan></text>
+  <text class="cell" x="494" y="358"><tspan x="494" dy="0">요구사항이 자주 바뀌고</tspan><tspan x="494" dy="20">사용자 검증이 자주 필요한 프로젝트</tspan></text>
+  <text class="cell" x="850" y="358"><tspan x="850" dy="0">범위와 일정 통제가 흔들리면</tspan><tspan x="850" dy="20">혼란이 커질 수 있다.</tspan></text>
+  <text class="note" x="234" y="402">작은 결과물을 자주 배포하고 학습하는 팀에 적합</text>
+
+  <rect x="34" y="436" width="1132" height="92" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="label" x="54" y="472">나선형</text>
+  <text class="cell" x="234" y="462"><tspan x="234" dy="0">위험 분석 · 반복 ·</tspan><tspan x="234" dy="20">프로토타입</tspan></text>
+  <text class="cell" x="494" y="462"><tspan x="494" dy="0">대규모·고위험·복잡 연동</tspan><tspan x="494" dy="20">프로젝트</tspan></text>
+  <text class="cell" x="850" y="462"><tspan x="850" dy="0">위험 분석과 관리 절차가 많아</tspan><tspan x="850" dy="20">비용 부담이 크다.</tspan></text>
+  <text class="note" x="234" y="506">성능, 보안, 외부 연동처럼 실패 비용이 큰 경우에 적합</text>
+
+  <rect x="34" y="540" width="1132" height="92" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="label" x="54" y="576">스크럼</text>
+  <text class="cell" x="234" y="566"><tspan x="234" dy="0">스프린트 · 백로그 ·</tspan><tspan x="234" dy="20">역할 기반 운영</tspan></text>
+  <text class="cell" x="494" y="566"><tspan x="494" dy="0">팀 단위 반복 개발과</tspan><tspan x="494" dy="20">짧은 주기 점검이 필요한 경우</tspan></text>
+  <text class="cell" x="850" y="566"><tspan x="850" dy="0">형식만 도입하면 회의만 많고</tspan><tspan x="850" dy="20">개선이 없는 팀이 된다.</tspan></text>
+  <text class="note" x="234" y="610">제품 책임자, 스크럼 마스터, 개발팀의 책임 구분이 중요</text>
+
+  <rect x="34" y="644" width="1132" height="92" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="label" x="54" y="680">칸반</text>
+  <text class="cell" x="234" y="670"><tspan x="234" dy="0">흐름 시각화 · WIP 제한 ·</tspan><tspan x="234" dy="20">병목 관리</tspan></text>
+  <text class="cell" x="494" y="670"><tspan x="494" dy="0">운영·유지보수, 요청 기반 업무,</tspan><tspan x="494" dy="20">서비스 티켓 처리</tspan></text>
+  <text class="cell" x="850" y="670"><tspan x="850" dy="0">장기 계획과 우선순위 정책을</tspan><tspan x="850" dy="20">따로 두지 않으면 표류하기 쉽다.</tspan></text>
+  <text class="note" x="234" y="714">평균 처리시간, 처리율 같은 흐름 지표와 함께 봐야 효과적</text>
+
+  <rect x="34" y="748" width="1132" height="92" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text class="label" x="54" y="784">UP</text>
+  <text class="cell" x="234" y="774"><tspan x="234" dy="0">유스케이스 · 아키텍처 ·</tspan><tspan x="234" dy="20">위험 중심 반복</tspan></text>
+  <text class="cell" x="494" y="774"><tspan x="494" dy="0">객체지향·대규모 프로젝트에서</tspan><tspan x="494" dy="20">구조 검증이 중요할 때</tspan></text>
+  <text class="cell" x="850" y="774"><tspan x="850" dy="0">절차와 산출물이 무거워지면</tspan><tspan x="850" dy="20">개발 속도가 느려질 수 있다.</tspan></text>
+  <text class="note" x="234" y="818">도입·정련·구축·전이 단계별 목표를 구분해 기억</text>
+
+  <rect x="34" y="852" width="1132" height="92" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="label" x="54" y="888">RAD / XP</text>
+  <text class="cell" x="234" y="878"><tspan x="234" dy="0">RAD: 빠른 프로토타입</tspan><tspan x="234" dy="20">XP: TDD · CI · 짝 프로그래밍</tspan></text>
+  <text class="cell" x="494" y="878"><tspan x="494" dy="0">RAD는 단기 화면 개발,</tspan><tspan x="494" dy="20">XP는 빠른 변화 대응과 품질 강화</tspan></text>
+  <text class="cell" x="850" y="878"><tspan x="850" dy="0">RAD는 확장성 관리가 약하고</tspan><tspan x="850" dy="20">XP는 팀 규율 의존도가 높다.</tspan></text>
+</svg>

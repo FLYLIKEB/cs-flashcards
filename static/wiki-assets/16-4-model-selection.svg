@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">16-4. 모델 선택 비교표</title>
+  <desc id="desc">단순 모델과 복잡 모델을 데이터 크기, 설명가능성, 추론 속도, 피처 구조 기준으로 비교한 페이지 전용 SVG</desc>
+  <defs>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .eyebrow { font-size: 15px; font-weight: 700; fill: #475569; }
+      .title { font-size: 32px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .head { font-size: 20px; font-weight: 800; fill: #0f172a; }
+      .cellHead { font-size: 17px; font-weight: 800; fill: #0f172a; }
+      .cell { font-size: 16px; font-weight: 500; fill: #334155; }
+      .note { font-size: 15px; font-weight: 600; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f8fafc"/>
+  <rect x="24" y="24" width="1152" height="712" rx="28" fill="#ffffff" stroke="#dbe4f0"/>
+
+  <text x="64" y="78" class="eyebrow">금융공기업 IT · 모델 선택 기준 분리 요약</text>
+  <text x="64" y="122" class="title">단순 모델 vs 복잡 모델: 언제 넘어가야 하는가?</text>
+  <text x="64" y="156" class="subtitle">성능만 보지 말고 데이터 규모, 설명가능성, 추론 제약, 피처 학습 필요성을 함께 비교한다.</text>
+
+  <text x="64" y="218" class="head">모델 선택 비교표</text>
+
+  <rect x="64" y="246" width="220" height="62" rx="16" fill="#e2e8f0"/>
+  <rect x="300" y="246" width="386" height="62" rx="16" fill="#dcfce7"/>
+  <rect x="702" y="246" width="434" height="62" rx="16" fill="#dbeafe"/>
+  <text x="174" y="284" text-anchor="middle" class="cellHead">기준</text>
+  <text x="493" y="284" text-anchor="middle" class="cellHead">단순 모델 선호 상황</text>
+  <text x="919" y="284" text-anchor="middle" class="cellHead">복잡 모델 선호 상황</text>
+
+  <rect x="64" y="326" width="220" height="92" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="300" y="326" width="386" height="92" rx="18" fill="#f0fdf4" stroke="#bbf7d0"/>
+  <rect x="702" y="326" width="434" height="92" rx="18" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="88" y="362" class="cellHead">데이터 크기</text>
+  <text x="88" y="390" class="cell">작거나 구조화 중심이라면</text>
+  <text x="88" y="414" class="cell">회귀·트리 베이스라인이 유리</text>
+  <text x="324" y="362" class="cell">샘플 수가 적어도 설명과 유지보수가 쉬움</text>
+  <text x="324" y="390" class="cell">전처리 비용과 학습 시간이 낮다</text>
+  <text x="726" y="362" class="cell">매우 크거나 이미지·텍스트 같은 비정형 포함</text>
+  <text x="726" y="390" class="cell">표현 학습이 성능 차이를 크게 만들 수 있다</text>
+
+  <rect x="64" y="434" width="220" height="92" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="300" y="434" width="386" height="92" rx="18" fill="#f0fdf4" stroke="#bbf7d0"/>
+  <rect x="702" y="434" width="434" height="92" rx="18" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="88" y="470" class="cellHead">설명가능성</text>
+  <text x="88" y="498" class="cell">규제 대응과 승인 문서가 중요하면</text>
+  <text x="88" y="522" class="cell">단순 모델 쪽이 안전하다</text>
+  <text x="324" y="470" class="cell">계수, 규칙, 피처 기여를 설명하기 쉽다</text>
+  <text x="324" y="498" class="cell">금융권 의사결정 근거 제시에 유리</text>
+  <text x="726" y="470" class="cell">최고 성능이 더 중요하고</text>
+  <text x="726" y="498" class="cell">설명 도구를 따로 붙일 수 있을 때 적합</text>
+
+  <rect x="64" y="542" width="220" height="92" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <rect x="300" y="542" width="386" height="92" rx="18" fill="#f0fdf4" stroke="#bbf7d0"/>
+  <rect x="702" y="542" width="434" height="92" rx="18" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="88" y="578" class="cellHead">속도·피처 구조</text>
+  <text x="88" y="606" class="cell">실시간 추론이 필요하거나</text>
+  <text x="88" y="630" class="cell">사람이 만든 피처가 이미 강함</text>
+  <text x="324" y="578" class="cell">경량 모델로 배포와 모니터링이 단순하다</text>
+  <text x="324" y="606" class="cell">운영 비용과 지연 시간을 낮추기 쉽다</text>
+  <text x="726" y="578" class="cell">배치 처리가 가능하고</text>
+  <text x="726" y="606" class="cell">표현 학습이 핵심 경쟁력이 될 때 적합</text>
+
+  <text x="64" y="686" class="note">면접 답변 팁: “로지스틱 회귀로 베이스라인을 세우고, 트리 기반 모델로 성능을 비교한 뒤, 비정형 데이터나 표현 학습이 필요할 때 딥러닝을 검토하겠습니다.”</text>
+</svg>

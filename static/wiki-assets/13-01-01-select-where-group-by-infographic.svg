@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">13-01-01 SELECT WHERE GROUP BY 인포그래픽</title>
-  <desc id="desc">orders 테이블 예시로 SQL의 논리적 실행 순서 FROM, WHERE, GROUP BY, HAVING, SELECT를 설명하는 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="920" viewBox="0 0 1280 920" role="img" aria-labelledby="title desc">
+  <title id="title">SELECT WHERE GROUP BY 논리적 실행 순서</title>
+  <desc id="desc">FROM, WHERE, GROUP BY, HAVING, SELECT의 논리적 실행 순서와 WHERE와 HAVING의 차이를 설명하는 인포그래픽</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f8fbff"/>
-      <stop offset="100%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#eefbf3"/>
     </linearGradient>
     <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#0f172a"/>
@@ -14,169 +14,114 @@
       <path d="M0 0L10 5L0 10Z" fill="#2563eb"/>
     </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
-      .section { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .stepNo { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
-      .stepTitle { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .mono { font: 600 13px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
-      .monoSmall { font: 600 12px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
-      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; }
-      .softBlue { fill: #eff6ff; stroke: #93c5fd; stroke-width: 1.5; }
-      .softGreen { fill: #f0fdf4; stroke: #86efac; stroke-width: 1.5; }
-      .softAmber { fill: #fffbeb; stroke: #fcd34d; stroke-width: 1.5; }
-      .softViolet { fill: #f5f3ff; stroke: #c4b5fd; stroke-width: 1.5; }
-      .softSlate { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.5; }
-      .grid { stroke: #cbd5e1; stroke-width: 1; }
-      .muted { fill: #64748b; }
-      .strike { stroke: #ef4444; stroke-width: 3; stroke-linecap: round; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .stepNo { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
+      .stepTitle { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 600 17px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .monoSmall { font: 600 15px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.6; }
+      .blue { fill: #eff6ff; stroke: #93c5fd; stroke-width: 1.6; }
+      .green { fill: #f0fdf4; stroke: #86efac; stroke-width: 1.6; }
+      .amber { fill: #fffbeb; stroke: #fcd34d; stroke-width: 1.6; }
+      .violet { fill: #f5f3ff; stroke: #c4b5fd; stroke-width: 1.6; }
+      .slate { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.6; }
+      .rule { stroke: #cbd5e1; stroke-width: 1.2; }
+      .arrow { stroke: #2563eb; stroke-width: 4; marker-end: url(#arrow); }
+      .danger { fill: #fee2e2; stroke: #fca5a5; stroke-width: 1.6; }
+      .ok { fill: #dcfce7; stroke: #86efac; stroke-width: 1.6; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)"/>
-  <rect x="32" y="28" width="1136" height="664" rx="28" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+  <rect width="1280" height="920" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1224" height="864" rx="30" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
 
-  <rect x="56" y="48" width="1088" height="110" rx="24" fill="url(#header)"/>
-  <text class="title" x="86" y="93">SELECT · WHERE · GROUP BY</text>
-  <text class="subtitle" x="86" y="123">핵심은 '행을 먼저 거르고(WHERE) → 묶고(GROUP BY) → 그룹을 거른다(HAVING)'는 논리적 실행 순서다.</text>
-  <text class="mono" x="86" y="149">SELECT customer_id, SUM(amount) AS total_paid FROM orders WHERE status = 'paid' GROUP BY customer_id;</text>
+  <rect x="56" y="52" width="1168" height="118" rx="24" fill="url(#header)"/>
+  <text class="title" x="88" y="98">SELECT · WHERE · GROUP BY · HAVING</text>
+  <text class="subtitle" x="88" y="128">핵심은 행을 먼저 걸러낸 뒤 묶고, 그룹이 만들어진 다음에 다시 조건을 건다는 점이다.</text>
+  <text class="mono" x="88" y="156">SELECT customer_id, SUM(amount) AS total_paid FROM orders WHERE status = 'paid' GROUP BY customer_id;</text>
 
-  <text class="section" x="70" y="196">orders 예제로 보는 SQL 파이프라인</text>
+  <text class="section" x="72" y="214">1. 논리적 실행 순서</text>
 
-  <rect class="softSlate" x="68" y="216" width="220" height="366" rx="20"/>
-  <circle cx="98" cy="247" r="16" fill="#dbeafe"/>
-  <text class="stepNo" x="92" y="252">1</text>
-  <text class="stepTitle" x="122" y="253">FROM orders</text>
-  <text class="body" x="88" y="280">원본 행 전체를 읽어온다.</text>
-  <rect x="88" y="300" width="180" height="240" rx="14" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-  <line class="grid" x1="88" y1="336" x2="268" y2="336"/>
-  <line class="grid" x1="118" y1="300" x2="118" y2="540"/>
-  <line class="grid" x1="176" y1="300" x2="176" y2="540"/>
-  <line class="grid" x1="227" y1="300" x2="227" y2="540"/>
-  <line class="grid" x1="88" y1="372" x2="268" y2="372"/>
-  <line class="grid" x1="88" y1="408" x2="268" y2="408"/>
-  <line class="grid" x1="88" y1="444" x2="268" y2="444"/>
-  <line class="grid" x1="88" y1="480" x2="268" y2="480"/>
-  <line class="grid" x1="88" y1="516" x2="268" y2="516"/>
-  <text class="monoSmall" x="95" y="323">id</text>
-  <text class="monoSmall" x="127" y="323">cust</text>
-  <text class="monoSmall" x="184" y="323">amt</text>
-  <text class="monoSmall" x="234" y="323">status</text>
-  <text class="monoSmall" x="97" y="359">1</text>
-  <text class="monoSmall" x="127" y="359">100</text>
-  <text class="monoSmall" x="188" y="359">10</text>
-  <text class="monoSmall" x="232" y="359">paid</text>
-  <text class="monoSmall" x="97" y="395">2</text>
-  <text class="monoSmall" x="127" y="395">101</text>
-  <text class="monoSmall" x="188" y="395">20</text>
-  <text class="monoSmall" x="232" y="395">pending</text>
-  <text class="monoSmall" x="97" y="431">3</text>
-  <text class="monoSmall" x="127" y="431">100</text>
-  <text class="monoSmall" x="188" y="431">15</text>
-  <text class="monoSmall" x="232" y="431">paid</text>
-  <text class="monoSmall" x="97" y="467">4</text>
-  <text class="monoSmall" x="127" y="467">102</text>
-  <text class="monoSmall" x="182" y="467">NULL</text>
-  <text class="monoSmall" x="232" y="467">cancel</text>
-  <text class="monoSmall" x="97" y="503">5</text>
-  <text class="monoSmall" x="127" y="503">101</text>
-  <text class="monoSmall" x="188" y="503">5</text>
-  <text class="monoSmall" x="232" y="503">paid</text>
+  <rect class="slate" x="72" y="236" width="1136" height="184" rx="24"/>
 
-  <line x1="288" y1="398" x2="332" y2="398" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect class="card" x="96" y="270" width="188" height="112" rx="20"/>
+  <circle cx="126" cy="304" r="18" fill="#dbeafe"/>
+  <text class="stepNo" x="120" y="310">1</text>
+  <text class="stepTitle" x="154" y="310">FROM</text>
+  <text class="body" x="114" y="338">원본 테이블과 JOIN 대상을</text>
+  <text class="body" x="114" y="362">먼저 확정한다.</text>
 
-  <rect class="softBlue" x="332" y="216" width="220" height="366" rx="20"/>
-  <circle cx="362" cy="247" r="16" fill="#bfdbfe"/>
-  <text class="stepNo" x="356" y="252">2</text>
-  <text class="stepTitle" x="386" y="253">WHERE status='paid'</text>
-  <text class="body" x="352" y="280">그룹화 전에 개별 행을 거른다.</text>
-  <rect x="352" y="300" width="180" height="240" rx="14" fill="#ffffff" stroke="#60a5fa" stroke-width="1.5"/>
-  <line class="grid" x1="352" y1="336" x2="532" y2="336"/>
-  <line class="grid" x1="382" y1="300" x2="382" y2="540"/>
-  <line class="grid" x1="440" y1="300" x2="440" y2="540"/>
-  <line class="grid" x1="491" y1="300" x2="491" y2="540"/>
-  <line class="grid" x1="352" y1="372" x2="532" y2="372"/>
-  <line class="grid" x1="352" y1="408" x2="532" y2="408"/>
-  <line class="grid" x1="352" y1="444" x2="532" y2="444"/>
-  <line class="grid" x1="352" y1="480" x2="532" y2="480"/>
-  <line class="grid" x1="352" y1="516" x2="532" y2="516"/>
-  <text class="monoSmall" x="359" y="323">id</text>
-  <text class="monoSmall" x="391" y="323">cust</text>
-  <text class="monoSmall" x="448" y="323">amt</text>
-  <text class="monoSmall" x="498" y="323">status</text>
-  <text class="monoSmall" x="361" y="359">1</text>
-  <text class="monoSmall" x="391" y="359">100</text>
-  <text class="monoSmall" x="452" y="359">10</text>
-  <text class="monoSmall" x="496" y="359">paid</text>
-  <text class="monoSmall muted" x="361" y="395">2</text>
-  <text class="monoSmall muted" x="391" y="395">101</text>
-  <text class="monoSmall muted" x="452" y="395">20</text>
-  <text class="monoSmall muted" x="496" y="395">pending</text>
-  <line class="strike" x1="358" y1="384" x2="526" y2="404"/>
-  <text class="monoSmall" x="361" y="431">3</text>
-  <text class="monoSmall" x="391" y="431">100</text>
-  <text class="monoSmall" x="452" y="431">15</text>
-  <text class="monoSmall" x="496" y="431">paid</text>
-  <text class="monoSmall muted" x="361" y="467">4</text>
-  <text class="monoSmall muted" x="391" y="467">102</text>
-  <text class="monoSmall muted" x="446" y="467">NULL</text>
-  <text class="monoSmall muted" x="496" y="467">cancel</text>
-  <line class="strike" x1="358" y1="456" x2="526" y2="476"/>
-  <text class="monoSmall" x="361" y="503">5</text>
-  <text class="monoSmall" x="391" y="503">101</text>
-  <text class="monoSmall" x="452" y="503">5</text>
-  <text class="monoSmall" x="496" y="503">paid</text>
-  <text class="small" x="352" y="560">WHERE는 행 단위 조건이다. HAVING보다 먼저 적용된다.</text>
+  <line class="arrow" x1="284" y1="326" x2="332" y2="326"/>
 
-  <line x1="552" y1="398" x2="596" y2="398" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect class="blue" x="332" y="270" width="188" height="112" rx="20"/>
+  <circle cx="362" cy="304" r="18" fill="#bfdbfe"/>
+  <text class="stepNo" x="356" y="310">2</text>
+  <text class="stepTitle" x="390" y="310">WHERE</text>
+  <text class="body" x="350" y="338">개별 행 조건으로</text>
+  <text class="body" x="350" y="362">먼저 행 수를 줄인다.</text>
 
-  <rect class="softGreen" x="596" y="216" width="220" height="366" rx="20"/>
-  <circle cx="626" cy="247" r="16" fill="#bbf7d0"/>
-  <text class="stepNo" x="620" y="252">3</text>
-  <text class="stepTitle" x="650" y="253">GROUP BY customer_id</text>
-  <text class="body" x="616" y="280">남은 행을 고객별 바구니로 묶는다.</text>
-  <rect x="616" y="304" width="180" height="70" rx="14" fill="#ffffff" stroke="#4ade80" stroke-width="1.5"/>
-  <text class="label" x="632" y="329">customer 100</text>
-  <text class="monoSmall" x="632" y="352">rows: (10), (15)</text>
-  <text class="monoSmall" x="632" y="368">SUM(amount)=25</text>
-  <rect x="616" y="392" width="180" height="70" rx="14" fill="#ffffff" stroke="#4ade80" stroke-width="1.5"/>
-  <text class="label" x="632" y="417">customer 101</text>
-  <text class="monoSmall" x="632" y="440">rows: (5)</text>
-  <text class="monoSmall" x="632" y="456">SUM(amount)=5</text>
-  <rect x="616" y="480" width="180" height="70" rx="14" fill="#ffffff" stroke="#4ade80" stroke-width="1.5"/>
-  <text class="label" x="632" y="505">customer 102</text>
-  <text class="monoSmall" x="632" y="528">없음: WHERE에서 이미 제거</text>
-  <text class="small" x="616" y="568">COUNT, SUM, AVG 같은 집계는 이 단계 이후 그룹 기준으로 계산된다.</text>
+  <line class="arrow" x1="520" y1="326" x2="568" y2="326"/>
 
-  <line x1="816" y1="398" x2="860" y2="398" stroke="#2563eb" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect class="green" x="568" y="270" width="188" height="112" rx="20"/>
+  <circle cx="598" cy="304" r="18" fill="#bbf7d0"/>
+  <text class="stepNo" x="592" y="310">3</text>
+  <text class="stepTitle" x="626" y="310">GROUP BY</text>
+  <text class="body" x="586" y="338">남은 행을 같은 값끼리</text>
+  <text class="body" x="586" y="362">그룹으로 묶는다.</text>
 
-  <rect class="softAmber" x="860" y="216" width="284" height="170" rx="20"/>
-  <circle cx="890" cy="247" r="16" fill="#fde68a"/>
-  <text class="stepNo" x="884" y="252">4</text>
-  <text class="stepTitle" x="914" y="253">HAVING COUNT(*) ≥ 2</text>
-  <text class="body" x="880" y="280">그룹이 만들어진 뒤 그룹 단위로 거른다.</text>
-  <rect x="880" y="304" width="244" height="58" rx="14" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5"/>
-  <text class="monoSmall" x="896" y="327">customer 100  →  keep (2 rows)</text>
-  <text class="monoSmall" x="896" y="347">customer 101  →  drop (1 row)</text>
+  <line class="arrow" x1="756" y1="326" x2="804" y2="326"/>
 
-  <rect class="softViolet" x="860" y="404" width="284" height="178" rx="20"/>
-  <circle cx="890" cy="435" r="16" fill="#ddd6fe"/>
-  <text class="stepNo" x="884" y="440">5</text>
-  <text class="stepTitle" x="914" y="440">SELECT 출력</text>
-  <text class="body" x="880" y="467">최종 컬럼과 집계 결과를 반환한다.</text>
-  <rect x="880" y="488" width="244" height="70" rx="14" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
-  <text class="monoSmall" x="896" y="513">customer_id | total_paid</text>
-  <text class="monoSmall" x="896" y="538">100         | 25</text>
-  <text class="small" x="880" y="572">SELECT에 일반 컬럼과 집계를 함께 쓰면 일반 컬럼은 GROUP BY에 포함되어야 한다.</text>
+  <rect class="amber" x="804" y="270" width="188" height="112" rx="20"/>
+  <circle cx="834" cy="304" r="18" fill="#fde68a"/>
+  <text class="stepNo" x="828" y="310">4</text>
+  <text class="stepTitle" x="862" y="310">HAVING</text>
+  <text class="body" x="822" y="338">집계가 끝난 그룹만 보고</text>
+  <text class="body" x="822" y="362">조건을 다시 건다.</text>
 
-  <text class="section" x="70" y="624">시험 포인트</text>
-  <rect class="card" x="68" y="640" width="330" height="34" rx="12"/>
-  <text class="body" x="84" y="662">WHERE = 그룹화 전 행 필터, HAVING = 그룹화 후 그룹 필터</text>
-  <rect class="card" x="412" y="640" width="340" height="34" rx="12"/>
-  <text class="body" x="428" y="662">COUNT(col)은 NULL 제외, COUNT(*)는 모든 행 포함</text>
-  <rect class="card" x="766" y="640" width="378" height="34" rx="12"/>
-  <text class="body" x="782" y="662">논리적 순서 암기: FROM → WHERE → GROUP BY → HAVING → SELECT</text>
+  <line class="arrow" x1="992" y1="326" x2="1040" y2="326"/>
+
+  <rect class="violet" x="1040" y="270" width="144" height="112" rx="20"/>
+  <circle cx="1070" cy="304" r="18" fill="#ddd6fe"/>
+  <text class="stepNo" x="1064" y="310">5</text>
+  <text class="stepTitle" x="1098" y="310">SELECT</text>
+  <text class="body" x="1058" y="338">최종 컬럼과</text>
+  <text class="body" x="1058" y="362">집계값을 출력한다.</text>
+
+  <text class="small" x="96" y="404">시험에서는 WHERE와 HAVING의 위치를 자주 바꿔 묻는다. WHERE는 행, HAVING은 그룹을 거른다.</text>
+
+  <text class="section" x="72" y="474">2. WHERE와 HAVING 차이</text>
+
+  <rect class="blue" x="72" y="500" width="540" height="260" rx="24"/>
+  <text class="stepTitle" x="100" y="544">WHERE: 그룹화 전에 행 필터</text>
+  <rect class="card" x="100" y="570" width="484" height="78" rx="16"/>
+  <text class="monoSmall" x="120" y="602">WHERE status = 'paid'</text>
+  <text class="body" x="120" y="628">pending, cancelled 같은 행이 먼저 제거된다.</text>
+  <rect class="ok" x="100" y="668" width="216" height="64" rx="16"/>
+  <text class="label" x="118" y="694">남는 행</text>
+  <text class="monoSmall" x="118" y="718">(100, 10), (100, 15), (101, 5)</text>
+  <rect class="danger" x="336" y="668" width="248" height="64" rx="16"/>
+  <text class="label" x="354" y="694">제거되는 행</text>
+  <text class="monoSmall" x="354" y="718">(101, 20, pending), (102, NULL, cancelled)</text>
+
+  <rect class="amber" x="640" y="500" width="568" height="260" rx="24"/>
+  <text class="stepTitle" x="668" y="544">HAVING: 그룹화 후 그룹 필터</text>
+  <rect class="card" x="668" y="570" width="512" height="78" rx="16"/>
+  <text class="monoSmall" x="688" y="602">HAVING COUNT(*) &gt;= 2</text>
+  <text class="body" x="688" y="628">customer_id별로 묶은 결과를 보고 남길 그룹만 선택한다.</text>
+  <rect class="ok" x="668" y="668" width="236" height="64" rx="16"/>
+  <text class="label" x="686" y="694">남는 그룹</text>
+  <text class="monoSmall" x="686" y="718">customer 100 → 2건</text>
+  <rect class="danger" x="924" y="668" width="256" height="64" rx="16"/>
+  <text class="label" x="942" y="694">제거되는 그룹</text>
+  <text class="monoSmall" x="942" y="718">customer 101 → 1건</text>
+
+  <text class="section" x="72" y="808">3. 기억할 한 줄</text>
+  <rect class="card" x="72" y="828" width="1136" height="40" rx="14"/>
+  <text class="body" x="96" y="854">FROM으로 대상을 정하고 → WHERE로 행을 줄이고 → GROUP BY로 묶고 → HAVING으로 그룹을 거른 뒤 → SELECT로 보여준다.</text>
 </svg>

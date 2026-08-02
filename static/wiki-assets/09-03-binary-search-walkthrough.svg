@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">09-03. 이진 탐색 단계별 추적</title>
+  <desc id="desc">정렬된 배열에서 target 27을 찾기 위해 중간값을 비교하고 탐색 범위를 절반씩 줄이는 이진 탐색의 세 단계를 보여준다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#7c3aed"/>
+    </marker>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 18px; font-weight: 700; fill: #475569; }
+      .title { font-size: 36px; font-weight: 800; }
+      .subtitle { font-size: 18px; font-weight: 500; fill: #334155; }
+      .section { font-size: 22px; font-weight: 800; }
+      .label { font-size: 19px; font-weight: 800; }
+      .body { font-size: 17px; font-weight: 500; fill: #334155; }
+      .small { font-size: 15px; font-weight: 600; fill: #475569; }
+      .mono { font-size: 19px; font-weight: 800; fill: #1e293b; }
+      .arrayLabel { font-size: 15px; font-weight: 700; fill: #334155; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="704" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="eyebrow" x="72" y="84">정렬 후 탐색 · O(log n) 직관</text>
+  <text class="title" x="72" y="128">이진 탐색은 왜 빠를까</text>
+  <text class="subtitle" x="72" y="162">중간값과 비교해 절반을 한 번에 버리므로, 남은 후보 수가 8 → 4 → 1로 줄어든다.</text>
+
+  <rect x="72" y="208" width="1056" height="122" rx="24" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text class="section" x="104" y="246">시작 배열과 목표값</text>
+  <text class="small" x="104" y="272">target = 27, 인덱스는 0부터 시작</text>
+  <rect x="104" y="286" width="70" height="34" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+  <rect x="182" y="286" width="70" height="34" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+  <rect x="260" y="286" width="70" height="34" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+  <rect x="338" y="286" width="70" height="34" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="416" y="286" width="70" height="34" rx="10" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+  <rect x="494" y="286" width="70" height="34" rx="10" fill="#e9d5ff" stroke="#a855f7"/>
+  <rect x="572" y="286" width="70" height="34" rx="10" fill="#e9d5ff" stroke="#a855f7"/>
+  <rect x="650" y="286" width="70" height="34" rx="10" fill="#e9d5ff" stroke="#a855f7"/>
+  <text class="mono" x="139" y="309" text-anchor="middle">3</text>
+  <text class="mono" x="217" y="309" text-anchor="middle">8</text>
+  <text class="mono" x="295" y="309" text-anchor="middle">14</text>
+  <text class="mono" x="373" y="309" text-anchor="middle">21</text>
+  <text class="mono" x="451" y="309" text-anchor="middle">27</text>
+  <text class="mono" x="529" y="309" text-anchor="middle">33</text>
+  <text class="mono" x="607" y="309" text-anchor="middle">41</text>
+  <text class="mono" x="685" y="309" text-anchor="middle">56</text>
+  <text class="arrayLabel" x="139" y="280" text-anchor="middle">0</text>
+  <text class="arrayLabel" x="217" y="280" text-anchor="middle">1</text>
+  <text class="arrayLabel" x="295" y="280" text-anchor="middle">2</text>
+  <text class="arrayLabel" x="373" y="280" text-anchor="middle">3</text>
+  <text class="arrayLabel" x="451" y="280" text-anchor="middle">4</text>
+  <text class="arrayLabel" x="529" y="280" text-anchor="middle">5</text>
+  <text class="arrayLabel" x="607" y="280" text-anchor="middle">6</text>
+  <text class="arrayLabel" x="685" y="280" text-anchor="middle">7</text>
+  <text class="small" x="756" y="298">노랑 = 현재 mid</text>
+  <text class="small" x="756" y="320">빨강 = 찾는 값 27</text>
+
+  <rect x="72" y="364" width="328" height="292" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text class="section" x="100" y="404">1단계</text>
+  <text class="label" x="100" y="436">lo = 0, hi = 7</text>
+  <text class="body" x="100" y="468">mid = 3 → 값 21</text>
+  <text class="body" x="100" y="496">27이 더 크므로 왼쪽 절반은 버린다.</text>
+  <line x1="104" y1="528" x2="286" y2="528" stroke="#7c3aed" stroke-width="4" marker-end="url(#arrow)"/>
+  <text class="small" x="100" y="562">다음 범위: 인덱스 4~7</text>
+  <text class="small" x="100" y="586">남는 값: [27, 33, 41, 56]</text>
+  <rect x="100" y="604" width="272" height="34" rx="12" fill="#ffffff" stroke="#bfdbfe"/>
+  <text class="small" x="116" y="626">비교 한 번으로 4개 후보를 제거</text>
+
+  <rect x="436" y="364" width="328" height="292" rx="24" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text class="section" x="464" y="404">2단계</text>
+  <text class="label" x="464" y="436">lo = 4, hi = 7</text>
+  <text class="body" x="464" y="468">mid = 5 → 값 33</text>
+  <text class="body" x="464" y="496">27이 더 작으므로 오른쪽 절반을 버린다.</text>
+  <line x1="468" y1="528" x2="650" y2="528" stroke="#7c3aed" stroke-width="4" marker-end="url(#arrow)"/>
+  <text class="small" x="464" y="562">다음 범위: 인덱스 4~4</text>
+  <text class="small" x="464" y="586">남는 값: [27]</text>
+  <rect x="464" y="604" width="272" height="34" rx="12" fill="#ffffff" stroke="#ddd6fe"/>
+  <text class="small" x="480" y="626">또 절반을 버려 후보 1개만 남김</text>
+
+  <rect x="800" y="364" width="328" height="292" rx="24" fill="#fef2f2" stroke="#fca5a5" stroke-width="2"/>
+  <text class="section" x="828" y="404">3단계</text>
+  <text class="label" x="828" y="436">lo = hi = 4</text>
+  <text class="body" x="828" y="468">mid = 4 → 값 27</text>
+  <text class="body" x="828" y="496">target과 같으므로 탐색 종료.</text>
+  <circle cx="972" cy="560" r="42" fill="#ef4444"/>
+  <text x="972" y="552" text-anchor="middle" font-size="20" font-weight="800" fill="#ffffff">찾음</text>
+  <text x="972" y="578" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">index 4</text>
+  <rect x="828" y="604" width="272" height="34" rx="12" fill="#ffffff" stroke="#fecaca"/>
+  <text class="small" x="844" y="626">핵심: 매 단계마다 후보 수가 절반으로 감소</text>
+
+  <rect x="72" y="678" width="1056" height="34" rx="16" fill="#e2e8f0"/>
+  <text class="small" x="96" y="700">시험 포인트: while lo ≤ hi, mid 계산, lo = mid + 1 / hi = mid - 1 경계를 정확히 써야 off-by-one 오류를 피한다.</text>
+</svg>

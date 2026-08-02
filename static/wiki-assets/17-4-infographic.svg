@@ -1,138 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">17-4. 메시지 큐 인포그래픽</title>
-  <desc id="desc">생산자, 브로커, 큐, 소비자, Kafka와 RabbitMQ 비교, 전달 보장과 백프레셔를 설명하는 메시지 큐 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="980" viewBox="0 0 1280 980" role="img" aria-labelledby="title desc">
+  <title id="title">17-4. 메시지 큐 흐름 인포그래픽</title>
+  <desc id="desc">생산자, 브로커, 파티션과 큐, 소비자 그룹, 재처리와 백프레셔를 분리해 보여주는 메시지 큐 흐름 요약도</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#ecfeff"/>
-    </linearGradient>
-    <linearGradient id="brokerGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1d4ed8"/>
-      <stop offset="100%" stop-color="#0f766e"/>
-    </linearGradient>
-    <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#14b8a6"/>
-    </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
-    </marker>
     <style>
-      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
-      .kicker { font-size: 15px; font-weight: 700; fill: #0f766e; letter-spacing: 0.08em; }
-      .title { font-size: 34px; font-weight: 800; fill: #0f172a; }
-      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
-      .section { font-size: 18px; font-weight: 800; fill: #0f172a; }
-      .label { font-size: 16px; font-weight: 700; fill: #0f172a; }
-      .body { font-size: 14px; font-weight: 500; fill: #334155; }
-      .small { font-size: 12px; font-weight: 600; fill: #475569; }
-      .value { font-size: 13px; font-weight: 700; fill: #1e293b; }
-      .chip { font-size: 12px; font-weight: 700; fill: #0f172a; }
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .kicker { font-size: 18px; font-weight: 800; letter-spacing: 0.12em; fill: #0f766e; }
+      .title { font-size: 38px; font-weight: 800; }
+      .subtitle { font-size: 20px; font-weight: 500; fill: #334155; }
+      .section { font-size: 23px; font-weight: 800; }
+      .label { font-size: 21px; font-weight: 800; }
+      .body { font-size: 18px; font-weight: 500; fill: #334155; }
+      .small { font-size: 16px; font-weight: 600; fill: #475569; }
+      .chip { font-size: 16px; font-weight: 700; }
     </style>
+    <marker id="arrow" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M0 0L14 7L0 14Z" fill="#2563eb"/>
+    </marker>
   </defs>
 
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="url(#bg)" stroke="#cbd5e1"/>
+  <rect width="1280" height="980" fill="#f8fafc"/>
+  <rect x="26" y="26" width="1228" height="928" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 
-  <text class="kicker" x="72" y="84">ASYNC · BUFFER · REPLAY</text>
-  <text class="title" x="72" y="124">17-4. 메시지 큐</text>
-  <text class="subtitle" x="72" y="156">생산자와 소비자를 분리해 비동기 처리, 부하 완충, 장애 격리를 만든다.</text>
-  <text class="subtitle" x="72" y="180">핵심은 브로커, 오프셋, 전달 보장, 재처리 정책을 함께 설계하는 것이다.</text>
+  <text class="kicker" x="72" y="92">ASYNC · BUFFER · REPLAY</text>
+  <text class="title" x="72" y="138">17-4. 메시지 큐</text>
+  <text class="subtitle" x="72" y="176">생산자와 소비자를 분리해 응답성을 높이고, 부하를 완충하며, 장애 전파를 줄인다.</text>
+  <text class="subtitle" x="72" y="204">핵심 설계 포인트는 브로커 구조, 오프셋/ACK, 재처리, consumer lag 관리다.</text>
 
-  <rect x="64" y="216" width="650" height="430" rx="24" fill="#ffffff" stroke="#bfdbfe" stroke-width="2"/>
-  <text class="section" x="92" y="254">메시지 흐름: Producer → Broker/Queue → Consumer</text>
+  <rect x="64" y="246" width="1152" height="352" rx="26" fill="#f8fbff" stroke="#bfdbfe" stroke-width="2"/>
+  <text class="section" x="96" y="286">1) 기본 흐름: Producer → Broker → Consumer Group</text>
 
-  <rect x="96" y="300" width="140" height="116" rx="20" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
-  <text class="label" x="166" y="336" text-anchor="middle">Producer</text>
-  <text class="body" x="166" y="362" text-anchor="middle">거래 이벤트</text>
-  <text class="body" x="166" y="384" text-anchor="middle">로그 · 알림</text>
-  <circle cx="128" cy="318" r="10" fill="#2563eb" opacity="0.18"/>
-  <circle cx="166" cy="318" r="10" fill="#2563eb" opacity="0.3"/>
-  <circle cx="204" cy="318" r="10" fill="#2563eb" opacity="0.45"/>
+  <rect x="96" y="336" width="214" height="188" rx="24" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text class="label" x="203" y="378" text-anchor="middle">Producer</text>
+  <text class="body" x="203" y="414" text-anchor="middle">거래 이벤트 발행</text>
+  <text class="body" x="203" y="442" text-anchor="middle">로그 · 알림 · 업무 요청</text>
+  <text class="small" x="203" y="478" text-anchor="middle">빠르게 밀어 넣고 직접 대기하지 않음</text>
 
-  <rect x="292" y="270" width="248" height="206" rx="24" fill="url(#brokerGrad)"/>
-  <text class="label" x="416" y="308" text-anchor="middle" fill="#ffffff">Broker / Topic / Queue</text>
-  <text class="body" x="416" y="332" text-anchor="middle" fill="#dbeafe">생산자와 소비자 분리</text>
+  <line x1="310" y1="430" x2="398" y2="430" stroke="#2563eb" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <text class="small" x="354" y="408" text-anchor="middle">burst traffic</text>
 
-  <rect x="324" y="352" width="60" height="88" rx="14" fill="#ffffff" opacity="0.95"/>
-  <text class="small" x="354" y="378" text-anchor="middle">P0</text>
-  <text class="body" x="354" y="402" text-anchor="middle">offset</text>
-  <text class="small" x="354" y="422" text-anchor="middle">0..n</text>
+  <rect x="400" y="310" width="360" height="248" rx="26" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="2"/>
+  <text x="580" y="356" text-anchor="middle" font-size="24" font-weight="800" fill="#ffffff">Broker / Topic / Queue</text>
+  <text x="580" y="388" text-anchor="middle" font-size="18" font-weight="500" fill="#dbeafe">생산자와 소비자 사이에 완충 계층을 둔다</text>
 
-  <rect x="386" y="352" width="60" height="88" rx="14" fill="#ffffff" opacity="0.95"/>
-  <text class="small" x="416" y="378" text-anchor="middle">P1</text>
-  <text class="body" x="416" y="402" text-anchor="middle">lag</text>
-  <text class="small" x="416" y="422" text-anchor="middle">buffer</text>
+  <rect x="438" y="420" width="84" height="96" rx="18" fill="#ffffff"/>
+  <text class="label" x="480" y="454" text-anchor="middle">P0</text>
+  <text class="small" x="480" y="482" text-anchor="middle">offset</text>
+  <text class="small" x="480" y="504" text-anchor="middle">0 → n</text>
 
-  <rect x="448" y="352" width="60" height="88" rx="14" fill="#ffffff" opacity="0.95"/>
-  <text class="small" x="478" y="378" text-anchor="middle">P2</text>
-  <text class="body" x="478" y="402" text-anchor="middle">replay</text>
-  <text class="small" x="478" y="422" text-anchor="middle">retain</text>
+  <rect x="538" y="420" width="84" height="96" rx="18" fill="#ffffff"/>
+  <text class="label" x="580" y="454" text-anchor="middle">P1</text>
+  <text class="small" x="580" y="482" text-anchor="middle">buffer</text>
+  <text class="small" x="580" y="504" text-anchor="middle">lag 흡수</text>
 
-  <line x1="236" y1="358" x2="292" y2="358" stroke="url(#flowGrad)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <line x1="540" y1="358" x2="616" y2="358" stroke="url(#flowGrad)" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <rect x="638" y="420" width="84" height="96" rx="18" fill="#ffffff"/>
+  <text class="label" x="680" y="454" text-anchor="middle">P2</text>
+  <text class="small" x="680" y="482" text-anchor="middle">retain</text>
+  <text class="small" x="680" y="504" text-anchor="middle">replay 가능</text>
 
-  <rect x="616" y="284" width="72" height="104" rx="18" fill="#dcfce7" stroke="#34d399" stroke-width="2"/>
-  <text class="label" x="652" y="320" text-anchor="middle">C1</text>
-  <text class="body" x="652" y="346" text-anchor="middle">group A</text>
-  <text class="small" x="652" y="368" text-anchor="middle">partition</text>
+  <line x1="760" y1="430" x2="848" y2="430" stroke="#2563eb" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <text class="small" x="804" y="408" text-anchor="middle">fetch / ack</text>
 
-  <rect x="616" y="400" width="72" height="104" rx="18" fill="#dcfce7" stroke="#34d399" stroke-width="2"/>
-  <text class="label" x="652" y="436" text-anchor="middle">C2</text>
-  <text class="body" x="652" y="462" text-anchor="middle">group A</text>
-  <text class="small" x="652" y="484" text-anchor="middle">rebalance</text>
+  <rect x="850" y="322" width="154" height="90" rx="22" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text class="label" x="927" y="358" text-anchor="middle">Consumer C1</text>
+  <text class="small" x="927" y="386" text-anchor="middle">group A, partition 할당</text>
 
-  <text class="body" x="94" y="466">• 파티션 단위 순서 보장, 전역 순서는 비용 증가</text>
-  <text class="body" x="94" y="490">• 소비자 지연 시 큐가 백프레셔를 흡수하지만 무한 증가는 불가</text>
-  <text class="body" x="94" y="514">• 로그 보존/TTL/컴팩션 + 오프셋 리셋이 재처리 전략의 핵심</text>
+  <rect x="850" y="436" width="154" height="90" rx="22" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text class="label" x="927" y="472" text-anchor="middle">Consumer C2</text>
+  <text class="small" x="927" y="500" text-anchor="middle">지연 시 rebalance 가능</text>
 
-  <rect x="94" y="550" width="588" height="72" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
-  <text class="label" x="116" y="578">전달 보장</text>
-  <rect x="210" y="558" width="120" height="36" rx="18" fill="#fee2e2"/>
-  <text class="chip" x="270" y="581" text-anchor="middle">at-most-once</text>
-  <rect x="342" y="558" width="120" height="36" rx="18" fill="#fef3c7"/>
-  <text class="chip" x="402" y="581" text-anchor="middle">at-least-once</text>
-  <rect x="474" y="558" width="120" height="36" rx="18" fill="#dcfce7"/>
-  <text class="chip" x="534" y="581" text-anchor="middle">exactly-once</text>
-  <text class="small" x="210" y="610">손실 가능</text>
-  <text class="small" x="342" y="610">중복 가능</text>
-  <text class="small" x="474" y="610">복잡도·비용 큼</text>
+  <rect x="1032" y="322" width="150" height="204" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="label" x="1107" y="358" text-anchor="middle">왜 필요한가</text>
+  <text class="body" x="1058" y="396">• 비동기 처리</text>
+  <text class="body" x="1058" y="426">• 부하 완충</text>
+  <text class="body" x="1058" y="456">• 장애 격리</text>
+  <text class="body" x="1058" y="486">• 재처리 기반</text>
 
-  <rect x="742" y="216" width="394" height="196" rx="24" fill="#ffffff" stroke="#c7d2fe" stroke-width="2"/>
-  <text class="section" x="770" y="254">Kafka vs RabbitMQ</text>
-  <line x1="939" y1="272" x2="939" y2="388" stroke="#cbd5e1"/>
-  <text class="label" x="820" y="286" text-anchor="middle">Kafka</text>
-  <text class="label" x="1036" y="286" text-anchor="middle">RabbitMQ</text>
+  <rect x="64" y="624" width="548" height="264" rx="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="96" y="666">2) 순서 · 재처리 · 백프레셔</text>
+  <text class="body" x="96" y="710">• 순서 보장은 보통 partition 단위다.</text>
+  <text class="body" x="96" y="742">• 전역 순서는 partition 축소, 단일 리더 등 비용이 커진다.</text>
+  <text class="body" x="96" y="774">• retention, TTL, compaction, offset reset이 재처리의 핵심이다.</text>
+  <text class="body" x="96" y="806">• consumer가 느려지면 backlog가 쌓여 producer 충격을 완화한다.</text>
+  <text class="body" x="96" y="838">• backlog 무한 증가는 저장소 압박과 SLA 악화로 이어진다.</text>
 
-  <text class="small" x="770" y="320">중심 모델</text>
-  <text class="value" x="820" y="320" text-anchor="middle">로그 기반 스트리밍</text>
-  <text class="value" x="1036" y="320" text-anchor="middle">브로커 기반 라우팅</text>
+  <rect x="636" y="624" width="580" height="264" rx="26" fill="#f8fbff" stroke="#bfdbfe" stroke-width="2"/>
+  <text class="section" x="668" y="666">3) 운영자가 보는 신호</text>
 
-  <text class="small" x="770" y="350">강점</text>
-  <text class="value" x="820" y="350" text-anchor="middle">대용량 · 재처리 · 순서</text>
-  <text class="value" x="1036" y="350" text-anchor="middle">복잡한 라우팅 · 작업 큐</text>
+  <rect x="668" y="700" width="514" height="26" rx="13" fill="#e2e8f0"/>
+  <rect x="668" y="700" width="344" height="26" rx="13" fill="#0f766e"/>
+  <text class="small" x="668" y="692">consumer lag / backlog</text>
+  <text class="small" x="1116" y="692" text-anchor="end">임계치 접근</text>
 
-  <text class="small" x="770" y="380">사용 예</text>
-  <text class="value" x="820" y="380" text-anchor="middle">이벤트 스트림 · 로그</text>
-  <text class="value" x="1036" y="380" text-anchor="middle">업무 비동기 · 알림</text>
+  <rect x="668" y="754" width="166" height="96" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text class="label" x="751" y="790" text-anchor="middle">필수 지표</text>
+  <text class="small" x="751" y="818" text-anchor="middle">lag · msg/s</text>
+  <text class="small" x="751" y="840" text-anchor="middle">end-to-end 지연</text>
 
-  <rect x="742" y="432" width="394" height="214" rx="24" fill="#ffffff" stroke="#99f6e4" stroke-width="2"/>
-  <text class="section" x="770" y="470">운영 포인트와 금융권 주의점</text>
+  <rect x="852" y="754" width="166" height="96" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text class="label" x="935" y="790" text-anchor="middle">재처리 준비</text>
+  <text class="small" x="935" y="818" text-anchor="middle">DLQ · offset reset</text>
+  <text class="small" x="935" y="840" text-anchor="middle">runbook 문서화</text>
 
-  <text class="body" x="770" y="506">• 필수 지표: consumer lag, msg/s, end-to-end 지연, DLQ 비율</text>
-  <text class="body" x="770" y="532">• 중복 처리 방지를 위한 아이덤포턴시 키 설계</text>
-  <text class="body" x="770" y="558">• 보존 정책, 감사 로그, 재처리 절차를 문서화</text>
+  <rect x="1036" y="754" width="146" height="96" rx="18" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+  <text class="label" x="1109" y="790" text-anchor="middle">금융권 체크</text>
+  <text class="small" x="1109" y="818" text-anchor="middle">감사 로그</text>
+  <text class="small" x="1109" y="840" text-anchor="middle">중복 방지 키</text>
 
-  <rect x="770" y="582" width="314" height="20" rx="10" fill="#e2e8f0"/>
-  <rect x="770" y="582" width="218" height="20" rx="10" fill="#14b8a6">
-    <animate attributeName="width" values="150;245;218" dur="4.5s" repeatCount="indefinite"/>
-  </rect>
-  <text class="small" x="770" y="574">Queue backlog / consumer lag</text>
-  <text class="small" x="1094" y="596" text-anchor="end">임계치 초과 시 확장·재처리</text>
-
-  <rect x="1002" y="500" width="102" height="56" rx="14" fill="#fef2f2" stroke="#f87171"/>
-  <text class="label" x="1053" y="524" text-anchor="middle">DLQ</text>
-  <text class="small" x="1053" y="544" text-anchor="middle">실패 메시지 격리</text>
-
-  <text class="small" x="72" y="675">페이지 요지: 비동기화·부하 완충·재처리 가능성은 메시지 큐의 장점이지만, 순서·중복·보존 정책을 함께 설계해야 한다.</text>
+  <text class="small" x="72" y="926">요지: 메시지 큐는 비동기화 도구이지만, 순서 보장 범위와 중복/재처리 정책을 함께 설계해야 안전하다.</text>
 </svg>

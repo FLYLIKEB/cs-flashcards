@@ -1,106 +1,90 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">15-4. 금융 규제 프레임워크 인포그래픽</title>
-  <desc id="desc">금융 IT 운영 흐름 위에 바젤Ⅲ, 전자금융거래법, 망분리 규제, 금융보안원 기준이 각각 어떤 통제 지점을 만드는지 보여주는 SVG 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">15-4. 금융 규제 프레임워크 규제 지도</title>
+  <desc id="desc">바젤Ⅲ, 전자금융거래법, 망분리 규제, 금융보안원 기준의 목적과 IT 통제 포인트를 금융 업무 흐름에 맞춰 정리한 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff" />
       <stop offset="100%" stop-color="#f8fafc" />
     </linearGradient>
-    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f766e" />
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a" />
       <stop offset="100%" stop-color="#1d4ed8" />
     </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
-    </marker>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      text { font-family: 'Pretendard','Noto Sans KR',sans-serif; }
+      .eyebrow { font-size: 14px; font-weight: 700; fill: #bfdbfe; letter-spacing: 0.04em; }
+      .title { font-size: 34px; font-weight: 800; fill: #ffffff; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #dbeafe; }
+      .section { font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .cardTitle { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .cardBody { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 14px; font-weight: 700; fill: #475569; }
+      .chip { font-size: 13px; font-weight: 800; fill: #0f172a; }
       .center { text-anchor: middle; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="28" y="28" width="1144" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" />
+  <rect width="1200" height="860" fill="url(#bg)" />
+  <rect x="32" y="28" width="1136" height="804" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
 
-  <text class="tiny" x="76" y="74">금융공기업 IT · 규제를 개발 제약이 아닌 설계 조건으로 해석</text>
-  <text class="title" x="76" y="116">15-4. 금융 규제 프레임워크</text>
-  <text class="subtitle" x="76" y="146">금융 서비스 운영 흐름마다 규제 목적이 다르며, IT는 데이터 품질·인증·망통제·로그·사고대응을 연결해 신뢰를 유지한다.</text>
+  <rect x="58" y="52" width="1084" height="136" rx="26" fill="url(#hero)" />
+  <text class="eyebrow" x="84" y="90">REGULATION MAP FOR FINANCIAL IT</text>
+  <text class="title" x="84" y="126">15-4. 금융 규제 프레임워크</text>
+  <text class="subtitle" x="84" y="156">규제마다 목적은 다르지만, IT에서는 데이터 품질·인증·망통제·로그·사고대응을 한 흐름으로 묶어 설명해야 한다.</text>
 
-  <rect x="86" y="188" width="1028" height="110" rx="26" fill="#eef6ff" stroke="#93c5fd" />
-  <text class="section" x="120" y="220">금융 IT 운영 흐름</text>
-  <line x1="165" y1="254" x2="1035" y2="254" stroke="url(#flow)" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow)" />
+  <text class="section" x="80" y="240">1. 규제별 목적과 IT 포인트</text>
 
-  <rect x="130" y="224" width="170" height="60" rx="18" fill="#ffffff" stroke="#14b8a6" />
-  <text class="label center" x="215" y="248">거래·접속</text>
-  <text class="body center" x="215" y="268">채널, 인증, 세션</text>
+  <rect x="80" y="266" width="498" height="166" rx="24" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" />
+  <text class="cardTitle" x="108" y="306">바젤Ⅲ 자본규제</text>
+  <rect x="404" y="284" width="148" height="32" rx="16" fill="#dcfce7" />
+  <text class="chip center" x="478" y="305">건전성 · 보고 정확성</text>
+  <text class="cardBody" x="108" y="338">• 목적: 자본 적정성·유동성 확보로 금융기관의 안정성 유지</text>
+  <text class="cardBody" x="108" y="366">• IT 포인트: 리스크 데이터 정합성, ETL 추적성, 규제보고 자동화</text>
+  <text class="cardBody" x="108" y="394">• 면접 연결: 스트레스 테스트 입력·계산·집계 흐름을 재현 가능하게 설계</text>
 
-  <rect x="340" y="224" width="170" height="60" rx="18" fill="#ffffff" stroke="#0ea5e9" />
-  <text class="label center" x="425" y="248">핵심 처리</text>
-  <text class="body center" x="425" y="268">원장, 결제, 승인</text>
+  <rect x="622" y="266" width="498" height="166" rx="24" fill="#fef2f2" stroke="#ef4444" stroke-width="2" />
+  <text class="cardTitle" x="650" y="306">전자금융거래법</text>
+  <rect x="960" y="284" width="134" height="32" rx="16" fill="#fee2e2" />
+  <text class="chip center" x="1027" y="305">이용자 보호</text>
+  <text class="cardBody" x="650" y="338">• 목적: 인증·접근통제·거래 무결성으로 이용자 피해와 분쟁을 줄임</text>
+  <text class="cardBody" x="650" y="366">• IT 포인트: 2차 인증, 세션 관리, 트랜잭션 로그 보존, 포렌식 준비</text>
+  <text class="cardBody" x="650" y="394">• 면접 연결: 사고 시 책임 추적이 가능한 증적 체계를 함께 설명</text>
 
-  <rect x="550" y="224" width="170" height="60" rx="18" fill="#ffffff" stroke="#8b5cf6" />
-  <text class="label center" x="635" y="248">데이터·분석</text>
-  <text class="body center" x="635" y="268">ETL, 리스크, FDS</text>
+  <rect x="80" y="454" width="498" height="166" rx="24" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />
+  <text class="cardTitle" x="108" y="494">망분리 규제</text>
+  <rect x="418" y="472" width="134" height="32" rx="16" fill="#dbeafe" />
+  <text class="chip center" x="485" y="493">확산 차단</text>
+  <text class="cardBody" x="108" y="526">• 목적: 외부 공격과 악성코드가 업무망으로 번지는 경로를 제한</text>
+  <text class="cardBody" x="108" y="554">• IT 포인트: 게이트웨이, 검역, 세그먼트, 예외 승인, 위험기반 모니터링</text>
+  <text class="cardBody" x="108" y="582">• 면접 연결: 물리적 분리와 논리적 분리의 장단점을 운영비용과 함께 비교</text>
 
-  <rect x="760" y="224" width="170" height="60" rx="18" fill="#ffffff" stroke="#f59e0b" />
-  <text class="label center" x="845" y="248">보고·보안운영</text>
-  <text class="body center" x="845" y="268">규제보고, SIEM, 복구</text>
+  <rect x="622" y="454" width="498" height="166" rx="24" fill="#fff7ed" stroke="#f59e0b" stroke-width="2" />
+  <text class="cardTitle" x="650" y="494">금융보안원 기준</text>
+  <rect x="944" y="472" width="150" height="32" rx="16" fill="#ffedd5" />
+  <text class="chip center" x="1019" y="493">보안 운영 표준</text>
+  <text class="cardBody" x="650" y="526">• 목적: 접근통제·로그·암호화·취약점·사고대응을 표준화</text>
+  <text class="cardBody" x="650" y="554">• IT 포인트: SIEM 중앙화, 무결성 보관, 패치 우선순위, Tabletop 훈련</text>
+  <text class="cardBody" x="650" y="582">• 면접 연결: 탐지 → 격리 → 분석 → 복구 → 보고 절차를 역할과 함께 제시</text>
 
-  <rect x="960" y="212" width="120" height="84" rx="22" fill="#dcfce7" stroke="#16a34a" />
-  <text class="label center" x="1020" y="246">신뢰 유지</text>
-  <text class="body center" x="1020" y="266">안정성·보호</text>
+  <text class="section" x="80" y="688">2. 업무 흐름에 걸리는 통제 지도</text>
+  <rect x="80" y="714" width="1040" height="86" rx="26" fill="#f8fafc" stroke="#cbd5e1" />
 
-  <rect x="86" y="338" width="470" height="138" rx="24" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" />
-  <text class="section" x="114" y="372">바젤Ⅲ 자본규제</text>
-  <text class="body" x="114" y="398">• 목적: 자본 적정성·유동성 확보로 건전성 유지</text>
-  <text class="body" x="114" y="422">• IT: 리스크 데이터 정합성, ETL 추적성, 규제보고 자동화</text>
-  <text class="body" x="114" y="446">• 스트레스 테스트: 시나리오 입력 → 계산 엔진 → 결과 집계</text>
-  <line x1="510" y1="398" x2="595" y2="288" stroke="#22c55e" stroke-width="3" />
-  <line x1="520" y1="432" x2="805" y2="288" stroke="#22c55e" stroke-width="3" />
+  <rect x="104" y="732" width="230" height="50" rx="18" fill="#ecfeff" stroke="#14b8a6" />
+  <text class="cardTitle center" x="219" y="764">거래·접속</text>
+  <text class="small center" x="219" y="787">전자금융거래법 · 망분리</text>
 
-  <rect x="86" y="500" width="470" height="138" rx="24" fill="#fef2f2" stroke="#ef4444" stroke-width="2" />
-  <text class="section" x="114" y="534">전자금융거래법</text>
-  <text class="body" x="114" y="560">• 핵심: 이용자 보호, 인증·접근통제, 거래 무결성, 책임·보상</text>
-  <text class="body" x="114" y="584">• IT: OTP·2차 인증, 세션 관리, 로그 보존·암호화·포렌식</text>
-  <text class="body" x="114" y="608">• 사고 시 증적 확보와 복구 절차를 함께 설계</text>
-  <line x1="510" y1="542" x2="240" y2="288" stroke="#ef4444" stroke-width="3" />
-  <line x1="520" y1="578" x2="420" y2="288" stroke="#ef4444" stroke-width="3" />
+  <rect x="356" y="732" width="230" height="50" rx="18" fill="#eef2ff" stroke="#6366f1" />
+  <text class="cardTitle center" x="471" y="764">핵심 처리</text>
+  <text class="small center" x="471" y="787">전자금융거래법 · 금융보안원</text>
 
-  <rect x="642" y="338" width="472" height="138" rx="24" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />
-  <text class="section" x="670" y="372">망분리 규제</text>
-  <text class="body" x="670" y="398">• 목적: 외부 공격과 악성코드의 내부 확산 차단</text>
-  <text class="body" x="670" y="422">• 형태: 물리적 분리 vs 논리적 분리, 클라우드·원격근무는 대체통제</text>
-  <text class="body" x="670" y="446">• IT: 게이트웨이, 전송 통제·암호화, 예외 승인, 위험기반 모니터링</text>
-  <rect x="944" y="368" width="136" height="76" rx="18" fill="#ffffff" stroke="#3b82f6" stroke-dasharray="8 6" />
-  <text class="tiny center" x="1012" y="394">업무망 ↔ 외부망</text>
-  <text class="tiny center" x="1012" y="414">검역·세그먼트·감시</text>
-  <line x1="944" y1="406" x2="510" y2="254" stroke="#3b82f6" stroke-width="3" />
+  <rect x="608" y="732" width="230" height="50" rx="18" fill="#f0fdf4" stroke="#22c55e" />
+  <text class="cardTitle center" x="723" y="764">데이터·분석</text>
+  <text class="small center" x="723" y="787">바젤Ⅲ · 금융보안원</text>
 
-  <rect x="642" y="500" width="472" height="138" rx="24" fill="#fff7ed" stroke="#f59e0b" stroke-width="2" />
-  <text class="section" x="670" y="534">금융보안원 기준</text>
-  <text class="body" x="670" y="560">• 통제 항목: 접근통제, 로그, 암호화, 취약점 점검, 패치 관리</text>
-  <text class="body" x="670" y="584">• 사고대응: 탐지 → 격리 → 분석 → 복구 → 보고</text>
-  <text class="body" x="670" y="608">• IT: SIEM 중앙화, 무결성 보관, Tabletop 훈련, RACI 명확화</text>
-  <line x1="690" y1="500" x2="845" y2="288" stroke="#f59e0b" stroke-width="3" />
-  <line x1="770" y1="500" x2="1010" y2="296" stroke="#f59e0b" stroke-width="3" />
+  <rect x="860" y="732" width="236" height="50" rx="18" fill="#fff7ed" stroke="#f59e0b" />
+  <text class="cardTitle center" x="978" y="764">보고·보안운영</text>
+  <text class="small center" x="978" y="787">바젤Ⅲ · 금융보안원 · 망분리 예외통제</text>
 
-  <rect x="462" y="332" width="276" height="312" rx="28" fill="#0f172a" />
-  <text class="section center" x="600" y="368" fill="#ffffff">공통 설계 원칙</text>
-  <text class="body center" x="600" y="398" fill="#cbd5e1">규제는 각각 다르지만 통제 방식은 연결된다</text>
-
-  <rect x="492" y="422" width="216" height="74" rx="18" fill="#1e293b" stroke="#475569" />
-  <text class="label center" x="600" y="448" fill="#f8fafc">기술적 제어</text>
-  <text class="body center" x="600" y="470" fill="#cbd5e1">인증 · 암호화 · ETL 검증 · IAM</text>
-
-  <rect x="492" y="514" width="216" height="96" rx="18" fill="#1e293b" stroke="#475569" />
-  <text class="label center" x="600" y="540" fill="#f8fafc">운영적 제어</text>
-  <text class="body center" x="600" y="562" fill="#cbd5e1">모니터링 · 감사추적 · 예외승인</text>
-  <text class="body center" x="600" y="584" fill="#cbd5e1">사고대응 · 보고 · 복구훈련</text>
-
-  <text class="tiny" x="76" y="670">핵심 메시지: 보안과 편의성, 유연성과 통제를 함께 설명할 수 있어야 금융 IT 규제 이해도가 드러난다.</text>
+  <rect x="80" y="808" width="1040" height="20" rx="10" fill="#0f172a" />
+  <text class="subtitle" x="106" y="822">핵심 메시지: 규제를 따로 외우기보다 “어느 단계에서 어떤 통제로 설명 가능한가”를 연결하면 금융 IT 답변의 완성도가 올라간다.</text>
 </svg>

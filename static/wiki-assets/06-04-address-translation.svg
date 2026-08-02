@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">06-04 주소 변환과 TLB 흐름</title>
+  <desc id="desc">가상주소가 TLB와 페이지 테이블을 거쳐 물리 프레임으로 변환되는 흐름과 EAT를 설명하는 SVG</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569" />
+    </marker>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 21px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="780" fill="#f8fafc" />
+  <rect x="28" y="28" width="1144" height="724" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <text class="title" x="72" y="92">가상주소 → 물리주소 변환</text>
+  <text class="subtitle" x="72" y="124">주소는 페이지 번호와 오프셋으로 나뉘고, TLB hit/miss에 따라 접근 경로가 달라진다.</text>
+
+  <rect x="60" y="162" width="1080" height="236" rx="24" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section" x="88" y="202">1) 기본 변환 흐름</text>
+
+  <rect x="90" y="236" width="212" height="120" rx="20" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" />
+  <text class="label" x="196" y="272" text-anchor="middle">가상주소</text>
+  <rect x="122" y="294" width="88" height="32" rx="8" fill="#2563eb" />
+  <rect x="210" y="294" width="60" height="32" rx="8" fill="#93c5fd" />
+  <text class="chip" x="166" y="315" text-anchor="middle">페이지 번호</text>
+  <text class="chip" x="240" y="315" text-anchor="middle">오프셋</text>
+
+  <rect x="364" y="236" width="180" height="120" rx="20" fill="#dcfce7" stroke="#22c55e" stroke-width="2" />
+  <text class="label" x="454" y="272" text-anchor="middle">TLB</text>
+  <text class="body" x="454" y="301" text-anchor="middle">최근 변환 결과 캐시</text>
+  <text class="small" x="454" y="324" text-anchor="middle">hit면 페이지 테이블 생략</text>
+
+  <rect x="618" y="212" width="192" height="68" rx="16" fill="#ecfccb" stroke="#84cc16" stroke-width="2" />
+  <text class="label" x="714" y="254" text-anchor="middle">TLB hit</text>
+  <text class="body" x="714" y="274" text-anchor="middle">바로 프레임 번호 획득</text>
+
+  <rect x="618" y="312" width="212" height="124" rx="20" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2" />
+  <text class="label" x="724" y="348" text-anchor="middle">페이지 테이블 조회</text>
+  <text class="body" x="724" y="378" text-anchor="middle">페이지 번호로 프레임 번호 검색</text>
+  <text class="body" x="724" y="400" text-anchor="middle">present bit로 메모리 적재 여부 확인</text>
+  <text class="small" x="724" y="422" text-anchor="middle">다단계면 필요한 하위 테이블만 생성</text>
+
+  <rect x="906" y="236" width="176" height="120" rx="20" fill="#bfdbfe" stroke="#2563eb" stroke-width="2" />
+  <text class="label" x="994" y="272" text-anchor="middle">물리 메모리</text>
+  <rect x="952" y="294" width="84" height="22" rx="6" fill="#1d4ed8" />
+  <rect x="952" y="324" width="84" height="22" rx="6" fill="#60a5fa" />
+  <text class="small" x="994" y="343" text-anchor="middle">선택된 프레임 + 오프셋</text>
+
+  <line x1="302" y1="296" x2="364" y2="296" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="544" y1="296" x2="618" y2="246" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="544" y1="296" x2="618" y2="374" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="810" y1="246" x2="906" y2="246" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="830" y1="374" x2="906" y2="296" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+
+  <rect x="60" y="432" width="540" height="280" rx="24" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="section" x="88" y="472">2) TLB 성능 요약</text>
+  <rect x="88" y="504" width="484" height="176" rx="20" fill="#ffffff" stroke="#cbd5e1" />
+  <text class="label" x="112" y="540">EAT(평균 메모리 접근 시간)</text>
+  <text class="body" x="112" y="574">• hit 비용 = TLB 접근 + 메모리 1회 접근</text>
+  <text class="body" x="112" y="604">• miss 비용 = TLB 접근 + 페이지 테이블 조회 + 메모리 1회 접근</text>
+  <text class="body" x="112" y="634">• EAT ≈ h × (TLB + M) + (1-h) × (TLB + 2M)</text>
+  <text class="small" x="112" y="664">적중률 h가 높을수록 페이지 테이블 조회를 덜 거쳐 성능이 좋아진다.</text>
+
+  <rect x="630" y="432" width="510" height="280" rx="24" fill="#fff7ed" stroke="#fdba74" />
+  <text class="section" x="658" y="472">3) 페이지 폴트가 나면</text>
+  <rect x="658" y="504" width="454" height="176" rx="20" fill="#ffffff" stroke="#fdba74" />
+  <text class="body" x="682" y="542">1. present bit = 0 이면 페이지 폴트 발생</text>
+  <text class="body" x="682" y="574">2. 운영체제가 디스크에서 필요한 페이지를 적재</text>
+  <text class="body" x="682" y="606">3. 빈 프레임이 없으면 교체 알고리즘이 희생 페이지 선택</text>
+  <text class="body" x="682" y="638">4. 적재 후 페이지 테이블과 TLB를 갱신하고 재실행</text>
+  <text class="small" x="682" y="664">페이지 폴트가 잦아지면 thrashing으로 이어질 수 있다.</text>
+</svg>

@@ -1,123 +1,115 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-01. 선형 자료구조 인포그래픽</title>
-  <desc id="desc">배열, 연결리스트, 스택, 큐를 선형 순서와 접근 방식, 삽입 삭제 특성으로 비교하는 페이지 전용 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-labelledby="title desc">
+  <title id="title">09-01 선형 자료구조 핵심 비교</title>
+  <desc id="desc">배열, 연결리스트, 스택, 큐의 직관, 핵심 연산, 사용 상황을 넓은 카드형 레이아웃으로 비교한 인포그래픽</desc>
   <defs>
     <style>
       .bg { fill: #f8fafc; }
-      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
-      .metric { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .hero { fill: #0f172a; }
+      .heroTitle { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .heroSub { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #cbd5e1; }
+      .kicker { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #93c5fd; letter-spacing: 0.04em; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .cardTitle { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .accent { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #1d4ed8; }
+      .body { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .pillText { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .axis { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .mini { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
     </style>
-    <marker id="arrow-slate" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
-    </marker>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
     </marker>
-    <marker id="arrow-green" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
     </marker>
   </defs>
 
-  <rect class="bg" width="1200" height="720"/>
-  <rect x="34" y="34" width="1132" height="652" rx="28" fill="#e2e8f0"/>
-  <rect x="46" y="46" width="1108" height="628" rx="26" fill="#ffffff"/>
+  <rect class="bg" width="1200" height="960"/>
+  <rect x="28" y="28" width="1144" height="904" rx="30" fill="#e2e8f0"/>
+  <rect x="42" y="42" width="1116" height="876" rx="28" fill="#ffffff"/>
 
-  <text class="small" x="84" y="92">자료구조 핵심 비교 · 순서, 접근, 삽입/삭제, 사용 상황</text>
-  <text class="title" x="84" y="130">09-01. 선형 자료구조</text>
-  <text class="subtitle" x="84" y="164">데이터가 한 줄 순서로 이어지지만, 접근 방식과 넣고 빼는 비용은 구조마다 다르다.</text>
+  <rect class="hero" x="70" y="66" width="1060" height="150" rx="28"/>
+  <text class="kicker" x="104" y="108">LINEAR DATA STRUCTURES</text>
+  <text class="heroTitle" x="104" y="152">09-01. 선형 자료구조 한눈에 비교</text>
+  <text class="heroSub" x="104" y="188">같은 "한 줄 구조"라도 무엇을 자주 하는지에 따라 배열, 리스트, 스택, 큐의 선택이 달라진다.</text>
 
-  <rect x="84" y="188" width="1032" height="76" rx="20" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
-  <text class="section" x="112" y="220">공통점: 모든 원소가 1차원 순서를 가진다</text>
-  <line x1="174" y1="238" x2="1018" y2="238" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
-  <circle cx="210" cy="238" r="15" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <circle cx="370" cy="238" r="15" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <circle cx="530" cy="238" r="15" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <circle cx="690" cy="238" r="15" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <circle cx="850" cy="238" r="15" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <text class="small" x="202" y="243">0</text>
-  <text class="small" x="362" y="243">1</text>
-  <text class="small" x="522" y="243">2</text>
-  <text class="small" x="682" y="243">3</text>
-  <text class="small" x="842" y="243">4</text>
-  <text class="body" x="1040" y="243">앞뒤 관계가 분명</text>
+  <rect x="70" y="240" width="1060" height="92" rx="22" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+  <text class="section" x="98" y="279">공통 직관: 데이터가 순서대로 이어진다</text>
+  <line x1="190" y1="302" x2="1000" y2="302" stroke="#2563eb" stroke-width="4" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
+  <circle cx="236" cy="302" r="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="412" cy="302" r="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="588" cy="302" r="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="764" cy="302" r="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="940" cy="302" r="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="small" x="228" y="307">0</text>
+  <text class="small" x="404" y="307">1</text>
+  <text class="small" x="580" y="307">2</text>
+  <text class="small" x="756" y="307">3</text>
+  <text class="small" x="932" y="307">4</text>
+  <text class="body" x="1018" y="307">앞뒤 관계가 있다</text>
 
-  <rect class="card" x="84" y="286" width="510" height="286" rx="24"/>
-  <text class="section" x="112" y="324">배열 vs 연결리스트</text>
+  <rect class="panel" x="70" y="362" width="500" height="246" rx="24"/>
+  <text class="cardTitle" x="100" y="402">배열 Array</text>
+  <text class="accent" x="100" y="432">번호표가 붙은 사물함처럼 바로 찾는다</text>
+  <rect x="104" y="460" width="56" height="54" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="170" y="460" width="56" height="54" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="236" y="460" width="56" height="54" rx="10" fill="#93c5fd" stroke="#2563eb" stroke-width="2"/>
+  <rect x="302" y="460" width="56" height="54" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <rect x="368" y="460" width="56" height="54" rx="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text class="mini" x="126" y="493">0</text>
+  <text class="mini" x="192" y="493">1</text>
+  <text class="mini" x="258" y="493">2</text>
+  <text class="mini" x="324" y="493">3</text>
+  <text class="mini" x="390" y="493">4</text>
+  <line x1="264" y1="448" x2="264" y2="404" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text class="body" x="100" y="548">• 인덱스로 임의 위치 접근 O(1)</text>
+  <text class="body" x="100" y="574">• 중간 삽입·삭제는 뒤 원소를 밀어 O(n)</text>
+  <text class="body" x="100" y="600">• 자주 찾는 데이터, 고정 크기 처리에 유리</text>
 
-  <rect x="112" y="344" width="218" height="200" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="label" x="132" y="372">배열 Array</text>
-  <text class="metric" x="132" y="396">인덱스 접근 O(1)</text>
-  <rect x="132" y="414" width="36" height="42" rx="8" fill="#dbeafe" stroke="#60a5fa"/>
-  <rect x="172" y="414" width="36" height="42" rx="8" fill="#dbeafe" stroke="#60a5fa"/>
-  <rect x="212" y="414" width="36" height="42" rx="8" fill="#93c5fd" stroke="#2563eb"/>
-  <rect x="252" y="414" width="36" height="42" rx="8" fill="#dbeafe" stroke="#60a5fa"/>
-  <rect x="292" y="414" width="36" height="42" rx="8" fill="#dbeafe" stroke="#60a5fa"/>
-  <text class="small" x="145" y="439">0</text>
-  <text class="small" x="185" y="439">1</text>
-  <text class="small" x="225" y="439">2</text>
-  <text class="small" x="265" y="439">3</text>
-  <text class="small" x="305" y="439">4</text>
-  <line x1="252" y1="400" x2="252" y2="372" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
-  <text class="body" x="132" y="486">• 연속 메모리 → 캐시 친화적</text>
-  <text class="body" x="132" y="508">• 중간 삽입/삭제는 뒤 원소 이동 O(n)</text>
-  <text class="body" x="132" y="530">• 자주 찾는 데이터, 고정 크기에 적합</text>
+  <rect class="panel" x="590" y="362" width="540" height="246" rx="24"/>
+  <text class="cardTitle" x="620" y="402">연결리스트 Linked List</text>
+  <text class="accent" x="620" y="432">사람들이 손을 잡고 다음 사람을 가리키는 줄</text>
+  <rect x="630" y="470" width="90" height="48" rx="12" fill="#dcfce7" stroke="#34d399" stroke-width="2"/>
+  <rect x="788" y="470" width="90" height="48" rx="12" fill="#bbf7d0" stroke="#10b981" stroke-width="2"/>
+  <rect x="946" y="470" width="90" height="48" rx="12" fill="#dcfce7" stroke="#34d399" stroke-width="2"/>
+  <line x1="720" y1="494" x2="788" y2="494" stroke="#059669" stroke-width="4" marker-end="url(#arrowGreen)"/>
+  <line x1="878" y1="494" x2="946" y2="494" stroke="#059669" stroke-width="4" marker-end="url(#arrowGreen)"/>
+  <rect x="788" y="540" width="90" height="48" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="833" y1="540" x2="833" y2="518" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <text class="small" x="626" y="562">새 노드는 포인터만 다시 연결하면 들어간다.</text>
+  <text class="body" x="620" y="584">• 임의 접근은 head부터 따라가므로 O(n)</text>
+  <text class="body" x="620" y="610">• 위치를 이미 알면 삽입·삭제 O(1)</text>
+  <text class="body" x="620" y="636">• 크기 변화가 많고 중간 수정이 잦을 때 유리</text>
 
-  <rect x="348" y="344" width="218" height="200" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text class="label" x="368" y="372">연결리스트 Linked List</text>
-  <text class="metric" x="368" y="396">포인터 재연결 O(1)*</text>
-  <rect x="370" y="420" width="48" height="34" rx="8" fill="#dcfce7" stroke="#34d399"/>
-  <rect x="444" y="420" width="48" height="34" rx="8" fill="#bbf7d0" stroke="#10b981"/>
-  <rect x="518" y="420" width="48" height="34" rx="8" fill="#dcfce7" stroke="#34d399"/>
-  <line x1="418" y1="437" x2="444" y2="437" stroke="#059669" stroke-width="3" marker-end="url(#arrow-green)"/>
-  <line x1="492" y1="437" x2="518" y2="437" stroke="#059669" stroke-width="3" marker-end="url(#arrow-green)"/>
-  <rect x="444" y="476" width="48" height="34" rx="8" fill="#fef3c7" stroke="#f59e0b"/>
-  <line x1="468" y1="476" x2="468" y2="454" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow-slate)"/>
-  <text class="small" x="436" y="530">*위치를 이미 알고 있을 때</text>
-  <text class="body" x="368" y="486">• 임의 접근은 head부터 따라가며 O(n)</text>
-  <text class="body" x="368" y="508">• 삽입/삭제가 잦고 크기 변화가 큰 경우 유리</text>
+  <rect class="panel" x="70" y="636" width="500" height="188" rx="24"/>
+  <text class="cardTitle" x="100" y="676">스택 Stack</text>
+  <text class="accent" x="100" y="706">LIFO: 마지막에 넣은 값이 먼저 나온다</text>
+  <rect x="120" y="732" width="120" height="28" rx="8" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="120" y="766" width="120" height="28" rx="8" fill="#fcd34d" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="120" y="800" width="120" height="28" rx="8" fill="#fbbf24" stroke="#d97706" stroke-width="2"/>
+  <text class="axis" x="268" y="744">push</text>
+  <line x1="290" y1="748" x2="290" y2="716" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text class="axis" x="332" y="744">pop</text>
+  <line x1="354" y1="716" x2="354" y2="748" stroke="#dc2626" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text class="body" x="100" y="850">괄호 검사, DFS, 실행 취소처럼 "되돌리기"가 핵심인 문제에 적합</text>
 
-  <rect class="card" x="620" y="286" width="496" height="138" rx="24"/>
-  <text class="section" x="648" y="324">스택 Stack</text>
-  <text class="metric" x="648" y="348">LIFO · push / pop / peek</text>
-  <rect x="684" y="360" width="92" height="24" rx="6" fill="#fde68a" stroke="#f59e0b"/>
-  <rect x="684" y="388" width="92" height="24" rx="6" fill="#fcd34d" stroke="#f59e0b"/>
-  <rect x="684" y="416" width="92" height="24" rx="6" fill="#fbbf24" stroke="#f59e0b"/>
-  <line x1="812" y1="372" x2="812" y2="344" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow-slate)"/>
-  <line x1="838" y1="344" x2="838" y2="372" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-slate)"/>
-  <text class="label" x="796" y="392">top</text>
-  <text class="body" x="870" y="372">최근에 넣은 값이</text>
-  <text class="body" x="870" y="394">가장 먼저 나온다.</text>
-  <text class="body" x="870" y="418">예: 괄호 검사, DFS, 실행 취소</text>
+  <rect class="panel" x="590" y="636" width="540" height="188" rx="24"/>
+  <text class="cardTitle" x="620" y="676">큐 Queue</text>
+  <text class="accent" x="620" y="706">FIFO: 먼저 들어온 값이 먼저 나온다</text>
+  <rect x="692" y="746" width="84" height="44" rx="10" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="2"/>
+  <rect x="786" y="746" width="84" height="44" rx="10" fill="#c4b5fd" stroke="#8b5cf6" stroke-width="2"/>
+  <rect x="880" y="746" width="84" height="44" rx="10" fill="#a78bfa" stroke="#7c3aed" stroke-width="2"/>
+  <rect x="974" y="746" width="84" height="44" rx="10" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="2"/>
+  <text class="axis" x="620" y="772">front</text>
+  <line x1="664" y1="768" x2="692" y2="768" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text class="axis" x="1076" y="772">rear</text>
+  <line x1="1058" y1="768" x2="1086" y2="768" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text class="body" x="620" y="820">작업 대기열, BFS, 프린터 큐처럼 "먼저 온 순서"를 지켜야 할 때 사용</text>
+  <text class="small" x="620" y="846">원형 큐는 (rear + 1) % capacity 로 이동해 앞쪽 원소 밀기를 피한다.</text>
 
-  <rect class="card" x="620" y="434" width="496" height="138" rx="24"/>
-  <text class="section" x="648" y="472">큐 Queue</text>
-  <text class="metric" x="648" y="496">FIFO · enqueue / dequeue / front</text>
-  <rect x="690" y="510" width="62" height="34" rx="8" fill="#ddd6fe" stroke="#8b5cf6"/>
-  <rect x="756" y="510" width="62" height="34" rx="8" fill="#c4b5fd" stroke="#8b5cf6"/>
-  <rect x="822" y="510" width="62" height="34" rx="8" fill="#a78bfa" stroke="#7c3aed"/>
-  <rect x="888" y="510" width="62" height="34" rx="8" fill="#ddd6fe" stroke="#8b5cf6"/>
-  <line x1="660" y1="527" x2="690" y2="527" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow-slate)"/>
-  <line x1="950" y1="527" x2="980" y2="527" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrow-slate)"/>
-  <path d="M 950 550 A 120 36 0 0 1 690 550" fill="none" stroke="#a78bfa" stroke-width="3" stroke-dasharray="7 7"/>
-  <text class="label" x="650" y="520">front</text>
-  <text class="label" x="985" y="520">rear</text>
-  <text class="body" x="648" y="558">원형 큐는 (rear + 1) % capacity 로 이동해 앞 삭제 O(n) 이동을 피한다.</text>
-
-  <rect class="card" x="84" y="592" width="1032" height="64" rx="22"/>
-  <text class="section" x="112" y="630">선택 기준</text>
-  <rect x="250" y="606" width="184" height="34" rx="17" fill="#dbeafe"/>
-  <text class="chip" x="342" y="629" text-anchor="middle">자주 찾기 → 배열</text>
-  <rect x="450" y="606" width="232" height="34" rx="17" fill="#dcfce7"/>
-  <text class="chip" x="566" y="629" text-anchor="middle">중간 삽입/삭제 → 리스트</text>
-  <rect x="698" y="606" width="176" height="34" rx="17" fill="#fef3c7"/>
-  <text class="chip" x="786" y="629" text-anchor="middle">되돌리기/DFS → 스택</text>
-  <rect x="890" y="606" width="184" height="34" rx="17" fill="#ede9fe"/>
-  <text class="chip" x="982" y="629" text-anchor="middle">대기열/BFS → 큐</text>
+  <rect x="70" y="850" width="1060" height="48" rx="20" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="pillText" x="106" y="881">선택 기준</text>
+  <text class="body" x="222" y="881">자주 찾기 → 배열 / 중간 삽입·삭제 → 리스트 / 되돌리기·DFS → 스택 / 대기열·BFS → 큐</text>
 </svg>

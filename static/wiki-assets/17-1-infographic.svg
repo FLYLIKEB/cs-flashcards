@@ -1,154 +1,97 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="930" viewBox="0 0 1200 930" role="img" aria-labelledby="title desc">
   <title id="title">17-1. 클라우드 기초 인포그래픽</title>
-  <desc id="desc">IaaS, PaaS, SaaS의 책임 분담과 금융권 통제 포인트를 함께 보여주는 클라우드 기초 인포그래픽.</desc>
+  <desc id="desc">IaaS, PaaS, SaaS의 책임 분담과 금융권 클라우드 통제 포인트를 읽기 쉽게 정리한 인포그래픽.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff"/>
-      <stop offset="100%" stop-color="#ecfeff"/>
-    </linearGradient>
-    <linearGradient id="cloudFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#06b6d4"/>
-    </linearGradient>
-    <linearGradient id="iaasFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#bfdbfe"/>
-    </linearGradient>
-    <linearGradient id="paasFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dcfce7"/>
-      <stop offset="100%" stop-color="#bbf7d0"/>
-    </linearGradient>
-    <linearGradient id="saasFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fef3c7"/>
-      <stop offset="100%" stop-color="#fde68a"/>
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef6ff"/>
     </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 19px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .chip { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .white { fill: #ffffff; }
+      .title { font: 700 36px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 28px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .chip { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; letter-spacing: 0.08em; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="#f8fafc"/>
-  <rect x="24" y="24" width="1152" height="672" rx="28" fill="url(#bg)" stroke="#cbd5e1"/>
+  <rect width="1200" height="930" fill="#e2e8f0"/>
+  <rect x="24" y="24" width="1152" height="882" rx="28" fill="url(#bg)" stroke="#cbd5e1"/>
 
-  <text class="small" x="64" y="68">17-1 CLOUD BASICS</text>
-  <text class="title" x="64" y="108">클라우드 기초: 서비스 모델과 책임 분담</text>
-  <text class="subtitle" x="64" y="142">IaaS → PaaS → SaaS로 갈수록 공급자 관리 범위가 커지고, 금융권은 보안·로그·복구 통제를 함께 설계해야 한다.</text>
+  <text class="mono" x="64" y="72">17-1 CLOUD BASICS</text>
+  <text class="title" x="64" y="118">클라우드 기초: 서비스 모델별 책임 분담</text>
+  <text class="subtitle" x="64" y="154">IaaS는 제어권이 크고, PaaS는 개발 속도가 빠르며, SaaS는 운영 부담이 가장 작다. 금융권 답안은 장점뿐 아니라 통제와 복구까지 함께 적는다.</text>
 
-  <g transform="translate(70 182)">
-    <rect x="0" y="0" width="1060" height="250" rx="24" fill="#ffffff" stroke="#dbeafe"/>
-    <text class="section" x="28" y="34">1. 무엇을 누가 관리하는가?</text>
+  <rect x="48" y="192" width="1104" height="452" rx="26" fill="#ffffff" stroke="#bfdbfe"/>
+  <text class="section" x="76" y="232">1. 서비스 모델별로 누가 무엇을 관리하는가?</text>
+  <text class="small" x="76" y="262">읽는 순서: 왼쪽에서 오른쪽으로 갈수록 공급자 관리 범위가 커지고, 사용자가 직접 운영할 부분은 줄어든다.</text>
 
-    <g transform="translate(22 58)">
-      <rect x="0" y="0" width="314" height="168" rx="22" fill="url(#iaasFill)" stroke="#60a5fa" stroke-width="2"/>
-      <text class="label" x="24" y="36">IaaS</text>
-      <text class="chip" x="24" y="64">사용자 책임이 가장 큼</text>
-      <rect x="24" y="82" width="266" height="30" rx="15" fill="#ffffff" opacity="0.95"/>
-      <text class="body" x="40" y="102">사용자 관리: OS · 런타임 · 애플리케이션</text>
-      <rect x="24" y="120" width="266" height="30" rx="15" fill="#eff6ff"/>
-      <text class="body" x="40" y="140">공급자 제공: VM · VPC · Block Storage</text>
-      <text class="small" x="24" y="159">제어권은 크지만 운영 책임도 함께 증가</text>
-    </g>
-
-    <g transform="translate(373 58)">
-      <rect x="0" y="0" width="314" height="168" rx="22" fill="url(#paasFill)" stroke="#4ade80" stroke-width="2"/>
-      <text class="label" x="24" y="36">PaaS</text>
-      <text class="chip" x="24" y="64">개발 생산성 중심</text>
-      <rect x="24" y="82" width="266" height="30" rx="15" fill="#ffffff" opacity="0.95"/>
-      <text class="body" x="40" y="102">사용자 관리: 앱 · 데이터</text>
-      <rect x="24" y="120" width="266" height="30" rx="15" fill="#ecfdf5"/>
-      <text class="body" x="40" y="140">공급자 제공: 런타임 · 배포 플랫폼</text>
-      <text class="small" x="24" y="159">빠르지만 플랫폼 종속(lock-in) 위험 존재</text>
-    </g>
-
-    <g transform="translate(724 58)">
-      <rect x="0" y="0" width="314" height="168" rx="22" fill="url(#saasFill)" stroke="#f59e0b" stroke-width="2"/>
-      <text class="label" x="24" y="36">SaaS</text>
-      <text class="chip" x="24" y="64">운영 부담이 가장 작음</text>
-      <rect x="24" y="82" width="266" height="30" rx="15" fill="#ffffff" opacity="0.95"/>
-      <text class="body" x="40" y="102">사용자 관리: 설정 · 계정 · 데이터</text>
-      <rect x="24" y="120" width="266" height="30" rx="15" fill="#fffbeb"/>
-      <text class="body" x="40" y="140">공급자 제공: 완성된 소프트웨어 서비스</text>
-      <text class="small" x="24" y="159">간편하지만 커스터마이징 통제 범위는 제한</text>
-    </g>
+  <g transform="translate(76 292)">
+    <rect x="0" y="0" width="320" height="312" rx="24" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+    <text class="label" x="28" y="42">IaaS</text>
+    <rect x="28" y="62" width="132" height="32" rx="16" fill="#ffffff"/>
+    <text class="chip" x="46" y="83">사용자 책임 큼</text>
+    <rect x="28" y="112" width="264" height="78" rx="18" fill="#ffffff" stroke="#bfdbfe"/>
+    <text class="chip" x="48" y="138">사용자가 관리</text>
+    <text class="body" x="48" y="164">OS · 런타임 · 애플리케이션</text>
+    <text class="small" x="48" y="186">패치, 배포, 용량 운영을 직접 챙김</text>
+    <rect x="28" y="206" width="264" height="78" rx="18" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text class="chip" x="48" y="232">공급자가 제공</text>
+    <text class="body" x="48" y="258">VM · 네트워크 · 스토리지</text>
+    <text class="small" x="48" y="280">예: VPC, Block Storage, 가상 서버</text>
   </g>
 
-  <g transform="translate(70 452)">
-    <rect x="0" y="0" width="520" height="212" rx="24" fill="#ffffff" stroke="#cbd5e1"/>
-    <text class="section" x="28" y="36">2. 금융권 클라우드 통제 6가지</text>
-
-    <g transform="translate(28 56)">
-      <rect x="0" y="0" width="218" height="38" rx="19" fill="#e0f2fe"/>
-      <text class="chip" x="18" y="24">1) 데이터 위치와 위탁관리</text>
-      <rect x="0" y="50" width="218" height="38" rx="19" fill="#dcfce7"/>
-      <text class="chip" x="18" y="74">2) 최소 권한 접근통제</text>
-      <rect x="0" y="100" width="218" height="38" rx="19" fill="#fef3c7"/>
-      <text class="chip" x="18" y="124">3) 저장·전송 구간 암호화</text>
-    </g>
-
-    <g transform="translate(274 56)">
-      <rect x="0" y="0" width="218" height="38" rx="19" fill="#ede9fe"/>
-      <text class="chip" x="18" y="24">4) 중앙 로그와 감사 추적</text>
-      <rect x="0" y="50" width="218" height="38" rx="19" fill="#fee2e2"/>
-      <text class="chip" x="18" y="74">5) 장애 대응과 DR</text>
-      <rect x="0" y="100" width="218" height="38" rx="19" fill="#dbeafe"/>
-      <text class="chip" x="18" y="124">6) 비용 모니터링</text>
-    </g>
-
-    <text class="body" x="28" y="178">답안에서는 “민첩성 향상”만 쓰지 말고 책임 분담 모델과 복구 전략까지 같이 설명해야 한다.</text>
+  <g transform="translate(440 292)">
+    <rect x="0" y="0" width="320" height="312" rx="24" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+    <text class="label" x="28" y="42">PaaS</text>
+    <rect x="28" y="62" width="150" height="32" rx="16" fill="#ffffff"/>
+    <text class="chip" x="46" y="83">개발 생산성 중심</text>
+    <rect x="28" y="112" width="264" height="78" rx="18" fill="#ffffff" stroke="#bbf7d0"/>
+    <text class="chip" x="48" y="138">사용자가 관리</text>
+    <text class="body" x="48" y="164">애플리케이션 · 데이터</text>
+    <text class="small" x="48" y="186">비즈니스 로직과 데이터 품질에 집중</text>
+    <rect x="28" y="206" width="264" height="78" rx="18" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text class="chip" x="48" y="232">공급자가 제공</text>
+    <text class="body" x="48" y="258">런타임 · 배포 플랫폼 · 확장 도구</text>
+    <text class="small" x="48" y="280">예: App Platform, Managed DB, CI/CD 연동</text>
   </g>
 
-  <g transform="translate(618 452)">
-    <rect x="0" y="0" width="512" height="212" rx="24" fill="#0f172a"/>
-    <text class="section white" x="28" y="36">3. 마이그레이션 체크 흐름</text>
-
-    <g transform="translate(30 58)">
-      <rect x="0" y="16" width="110" height="52" rx="18" fill="#1d4ed8"/>
-      <text class="chip white" x="55" y="47" text-anchor="middle">배치 기준</text>
-      <text class="small" x="55" y="84" text-anchor="middle" fill="#cbd5e1">IaaS/PaaS/SaaS</text>
-
-      <line x1="110" y1="42" x2="162" y2="42" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8">
-        <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="1.8s" repeatCount="indefinite"/>
-      </line>
-
-      <rect x="162" y="16" width="110" height="52" rx="18" fill="#0f766e"/>
-      <text class="chip white" x="217" y="47" text-anchor="middle">보호 설계</text>
-      <text class="small" x="217" y="84" text-anchor="middle" fill="#cbd5e1">암호화·망 분리</text>
-
-      <line x1="272" y1="42" x2="324" y2="42" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8">
-        <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="1.8s" repeatCount="indefinite"/>
-      </line>
-
-      <rect x="324" y="16" width="110" height="52" rx="18" fill="#7c3aed"/>
-      <text class="chip white" x="379" y="47" text-anchor="middle">운영 검증</text>
-      <text class="small" x="379" y="84" text-anchor="middle" fill="#cbd5e1">로그·알림·감사</text>
-
-      <line x1="434" y1="42" x2="486" y2="42" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8">
-        <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="1.8s" repeatCount="indefinite"/>
-      </line>
-
-      <rect x="486" y="16" width="0" height="0" fill="none"/>
-    </g>
-
-    <g transform="translate(354 116)">
-      <rect x="0" y="0" width="128" height="52" rx="18" fill="#ea580c"/>
-      <text class="chip white" x="64" y="31" text-anchor="middle">복구 훈련</text>
-      <text class="small" x="64" y="68" text-anchor="middle" fill="#cbd5e1">RTO · RPO 점검</text>
-    </g>
-
-    <path d="M 379 84 C 379 98, 418 98, 418 116" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8">
-      <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="1.8s" repeatCount="indefinite"/>
-    </path>
-
-    <g transform="translate(28 170)">
-      <text class="body" x="0" y="0" fill="#e2e8f0">장점: 탄력성 · 빠른 배포 · 관리형 서비스 활용</text>
-      <text class="body" x="0" y="24" fill="#e2e8f0">위험: 데이터 유출 · 권한 오남용 · 공급자 종속 · 리전 장애 전파</text>
-    </g>
+  <g transform="translate(804 292)">
+    <rect x="0" y="0" width="320" height="312" rx="24" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <text class="label" x="28" y="42">SaaS</text>
+    <rect x="28" y="62" width="156" height="32" rx="16" fill="#ffffff"/>
+    <text class="chip" x="46" y="83">운영 부담 가장 작음</text>
+    <rect x="28" y="112" width="264" height="78" rx="18" fill="#ffffff" stroke="#fde68a"/>
+    <text class="chip" x="48" y="138">사용자가 관리</text>
+    <text class="body" x="48" y="164">설정 · 계정 · 업무 데이터</text>
+    <text class="small" x="48" y="186">권한 부여와 데이터 반출 정책을 설계</text>
+    <rect x="28" y="206" width="264" height="78" rx="18" fill="#fffbeb" stroke="#fde68a"/>
+    <text class="chip" x="48" y="232">공급자가 제공</text>
+    <text class="body" x="48" y="258">완성된 소프트웨어 서비스</text>
+    <text class="small" x="48" y="280">예: 협업툴, CRM, 보안관제 서비스</text>
   </g>
+
+  <rect x="48" y="672" width="1104" height="206" rx="26" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="section" x="76" y="712">2. 금융권 답안에서 꼭 같이 적어야 하는 통제</text>
+  <text class="small" x="76" y="742">민첩성만 강조하면 부족하다. 책임 분담 모델 위에 아래 통제를 얹어야 답안이 설득력을 가진다.</text>
+
+  <g transform="translate(76 770)">
+    <rect x="0" y="0" width="168" height="56" rx="18" fill="#e0f2fe"/>
+    <text class="chip" x="18" y="33">데이터 위치 · 위탁관리</text>
+    <rect x="180" y="0" width="156" height="56" rx="18" fill="#dcfce7"/>
+    <text class="chip" x="198" y="33">최소 권한 접근통제</text>
+    <rect x="348" y="0" width="174" height="56" rx="18" fill="#fef3c7"/>
+    <text class="chip" x="366" y="33">저장 · 전송 구간 암호화</text>
+    <rect x="534" y="0" width="164" height="56" rx="18" fill="#ede9fe"/>
+    <text class="chip" x="552" y="33">중앙 로그 · 감사 추적</text>
+    <rect x="710" y="0" width="138" height="56" rx="18" fill="#fee2e2"/>
+    <text class="chip" x="728" y="33">장애 대응 · DR</text>
+    <rect x="860" y="0" width="148" height="56" rx="18" fill="#dbeafe"/>
+    <text class="chip" x="878" y="33">비용 모니터링</text>
+  </g>
+
+  <text class="body" x="76" y="852">핵심 비교 문장: IaaS는 통제권이 크지만 운영 책임도 크고, SaaS는 빠르지만 커스터마이징과 데이터 통제 범위가 제한된다.</text>
 </svg>

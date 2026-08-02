@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="920" viewBox="0 0 1280 920" role="img" aria-labelledby="title desc">
+  <title id="title">10. 보안 통제 매핑 인포그래픽</title>
+  <desc id="desc">보안의 핵심 개념을 목표, 대표 위험, 핵심 통제, 운영 증적으로 나누어 연결한 학습용 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+      .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 36px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-size: 17px; font-weight: 500; fill: #334155; }
+      .head { font-size: 17px; font-weight: 800; fill: #0f172a; }
+      .laneTitle { font-size: 22px; font-weight: 800; fill: #0f172a; }
+      .body { font-size: 15px; font-weight: 500; fill: #334155; }
+      .small { font-size: 13px; font-weight: 700; fill: #1e3a8a; letter-spacing: 0.05em; }
+      .chip { font-size: 13px; font-weight: 700; fill: #1e293b; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .divider { stroke: #dbeafe; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="920" fill="url(#bg)"/>
+  <rect x="28" y="26" width="1224" height="868" rx="30" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <text class="eyebrow" x="72" y="82">SECURITY CONTROL MAP</text>
+  <text class="title" x="72" y="126">개념 → 위험 → 통제 → 운영 증적</text>
+  <text class="subtitle" x="72" y="158">메인 페이지 핵심 개념을 실제 방어 포인트로 묶어 외우기 위한 표형 인포그래픽</text>
+
+  <g transform="translate(72 196)">
+    <rect x="0" y="0" width="1136" height="56" rx="18" fill="#0f172a"/>
+    <text class="head" x="48" y="35" fill="#ffffff">학습 축</text>
+    <text class="head" x="260" y="35" fill="#ffffff">대표 위험 / 질문</text>
+    <text class="head" x="560" y="35" fill="#ffffff">핵심 통제</text>
+    <text class="head" x="892" y="35" fill="#ffffff">운영 증적</text>
+
+    <g transform="translate(0 76)">
+      <rect class="card" width="1136" height="132" rx="24" fill="#eff6ff"/>
+      <rect x="18" y="18" width="196" height="96" rx="20" fill="#dbeafe"/>
+      <text class="small" x="42" y="48">10-01 PROTECT DATA</text>
+      <text class="laneTitle" x="42" y="78">암호화와 해시</text>
+      <text class="body" x="42" y="104">기밀성·무결성</text>
+      <line class="divider" x1="240" y1="18" x2="240" y2="114"/>
+      <text class="body" x="266" y="50">복호화 가능한가?</text>
+      <text class="body" x="266" y="78">무결성 검증이 필요한가?</text>
+      <text class="body" x="266" y="106">비밀번호를 평문 저장하는가?</text>
+      <line class="divider" x1="536" y1="18" x2="536" y2="114"/>
+      <text class="body" x="562" y="50">대칭·비대칭 암호화, TLS, 인증서</text>
+      <text class="body" x="562" y="78">해시 + 솔트, 서명, 체크섬</text>
+      <text class="body" x="562" y="106">키 관리와 알고리즘 선택</text>
+      <line class="divider" x1="870" y1="18" x2="870" y2="114"/>
+      <text class="body" x="896" y="50">인증서 유효성, 만료 알림</text>
+      <text class="body" x="896" y="78">비밀번호 저장 정책</text>
+      <text class="body" x="896" y="106">무결성 검증 로그</text>
+    </g>
+
+    <g transform="translate(0 226)">
+      <rect class="card" width="1136" height="132" rx="24" fill="#f0fdf4"/>
+      <rect x="18" y="18" width="196" height="96" rx="20" fill="#dcfce7"/>
+      <text class="small" x="42" y="48">10-02 CONTROL ACCESS</text>
+      <text class="laneTitle" x="42" y="78">인증 · 인가 · 접근통제</text>
+      <text class="body" x="42" y="104">누가 무엇을 할 수 있는가</text>
+      <line class="divider" x1="240" y1="18" x2="240" y2="114"/>
+      <text class="body" x="266" y="50">정체성 검증이 약한가?</text>
+      <text class="body" x="266" y="78">권한이 과도하게 부여됐는가?</text>
+      <text class="body" x="266" y="106">역할 변경이 추적되는가?</text>
+      <line class="divider" x1="536" y1="18" x2="536" y2="114"/>
+      <text class="body" x="562" y="50">로그인, MFA, 세션 보호</text>
+      <text class="body" x="562" y="78">DAC·MAC·RBAC, 최소 권한</text>
+      <text class="body" x="562" y="106">권한 검토와 승인 절차</text>
+      <line class="divider" x1="870" y1="18" x2="870" y2="114"/>
+      <text class="body" x="896" y="50">인증 실패 로그</text>
+      <text class="body" x="896" y="78">권한 변경 이력</text>
+      <text class="body" x="896" y="106">접근 거부·허용 감사 기록</text>
+    </g>
+
+    <g transform="translate(0 376)">
+      <rect class="card" width="1136" height="132" rx="24" fill="#fff7ed"/>
+      <rect x="18" y="18" width="196" height="96" rx="20" fill="#fde68a"/>
+      <text class="small" x="42" y="48">10-03 BLOCK ATTACKS</text>
+      <text class="laneTitle" x="42" y="78">웹 · 네트워크 공격</text>
+      <text class="body" x="42" y="104">입력·트래픽 악용 차단</text>
+      <line class="divider" x1="240" y1="18" x2="240" y2="114"/>
+      <text class="body" x="266" y="50">SQL Injection, XSS가 가능한가?</text>
+      <text class="body" x="266" y="78">대량 요청으로 서비스가 흔들리는가?</text>
+      <text class="body" x="266" y="106">세션·패킷이 노출되는가?</text>
+      <line class="divider" x1="536" y1="18" x2="536" y2="114"/>
+      <text class="body" x="562" y="50">입력 검증, 출력 인코딩, CSP</text>
+      <text class="body" x="562" y="78">WAF, 필터링, 레이트 리미팅, CDN</text>
+      <text class="body" x="562" y="106">TLS, 세션 보호, 네트워크 분리</text>
+      <line class="divider" x1="870" y1="18" x2="870" y2="114"/>
+      <text class="body" x="896" y="50">차단 룰과 탐지 이벤트</text>
+      <text class="body" x="896" y="78">트래픽 급증 알림</text>
+      <text class="body" x="896" y="106">취약점 점검 결과</text>
+    </g>
+
+    <g transform="translate(0 526)">
+      <rect class="card" width="1136" height="132" rx="24" fill="#fef2f2"/>
+      <rect x="18" y="18" width="196" height="96" rx="20" fill="#fee2e2"/>
+      <text class="small" x="42" y="48">10-04 DETECT &amp; AUDIT</text>
+      <text class="laneTitle" x="42" y="78">IDS · IPS · 로그 감사</text>
+      <text class="body" x="42" y="104">탐지·차단·사후 조사</text>
+      <line class="divider" x1="240" y1="18" x2="240" y2="114"/>
+      <text class="body" x="266" y="50">이상 징후를 놓치는가?</text>
+      <text class="body" x="266" y="78">실시간 차단이 필요한가?</text>
+      <text class="body" x="266" y="106">사고 후 원인 추적이 가능한가?</text>
+      <line class="divider" x1="536" y1="18" x2="536" y2="114"/>
+      <text class="body" x="562" y="50">IDS, IPS, 시그니처·행위 탐지</text>
+      <text class="body" x="562" y="78">로그 수집, 보존, 무결성 보호</text>
+      <text class="body" x="562" y="106">타임스탬프와 접근 제어</text>
+      <line class="divider" x1="870" y1="18" x2="870" y2="114"/>
+      <text class="body" x="896" y="50">탐지 경보와 차단 기록</text>
+      <text class="body" x="896" y="78">감사 로그 보존 정책</text>
+      <text class="body" x="896" y="106">사고 대응 보고서</text>
+    </g>
+  </g>
+
+  <g transform="translate(72 846)">
+    <rect width="1136" height="28" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text class="chip" x="22" y="19">암기 팁: 각 축마다 “무엇을 지키나 → 어떤 위험인가 → 무슨 통제인가 → 어떤 로그가 남나” 순서로 외우면 된다.</text>
+  </g>
+</svg>

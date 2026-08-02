@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">13-02 구현 상태 전이 시뮬레이션</title>
+  <desc id="desc">명령형 구현 문제에서 입력 명령을 손으로 시뮬레이션하며 상태 변화를 추적하는 과정을 단계별로 보여주는 SVG.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ecfeff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 700 18px 'SFMono-Regular','Consolas','Menlo',monospace; fill: #0f172a; }
+      .step { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="860" fill="url(#bg)"/>
+  <rect x="32" y="28" width="1136" height="804" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="small" x="72" y="74">작은 예제로 상태 갱신 순서를 검증하는 방법</text>
+  <text class="title" x="72" y="116">13-02. 상태 전이 시뮬레이션</text>
+  <text class="subtitle" x="72" y="150">명령을 한 줄씩 실행하며 중간 상태를 적으면 예외 처리와 인덱스 오류를 빠르게 잡을 수 있다.</text>
+
+  <rect x="72" y="192" width="1056" height="112" rx="24" fill="#0f172a"/>
+  <text class="section" x="104" y="234" fill="#f8fafc">예시 명령열</text>
+  <rect x="104" y="252" width="148" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+  <text class="mono" x="178" y="274" text-anchor="middle" fill="#f8fafc">PUSH 3</text>
+  <rect x="272" y="252" width="148" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+  <text class="mono" x="346" y="274" text-anchor="middle" fill="#f8fafc">PUSH 7</text>
+  <rect x="440" y="252" width="148" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+  <text class="mono" x="514" y="274" text-anchor="middle" fill="#f8fafc">INC 1 2</text>
+  <rect x="608" y="252" width="148" height="34" rx="10" fill="#1e293b" stroke="#64748b"/>
+  <text class="mono" x="682" y="274" text-anchor="middle" fill="#f8fafc">POP</text>
+  <text class="body" x="790" y="274" fill="#cbd5e1">초기 상태: stack = [ ]</text>
+
+  <text class="section" x="72" y="356">단계별 추적</text>
+
+  <g>
+    <rect x="72" y="388" width="248" height="160" rx="24" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <circle cx="108" cy="426" r="18" fill="#2563eb"/>
+    <text class="step" x="108" y="432" text-anchor="middle">1</text>
+    <text class="label" x="140" y="432">PUSH 3 실행</text>
+    <text class="body" x="104" y="468">• 스택 끝에 3을 추가</text>
+    <text class="body" x="104" y="498">• 새 상태: [3]</text>
+    <text class="small" x="104" y="530">질문: append 위치가 올바른가?</text>
+  </g>
+
+  <g>
+    <rect x="344" y="388" width="248" height="160" rx="24" fill="#cffafe" stroke="#0891b2" stroke-width="2"/>
+    <circle cx="380" cy="426" r="18" fill="#0891b2"/>
+    <text class="step" x="380" y="432" text-anchor="middle">2</text>
+    <text class="label" x="412" y="432">PUSH 7 실행</text>
+    <text class="body" x="376" y="468">• 이전 상태 [3] 뒤에 7 추가</text>
+    <text class="body" x="376" y="498">• 새 상태: [3, 7]</text>
+    <text class="small" x="376" y="530">질문: 순서가 바뀌지 않았는가?</text>
+  </g>
+
+  <g>
+    <rect x="616" y="388" width="248" height="160" rx="24" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+    <circle cx="652" cy="426" r="18" fill="#8b5cf6"/>
+    <text class="step" x="652" y="432" text-anchor="middle">3</text>
+    <text class="label" x="684" y="432">INC 1 2 실행</text>
+    <text class="body" x="648" y="468">• 앞에서 1개 원소에 2를 더함</text>
+    <text class="body" x="648" y="498">• 새 상태: [5, 7]</text>
+    <text class="small" x="648" y="530">질문: min(k, len) 처리가 있는가?</text>
+  </g>
+
+  <g>
+    <rect x="888" y="388" width="240" height="160" rx="24" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <circle cx="924" cy="426" r="18" fill="#16a34a"/>
+    <text class="step" x="924" y="432" text-anchor="middle">4</text>
+    <text class="label" x="956" y="432">POP 실행</text>
+    <text class="body" x="920" y="468">• 스택이 비지 않았는지 확인</text>
+    <text class="body" x="920" y="498">• 새 상태: [5]</text>
+    <text class="small" x="920" y="530">질문: 빈 스택이면 어떻게 처리할까?</text>
+  </g>
+
+  <rect x="72" y="588" width="720" height="184" rx="26" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text class="section" x="104" y="628">시뮬레이션으로 잡는 실수</text>
+  <text class="body" x="104" y="666">1) 반복 범위를 잘못 잡아 INC가 두 칸 이상 바뀌는 경우</text>
+  <text class="body" x="104" y="702">2) POP 전에 빈 스택 검사를 빼서 런타임 에러가 나는 경우</text>
+  <text class="body" x="104" y="738">3) 최종 출력에서 빈 상태를 'EMPTY' 대신 공백 문자열로 내보내는 경우</text>
+
+  <rect x="820" y="588" width="308" height="184" rx="26" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text class="section" x="852" y="628">마무리 질문</text>
+  <text class="body" x="852" y="666">• 각 명령 뒤 상태를 종이에 적어봤는가?</text>
+  <text class="body" x="852" y="702">• 예외 입력에서도 같은 규칙이 유지되는가?</text>
+  <text class="body" x="852" y="738">• 출력 형식이 문제 문장과 완전히 같은가?</text>
+</svg>

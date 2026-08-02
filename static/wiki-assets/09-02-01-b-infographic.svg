@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09-02-01. 이진트리-힙-B트리 인포그래픽</title>
-  <desc id="desc">BST는 정렬된 탐색, 힙은 우선순위 큐, B트리는 디스크 친화 인덱스라는 차이를 비교하는 페이지 전용 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">09-02-01. 이진트리-힙-B트리 비교 인포그래픽</title>
+  <desc id="desc">BST는 정렬 탐색, 힙은 루트 우선순위, B트리는 저장 장치 친화 인덱스라는 차이를 나란히 비교하는 페이지 전용 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eff6ff" />
@@ -11,137 +11,142 @@
       <stop offset="100%" stop-color="#1d4ed8" />
     </linearGradient>
     <style>
-      .title { font: 700 33px 'Pretendard','Noto Sans KR',sans-serif; fill: #f8fafc; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
-      .panelTitle { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .panelBody { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .tiny { font: 600 11px 'Pretendard','Noto Sans KR',sans-serif; fill: #64748b; }
-      .metric { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .nodeText { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: white; }
-      .arrayText { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .pageKey { font: 700 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #f8fafc; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #dbeafe; }
+      .panelTitle { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .panelBody { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .label { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .tiny { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .metric { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .nodeText { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+      .chipText { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .pageKey { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .footer { font: 600 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #cbd5e1; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="36" y="28" width="1128" height="664" rx="28" fill="white" stroke="#cbd5e1" stroke-width="2" />
-  <rect x="36" y="28" width="1128" height="116" rx="28" fill="url(#header)" />
-  <rect x="36" y="110" width="1128" height="34" fill="url(#header)" />
+  <rect width="1200" height="760" fill="url(#bg)" />
+  <rect x="32" y="24" width="1136" height="712" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <rect x="32" y="24" width="1136" height="122" rx="28" fill="url(#header)" />
+  <rect x="32" y="112" width="1136" height="34" fill="url(#header)" />
 
-  <text class="subtitle" x="72" y="66">자료구조 비교 · 구조 / 핵심 연산 / 실무 사용처</text>
-  <text class="title" x="72" y="104">이진 탐색 트리(BST) · 힙(Heap) · B트리(B-tree)</text>
-  <text class="subtitle" x="72" y="128">정렬 탐색은 BST, 최댓값·최솟값 우선순위는 힙, 디스크 기반 인덱스는 B트리</text>
+  <text class="subtitle" x="70" y="64">자료구조 비교 · 구조 · 핵심 연산 · 대표 사용처</text>
+  <text class="title" x="70" y="104">이진 탐색 트리(BST) · 힙(Heap) · B트리(B-tree)</text>
+  <text class="subtitle" x="70" y="130">정렬 탐색은 BST, 최댓값·최솟값 우선순위는 힙, 디스크 기반 인덱스는 B트리</text>
 
-  <rect x="62" y="168" width="340" height="420" rx="24" fill="#f8fafc" stroke="#bfdbfe" stroke-width="2" />
-  <rect x="430" y="168" width="340" height="420" rx="24" fill="#f8fafc" stroke="#c7d2fe" stroke-width="2" />
-  <rect x="798" y="168" width="340" height="420" rx="24" fill="#f8fafc" stroke="#bae6fd" stroke-width="2" />
+  <rect x="58" y="174" width="344" height="466" rx="24" fill="#f8fafc" stroke="#93c5fd" stroke-width="2" />
+  <rect x="428" y="174" width="344" height="466" rx="24" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2" />
+  <rect x="798" y="174" width="344" height="466" rx="24" fill="#f0f9ff" stroke="#67e8f9" stroke-width="2" />
 
-  <text class="panelTitle" x="86" y="206">1. BST: 정렬된 탐색</text>
-  <text class="panelBody" x="86" y="230">왼쪽 &lt; 부모 &lt; 오른쪽 → inorder 순회 결과가 정렬</text>
+  <text class="panelTitle" x="84" y="214">1. BST: 정렬된 탐색</text>
+  <text class="panelBody" x="84" y="238">왼쪽 &lt; 부모 &lt; 오른쪽</text>
+  <text class="panelBody" x="84" y="260">inorder 순회 결과가 정렬된다.</text>
 
-  <line x1="206" y1="260" x2="146" y2="318" stroke="#2563eb" stroke-width="3" />
-  <line x1="206" y1="260" x2="266" y2="318" stroke="#2563eb" stroke-width="3" />
-  <line x1="146" y1="318" x2="108" y2="376" stroke="#2563eb" stroke-width="3" />
-  <line x1="146" y1="318" x2="184" y2="376" stroke="#2563eb" stroke-width="3" />
-  <line x1="266" y1="318" x2="308" y2="376" stroke="#2563eb" stroke-width="3" />
-  <line x1="184" y1="376" x2="164" y2="430" stroke="#2563eb" stroke-width="3" />
-  <line x1="308" y1="376" x2="330" y2="430" stroke="#2563eb" stroke-width="3" />
+  <line x1="210" y1="288" x2="148" y2="348" stroke="#2563eb" stroke-width="3" />
+  <line x1="210" y1="288" x2="272" y2="348" stroke="#2563eb" stroke-width="3" />
+  <line x1="148" y1="348" x2="108" y2="408" stroke="#2563eb" stroke-width="3" />
+  <line x1="148" y1="348" x2="188" y2="408" stroke="#2563eb" stroke-width="3" />
+  <line x1="272" y1="348" x2="312" y2="408" stroke="#2563eb" stroke-width="3" />
+  <line x1="188" y1="408" x2="164" y2="462" stroke="#2563eb" stroke-width="3" />
+  <line x1="188" y1="408" x2="212" y2="462" stroke="#2563eb" stroke-width="3" />
 
-  <circle cx="206" cy="260" r="23" fill="#2563eb" /><text class="nodeText" x="206" y="265" text-anchor="middle">8</text>
-  <circle cx="146" cy="318" r="21" fill="#3b82f6" /><text class="nodeText" x="146" y="323" text-anchor="middle">3</text>
-  <circle cx="266" cy="318" r="21" fill="#3b82f6" /><text class="nodeText" x="266" y="323" text-anchor="middle">10</text>
-  <circle cx="108" cy="376" r="19" fill="#60a5fa" /><text class="nodeText" x="108" y="381" text-anchor="middle">1</text>
-  <circle cx="184" cy="376" r="19" fill="#60a5fa" /><text class="nodeText" x="184" y="381" text-anchor="middle">6</text>
-  <circle cx="308" cy="376" r="19" fill="#60a5fa" /><text class="nodeText" x="308" y="381" text-anchor="middle">14</text>
-  <circle cx="164" cy="430" r="17" fill="#93c5fd" /><text class="nodeText" x="164" y="435" text-anchor="middle">4</text>
-  <circle cx="330" cy="430" r="17" fill="#93c5fd" /><text class="nodeText" x="330" y="435" text-anchor="middle">7</text>
+  <circle cx="210" cy="288" r="24" fill="#2563eb" /><text class="nodeText" x="210" y="293" text-anchor="middle">8</text>
+  <circle cx="148" cy="348" r="22" fill="#3b82f6" /><text class="nodeText" x="148" y="353" text-anchor="middle">3</text>
+  <circle cx="272" cy="348" r="22" fill="#3b82f6" /><text class="nodeText" x="272" y="353" text-anchor="middle">10</text>
+  <circle cx="108" cy="408" r="19" fill="#60a5fa" /><text class="nodeText" x="108" y="413" text-anchor="middle">1</text>
+  <circle cx="188" cy="408" r="19" fill="#60a5fa" /><text class="nodeText" x="188" y="413" text-anchor="middle">6</text>
+  <circle cx="312" cy="408" r="19" fill="#60a5fa" /><text class="nodeText" x="312" y="413" text-anchor="middle">14</text>
+  <circle cx="164" cy="462" r="17" fill="#93c5fd" /><text class="nodeText" x="164" y="467" text-anchor="middle">4</text>
+  <circle cx="212" cy="462" r="17" fill="#93c5fd" /><text class="nodeText" x="212" y="467" text-anchor="middle">7</text>
 
-  <text class="small" x="86" y="468">inorder → Left → Node → Right</text>
-  <g transform="translate(86 484)">
-    <rect x="0" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="14" y="19" text-anchor="middle">1</text>
-    <rect x="34" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="48" y="19" text-anchor="middle">3</text>
-    <rect x="68" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="82" y="19" text-anchor="middle">4</text>
-    <rect x="102" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="116" y="19" text-anchor="middle">6</text>
-    <rect x="136" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="150" y="19" text-anchor="middle">7</text>
-    <rect x="170" y="0" width="28" height="28" rx="8" fill="#bfdbfe" /><text class="chip" x="184" y="19" text-anchor="middle">8</text>
-    <rect x="204" y="0" width="34" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="221" y="19" text-anchor="middle">10</text>
-    <rect x="244" y="0" width="34" height="28" rx="8" fill="#dbeafe" /><text class="chip" x="261" y="19" text-anchor="middle">14</text>
+  <text class="small" x="84" y="508">inorder: Left → Node → Right</text>
+  <g transform="translate(84 524)">
+    <rect x="0" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chipText" x="14" y="19" text-anchor="middle">1</text>
+    <rect x="34" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chipText" x="48" y="19" text-anchor="middle">3</text>
+    <rect x="68" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chipText" x="82" y="19" text-anchor="middle">4</text>
+    <rect x="102" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chipText" x="116" y="19" text-anchor="middle">6</text>
+    <rect x="136" y="0" width="28" height="28" rx="8" fill="#dbeafe" /><text class="chipText" x="150" y="19" text-anchor="middle">7</text>
+    <rect x="170" y="0" width="28" height="28" rx="8" fill="#bfdbfe" /><text class="chipText" x="184" y="19" text-anchor="middle">8</text>
+    <rect x="204" y="0" width="34" height="28" rx="8" fill="#dbeafe" /><text class="chipText" x="221" y="19" text-anchor="middle">10</text>
+    <rect x="244" y="0" width="34" height="28" rx="8" fill="#dbeafe" /><text class="chipText" x="261" y="19" text-anchor="middle">14</text>
   </g>
-  <rect x="86" y="530" width="292" height="42" rx="14" fill="#eff6ff" stroke="#93c5fd" />
-  <text class="metric" x="102" y="556">탐색·삽입·삭제 평균 O(log n), 편향되면 최악 O(n)</text>
+  <rect x="84" y="572" width="292" height="48" rx="14" fill="#eff6ff" stroke="#93c5fd" />
+  <text class="metric" x="100" y="592">정렬된 탐색과 순회가 핵심</text>
+  <text class="small" x="100" y="612">평균 O(log n), 편향되면 최악 O(n)</text>
 
-  <text class="panelTitle" x="454" y="206">2. 힙: 루트 우선순위</text>
-  <text class="panelBody" x="454" y="230">완전이진트리 + 배열 표현 → 최댓값/최솟값 즉시 확인</text>
+  <text class="panelTitle" x="454" y="214">2. 힙: 루트 우선순위</text>
+  <text class="panelBody" x="454" y="238">완전이진트리 + 배열 표현</text>
+  <text class="panelBody" x="454" y="260">루트에서 최댓값/최솟값을 바로 꺼낸다.</text>
 
-  <line x1="600" y1="260" x2="540" y2="318" stroke="#7c3aed" stroke-width="3" />
-  <line x1="600" y1="260" x2="660" y2="318" stroke="#7c3aed" stroke-width="3" />
-  <line x1="540" y1="318" x2="504" y2="374" stroke="#7c3aed" stroke-width="3" />
-  <line x1="540" y1="318" x2="576" y2="374" stroke="#7c3aed" stroke-width="3" />
-  <line x1="660" y1="318" x2="624" y2="374" stroke="#7c3aed" stroke-width="3" />
-  <line x1="660" y1="318" x2="696" y2="374" stroke="#7c3aed" stroke-width="3" />
+  <line x1="600" y1="288" x2="540" y2="348" stroke="#7c3aed" stroke-width="3" />
+  <line x1="600" y1="288" x2="660" y2="348" stroke="#7c3aed" stroke-width="3" />
+  <line x1="540" y1="348" x2="504" y2="408" stroke="#7c3aed" stroke-width="3" />
+  <line x1="540" y1="348" x2="576" y2="408" stroke="#7c3aed" stroke-width="3" />
+  <line x1="660" y1="348" x2="624" y2="408" stroke="#7c3aed" stroke-width="3" />
+  <line x1="660" y1="348" x2="696" y2="408" stroke="#7c3aed" stroke-width="3" />
 
-  <circle cx="600" cy="260" r="23" fill="#7c3aed" /><text class="nodeText" x="600" y="265" text-anchor="middle">90</text>
-  <circle cx="540" cy="318" r="21" fill="#8b5cf6" /><text class="nodeText" x="540" y="323" text-anchor="middle">70</text>
-  <circle cx="660" cy="318" r="21" fill="#8b5cf6" /><text class="nodeText" x="660" y="323" text-anchor="middle">65</text>
-  <circle cx="504" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="504" y="379" text-anchor="middle">30</text>
-  <circle cx="576" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="576" y="379" text-anchor="middle">50</text>
-  <circle cx="624" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="624" y="379" text-anchor="middle">40</text>
-  <circle cx="696" cy="374" r="18" fill="#a78bfa" /><text class="nodeText" x="696" y="379" text-anchor="middle">20</text>
+  <circle cx="600" cy="288" r="24" fill="#7c3aed" /><text class="nodeText" x="600" y="293" text-anchor="middle">90</text>
+  <circle cx="540" cy="348" r="22" fill="#8b5cf6" /><text class="nodeText" x="540" y="353" text-anchor="middle">70</text>
+  <circle cx="660" cy="348" r="22" fill="#8b5cf6" /><text class="nodeText" x="660" y="353" text-anchor="middle">65</text>
+  <circle cx="504" cy="408" r="19" fill="#a78bfa" /><text class="nodeText" x="504" y="413" text-anchor="middle">30</text>
+  <circle cx="576" cy="408" r="19" fill="#a78bfa" /><text class="nodeText" x="576" y="413" text-anchor="middle">50</text>
+  <circle cx="624" cy="408" r="19" fill="#a78bfa" /><text class="nodeText" x="624" y="413" text-anchor="middle">40</text>
+  <circle cx="696" cy="408" r="19" fill="#a78bfa" /><text class="nodeText" x="696" y="413" text-anchor="middle">20</text>
 
-  <text class="small" x="454" y="415">배열 인덱스(0-based): parent(i)=(i-1)//2, child=2i+1 / 2i+2</text>
-  <g transform="translate(454 430)">
-    <rect x="0" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="18" y="21" text-anchor="middle">90</text>
-    <rect x="38" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="56" y="21" text-anchor="middle">70</text>
-    <rect x="76" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="94" y="21" text-anchor="middle">65</text>
-    <rect x="114" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="132" y="21" text-anchor="middle">30</text>
-    <rect x="152" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="170" y="21" text-anchor="middle">50</text>
-    <rect x="190" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="208" y="21" text-anchor="middle">40</text>
-    <rect x="228" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="arrayText" x="246" y="21" text-anchor="middle">20</text>
-    <text class="tiny" x="18" y="50" text-anchor="middle">0</text>
-    <text class="tiny" x="56" y="50" text-anchor="middle">1</text>
-    <text class="tiny" x="94" y="50" text-anchor="middle">2</text>
-    <text class="tiny" x="132" y="50" text-anchor="middle">3</text>
-    <text class="tiny" x="170" y="50" text-anchor="middle">4</text>
-    <text class="tiny" x="208" y="50" text-anchor="middle">5</text>
-    <text class="tiny" x="246" y="50" text-anchor="middle">6</text>
+  <text class="small" x="454" y="458">배열 인덱스(0-based): parent=(i-1)//2, child=2i+1 / 2i+2</text>
+  <g transform="translate(454 476)">
+    <rect x="0" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="chipText" x="18" y="21" text-anchor="middle">90</text>
+    <rect x="38" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="chipText" x="56" y="21" text-anchor="middle">70</text>
+    <rect x="76" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="chipText" x="94" y="21" text-anchor="middle">65</text>
+    <rect x="114" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="chipText" x="132" y="21" text-anchor="middle">30</text>
+    <rect x="152" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="chipText" x="170" y="21" text-anchor="middle">50</text>
+    <rect x="190" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="chipText" x="208" y="21" text-anchor="middle">40</text>
+    <rect x="228" y="0" width="36" height="34" rx="8" fill="#ede9fe" /><text class="chipText" x="246" y="21" text-anchor="middle">20</text>
+    <text class="tiny" x="18" y="52" text-anchor="middle">0</text>
+    <text class="tiny" x="56" y="52" text-anchor="middle">1</text>
+    <text class="tiny" x="94" y="52" text-anchor="middle">2</text>
+    <text class="tiny" x="132" y="52" text-anchor="middle">3</text>
+    <text class="tiny" x="170" y="52" text-anchor="middle">4</text>
+    <text class="tiny" x="208" y="52" text-anchor="middle">5</text>
+    <text class="tiny" x="246" y="52" text-anchor="middle">6</text>
   </g>
-  <rect x="454" y="500" width="292" height="72" rx="14" fill="#faf5ff" stroke="#c4b5fd" />
-  <text class="metric" x="470" y="524">peek O(1) · insert/extract O(log n)</text>
-  <text class="small" x="470" y="546">build-heap은 바닥에서 siftdown → O(n)</text>
-  <text class="small" x="470" y="564">임의 원소 탐색은 정렬 보장이 없어 O(n)</text>
+  <rect x="454" y="548" width="292" height="72" rx="14" fill="#f5f3ff" stroke="#c4b5fd" />
+  <text class="metric" x="470" y="571">peek O(1) · insert/extract O(log n)</text>
+  <text class="small" x="470" y="594">정렬 트리가 아니라 우선순위 큐용 구조</text>
+  <text class="small" x="470" y="614">임의 원소 탐색은 O(n)</text>
 
-  <text class="panelTitle" x="822" y="206">3. B트리: 높이를 낮춰 I/O 절감</text>
-  <text class="panelBody" x="822" y="230">한 노드에 여러 키와 자식 포인터를 담아 디스크 접근 횟수를 줄인다</text>
+  <text class="panelTitle" x="824" y="214">3. B트리: 낮은 높이로 I/O 절감</text>
+  <text class="panelBody" x="824" y="238">한 노드에 여러 키·포인터를 담아</text>
+  <text class="panelBody" x="824" y="260">디스크 블록 접근 횟수를 줄인다.</text>
 
-  <rect x="920" y="254" width="104" height="48" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
-  <text class="pageKey" x="972" y="284" text-anchor="middle">20 | 40</text>
-  <line x1="944" y1="302" x2="888" y2="346" stroke="#0284c7" stroke-width="3" />
-  <line x1="972" y1="302" x2="972" y2="346" stroke="#0284c7" stroke-width="3" />
-  <line x1="1000" y1="302" x2="1056" y2="346" stroke="#0284c7" stroke-width="3" />
+  <rect x="922" y="286" width="108" height="52" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
+  <text class="pageKey" x="976" y="318" text-anchor="middle">20 | 40</text>
+  <line x1="948" y1="338" x2="888" y2="390" stroke="#0284c7" stroke-width="3" />
+  <line x1="976" y1="338" x2="976" y2="390" stroke="#0284c7" stroke-width="3" />
+  <line x1="1004" y1="338" x2="1064" y2="390" stroke="#0284c7" stroke-width="3" />
 
-  <rect x="838" y="346" width="100" height="54" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
-  <text class="pageKey" x="888" y="378" text-anchor="middle">5 | 12</text>
-  <rect x="922" y="346" width="100" height="54" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
-  <text class="pageKey" x="972" y="378" text-anchor="middle">24 | 31</text>
-  <rect x="1006" y="346" width="100" height="54" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
-  <text class="pageKey" x="1056" y="378" text-anchor="middle">52 | 68</text>
+  <rect x="836" y="390" width="104" height="58" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="888" y="424" text-anchor="middle">5 | 12</text>
+  <text class="tiny" x="888" y="441" text-anchor="middle">&lt; 20 범위</text>
+  <rect x="924" y="390" width="104" height="58" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="976" y="424" text-anchor="middle">24 | 31</text>
+  <text class="tiny" x="976" y="441" text-anchor="middle">20 ~ 40 범위</text>
+  <rect x="1012" y="390" width="104" height="58" rx="14" fill="#f0f9ff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="1064" y="424" text-anchor="middle">52 | 68</text>
+  <text class="tiny" x="1064" y="441" text-anchor="middle">&gt; 40 범위</text>
 
-  <g transform="translate(824 430)">
-    <ellipse cx="26" cy="10" rx="24" ry="8" fill="#0f766e" opacity="0.18" />
-    <rect x="2" y="10" width="48" height="44" rx="8" fill="#14b8a6" opacity="0.18" stroke="#0f766e" />
-    <ellipse cx="26" cy="54" rx="24" ry="8" fill="#14b8a6" opacity="0.18" stroke="#0f766e" />
-    <text class="small" x="76" y="26">DB / 파일시스템 페이지</text>
-    <text class="metric" x="76" y="48">노드당 키↑ → 트리 높이↓ → 블록 I/O↓</text>
-    <text class="small" x="76" y="68">삽입 시 split, 삭제 시 merge/재분배</text>
+  <g transform="translate(824 478)">
+    <rect x="0" y="0" width="288" height="94" rx="16" fill="#ecfeff" stroke="#67e8f9" />
+    <rect x="18" y="18" width="62" height="58" rx="10" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" />
+    <text class="label" x="49" y="42" text-anchor="middle">디스크</text>
+    <text class="label" x="49" y="60" text-anchor="middle">페이지</text>
+    <text class="metric" x="100" y="34">키를 많이 담을수록 높이가 낮아진다.</text>
+    <text class="small" x="100" y="58">탐색은 루트 → 몇 개의 페이지로 끝난다.</text>
+    <text class="small" x="100" y="80">삽입은 split, 삭제는 merge/재분배로 균형 유지</text>
   </g>
 
-  <rect x="822" y="520" width="292" height="52" rx="14" fill="#ecfeff" stroke="#67e8f9" />
-  <text class="metric" x="838" y="542">전체 탐색 O(log n), 범위 조회·인덱스에 강함</text>
-  <text class="small" x="838" y="560">모든 리프가 같은 깊이여서 균형 유지</text>
-
-  <rect x="62" y="610" width="1076" height="58" rx="20" fill="#0f172a" />
-  <text class="subtitle" x="88" y="635">언제 어떤 구조를 쓰나</text>
-  <text class="small" x="88" y="654" fill="#cbd5e1">BST/Balanced BST: 메모리 내 정렬 집합 · 힙: 우선순위 큐/스케줄러 · B트리: DB 인덱스/대용량 범위 검색</text>
+  <rect x="58" y="662" width="1084" height="54" rx="20" fill="#0f172a" />
+  <text class="subtitle" x="84" y="685">언제 어떤 구조를 쓰나</text>
+  <text class="footer" x="84" y="705">BST/균형 BST: 메모리 내 정렬 집합 · 힙: 우선순위 큐/스케줄러 · B트리: DB 인덱스/대용량 범위 검색</text>
 </svg>

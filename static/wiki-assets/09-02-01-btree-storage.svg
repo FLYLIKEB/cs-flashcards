@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">09-02-01. B트리 저장 구조 SVG</title>
+  <desc id="desc">B트리가 한 노드에 여러 키를 넣어 디스크 페이지 접근 수를 줄이는 방식을 설명하는 페이지 전용 SVG</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0f9ff" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569" />
+    </marker>
+    <style>
+      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .panelTitle { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .label { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .metric { font: 700 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .pageKey { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="620" fill="url(#bg)" />
+  <rect x="32" y="28" width="1136" height="564" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <text class="title" x="68" y="76">B트리: 키를 한 페이지에 묶어 높이를 낮춘다</text>
+  <text class="subtitle" x="68" y="108">핵심은 한 번의 노드 방문에서 여러 키 범위를 함께 판별해 디스크 I/O를 줄이는 것이다.</text>
+
+  <rect x="68" y="148" width="500" height="392" rx="24" fill="#f0f9ff" stroke="#67e8f9" stroke-width="2" />
+  <text class="panelTitle" x="94" y="188">왼쪽: 한 노드가 여러 키 범위를 나눈다</text>
+  <text class="body" x="94" y="214">루트에서 키 범위를 고르면 다음 페이지로 바로 내려간다.</text>
+
+  <rect x="238" y="242" width="160" height="58" rx="16" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
+  <text class="pageKey" x="318" y="277" text-anchor="middle">20 | 40 | 60</text>
+  <line x1="262" y1="300" x2="152" y2="372" stroke="#0284c7" stroke-width="3" />
+  <line x1="298" y1="300" x2="262" y2="372" stroke="#0284c7" stroke-width="3" />
+  <line x1="338" y1="300" x2="374" y2="372" stroke="#0284c7" stroke-width="3" />
+  <line x1="374" y1="300" x2="484" y2="372" stroke="#0284c7" stroke-width="3" />
+
+  <rect x="108" y="372" width="88" height="64" rx="14" fill="#ecfeff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="152" y="409" text-anchor="middle">5 | 12</text>
+  <text class="small" x="152" y="428" text-anchor="middle">&lt; 20</text>
+  <rect x="218" y="372" width="88" height="64" rx="14" fill="#ecfeff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="262" y="409" text-anchor="middle">24 | 31</text>
+  <text class="small" x="262" y="428" text-anchor="middle">20~40</text>
+  <rect x="330" y="372" width="88" height="64" rx="14" fill="#ecfeff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="374" y="409" text-anchor="middle">45 | 52</text>
+  <text class="small" x="374" y="428" text-anchor="middle">40~60</text>
+  <rect x="440" y="372" width="88" height="64" rx="14" fill="#ecfeff" stroke="#38bdf8" stroke-width="2" />
+  <text class="pageKey" x="484" y="409" text-anchor="middle">71 | 88</text>
+  <text class="small" x="484" y="428" text-anchor="middle">&gt; 60</text>
+
+  <rect x="608" y="148" width="524" height="392" rx="24" fill="#f8fafc" stroke="#bae6fd" stroke-width="2" />
+  <text class="panelTitle" x="634" y="188">오른쪽: 디스크 페이지 관점</text>
+  <text class="body" x="634" y="214">노드 하나가 보통 저장 장치의 페이지 크기에 맞춰 설계된다.</text>
+
+  <rect x="664" y="252" width="170" height="194" rx="22" fill="#ecfeff" stroke="#0891b2" stroke-width="2" />
+  <text class="label" x="749" y="286" text-anchor="middle">페이지 A</text>
+  <rect x="688" y="304" width="122" height="34" rx="10" fill="#cffafe" stroke="#0891b2" />
+  <text class="small" x="749" y="326" text-anchor="middle">키 20 | 40 | 60</text>
+  <rect x="688" y="352" width="122" height="70" rx="10" fill="#ffffff" stroke="#67e8f9" />
+  <text class="small" x="749" y="376" text-anchor="middle">자식 포인터 4개</text>
+  <text class="small" x="749" y="396" text-anchor="middle">각 범위를 다음 페이지로 연결</text>
+
+  <rect x="912" y="252" width="170" height="194" rx="22" fill="#f0fdf4" stroke="#16a34a" stroke-width="2" />
+  <text class="label" x="997" y="286" text-anchor="middle">페이지 B</text>
+  <rect x="936" y="304" width="122" height="34" rx="10" fill="#dcfce7" stroke="#16a34a" />
+  <text class="small" x="997" y="326" text-anchor="middle">키 24 | 31</text>
+  <rect x="936" y="352" width="122" height="70" rx="10" fill="#ffffff" stroke="#86efac" />
+  <text class="small" x="997" y="376" text-anchor="middle">리프면 데이터 위치</text>
+  <text class="small" x="997" y="396" text-anchor="middle">또는 실제 레코드 참조</text>
+
+  <line x1="834" y1="348" x2="912" y2="348" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+
+
+  <rect x="94" y="478" width="1010" height="42" rx="14" fill="#f8fafc" stroke="#cbd5e1" />
+  <text class="metric" x="114" y="503">키 수가 많을수록 높이는 낮아지고, 루트 → 내부 → 리프 몇 번만 읽어도 탐색이 끝난다.</text>
+
+  <rect x="68" y="548" width="1064" height="30" rx="12" fill="#0f172a" />
+  <text class="small" x="92" y="568" fill="#cbd5e1">삽입은 split, 삭제는 merge/재분배로 균형을 유지하므로 DB 인덱스와 파일 시스템에 적합하다.</text>
+</svg>

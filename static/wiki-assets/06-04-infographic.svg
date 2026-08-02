@@ -1,143 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">06-04. 메모리와 가상메모리 인포그래픽</title>
-  <desc id="desc">내부·외부 단편화, 페이징과 세그먼트, TLB 기반 주소 변환, 페이지 교체와 스래싱을 함께 설명하는 SVG</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">06-04 메모리와 가상메모리 운영 흐름</title>
+  <desc id="desc">가상메모리에서 페이지 폴트, 페이지 교체, thrashing 대응 흐름을 정리한 SVG</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff" />
-      <stop offset="100%" stop-color="#f8fafc" />
-    </linearGradient>
-    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1d4ed8" />
-      <stop offset="100%" stop-color="#7c3aed" />
-    </linearGradient>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569" />
     </marker>
     <style>
-      .title { font: 700 32px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .subtitle { font: 500 16px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .section { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .label { font: 700 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
-      .body { font: 500 14px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
-      .chip { font: 700 12px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .chip { font: 700 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #1e293b; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="32" y="28" width="1136" height="664" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <rect width="1200" height="860" fill="#f8fafc" />
+  <rect x="28" y="28" width="1144" height="804" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
 
-  <rect x="64" y="52" width="1072" height="84" rx="22" fill="url(#header)" />
-  <text class="small" x="88" y="84">운영체제 · 메모리 관리 핵심 구조</text>
-  <text class="title" x="88" y="116">06-04. 메모리와 가상메모리</text>
-  <text class="subtitle" x="740" y="103">단편화 비교 → 주소 변환 → 페이지 교체 → 스래싱 대응</text>
+  <text class="title" x="72" y="92">가상메모리 운영 흐름 한 장 정리</text>
+  <text class="subtitle" x="72" y="124">주소 변환 이후 실제 운영체제가 처리하는 page fault, 교체, thrashing 완화 흐름을 중심으로 본다.</text>
 
-  <rect x="64" y="164" width="328" height="286" rx="22" fill="#f8fafc" stroke="#cbd5e1" />
-  <text class="section" x="88" y="198">1) 단편화와 할당 방식</text>
+  <rect x="60" y="164" width="1080" height="190" rx="24" fill="#eff6ff" stroke="#93c5fd" />
+  <text class="section" x="88" y="204">1) 필요한 페이지가 없으면 page fault</text>
+  <rect x="92" y="230" width="280" height="94" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2" />
+  <text class="label" x="232" y="264" text-anchor="middle">CPU가 가상주소 참조</text>
+  <text class="body" x="232" y="292" text-anchor="middle">MMU가 페이지 테이블의 present bit 확인</text>
+  <rect x="458" y="230" width="280" height="94" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2" />
+  <text class="label" x="598" y="264" text-anchor="middle">present bit = 0</text>
+  <text class="body" x="598" y="292" text-anchor="middle">메모리에 없는 페이지라 page fault 발생</text>
+  <rect x="824" y="230" width="280" height="94" rx="18" fill="#ffffff" stroke="#60a5fa" stroke-width="2" />
+  <text class="label" x="964" y="264" text-anchor="middle">운영체제가 디스크 접근</text>
+  <text class="body" x="964" y="292" text-anchor="middle">필요한 페이지를 보조기억장치에서 읽어 온다</text>
+  <line x1="372" y1="277" x2="458" y2="277" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="738" y1="277" x2="824" y2="277" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
 
-  <rect x="88" y="218" width="132" height="94" rx="18" fill="#dbeafe" stroke="#60a5fa" />
-  <text class="label" x="154" y="244" text-anchor="middle">내부 단편화</text>
-  <rect x="104" y="258" width="96" height="30" rx="8" fill="#93c5fd" />
-  <rect x="168" y="258" width="32" height="30" rx="8" fill="#fbbf24" opacity="0.9" />
-  <text class="small" x="154" y="305" text-anchor="middle">고정 블록 안 남는 공간</text>
+  <rect x="60" y="388" width="1080" height="208" rx="24" fill="#fff7ed" stroke="#fdba74" />
+  <text class="section" x="88" y="428">2) 빈 프레임이 없으면 페이지 교체</text>
+  <rect x="92" y="454" width="312" height="110" rx="18" fill="#ffffff" stroke="#f59e0b" stroke-width="2" />
+  <text class="label" x="248" y="488" text-anchor="middle">희생 페이지 선택</text>
+  <text class="body" x="248" y="516" text-anchor="middle">FIFO: 가장 오래 있던 페이지</text>
+  <text class="body" x="248" y="538" text-anchor="middle">LRU/Clock: 최근 사용성 반영</text>
+  <rect x="444" y="454" width="312" height="110" rx="18" fill="#ffffff" stroke="#f59e0b" stroke-width="2" />
+  <text class="label" x="600" y="488" text-anchor="middle">교체 후 갱신</text>
+  <text class="body" x="600" y="516" text-anchor="middle">새 페이지 적재, 페이지 테이블 수정</text>
+  <text class="body" x="600" y="538" text-anchor="middle">필요하면 TLB 엔트리도 함께 갱신</text>
+  <rect x="796" y="454" width="308" height="110" rx="18" fill="#ffffff" stroke="#f59e0b" stroke-width="2" />
+  <text class="label" x="950" y="488" text-anchor="middle">시험 포인트</text>
+  <text class="body" x="950" y="516" text-anchor="middle">OPT는 이론상 최적이지만 미래 참조가 필요</text>
+  <text class="body" x="950" y="538" text-anchor="middle">FIFO는 Belady anomaly 가능</text>
+  <line x1="404" y1="509" x2="444" y2="509" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="756" y1="509" x2="796" y2="509" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
 
-  <rect x="236" y="218" width="132" height="94" rx="18" fill="#ede9fe" stroke="#a78bfa" />
-  <text class="label" x="302" y="244" text-anchor="middle">외부 단편화</text>
-  <rect x="250" y="258" width="24" height="30" rx="6" fill="#c4b5fd" />
-  <rect x="282" y="258" width="42" height="30" rx="6" fill="#8b5cf6" />
-  <rect x="332" y="258" width="18" height="30" rx="6" fill="#c4b5fd" />
-  <text class="small" x="302" y="305" text-anchor="middle">빈 공간이 흩어져 연속 할당 곤란</text>
-
-  <rect x="88" y="334" width="128" height="96" rx="18" fill="#eff6ff" stroke="#60a5fa" />
-  <text class="label" x="152" y="360" text-anchor="middle">페이징</text>
-  <rect x="106" y="372" width="92" height="12" rx="4" fill="#60a5fa" />
-  <rect x="106" y="390" width="92" height="12" rx="4" fill="#93c5fd" />
-  <rect x="106" y="408" width="92" height="12" rx="4" fill="#bfdbfe" />
-  <text class="small" x="152" y="425" text-anchor="middle">고정 크기 페이지</text>
-
-  <rect x="228" y="334" width="140" height="96" rx="18" fill="#faf5ff" stroke="#c084fc" />
-  <text class="label" x="298" y="360" text-anchor="middle">세그먼트</text>
-  <rect x="246" y="372" width="46" height="12" rx="4" fill="#d8b4fe" />
-  <rect x="246" y="390" width="88" height="12" rx="4" fill="#a78bfa" />
-  <rect x="246" y="408" width="62" height="12" rx="4" fill="#c084fc" />
-  <text class="small" x="298" y="425" text-anchor="middle">가변 크기 논리 단위</text>
-
-  <text class="body" x="88" y="466">• 페이징: 단순한 고정 크기 관리, 내부 단편화 가능</text>
-  <text class="body" x="88" y="489">• 세그먼트: 코드·데이터·스택처럼 논리적 분할</text>
-  <text class="body" x="88" y="512">• 세그먼트는 외부 단편화 가능성이 더 큼</text>
-
-  <rect x="416" y="164" width="472" height="406" rx="22" fill="#f8fafc" stroke="#cbd5e1" />
-  <text class="section" x="440" y="198">2) 가상주소 → 물리주소 변환</text>
-  <text class="body" x="440" y="224">가상메모리는 큰 연속 주소 공간처럼 보이게 하고, MMU·TLB·페이지 테이블이 실제 위치를 찾는다.</text>
-
-  <rect x="442" y="252" width="134" height="86" rx="18" fill="#dbeafe" stroke="#60a5fa" />
-  <text class="label" x="509" y="282" text-anchor="middle">가상주소</text>
-  <text class="body" x="509" y="306" text-anchor="middle">페이지 번호</text>
-  <text class="body" x="509" y="325" text-anchor="middle">+ 오프셋</text>
-
-  <rect x="622" y="252" width="110" height="86" rx="18" fill="#dcfce7" stroke="#4ade80" />
-  <text class="label" x="677" y="282" text-anchor="middle">TLB</text>
-  <text class="body" x="677" y="306" text-anchor="middle">최근 변환</text>
-  <text class="small" x="677" y="325" text-anchor="middle">hit면 즉시 통과</text>
-
-  <rect x="760" y="236" width="102" height="54" rx="14" fill="#ecfccb" stroke="#84cc16" />
-  <text class="chip" x="811" y="268" text-anchor="middle">TLB hit</text>
-  <rect x="760" y="300" width="102" height="54" rx="14" fill="#fee2e2" stroke="#f87171" />
-  <text class="chip" x="811" y="332" text-anchor="middle">TLB miss</text>
-
-  <rect x="622" y="380" width="156" height="104" rx="18" fill="#ede9fe" stroke="#a78bfa" />
-  <text class="label" x="700" y="410" text-anchor="middle">페이지 테이블</text>
-  <text class="body" x="700" y="433" text-anchor="middle">페이지 → 프레임</text>
-  <text class="body" x="700" y="452" text-anchor="middle">present bit 검사</text>
-  <text class="small" x="700" y="472" text-anchor="middle">다단계면 필요한 하위 테이블만 생성</text>
-
-  <rect x="456" y="388" width="126" height="146" rx="18" fill="#eff6ff" stroke="#60a5fa" />
-  <text class="label" x="519" y="418" text-anchor="middle">EAT</text>
-  <text class="small" x="519" y="442" text-anchor="middle">hit: TLB + M</text>
-  <text class="small" x="519" y="463" text-anchor="middle">miss: TLB + 2M</text>
-  <text class="small" x="519" y="494" text-anchor="middle">h·(TLB+M)</text>
-  <text class="small" x="519" y="511" text-anchor="middle">+ (1-h)·(TLB+2M)</text>
-
-  <rect x="800" y="388" width="64" height="146" rx="18" fill="#bfdbfe" stroke="#60a5fa" />
-  <rect x="814" y="408" width="36" height="22" rx="6" fill="#1d4ed8" />
-  <rect x="814" y="438" width="36" height="22" rx="6" fill="#60a5fa" />
-  <rect x="814" y="468" width="36" height="22" rx="6" fill="#93c5fd" />
-  <text class="small" x="832" y="517" text-anchor="middle">프레임</text>
-
-  <line x1="576" y1="295" x2="622" y2="295" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="677" y1="338" x2="677" y2="380" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="732" y1="295" x2="760" y2="263" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="732" y1="295" x2="760" y2="327" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="862" y1="263" x2="800" y2="263" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="778" y1="327" x2="760" y2="380" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="778" y1="432" x2="800" y2="432" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-
-  <rect x="910" y="164" width="226" height="406" rx="22" fill="#fff7ed" stroke="#fdba74" />
-  <text class="section" x="934" y="198">3) 페이지 폴트 이후</text>
-
-  <rect x="934" y="226" width="178" height="68" rx="16" fill="#fee2e2" stroke="#f87171" />
-  <text class="label" x="1023" y="252" text-anchor="middle">demand paging</text>
-  <text class="body" x="1023" y="274" text-anchor="middle">없는 페이지면</text>
-  <text class="body" x="1023" y="291" text-anchor="middle">디스크에서 적재</text>
-
-  <rect x="934" y="314" width="178" height="84" rx="16" fill="#fef3c7" stroke="#f59e0b" />
-  <text class="label" x="1023" y="340" text-anchor="middle">페이지 교체</text>
-  <text class="small" x="1023" y="362" text-anchor="middle">FIFO: 단순, Belady anomaly 가능</text>
-  <text class="small" x="1023" y="380" text-anchor="middle">LRU/Clock: 최근성 반영</text>
-
-  <rect x="934" y="418" width="178" height="126" rx="16" fill="#ecfccb" stroke="#84cc16" />
-  <text class="label" x="1023" y="444" text-anchor="middle">Thrashing 완화</text>
-  <text class="body" x="1023" y="467" text-anchor="middle">페이지 폴트가 과도하면</text>
-  <text class="body" x="1023" y="486" text-anchor="middle">CPU보다 교체 비용이 커진다</text>
-  <text class="small" x="1023" y="510" text-anchor="middle">Working Set 유지</text>
-  <text class="small" x="1023" y="528" text-anchor="middle">프레임 재분배로 완화</text>
-
-  <line x1="864" y1="462" x2="934" y2="462" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="1023" y1="294" x2="1023" y2="314" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-  <line x1="1023" y1="398" x2="1023" y2="418" stroke="#475569" stroke-width="3" marker-end="url(#arrow)" />
-
-  <rect x="64" y="590" width="1072" height="72" rx="20" fill="#0f172a" />
-  <text class="section" x="88" y="621" fill="#f8fafc">시험 직전 체크</text>
-  <text class="body" x="248" y="621" fill="#e2e8f0">내부 vs 외부 단편화, 페이징 vs 세그먼트, TLB hit/miss, page fault·교체·thrashing 흐름을 한 장으로 정리</text>
-  <text class="small" x="88" y="645" fill="#94a3b8">06-04-infographic.svg</text>
+  <rect x="60" y="630" width="1080" height="170" rx="24" fill="#ecfccb" stroke="#84cc16" />
+  <text class="section" x="88" y="670">3) 페이지 폴트가 너무 잦으면 thrashing</text>
+  <rect x="92" y="696" width="312" height="72" rx="18" fill="#ffffff" stroke="#84cc16" stroke-width="2" />
+  <text class="body" x="248" y="727" text-anchor="middle">CPU보다 페이지 교체에 시간을 더 쓰는 상태</text>
+  <text class="small" x="248" y="749" text-anchor="middle">원인: 프레임 부족, 작업셋 과대</text>
+  <rect x="444" y="696" width="312" height="72" rx="18" fill="#ffffff" stroke="#84cc16" stroke-width="2" />
+  <text class="body" x="600" y="727" text-anchor="middle">Working Set을 수용할 프레임을 확보</text>
+  <text class="small" x="600" y="749" text-anchor="middle">지역성을 살리고 불필요한 교체를 줄인다</text>
+  <rect x="796" y="696" width="308" height="72" rx="18" fill="#ffffff" stroke="#84cc16" stroke-width="2" />
+  <text class="body" x="950" y="727" text-anchor="middle">프레임 재분배·프로세스 수 조절로 완화</text>
+  <text class="small" x="950" y="749" text-anchor="middle">폴트율과 TLB miss 비율을 함께 본다</text>
 </svg>

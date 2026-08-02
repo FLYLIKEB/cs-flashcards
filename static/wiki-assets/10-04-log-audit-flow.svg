@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">10-04. 로그 감사와 SIEM 처리 흐름</title>
+  <desc id="desc">보안 장비와 시스템 로그가 중앙 수집, 정규화, 상관분석, 대응, 보존 단계로 이어지며 시간 동기화와 무결성 통제가 함께 적용되는 과정을 보여준다.</desc>
+  <defs>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 22px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 17px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 13px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .mono { font: 600 13px 'SFMono-Regular',Consolas,monospace; fill: #334155; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#2563eb" />
+    </marker>
+    <marker id="amberArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#d97706" />
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="760" fill="#f8fafc" />
+  <rect x="24" y="24" width="1152" height="712" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+
+  <text x="64" y="82" class="small">로그 감사 상세 가이드 요약</text>
+  <text x="64" y="126" class="title">로그 감사 · SIEM 처리 흐름</text>
+  <text x="64" y="158" class="subtitle">수집부터 상관분석, 대응, 장기 보존까지 이어지는 절차를 분리해 보면 왜 시간 동기화와 무결성이 중요한지 선명해진다.</text>
+
+  <rect x="64" y="194" width="1072" height="146" rx="24" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2" />
+  <text x="92" y="230" class="section">1) 로그 원천 수집</text>
+  <rect x="92" y="254" width="150" height="60" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+  <text x="167" y="289" text-anchor="middle" class="label">방화벽</text>
+  <rect x="262" y="254" width="150" height="60" rx="18" fill="#dcfce7" stroke="#16a34a" stroke-width="2" />
+  <text x="337" y="289" text-anchor="middle" class="label">서버 / OS</text>
+  <rect x="432" y="254" width="150" height="60" rx="18" fill="#fef3c7" stroke="#d97706" stroke-width="2" />
+  <text x="507" y="289" text-anchor="middle" class="label">DB / 앱</text>
+  <rect x="602" y="254" width="180" height="60" rx="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" />
+  <text x="692" y="289" text-anchor="middle" class="label">IDS / IPS 경보</text>
+  <rect x="802" y="254" width="306" height="60" rx="18" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
+  <text x="955" y="280" text-anchor="middle" class="label">계정 활동 · 인증 · 네트워크 장비</text>
+  <text x="92" y="330" class="body">원본 로그를 중앙으로 보내되, 가능하면 소스별 원본 보존 원칙을 유지한다.</text>
+
+  <rect x="64" y="368" width="1072" height="170" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+  <text x="92" y="404" class="section">2) 중앙 수집기와 SIEM 정규화</text>
+  <rect x="104" y="436" width="252" height="70" rx="18" fill="#fffbeb" stroke="#f59e0b" stroke-width="2" />
+  <text x="230" y="465" text-anchor="middle" class="label">중앙 수집기</text>
+  <text x="230" y="489" text-anchor="middle" class="body">포맷 통일 전 원시 로그 보관</text>
+  <line x1="356" y1="471" x2="492" y2="471" stroke="#2563eb" stroke-width="6" marker-end="url(#arrow)" />
+  <text x="385" y="448" class="small">필드 추출 · 타임스탬프 정렬</text>
+  <rect x="504" y="420" width="292" height="102" rx="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+  <text x="650" y="450" text-anchor="middle" class="label">SIEM 정규화</text>
+  <text x="526" y="478" class="body">• 장비별 필드를 공통 스키마로 변환</text>
+  <text x="526" y="502" class="body">• 검색·상관분석 가능한 이벤트로 정리</text>
+  <rect x="834" y="420" width="272" height="102" rx="18" fill="#ecfccb" stroke="#65a30d" stroke-width="2" />
+  <text x="970" y="450" text-anchor="middle" class="label">상관분석</text>
+  <text x="856" y="478" class="body">• 실패 로그인 → 성공 로그인</text>
+  <text x="856" y="502" class="body">• 이후 대량 조회·비정상 접근 연결</text>
+
+  <rect x="64" y="566" width="1072" height="122" rx="24" fill="#fff7ed" stroke="#fdba74" stroke-width="2" />
+  <text x="92" y="602" class="section">3) 경보, 조사, 보존</text>
+  <line x1="122" y1="632" x2="312" y2="632" stroke="#d97706" stroke-width="6" marker-end="url(#amberArrow)" />
+  <line x1="372" y1="632" x2="562" y2="632" stroke="#d97706" stroke-width="6" marker-end="url(#amberArrow)" />
+  <line x1="622" y1="632" x2="812" y2="632" stroke="#d97706" stroke-width="6" marker-end="url(#amberArrow)" />
+  <rect x="92" y="606" width="190" height="54" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="2" />
+  <text x="187" y="639" text-anchor="middle" class="label">경보 생성</text>
+  <rect x="342" y="606" width="190" height="54" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2" />
+  <text x="437" y="639" text-anchor="middle" class="label">분석 · 조사</text>
+  <rect x="592" y="606" width="190" height="54" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="2" />
+  <text x="687" y="639" text-anchor="middle" class="label">대응 워크플로우</text>
+  <rect x="842" y="606" width="236" height="54" rx="16" fill="#fef3c7" stroke="#d97706" stroke-width="2" />
+  <text x="960" y="639" text-anchor="middle" class="label">증적 보존 · 사후보고</text>
+
+  <rect x="876" y="194" width="260" height="146" rx="24" fill="#0f172a" />
+  <text x="906" y="228" class="label" fill="#f8fafc">항상 같이 붙는 통제</text>
+  <text x="906" y="260" class="body" fill="#cbd5e1">• NTP 시간 동기화</text>
+  <text x="906" y="286" class="body" fill="#cbd5e1">• append-only / 해시 / 서명</text>
+  <text x="906" y="312" class="body" fill="#cbd5e1">• 보존기간 문서화</text>
+  <text x="906" y="338" class="body" fill="#cbd5e1">• 접근통제와 개인정보 마스킹</text>
+
+  <text x="600" y="714" text-anchor="middle" class="mono">핵심: 많이 모으는 것보다, 시간·무결성·상관분석 기준을 맞춰야 감사와 포렌식에 쓸 수 있다</text>
+</svg>

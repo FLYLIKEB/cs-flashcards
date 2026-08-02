@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">07-02-01 정규화 이상현상과 판별 질문 요약</title>
+  <desc id="desc">1NF, 2NF, 3NF가 각각 어떤 이상현상을 줄이는지와 시험장에서 던질 판별 질문을 정리한 SVG 요약표.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .eyebrow { font-size: 18px; font-weight: 700; letter-spacing: 0.08em; fill: #475569; }
+      .title { font-size: 38px; font-weight: 800; }
+      .subtitle { font-size: 19px; font-weight: 500; fill: #334155; }
+      .card-title { font-size: 28px; font-weight: 800; }
+      .chip { font-size: 14px; font-weight: 800; fill: #ffffff; }
+      .line { font-size: 17px; font-weight: 600; }
+      .label { font-size: 16px; font-weight: 800; fill: #1e293b; }
+      .foot { font-size: 15px; font-weight: 700; fill: #475569; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="860" fill="#f8fafc"/>
+  <rect x="28" y="28" width="1144" height="804" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="eyebrow" x="72" y="92">ANOMALY CHECK</text>
+  <text class="title" x="72" y="140">정규형별 이상현상과 판별 질문</text>
+  <text class="subtitle" x="72" y="180">정규화는 테이블을 예쁘게 쪼개는 작업이 아니라, 반복·중복·갱신 이상을 없애기 위한 진단 절차다.</text>
+
+  <rect x="72" y="228" width="328" height="454" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text class="card-title" x="104" y="280">1NF</text>
+  <rect x="290" y="250" width="78" height="28" rx="14" fill="#2563eb"/>
+  <text class="chip" x="329" y="269" text-anchor="middle">원자성</text>
+  <text class="label" x="104" y="334">판별 질문</text>
+  <text class="line" x="104" y="366">• 한 칸에 여러 값이 들어 있는가?</text>
+  <text class="label" x="104" y="420">대표 이상</text>
+  <text class="line" x="104" y="452">• 특정 과목 성적을 바로 찾기 어렵다.</text>
+  <text class="line" x="104" y="486">• 새 과목 추가 시 문자열 전체를 다시 써야 한다.</text>
+  <text class="line" x="104" y="520">• 일부 값만 지우면 나머지 값도 함께 망가진다.</text>
+  <text class="label" x="104" y="574">해결 방향</text>
+  <text class="line" x="104" y="606">• 반복 그룹을 행으로 분해해</text>
+  <text class="line" x="104" y="636">  각 수강 기록을 독립시킨다.</text>
+
+  <rect x="436" y="228" width="328" height="454" rx="24" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <text class="card-title" x="468" y="280">2NF</text>
+  <rect x="654" y="250" width="78" height="28" rx="14" fill="#16a34a"/>
+  <text class="chip" x="693" y="269" text-anchor="middle">부분 종속</text>
+  <text class="label" x="468" y="334">판별 질문</text>
+  <text class="line" x="468" y="366">• 복합키의 일부만으로 결정되는 속성이 있는가?</text>
+  <text class="label" x="468" y="420">대표 이상</text>
+  <text class="line" x="468" y="452">• 학생명·과목명이 여러 행에 반복된다.</text>
+  <text class="line" x="468" y="486">• 학생 정보 수정 시 여러 행을 함께 고쳐야 한다.</text>
+  <text class="line" x="468" y="520">• 한 과목 정보만 먼저 등록하기 어렵다.</text>
+  <text class="label" x="468" y="574">해결 방향</text>
+  <text class="line" x="468" y="606">• 학생 / 과목 / 수강으로 나누어</text>
+  <text class="line" x="468" y="636">  속성이 키 전체에만 의존하게 만든다.</text>
+
+  <rect x="800" y="228" width="328" height="454" rx="24" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text class="card-title" x="832" y="280">3NF</text>
+  <rect x="1018" y="250" width="78" height="28" rx="14" fill="#7c3aed"/>
+  <text class="chip" x="1057" y="269" text-anchor="middle">이행 종속</text>
+  <text class="label" x="832" y="334">판별 질문</text>
+  <text class="line" x="832" y="366">• 키 아닌 속성이 다른 키 아닌 속성을 결정하는가?</text>
+  <text class="label" x="832" y="420">대표 이상</text>
+  <text class="line" x="832" y="452">• 학과명·연구실이 여러 행에 다시 반복된다.</text>
+  <text class="line" x="832" y="486">• 학과명 한 번 바뀌어도 여러 행을 수정해야 한다.</text>
+  <text class="line" x="832" y="520">• 교수 연구실 변경이 과목 행마다 중복된다.</text>
+  <text class="label" x="832" y="574">해결 방향</text>
+  <text class="line" x="832" y="606">• 학과 / 교수 테이블을 분리해</text>
+  <text class="line" x="832" y="636">  변경 지점을 한 곳으로 줄인다.</text>
+
+  <rect x="72" y="718" width="1056" height="70" rx="18" fill="#e2e8f0"/>
+  <text class="label" x="104" y="752">시험장에서의 순서</text>
+  <text class="foot" x="104" y="780">1) 원자값 확인 → 2) 후보키가 복합키인지 확인 → 3) 부분 종속 확인 → 4) 이행 종속 확인 → 5) 무손실 조인·종속성 보존 점검</text>
+</svg>

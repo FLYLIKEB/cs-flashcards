@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">13-02 구현 실전 체크리스트</title>
+  <desc id="desc">구현 문제를 풀기 전후에 확인할 체크리스트를 준비 단계와 마감 단계로 나눠 정리한 SVG.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 34px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .section { font: 700 24px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .label { font: 700 20px 'Pretendard','Noto Sans KR',sans-serif; fill: #0f172a; }
+      .body { font: 500 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #334155; }
+      .small { font: 600 15px 'Pretendard','Noto Sans KR',sans-serif; fill: #475569; }
+      .num { font: 700 18px 'Pretendard','Noto Sans KR',sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="820" fill="url(#bg)"/>
+  <rect x="32" y="28" width="1136" height="764" rx="30" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <text class="small" x="72" y="74">코딩 전/후에 바로 적용하는 검토 순서</text>
+  <text class="title" x="72" y="116">13-02. 구현 실전 체크리스트</text>
+  <text class="subtitle" x="72" y="150">체크 항목을 두 묶음으로 나누면 풀이 시작 전 준비와 제출 직전 검증을 빠르게 끝낼 수 있다.</text>
+
+  <rect x="72" y="198" width="500" height="486" rx="28" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text class="section" x="104" y="240">코딩 전: 요구사항을 고정</text>
+  <text class="small" x="104" y="268">입력과 복잡도를 먼저 확정하면 중간에 로직을 갈아엎는 일을 줄인다.</text>
+
+  <g>
+    <circle cx="126" cy="324" r="18" fill="#2563eb"/>
+    <text class="num" x="126" y="330" text-anchor="middle">1</text>
+    <text class="label" x="156" y="330">입력/출력 포맷을 적는다</text>
+    <text class="body" x="156" y="360">첫 줄, 반복 횟수, 공백·개행 규칙을 메모한다.</text>
+  </g>
+  <g>
+    <circle cx="126" cy="420" r="18" fill="#2563eb"/>
+    <text class="num" x="126" y="426" text-anchor="middle">2</text>
+    <text class="label" x="156" y="426">최대 입력으로 복잡도를 계산한다</text>
+    <text class="body" x="156" y="456">n ≤ 1e5면 O(nlogn) 또는 O(n) 중심으로 본다.</text>
+  </g>
+  <g>
+    <circle cx="126" cy="516" r="18" fill="#2563eb"/>
+    <text class="num" x="126" y="522" text-anchor="middle">3</text>
+    <text class="label" x="156" y="522">경계 케이스를 미리 열거한다</text>
+    <text class="body" x="156" y="552">빈값, 최소·최대, 한 원소, 동점 상황을 분리한다.</text>
+  </g>
+  <g>
+    <circle cx="126" cy="612" r="18" fill="#2563eb"/>
+    <text class="num" x="126" y="618" text-anchor="middle">4</text>
+    <text class="label" x="156" y="618">자료형과 예외 조건을 정한다</text>
+    <text class="body" x="156" y="648">오버플로우, 분모 0, 인덱스 초과 가능성을 먼저 본다.</text>
+  </g>
+
+  <rect x="624" y="198" width="500" height="486" rx="28" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <text class="section" x="656" y="240">코딩 후: 출력 전 검증</text>
+  <text class="small" x="656" y="268">작은 예제 재실행과 형식 검증만 해도 구현형 오답의 상당수를 막을 수 있다.</text>
+
+  <g>
+    <circle cx="678" cy="324" r="18" fill="#16a34a"/>
+    <text class="num" x="678" y="330" text-anchor="middle">5</text>
+    <text class="label" x="708" y="330">샘플을 손으로 다시 시뮬레이션한다</text>
+    <text class="body" x="708" y="360">상태가 코드와 같은 순서로 변하는지 한 줄씩 대조한다.</text>
+  </g>
+  <g>
+    <circle cx="678" cy="420" r="18" fill="#16a34a"/>
+    <text class="num" x="678" y="426" text-anchor="middle">6</text>
+    <text class="label" x="708" y="426">예외 처리 분기를 다시 본다</text>
+    <text class="body" x="708" y="456">빈 스택, 없는 값, 실패 조건이 조용히 깨지지 않는지 확인한다.</text>
+  </g>
+  <g>
+    <circle cx="678" cy="516" r="18" fill="#16a34a"/>
+    <text class="num" x="678" y="522" text-anchor="middle">7</text>
+    <text class="label" x="708" y="522">출력 형식을 샘플과 맞춘다</text>
+    <text class="body" x="708" y="552">공백 하나, 개행 하나, EMPTY 같은 특수 문자열까지 점검한다.</text>
+  </g>
+  <g>
+    <circle cx="678" cy="612" r="18" fill="#16a34a"/>
+    <text class="num" x="678" y="618" text-anchor="middle">8</text>
+    <text class="label" x="708" y="618">불필요한 로직을 줄여 제출한다</text>
+    <text class="body" x="708" y="648">문제 요구보다 복잡한 구조는 오히려 실수 지점을 늘린다.</text>
+  </g>
+
+  <rect x="72" y="712" width="1052" height="52" rx="18" fill="#0f172a"/>
+  <text class="body" x="98" y="745" fill="#e2e8f0">핵심 기억: 구현형은 새로운 이론보다 입력 규칙, 경계 조건, 출력 형식을 끝까지 지키는 문제가 더 많다.</text>
+</svg>

@@ -1,131 +1,102 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
-  <title id="title">09. 자료구조/알고리즘 인포그래픽</title>
-  <desc id="desc">자료구조 선택과 알고리즘 패턴을 연결해 학습 순서, 핵심 시간복잡도, 대표 기법을 한 장에 요약한 페이지 전용 인포그래픽</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="1040" viewBox="0 0 1360 1040" role="img" aria-labelledby="title desc">
+  <title id="title">09. 자료구조·알고리즘 학습 로드맵</title>
+  <desc id="desc">선형 자료구조부터 DP와 재귀까지의 학습 순서와 각 단계에서 바로 떠올릴 질문을 넉넉한 카드형 배치로 정리한 SVG</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eff6ff" />
-      <stop offset="100%" stop-color="#f8fafc" />
-    </linearGradient>
-    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#312e81" />
-      <stop offset="100%" stop-color="#1d4ed8" />
-    </linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="0%" stop-color="#f8fbff" />
       <stop offset="100%" stop-color="#eef4ff" />
     </linearGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
-    </marker>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
     <style>
-      .title { font: 700 34px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
-      .subtitle { font: 500 16px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #cbd5e1; }
-      .section { font: 700 21px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
-      .label { font: 700 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
-      .body { font: 500 15px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
-      .small { font: 600 12px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #475569; }
-      .tiny { font: 700 11px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #1e3a8a; }
-      .tableHead { font: 700 13px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
-      .tableCell { font: 600 12px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
-      .accent { fill: #dbeafe; stroke: #60a5fa; stroke-width: 1.5; }
+      .title { font: 700 36px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
+      .subtitle { font: 500 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #dbeafe; }
+      .section { font: 700 26px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .stepNo { font: 700 24px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #ffffff; }
+      .stepTitle { font: 700 24px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #0f172a; }
+      .body { font: 500 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #334155; }
+      .bodyStrong { font: 700 18px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #1e293b; }
+      .small { font: 600 14px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #475569; }
+      .pill { font: 700 15px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #1e40af; }
+      .footerHead { font: 700 19px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #eff6ff; }
+      .footerBody { font: 500 17px 'Pretendard', 'Noto Sans KR', sans-serif; fill: #dbeafe; }
     </style>
   </defs>
 
-  <rect width="1200" height="720" fill="url(#bg)" />
-  <rect x="32" y="28" width="1136" height="664" rx="30" fill="#ffffff" stroke="#cbd5e1" />
+  <rect width="1360" height="1040" fill="url(#bg)" />
+  <rect x="32" y="28" width="1296" height="984" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
 
-  <rect x="56" y="48" width="1088" height="138" rx="28" fill="url(#hero)" />
-  <text class="small" x="84" y="84">금융공기업 IT · 자료구조/알고리즘 전체 맵</text>
-  <text class="title" x="84" y="122">09. 자료구조/알고리즘</text>
-  <text class="subtitle" x="84" y="154">선형 자료구조 → 트리·그래프 → 정렬·탐색 → DP·재귀로 이어지는 학습 흐름과 대표 복잡도를 한 장에 연결</text>
+  <rect x="60" y="52" width="1240" height="138" rx="24" fill="url(#hero)" />
+  <text class="small" x="94" y="94" fill="#bfdbfe">금융공기업 IT · 자료구조/알고리즘 한 장 정리</text>
+  <text class="title" x="94" y="136">09. 자료구조·알고리즘 학습 로드맵</text>
+  <text class="subtitle" x="94" y="170">자료구조 선택 → 탐색·정렬 → DP 패턴으로 이어지는 흐름으로 묶어 보면 암기와 서술이 쉬워진다.</text>
 
-  <rect x="84" y="206" width="312" height="290" rx="24" fill="url(#panel)" stroke="#bfdbfe" />
-  <text class="section" x="108" y="242">학습 순서</text>
-  <line x1="156" y1="276" x2="156" y2="450" stroke="#93c5fd" stroke-width="6" stroke-linecap="round" />
-  <circle cx="156" cy="300" r="22" fill="#1d4ed8" />
-  <circle cx="156" cy="354" r="22" fill="#2563eb" />
-  <circle cx="156" cy="408" r="22" fill="#3b82f6" />
-  <circle cx="156" cy="462" r="22" fill="#60a5fa" />
-  <text x="156" y="306" text-anchor="middle" class="tableHead">01</text>
-  <text x="156" y="360" text-anchor="middle" class="tableHead">02</text>
-  <text x="156" y="414" text-anchor="middle" class="tableHead">03</text>
-  <text x="156" y="468" text-anchor="middle" class="tableHead">04</text>
-  <text class="label" x="194" y="294">선형 자료구조</text>
-  <text class="body" x="194" y="316">배열 · 연결리스트 · 스택 · 큐 · 해시맵</text>
-  <text class="label" x="194" y="348">트리와 그래프</text>
-  <text class="body" x="194" y="370">순회 · 힙 · 인접리스트/행렬 · BFS/DFS</text>
-  <text class="label" x="194" y="402">정렬과 탐색</text>
-  <text class="body" x="194" y="424">병합/퀵/힙 정렬 · 이분 탐색</text>
-  <text class="label" x="194" y="456">DP와 재귀</text>
-  <text class="body" x="194" y="478">상태 정의 · 점화식 · 메모이제이션</text>
+  <text class="section" x="84" y="244">1) 순서대로 잡는 핵심 축</text>
+  <line x1="170" y1="294" x2="170" y2="778" stroke="#93c5fd" stroke-width="8" stroke-linecap="round" />
 
-  <rect x="424" y="206" width="324" height="290" rx="24" fill="#ffffff" stroke="#93c5fd" />
-  <text class="section" x="448" y="242">문제 풀이 선택 기준</text>
-  <rect x="500" y="268" width="172" height="74" rx="20" fill="#dbeafe" stroke="#60a5fa" stroke-width="2" />
-  <text class="label" x="586" y="298" text-anchor="middle">문제 요구 분석</text>
-  <text class="body" x="586" y="320" text-anchor="middle">접근 · 검색 · 삽입 · 최적화</text>
-  <line x1="586" y1="342" x2="586" y2="374" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)" />
-  <rect x="454" y="378" width="110" height="84" rx="18" class="accent" />
-  <rect x="586" y="378" width="110" height="84" rx="18" class="accent" />
-  <rect x="520" y="390" width="110" height="84" rx="18" fill="#eff6ff" stroke="#818cf8" stroke-width="1.5" />
-  <text class="tiny" x="509" y="402">구조 선택</text>
-  <text class="body" x="468" y="410">배열</text>
-  <text class="body" x="468" y="430">연결리스트</text>
-  <text class="body" x="468" y="450">해시/BST</text>
-  <text class="tiny" x="641" y="402">전략 선택</text>
-  <text class="body" x="600" y="410">BFS·DFS</text>
-  <text class="body" x="600" y="430">정렬·탐색</text>
-  <text class="body" x="600" y="450">DP·재귀</text>
-  <text class="tiny" x="575" y="414" text-anchor="middle">출력 규칙</text>
-  <text class="body" x="575" y="436" text-anchor="middle">복잡도와</text>
-  <text class="body" x="575" y="456" text-anchor="middle">근거를 함께 설명</text>
+  <rect x="84" y="272" width="540" height="132" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+  <circle cx="170" cy="338" r="32" fill="#2563eb" />
+  <text class="stepNo" x="170" y="346" text-anchor="middle">01</text>
+  <text class="stepTitle" x="230" y="328">선형 자료구조</text>
+  <text class="body" x="230" y="360">배열·연결리스트·스택·큐·해시맵의 연산 비용을 비교한다.</text>
+  <text class="bodyStrong" x="230" y="392">질문: 접근이 중요한가, 삽입·삭제가 중요한가?</text>
 
-  <rect x="776" y="206" width="340" height="290" rx="24" fill="url(#panel)" stroke="#bfdbfe" />
-  <text class="section" x="800" y="242">대표 알고리즘 패턴</text>
-  <path d="M 836 304 C 862 272, 912 272, 938 304" fill="none" stroke="#2563eb" stroke-width="4" />
-  <path d="M 938 304 C 964 272, 1014 272, 1040 304" fill="none" stroke="#2563eb" stroke-width="4" />
-  <line x1="886" y1="304" x2="886" y2="350" stroke="#2563eb" stroke-width="4" />
-  <line x1="988" y1="304" x2="988" y2="350" stroke="#2563eb" stroke-width="4" />
-  <circle cx="836" cy="304" r="18" fill="#1d4ed8" />
-  <circle cx="938" cy="304" r="18" fill="#3b82f6" />
-  <circle cx="1040" cy="304" r="18" fill="#60a5fa" />
-  <circle cx="886" cy="350" r="18" fill="#93c5fd" />
-  <circle cx="988" cy="350" r="18" fill="#bfdbfe" stroke="#60a5fa" stroke-width="2" />
-  <text class="tableHead" x="836" y="309" text-anchor="middle">S</text>
-  <text class="tableHead" x="938" y="309" text-anchor="middle">Q</text>
-  <text class="tableHead" x="1040" y="309" text-anchor="middle">G</text>
-  <text class="tableCell" x="836" y="336" text-anchor="middle">DFS</text>
-  <text class="tableCell" x="938" y="336" text-anchor="middle">BFS</text>
-  <text class="tableCell" x="1040" y="336" text-anchor="middle">그래프</text>
-  <text class="tableCell" x="886" y="382" text-anchor="middle">정렬</text>
-  <text class="tableCell" x="988" y="382" text-anchor="middle">탐색</text>
-  <text class="body" x="810" y="420">• BFS: 최단 간선 경로, 큐 사용</text>
-  <text class="body" x="810" y="442">• DFS: 경로 탐색, 재귀/스택</text>
-  <text class="body" x="810" y="464">• 이분 탐색: 정렬된 배열에서만 O(log n)</text>
+  <rect x="84" y="426" width="540" height="132" rx="24" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" />
+  <circle cx="170" cy="492" r="32" fill="#3b82f6" />
+  <text class="stepNo" x="170" y="500" text-anchor="middle">02</text>
+  <text class="stepTitle" x="230" y="482">트리와 그래프</text>
+  <text class="body" x="230" y="514">순회, 힙, 인접리스트/행렬, BFS/DFS를 연결해서 본다.</text>
+  <text class="bodyStrong" x="230" y="546">질문: 연결 관계를 어떻게 저장하고 방문할 것인가?</text>
 
-  <rect x="84" y="524" width="1032" height="132" rx="24" fill="#0f172a" />
-  <text class="section" x="108" y="560" fill="#eff6ff">핵심 시간복잡도 비교</text>
-  <rect x="108" y="578" width="984" height="28" rx="10" fill="#1e3a8a" />
-  <text class="tableHead" x="146" y="597">구조/알고리즘</text>
-  <text class="tableHead" x="454" y="597" text-anchor="middle">접근</text>
-  <text class="tableHead" x="580" y="597" text-anchor="middle">검색</text>
-  <text class="tableHead" x="706" y="597" text-anchor="middle">삽입</text>
-  <text class="tableHead" x="832" y="597" text-anchor="middle">삭제</text>
-  <text class="tableHead" x="980" y="597" text-anchor="middle">시험 포인트</text>
+  <rect x="84" y="580" width="540" height="132" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" />
+  <circle cx="170" cy="646" r="32" fill="#60a5fa" />
+  <text class="stepNo" x="170" y="654" text-anchor="middle">03</text>
+  <text class="stepTitle" x="230" y="636">정렬과 탐색</text>
+  <text class="body" x="230" y="668">정렬 전제, 안정성, 평균·최악 복잡도를 함께 묶어 외운다.</text>
+  <text class="bodyStrong" x="230" y="700">질문: 먼저 정렬해야 하는가, 이미 정렬된 입력인가?</text>
 
-  <rect x="108" y="606" width="984" height="34" rx="8" fill="#e0ecff" />
-  <text class="tableCell" x="146" y="628">배열 / 연결리스트</text>
-  <text class="tableCell" x="454" y="628" text-anchor="middle">O(1) / O(n)</text>
-  <text class="tableCell" x="580" y="628" text-anchor="middle">O(n)</text>
-  <text class="tableCell" x="706" y="628" text-anchor="middle">O(n) / O(1)</text>
-  <text class="tableCell" x="832" y="628" text-anchor="middle">O(n) / O(1)</text>
-  <text class="tableCell" x="980" y="628" text-anchor="middle">랜덤 액세스 vs 포인터 조작</text>
+  <rect x="84" y="734" width="540" height="132" rx="24" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" />
+  <circle cx="170" cy="800" r="32" fill="#1d4ed8" />
+  <text class="stepNo" x="170" y="808" text-anchor="middle">04</text>
+  <text class="stepTitle" x="230" y="790">DP와 재귀</text>
+  <text class="body" x="230" y="822">상태 정의, 점화식, 기저 사례, 메모이제이션을 먼저 적는다.</text>
+  <text class="bodyStrong" x="230" y="854">질문: 같은 부분문제를 여러 번 푸는가?</text>
 
-  <rect x="108" y="640" width="984" height="34" rx="8" fill="#f8fbff" />
-  <text class="tableCell" x="146" y="662">해시 / BST / 이분 탐색</text>
-  <text class="tableCell" x="454" y="662" text-anchor="middle">- / O(log n) / -</text>
-  <text class="tableCell" x="580" y="662" text-anchor="middle">O(1) / O(log n) / O(log n)</text>
-  <text class="tableCell" x="706" y="662" text-anchor="middle">O(1) / O(log n) / -</text>
-  <text class="tableCell" x="832" y="662" text-anchor="middle">O(1) / O(log n) / -</text>
-  <text class="tableCell" x="980" y="662" text-anchor="middle">충돌·편향·정렬 전제 확인</text>
+  <text class="section" x="672" y="244">2) 각 단계에서 바로 외울 포인트</text>
+
+  <rect x="672" y="272" width="580" height="152" rx="24" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <rect x="698" y="296" width="110" height="36" rx="18" fill="#dbeafe" />
+  <text class="pill" x="753" y="320" text-anchor="middle">선형</text>
+  <text class="body" x="834" y="320">배열: 접근 O(1), 중간 삽입 O(n)</text>
+  <text class="body" x="698" y="362">연결리스트: 포인터 조작은 빠르지만</text>
+  <text class="body" x="698" y="390">임의 접근이 느리다.</text>
+  <text class="body" x="698" y="418">해시맵: 평균 O(1) 조회지만 충돌 시 최악 O(n)도 적는다.</text>
+
+  <rect x="672" y="446" width="580" height="152" rx="24" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <rect x="698" y="470" width="128" height="36" rx="18" fill="#dbeafe" />
+  <text class="pill" x="762" y="494" text-anchor="middle">트리·그래프</text>
+  <text class="body" x="844" y="494">인접리스트: 희소 그래프에 유리</text>
+  <text class="body" x="844" y="522">인접행렬: 간선 확인이 빠르다</text>
+  <text class="body" x="698" y="564">BFS는 최단 간선 수, DFS는 경로 탐색·백트래킹에 자주 쓰인다.</text>
+  <text class="body" x="698" y="592">힙은 우선순위 큐, BST는 정렬된 탐색으로 구분해 기억한다.</text>
+
+  <rect x="672" y="620" width="580" height="144" rx="24" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <rect x="698" y="644" width="120" height="36" rx="18" fill="#dbeafe" />
+  <text class="pill" x="758" y="668" text-anchor="middle">정렬·탐색</text>
+  <text class="body" x="840" y="668">병합 정렬: 안정적</text>
+  <text class="body" x="840" y="696">퀵 정렬: 평균 빠르지만 최악 O(n²)</text>
+  <text class="body" x="698" y="738">이분 탐색은 정렬된 배열에서만 가능하다는 전제를 먼저 확인한다.</text>
+
+  <rect x="672" y="786" width="580" height="144" rx="24" fill="#ffffff" stroke="#93c5fd" stroke-width="2" />
+  <rect x="698" y="810" width="110" height="36" rx="18" fill="#dbeafe" />
+  <text class="pill" x="753" y="834" text-anchor="middle">DP·재귀</text>
+  <text class="body" x="834" y="834">최적 부분구조 + 중복 부분문제이면 DP 후보</text>
+  <text class="body" x="698" y="876">탑다운은 구현이 쉽고, 바텀업은 재귀 깊이 제한을 피하기 쉽다.</text>
+  <text class="body" x="698" y="904">복잡도는 상태 수 × 상태 전이 비용으로 계산한다.</text>
+
+  <rect x="60" y="946" width="1240" height="44" rx="16" fill="#0f172a" />
+  <text class="footerHead" x="88" y="974">시험 답안 연결 문장</text>
+  <text class="footerBody" x="304" y="974">“왜 이 구조를 골랐는지”와 “복잡도 근거”를 한 문장으로 함께 적는다.</text>
 </svg>
