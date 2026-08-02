@@ -864,6 +864,108 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='main-filter-toggle-pressed-state', status=status, observations=case)
             await page.close()
 
+    async def test_card_state_toggles_expose_pressed_state(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            case['table_render_contract'] = await page.evaluate(
+                """
+                () => {
+                  const render = FLASHCARD_TABLE_COLUMNS?.status?.render;
+                  const wrapper = document.createElement('div');
+                  wrapper.innerHTML = typeof render === 'function' ? render({id: 'CS-TEST', known_status: 'X'}) : '';
+                  const pick = (value) => {
+                    const node = wrapper.querySelector(`[data-status-value="${value}"]`);
+                    return {
+                      pressed: node?.getAttribute('aria-pressed') || '',
+                      active: Boolean(node?.classList.contains('active')),
+                    };
+                  };
+                  return {
+                    renderExists: typeof render === 'function',
+                    known: pick('O'),
+                    unknown: pick('X'),
+                    unreviewed: pick(''),
+                  };
+                }
+                """
+            )
+            self.assertTrue(case['table_render_contract']['renderExists'])
+            self.assertEqual(case['table_render_contract']['known']['pressed'], 'false')
+            self.assertEqual(case['table_render_contract']['unknown']['pressed'], 'true')
+            self.assertEqual(case['table_render_contract']['unreviewed']['pressed'], 'false')
+            for key in ('known', 'unknown', 'unreviewed'):
+                self.assertEqual(case['table_render_contract'][key]['active'], case['table_render_contract'][key]['pressed'] == 'true')
+
+            await page.evaluate(
+                """
+                () => {
+                  const cardId = state.filtered[0]?.id || state.cards[0]?.id || 'CS-001';
+                  state.questions = [{
+                    card_id: cardId,
+                    prompt: '상태 토글 prompt',
+                    answer: '상태 토글 answer',
+                    type: 'subjective',
+                    answerRevealed: false,
+                    judgment: 'pending',
+                  }];
+                  state.questionIndex = 0;
+                  toggleQuestionMode(true);
+                }
+                """
+            )
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.querySelector('[data-question-mark=\"O\"]') && !document.querySelector('[data-question-mark=\"O\"]').disabled")
+            case['question_initial'] = await page.evaluate(
+                """
+                () => {
+                  const pick = (value) => {
+                    const node = document.querySelector(`[data-question-mark="${value}"]`);
+                    return {
+                      pressed: node?.getAttribute('aria-pressed') || '',
+                      active: Boolean(node?.classList.contains('active')),
+                    };
+                  };
+                  return {known: pick('O'), unknown: pick('X'), unreviewed: pick('')};
+                }
+                """
+            )
+            for key in ('known', 'unknown', 'unreviewed'):
+                self.assertEqual(case['question_initial'][key]['active'], case['question_initial'][key]['pressed'] == 'true')
+            self.assertEqual(sum(case['question_initial'][key]['pressed'] == 'true' for key in ('known', 'unknown', 'unreviewed')), 1)
+
+            await page.evaluate("document.querySelector('[data-question-mark=\"O\"]')?.click()")
+            await page.waitForFunction(
+                """
+                () => document.querySelector('[data-question-mark="O"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelector('[data-question-mark="X"]')?.getAttribute('aria-pressed') === 'false'
+                  && document.querySelector('[data-question-mark=""]')?.getAttribute('aria-pressed') === 'false'
+                """
+            )
+            case['question_after_known'] = await page.evaluate(
+                """
+                () => {
+                  const pick = (value) => {
+                    const node = document.querySelector(`[data-question-mark="${value}"]`);
+                    return {
+                      pressed: node?.getAttribute('aria-pressed') || '',
+                      active: Boolean(node?.classList.contains('active')),
+                    };
+                  };
+                  return {known: pick('O'), unknown: pick('X'), unreviewed: pick('')};
+                }
+                """
+            )
+            self.assertEqual(case['question_after_known']['known']['pressed'], 'true')
+            self.assertEqual(case['question_after_known']['unknown']['pressed'], 'false')
+            self.assertEqual(case['question_after_known']['unreviewed']['pressed'], 'false')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='card-state-toggle-pressed-state', status=status, observations=case)
+            await page.close()
+
     async def test_filter_inputs_expose_explicit_accessible_names(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

@@ -151,7 +151,7 @@ const FLASHCARD_TABLE_COLUMNS = {
   status: {
     label: '상태',
     width: 92,
-    render: (card) => `<div class="status-actions">${['O', 'X', ''].map((value) => `<button class="table-action status-action${card.known_status === value ? ' active' : ''}" type="button" data-status-card-id="${escapeHtml(card.id)}" data-status-value="${escapeHtml(value)}" aria-label="상태 ${escapeHtml(statusLabel(value))}" title="${escapeHtml(statusLabel(value))}"${state.markSaving ? ' disabled' : ''}>${escapeHtml(statusLabel(value))}</button>`).join('')}</div>`,
+    render: (card) => `<div class="status-actions">${['O', 'X', ''].map((value) => `<button class="table-action status-action${card.known_status === value ? ' active' : ''}" type="button" data-status-card-id="${escapeHtml(card.id)}" data-status-value="${escapeHtml(value)}" aria-label="상태 ${escapeHtml(statusLabel(value))}" aria-pressed="${card.known_status === value ? 'true' : 'false'}" title="${escapeHtml(statusLabel(value))}"${state.markSaving ? ' disabled' : ''}>${escapeHtml(statusLabel(value))}</button>`).join('')}</div>`,
   },
 };
 const AUDIO_SETTING_IDS = ['speakTerm', 'speakDefinition', 'speakDetail', 'speakRelated', 'speakExam', 'speakDetailMeaning', 'speakDetailUsage', 'termSpeechMode', 'termRepeatCount', 'cardRepeatCount', 'listRepeatCount', 'speechRate', 'speechVoice'];
@@ -6315,9 +6315,9 @@ function renderQuestionPanel() {
         <span class="question-review-status">${escapeHtml(reviewStatusText)}</span>
       </div>
       <div class="question-review-actions">
-        <button class="mark known${reviewStatus === 'O' ? ' active' : ''}" type="button" data-question-mark="O" aria-label="이 개념을 안다로 표시" title="안다 (O)" ${reviewDisabled ? 'disabled' : ''}>O</button>
-        <button class="mark unknown${reviewStatus === 'X' ? ' active' : ''}" type="button" data-question-mark="X" aria-label="이 개념을 모른다로 표시" title="모른다 (X)" ${reviewDisabled ? 'disabled' : ''}>X</button>
-        <button class="mark unreviewed${!reviewStatus ? ' active' : ''}" type="button" data-question-mark="" aria-label="이 개념을 미복습으로 표시" title="미복습 (–)" ${reviewDisabled ? 'disabled' : ''}>–</button>
+        <button class="mark known${reviewStatus === 'O' ? ' active' : ''}" type="button" data-question-mark="O" aria-label="이 개념을 안다로 표시" aria-pressed="${reviewStatus === 'O' ? 'true' : 'false'}" title="안다 (O)" ${reviewDisabled ? 'disabled' : ''}>O</button>
+        <button class="mark unknown${reviewStatus === 'X' ? ' active' : ''}" type="button" data-question-mark="X" aria-label="이 개념을 모른다로 표시" aria-pressed="${reviewStatus === 'X' ? 'true' : 'false'}" title="모른다 (X)" ${reviewDisabled ? 'disabled' : ''}>X</button>
+        <button class="mark unreviewed${!reviewStatus ? ' active' : ''}" type="button" data-question-mark="" aria-label="이 개념을 미복습으로 표시" aria-pressed="${!reviewStatus ? 'true' : 'false'}" title="미복습 (–)" ${reviewDisabled ? 'disabled' : ''}>–</button>
       </div>
     </div>`;
   const choices = Array.isArray(question.choices) ? question.choices : [];
