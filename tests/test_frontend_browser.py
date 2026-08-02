@@ -1200,7 +1200,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertIn('is-wrong', case['table_rows'][0]['numberClass'])
             self.assertEqual(case['table_rows'][1]['status'], '맞은')
 
-            await embed_frame.evaluate("document.querySelector('[data-question-nav=\"prev\"]')?.click()")
+            await embed_frame.evaluate("moveQuestion(-1)")
             await embed_frame.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('첫 오답 prompt')")
             case['choice_classes'] = await embed_frame.evaluate(
                 "() => [...document.querySelectorAll('[data-choice-index]')].map((node) => ({text: (node.textContent || '').trim(), className: node.className}))"
@@ -1211,6 +1211,97 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-finish-grading-ui', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_filter_reload_clears_stale_finished_summary(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        wrong_item = self.question_bank_item(
+            '첫 오답',
+            question_type='multiple_choice',
+            choices=['내 답', '정답'],
+            answer='정답',
+            answer_index=1,
+            points=50,
+        )
+        correct_item = self.question_bank_item(
+            '둘째 정답',
+            question_type='multiple_choice',
+            choices=['정답', '오답'],
+            answer='정답',
+            answer_index=0,
+            points=50,
+        )
+        filtered_item = self.question_bank_item(
+            '필터 후 새 문제',
+            question_type='multiple_choice',
+            choices=['정답', '오답'],
+            answer='정답',
+            answer_index=0,
+            points=50,
+        )
+        payload = self.question_bank_payload('finish-grading-filter-clear', items=[wrong_item, correct_item])
+        filtered_payload = self.question_bank_payload('finish-grading-filtered', items=[filtered_item])
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (payload, filteredPayload) => {
+                  const originalFetch = window.fetch.bind(window);
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname !== '/api/question-bank') return originalFetch(input, init);
+                    const nextPayload = parsed.searchParams.get('q') === '필터테스트' ? filteredPayload : payload;
+                    return Promise.resolve(new Response(JSON.stringify(nextPayload), {
+                      status: 200,
+                      headers: {'Content-Type': 'application/json'},
+                    }));
+                  };
+                }
+                """,
+                payload,
+                filtered_payload,
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList tbody tr').length === 2")
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+
+            await embed_frame.click('[data-choice-index="0"]')
+            await embed_frame.click('[data-question-nav="next"]')
+            await embed_frame.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('둘째 정답 prompt')")
+            await embed_frame.click('[data-choice-index="0"]')
+            await embed_frame.evaluate("document.getElementById('finishQuestionSessionBtn').click()")
+
+            await page.waitForFunction("document.querySelector('#bankPagePracticeStatus').textContent.includes('점수 50 / 100점')")
+            await page.evaluate("document.getElementById('bankPageToggleFiltersBtn')?.click()")
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await page.evaluate(
+                """
+                () => {
+                  const input = document.getElementById('bankPageQueryInput');
+                  input.value = '필터테스트';
+                  input.dispatchEvent(new Event('input', {bubbles: true}));
+                }
+                """
+            )
+            await page.waitForFunction("document.querySelector('#bankPageActiveFilters').textContent.includes('필터테스트')")
+            await page.waitForFunction("document.querySelectorAll('#bankPageList tbody tr').length === 1")
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeStatus').textContent.includes('50 / 100점')")
+
+            case['header_summary_after_filter'] = await self.text(page, '#bankPageHeaderSummary')
+            case['practice_status_after_filter'] = await self.text(page, '#bankPagePracticeStatus')
+            case['overview_cards_after_filter'] = await page.evaluate(
+                "() => [...document.querySelectorAll('#bankPageOverviewCards .question-bank-metric-card')].map((node) => (node.textContent || '').replace(/\\s+/g, ' ').trim())"
+            )
+            self.assertNotIn('채점 완료', case['header_summary_after_filter'])
+            self.assertNotIn('50 / 100점', case['practice_status_after_filter'])
+            self.assertTrue(all('50 / 100점' not in card for card in case['overview_cards_after_filter']))
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-finish-summary-clears-on-filter-change', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_page_preserves_filters_across_reload_until_reset(self):

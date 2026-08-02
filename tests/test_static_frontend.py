@@ -322,6 +322,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             '총괄 채점',
             '빨간 표시 문제',
             '채점 완료 · ${sessionSummary.scorePercent}점',
+            "questionBankIds: items.map((item) => String(item?.questionBankId || '').trim()).filter(Boolean)",
             'question-review-box',
             'question-review-actions',
             "markQuestionSourceCard('O')",
@@ -403,6 +404,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-guide-table', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-metric-card.score', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-summary-pill.attempt-wrong', TABLE_SHELL_CSS)
+        self.assertIn('function questionBankSliceMatchesPracticeSummary(summary = bankState.practiceSummary)', QUESTION_BANK_JS)
+        self.assertIn('if (bankState.practiceSummary && !questionBankSliceMatchesPracticeSummary(bankState.practiceSummary)) {', QUESTION_BANK_JS)
         self.assertIn('.question-bank-row-number.is-wrong::after', TABLE_SHELL_CSS)
         self.assertIn('.question-choice.wrong', STYLE_CSS)
 
