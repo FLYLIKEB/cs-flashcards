@@ -2666,7 +2666,7 @@ def _ensure_card_exists(
     if not normalized_card_id:
         raise KeyError(card_id)
     if card_map is None:
-        return read_card(progress_db_path, normalized_card_id)
+        card_map, _ = load_question_bank_card_context(progress_db_path, card_ids=[normalized_card_id])
     card = card_map.get(normalized_card_id)
     if not isinstance(card, dict) or not card:
         raise KeyError(normalized_card_id)
@@ -2695,6 +2695,70 @@ def question_bank_missing_card_keywords(values: Any, *, linked_keywords: Any = N
         for keyword in normalize_question_bank_list(values, item_limit=255)
         if keyword.casefold() not in linked
     ]
+
+
+def question_bank_card_map(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    return {
+        normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255): row
+        for row in rows
+        if normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255)
+    }
+
+
+def load_question_bank_card_context(
+    progress_db_path: Path | None = None,
+    *,
+    card_ids: list[str] | None = None,
+) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path, must_exist=True)
+    normalized_ids = [
+        card_id
+        for card_id in (
+            normalize_question_bank_text(value, limit=255)
+            for value in (card_ids or [])
+        )
+        if card_id
+    ]
+    card_map: dict[str, dict[str, Any]] = {}
+    categories: list[str] = []
+    seen: set[str] = set()
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        category_rows = conn.execute(
+            """
+            SELECT category, MIN(sort_order) AS sort_order
+            FROM cards
+            WHERE TRIM(COALESCE(category, '')) <> ''
+            GROUP BY category
+            ORDER BY sort_order ASC, category COLLATE NOCASE ASC
+            """
+        ).fetchall()
+        for row in category_rows:
+            category = normalize_question_bank_text(row["category"], limit=128)
+            if not category or category.casefold() in seen:
+                continue
+            seen.add(category.casefold())
+            categories.append(category)
+        if normalized_ids:
+            qmarks = ", ".join("?" for _ in normalized_ids)
+            card_rows = conn.execute(
+                f"SELECT card_id, term, english, category, related_concepts, source_files, difficulty FROM cards WHERE card_id IN ({qmarks})",
+                tuple(normalized_ids),
+            ).fetchall()
+            card_map = {
+                str(row["card_id"] or "").strip(): {
+                    "id": row["card_id"] or "",
+                    "term": row["term"] or "",
+                    "english": row["english"] or "",
+                    "category": row["category"] or "",
+                    "related_concepts": row["related_concepts"] or "",
+                    "source_files": row["source_files"] or "",
+                    "difficulty": row["difficulty"] or "",
+                }
+                for row in card_rows
+                if str(row["card_id"] or "").strip()
+            }
+    return card_map, question_bank_categories_from_cards(rows=[{"category": category} for category in categories])
 
 
 def question_bank_missing_card_rows(
@@ -2760,7 +2824,8 @@ def question_bank_categories_from_cards(
     rows: list[dict[str, Any]] | None = None,
 ) -> list[str]:
     if rows is None:
-        rows, _ = read_cards(progress_db_path)
+        _, categories = load_question_bank_card_context(progress_db_path)
+        return categories
     seen: set[str] = set()
     categories: list[str] = []
     for category in QUESTION_BANK_CATEGORIES:
@@ -3186,14 +3251,25 @@ def seed_demo_question_bank_entries(
 def upsert_question_bank_entries(
     entries: list[QuestionBankEntryRequest | dict[str, Any]],
     progress_db_path: Path | None = None,
+    *,
+    card_map: dict[str, dict[str, Any]] | None = None,
+    allowed_categories: list[str] | None = None,
 ) -> dict[str, Any]:
-    rows, _ = read_cards(progress_db_path)
-    card_map = {
-        normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255): row
-        for row in rows
-        if normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255)
-    }
-    allowed_categories = question_bank_categories_from_cards(rows=rows)
+    if card_map is None or allowed_categories is None:
+        card_ids = []
+        if entries:
+            card_ids = [
+                normalize_question_bank_text(
+                    (entry.model_dump() if isinstance(entry, BaseModel) else dict(entry or {})).get("card_id"),
+                    limit=255,
+                )
+                for entry in entries
+            ]
+        loaded_card_map, loaded_categories = load_question_bank_card_context(progress_db_path, card_ids=card_ids)
+        if card_map is None:
+            card_map = loaded_card_map
+        if allowed_categories is None:
+            allowed_categories = loaded_categories
     normalized_entries = [
         normalize_question_bank_entry(
             entry,
@@ -3652,9 +3728,14 @@ def attach_generated_question_bank_ids(
     questions = list(payload.get("questions") or [])
     if not questions:
         return payload
-    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
+    card_map = question_bank_card_map(rows)
     bank_payloads = [generated_question_bank_entry(question, card_map.get(str(question.get("card_id") or ""), {})) for question in questions]
-    saved = upsert_question_bank_entries(bank_payloads, progress_db_path)
+    saved = upsert_question_bank_entries(
+        bank_payloads,
+        progress_db_path,
+        card_map=card_map,
+        allowed_categories=question_bank_categories_from_cards(rows=rows),
+    )
     for question, stored in zip(questions, saved.get("items") or []):
         question["question_bank_id"] = stored.get("question_bank_id") or ""
         question["topic"] = stored.get("topic") or question.get("topic") or ""

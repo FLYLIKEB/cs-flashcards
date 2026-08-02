@@ -2440,7 +2440,7 @@ class FlashcardProgressTests(unittest.TestCase):
             with mock.patch.object(flashcard_app, 'read_cards', wraps=flashcard_app.read_cards) as read_cards_mock:
                 saved = flashcard_app.upsert_question_bank_entries(entries, db_path)
 
-            self.assertEqual(read_cards_mock.call_count, 1)
+            self.assertEqual(read_cards_mock.call_count, 0)
             self.assertEqual(saved['count'], 3)
             self.assertEqual(saved['items'][0]['category'], '소프트웨어공학')
             self.assertEqual(saved['items'][0]['keywords'], ['테스트', 'Test', '검증'])
@@ -2450,6 +2450,47 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(saved['items'][2]['category'], '네트워크')
             self.assertEqual(saved['items'][2]['keywords'], [])
             self.assertEqual(saved['items'][2]['missing_card_keywords'], ['흐름 제어'])
+
+    def test_attach_generated_question_bank_ids_reuses_loaded_rows_without_read_cards_reload(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+            rows, _ = flashcard_app.read_cards(db_path)
+            payload = {
+                'questions': [
+                    {
+                        'card_id': 'CS-001',
+                        'type': 'subjective',
+                        'prompt': '형상관리의 목적을 설명하시오.',
+                        'body': '소프트웨어 변경 통제 관점에서 답하시오.',
+                        'answer': '변경 이력과 기준선을 관리해 일관성을 유지한다.',
+                        'explanation': '버전, 변경 승인, 릴리스를 함께 관리해야 한다.',
+                        'rubric': ['변경 이력 관리', '기준선 관리'],
+                        'section': '전공필기',
+                        'points': 10,
+                        'expected_time_seconds': 300,
+                        'answer_guide': '기준선과 변경 통제를 함께 설명',
+                        'session_mode': 'practice',
+                    }
+                ]
+            }
+
+            with mock.patch.object(flashcard_app, 'read_cards', wraps=flashcard_app.read_cards) as read_cards_mock:
+                saved_payload = flashcard_app.attach_generated_question_bank_ids(payload, rows, db_path)
+
+            self.assertEqual(read_cards_mock.call_count, 0)
+            self.assertEqual(saved_payload['question_bank_saved'], 1)
+            question = saved_payload['questions'][0]
+            self.assertTrue(question['question_bank_id'])
+            self.assertEqual(question['topic'], '소프트웨어공학')
+            self.assertEqual(question['keywords'], ['테스트', 'Test', '검증'])
+            listed = flashcard_app.read_question_bank_entries(db_path, limit=10)
+            self.assertEqual(listed['summary']['total'], 1)
+            self.assertEqual(listed['items'][0]['question_bank_id'], question['question_bank_id'])
+            self.assertEqual(listed['items'][0]['missing_card_keywords'], [])
 
     def test_question_bank_upsert_infers_missing_difficulty_and_backfills_runtime_rows(self):
         with tempfile.TemporaryDirectory() as td:
