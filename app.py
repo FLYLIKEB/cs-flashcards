@@ -9085,6 +9085,7 @@ def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
         if not db_path.exists():
             ensure_progress_db(db_path)
         with closing(connect_progress_db(db_path)) as conn:
+            ensure_progress_db(db_path, conn=conn)
             card = mark_card(card_id, payload.known_status, progress_db_path=db_path, conn=conn)
             summary = read_card_mutation_summary(db_path, conn=conn)
     except KeyError as exc:
@@ -9101,6 +9102,7 @@ def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
         if not db_path.exists():
             ensure_progress_db(db_path)
         with closing(connect_progress_db(db_path)) as conn:
+            ensure_progress_db(db_path, conn=conn)
             card = set_bookmark(card_id, payload.bookmarked, progress_db_path=db_path, conn=conn)
             summary = read_card_mutation_summary(db_path, conn=conn)
     except KeyError as exc:
@@ -9117,6 +9119,7 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
         if not db_path.exists():
             ensure_progress_db(db_path)
         with closing(connect_progress_db(db_path)) as conn:
+            ensure_progress_db(db_path, conn=conn)
             card = save_memo(card_id, payload.memo, progress_db_path=db_path, conn=conn)
             summary = read_card_mutation_summary(db_path, conn=conn)
     except KeyError as exc:

@@ -591,6 +591,56 @@ class FlashcardProgressTests(unittest.TestCase):
                 for key, value in expected_summary.items():
                     self.assertEqual(data['summary'][key], value)
 
+    def test_api_card_mutations_upgrade_existing_db_before_same_connection_summary_read(self):
+        scenarios = [
+            (
+                'mark',
+                lambda: flashcard_app.api_mark('CS-001', flashcard_app.MarkRequest(known_status='O')),
+                ('known_status', 'O'),
+                ('known', 1),
+            ),
+            (
+                'bookmark',
+                lambda: flashcard_app.api_bookmark('CS-001', flashcard_app.BookmarkRequest(bookmarked=True)),
+                ('bookmarked', '1'),
+                ('bookmarked', 1),
+            ),
+            (
+                'memo',
+                lambda: flashcard_app.api_memo('CS-001', flashcard_app.MemoRequest(memo='레거시 스키마 보강')),
+                ('memo', '레거시 스키마 보강'),
+                ('memo_count', 1),
+            ),
+        ]
+        for name, invoke, expected_card, expected_summary in scenarios:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                csv_path = root / 'cards.csv'
+                db_path = root / 'progress.sqlite'
+                write_sample(csv_path)
+                read_cards(csv_path, db_path)
+                with closing(sqlite3.connect(db_path)) as conn:
+                    conn.execute('DROP TABLE question_attempt_card_summary')
+                    conn.commit()
+                original_db = flashcard_app.PROGRESS_DB_PATH
+                try:
+                    flashcard_app.PROGRESS_DB_PATH = db_path
+                    with mock.patch.object(
+                        flashcard_app,
+                        'read_cards',
+                        side_effect=AssertionError(f'{name} api should upgrade in-place without reloading full card rows'),
+                    ):
+                        data = invoke()
+                finally:
+                    flashcard_app.PROGRESS_DB_PATH = original_db
+
+                self.assertEqual(data['card'][expected_card[0]], expected_card[1])
+                self.assertEqual(data['summary'][expected_summary[0]], expected_summary[1])
+                with closing(sqlite3.connect(db_path)) as conn:
+                    recreated = conn.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' AND name='question_attempt_card_summary'"
+                    ).fetchone()
+                self.assertIsNotNone(recreated)
     def test_mark_card_reuses_connection_for_lookup_write_and_response(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
