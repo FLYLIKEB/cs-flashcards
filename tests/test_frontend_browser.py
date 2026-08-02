@@ -1880,6 +1880,31 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertIn('question-bank-row-state-wrong', case['table_rows'][0]['className'])
             self.assertIn('is-wrong', case['table_rows'][0]['numberClass'])
             self.assertEqual(case['table_rows'][1]['status'], '맞은')
+            case['grade_state_on_finished_question'] = await embed_frame.evaluate(
+                """
+                () => ({
+                  choices: [...document.querySelectorAll('[data-choice-index]')].map((node) => ({
+                    text: (node.textContent || '').trim(),
+                    pressed: node.getAttribute('aria-pressed') || '',
+                    className: node.className,
+                  })),
+                  grades: Object.fromEntries(
+                    [...document.querySelectorAll('[data-question-judgment]')].map((node) => [
+                      node.getAttribute('data-question-judgment') || '',
+                      {
+                        pressed: node.getAttribute('aria-pressed') || '',
+                        className: node.className,
+                      },
+                    ])
+                  ),
+                })
+                """
+            )
+            self.assertEqual(case['grade_state_on_finished_question']['choices'][0]['pressed'], 'true')
+            self.assertEqual(case['grade_state_on_finished_question']['choices'][1]['pressed'], 'false')
+            self.assertEqual(case['grade_state_on_finished_question']['grades']['correct']['pressed'], 'true')
+            self.assertEqual(case['grade_state_on_finished_question']['grades']['wrong']['pressed'], 'false')
+            self.assertIn('active', case['grade_state_on_finished_question']['grades']['correct']['className'])
 
             await embed_frame.evaluate("moveQuestion(-1)")
             await embed_frame.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('첫 오답 prompt')")
@@ -1889,6 +1914,31 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertIn('wrong', case['choice_classes'][0]['className'])
             self.assertIn('selected', case['choice_classes'][0]['className'])
             self.assertIn('answer', case['choice_classes'][1]['className'])
+            case['grade_state_on_wrong_question'] = await embed_frame.evaluate(
+                """
+                () => ({
+                  choices: [...document.querySelectorAll('[data-choice-index]')].map((node) => ({
+                    text: (node.textContent || '').trim(),
+                    pressed: node.getAttribute('aria-pressed') || '',
+                    className: node.className,
+                  })),
+                  grades: Object.fromEntries(
+                    [...document.querySelectorAll('[data-question-judgment]')].map((node) => [
+                      node.getAttribute('data-question-judgment') || '',
+                      {
+                        pressed: node.getAttribute('aria-pressed') || '',
+                        className: node.className,
+                      },
+                    ])
+                  ),
+                })
+                """
+            )
+            self.assertEqual(case['grade_state_on_wrong_question']['choices'][0]['pressed'], 'true')
+            self.assertEqual(case['grade_state_on_wrong_question']['choices'][1]['pressed'], 'false')
+            self.assertEqual(case['grade_state_on_wrong_question']['grades']['wrong']['pressed'], 'true')
+            self.assertEqual(case['grade_state_on_wrong_question']['grades']['correct']['pressed'], 'false')
+            self.assertIn('active', case['grade_state_on_wrong_question']['grades']['wrong']['className'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-finish-grading-ui', status=status, observations=case)
