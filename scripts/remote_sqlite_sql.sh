@@ -173,14 +173,28 @@ PY
 }
 
 validate_sql_text "$SQL_TEXT"
+SQL_B64="$(python3 - <<'PY' "$SQL_TEXT"
+import base64
+import sys
+
+print(base64.b64encode(sys.argv[1].encode('utf-8')).decode('ascii'), end='')
+PY
+)"
 
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 
-"${SSH[@]}" bash -s -- "$REMOTE_DB_PATH" "$SQL_TEXT" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DB_PATH" "$SQL_B64" <<'REMOTE'
 set -euo pipefail
 REMOTE_DB_PATH="$1"
-SQL_TEXT="$2"
+SQL_B64="$2"
+SQL_TEXT="$(python3 - <<'PY' "$SQL_B64"
+import base64
+import sys
+
+sys.stdout.write(base64.b64decode(sys.argv[1]).decode('utf-8'))
+PY
+)"
 if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없습니다: $REMOTE_DB_PATH" >&2
   exit 1

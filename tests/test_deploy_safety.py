@@ -1,3 +1,4 @@
+import base64
 import json
 import io
 import os
@@ -156,15 +157,20 @@ def run_remote_sql_script(db_path: Path, sql_text: str) -> tuple[subprocess.Comp
             "        break\n"
             "if index >= len(args):\n"
             "    raise SystemExit('missing ssh host')\n"
+            "stdin_text = sys.stdin.read()\n"
+            "command = args[index + 1:]\n"
+            "command_string = ' '.join(command)\n"
             "payload = {\n"
             "    'argv': args,\n"
             "    'host': args[index],\n"
-            "    'command': args[index + 1:],\n"
+            "    'command': command,\n"
+            "    'command_string': command_string,\n"
+            "    'stdin': stdin_text,\n"
             "    'sql_text_env': os.environ.get('SQL_TEXT'),\n"
             "}\n"
             "with open(os.environ['FAKE_SSH_LOG'], 'w', encoding='utf-8') as handle:\n"
             "    json.dump(payload, handle)\n"
-            "result = subprocess.run(args[index + 1:], stdin=sys.stdin.buffer, check=False)\n"
+            "result = subprocess.run(['bash', '-lc', command_string], input=stdin_text, text=True, check=False)\n"
             "raise SystemExit(result.returncode)\n",
             encoding='utf-8',
         )
@@ -392,23 +398,28 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertNotIn('INSERT INTO {table}', REMOTE_SQL_SCRIPT)
         self.assertNotIn('env SQL_TEXT=', REMOTE_SQL_SCRIPT)
         self.assertIn('원격 DB 경로 변경은 금지됩니다', REMOTE_SQL_SCRIPT)
-        self.assertIn('bash -s -- "$REMOTE_DB_PATH" "$SQL_TEXT"', REMOTE_SQL_SCRIPT)
+        self.assertIn('bash -s -- "$REMOTE_DB_PATH" "$SQL_B64"', REMOTE_SQL_SCRIPT)
 
-    def test_remote_sql_script_passes_sql_over_explicit_ssh_transport(self):
+    def test_remote_sql_script_passes_sql_over_shell_safe_ssh_transport(self):
         with tempfile.TemporaryDirectory() as td:
             db_path = Path(td) / 'remote.sqlite'
             write_named_rows_sqlite(db_path, 'before')
-            sql_text = "UPDATE items SET name='changed';\nINSERT INTO items (name) VALUES ('after');\n"
+            sql_text = "UPDATE items SET name='quo''te $HOME `uname` ; first line\nsecond line';\nINSERT INTO items (name) VALUES ('after');\n"
 
             result, transport = run_remote_sql_script(db_path, sql_text)
 
             self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIsNotNone(transport)
             self.assertIsNone(transport['sql_text_env'])
             self.assertEqual(transport['command'][:3], ['bash', '-s', '--'])
             self.assertTrue(str(transport['command'][3]).endswith('/state/progress.sqlite'))
-            self.assertEqual(transport['command'][4], sql_text.rstrip('\n'))
+            self.assertEqual(base64.b64decode(transport['command'][4]).decode('utf-8'), sql_text)
+            self.assertNotIn(sql_text, transport['command_string'])
             with sqlite3.connect(db_path) as conn:
-                self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('changed',), ('after',)])
+                self.assertEqual(
+                    conn.execute('SELECT name FROM items ORDER BY id').fetchall(),
+                    [("quo'te $HOME `uname` ; first line\nsecond line",), ('after',)],
+                )
 
     def test_remote_sql_script_rejects_sqlite_meta_and_transaction_commands(self):
         self.assertIn('sqlite dot-command는 허용되지 않습니다.', REMOTE_SQL_SCRIPT)
