@@ -1311,6 +1311,18 @@ function renderPracticePane() {
     return;
   }
   const start = bankState.practiceLoaded ? practiceActiveIndex() : selectedIndex(bankState.practiceStartIndex);
+  if (!bankState.practiceLoaded) {
+    summary.textContent = `현재 목록 ${bankState.items.length}문항 · ${start + 1}번 선택 · 새 풀이를 시작하세요.`;
+    status.innerHTML = [
+      `<span class="question-bank-practice-pill">선택 ${escapeHtml(`${start + 1} / ${bankState.items.length}`)}</span>`,
+      ...summaryBits(item),
+    ].filter(Boolean).join('');
+    placeholder.textContent = bankState.error || '문제를 선택하면 문제은행은 숨기고 풀이 화면만 보이도록 전환합니다.';
+    placeholder.hidden = false;
+    frame.hidden = true;
+    applyPracticeViewState();
+    return;
+  }
   const practiceSummary = finishedPracticeSummary();
   summary.textContent = practiceSummary
     ? `현재 목록 ${bankState.items.length}문항 · 채점 완료 · 점수 ${practiceSummary.scoreLabel} · ${selectedPrompt(item, `문제 ${start + 1}`).slice(0, 58)}`
@@ -1340,6 +1352,7 @@ function renderTable() {
     ? '문제은행을 불러오는 중입니다.'
     : `총 ${total}문항 · 현재 ${returned}문항 · 필터 ${filterCount}개`;
   error.textContent = bankState.error || '';
+  renderPracticeToggle();
   renderHeader();
   renderOverviewCards();
   renderQuestionBankReview();
@@ -1380,6 +1393,16 @@ function renderLaunchState() {
   ensureSelectedRowVisible();
   renderPracticePane();
 }
+function resetPracticeSession({message = '', collapse = true} = {}) {
+  bankState.practiceLoaded = false;
+  bankState.practiceActiveId = '';
+  bankState.practiceSummary = null;
+  bankState.practiceSessionState = null;
+  bankState.practiceResultSetKey = '';
+  if (collapse) bankState.practiceCollapsed = true;
+  if (message) bankState.error = message;
+}
+
 async function launch(startIndex = 0, {reveal = true} = {}) {
   if (!bankState.items.length) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
@@ -1474,9 +1497,12 @@ async function loadQuestionBankPage() {
       restoredPracticeState = null;
       bankState.selectedId = '';
       bankState.practiceStartIndex = 0;
-      if (!preservingHiddenPractice) {
-        bankState.practiceLoaded = false;
-        bankState.practiceActiveId = '';
+      if (preservingHiddenPractice) {
+        resetPracticeSession({
+          message: '현재 필터에서 숨겨둔 풀이 문항이 제외되었습니다. 현재 선택 문항으로 새 풀이를 시작하세요.',
+        });
+      } else {
+        resetPracticeSession();
       }
       persistFilterState();
     } else if (pendingPracticeLaunch) {
@@ -1496,11 +1522,11 @@ async function loadQuestionBankPage() {
       applyPracticeLaunch(restoreIndex, {reveal: true});
     } else if (bankState.practiceLoaded && nextIndex < 0) {
       if (preservingHiddenPractice) {
-        bankState.practiceActiveId = practiceActiveIdBeforeRequest;
+        resetPracticeSession({
+          message: '현재 필터에서 숨겨둔 풀이 문항이 제외되었습니다. 현재 선택 문항으로 새 풀이를 시작하세요.',
+        });
       } else {
-        bankState.practiceLoaded = false;
-        bankState.practiceActiveId = '';
-        bankState.practiceCollapsed = true;
+        resetPracticeSession();
       }
       persistFilterState();
     } else {
