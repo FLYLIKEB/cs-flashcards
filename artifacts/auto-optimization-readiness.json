@@ -1,19 +1,13 @@
 {
-  "checked_at": "2026-08-02T20:01:32Z",
+  "checked_at": "2026-08-02T20:07:00Z",
   "gate_open": false,
   "summary": {
-    "open_issue_count": 2,
-    "open_pr_count": 1,
-    "blocking_worktree_count": 2,
+    "open_issue_count": 1,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 1,
     "reusable_backlog_count": 0
   },
   "open_issues": [
-    {
-      "number": 183,
-      "state": "OPEN",
-      "title": "문항 이력 조회 경로의 카드 컨텍스트 재조회용 중복 SQLite 연결 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/183"
-    },
     {
       "number": 182,
       "state": "OPEN",
@@ -21,34 +15,21 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/182"
     }
   ],
-  "open_prs": [
-    {
-      "number": 184,
-      "state": "OPEN",
-      "title": "Issue 183: 문항 이력 조회 카드 컨텍스트 연결 재사용",
-      "head": "issue-183-attempt-context-single-connection",
-      "base": "main",
-      "merge_state_status": "UNSTABLE",
-      "checks": [
-        "frontend-browser:IN_PROGRESS"
-      ],
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/184"
-    }
-  ],
+  "open_prs": [],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-182",
       "branch": "issue-182-embedded-dynamic-filter-restore",
       "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-183",
-      "branch": "issue-183-attempt-context-single-connection",
-      "status": "tracked-branch-worktree"
     }
   ],
   "reusable_backlog": [],
   "recently_completed": [
+    {
+      "issue": 183,
+      "pr": 184,
+      "merge_commit": "3f70b5ad28383322c79678b9f9d853766d414955"
+    },
     {
       "issue": 178,
       "pr": 181,
@@ -56,7 +37,7 @@
     }
   ],
   "notes": [
-    "Issue #183 implementation opened PR #184.",
-    "Issue #182 implementation is still running."
+    "Issue #183 merged as PR #184 and its worktree was removed.",
+    "Issue #182 remains the only active round 36 lane."
   ]
 }
