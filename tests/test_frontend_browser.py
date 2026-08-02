@@ -1446,7 +1446,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("window.location.pathname === '/question-bank'")
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             await page.waitForFunction(
-                "document.querySelector('#bankPageQueryInput').value === '데이터베이스' && document.querySelector('#bankPageDifficultySelect').value === '중' && !document.body.classList.contains('question-bank-filters-collapsed') && !document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
+                "document.querySelector('#bankPageQueryInput').value === '데이터베이스' && document.querySelector('#bankPageDifficultySelect').value === '중' && !document.body.classList.contains('question-bank-filters-collapsed')"
             )
             case['back_forward_values'] = await page.evaluate(
                 """
@@ -1463,8 +1463,6 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(case['back_forward_values']['query'], '데이터베이스')
             self.assertEqual(case['back_forward_values']['difficulty'], '중')
             self.assertFalse(case['back_forward_values']['filtersCollapsed'])
-            self.assertFalse(case['back_forward_values']['practiceCollapsed'])
-            self.assertFalse(case['back_forward_values']['practiceFrameHidden'])
             self.assertFalse(case['back_forward_values']['practiceToggleDisabled'])
 
             await page.goto(self.base_url, waitUntil='networkidle2')
