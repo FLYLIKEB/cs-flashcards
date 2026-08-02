@@ -1,22 +1,80 @@
 {
-  "timestamp": "2026-08-02T14:39:40Z",
-  "blocked": true,
-  "openIssueCount": 2,
-  "openPullRequestCount": 0,
-  "blockingWorktrees": [
+  "checked_at": "2026-08-02T14:58:22Z",
+  "gate_open": false,
+  "summary": {
+    "open_issue_count": 2,
+    "open_pr_count": 2,
+    "blocking_worktree_count": 2,
+    "reusable_backlog_count": 0
+  },
+  "open_issues": [
+    {
+      "number": 137,
+      "state": "OPEN",
+      "title": "문제은행 row trigger를 버튼 semantics로 승격하고 키보드 접근성 고정",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/137"
+    },
+    {
+      "number": 136,
+      "state": "OPEN",
+      "title": "문제은행 attempt 상태 판정을 is_correct fallback까지 일관화",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/136"
+    }
+  ],
+  "open_prs": [
+    {
+      "baseRefName": "main",
+      "headRefName": "issue-137-question-bank-row-trigger-button",
+      "isDraft": false,
+      "mergeStateStatus": "CLEAN",
+      "number": 139,
+      "reviewDecision": "",
+      "title": "Issue 137: 문제은행 row trigger 버튼 semantics 적용",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/139"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "issue-136-question-bank-status-fallback",
+      "isDraft": false,
+      "mergeStateStatus": "CLEAN",
+      "number": 138,
+      "reviewDecision": "",
+      "title": "Issue 136: 문제은행 attempt 상태 fallback 일관화",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/138"
+    }
+  ],
+  "blocking_worktrees": [
     {
       "path": "/private/tmp/cs-opt-136",
       "branch": "issue-136-question-bank-status-fallback",
-      "reason": "Backend round 25 implementation in progress."
+      "status": "tracked-branch-worktree"
     },
     {
       "path": "/private/tmp/cs-opt-137",
       "branch": "issue-137-question-bank-row-trigger-button",
-      "reason": "Frontend round 25 implementation in progress."
+      "status": "tracked-branch-worktree"
+    }
+  ],
+  "reusable_backlog": [],
+  "recently_completed": [
+    {
+      "issue": 133,
+      "pr": 135,
+      "merge_commit": "b91e982dab8a6ac2e810517f5f5134cee81a7b34"
+    },
+    {
+      "issue": 132,
+      "pr": 134,
+      "merge_commit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
+    },
+    {
+      "issue": 130,
+      "pr": 131,
+      "merge_commit": "60d0bcd3993dc9de00438ee6e8bf1591ece9beea"
     }
   ],
   "notes": [
-    "Latest-head audits accepted backend issue #136 and frontend issue #137.",
-    "No PRs are open yet; blockers are the newly opened issues and active implementation worktrees."
+    "Round 25 is now in PR review state.",
+    "Focused verification already passed in both isolated worktrees before review."
   ]
 }

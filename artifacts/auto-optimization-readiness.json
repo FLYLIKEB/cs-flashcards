@@ -1,12 +1,16 @@
 {
-  "skill": "cs-auto-optimization-orchestrator",
-  "timestamp": "2026-08-02T14:39:40Z",
-  "canStartRound": false,
-  "waitReasons": [
-    "2 open GitHub issues remain",
-    "2 issue worktrees remain"
+  "checked_at": "2026-08-02T14:58:22Z",
+  "gate_open": false,
+  "summary": {
+    "open_issue_count": 2,
+    "open_pr_count": 2,
+    "blocking_worktree_count": 2
+  },
+  "notes": [
+    "Round 25 implementation finished and both branches were pushed.",
+    "PR #138 and PR #139 are open and under review."
   ],
-  "openIssues": [
+  "open_issues": [
     {
       "number": 137,
       "state": "OPEN",
@@ -20,16 +24,40 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/136"
     }
   ],
-  "openPullRequests": [],
-  "blockingWorktrees": [
+  "open_prs": [
+    {
+      "baseRefName": "main",
+      "headRefName": "issue-137-question-bank-row-trigger-button",
+      "isDraft": false,
+      "mergeStateStatus": "CLEAN",
+      "number": 139,
+      "reviewDecision": "",
+      "title": "Issue 137: 문제은행 row trigger 버튼 semantics 적용",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/139"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "issue-136-question-bank-status-fallback",
+      "isDraft": false,
+      "mergeStateStatus": "CLEAN",
+      "number": 138,
+      "reviewDecision": "",
+      "title": "Issue 136: 문제은행 attempt 상태 fallback 일관화",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/138"
+    }
+  ],
+  "blocking_worktrees": [
     {
       "path": "/private/tmp/cs-opt-136",
-      "branch": "refs/heads/issue-136-question-bank-status-fallback"
+      "branch": "issue-136-question-bank-status-fallback",
+      "head": "68597089ca692d8f09f8bb79f2890ce3d0a743ed",
+      "status": "tracked-branch-worktree"
     },
     {
       "path": "/private/tmp/cs-opt-137",
-      "branch": "refs/heads/issue-137-question-bank-row-trigger-button"
+      "branch": "issue-137-question-bank-row-trigger-button",
+      "head": "2d610359eac13ec328df2b3b2ba73cdbec611ef2",
+      "status": "tracked-branch-worktree"
     }
-  ],
-  "summary": "라운드 25 이슈 #136/#137을 생성하고 구현 worktree를 열어 게이트가 다시 닫혀 있다."
+  ]
 }

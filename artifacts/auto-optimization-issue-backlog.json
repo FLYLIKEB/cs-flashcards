@@ -31,5 +31,58 @@
       "mergedPullRequest": 134,
       "mergeCommit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
     }
-  ]
+  ],
+  "generated_at": "2026-08-02T14:58:22Z",
+  "wave": "2026-08-02-round-25",
+  "queue": [
+    {
+      "issue": 136,
+      "pr": 138,
+      "branch": "issue-136-question-bank-status-fallback",
+      "worktree": "/private/tmp/cs-opt-136",
+      "surface": "backend",
+      "status": "in-review"
+    },
+    {
+      "issue": 137,
+      "pr": 139,
+      "branch": "issue-137-question-bank-row-trigger-button",
+      "worktree": "/private/tmp/cs-opt-137",
+      "surface": "frontend",
+      "status": "in-review"
+    }
+  ],
+  "completed": [
+    {
+      "issue": 125,
+      "pr": 127,
+      "branch": "issue-125-ai-refine-linked-card-lookup",
+      "status": "merged"
+    },
+    {
+      "issue": 126,
+      "pr": 128,
+      "branch": "issue-126-practice-launch-render-dedupe",
+      "status": "merged"
+    },
+    {
+      "issue": 130,
+      "pr": 131,
+      "branch": "issue-130-question-bank-helper-dedupe",
+      "status": "merged"
+    },
+    {
+      "issue": 132,
+      "pr": 134,
+      "branch": "issue-132-question-bank-latest-wrong-answer-restore",
+      "status": "merged"
+    },
+    {
+      "issue": 133,
+      "pr": 135,
+      "branch": "issue-133-question-bank-back-forward-restore",
+      "status": "merged"
+    }
+  ],
+  "held": []
 }
