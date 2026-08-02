@@ -1642,60 +1642,72 @@ def read_cards(progress_db_path: Path | None = None) -> tuple[list[dict[str, str
     return rows, fieldnames
 
 
-def read_card(progress_db_path: Path | None, card_id: Any) -> dict[str, Any]:
-    normalized_card_id = normalize_question_bank_text(card_id, limit=255)
-    if not normalized_card_id:
-        raise KeyError(card_id)
-    db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path, must_exist=True)
-    sync_ai_image_files_to_db(db_path)
+def _read_card_on_connection(
+    progress_db_path: Path,
+    conn: sqlite3.Connection,
+    normalized_card_id: str,
+    *,
+    image_dir: Path | None = None,
+    should_scan: bool | None = None,
+    dir_stamp: tuple[bool, int] | None = None,
+    scan_root: Path | None = None,
+    scan_generation: int | None = None,
+) -> dict[str, Any]:
+    if should_scan is None:
+        should_scan, dir_stamp, scan_root, scan_generation = _should_sync_ai_image_files_to_db(progress_db_path, image_dir)
+    if should_scan:
+        _sync_ai_image_files_to_db_on_connection(
+            progress_db_path,
+            scan_root or _ai_image_recovery_root(image_dir),
+            conn,
+            int(scan_generation or 0),
+        )
     select_fields = ["card_id", *CARD_CONTENT_DB_COLUMNS]
-    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
-        row = conn.execute(
-            f"SELECT {', '.join(select_fields)} FROM cards WHERE card_id = ?",
-            (normalized_card_id,),
-        ).fetchone()
-        if row is None:
-            raise KeyError(normalized_card_id)
-        item = {"id": row["card_id"] or ""}
-        for field in CARD_CONTENT_DB_COLUMNS:
-            item[field] = row[field] or ""
-        item["concept_image_url"] = normalized_runtime_media_url(item.get("concept_image_url"))
-        media_type = normalized_concept_media_type(item.get("concept_media_type")) if item.get("concept_media_type") else ""
-        if media_type in {"image", "gif", "video"}:
-            item["concept_media_payload"] = normalized_runtime_media_url(item.get("concept_media_payload"))
-        progress_row = conn.execute(
+    row = conn.execute(
+        f"SELECT {', '.join(select_fields)} FROM cards WHERE card_id = ?",
+        (normalized_card_id,),
+    ).fetchone()
+    if row is None:
+        raise KeyError(normalized_card_id)
+    item = {"id": row["card_id"] or ""}
+    for field in CARD_CONTENT_DB_COLUMNS:
+        item[field] = row[field] or ""
+    item["concept_image_url"] = normalized_runtime_media_url(item.get("concept_image_url"))
+    media_type = normalized_concept_media_type(item.get("concept_media_type")) if item.get("concept_media_type") else ""
+    if media_type in {"image", "gif", "video"}:
+        item["concept_media_payload"] = normalized_runtime_media_url(item.get("concept_media_payload"))
+    progress_row = conn.execute(
+        """
+        SELECT known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at
+        FROM card_progress
+        WHERE card_id = ?
+        """,
+        (normalized_card_id,),
+    ).fetchone()
+    if progress_row is not None:
+        item.update({
+            "known_status": progress_row["known_status"] if progress_row["known_status"] in VALID_STATUSES else "",
+            "last_reviewed": progress_row["last_reviewed"] or "",
+            "review_count": normalized_review_count(str(progress_row["review_count"])),
+            "bookmarked": normalized_bookmarked(progress_row["bookmarked"]),
+            "memo": progress_row["memo"] or "",
+            "memo_updated_at": progress_row["memo_updated_at"] or "",
+        })
+    summary = _question_attempt_summary_dict(
+        conn.execute(
             """
-            SELECT known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at
-            FROM card_progress
+            SELECT
+                question_attempt_count,
+                question_correct_count,
+                question_wrong_count,
+                latest_wrong_note,
+                latest_wrong_note_updated_at
+            FROM question_attempt_card_summary
             WHERE card_id = ?
             """,
             (normalized_card_id,),
         ).fetchone()
-        if progress_row is not None:
-            item.update({
-                "known_status": progress_row["known_status"] if progress_row["known_status"] in VALID_STATUSES else "",
-                "last_reviewed": progress_row["last_reviewed"] or "",
-                "review_count": normalized_review_count(str(progress_row["review_count"])),
-                "bookmarked": normalized_bookmarked(progress_row["bookmarked"]),
-                "memo": progress_row["memo"] or "",
-                "memo_updated_at": progress_row["memo_updated_at"] or "",
-            })
-        summary = _question_attempt_summary_dict(
-            conn.execute(
-                """
-                SELECT
-                    question_attempt_count,
-                    question_correct_count,
-                    question_wrong_count,
-                    latest_wrong_note,
-                    latest_wrong_note_updated_at
-                FROM question_attempt_card_summary
-                WHERE card_id = ?
-                """,
-                (normalized_card_id,),
-            ).fetchone()
-        )
+    )
     item["known_status"] = item.get("known_status") or ""
     item["last_reviewed"] = item.get("last_reviewed") or ""
     item["review_count"] = normalized_review_count(item.get("review_count"))
@@ -1703,8 +1715,32 @@ def read_card(progress_db_path: Path | None, card_id: Any) -> dict[str, Any]:
     item["memo"] = item.get("memo") or ""
     item["memo_updated_at"] = item.get("memo_updated_at") or ""
     item.update(summary)
-
     return item
+
+
+def read_card(
+    progress_db_path: Path | None,
+    card_id: Any,
+    *,
+    conn: sqlite3.Connection | None = None,
+) -> dict[str, Any]:
+    normalized_card_id = normalize_question_bank_text(card_id, limit=255)
+    if not normalized_card_id:
+        raise KeyError(card_id)
+    db_path = progress_db_for(progress_db_path)
+    if conn is None:
+        should_scan, dir_stamp, scan_root, scan_generation = _should_sync_ai_image_files_to_db(db_path)
+        with closing(connect_progress_db(db_path, must_exist=True)) as db_conn:
+            return _read_card_on_connection(
+                db_path,
+                db_conn,
+                normalized_card_id,
+                should_scan=should_scan,
+                dir_stamp=dir_stamp,
+                scan_root=scan_root,
+                scan_generation=scan_generation,
+            )
+    return _read_card_on_connection(db_path, conn, normalized_card_id)
 
 def read_card_attempt_context(progress_db_path: Path | None, card_ids: list[str] | None) -> dict[str, dict[str, str]]:
     normalized_ids = sorted(normalize_card_ids(card_ids) or [])
@@ -1814,22 +1850,16 @@ def latest_ai_image_urls_by_card_id(image_dir: Path | None = None) -> dict[str, 
     }
 
 
-def sync_ai_image_files_to_db(
+def _sync_ai_image_files_to_db_on_connection(
     progress_db_path: Path,
-    image_dir: Path | None = None,
-    conn: sqlite3.Connection | None = None,
+    root: Path,
+    conn: sqlite3.Connection,
+    scan_generation: int,
 ) -> bool:
-    should_scan, dir_stamp, root, scan_generation = _should_sync_ai_image_files_to_db(progress_db_path, image_dir)
-    if not should_scan:
-        return False
     recovered_urls = latest_ai_image_urls_by_card_id(root)
     if not recovered_urls:
-        _mark_ai_image_recovery_clean(progress_db_path, dir_stamp, scan_generation, root)
+        _mark_ai_image_recovery_clean(progress_db_path, _ai_image_recovery_dir_stamp(root), scan_generation, root)
         return False
-    if conn is None:
-        ensure_progress_db(progress_db_path)
-        with closing(connect_progress_db(progress_db_path)) as db_conn:
-            return sync_ai_image_files_to_db(progress_db_path, image_dir, db_conn)
     changed = False
     rows = conn.execute(
         "SELECT card_id, concept_image_url, concept_media_type, concept_media_payload FROM cards"
@@ -1857,6 +1887,21 @@ def sync_ai_image_files_to_db(
         conn.commit()
     _mark_ai_image_recovery_clean(progress_db_path, _ai_image_recovery_dir_stamp(root), scan_generation, root)
     return changed
+
+
+def sync_ai_image_files_to_db(
+    progress_db_path: Path,
+    image_dir: Path | None = None,
+    conn: sqlite3.Connection | None = None,
+) -> bool:
+    should_scan, dir_stamp, root, scan_generation = _should_sync_ai_image_files_to_db(progress_db_path, image_dir)
+    if not should_scan:
+        return False
+    if conn is None:
+        ensure_progress_db(progress_db_path)
+        with closing(connect_progress_db(progress_db_path)) as db_conn:
+            return _sync_ai_image_files_to_db_on_connection(progress_db_path, root, db_conn, scan_generation)
+    return _sync_ai_image_files_to_db_on_connection(progress_db_path, root, conn, scan_generation)
 
 
 
@@ -1946,8 +1991,13 @@ def mark_card(
     return read_card(db_path, normalized_card_id)
 
 
-def _ensure_card_exists(card_id: str, progress_db_path: Path | None = None) -> dict[str, Any]:
-    return read_card(progress_db_path, card_id)
+def _ensure_card_exists(
+    card_id: str,
+    progress_db_path: Path | None = None,
+    *,
+    conn: sqlite3.Connection | None = None,
+) -> dict[str, Any]:
+    return read_card(progress_db_path, card_id, conn=conn)
 
 
 def set_bookmark(
@@ -2831,11 +2881,14 @@ def _ensure_card_exists(
     progress_db_path: Path | None = None,
     *,
     card_map: dict[str, dict[str, Any]] | None = None,
+    conn: sqlite3.Connection | None = None,
 ) -> dict[str, Any]:
     normalized_card_id = normalize_question_bank_text(card_id, limit=255)
     if not normalized_card_id:
         raise KeyError(card_id)
     if card_map is None:
+        if conn is not None:
+            return read_card(progress_db_path, normalized_card_id, conn=conn)
         card_map, _ = load_question_bank_card_context(progress_db_path, card_ids=[normalized_card_id])
     card = card_map.get(normalized_card_id)
     if not isinstance(card, dict) or not card:
@@ -6205,7 +6258,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                     raise ValueError(f"question_bank_id {question_bank_id} is linked to card_id {linked_card_id}, not {card_id}")
                 card_id = linked_card_id
         if card_id:
-            _ensure_card_exists(card_id, db_path)
+            _ensure_card_exists(card_id, db_path, conn=conn)
             conn.execute(
                 """
                 INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
@@ -6301,8 +6354,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
             """,
             (question_id,),
         ).fetchone()
-
-    refreshed_card = read_card(db_path, card_id) if card_id else None
+        refreshed_card = read_card(db_path, card_id, conn=conn) if card_id else None
     return {
         "attempt": question_attempt_row_to_dict(saved),
         "card": refreshed_card,
