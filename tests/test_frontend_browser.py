@@ -764,6 +764,55 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='main-symbolic-button-a11y', status=status, observations=case)
             await page.close()
 
+    async def test_filter_inputs_expose_explicit_accessible_names(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#searchInput')
+            await page.click('#questionPracticeBtn')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            case['controls'] = await page.evaluate(
+                """
+                () => {
+                  const specs = [
+                    ['searchInput', '카드 검색', 'aria-label'],
+                    ['positionInput', '카드 번호 이동', 'aria-label'],
+                    ['categorySelect', '카테고리', 'aria-label'],
+                    ['importanceSelect', '중요도', 'aria-label'],
+                    ['difficultySelect', '난이도', 'aria-label'],
+                    ['bokSelect', '한국은행 기출 여부', 'aria-label'],
+                    ['questionBankQueryInput', '문제/정답/키워드 검색', 'aria-label'],
+                  ];
+                  return Object.fromEntries(
+                    specs.map(([id, expectedName, expectedSource]) => {
+                      const node = document.getElementById(id);
+                      const ariaLabel = node?.getAttribute('aria-label') || '';
+                      return [
+                        id,
+                        {
+                          exists: Boolean(node),
+                          name: ariaLabel,
+                          source: ariaLabel ? 'aria-label' : '',
+                          expectedName,
+                          expectedSource,
+                        },
+                      ];
+                    }),
+                  );
+                }
+                """
+            )
+            for control_id, snapshot in case['controls'].items():
+                self.assertTrue(snapshot['exists'], control_id)
+                self.assertEqual(snapshot['name'], snapshot['expectedName'], control_id)
+                self.assertEqual(snapshot['source'], snapshot['expectedSource'], control_id)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='filter-input-accessible-names', status=status, observations=case)
+            await page.close()
+
     async def test_concept_image_dialog_focus_traps_embedded_media_and_restores_opener(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

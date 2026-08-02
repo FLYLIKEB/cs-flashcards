@@ -16,7 +16,7 @@
     </div>
     <div class="header-search" title="검색">
       <span>⌕</span>
-      <input id="searchInput" type="search" placeholder="검색" />
+      <input id="searchInput" type="search" placeholder="검색" aria-label="카드 검색" />
     </div>
     <div class="stats" aria-live="polite">
       <button id="filterAllBtn" class="stat-filter active has-tip" type="button" data-status-filter="" title="전체" data-tip="전체" aria-label="전체">Σ <strong id="statTotal">0</strong></button>
@@ -144,7 +144,7 @@
     <section class="study-area">
       <div class="progress-line">
         <label class="position-jump" title="카드 번호 이동">
-          <input id="positionInput" type="number" min="1" value="0" />
+          <input id="positionInput" type="number" min="1" value="0" aria-label="카드 번호 이동" />
           <span>/ <span id="positionTotal">0</span></span>
         </label>
         <button id="filterToggleBtn" class="has-tip filter-toggle" type="button" aria-expanded="false" aria-controls="filterRow" title="필터" data-tip="필터 펼치기/접기">필터 ▾</button>
@@ -153,22 +153,22 @@
         </div>
       </div>
       <div id="filterRow" class="filter-row">
-        <select id="categorySelect" class="category-filter" title="카테고리">
+        <select id="categorySelect" class="category-filter" title="카테고리" aria-label="카테고리">
           <option value="">▦ *</option>
         </select>
-        <select id="importanceSelect" class="category-filter" title="중요도">
+        <select id="importanceSelect" class="category-filter" title="중요도" aria-label="중요도">
           <option value="">⭐ *</option>
           <option value="상">⭐⭐⭐</option>
           <option value="중">⭐⭐</option>
           <option value="하">⭐</option>
         </select>
-        <select id="difficultySelect" class="category-filter" title="난이도">
+        <select id="difficultySelect" class="category-filter" title="난이도" aria-label="난이도">
           <option value="">▲ *</option>
           <option value="상">▲▲▲</option>
           <option value="중">▲▲</option>
           <option value="하">▲</option>
         </select>
-        <select id="bokSelect" class="category-filter" title="한국은행 기출 여부">
+        <select id="bokSelect" class="category-filter" title="한국은행 기출 여부" aria-label="한국은행 기출 여부">
           <option value="">한은 *</option>
           <option value="O">한은 O</option>
           <option value="-">한은 –</option>
@@ -247,7 +247,7 @@
             </div>
           </div>
           <div class="question-bank-filter-grid">
-            <input id="questionBankQueryInput" type="search" placeholder="문제/정답/키워드 검색" />
+            <input id="questionBankQueryInput" type="search" placeholder="문제/정답/키워드 검색" aria-label="문제/정답/키워드 검색" />
             <select id="questionBankAttemptStatusSelect" aria-label="풀이상태">
               <option value="">풀이상태 *</option>
               <option value="unseen">안푼</option>
