@@ -98,6 +98,9 @@ let questionHistoryLoadRequest = 0;
 let questionHistoryAbortController = null;
 let questionBankLoadRequest = 0;
 let questionBankAbortController = null;
+let pendingQuestionBankLoadTimer = 0;
+const QUESTION_BANK_TEXT_FILTER_DEBOUNCE_MS = 180;
+
 
 const $ = (id) => document.getElementById(id);
 const cardEl = $('card');
@@ -5408,9 +5411,11 @@ function resetQuestionBankFilters() {
     const input = $(id);
     if (input) input.value = '';
   });
+  window.clearTimeout(pendingQuestionBankLoadTimer);
   syncQuestionBankBrowserUrl(questionBankFilterValues(), {clear: true});
   loadQuestionBankBrowser().catch(() => {});
 }
+
 
 function restoreQuestionBankBrowserFromUrl(search = window.location.search) {
   const restored = applyQuestionBankFiltersFromUrl(search);
@@ -5582,6 +5587,18 @@ function openQuestionBankSession(startIndex = 0) {
   activateCurrentQuestionTimer();
   renderQuestionPanel();
   setMessage(`문제은행 ${state.questionBankItems.length}문항을 불러왔습니다.`);
+}
+
+function scheduleQuestionBankBrowserLoad() {
+  window.clearTimeout(pendingQuestionBankLoadTimer);
+  pendingQuestionBankLoadTimer = window.setTimeout(() => {
+    loadQuestionBankBrowser().catch(() => {});
+  }, QUESTION_BANK_TEXT_FILTER_DEBOUNCE_MS);
+}
+
+function triggerQuestionBankBrowserLoad() {
+  window.clearTimeout(pendingQuestionBankLoadTimer);
+  loadQuestionBankBrowser().catch(() => {});
 }
 
 async function loadQuestionBankBrowser() {
@@ -7281,21 +7298,21 @@ $('questionSessionModeSelect')?.addEventListener('change', () => {
 $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurrentFilter);
 $('openQuestionImportBtn')?.addEventListener('click', openQuestionImportDialog);
 $('questionBankToggleBtn')?.addEventListener('click', () => toggleQuestionBankBrowser());
-$('questionBankRefreshBtn')?.addEventListener('click', () => loadQuestionBankBrowser().catch(() => {}));
+$('questionBankRefreshBtn')?.addEventListener('click', triggerQuestionBankBrowserLoad);
 $('questionBankResetFiltersBtn')?.addEventListener('click', resetQuestionBankFilters);
 $('questionBankLoadBtn')?.addEventListener('click', () => openQuestionBankSession(0));
 $('questionBankCloseBtn')?.addEventListener('click', () => toggleQuestionBankBrowser(false));
 ['questionBankQueryInput', 'questionBankTopicInput', 'questionBankSourceInput', 'questionBankSectionInput'].forEach((id) => {
-  $(id)?.addEventListener('input', () => loadQuestionBankBrowser().catch(() => {}));
+  $(id)?.addEventListener('input', scheduleQuestionBankBrowserLoad);
   $(id)?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      loadQuestionBankBrowser().catch(() => {});
+      triggerQuestionBankBrowserLoad();
     }
   });
 });
 ['questionBankAttemptStatusSelect', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankDifficultySelect', 'questionBankTypeSelect'].forEach((id) => {
-  $(id)?.addEventListener('change', () => loadQuestionBankBrowser().catch(() => {}));
+  $(id)?.addEventListener('change', triggerQuestionBankBrowserLoad);
 });
 
 $('openAiQuizSearchBtn')?.addEventListener('click', openAiQuizSearch);
