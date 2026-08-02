@@ -2988,6 +2988,101 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         finally:
             self.record_case(case_id='embedded-question-bank-filter-reload', status=status, observations=case)
             await page.close()
+    async def test_embedded_question_bank_dynamic_select_deep_link_survives_first_request_and_reload(self):
+        case = {'path': '/?field_name=전산학술&q=embedded&attempt_status=wrong'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        payload = self.question_bank_payload(
+            'embedded-dynamic-field',
+            items=[self.question_bank_item('전산학술 문항', field_name='전산학술', category='데이터베이스', issuer='한국은행', question_attempt_status='wrong')],
+        )
+        payload['summary']['available_field_names'] = ['전산학술', '테스트분야']
+        payload['summary']['available_categories'] = ['데이터베이스']
+        payload['summary']['available_issuers'] = ['한국은행']
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (responsePayload) => {
+                  window.__questionBankRequestQueries = [];
+                  const originalFetch = window.fetch.bind(window);
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname !== '/api/question-bank') return originalFetch(input, init);
+                    window.__questionBankRequestQueries.push({
+                      q: parsed.searchParams.get('q') || '',
+                      attempt_status: parsed.searchParams.get('attempt_status') || '',
+                      field_name: parsed.searchParams.get('field_name') || '',
+                    });
+                    return Promise.resolve(new Response(JSON.stringify(responsePayload), {
+                      status: 200,
+                      headers: {'Content-Type': 'application/json'},
+                    }));
+                  };
+                }
+                """,
+                payload,
+            )
+            await page.goto(f'{self.base_url}/?field_name=%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0&q=embedded&attempt_status=wrong', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await page.waitForFunction("window.__questionBankRequestQueries.length > 0")
+            await page.waitForFunction("document.querySelectorAll('#questionBankList tr').length > 0")
+            await page.waitForFunction("document.querySelector('#questionBankQueryInput').value === 'embedded' && document.querySelector('#questionBankAttemptStatusSelect').value === 'wrong' && document.querySelector('#questionBankFieldInput').value === '전산학술'")
+            case['initial_request'] = await page.evaluate('window.__questionBankRequestQueries[0]')
+            case['initial_state'] = await page.evaluate(
+                """
+                () => ({
+                  q: document.querySelector('#questionBankQueryInput')?.value || '',
+                  attemptStatus: document.querySelector('#questionBankAttemptStatusSelect')?.value || '',
+                  fieldName: document.querySelector('#questionBankFieldInput')?.value || '',
+                  activeFilters: document.querySelector('#questionBankSummary')?.textContent || '',
+                  search: window.location.search,
+                })
+                """
+            )
+            self.assertEqual(case['initial_request']['q'], 'embedded')
+            self.assertEqual(case['initial_request']['attempt_status'], 'wrong')
+            self.assertEqual(case['initial_request']['field_name'], '전산학술')
+            self.assertEqual(case['initial_state']['q'], 'embedded')
+            self.assertEqual(case['initial_state']['attemptStatus'], 'wrong')
+            self.assertEqual(case['initial_state']['fieldName'], '전산학술')
+            self.assertIn('field_name=%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0', case['initial_state']['search'])
+            self.assertIn('attempt_status=wrong', case['initial_state']['search'])
+            self.assertIn('q=embedded', case['initial_state']['search'])
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await page.waitForFunction("window.__questionBankRequestQueries.length > 0")
+            await page.waitForFunction("document.querySelectorAll('#questionBankList tr').length > 0")
+            await page.waitForFunction("document.querySelector('#questionBankQueryInput').value === 'embedded' && document.querySelector('#questionBankAttemptStatusSelect').value === 'wrong' && document.querySelector('#questionBankFieldInput').value === '전산학술'")
+            case['reload_request'] = await page.evaluate('window.__questionBankRequestQueries[0]')
+            case['reload_state'] = await page.evaluate(
+                """
+                () => ({
+                  q: document.querySelector('#questionBankQueryInput')?.value || '',
+                  attemptStatus: document.querySelector('#questionBankAttemptStatusSelect')?.value || '',
+                  fieldName: document.querySelector('#questionBankFieldInput')?.value || '',
+                  rows: document.querySelector('#questionBankList')?.textContent || '',
+                  search: window.location.search,
+                })
+                """
+            )
+            self.assertEqual(case['reload_request']['q'], 'embedded')
+            self.assertEqual(case['reload_request']['attempt_status'], 'wrong')
+            self.assertEqual(case['reload_request']['field_name'], '전산학술')
+            self.assertEqual(case['reload_state']['q'], 'embedded')
+            self.assertEqual(case['reload_state']['attemptStatus'], 'wrong')
+            self.assertEqual(case['reload_state']['fieldName'], '전산학술')
+            self.assertIn('전산학술 문항', case['reload_state']['rows'])
+            self.assertIn('field_name=%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0', case['reload_state']['search'])
+            self.assertIn('attempt_status=wrong', case['reload_state']['search'])
+            self.assertIn('q=embedded', case['reload_state']['search'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='embedded-question-bank-dynamic-select-reload', status=status, observations=case)
+            await page.close()
     async def test_embedded_question_bank_text_filters_debounce_requests(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
