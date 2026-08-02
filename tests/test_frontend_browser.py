@@ -2265,20 +2265,27 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-finish-summary-clears-on-filter-change', status=status, observations=case)
             await page.close()
 
-    async def test_question_bank_page_preserves_filters_across_reload_until_reset(self):
-        case = {'path': '/question-bank'}
+    async def test_question_bank_page_preserves_hash_and_query_filters_across_reload_until_reset(self):
+        case = {'path': '/question-bank#review-anchor'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
         status = 'failed'
         try:
-            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.goto(f"{self.base_url}{case['path']}", waitUntil='networkidle2')
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            case['hash_after_initial_render'] = await page.evaluate('window.location.hash')
+            self.assertEqual(case['hash_after_initial_render'], '#review-anchor')
             await page.click('#bankPageToggleFiltersBtn')
             await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
             await page.type('#bankPageQueryInput', '데이터베이스')
             await page.select('#bankPageDifficultySelect', '중')
             await page.waitForFunction(
+                "window.location.search.includes('q=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4') && window.location.search.includes('difficulty=%EC%A4%91')"
+            )
+            await page.waitForFunction(
                 "document.querySelector('#bankPageActiveFilters').textContent.includes('데이터베이스') && document.querySelector('#bankPageActiveFilters').textContent.includes('중')"
             )
+            case['hash_after_filter_change'] = await page.evaluate('window.location.hash')
+            self.assertEqual(case['hash_after_filter_change'], '#review-anchor')
             case['stored_filter_state_before_reload'] = await page.evaluate(
                 '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
                 QUESTION_BANK_FILTER_STATE_KEY,
@@ -2301,11 +2308,13 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 })
                 """
             )
+            case['hash_after_reload'] = await page.evaluate('window.location.hash')
             case['query_after_reload'] = await page.Jeval('#bankPageQueryInput', '(node) => node.value')
             case['difficulty_after_reload'] = await page.Jeval('#bankPageDifficultySelect', '(node) => node.value')
             self.assertFalse(case['filters_expanded_after_reload']['bodyCollapsed'])
             self.assertFalse(case['filters_expanded_after_reload']['regionHidden'])
             self.assertEqual(case['filters_expanded_after_reload']['toggleExpanded'], 'true')
+            self.assertEqual(case['hash_after_reload'], '#review-anchor')
             self.assertEqual(case['query_after_reload'], '데이터베이스')
             self.assertEqual(case['difficulty_after_reload'], '중')
 
@@ -2313,6 +2322,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction(
                 "document.querySelector('#bankPageQueryInput').value === '' && document.querySelector('#bankPageDifficultySelect').value === '중' && !document.querySelector('#bankPageActiveFilters').textContent.includes('데이터베이스')"
             )
+            case['hash_after_chip_clear'] = await page.evaluate('window.location.hash')
+            self.assertEqual(case['hash_after_chip_clear'], '#review-anchor')
             case['stored_filter_state_after_chip_clear'] = await page.evaluate(
                 '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
                 QUESTION_BANK_FILTER_STATE_KEY,
@@ -2325,15 +2336,17 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction(
                 "document.querySelector('#bankPageQueryInput').value === '' && document.querySelector('#bankPageDifficultySelect').value === '중'"
             )
+            case['hash_after_chip_clear_reload'] = await page.evaluate('window.location.hash')
             case['query_after_chip_clear_reload'] = await page.Jeval('#bankPageQueryInput', '(node) => node.value')
             case['difficulty_after_chip_clear_reload'] = await page.Jeval('#bankPageDifficultySelect', '(node) => node.value')
             case['active_filters_after_chip_clear_reload'] = await self.text(page, '#bankPageActiveFilters')
+            self.assertEqual(case['hash_after_chip_clear_reload'], '#review-anchor')
             self.assertEqual(case['query_after_chip_clear_reload'], '')
             self.assertEqual(case['difficulty_after_chip_clear_reload'], '중')
             self.assertNotIn('데이터베이스', case['active_filters_after_chip_clear_reload'])
             status = 'passed'
         finally:
-            self.record_case(case_id='question-bank-filter-reload', status=status, observations=case)
+            self.record_case(case_id='question-bank-hash-and-filter-reload', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_page_preserves_dynamic_select_filter_on_deep_link_and_reload(self):
