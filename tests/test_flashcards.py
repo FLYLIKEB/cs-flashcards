@@ -2969,6 +2969,10 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app.OPENAI_API_KEY = 'test-key'
                 with mock.patch.object(
                     flashcard_app,
+                    'read_cards',
+                    side_effect=AssertionError('question-bank ai refine should not reload all cards'),
+                ), mock.patch.object(
+                    flashcard_app,
                     'urlopen',
                     return_value=FakeUrlopenResponse({
                         'output_text': json.dumps({

@@ -2965,8 +2965,7 @@ def update_question_bank_ai_content(
         current = question_bank_row_to_dict(row) or {}
         linked_card: dict[str, Any] = {}
         if current.get("card_id"):
-            rows, _ = read_cards(db_path)
-            linked_card = next((item for item in rows if str(item.get("id") or "").strip() == current.get("card_id")), {})
+            linked_card = read_card(db_path, current.get("card_id"))
 
         proposal = rewrite_question_bank_answer_with_codex(current, linked_card, payload.instruction)
         next_entry = {**current, **proposal}
