@@ -272,5 +272,20 @@ for statement in sanitized.split(';'):
         print('SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.', file=sys.stderr)
         sys.exit(1)
 PY
-printf 'BEGIN IMMEDIATE;\n%s\nCOMMIT;\n' "$SQL_TEXT" | sqlite3 -bail "$REMOTE_DB_PATH"
+python3 - <<'PY' "$REMOTE_DB_PATH" "$SQL_TEXT"
+import sqlite3
+import sys
+
+
+db_path, sql_text = sys.argv[1], sys.argv[2]
+conn = sqlite3.connect(db_path, isolation_level=None)
+try:
+    conn.executescript(f"BEGIN IMMEDIATE;\n{sql_text}\nCOMMIT;\n")
+except Exception:
+    if conn.in_transaction:
+        conn.rollback()
+    raise
+finally:
+    conn.close()
+PY
 REMOTE

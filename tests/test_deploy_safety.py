@@ -332,11 +332,17 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertNotIn('PAYLOAD_FILE', REMOTE_SQL_SCRIPT)
         self.assertNotIn('INSERT INTO {table}', REMOTE_SQL_SCRIPT)
         self.assertIn('원격 DB 경로 변경은 금지됩니다', REMOTE_SQL_SCRIPT)
-        self.assertIn('sqlite3 -bail "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
 
-    def test_remote_sql_script_wraps_sql_in_transaction_and_bails_on_error(self):
-        self.assertIn("BEGIN IMMEDIATE;", REMOTE_SQL_SCRIPT)
-        self.assertIn('sqlite3 -bail "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
+    def test_remote_sql_script_executes_multi_statement_payload_atomically(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'remote.sqlite'
+            write_named_rows_sqlite(db_path, 'before')
+
+            result = run_remote_sql_block(db_path, "UPDATE items SET name='changed';\nINSERT INTO items (name) VALUES ('after');\n")
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            with sqlite3.connect(db_path) as conn:
+                self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('changed',), ('after',)])
 
     def test_remote_sql_script_rejects_sqlite_meta_and_transaction_commands(self):
         self.assertIn('sqlite dot-command는 허용되지 않습니다.', REMOTE_SQL_SCRIPT)
@@ -386,16 +392,6 @@ class DeploySafetyTests(unittest.TestCase):
             with sqlite3.connect(db_path) as conn:
                 self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('before',)])
 
-    def test_remote_sql_script_applies_all_statements_when_transaction_succeeds(self):
-        with tempfile.TemporaryDirectory() as td:
-            db_path = Path(td) / 'remote.sqlite'
-            write_named_rows_sqlite(db_path, 'before')
-
-            result = run_remote_sql_block(db_path, "UPDATE items SET name='changed';\nINSERT INTO items (name) VALUES ('after');\n")
-
-            self.assertEqual(result.returncode, 0, result.stderr)
-            with sqlite3.connect(db_path) as conn:
-                self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('changed',), ('after',)])
 
     def test_skill_docs_use_direct_remote_sql_policy(self):
         self.assertIn('./scripts/remote_sqlite_sql.sh', DEPLOY_SKILL)
