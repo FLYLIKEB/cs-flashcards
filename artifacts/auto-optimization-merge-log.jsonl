@@ -1,0 +1,2 @@
+{"timestamp":"2026-08-02T13:15:50Z","issue":125,"pullRequest":127,"title":"문제은행 AI 답안 보강 경로의 linked card 조회를 단일 lookup으로 축소","mergeCommit":"5c7bf65e70cc3664b424550c53a418a165cd3e3f","head":"56dbde4d482f82b9bb7c29a87b03b6f8d055ff11"}
+{"timestamp":"2026-08-02T13:16:11Z","issue":126,"pullRequest":128,"title":"문제은행 practice launch/relaunch 시 table 이중 렌더 제거","mergeCommit":"05e2b1fe0329992c051e7b87ab5e199949f5e55a","head":"161fed681e41266048862622c2334fea9e339d38"}

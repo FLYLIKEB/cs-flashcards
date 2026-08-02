@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-08-02T13:17:53Z",
+  "blocked": false,
+  "openIssueCount": 0,
+  "openPullRequestCount": 0,
+  "blockingWorktrees": [],
+  "notes": [
+    "Merged PR #127 and PR #128, then removed their issue worktrees and local branches.",
+    "Only the temporary detached orchestrator sync checkout remained during artifact publication; it is excluded from readiness blocking and removed immediately after push."
+  ]
+}
