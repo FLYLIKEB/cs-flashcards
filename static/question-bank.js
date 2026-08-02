@@ -1044,6 +1044,16 @@ function selectQuestionBankItem(questionBankId, {launchPractice = false} = {}) {
   if (launchPractice) launch(index);
 }
 
+function bindQuestionBankRowTriggerActions() {
+  $('bankPageList')?.querySelectorAll('[data-question-bank-row-index]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const index = Number.parseInt(button.dataset.questionBankRowIndex || '', 10);
+      if (!Number.isInteger(index)) return;
+      launch(index);
+    });
+  });
+}
+
 function bindQuestionBankReviewActions() {
   $('bankPageReviewFilters')?.querySelectorAll('[data-review-filter]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -1273,7 +1283,7 @@ function tableRows() {
       cells: {
         index: `<span class="question-bank-row-number${attemptStatus === 'wrong' ? ' is-wrong' : attemptStatus === 'correct' ? ' is-correct' : ''}">${index + 1}</span>`,
         attempt_status: `<span class="question-bank-summary-pill ${attemptTone}">${escapeHtml(questionAttemptStatusLabel(item))}</span>`,
-        prompt: `<div class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</div>`,
+        prompt: `<button class="question-bank-row-trigger" type="button" data-question-bank-row-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button>`,
         type: `<span class="question-bank-type-pill ${pillTone('type', item.question_type)}">${escapeHtml(questionTypeLabel(item) || '문제')}</span>`,
         topic: `<div class="question-bank-keyword-list">${renderQuestionKeywordLinks(item.keywords, {limit: 2})}</div>`,
         issuer: `<span class="question-bank-issuer-text">${escapeHtml(item.issuer || '—')}</span>`,
@@ -1351,6 +1361,7 @@ function renderTable() {
       renderTable();
     },
   });
+  bindQuestionBankRowTriggerActions();
 }
 
 function ensureSelectedRowVisible() {

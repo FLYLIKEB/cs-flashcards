@@ -905,6 +905,136 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_row_trigger_supports_tab_enter_and_space_activation(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            case['row_ids'] = await page.evaluate(
+                """
+                () => ({
+                  first: document.querySelector('#bankPageList tbody tr:nth-child(1)')?.getAttribute('data-table-row-id') || '',
+                  second: document.querySelector('#bankPageList tbody tr:nth-child(2)')?.getAttribute('data-table-row-id') || '',
+                })
+                """
+            )
+
+            await page.focus('#bankPageTogglePracticeBtn')
+            case['focus_trace'] = []
+            trigger_reached = False
+            for _ in range(12):
+                await page.keyboard.press('Tab')
+                snapshot = await page.evaluate(
+                    """
+                    () => ({
+                      tagName: document.activeElement?.tagName || '',
+                      className: document.activeElement?.className || '',
+                      rowIndex: document.activeElement?.getAttribute?.('data-question-bank-row-index') || '',
+                    })
+                    """
+                )
+                case['focus_trace'].append(snapshot)
+                if 'question-bank-row-trigger' in str(snapshot.get('className') or '').split():
+                    case['first_trigger_semantics'] = snapshot
+                    trigger_reached = True
+                    break
+            self.assertTrue(trigger_reached)
+            self.assertEqual(case['first_trigger_semantics']['tagName'], 'BUTTON')
+            self.assertEqual(case['first_trigger_semantics']['rowIndex'], '0')
+
+            await page.keyboard.press('Enter')
+            await page.waitForFunction(
+                """
+                (expectedId) => {
+                  const frame = document.querySelector('#bankPagePracticeFrame');
+                  const activeRow = document.querySelector('#bankPageList [aria-current="true"]');
+                  const summary = document.querySelector('#bankPageSelectionSummary');
+                  const status = document.querySelector('#bankPagePracticeStatus');
+                  return activeRow
+                    && activeRow.getAttribute('data-table-row-id') === expectedId
+                    && summary
+                    && summary.textContent.includes('선택 1 /')
+                    && status
+                    && status.textContent.includes('현재 1 /')
+                    && frame
+                    && !frame.hidden;
+                }
+                """,
+                {},
+                case['row_ids']['first'],
+            )
+            case['enter_activation'] = await page.evaluate(
+                """
+                () => ({
+                  activeRowId: document.querySelector('#bankPageList [aria-current="true"]')?.getAttribute('data-table-row-id') || '',
+                  selectionSummary: document.querySelector('#bankPageSelectionSummary')?.textContent || '',
+                  practiceStatus: document.querySelector('#bankPagePracticeStatus')?.textContent || '',
+                  frameSrc: document.querySelector('#bankPagePracticeFrame')?.getAttribute('src') || '',
+                })
+                """
+            )
+            self.assertEqual(case['enter_activation']['activeRowId'], case['row_ids']['first'])
+            self.assertIn('선택 1 /', case['enter_activation']['selectionSummary'])
+            self.assertIn('현재 1 /', case['enter_activation']['practiceStatus'])
+            self.assertIn('question-bank-embed=1', case['enter_activation']['frameSrc'])
+
+            await page.click('#bankPagePracticeExitBtn')
+            await page.waitForFunction("document.body.classList.contains('question-bank-practice-collapsed')")
+
+            await page.focus('#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger')
+            case['focus_before_space'] = await page.evaluate(
+                """
+                () => ({
+                  tagName: document.activeElement?.tagName || '',
+                  rowIndex: document.activeElement?.getAttribute?.('data-question-bank-row-index') || '',
+                })
+                """
+            )
+            self.assertEqual(case['focus_before_space']['tagName'], 'BUTTON')
+            self.assertEqual(case['focus_before_space']['rowIndex'], '1')
+
+            await page.keyboard.press(' ')
+            await page.waitForFunction(
+                """
+                (expectedId) => {
+                  const frame = document.querySelector('#bankPagePracticeFrame');
+                  const activeRow = document.querySelector('#bankPageList [aria-current="true"]');
+                  const summary = document.querySelector('#bankPageSelectionSummary');
+                  const status = document.querySelector('#bankPagePracticeStatus');
+                  return activeRow
+                    && activeRow.getAttribute('data-table-row-id') === expectedId
+                    && summary
+                    && summary.textContent.includes('선택 2 /')
+                    && status
+                    && status.textContent.includes('현재 2 /')
+                    && frame
+                    && !frame.hidden;
+                }
+                """,
+                {},
+                case['row_ids']['second'],
+            )
+            case['space_activation'] = await page.evaluate(
+                """
+                () => ({
+                  activeRowId: document.querySelector('#bankPageList [aria-current="true"]')?.getAttribute('data-table-row-id') || '',
+                  selectionSummary: document.querySelector('#bankPageSelectionSummary')?.textContent || '',
+                  practiceStatus: document.querySelector('#bankPagePracticeStatus')?.textContent || '',
+                  frameSrc: document.querySelector('#bankPagePracticeFrame')?.getAttribute('src') || '',
+                })
+                """
+            )
+            self.assertEqual(case['space_activation']['activeRowId'], case['row_ids']['second'])
+            self.assertIn('선택 2 /', case['space_activation']['selectionSummary'])
+            self.assertIn('현재 2 /', case['space_activation']['practiceStatus'])
+            self.assertIn('question-bank-embed=1', case['space_activation']['frameSrc'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-row-trigger-keyboard', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_filter_refresh_keeps_hidden_practice_inert_until_explicit_launch(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
