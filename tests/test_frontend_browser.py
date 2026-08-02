@@ -1408,10 +1408,9 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-filter-reload', status=status, observations=case)
             await page.close()
 
-    async def test_question_bank_page_ignores_stale_filters_on_fresh_entry_without_url_params(self):
+    async def test_question_bank_page_ignores_stale_filters_on_same_tab_fresh_entry_without_url_params(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
-        fresh_page = None
         status = 'failed'
         try:
             await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
@@ -1423,39 +1422,55 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction(
                 "document.querySelector('#bankPageActiveFilters').textContent.includes('데이터베이스') && document.querySelector('#bankPageActiveFilters').textContent.includes('중')"
             )
-            case['stored_filter_state_before_reload'] = await page.evaluate(
-                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
-                QUESTION_BANK_FILTER_STATE_KEY,
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
             )
-            self.assertEqual(case['stored_filter_state_before_reload']['filters']['q'], '데이터베이스')
-            self.assertEqual(case['stored_filter_state_before_reload']['filters']['difficulty'], '중')
-            self.assertFalse(case['stored_filter_state_before_reload']['filtersCollapsed'])
+            case['stored_state_before_navigation'] = await page.evaluate(
+                """
+                (filterKey, practiceKey) => ({
+                  filterState: JSON.parse(window.localStorage.getItem(filterKey) || 'null'),
+                  practiceCollapsed: window.localStorage.getItem(practiceKey),
+                })
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
+            )
+            self.assertEqual(case['stored_state_before_navigation']['filterState']['filters']['q'], '데이터베이스')
+            self.assertEqual(case['stored_state_before_navigation']['filterState']['filters']['difficulty'], '중')
+            self.assertTrue(case['stored_state_before_navigation']['filterState']['practice']['loaded'])
+            self.assertEqual(case['stored_state_before_navigation']['practiceCollapsed'], '0')
 
-            await page.reload({'waitUntil': 'networkidle2'})
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('history.back()')
+            await page.waitForFunction("window.location.pathname === '/question-bank'")
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             await page.waitForFunction(
-                "document.querySelector('#bankPageQueryInput').value === '데이터베이스' && document.querySelector('#bankPageDifficultySelect').value === '중'"
+                "document.querySelector('#bankPageQueryInput').value === '데이터베이스' && document.querySelector('#bankPageDifficultySelect').value === '중' && !document.body.classList.contains('question-bank-filters-collapsed')"
             )
-            case['reload_values'] = await page.evaluate(
+            case['back_forward_values'] = await page.evaluate(
                 """
                 () => ({
                   query: document.querySelector('#bankPageQueryInput')?.value || '',
                   difficulty: document.querySelector('#bankPageDifficultySelect')?.value || '',
                   filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame')?.hidden,
+                  practiceToggleDisabled: document.querySelector('#bankPageTogglePracticeBtn')?.disabled,
                 })
                 """
             )
-            self.assertEqual(case['reload_values']['query'], '데이터베이스')
-            self.assertEqual(case['reload_values']['difficulty'], '중')
-            self.assertFalse(case['reload_values']['filtersCollapsed'])
+            self.assertEqual(case['back_forward_values']['query'], '데이터베이스')
+            self.assertEqual(case['back_forward_values']['difficulty'], '중')
+            self.assertFalse(case['back_forward_values']['filtersCollapsed'])
 
-            fresh_page = await self.new_page(viewport={'width': 1440, 'height': 1100})
-            await fresh_page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
-            await fresh_page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
-            await fresh_page.waitForFunction(
-                "document.querySelector('#bankPageQueryInput').value === '' && document.querySelector('#bankPageDifficultySelect').value === ''"
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "document.querySelector('#bankPageQueryInput').value === '' && document.querySelector('#bankPageDifficultySelect').value === '' && document.body.classList.contains('question-bank-filters-collapsed') && document.body.classList.contains('question-bank-practice-collapsed') && document.querySelector('#bankPagePracticeFrame').hidden && document.querySelector('#bankPageTogglePracticeBtn').disabled"
             )
-            case['fresh_entry_values'] = await fresh_page.evaluate(
+            case['fresh_entry_values'] = await page.evaluate(
                 """
                 () => ({
                   query: document.querySelector('#bankPageQueryInput')?.value || '',
@@ -1463,12 +1478,21 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                   activeFilters: document.querySelector('#bankPageActiveFilters')?.textContent || '',
                   filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
                   filtersRegionHidden: document.querySelector('#bankPageFiltersRegion')?.hidden,
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame')?.hidden,
+                  practiceToggleDisabled: document.querySelector('#bankPageTogglePracticeBtn')?.disabled,
                 })
                 """
             )
-            case['stored_filter_state_after_fresh_entry'] = await fresh_page.evaluate(
-                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
+            case['stored_state_after_fresh_entry'] = await page.evaluate(
+                """
+                (filterKey, practiceKey) => ({
+                  filterState: JSON.parse(window.localStorage.getItem(filterKey) || 'null'),
+                  practiceCollapsed: window.localStorage.getItem(practiceKey),
+                })
+                """,
                 QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
             )
             self.assertEqual(case['fresh_entry_values']['query'], '')
             self.assertEqual(case['fresh_entry_values']['difficulty'], '')
@@ -1476,12 +1500,55 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotIn('중', case['fresh_entry_values']['activeFilters'])
             self.assertTrue(case['fresh_entry_values']['filtersCollapsed'])
             self.assertTrue(case['fresh_entry_values']['filtersRegionHidden'])
-            self.assertEqual(case['stored_filter_state_after_fresh_entry']['filters']['q'], '')
-            self.assertEqual(case['stored_filter_state_after_fresh_entry']['filters']['difficulty'], '')
+            self.assertTrue(case['fresh_entry_values']['practiceCollapsed'])
+            self.assertTrue(case['fresh_entry_values']['practiceFrameHidden'])
+            self.assertTrue(case['fresh_entry_values']['practiceToggleDisabled'])
+            self.assertEqual(case['stored_state_after_fresh_entry']['filterState']['filters']['q'], '')
+            self.assertEqual(case['stored_state_after_fresh_entry']['filterState']['filters']['difficulty'], '')
+            self.assertFalse(case['stored_state_after_fresh_entry']['filterState']['practice']['loaded'])
+            self.assertEqual(case['stored_state_after_fresh_entry']['practiceCollapsed'], '1')
+
+            await page.evaluate(
+                """
+                (filterKey, practiceKey) => {
+                  window.localStorage.setItem(filterKey, JSON.stringify({
+                    filters: {q: 'stale-query', difficulty: '상'},
+                    filtersCollapsed: false,
+                    selection: {selectedId: '', startIndex: 0},
+                    practice: {loaded: true, selectedId: 'stale-question', startIndex: 1},
+                  }));
+                  window.localStorage.setItem(practiceKey, '0');
+                }
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
+            )
+            await page.goto(f'{self.base_url}/question-bank?q=%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC&difficulty=%ED%95%98', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "document.querySelector('#bankPageQueryInput').value === '네트워크' && document.querySelector('#bankPageDifficultySelect').value === '하'"
+            )
+            case['url_param_values'] = await page.evaluate(
+                """
+                () => ({
+                  query: document.querySelector('#bankPageQueryInput')?.value || '',
+                  difficulty: document.querySelector('#bankPageDifficultySelect')?.value || '',
+                  activeFilters: document.querySelector('#bankPageActiveFilters')?.textContent || '',
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame')?.hidden,
+                })
+                """
+            )
+            self.assertEqual(case['url_param_values']['query'], '네트워크')
+            self.assertEqual(case['url_param_values']['difficulty'], '하')
+            self.assertIn('네트워크', case['url_param_values']['activeFilters'])
+            self.assertIn('하', case['url_param_values']['activeFilters'])
+            self.assertTrue(case['url_param_values']['filtersCollapsed'])
+            self.assertTrue(case['url_param_values']['practiceCollapsed'])
+            self.assertTrue(case['url_param_values']['practiceFrameHidden'])
             status = 'passed'
         finally:
-            if fresh_page is not None:
-                await fresh_page.close()
             self.record_case(case_id='question-bank-fresh-entry-filters', status=status, observations=case)
             await page.close()
 
