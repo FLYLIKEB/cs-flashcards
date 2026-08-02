@@ -3020,9 +3020,9 @@ class FlashcardProgressTests(unittest.TestCase):
                     INSERT INTO question_bank (
                         id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
                         rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
-                        difficulty, issuer, source_location, section, points, expected_time_seconds,
+                        missing_card_keywords_json, difficulty, issuer, source_location, section, points, expected_time_seconds,
                         answer_guide, session_mode, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '[]', '[]', NULL, ?, ?, ?, '[]', '', ?, ?, ?, NULL, NULL, '', ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '[]', '[]', NULL, ?, ?, ?, ?, '[]', '', ?, ?, ?, NULL, NULL, '', ?, ?, ?)
                     """,
                     (
                         'qb-runtime-difficulty-backfill',
@@ -3036,6 +3036,7 @@ class FlashcardProgressTests(unittest.TestCase):
                         '클라우드',
                         '전산논술',
                         '클라우드·분산시스템',
+                        '["stale"]',
                         '한국은행',
                         '테스트 논술 1',
                         '전공논술',
@@ -3046,13 +3047,56 @@ class FlashcardProgressTests(unittest.TestCase):
                 )
                 conn.commit()
 
-            flashcard_app.ensure_progress_db(db_path)
+            with mock.patch.object(
+                flashcard_app,
+                'backfill_question_bank_difficulty_rows',
+                wraps=flashcard_app.backfill_question_bank_difficulty_rows,
+            ) as backfill_mock:
+                flashcard_app.ensure_progress_db(db_path)
+            backfill_mock.assert_called_once()
             with closing(sqlite3.connect(db_path)) as conn:
-                inferred = conn.execute(
-                    "SELECT difficulty FROM question_bank WHERE id = ?",
+                conn.row_factory = sqlite3.Row
+                repaired = conn.execute(
+                    "SELECT difficulty, keywords_json FROM question_bank WHERE id = ?",
                     ('qb-runtime-difficulty-backfill',),
-                ).fetchone()[0]
-            self.assertEqual(inferred, '상')
+                ).fetchone()
+            self.assertEqual(repaired['difficulty'], '상')
+            self.assertEqual(json.loads(repaired['keywords_json']), ['테스트', 'Test', '검증'])
+
+    def test_ensure_progress_db_skips_question_bank_backfill_after_runtime_state_is_clean(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '정규화의 목적을 설명하시오.',
+                        'body': '데이터베이스 설계 관점에서 답하시오.',
+                        'answer': '중복을 줄이고 이상 현상을 방지한다.',
+                        'explanation': '정규화의 목적을 구조적으로 설명해야 한다.',
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'category': '데이터베이스',
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '테스트 학술 2',
+                        'section': '전공필기',
+                        'session_mode': 'bok',
+                    }
+                ],
+                db_path,
+            )
+            with mock.patch.object(flashcard_app, 'backfill_question_bank_difficulty_rows') as backfill_mock:
+                flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+                flashcard_app.ensure_progress_db(db_path)
+
+            backfill_mock.assert_not_called()
 
     def test_question_bank_preserves_markdown_blocks(self):
         with tempfile.TemporaryDirectory() as td:
