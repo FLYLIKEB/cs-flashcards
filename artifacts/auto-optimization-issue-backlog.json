@@ -1,12 +1,13 @@
 {
-  "generated_at": "2026-08-02T20:07:00Z",
+  "generated_at": "2026-08-02T20:13:35Z",
   "wave": "2026-08-02-round-36",
   "queue": [
     {
       "issue": 182,
       "title": "메인 앱 임베드 문제은행의 동적 select 필터(field/category/issuer) deep-link·reload 복원 누락",
       "branch": "issue-182-embedded-dynamic-filter-restore",
-      "status": "implementation_in_progress"
+      "pr": 185,
+      "status": "pr_open_review_running"
     }
   ],
   "completed": [

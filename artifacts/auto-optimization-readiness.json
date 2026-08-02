@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-08-02T20:07:00Z",
+  "checked_at": "2026-08-02T20:13:35Z",
   "gate_open": false,
   "summary": {
     "open_issue_count": 1,
-    "open_pr_count": 0,
+    "open_pr_count": 1,
     "blocking_worktree_count": 1,
     "reusable_backlog_count": 0
   },
@@ -15,7 +15,20 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/182"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "number": 185,
+      "state": "OPEN",
+      "title": "Issue 182: 임베드 문제은행 동적 필터 deep-link 복원",
+      "head": "issue-182-embedded-dynamic-filter-restore",
+      "base": "main",
+      "merge_state_status": "UNSTABLE",
+      "checks": [
+        "frontend-browser:IN_PROGRESS"
+      ],
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/185"
+    }
+  ],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-182",
@@ -29,15 +42,10 @@
       "issue": 183,
       "pr": 184,
       "merge_commit": "3f70b5ad28383322c79678b9f9d853766d414955"
-    },
-    {
-      "issue": 178,
-      "pr": 181,
-      "merge_commit": "5c9b7ba5e3a8ea2571446ba0ac03d4af13ea8a3b"
     }
   ],
   "notes": [
-    "Issue #183 merged as PR #184 and its worktree was removed.",
-    "Issue #182 remains the only active round 36 lane."
+    "Issue #182 implementation opened PR #185.",
+    "PR #185 review and checks are in progress."
   ]
 }
