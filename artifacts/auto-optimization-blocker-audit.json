@@ -1,17 +1,11 @@
 {
-  "timestamp": "2026-08-02T13:33:20Z",
-  "blocked": true,
-  "openIssueCount": 1,
-  "openPullRequestCount": 1,
-  "blockingWorktrees": [
-    {
-      "path": "/private/tmp/cs-opt-130",
-      "branch": "issue-130-question-bank-helper-dedupe",
-      "reason": "Frontend round 23 review lane and CI pending."
-    }
-  ],
+  "timestamp": "2026-08-02T13:37:10Z",
+  "blocked": false,
+  "openIssueCount": 0,
+  "openPullRequestCount": 0,
+  "blockingWorktrees": [],
   "notes": [
-    "Issue #129 was closed as a stale candidate after latest origin/main re-check.",
-    "Issue #130 remains active with PR #131 open and frontend-browser CI pending."
+    "Issue #129 was closed without code as a stale candidate after latest origin/main re-check.",
+    "Issue #130 merged through PR #131, and the issue worktree/branch were cleaned up."
   ]
 }

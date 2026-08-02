@@ -1,37 +1,10 @@
 {
   "skill": "cs-auto-optimization-orchestrator",
-  "timestamp": "2026-08-02T13:33:20Z",
-  "canStartRound": false,
-  "waitReasons": [
-    "1 open GitHub issue remains",
-    "1 open GitHub pull request remains",
-    "1 issue worktree remains"
-  ],
-  "openIssues": [
-    {
-      "number": 130,
-      "state": "OPEN",
-      "title": "문제은행 launch/review helper 중복 정의 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/130"
-    }
-  ],
-  "openPullRequests": [
-    {
-      "number": 131,
-      "title": "Issue 130: 문제은행 helper 단일 정의 계약 고정",
-      "headRefName": "issue-130-question-bank-helper-dedupe",
-      "baseRefName": "main",
-      "reviewDecision": "",
-      "mergeStateStatus": "UNSTABLE",
-      "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/131"
-    }
-  ],
-  "blockingWorktrees": [
-    {
-      "path": "/private/tmp/cs-opt-130",
-      "branch": "refs/heads/issue-130-question-bank-helper-dedupe"
-    }
-  ],
-  "summary": "이슈 #129는 stale candidate로 닫혔고, 현재는 issue #130 / PR #131 검토·CI 완료 전까지 라운드 23 게이트가 닫혀 있다."
+  "timestamp": "2026-08-02T13:37:10Z",
+  "canStartRound": true,
+  "waitReasons": [],
+  "openIssues": [],
+  "openPullRequests": [],
+  "blockingWorktrees": [],
+  "summary": "이슈 #130 / PR #131 정리까지 끝나 다음 최적화 라운드를 바로 시작할 수 있다."
 }

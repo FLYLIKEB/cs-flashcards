@@ -1,27 +1,14 @@
 {
-  "updatedAt": "2026-08-02T13:33:20Z",
-  "status": "round23_reviewing",
-  "openIssues": [
+  "updatedAt": "2026-08-02T13:37:10Z",
+  "status": "ready_for_next_audit",
+  "openIssues": [],
+  "openPullRequests": [],
+  "recentlyClosedIssues": [
     {
       "number": 130,
-      "title": "문제은행 launch/review helper 중복 정의 제거",
-      "track": "frontend",
-      "branch": "issue-130-question-bank-helper-dedupe",
-      "worktree": "/private/tmp/cs-opt-130",
-      "pullRequest": 131,
-      "state": "reviewing"
-    }
-  ],
-  "openPullRequests": [
-    {
-      "number": 131,
-      "title": "Issue 130: 문제은행 helper 단일 정의 계약 고정",
-      "headRefName": "issue-130-question-bank-helper-dedupe",
-      "baseRefName": "main",
-      "state": "open"
-    }
-  ],
-  "recentlyClosedIssues": [
+      "mergedPullRequest": 131,
+      "mergeCommit": "60d0bcd3993dc9de00438ee6e8bf1591ece9beea"
+    },
     {
       "number": 129,
       "resolution": "closed_without_code",
@@ -37,5 +24,9 @@
       "mergedPullRequest": 128,
       "mergeCommit": "05e2b1fe0329992c051e7b87ab5e199949f5e55a"
     }
-  ]
+  ],
+  "nextRound": {
+    "round": 24,
+    "state": "pending_audit"
+  }
 }
