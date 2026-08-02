@@ -1,80 +1,81 @@
 {
-  "checked_at": "2026-08-02T15:37:57Z",
+  "checked_at": "2026-08-02T15:50:08Z",
   "gate_open": false,
   "summary": {
-    "open_issue_count": 2,
-    "open_pr_count": 2,
-    "blocking_worktree_count": 2,
+    "open_issue_count": 4,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 4,
     "reusable_backlog_count": 0
   },
   "open_issues": [
     {
-      "number": 145,
+      "number": 151,
       "state": "OPEN",
-      "title": "임베드 문제은행 필터에 접근성 이름 보강",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/145"
+      "title": "헤더 메뉴 키보드 포커스와 Escape 닫기 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/151"
     },
     {
-      "number": 144,
+      "number": 150,
       "state": "OPEN",
-      "title": "문제은행 저장 시 전체 카드 대시보드 재로딩 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/144"
-    }
-  ],
-  "open_prs": [
-    {
-      "baseRefName": "main",
-      "headRefName": "issue-144-question-bank-upsert-context",
-      "isDraft": false,
-      "mergeStateStatus": "UNSTABLE",
-      "number": 147,
-      "reviewDecision": "",
-      "title": "Issue 144: 문제은행 저장 read_cards 재로딩 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/147"
+      "title": "임베드 문제은행 검색 입력 디바운스 적용",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/150"
     },
     {
-      "baseRefName": "main",
-      "headRefName": "issue-145-embedded-filter-a11y-labels",
-      "isDraft": false,
-      "mergeStateStatus": "CLEAN",
-      "number": 146,
-      "reviewDecision": "",
-      "title": "Issue 145: 임베드 문제은행 필터 접근성 이름 보강",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/146"
+      "number": 149,
+      "state": "OPEN",
+      "title": "메인 화면 문제 풀이 패널 진입 버튼 복구",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/149"
+    },
+    {
+      "number": 148,
+      "state": "OPEN",
+      "title": "문제은행 최신 풀이 조인용 복합 인덱스 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/148"
     }
   ],
+  "open_prs": [],
   "blocking_worktrees": [
     {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-144",
-      "branch": "issue-144-question-bank-upsert-context",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-148",
+      "branch": "issue-148-question-bank-latest-attempt-index",
       "status": "tracked-branch-worktree"
     },
     {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-145",
-      "branch": "issue-145-embedded-filter-a11y-labels",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-149",
+      "branch": "issue-149-question-panel-entry-button",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-150",
+      "branch": "issue-150-embedded-question-bank-debounce",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-151",
+      "branch": "issue-151-menu-keyboard-escape",
       "status": "tracked-branch-worktree"
     }
   ],
   "reusable_backlog": [],
   "recently_completed": [
     {
+      "issue": 145,
+      "pr": 146,
+      "merge_commit": "bb6340268e462ce7890f2fdd8cffbec34093ed54"
+    },
+    {
+      "issue": 144,
+      "pr": 147,
+      "merge_commit": "512d925a1426cbaa76be17f798c37f1e0a6dde64"
+    },
+    {
       "issue": 141,
       "pr": 143,
       "merge_commit": "57401cd7bab445e027eabb7c5a5190a7084ac9f6"
-    },
-    {
-      "issue": 140,
-      "pr": 142,
-      "merge_commit": "0fd42031884098e5942db5bfecd8f99e88671b5c"
-    },
-    {
-      "issue": 137,
-      "pr": 139,
-      "merge_commit": "d03ecd591c08813f6d04ea67adefddfe85bacbe3"
     }
   ],
   "notes": [
-    "Round 27 is in PR review state.",
-    "Both issue branches are isolated worktrees with focused verification already complete."
+    "Round 28 is in implementation state.",
+    "Issues #148-#151 came from a bounded audit, not a broad repo-wide backlog reset."
   ]
 }

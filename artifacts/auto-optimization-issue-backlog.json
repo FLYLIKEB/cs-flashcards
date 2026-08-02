@@ -32,24 +32,40 @@
       "mergeCommit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
     }
   ],
-  "generated_at": "2026-08-02T15:37:57Z",
-  "wave": "2026-08-02-round-27",
+  "generated_at": "2026-08-02T15:50:08Z",
+  "wave": "2026-08-02-round-28",
   "queue": [
     {
-      "issue": 144,
-      "pr": 147,
-      "branch": "issue-144-question-bank-upsert-context",
-      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-144",
+      "issue": 148,
+      "pr": null,
+      "branch": "issue-148-question-bank-latest-attempt-index",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-148",
       "surface": "backend",
-      "status": "in-review"
+      "status": "implementing"
     },
     {
-      "issue": 145,
-      "pr": 146,
-      "branch": "issue-145-embedded-filter-a11y-labels",
-      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-145",
+      "issue": 149,
+      "pr": null,
+      "branch": "issue-149-question-panel-entry-button",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-149",
       "surface": "frontend",
-      "status": "in-review"
+      "status": "implementing"
+    },
+    {
+      "issue": 150,
+      "pr": null,
+      "branch": "issue-150-embedded-question-bank-debounce",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-150",
+      "surface": "frontend",
+      "status": "implementing"
+    },
+    {
+      "issue": 151,
+      "pr": null,
+      "branch": "issue-151-menu-keyboard-escape",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-151",
+      "surface": "frontend",
+      "status": "implementing"
     }
   ],
   "completed": [
