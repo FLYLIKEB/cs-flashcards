@@ -2501,7 +2501,7 @@ def question_bank_missing_card_rows(
             keyword_labels[key] = keyword
     lookup = card_keyword_to_card_id or {}
     items: list[dict[str, Any]] = []
-    for key, count in sorted(keyword_counts.items(), key=lambda item: (-item[1], keyword_labels[item[0]].casefold())):
+    for key, count in sorted(keyword_counts.items(), key=lambda item: (-item[1], 0 if str(lookup.get(item[0]) or "").strip() else 1, keyword_labels[item[0]].casefold())):
         card_id = str(lookup.get(key) or "").strip()
         items.append({
             "keyword": keyword_labels[key],
