@@ -4254,6 +4254,49 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['concept_image_url'], 'https://example.com/test-concept.png')
             self.assertEqual(rows[0]['concept_media_type'], 'mermaid')
 
+    def test_read_cards_reuses_single_connection_without_ai_image_rescan(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+            attempt = flashcard_app.QuestionAttemptRequest(
+                question_id='q-CS-001-short-1',
+                card_id='CS-001',
+                question_type='short',
+                prompt='정의',
+                body='설명',
+                user_answer='큐는 FIFO 구조다',
+                is_correct=False,
+                judgment='wrong',
+                wrong_note='핵심 연산 설명 누락',
+            )
+            flashcard_app.save_question_attempt(attempt, db_path)
+
+            with mock.patch.object(
+                flashcard_app,
+                '_should_sync_ai_image_files_to_db',
+                return_value=(False, '', flashcard_app.AI_IMAGE_DIR, 0),
+            ), mock.patch.object(
+                flashcard_app,
+                'ensure_progress_db',
+                wraps=flashcard_app.ensure_progress_db,
+            ) as ensure_mock, mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
+                rows, fields = flashcard_app.read_cards(db_path)
+
+            self.assertEqual(ensure_mock.call_count, 1)
+            self.assertEqual(connect_mock.call_count, 1)
+            self.assertIn('concept_image_url', fields)
+            self.assertEqual(rows[0]['term'], '테스트')
+            self.assertEqual(rows[0]['concept_image_url'], 'https://example.com/test-concept.png')
+            self.assertEqual(rows[0]['question_attempt_count'], 1)
+            self.assertEqual(rows[0]['question_wrong_count'], 1)
+            self.assertEqual(rows[0]['latest_wrong_note'], '핵심 연산 설명 누락')
     def test_optional_basic_auth_helper(self):
         original_user = flashcard_app.PUBLIC_USERNAME
         original_password = flashcard_app.PUBLIC_PASSWORD

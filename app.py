@@ -1156,8 +1156,14 @@ def ensure_progress_db(
     seed_rows: list[dict[str, Any]] | None = None,
     *,
     must_exist: bool = False,
+    conn: sqlite3.Connection | None = None,
 ) -> None:
-    with closing(connect_progress_db(progress_db_path, must_exist=must_exist)) as conn:
+    if conn is None:
+        with closing(connect_progress_db(progress_db_path, must_exist=must_exist)) as db_conn:
+            ensure_progress_db(progress_db_path, seed_rows, must_exist=must_exist, conn=db_conn)
+        return
+    else:
+
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS cards (
@@ -1540,11 +1546,13 @@ def progress_db_runtime_summary(progress_db_path: Path | None = None) -> dict[st
 
 
 
-def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
-    ensure_progress_db(progress_db_path, must_exist=True)
+def read_progress(progress_db_path: Path, conn: sqlite3.Connection | None = None) -> dict[str, dict[str, str]]:
+    if conn is None:
+        ensure_progress_db(progress_db_path, must_exist=True)
+        with closing(connect_progress_db(progress_db_path, must_exist=True)) as db_conn:
+            return read_progress(progress_db_path, db_conn)
     select_fields = ["card_id", "known_status", "last_reviewed", "review_count", "bookmarked", "memo", "memo_updated_at"]
-    with closing(connect_progress_db(progress_db_path, must_exist=True)) as conn:
-        rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM card_progress").fetchall()
+    rows = conn.execute(f"SELECT {', '.join(select_fields)} FROM card_progress").fetchall()
     progress: dict[str, dict[str, str]] = {}
     for row in rows:
         progress[row["card_id"]] = {
@@ -1558,14 +1566,18 @@ def read_progress(progress_db_path: Path) -> dict[str, dict[str, str]]:
     return progress
 
 
-
-def read_card_content(progress_db_path: Path) -> tuple[list[dict[str, str]], list[str]]:
-    ensure_progress_db(progress_db_path, must_exist=True)
+def read_card_content(
+    progress_db_path: Path,
+    conn: sqlite3.Connection | None = None,
+) -> tuple[list[dict[str, str]], list[str]]:
+    if conn is None:
+        ensure_progress_db(progress_db_path, must_exist=True)
+        with closing(connect_progress_db(progress_db_path, must_exist=True)) as db_conn:
+            return read_card_content(progress_db_path, db_conn)
     select_fields = ["card_id", *CARD_CONTENT_DB_COLUMNS]
-    with closing(connect_progress_db(progress_db_path, must_exist=True)) as conn:
-        rows = conn.execute(
-            f"SELECT {', '.join(select_fields)} FROM cards ORDER BY sort_order ASC, card_id ASC"
-        ).fetchall()
+    rows = conn.execute(
+        f"SELECT {', '.join(select_fields)} FROM cards ORDER BY sort_order ASC, card_id ASC"
+    ).fetchall()
     cards: list[dict[str, str]] = []
     for row in rows:
         item = {"id": row["card_id"] or ""}
@@ -1578,7 +1590,6 @@ def read_card_content(progress_db_path: Path) -> tuple[list[dict[str, str]], lis
         cards.append(item)
 
     return cards, content_fieldnames()
-
 
 
 def merge_progress(
@@ -1615,16 +1626,21 @@ def merge_progress(
     return merged
 
 
-
 def read_cards(progress_db_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path, must_exist=True)
-    sync_ai_image_files_to_db(db_path)
-    card_rows, fieldnames = read_card_content(db_path)
-    if not card_rows:
-        raise FileNotFoundError(f"Card content not found in SQLite: {db_path}")
-    rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        ensure_progress_db(db_path, must_exist=True, conn=conn)
+        sync_ai_image_files_to_db(db_path, conn=conn)
+        card_rows, fieldnames = read_card_content(db_path, conn)
+        if not card_rows:
+            raise FileNotFoundError(f"Card content not found in SQLite: {db_path}")
+        rows = merge_progress(
+            card_rows,
+            read_progress(db_path, conn),
+            read_question_attempt_stats(db_path, conn),
+        )
     return rows, fieldnames
+
 
 def read_card(progress_db_path: Path | None, card_id: Any) -> dict[str, Any]:
     normalized_card_id = normalize_question_bank_text(card_id, limit=255)
@@ -1798,7 +1814,11 @@ def latest_ai_image_urls_by_card_id(image_dir: Path | None = None) -> dict[str, 
     }
 
 
-def sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = None) -> bool:
+def sync_ai_image_files_to_db(
+    progress_db_path: Path,
+    image_dir: Path | None = None,
+    conn: sqlite3.Connection | None = None,
+) -> bool:
     should_scan, dir_stamp, root, scan_generation = _should_sync_ai_image_files_to_db(progress_db_path, image_dir)
     if not should_scan:
         return False
@@ -1806,34 +1826,38 @@ def sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = N
     if not recovered_urls:
         _mark_ai_image_recovery_clean(progress_db_path, dir_stamp, scan_generation, root)
         return False
-    ensure_progress_db(progress_db_path)
+    if conn is None:
+        ensure_progress_db(progress_db_path)
+        with closing(connect_progress_db(progress_db_path)) as db_conn:
+            return sync_ai_image_files_to_db(progress_db_path, image_dir, db_conn)
     changed = False
-    with closing(connect_progress_db(progress_db_path)) as conn:
-        rows = conn.execute(
-            "SELECT card_id, concept_image_url, concept_media_type, concept_media_payload FROM cards"
-        ).fetchall()
-        for row in rows:
-            card_id = str(row["card_id"] or "").strip()
-            recovered_url = recovered_urls.get(card_id)
-            if not recovered_url:
-                continue
-            media_type = normalized_concept_media_type(row["concept_media_type"]) if row["concept_media_type"] else ""
-            if media_type in {"gif", "video", "mermaid", "html"}:
-                continue
-            current_url = normalized_runtime_media_url(row["concept_image_url"])
-            current_payload = str(row["concept_media_payload"] or "")
-            if media_type in {"image", "gif", "video"}:
-                current_payload = normalized_runtime_media_url(current_payload)
-            if current_url == recovered_url and media_type == "image" and current_payload == recovered_url:
-                continue
-            conn.execute(
-                "UPDATE cards SET concept_image_url=?, concept_media_type='image', concept_media_payload=?, updated_at=? WHERE card_id=?",
-                (recovered_url, recovered_url, utc_now_iso(), card_id),
-            )
-            changed = True
+    rows = conn.execute(
+        "SELECT card_id, concept_image_url, concept_media_type, concept_media_payload FROM cards"
+    ).fetchall()
+    for row in rows:
+        card_id = str(row["card_id"] or "").strip()
+        recovered_url = recovered_urls.get(card_id)
+        if not recovered_url:
+            continue
+        media_type = normalized_concept_media_type(row["concept_media_type"]) if row["concept_media_type"] else ""
+        if media_type in {"gif", "video", "mermaid", "html"}:
+            continue
+        current_url = normalized_runtime_media_url(row["concept_image_url"])
+        current_payload = str(row["concept_media_payload"] or "")
+        if media_type in {"image", "gif", "video"}:
+            current_payload = normalized_runtime_media_url(current_payload)
+        if current_url == recovered_url and media_type == "image" and current_payload == recovered_url:
+            continue
+        conn.execute(
+            "UPDATE cards SET concept_image_url=?, concept_media_type='image', concept_media_payload=?, updated_at=? WHERE card_id=?",
+            (recovered_url, recovered_url, utc_now_iso(), card_id),
+        )
+        changed = True
+    if changed:
         conn.commit()
     _mark_ai_image_recovery_clean(progress_db_path, _ai_image_recovery_dir_stamp(root), scan_generation, root)
     return changed
+
 
 
 def update_card_content_fields(
@@ -6001,23 +6025,28 @@ SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user
     }
 
 
-def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, Any]]:
-    ensure_progress_db(progress_db_path, must_exist=True)
+def read_question_attempt_stats(
+    progress_db_path: Path,
+    conn: sqlite3.Connection | None = None,
+) -> dict[str, dict[str, Any]]:
+    if conn is None:
+        ensure_progress_db(progress_db_path, must_exist=True)
+        with closing(connect_progress_db(progress_db_path)) as db_conn:
+            return read_question_attempt_stats(progress_db_path, db_conn)
     stats: dict[str, dict[str, Any]] = {}
-    with closing(connect_progress_db(progress_db_path)) as conn:
-        for row in conn.execute(
-            """
-            SELECT
-                card_id,
-                question_attempt_count,
-                question_correct_count,
-                question_wrong_count,
-                latest_wrong_note,
-                latest_wrong_note_updated_at
-            FROM question_attempt_card_summary
-            """
-        ).fetchall():
-            stats[row["card_id"]] = _question_attempt_summary_dict(row)
+    for row in conn.execute(
+        """
+        SELECT
+            card_id,
+            question_attempt_count,
+            question_correct_count,
+            question_wrong_count,
+            latest_wrong_note,
+            latest_wrong_note_updated_at
+        FROM question_attempt_card_summary
+        """
+    ).fetchall():
+        stats[row["card_id"]] = _question_attempt_summary_dict(row)
     return stats
 
 
