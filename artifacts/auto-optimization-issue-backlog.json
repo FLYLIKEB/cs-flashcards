@@ -1,15 +1,21 @@
 {
-  "generated_at": "2026-08-02T18:14:04Z",
-  "wave": "2026-08-02-round-32",
-  "queue": [],
-  "completed": [
+  "generated_at": "2026-08-02T18:19:41Z",
+  "wave": "2026-08-02-round-33",
+  "queue": [
     {
-      "issue": 168,
-      "pr": 169,
-      "branch": "issue-168-question-bank-toggle-a11y",
-      "status": "merged"
+      "issue": 170,
+      "title": "문제 풀이 선지·채점 버튼에 선택 상태 접근성 노출 추가",
+      "branch": "issue-170-question-controls-a11y",
+      "status": "implementation_in_progress"
+    },
+    {
+      "issue": 171,
+      "title": "단건 카드 수정 helper의 중복 SQLite 연결 축소",
+      "branch": "issue-171-single-card-mutation-connection",
+      "status": "implementation_in_progress"
     }
   ],
+  "completed": [],
   "closed_without_merge": [],
   "held": []
 }

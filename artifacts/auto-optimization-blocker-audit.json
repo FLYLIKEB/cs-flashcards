@@ -1,15 +1,39 @@
 {
-  "checked_at": "2026-08-02T18:14:04Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T18:19:41Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 171,
+      "state": "OPEN",
+      "title": "단건 카드 수정 helper의 중복 SQLite 연결 축소",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/171"
+    },
+    {
+      "number": 170,
+      "state": "OPEN",
+      "title": "문제 풀이 선지·채점 버튼에 선택 상태 접근성 노출 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/170"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-170",
+      "branch": "issue-170-question-controls-a11y",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-171",
+      "branch": "issue-171-single-card-mutation-connection",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,8 +48,8 @@
     }
   ],
   "notes": [
-    "Issue #168 / PR #169 is merged and cleaned up.",
-    "No open issues, open PRs, or blocking issue worktrees remain.",
-    "The next optimization round may start immediately."
+    "Issue #170 and #171 are the active round 33 lanes.",
+    "The frontend audit subagent returned no candidate payload; the accepted candidate was confirmed directly from latest app.js/tests evidence.",
+    "The backend audit subagent failed with a tool error; the accepted candidate was confirmed directly from latest app.py/tests evidence."
   ]
 }
