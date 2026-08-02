@@ -1065,6 +1065,125 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(breakdown[0]['unseen_count'], 0)
             self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
 
+    def test_read_question_bank_entries_missing_cards_cover_filtered_results_beyond_first_page(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                rows = [
+                    (
+                        'qb-page-1',
+                        'fp-page-1',
+                        'CS-001',
+                        'subjective',
+                        '최신 문항',
+                        '첫 페이지에 보이는 문항',
+                        '정답',
+                        '해설',
+                        '[]',
+                        '[]',
+                        None,
+                        '데이터베이스',
+                        '전산학술',
+                        '데이터베이스',
+                        '[]',
+                        '[]',
+                        '중',
+                        '한국은행',
+                        '테스트 1',
+                        '전공필기',
+                        None,
+                        None,
+                        '',
+                        'bok',
+                        '2026-08-03T00:00:00Z',
+                        '2026-08-03T00:00:00Z',
+                    ),
+                    (
+                        'qb-page-2',
+                        'fp-page-2',
+                        'CS-001',
+                        'short',
+                        '두 번째 문항',
+                        '여전히 첫 페이지에 보이는 문항',
+                        '정답',
+                        '해설',
+                        '[]',
+                        '[]',
+                        None,
+                        '데이터베이스',
+                        '전산학술',
+                        '데이터베이스',
+                        '[]',
+                        '[]',
+                        '중',
+                        '한국은행',
+                        '테스트 2',
+                        '전공필기',
+                        None,
+                        None,
+                        '',
+                        'bok',
+                        '2026-08-02T00:00:00Z',
+                        '2026-08-02T00:00:00Z',
+                    ),
+                    (
+                        'qb-page-3',
+                        'fp-page-3',
+                        '',
+                        'essay',
+                        '세 번째 문항',
+                        'limit 밖에 있지만 누락 카드 집계에는 포함되어야 한다.',
+                        '정답',
+                        '해설',
+                        '[]',
+                        '[]',
+                        None,
+                        '데이터베이스',
+                        '전산학술',
+                        '데이터베이스',
+                        '[]',
+                        json.dumps(['페이지 부재'], ensure_ascii=False),
+                        '중',
+                        '한국은행',
+                        '테스트 3',
+                        '전공필기',
+                        None,
+                        None,
+                        '',
+                        'bok',
+                        '2026-08-01T00:00:00Z',
+                        '2026-08-01T00:00:00Z',
+                    ),
+                ]
+                conn.executemany(
+                    """
+                    INSERT INTO question_bank (
+                        id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
+                        rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
+                        missing_card_keywords_json, difficulty, issuer, source_location, section, points, expected_time_seconds,
+                        answer_guide, session_mode, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    rows,
+                )
+                conn.commit()
+
+            listed = flashcard_app.read_question_bank_entries(db_path, category='데이터베이스', limit=2)
+
+            self.assertEqual(listed['summary']['total'], 3)
+            self.assertEqual(listed['summary']['returned'], 2)
+            self.assertEqual([item['question_bank_id'] for item in listed['items']], ['qb-page-1', 'qb-page-2'])
+            self.assertEqual(
+                listed['summary']['missing_cards'],
+                [{'keyword': '페이지 부재', 'question_count': 1, 'card_created': False, 'card_id': ''}],
+            )
+            self.assertEqual(listed['summary']['category_breakdown'][0]['total'], 3)
+
     def test_question_bank_attempt_without_card_id_persists_by_question_bank_id(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
