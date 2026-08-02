@@ -1,30 +1,22 @@
 {
-  "checked_at": "2026-08-02T17:21:33Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T17:50:51Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 1,
+    "open_issue_count": 0,
     "open_pr_count": 0,
-    "blocking_worktree_count": 1,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 165,
-      "state": "OPEN",
-      "title": "단건 카드 조회 경로의 중복 SQLite 연결과 AI 이미지 동기화 재진입 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/165"
-    }
-  ],
+  "open_issues": [],
   "open_prs": [],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-165",
-      "branch": "issue-165-read-card-single-connection",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
+    {
+      "issue": 165,
+      "pr": 167,
+      "merge_commit": "39dbbad9db813044e9db12436c0af0f3c7c4d1a8"
+    },
     {
       "issue": 164,
       "pr": 166,
@@ -32,8 +24,8 @@
     }
   ],
   "notes": [
-    "Issue #164 / PR #166 is merged and cleaned up.",
-    "Issue #165 is the only remaining in-flight lane in round 31.",
-    "The next readiness-open state depends solely on finishing #165."
+    "Issue #165 / PR #167 is merged and cleaned up.",
+    "No open issues, open PRs, or blocking issue worktrees remain.",
+    "The next optimization round may start immediately."
   ]
 }
