@@ -3124,6 +3124,7 @@ def read_question_bank_entries(
             f"SELECT COUNT(*) AS total_count FROM question_bank {latest_attempt_join_sql} {where_sql}",
             tuple(params),
         ).fetchone()
+        total_count = int(total_row["total_count"] or 0) if total_row else 0
         issuer_rows = conn.execute(
             "SELECT DISTINCT issuer FROM question_bank WHERE TRIM(issuer) <> '' ORDER BY issuer COLLATE NOCASE ASC"
         ).fetchall()
@@ -3159,15 +3160,6 @@ def read_question_bank_entries(
             """,
             tuple(params),
         ).fetchall()
-        missing_card_summary_rows = conn.execute(
-            f"""
-            SELECT question_bank.missing_card_keywords_json
-            FROM question_bank
-            {latest_attempt_join_sql}
-            {where_sql}
-            """,
-            tuple(params),
-        ).fetchall()
 
         query_rows = conn.execute(
             f"""
@@ -3187,6 +3179,21 @@ def read_question_bank_entries(
             """,
             tuple(params + [safe_limit]),
         ).fetchall()
+        if total_count <= len(query_rows):
+            missing_card_summary_rows = [dict(row) for row in query_rows]
+        else:
+            missing_card_summary_rows = [
+                dict(row)
+                for row in conn.execute(
+                    f"""
+                    SELECT question_bank.missing_card_keywords_json
+                    FROM question_bank
+                    {latest_attempt_join_sql}
+                    {where_sql}
+                    """,
+                    tuple(params),
+                ).fetchall()
+            ]
     items: list[dict[str, Any]] = []
     for row in query_rows:
         item = question_bank_row_to_dict(row) or {}
@@ -3210,7 +3217,7 @@ def read_question_bank_entries(
     return {
         "items": items,
         "summary": {
-            "total": int(total_row["total_count"] or 0) if total_row else 0,
+            "total": total_count,
             "returned": len(items),
             "limit": safe_limit,
             "available_issuers": [str(row[0] or "").strip() for row in issuer_rows if str(row[0] or "").strip()],
@@ -3218,7 +3225,7 @@ def read_question_bank_entries(
             "available_topics": [str(row[0] or "").strip() for row in topic_rows if str(row[0] or "").strip()],
             "available_field_names": [str(row[0] or "").strip() for row in field_name_rows if str(row[0] or "").strip()],
             "missing_cards": question_bank_missing_card_rows(
-                [dict(row) for row in missing_card_summary_rows],
+                missing_card_summary_rows,
                 card_keyword_to_card_id=card_keyword_to_card_id,
             ),
             "category_breakdown": [
