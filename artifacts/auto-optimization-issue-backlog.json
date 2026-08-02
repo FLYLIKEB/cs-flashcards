@@ -1,27 +1,23 @@
 {
-  "generated_at": "2026-08-02T20:50:02Z",
-  "wave": "2026-08-02-round-37",
-  "queue": [],
-  "completed": [
+  "generated_at": "2026-08-02T20:55:11Z",
+  "wave": "2026-08-02-round-38",
+  "queue": [
     {
-      "issue": 186,
-      "title": "헤더 메뉴의 북마크 필터 토글 후 포커스 복귀 누락",
-      "branch": "issue-186-bookmark-filter-focus-return",
-      "pr": 189,
-      "status": "merged",
-      "merge_commit": "b2ed9885b4483a1d23f72b992512f4c7c1be896f",
-      "merged_at": "2026-08-02T20:48:45Z"
+      "issue": 190,
+      "title": "문제은행 전용 페이지 URL 동기화가 해시 딥링크를 지우지 않도록 수정",
+      "branch": "issue-190-question-bank-hash-sync",
+      "pr": null,
+      "status": "implementation_running"
     },
     {
-      "issue": 187,
-      "title": "save_question_attempt 초기 스키마 보장에서 남아 있는 중복 SQLite 재연결 제거",
-      "branch": "issue-187-save-attempt-single-connection",
-      "pr": 188,
-      "status": "merged",
-      "merge_commit": "e6fa6f1abbe509024ce5fd302a0e7116963f1939",
-      "merged_at": "2026-08-02T20:48:42Z"
+      "issue": 191,
+      "title": "읽기/풀이 요청마다 문제은행 전체 백필을 다시 돌리지 않기",
+      "branch": "issue-191-question-bank-backfill-gate",
+      "pr": null,
+      "status": "implementation_running"
     }
   ],
+  "completed": [],
   "closed_without_merge": [],
   "held": []
 }

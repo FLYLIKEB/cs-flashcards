@@ -1,15 +1,39 @@
 {
-  "checked_at": "2026-08-02T20:50:02Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T20:55:11Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 191,
+      "state": "OPEN",
+      "title": "읽기/풀이 요청마다 문제은행 전체 백필을 다시 돌리지 않기",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/191"
+    },
+    {
+      "number": 190,
+      "state": "OPEN",
+      "title": "문제은행 전용 페이지 URL 동기화가 해시 딥링크를 지우지 않도록 수정",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/190"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-190",
+      "branch": "issue-190-question-bank-hash-sync",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-191",
+      "branch": "issue-191-question-bank-backfill-gate",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,6 +48,6 @@
     }
   ],
   "notes": [
-    "Round 37 PRs #188 and #189 merged; readiness gate reopened."
+    "Round 38 issues #190 and #191 opened; implementation running in separate worktrees."
   ]
 }
