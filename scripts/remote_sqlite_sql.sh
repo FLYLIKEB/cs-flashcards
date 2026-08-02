@@ -173,13 +173,28 @@ PY
 }
 
 validate_sql_text "$SQL_TEXT"
+SQL_B64="$(python3 - <<'PY' "$SQL_TEXT"
+import base64
+import sys
+
+print(base64.b64encode(sys.argv[1].encode('utf-8')).decode('ascii'), end='')
+PY
+)"
 
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 
-env SQL_TEXT="$SQL_TEXT" "${SSH[@]}" bash -s -- "$REMOTE_DB_PATH" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DB_PATH" "$SQL_B64" <<'REMOTE'
 set -euo pipefail
 REMOTE_DB_PATH="$1"
+SQL_B64="$2"
+SQL_TEXT="$(python3 - <<'PY' "$SQL_B64"
+import base64
+import sys
+
+sys.stdout.write(base64.b64decode(sys.argv[1]).decode('utf-8'))
+PY
+)"
 if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없습니다: $REMOTE_DB_PATH" >&2
   exit 1
@@ -272,5 +287,20 @@ for statement in sanitized.split(';'):
         print('SQLite 실행 경계를 변경하는 SQL은 허용되지 않습니다.', file=sys.stderr)
         sys.exit(1)
 PY
-printf 'BEGIN IMMEDIATE;\n%s\nCOMMIT;\n' "$SQL_TEXT" | sqlite3 -bail "$REMOTE_DB_PATH"
+python3 - <<'PY' "$REMOTE_DB_PATH" "$SQL_TEXT"
+import sqlite3
+import sys
+
+
+db_path, sql_text = sys.argv[1], sys.argv[2]
+conn = sqlite3.connect(db_path, isolation_level=None)
+try:
+    conn.executescript(f"BEGIN IMMEDIATE;\n{sql_text}\nCOMMIT;\n")
+except Exception:
+    if conn.in_transaction:
+        conn.rollback()
+    raise
+finally:
+    conn.close()
+PY
 REMOTE

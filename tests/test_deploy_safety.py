@@ -1,6 +1,9 @@
+import base64
+import json
 import io
 import os
 import re
+import shutil
 import sqlite3
 import subprocess
 import tarfile
@@ -8,6 +11,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
+
 
 import app as flashcard_app
 
@@ -23,7 +27,6 @@ REMOTE_AI_SKILL = (ROOT / '.gjc/skills/cs-remote-ai-batch/SKILL.md').read_text(e
 DEPLOY_GUARD_PATTERN = re.compile(r'^ensure_stage_has_no_sqlite_payload\(\) \{\n(?P<body>.*?)^\}\n', re.MULTILINE | re.DOTALL)
 DEPLOY_GUARD_CALL = 'ensure_stage_has_no_sqlite_payload "$TMP_STAGE" "$TMP_ARCHIVE"'
 REMOTE_SQL_VALIDATE_PATTERN = re.compile(r'^validate_sql_text\(\) \{\n(?P<body>.*?)^\}\n', re.MULTILINE | re.DOTALL)
-REMOTE_SQL_REMOTE_BLOCK_PATTERN = re.compile(r"<<'REMOTE'\n(?P<body>.*?)^REMOTE$", re.MULTILINE | re.DOTALL)
 
 
 
@@ -128,18 +131,80 @@ def run_pull_remote_sqlite(output_path: Path, downloaded_db: Path, temp_root: Pa
     )
 
 
-def run_remote_sql_block(db_path: Path, sql_text: str) -> subprocess.CompletedProcess[str]:
-    match = REMOTE_SQL_REMOTE_BLOCK_PATTERN.search(REMOTE_SQL_SCRIPT)
-    if match is None:
-        raise AssertionError('remote sqlite body not found')
-    script = match.group('body')
-    return subprocess.run(
-        ['bash', '-c', script, 'remote-sql-test', str(db_path)],
-        env={**os.environ, 'SQL_TEXT': sql_text},
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+def run_remote_sql_script(db_path: Path, sql_text: str) -> tuple[subprocess.CompletedProcess[str], dict[str, object] | None]:
+    with tempfile.TemporaryDirectory() as td:
+        temp_root = Path(td)
+        fake_key = temp_root / 'fake-key.pem'
+        fake_key.write_text('fake-key\n', encoding='utf-8')
+        fake_ssh_log = temp_root / 'fake-ssh-log.json'
+        fake_bin = temp_root / 'bin'
+        fake_bin.mkdir()
+        fake_ssh = fake_bin / 'ssh'
+        fake_ssh.write_text(
+            "#!/usr/bin/env python3\n"
+            "import json\n"
+            "import os\n"
+            "import subprocess\n"
+            "import sys\n"
+            "args = sys.argv[1:]\n"
+            "index = 0\n"
+            "while index < len(args):\n"
+            "    if args[index] in {'-i', '-o'}:\n"
+            "        index += 2\n"
+            "    elif args[index].startswith('-'):\n"
+            "        index += 1\n"
+            "    else:\n"
+            "        break\n"
+            "if index >= len(args):\n"
+            "    raise SystemExit('missing ssh host')\n"
+            "stdin_text = sys.stdin.read()\n"
+            "command = args[index + 1:]\n"
+            "command_string = ' '.join(command)\n"
+            "payload = {\n"
+            "    'argv': args,\n"
+            "    'host': args[index],\n"
+            "    'command': command,\n"
+            "    'command_string': command_string,\n"
+            "    'stdin': stdin_text,\n"
+            "    'sql_text_env': os.environ.get('SQL_TEXT'),\n"
+            "}\n"
+            "with open(os.environ['FAKE_SSH_LOG'], 'w', encoding='utf-8') as handle:\n"
+            "    json.dump(payload, handle)\n"
+            "result = subprocess.run(['bash', '-lc', command_string], input=stdin_text, text=True, check=False)\n"
+            "raise SystemExit(result.returncode)\n",
+            encoding='utf-8',
+        )
+        fake_ssh.chmod(0o755)
+
+        remote_dir = temp_root / 'remote'
+        remote_db_path = remote_dir / 'state' / 'progress.sqlite'
+        remote_db_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(db_path, remote_db_path)
+        env = {
+            **os.environ,
+            'PATH': f"{fake_bin}{os.pathsep}{os.environ.get('PATH', '')}",
+            'CS_FLASHCARDS_REMOTE_CONFIG': str(temp_root / 'missing-config'),
+            'CS_FLASHCARDS_LIGHTSAIL_HOST': 'example.test',
+            'CS_FLASHCARDS_LIGHTSAIL_USER': 'ubuntu',
+            'CS_FLASHCARDS_LIGHTSAIL_KEY': str(fake_key),
+            'CS_FLASHCARDS_REMOTE_DIR': str(remote_dir),
+            'FAKE_SSH_LOG': str(fake_ssh_log),
+        }
+        result = subprocess.run(
+            ['bash', str(ROOT / 'scripts' / 'remote_sqlite_sql.sh')],
+            cwd=ROOT,
+            env=env,
+            input=sql_text,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if remote_db_path.exists():
+            shutil.copy2(remote_db_path, db_path)
+        transport = None
+        if fake_ssh_log.exists():
+            transport = json.loads(fake_ssh_log.read_text(encoding='utf-8'))
+        return result, transport
 
 
 def run_remote_sql_validation(sql_text: str) -> subprocess.CompletedProcess[str]:
@@ -331,12 +396,30 @@ class DeploySafetyTests(unittest.TestCase):
         self.assertNotIn('scp ', REMOTE_SQL_SCRIPT)
         self.assertNotIn('PAYLOAD_FILE', REMOTE_SQL_SCRIPT)
         self.assertNotIn('INSERT INTO {table}', REMOTE_SQL_SCRIPT)
+        self.assertNotIn('env SQL_TEXT=', REMOTE_SQL_SCRIPT)
         self.assertIn('원격 DB 경로 변경은 금지됩니다', REMOTE_SQL_SCRIPT)
-        self.assertIn('sqlite3 -bail "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
+        self.assertIn('bash -s -- "$REMOTE_DB_PATH" "$SQL_B64"', REMOTE_SQL_SCRIPT)
 
-    def test_remote_sql_script_wraps_sql_in_transaction_and_bails_on_error(self):
-        self.assertIn("BEGIN IMMEDIATE;", REMOTE_SQL_SCRIPT)
-        self.assertIn('sqlite3 -bail "$REMOTE_DB_PATH"', REMOTE_SQL_SCRIPT)
+    def test_remote_sql_script_passes_sql_over_shell_safe_ssh_transport(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'remote.sqlite'
+            write_named_rows_sqlite(db_path, 'before')
+            sql_text = "UPDATE items SET name='quo''te $HOME `uname` ; first line\nsecond line';\nINSERT INTO items (name) VALUES ('after');\n"
+
+            result, transport = run_remote_sql_script(db_path, sql_text)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIsNotNone(transport)
+            self.assertIsNone(transport['sql_text_env'])
+            self.assertEqual(transport['command'][:3], ['bash', '-s', '--'])
+            self.assertTrue(str(transport['command'][3]).endswith('/state/progress.sqlite'))
+            self.assertEqual(base64.b64decode(transport['command'][4]).decode('utf-8'), sql_text)
+            self.assertNotIn(sql_text, transport['command_string'])
+            with sqlite3.connect(db_path) as conn:
+                self.assertEqual(
+                    conn.execute('SELECT name FROM items ORDER BY id').fetchall(),
+                    [("quo'te $HOME `uname` ; first line\nsecond line",), ('after',)],
+                )
 
     def test_remote_sql_script_rejects_sqlite_meta_and_transaction_commands(self):
         self.assertIn('sqlite dot-command는 허용되지 않습니다.', REMOTE_SQL_SCRIPT)
@@ -368,7 +451,7 @@ class DeploySafetyTests(unittest.TestCase):
             db_path = Path(td) / 'remote.sqlite'
             write_named_rows_sqlite(db_path, 'before')
 
-            result = run_remote_sql_block(db_path, "UPDATE items SET name='changed';\nINVALID SQL;\n")
+            result, _ = run_remote_sql_script(db_path, "UPDATE items SET name='changed';\nINVALID SQL;\n")
 
             self.assertNotEqual(result.returncode, 0)
             with sqlite3.connect(db_path) as conn:
@@ -379,23 +462,14 @@ class DeploySafetyTests(unittest.TestCase):
             db_path = Path(td) / 'remote.sqlite'
             write_named_rows_sqlite(db_path, 'before')
 
-            result = run_remote_sql_block(db_path, "COMMIT;\nUPDATE items SET name='changed';\nINVALID SQL;\n")
+            result, transport = run_remote_sql_script(db_path, "COMMIT;\nUPDATE items SET name='changed';\nINVALID SQL;\n")
 
             self.assertNotEqual(result.returncode, 0)
+            self.assertIsNone(transport)
             self.assertIn('트랜잭션 제어 SQL은 허용되지 않습니다.', result.stderr)
             with sqlite3.connect(db_path) as conn:
                 self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('before',)])
 
-    def test_remote_sql_script_applies_all_statements_when_transaction_succeeds(self):
-        with tempfile.TemporaryDirectory() as td:
-            db_path = Path(td) / 'remote.sqlite'
-            write_named_rows_sqlite(db_path, 'before')
-
-            result = run_remote_sql_block(db_path, "UPDATE items SET name='changed';\nINSERT INTO items (name) VALUES ('after');\n")
-
-            self.assertEqual(result.returncode, 0, result.stderr)
-            with sqlite3.connect(db_path) as conn:
-                self.assertEqual(conn.execute('SELECT name FROM items ORDER BY id').fetchall(), [('changed',), ('after',)])
 
     def test_skill_docs_use_direct_remote_sql_policy(self):
         self.assertIn('./scripts/remote_sqlite_sql.sh', DEPLOY_SKILL)
