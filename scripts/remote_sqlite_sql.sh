@@ -177,9 +177,10 @@ validate_sql_text "$SQL_TEXT"
 chmod 400 "$SSH_KEY" 2>/dev/null || true
 SSH=(ssh -i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=accept-new "$REMOTE_USER@$REMOTE_HOST")
 
-env SQL_TEXT="$SQL_TEXT" "${SSH[@]}" bash -s -- "$REMOTE_DB_PATH" <<'REMOTE'
+"${SSH[@]}" bash -s -- "$REMOTE_DB_PATH" "$SQL_TEXT" <<'REMOTE'
 set -euo pipefail
 REMOTE_DB_PATH="$1"
+SQL_TEXT="$2"
 if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없습니다: $REMOTE_DB_PATH" >&2
   exit 1
