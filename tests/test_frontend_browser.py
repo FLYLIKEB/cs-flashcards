@@ -570,6 +570,22 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             },
         }
 
+    def test_question_bank_source_keeps_single_launch_and_review_helpers(self) -> None:
+        source = (ROOT / 'static' / 'question-bank.js').read_text(encoding='utf-8')
+        helper_names = (
+            'persistPracticeLaunch',
+            'restartPracticeFrame',
+            'confirmPracticeRestart',
+            'bindQuestionBankReviewActions',
+            'reviewFieldHtml',
+            'renderQuestionBankReview',
+        )
+        helper_counts = {
+            name: len(re.findall(rf'\bfunction {name}\s*\(', source))
+            for name in helper_names
+        }
+        self.assertEqual(helper_counts, {name: 1 for name in helper_names})
+
     def question_history_payload(self, title: str, result_key: str) -> dict[str, object]:
         return {
             'items': [
