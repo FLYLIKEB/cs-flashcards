@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-08-02T18:44:29Z",
+  "checked_at": "2026-08-02T18:57:16Z",
   "gate_open": false,
   "summary": {
     "open_issue_count": 2,
-    "open_pr_count": 0,
+    "open_pr_count": 2,
     "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
@@ -21,7 +21,28 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/174"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "number": 177,
+      "title": "Issue 174: 메인 필터·기록 토글 선택 상태 접근성 노출",
+      "headRefName": "issue-174-main-filter-toggle-a11y",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "UNSTABLE",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/177"
+    },
+    {
+      "number": 176,
+      "title": "Issue 175: 카드 상태 갱신 helper SQLite 연결 재사용",
+      "headRefName": "issue-175-card-mutation-single-connection",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "CLEAN",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/176"
+    }
+  ],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-174",
@@ -48,8 +69,8 @@
     }
   ],
   "notes": [
-    "Issue #174 and #175 are the active round 34 lanes.",
-    "Round 34 frontend audit subagent returned no candidate payload; the accepted candidate was confirmed directly from latest app.js/tests evidence.",
-    "Round 34 backend audit subagent failed with a tool error; the accepted candidate was confirmed directly from latest app.py/tests evidence."
+    "PR #176 and PR #177 are the active round 34 review lanes.",
+    "PR #176 is mergeable pending approval; PR #177 still has CI in progress.",
+    "Round 34 cannot advance until both PRs finish and their worktrees are removed."
   ]
 }

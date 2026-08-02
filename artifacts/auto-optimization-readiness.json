@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-08-02T18:44:29Z",
+  "checked_at": "2026-08-02T18:57:16Z",
   "gate_open": false,
   "summary": {
     "open_issue_count": 2,
-    "open_pr_count": 0,
+    "open_pr_count": 2,
     "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
@@ -21,7 +21,28 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/174"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "number": 177,
+      "title": "Issue 174: 메인 필터·기록 토글 선택 상태 접근성 노출",
+      "headRefName": "issue-174-main-filter-toggle-a11y",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "UNSTABLE",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/177"
+    },
+    {
+      "number": 176,
+      "title": "Issue 175: 카드 상태 갱신 helper SQLite 연결 재사용",
+      "headRefName": "issue-175-card-mutation-single-connection",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "CLEAN",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/176"
+    }
+  ],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-174",
@@ -48,8 +69,8 @@
     }
   ],
   "notes": [
-    "Round 34 accepted one frontend and one backend candidate from latest main.",
-    "Issue #174 covers main filter and history toggle accessibility semantics in static/app.js.",
-    "Issue #175 covers reduced-connection reuse for mark/bookmark/memo single-card mutations in app.py."
+    "PR #176 is open for backend issue #175 and already has a passing frontend-browser check.",
+    "PR #177 is open for frontend issue #174 and is waiting on latest review plus frontend-browser verification.",
+    "The readiness gate remains closed until both round 34 PRs merge and their worktrees are cleaned up."
   ]
 }
