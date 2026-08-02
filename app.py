@@ -1975,43 +1975,46 @@ def mark_card(
     status: str,
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
+    *,
+    conn: sqlite3.Connection | None = None,
 ) -> dict[str, str]:
-    del backup_dir
     if status not in VALID_STATUSES:
         raise ValueError("known_status must be O, X, or empty")
 
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        card = _ensure_card_exists(card_id, db_path, conn=conn)
-        normalized_card_id = str(card.get("id") or card_id)
-        existing = conn.execute(
-            "SELECT review_count FROM card_progress WHERE card_id = ?",
-            (normalized_card_id,),
-        ).fetchone()
-        try:
-            count = int(existing["review_count"] if existing else 0)
-        except (TypeError, ValueError):
-            count = 0
-        last_reviewed = ""
-        if status:
-            count += 1
-            last_reviewed = utc_now_iso()
-        now = utc_now_iso()
-        conn.execute(
-            """
-            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
-            VALUES (?, ?, ?, ?, 0, '', '', ?)
-            ON CONFLICT(card_id) DO UPDATE SET
-                known_status = excluded.known_status,
-                last_reviewed = excluded.last_reviewed,
-                review_count = excluded.review_count,
-                updated_at = excluded.updated_at
-            """,
-            (normalized_card_id, status, last_reviewed, max(0, count), now),
-        )
-        conn.commit()
-        return read_card(db_path, normalized_card_id, conn=conn)
+    if conn is None:
+        ensure_progress_db(db_path)
+        with closing(connect_progress_db(db_path)) as db_conn:
+            return mark_card(card_id, status, backup_dir, db_path, conn=db_conn)
+    card = _ensure_card_exists(card_id, db_path, conn=conn)
+    normalized_card_id = str(card.get("id") or card_id)
+    existing = conn.execute(
+        "SELECT review_count FROM card_progress WHERE card_id = ?",
+        (normalized_card_id,),
+    ).fetchone()
+    try:
+        count = int(existing["review_count"] if existing else 0)
+    except (TypeError, ValueError):
+        count = 0
+    last_reviewed = ""
+    if status:
+        count += 1
+        last_reviewed = utc_now_iso()
+    now = utc_now_iso()
+    conn.execute(
+        """
+        INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+        VALUES (?, ?, ?, ?, 0, '', '', ?)
+        ON CONFLICT(card_id) DO UPDATE SET
+            known_status = excluded.known_status,
+            last_reviewed = excluded.last_reviewed,
+            review_count = excluded.review_count,
+            updated_at = excluded.updated_at
+        """,
+        (normalized_card_id, status, last_reviewed, max(0, count), now),
+    )
+    conn.commit()
+    return read_card(db_path, normalized_card_id, conn=conn)
 
 
 def _ensure_card_exists(
@@ -2027,77 +2030,91 @@ def set_bookmark(
     card_id: str,
     bookmarked: bool,
     progress_db_path: Path | None = None,
+    *,
+    conn: sqlite3.Connection | None = None,
 ) -> dict[str, str]:
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        card = _ensure_card_exists(card_id, db_path, conn=conn)
-        normalized_card_id = str(card.get("id") or card_id)
-        conn.execute(
-            """
-            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
-            VALUES (?, '', '', 0, ?, '', '', ?)
-            ON CONFLICT(card_id) DO UPDATE SET
-                bookmarked = excluded.bookmarked,
-                updated_at = excluded.updated_at
-            """,
-            (normalized_card_id, 1 if bookmarked else 0, utc_now_iso()),
-        )
-        conn.commit()
-        return read_card(db_path, normalized_card_id, conn=conn)
+    if conn is None:
+        ensure_progress_db(db_path)
+        with closing(connect_progress_db(db_path)) as db_conn:
+            return set_bookmark(card_id, bookmarked, db_path, conn=db_conn)
+    card = _ensure_card_exists(card_id, db_path, conn=conn)
+    normalized_card_id = str(card.get("id") or card_id)
+    conn.execute(
+        """
+        INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+        VALUES (?, '', '', 0, ?, '', '', ?)
+        ON CONFLICT(card_id) DO UPDATE SET
+            bookmarked = excluded.bookmarked,
+            updated_at = excluded.updated_at
+        """,
+        (normalized_card_id, 1 if bookmarked else 0, utc_now_iso()),
+    )
+    conn.commit()
+    return read_card(db_path, normalized_card_id, conn=conn)
 
 
 def save_memo(
     card_id: str,
     memo: str,
     progress_db_path: Path | None = None,
+    *,
+    conn: sqlite3.Connection | None = None,
 ) -> dict[str, str]:
     normalized_memo = str(memo or "")[:20000]
     memo_updated_at = utc_now_iso() if normalized_memo.strip() else ""
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
-    with closing(connect_progress_db(db_path)) as conn:
-        card = _ensure_card_exists(card_id, db_path, conn=conn)
-        normalized_card_id = str(card.get("id") or card_id)
-        conn.execute(
-            """
-            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
-            VALUES (?, '', '', 0, 0, ?, ?, ?)
-            ON CONFLICT(card_id) DO UPDATE SET
-                memo = excluded.memo,
-                memo_updated_at = excluded.memo_updated_at,
-                updated_at = excluded.updated_at
-            """,
-            (normalized_card_id, normalized_memo, memo_updated_at, utc_now_iso()),
-        )
-        conn.commit()
-        return read_card(db_path, normalized_card_id, conn=conn)
+    if conn is None:
+        ensure_progress_db(db_path)
+        with closing(connect_progress_db(db_path)) as db_conn:
+            return save_memo(card_id, memo, db_path, conn=db_conn)
+    card = _ensure_card_exists(card_id, db_path, conn=conn)
+    normalized_card_id = str(card.get("id") or card_id)
+    conn.execute(
+        """
+        INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+        VALUES (?, '', '', 0, 0, ?, ?, ?)
+        ON CONFLICT(card_id) DO UPDATE SET
+            memo = excluded.memo,
+            memo_updated_at = excluded.memo_updated_at,
+            updated_at = excluded.updated_at
+        """,
+        (normalized_card_id, normalized_memo, memo_updated_at, utc_now_iso()),
+    )
+    conn.commit()
+    return read_card(db_path, normalized_card_id, conn=conn)
 
 
-def read_card_mutation_summary(progress_db_path: Path | None = None) -> dict[str, Any]:
+def read_card_mutation_summary(
+    progress_db_path: Path | None = None,
+    *,
+    conn: sqlite3.Connection | None = None,
+) -> dict[str, Any]:
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path, must_exist=True)
-    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
-        summary_row = conn.execute(
-            """
-            SELECT
-                COUNT(cards.card_id) AS total_count,
-                SUM(CASE WHEN card_progress.known_status = 'O' THEN 1 ELSE 0 END) AS known_count,
-                SUM(CASE WHEN card_progress.known_status = 'X' THEN 1 ELSE 0 END) AS unknown_count,
-                SUM(CASE WHEN COALESCE(card_progress.bookmarked, 0) = 1 THEN 1 ELSE 0 END) AS bookmarked_count,
-                SUM(CASE WHEN TRIM(COALESCE(card_progress.memo, '')) <> '' THEN 1 ELSE 0 END) AS memo_count
-            FROM cards
-            LEFT JOIN card_progress ON card_progress.card_id = cards.card_id
-            """
-        ).fetchone()
-        category_rows = conn.execute(
-            """
-            SELECT DISTINCT category
-            FROM cards
-            WHERE TRIM(COALESCE(category, '')) <> ''
-            ORDER BY category COLLATE NOCASE
-            """
-        ).fetchall()
+    if conn is None:
+        ensure_progress_db(db_path, must_exist=True)
+        with closing(connect_progress_db(db_path, must_exist=True)) as db_conn:
+            return read_card_mutation_summary(db_path, conn=db_conn)
+    summary_row = conn.execute(
+        """
+        SELECT
+            COUNT(cards.card_id) AS total_count,
+            SUM(CASE WHEN card_progress.known_status = 'O' THEN 1 ELSE 0 END) AS known_count,
+            SUM(CASE WHEN card_progress.known_status = 'X' THEN 1 ELSE 0 END) AS unknown_count,
+            SUM(CASE WHEN COALESCE(card_progress.bookmarked, 0) = 1 THEN 1 ELSE 0 END) AS bookmarked_count,
+            SUM(CASE WHEN TRIM(COALESCE(card_progress.memo, '')) <> '' THEN 1 ELSE 0 END) AS memo_count
+        FROM cards
+        LEFT JOIN card_progress ON card_progress.card_id = cards.card_id
+        """
+    ).fetchone()
+    category_rows = conn.execute(
+        """
+        SELECT DISTINCT category
+        FROM cards
+        WHERE TRIM(COALESCE(category, '')) <> ''
+        ORDER BY category COLLATE NOCASE
+        """
+    ).fetchall()
     total = int(summary_row["total_count"] or 0) if summary_row else 0
     known = int(summary_row["known_count"] or 0) if summary_row else 0
     unknown = int(summary_row["unknown_count"] or 0) if summary_row else 0
@@ -9063,9 +9080,13 @@ def api_cards() -> dict[str, Any]:
 
 @app.post("/api/cards/{card_id}/mark")
 def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
+    db_path = progress_db_for(PROGRESS_DB_PATH)
     try:
-        card = mark_card(card_id, payload.known_status, progress_db_path=PROGRESS_DB_PATH)
-        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
+        if not db_path.exists():
+            ensure_progress_db(db_path)
+        with closing(connect_progress_db(db_path)) as conn:
+            card = mark_card(card_id, payload.known_status, progress_db_path=db_path, conn=conn)
+            summary = read_card_mutation_summary(db_path, conn=conn)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
@@ -9075,9 +9096,13 @@ def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
 
 @app.post("/api/cards/{card_id}/bookmark")
 def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
+    db_path = progress_db_for(PROGRESS_DB_PATH)
     try:
-        card = set_bookmark(card_id, payload.bookmarked, progress_db_path=PROGRESS_DB_PATH)
-        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
+        if not db_path.exists():
+            ensure_progress_db(db_path)
+        with closing(connect_progress_db(db_path)) as conn:
+            card = set_bookmark(card_id, payload.bookmarked, progress_db_path=db_path, conn=conn)
+            summary = read_card_mutation_summary(db_path, conn=conn)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
@@ -9087,9 +9112,13 @@ def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
 
 @app.post("/api/cards/{card_id}/memo")
 def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
+    db_path = progress_db_for(PROGRESS_DB_PATH)
     try:
-        card = save_memo(card_id, payload.memo, progress_db_path=PROGRESS_DB_PATH)
-        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
+        if not db_path.exists():
+            ensure_progress_db(db_path)
+        with closing(connect_progress_db(db_path)) as conn:
+            card = save_memo(card_id, payload.memo, progress_db_path=db_path, conn=conn)
+            summary = read_card_mutation_summary(db_path, conn=conn)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:

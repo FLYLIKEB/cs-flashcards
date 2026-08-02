@@ -539,6 +539,58 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(cleared['memo'], '')
             self.assertEqual(cleared['memo_updated_at'], '')
 
+    def test_api_card_mutations_reuse_single_connection_for_summary(self):
+        scenarios = [
+            (
+                'mark',
+                lambda: flashcard_app.api_mark('CS-001', flashcard_app.MarkRequest(known_status='O')),
+                ('known_status', 'O'),
+                {'known': 1, 'unknown': 0, 'unreviewed': 0, 'bookmarked': 0, 'memo_count': 0},
+            ),
+            (
+                'bookmark',
+                lambda: flashcard_app.api_bookmark('CS-001', flashcard_app.BookmarkRequest(bookmarked=True)),
+                ('bookmarked', '1'),
+                {'known': 0, 'unknown': 0, 'unreviewed': 1, 'bookmarked': 1, 'memo_count': 0},
+            ),
+            (
+                'memo',
+                lambda: flashcard_app.api_memo('CS-001', flashcard_app.MemoRequest(memo='연결 경로 회귀 확인')),
+                ('memo', '연결 경로 회귀 확인'),
+                {'known': 0, 'unknown': 0, 'unreviewed': 1, 'bookmarked': 0, 'memo_count': 1},
+            ),
+        ]
+        for name, invoke, expected_card, expected_summary in scenarios:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                csv_path = root / 'cards.csv'
+                db_path = root / 'progress.sqlite'
+                write_sample(csv_path)
+                read_cards(csv_path, db_path)
+                original_db = flashcard_app.PROGRESS_DB_PATH
+                try:
+                    flashcard_app.PROGRESS_DB_PATH = db_path
+                    with mock.patch.object(
+                        flashcard_app,
+                        'read_cards',
+                        side_effect=AssertionError(f'{name} api should not reload full card rows'),
+                    ), mock.patch.object(
+                        flashcard_app,
+                        'connect_progress_db',
+                        wraps=flashcard_app.connect_progress_db,
+                    ) as connect_mock:
+                        data = invoke()
+                finally:
+                    flashcard_app.PROGRESS_DB_PATH = original_db
+
+                self.assertEqual(connect_mock.call_count, 1)
+                self.assertEqual(data['card'][expected_card[0]], expected_card[1])
+                self.assertEqual(data['summary']['content_db_path'], str(db_path))
+                self.assertEqual(data['summary']['progress_db_path'], str(db_path))
+                self.assertEqual(data['summary']['categories'], ['소프트웨어공학'])
+                for key, value in expected_summary.items():
+                    self.assertEqual(data['summary'][key], value)
+
     def test_mark_card_reuses_connection_for_lookup_write_and_response(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
