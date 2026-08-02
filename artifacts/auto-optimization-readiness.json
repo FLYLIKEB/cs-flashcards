@@ -1,10 +1,11 @@
 {
   "skill": "cs-auto-optimization-orchestrator",
-  "timestamp": "2026-08-02T13:24:30Z",
+  "timestamp": "2026-08-02T13:33:20Z",
   "canStartRound": false,
   "waitReasons": [
-    "2 open GitHub issues remain",
-    "2 issue worktrees remain"
+    "1 open GitHub issue remains",
+    "1 open GitHub pull request remains",
+    "1 issue worktree remains"
   ],
   "openIssues": [
     {
@@ -12,24 +13,25 @@
       "state": "OPEN",
       "title": "문제은행 launch/review helper 중복 정의 제거",
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/130"
-    },
-    {
-      "number": 129,
-      "state": "OPEN",
-      "title": "문제풀이 저장 경로를 백엔드 단일 구현으로 통합하고 API 회귀 테스트 추가",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/129"
     }
   ],
-  "openPullRequests": [],
-  "blockingWorktrees": [
+  "openPullRequests": [
     {
-      "path": "/private/tmp/cs-opt-129",
-      "branch": "refs/heads/issue-129-question-attempt-backend-path"
-    },
+      "number": 131,
+      "title": "Issue 130: 문제은행 helper 단일 정의 계약 고정",
+      "headRefName": "issue-130-question-bank-helper-dedupe",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "UNSTABLE",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/131"
+    }
+  ],
+  "blockingWorktrees": [
     {
       "path": "/private/tmp/cs-opt-130",
       "branch": "refs/heads/issue-130-question-bank-helper-dedupe"
     }
   ],
-  "summary": "라운드 23 이슈 #129/#130을 생성하고 구현 worktree를 열어 다음 라운드 게이트는 일시적으로 닫혀 있다."
+  "summary": "이슈 #129는 stale candidate로 닫혔고, 현재는 issue #130 / PR #131 검토·CI 완료 전까지 라운드 23 게이트가 닫혀 있다."
 }

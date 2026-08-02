@@ -1,26 +1,32 @@
 {
-  "updatedAt": "2026-08-02T13:24:30Z",
-  "status": "round23_in_progress",
+  "updatedAt": "2026-08-02T13:33:20Z",
+  "status": "round23_reviewing",
   "openIssues": [
-    {
-      "number": 129,
-      "title": "문제풀이 저장 경로를 백엔드 단일 구현으로 통합하고 API 회귀 테스트 추가",
-      "track": "backend",
-      "branch": "issue-129-question-attempt-backend-path",
-      "worktree": "/private/tmp/cs-opt-129",
-      "state": "implementing"
-    },
     {
       "number": 130,
       "title": "문제은행 launch/review helper 중복 정의 제거",
       "track": "frontend",
       "branch": "issue-130-question-bank-helper-dedupe",
       "worktree": "/private/tmp/cs-opt-130",
-      "state": "implementing"
+      "pullRequest": 131,
+      "state": "reviewing"
     }
   ],
-  "openPullRequests": [],
+  "openPullRequests": [
+    {
+      "number": 131,
+      "title": "Issue 130: 문제은행 helper 단일 정의 계약 고정",
+      "headRefName": "issue-130-question-bank-helper-dedupe",
+      "baseRefName": "main",
+      "state": "open"
+    }
+  ],
   "recentlyClosedIssues": [
+    {
+      "number": 129,
+      "resolution": "closed_without_code",
+      "reason": "latest origin/main already contained the previously reported fix; stale candidate"
+    },
     {
       "number": 125,
       "mergedPullRequest": 127,
