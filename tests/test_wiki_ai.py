@@ -377,9 +377,15 @@ class WikiAiRewriteTests(unittest.TestCase):
         self.assertEqual(request_mock.call_args.args[1]['design_brief'], 'CUSTOM GIF PROMPT')
 
     def test_render_wiki_gif_plan_produces_distinct_frames(self):
-        gif_bytes = flashcard_app.render_wiki_gif_plan(sample_gif_plan())
+        with mock.patch.object(flashcard_app, 'WIKI_GIF_CANVAS_SIZE', (240, 135)), mock.patch.object(
+            flashcard_app,
+            'load_wiki_gif_font',
+            return_value=flashcard_app.ImageFont.load_default(),
+        ):
+            gif_bytes = flashcard_app.render_wiki_gif_plan(sample_gif_plan())
         self.assertEqual(gif_bytes[:6], b'GIF89a')
         with Image.open(BytesIO(gif_bytes)) as image:
+            self.assertEqual(image.size, (240, 135))
             self.assertGreaterEqual(image.n_frames, 6)
             image.seek(0)
             first = image.convert('RGBA').tobytes()
@@ -395,34 +401,49 @@ class WikiAiRewriteTests(unittest.TestCase):
             try:
                 flashcard_app.WIKI_BOOK_DIR = book
                 flashcard_app.OPENAI_API_KEY = 'test-key'
-                frame_payloads = []
-                for color in ('#60a5fa', '#34d399', '#f59e0b'):
-                    buffer = BytesIO()
-                    Image.new('RGBA', (96, 54), color).save(buffer, format='PNG')
-                    frame_payloads.append(FakeUrlopenResponse({
-                        'data': [{'b64_json': base64.b64encode(buffer.getvalue()).decode('ascii')}],
-                    }))
                 with mock.patch.object(
                     flashcard_app,
-                    'request_wiki_gif_plan',
-                    return_value=sample_gif_plan(),
-                ), mock.patch.object(
-                    flashcard_app,
-                    'urlopen',
-                    side_effect=frame_payloads,
-                ) as urlopen_mock:
-                    data = flashcard_app.api_wiki_image_regenerate(
-                        flashcard_app.WikiImageRegenerateRequest(
-                            source_path='pages/intro.md',
-                            image_index=0,
-                            format='gif',
+                    'WIKI_GIF_CANVAS_SIZE',
+                    (192, 108),
+                ):
+                    frame_payloads = []
+                    for color in ('#60a5fa', '#34d399', '#f59e0b'):
+                        buffer = BytesIO()
+                        Image.new('RGBA', (24, 24), color).save(buffer, format='PNG')
+                        frame_payloads.append(FakeUrlopenResponse({
+                            'data': [{'b64_json': base64.b64encode(buffer.getvalue()).decode('ascii')}],
+                        }))
+                    original_normalize = flashcard_app.normalize_wiki_gif_frame_image
+
+                    def normalize_small(image_bytes: bytes, size=(192, 108)):
+                        return original_normalize(image_bytes, size=size)
+
+                    with mock.patch.object(
+                        flashcard_app,
+                        'request_wiki_gif_plan',
+                        return_value=sample_gif_plan(),
+                    ), mock.patch.object(
+                        flashcard_app,
+                        'urlopen',
+                        side_effect=frame_payloads,
+                    ) as urlopen_mock, mock.patch.object(
+                        flashcard_app,
+                        'normalize_wiki_gif_frame_image',
+                        side_effect=normalize_small,
+                    ):
+                        data = flashcard_app.api_wiki_image_regenerate(
+                            flashcard_app.WikiImageRegenerateRequest(
+                                source_path='pages/intro.md',
+                                image_index=0,
+                                format='gif',
+                            )
                         )
-                    )
                 asset_path = book / data['updated']['asset_relative_path']
                 self.assertEqual(asset_path.read_bytes()[:6], b'GIF89a')
                 self.assertTrue(data['updated']['asset_relative_path'].endswith('.gif'))
                 self.assertEqual(urlopen_mock.call_count, len(sample_gif_plan()['stages']))
                 with Image.open(asset_path) as image:
+                    self.assertEqual(image.size, (192, 108))
                     self.assertGreaterEqual(image.n_frames, 3)
             finally:
                 flashcard_app.WIKI_BOOK_DIR = original_book_dir
