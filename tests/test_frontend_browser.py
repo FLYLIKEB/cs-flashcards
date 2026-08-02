@@ -1439,7 +1439,41 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 QUESTION_BANK_PRACTICE_COLLAPSED_KEY,
             )
             self.assertTrue(case['stored_open_state']['filterState']['practice']['loaded'])
-
+            case['alternate_row_before_reload'] = await page.evaluate(
+                """
+                () => {
+                  const row = document.querySelector('#bankPageList tbody tr:nth-child(1)');
+                  return row ? row.getAttribute('data-table-row-id') || '' : '';
+                }
+                """
+            )
+            await page.evaluate(
+                """
+                (rowId) => {
+                  if (!rowId) return;
+                  selectQuestionBankItem(rowId);
+                }
+                """,
+                case['alternate_row_before_reload'],
+            )
+            await page.waitForFunction(
+                """
+                (rowId) => {
+                  const activeRow = document.querySelector('#bankPageList [aria-current="true"]');
+                  const summary = document.querySelector('#bankPageSelectionSummary');
+                  return activeRow
+                    && activeRow.getAttribute('data-table-row-id') === rowId
+                    && summary
+                    && summary.textContent.includes('선택 1 /')
+                    && !document.body.classList.contains('question-bank-practice-collapsed')
+                    && !document.querySelector('#bankPagePracticeFrame').hidden;
+                }
+                """,
+                {},
+                case['alternate_row_before_reload'],
+            )
+            case['practice_prompt_after_row_only_reselection'] = await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertEqual(case['practice_prompt_after_row_only_reselection'], case['practice_prompt_before_reload'])
             await page.reload({'waitUntil': 'networkidle2'})
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             await page.waitForFunction(
@@ -1483,8 +1517,27 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(case['stored_closed_state']['filterState']['filtersCollapsed'])
             self.assertTrue(case['stored_closed_state']['filterState']['practice']['loaded'])
             self.assertEqual(case['stored_closed_state']['practiceCollapsed'], '1')
-
-
+            await page.evaluate(
+                """
+                (filterKey, rowId) => {
+                  const state = JSON.parse(window.localStorage.getItem(filterKey) || 'null');
+                  if (!state || !rowId) return;
+                  state.selection = {
+                    selectedId: rowId,
+                    startIndex: 0,
+                  };
+                  window.localStorage.setItem(filterKey, JSON.stringify(state));
+                }
+                """,
+                QUESTION_BANK_FILTER_STATE_KEY,
+                case['alternate_row_before_reload'],
+            )
+            case['stored_closed_state_with_diverged_selection'] = await page.evaluate(
+                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertEqual(case['stored_closed_state_with_diverged_selection']['selection']['selectedId'], case['alternate_row_before_reload'])
+            self.assertEqual(case['stored_closed_state_with_diverged_selection']['practice']['selectedId'], case['active_row_before_reload'])
             await page.reload({'waitUntil': 'networkidle2'})
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             await page.waitForFunction(
@@ -1518,6 +1571,91 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-pane-state-reload', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_page_restores_row_selection_without_reopening_practice_on_reload(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            case['second_row_id'] = await page.evaluate(
+                "document.querySelector('#bankPageList tbody tr:nth-child(2)')?.getAttribute('data-table-row-id') || ''"
+            )
+            await page.evaluate(
+                """
+                (rowId) => {
+                  if (!rowId) return;
+                  selectQuestionBankItem(rowId);
+                }
+                """,
+                case['second_row_id'],
+            )
+            await page.waitForFunction(
+                """
+                (expectedId) => {
+                  const activeRow = document.querySelector('#bankPageList [aria-current="true"]');
+                  const summary = document.querySelector('#bankPageSelectionSummary');
+                  return activeRow
+                    && activeRow.getAttribute('data-table-row-id') === expectedId
+                    && summary
+                    && summary.textContent.includes('선택 2 /')
+                    && document.body.classList.contains('question-bank-practice-collapsed')
+                    && document.querySelector('#bankPagePracticeFrame').hidden;
+                }
+                """,
+                {},
+                case['second_row_id'],
+            )
+            case['stored_selection_before_reload'] = await page.evaluate(
+                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertEqual(case['stored_selection_before_reload']['selection']['selectedId'], case['second_row_id'])
+            self.assertEqual(case['stored_selection_before_reload']['selection']['startIndex'], 1)
+            self.assertFalse(case['stored_selection_before_reload']['practice']['loaded'])
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.waitForFunction(
+                """
+                (expectedId) => {
+                  const activeRow = document.querySelector('#bankPageList [aria-current="true"]');
+                  const summary = document.querySelector('#bankPageSelectionSummary');
+                  const practiceToggle = document.querySelector('#bankPageTogglePracticeBtn');
+                  return activeRow
+                    && activeRow.getAttribute('data-table-row-id') === expectedId
+                    && summary
+                    && summary.textContent.includes('선택 2 /')
+                    && document.body.classList.contains('question-bank-practice-collapsed')
+                    && document.querySelector('#bankPagePracticeFrame').hidden
+                    && practiceToggle
+                    && practiceToggle.disabled;
+                }
+                """,
+                {},
+                case['second_row_id'],
+            )
+            case['selection_state_after_reload'] = await page.evaluate(
+                """
+                () => ({
+                  activeRowId: document.querySelector('#bankPageList [aria-current="true"]')?.getAttribute('data-table-row-id') || '',
+                  selectionSummary: document.querySelector('#bankPageSelectionSummary')?.textContent || '',
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame').hidden,
+                  practiceToggleDisabled: document.querySelector('#bankPageTogglePracticeBtn').disabled,
+                })
+                """
+            )
+            self.assertEqual(case['selection_state_after_reload']['activeRowId'], case['second_row_id'])
+            self.assertIn('선택 2 /', case['selection_state_after_reload']['selectionSummary'])
+            self.assertTrue(case['selection_state_after_reload']['practiceCollapsed'])
+            self.assertTrue(case['selection_state_after_reload']['practiceFrameHidden'])
+            self.assertTrue(case['selection_state_after_reload']['practiceToggleDisabled'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-selection-reload', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_page_does_not_reopen_practice_from_stale_open_bit_without_session(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
@@ -1531,6 +1669,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                   window.localStorage.setItem(filterKey, JSON.stringify({
                     filters: {},
                     filtersCollapsed: false,
+                    selection: {selectedId: '', startIndex: 0},
                     practice: {loaded: false, selectedId: '', startIndex: 1},
                   }));
                   window.localStorage.setItem(practiceKey, '0');
