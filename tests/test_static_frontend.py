@@ -243,7 +243,11 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'function finishQuestionSession()',
             'function questionHasSubmittedAnswer(question)',
             'function markUnansweredQuestionWrong(question, answeredAt = new Date().toISOString())',
-            "markUnansweredQuestionWrong(question, finishedAt);",
+            'function finalizeQuestionJudgment(question, answeredAt = new Date().toISOString())',
+            'function questionSessionScoreSummary(questions = state.questions)',
+            'strong>${escapeHtml(sessionSummary.scoreLabel)}</strong>',
+            "summary: questionSessionScoreSummary(),",
+            "finalizeQuestionJudgment(question, finishedAt);",
             'function saveCurrentWrongNote()',
             'question-answer-input',
             'question-wrong-note',
@@ -274,6 +278,15 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'question-judgment-badge',
             'is-judged-wrong',
             '틀림 표시됨',
+            "${isWrongSelection ? ' wrong selected-wrong' : ''}",
+            'question-choice-badges',
+            'question-choice-badge answer',
+            'question-choice-badge wrong',
+            'question-session-score-grid',
+            'question-session-missed-chip',
+            '총괄 채점',
+            '빨간 표시 문제',
+            '채점 완료 · ${sessionSummary.scorePercent}점',
             'question-review-box',
             'question-review-actions',
             "markQuestionSourceCard('O')",
@@ -336,10 +349,24 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-practice-status', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-header-chip', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-filter-chip', TABLE_SHELL_CSS)
+        self.assertIn('.question-choice-badges', STYLE_CSS)
+        self.assertIn('.question-choice-badge.answer', STYLE_CSS)
+        self.assertIn('.question-choice.selected-wrong', STYLE_CSS)
+        self.assertIn('.question-session-summary.is-finished', STYLE_CSS)
+        self.assertIn('.question-session-score-grid', STYLE_CSS)
+        self.assertIn('.question-session-missed-chip', STYLE_CSS)
+        self.assertIn('.question-side-note.is-score', STYLE_CSS)
+        self.assertIn('.question-card-shell.is-session-finished', STYLE_CSS)
+        self.assertIn('.question-embed-topbar.is-finished', STYLE_CSS)
+        self.assertIn('.question-embed-topbar-status.finished', STYLE_CSS)
         self.assertIn('.question-bank-header-chip-button', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-table-selection', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-shell-header-chips', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-guide-table', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-metric-card.score', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-summary-pill.attempt-wrong', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-row-number.is-wrong::after', TABLE_SHELL_CSS)
+        self.assertIn('.question-choice.wrong', STYLE_CSS)
 
     def test_concept_html_widgets_use_trusted_iframe_boundary(self):
         self.assertIn("const TRUSTED_CONCEPT_WIDGET_HTML_KIND = 'concept-widget';", APP_JS)

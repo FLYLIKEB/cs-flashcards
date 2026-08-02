@@ -514,9 +514,9 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             {'selector': selector, 'value': value, 'submit': submit},
         )
 
-    def question_bank_item(self, label: str, *, status: str = 'unseen') -> dict[str, object]:
+    def question_bank_item(self, label: str, *, status: str = 'unseen', **overrides: object) -> dict[str, object]:
         status_labels = {'unseen': '안푼', 'wrong': '틀린', 'correct': '맞은'}
-        return {
+        item: dict[str, object] = {
             'question_bank_id': f'{label}-1',
             'prompt': f'{label} prompt',
             'body': f'{label} body',
@@ -532,6 +532,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             'question_attempt_status': status,
             'question_attempt_status_label': status_labels[status],
         }
+        item.update(overrides)
+        return item
 
     def question_bank_payload(self, label: str, *, items: list[dict[str, object]] | None = None) -> dict[str, object]:
         payload_items = list(items) if items is not None else [self.question_bank_item(label)]
@@ -1122,6 +1124,93 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-status-column', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_finish_grading_shows_score_and_wrong_highlights(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        wrong_item = self.question_bank_item(
+            '첫 오답',
+            question_type='multiple_choice',
+            choices=['내 답', '정답'],
+            answer='정답',
+            answer_index=1,
+            points=50,
+        )
+        correct_item = self.question_bank_item(
+            '둘째 정답',
+            question_type='multiple_choice',
+            choices=['정답', '오답'],
+            answer='정답',
+            answer_index=0,
+            points=50,
+        )
+        payload = self.question_bank_payload('finish-grading', items=[wrong_item, correct_item])
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (payload) => {
+                  const originalFetch = window.fetch.bind(window);
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname !== '/api/question-bank') return originalFetch(input, init);
+                    return Promise.resolve(new Response(JSON.stringify(payload), {
+                      status: 200,
+                      headers: {'Content-Type': 'application/json'},
+                    }));
+                  };
+                }
+                """,
+                payload,
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList tbody tr').length === 2")
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+
+            await embed_frame.click('[data-choice-index="0"]')
+            await embed_frame.click('[data-question-nav="next"]')
+            await embed_frame.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('둘째 정답 prompt')")
+            await embed_frame.click('[data-choice-index="0"]')
+            await embed_frame.evaluate("document.getElementById('finishQuestionSessionBtn').click()")
+
+            await page.waitForFunction("document.querySelector('#bankPagePracticeStatus').textContent.includes('점수 50 / 100점')")
+            case['practice_status'] = await self.text(page, '#bankPagePracticeStatus')
+            case['header_summary'] = await self.text(page, '#bankPageHeaderSummary')
+            case['overview_cards'] = await page.evaluate(
+                "() => [...document.querySelectorAll('#bankPageOverviewCards .question-bank-metric-card')].map((node) => (node.textContent || '').replace(/\\s+/g, ' ').trim())"
+            )
+            case['table_rows'] = await page.evaluate(
+                """
+                () => [...document.querySelectorAll('#bankPageList tbody tr')].map((row) => ({
+                  className: row.className,
+                  status: (row.children[1]?.textContent || '').replace(/\s+/g, ' ').trim(),
+                  numberClass: row.querySelector('.question-bank-row-number')?.className || '',
+                }))
+                """
+            )
+            self.assertIn('점수 50 / 100점', case['practice_status'])
+            self.assertIn('채점 완료', case['header_summary'])
+            self.assertTrue(any('50 / 100점' in card for card in case['overview_cards']))
+            self.assertEqual(case['table_rows'][0]['status'], '틀린')
+            self.assertIn('question-bank-row-state-wrong', case['table_rows'][0]['className'])
+            self.assertIn('is-wrong', case['table_rows'][0]['numberClass'])
+            self.assertEqual(case['table_rows'][1]['status'], '맞은')
+
+            await embed_frame.evaluate("document.querySelector('[data-question-nav=\"prev\"]')?.click()")
+            await embed_frame.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('첫 오답 prompt')")
+            case['choice_classes'] = await embed_frame.evaluate(
+                "() => [...document.querySelectorAll('[data-choice-index]')].map((node) => ({text: (node.textContent || '').trim(), className: node.className}))"
+            )
+            self.assertIn('wrong', case['choice_classes'][0]['className'])
+            self.assertIn('selected', case['choice_classes'][0]['className'])
+            self.assertIn('answer', case['choice_classes'][1]['className'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-finish-grading-ui', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_page_preserves_filters_across_reload_until_reset(self):
