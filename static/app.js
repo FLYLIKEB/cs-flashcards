@@ -6686,9 +6686,10 @@ function toggleQuestionMode(force = !state.questionMode) {
 
 function openQuestionPracticeFromMenu() {
   const event = arguments[0] || null;
+  const trigger = event?.currentTarget || $('questionPracticeBtn') || document.activeElement;
   toggleMenu(false);
-  rememberQuestionModeOpener(event?.currentTarget || $('questionPracticeBtn') || document.activeElement);
-  toggleQuestionMode(true);
+  rememberQuestionModeOpener(trigger);
+  toggleQuestionMode(!state.questionMode);
 }
 
 function revealQuestionAnswer() {
