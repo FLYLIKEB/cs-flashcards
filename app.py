@@ -1367,6 +1367,13 @@ def ensure_progress_db(
                 conn.execute(f"ALTER TABLE question_attempts ADD COLUMN {column} {definition}")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_card_id ON question_attempts(card_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_bank_id ON question_attempts(question_bank_id)")
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_question_attempts_bank_latest
+            ON question_attempts(question_bank_id, updated_at DESC, created_at DESC, question_id DESC)
+            WHERE TRIM(COALESCE(question_bank_id, '')) <> ''
+            """
+        )
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
         _drop_empty_card_progress_sentinel(conn)
