@@ -1,6 +1,6 @@
 # Auto Optimization Audit 27
 
-- Checked at: 2026-08-02T20:55:11Z
+- Checked at: 2026-08-02T21:09:30Z
 - Base: `origin/main` @ `a65d321`
 - Round: 38
 
@@ -25,3 +25,7 @@
   - 여러 hot path가 `ensure_progress_db()`를 통해 이미 초기화된 DB에서도 `question_bank` 전체 difficulty/keyword 백필을 반복 실행한다.
   - 이 백필은 전역 스캔 비용이 커서 steady-state read/save 요청에 불필요한 SQLite 작업을 더한다.
   - 현재 테스트는 connection 재사용만 검증하고, 반복 호출에서 전역 백필이 다시 돌지 않는 계약은 지키지 못한다.
+
+## Closeout
+- Merged PRs: #192, #193
+- Round 38 gate reopened after merge cleanup.

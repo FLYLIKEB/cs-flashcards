@@ -1,52 +1,29 @@
 {
-  "checked_at": "2026-08-02T21:04:57Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T21:09:30Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 1,
-    "open_pr_count": 1,
-    "blocking_worktree_count": 1,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 191,
-      "state": "OPEN",
-      "title": "읽기/풀이 요청마다 문제은행 전체 백필을 다시 돌리지 않기",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/191"
-    }
-  ],
-  "open_prs": [
-    {
-      "number": 193,
-      "state": "OPEN",
-      "title": "Issue 191: 문제은행 전역 백필 hot path 게이트 추가",
-      "head": "issue-191-question-bank-backfill-gate",
-      "base": "main",
-      "merge_state_status": "UNKNOWN",
-      "checks": [
-        "frontend-browser:SUCCESS"
-      ],
-      "review": "block",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/193"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-191",
-      "branch": "issue-191-question-bank-backfill-gate",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
     {
       "issue": 190,
       "pr": 192,
       "merge_commit": "6e9eba8f5cfd036a333d2672055e011a0144ecbc"
+    },
+    {
+      "issue": 191,
+      "pr": 193,
+      "merge_commit": "7905101b78ad17bee20e4fe3e80322e9b079c629"
     }
   ],
   "notes": [
-    "Issue #190 / PR #192 merged and cleaned up.",
-    "Issue #191 remains blocked on PR #193 until the global question-bank backfill is gated off steady-state hot paths."
+    "Round 38 PRs #192 and #193 merged; readiness gate reopened."
   ]
 }

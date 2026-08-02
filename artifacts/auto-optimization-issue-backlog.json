@@ -1,15 +1,7 @@
 {
-  "generated_at": "2026-08-02T21:04:57Z",
+  "generated_at": "2026-08-02T21:09:30Z",
   "wave": "2026-08-02-round-38",
-  "queue": [
-    {
-      "issue": 191,
-      "title": "읽기/풀이 요청마다 문제은행 전체 백필을 다시 돌리지 않기",
-      "branch": "issue-191-question-bank-backfill-gate",
-      "pr": 193,
-      "status": "pr_open_blocked"
-    }
-  ],
+  "queue": [],
   "completed": [
     {
       "issue": 190,
@@ -19,6 +11,15 @@
       "status": "merged",
       "merge_commit": "6e9eba8f5cfd036a333d2672055e011a0144ecbc",
       "merged_at": "2026-08-02T21:04:12Z"
+    },
+    {
+      "issue": 191,
+      "title": "읽기/풀이 요청마다 문제은행 전체 백필을 다시 돌리지 않기",
+      "branch": "issue-191-question-bank-backfill-gate",
+      "pr": 193,
+      "status": "merged",
+      "merge_commit": "7905101b78ad17bee20e4fe3e80322e9b079c629",
+      "merged_at": "2026-08-02T21:08:51Z"
     }
   ],
   "closed_without_merge": [],
