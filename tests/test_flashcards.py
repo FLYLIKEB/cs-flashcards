@@ -3114,6 +3114,296 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(wrong['items'][0]['question_attempt_status'], 'wrong')
             self.assertEqual(flashcard_app.read_question_bank_entries(db_path, attempt_status='correct', limit=10)['summary']['total'], 0)
 
+    def test_question_bank_entry_and_attempt_views_share_legacy_is_correct_fallback(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': 'legacy correct prompt',
+                        'body': 'legacy correct body',
+                        'answer': '정답',
+                        'explanation': '해설',
+                        'rubric': ['포인트'],
+                        'topic': '데이터베이스',
+                        'field_name': '테스트',
+                        'keywords': ['legacy', 'correct'],
+                        'difficulty': '중',
+                        'issuer': '테스트',
+                        'source_location': 'legacy 1',
+                        'section': '연습문제',
+                        'points': 10,
+                        'expected_time_seconds': 300,
+                        'answer_guide': '정의 → 목적',
+                        'session_mode': 'practice',
+                    },
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': 'legacy wrong prompt',
+                        'body': 'legacy wrong body',
+                        'answer': '정답',
+                        'explanation': '해설',
+                        'rubric': ['포인트'],
+                        'topic': '데이터베이스',
+                        'field_name': '테스트',
+                        'keywords': ['legacy', 'wrong'],
+                        'difficulty': '중',
+                        'issuer': '테스트',
+                        'source_location': 'legacy 2',
+                        'section': '연습문제',
+                        'points': 10,
+                        'expected_time_seconds': 300,
+                        'answer_guide': '정의 → 목적',
+                        'session_mode': 'practice',
+                    },
+                ],
+                db_path,
+            )
+            correct_item, wrong_item = saved['items']
+            now = '2026-08-03T00:00:00Z'
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.executemany(
+                    """
+                    INSERT INTO question_attempts (
+                        question_id, question_bank_id, card_id, question_type, prompt, body, user_answer,
+                        selected_choice_index, is_correct, judgment, wrong_note, session_id, session_title,
+                        session_mode, section, points, expected_time_seconds, answer_guide, question_order,
+                        question_elapsed_seconds, session_elapsed_seconds, time_limit_seconds, question_started_at,
+                        answered_at, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    [
+                        (
+                            'legacy-correct-attempt',
+                            correct_item['question_bank_id'],
+                            'CS-001',
+                            correct_item['question_type'],
+                            correct_item['prompt'],
+                            correct_item['body'],
+                            'legacy correct answer',
+                            None,
+                            1,
+                            '',
+                            '',
+                            '',
+                            '',
+                            'practice',
+                            correct_item['section'],
+                            correct_item['points'],
+                            correct_item['expected_time_seconds'],
+                            correct_item['answer_guide'],
+                            None,
+                            None,
+                            None,
+                            None,
+                            '',
+                            now,
+                            now,
+                            now,
+                        ),
+                        (
+                            'legacy-wrong-attempt',
+                            wrong_item['question_bank_id'],
+                            'CS-001',
+                            wrong_item['question_type'],
+                            wrong_item['prompt'],
+                            wrong_item['body'],
+                            'legacy wrong answer',
+                            None,
+                            0,
+                            '',
+                            'legacy wrong note',
+                            '',
+                            '',
+                            'practice',
+                            wrong_item['section'],
+                            wrong_item['points'],
+                            wrong_item['expected_time_seconds'],
+                            wrong_item['answer_guide'],
+                            None,
+                            None,
+                            None,
+                            None,
+                            '',
+                            now,
+                            now,
+                            now,
+                        ),
+                    ],
+                )
+                conn.commit()
+
+            listed = flashcard_app.read_question_bank_entries(db_path, attempt_status='', limit=10)
+            listed_map = {item['question_bank_id']: item for item in listed['items']}
+            self.assertEqual(listed_map[correct_item['question_bank_id']]['question_attempt_status'], 'correct')
+            self.assertEqual(listed_map[wrong_item['question_bank_id']]['question_attempt_status'], 'wrong')
+            self.assertEqual(listed['summary']['category_breakdown'][0]['correct_count'], 1)
+            self.assertEqual(listed['summary']['category_breakdown'][0]['wrong_count'], 1)
+            self.assertEqual(flashcard_app.read_question_bank_entries(db_path, attempt_status='unseen', limit=10)['summary']['total'], 0)
+
+            attempts_correct = flashcard_app.read_question_bank_attempts(
+                db_path,
+                question_bank_ids=[correct_item['question_bank_id'], wrong_item['question_bank_id']],
+                result='correct',
+                limit=10,
+            )
+            attempts_wrong = flashcard_app.read_question_bank_attempts(
+                db_path,
+                question_bank_ids=[correct_item['question_bank_id'], wrong_item['question_bank_id']],
+                result='wrong',
+                limit=10,
+            )
+            self.assertEqual([item['question_bank_id'] for item in attempts_correct['items']], [correct_item['question_bank_id']])
+            self.assertEqual([item['question_bank_id'] for item in attempts_wrong['items']], [wrong_item['question_bank_id']])
+            self.assertEqual(attempts_correct['items'][0]['judgment'], 'correct')
+            self.assertEqual(attempts_wrong['items'][0]['judgment'], 'wrong')
+            self.assertEqual(attempts_wrong['items'][0]['wrong_note'], 'legacy wrong note')
+
+    def test_question_bank_legacy_blank_judgment_falls_back_to_is_correct_consistently(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '정규화의 목적은?',
+                        'body': '중복과 이상 현상 관점에서 설명하시오.',
+                        'answer': '데이터 중복을 줄이고 이상 현상을 방지한다.',
+                        'explanation': '정규화는 스키마 일관성을 높인다.',
+                        'rubric': ['중복 감소', '이상 현상 방지'],
+                        'topic': '데이터베이스',
+                        'field_name': '테스트',
+                        'keywords': ['정규화'],
+                        'difficulty': '중',
+                        'issuer': '테스트',
+                        'source_location': '테스트 문제 1',
+                        'section': '연습문제',
+                        'points': 10,
+                        'expected_time_seconds': 300,
+                        'answer_guide': '정의 → 목적',
+                        'session_mode': 'practice',
+                    },
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '트랜잭션의 ACID를 설명하시오.',
+                        'body': '각 속성의 의미를 간단히 적으시오.',
+                        'answer': '원자성, 일관성, 고립성, 지속성이다.',
+                        'explanation': '트랜잭션의 핵심 보장이다.',
+                        'rubric': ['원자성', '일관성', '고립성', '지속성'],
+                        'topic': '데이터베이스',
+                        'field_name': '테스트',
+                        'keywords': ['ACID'],
+                        'difficulty': '중',
+                        'issuer': '테스트',
+                        'source_location': '테스트 문제 2',
+                        'section': '연습문제',
+                        'points': 10,
+                        'expected_time_seconds': 300,
+                        'answer_guide': '약어 → 의미',
+                        'session_mode': 'practice',
+                    },
+                ],
+                db_path,
+            )
+            first_question = saved['items'][0]
+            second_question = saved['items'][1]
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='legacy-bank-correct',
+                    question_bank_id=first_question['question_bank_id'],
+                    card_id='CS-001',
+                    question_type=first_question['question_type'],
+                    prompt=first_question['prompt'],
+                    body=first_question['body'],
+                    judgment='correct',
+                    user_answer='중복을 줄인다.',
+                ),
+                db_path,
+            )
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='legacy-bank-wrong',
+                    question_bank_id=second_question['question_bank_id'],
+                    card_id='CS-001',
+                    question_type=second_question['question_type'],
+                    prompt=second_question['prompt'],
+                    body=second_question['body'],
+                    judgment='wrong',
+                    user_answer='트랜잭션은 빠를수록 좋다.',
+                    wrong_note='레거시 오답 행',
+                ),
+                db_path,
+            )
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute(
+                    "UPDATE question_attempts SET judgment = '' WHERE question_id IN (?, ?)",
+                    ('legacy-bank-correct', 'legacy-bank-wrong'),
+                )
+                conn.commit()
+
+            listed = flashcard_app.read_question_bank_entries(db_path, issuer='테스트', limit=10)
+            breakdown = listed['summary']['category_breakdown']
+            self.assertEqual(len(breakdown), 1)
+            self.assertEqual(breakdown[0]['correct_count'], 1)
+            self.assertEqual(breakdown[0]['wrong_count'], 1)
+            self.assertEqual(breakdown[0]['unseen_count'], 0)
+            item_map = {item['question_bank_id']: item for item in listed['items']}
+            self.assertEqual(item_map[first_question['question_bank_id']]['question_attempt_status'], 'correct')
+            self.assertEqual(item_map[first_question['question_bank_id']]['question_attempt_judgment'], 'correct')
+            self.assertEqual(item_map[second_question['question_bank_id']]['question_attempt_status'], 'wrong')
+            self.assertEqual(item_map[second_question['question_bank_id']]['question_attempt_judgment'], 'wrong')
+
+            correct_list = flashcard_app.read_question_bank_entries(db_path, issuer='테스트', attempt_status='correct', limit=10)
+            wrong_list = flashcard_app.read_question_bank_entries(db_path, issuer='테스트', attempt_status='wrong', limit=10)
+            self.assertEqual(correct_list['summary']['total'], 1)
+            self.assertEqual(correct_list['items'][0]['question_bank_id'], first_question['question_bank_id'])
+            self.assertEqual(wrong_list['summary']['total'], 1)
+            self.assertEqual(wrong_list['items'][0]['question_bank_id'], second_question['question_bank_id'])
+
+            attempts = flashcard_app.read_question_bank_attempts(
+                db_path,
+                question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
+                limit=10,
+            )
+            self.assertEqual(attempts['summary']['correct'], 1)
+            self.assertEqual(attempts['summary']['wrong'], 1)
+            attempt_map = {item['question_bank_id']: item for item in attempts['items']}
+            self.assertEqual(attempt_map[first_question['question_bank_id']]['judgment'], 'correct')
+            self.assertEqual(attempt_map[second_question['question_bank_id']]['judgment'], 'wrong')
+
+            correct_attempts = flashcard_app.read_question_bank_attempts(
+                db_path,
+                question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
+                result='correct',
+                limit=10,
+            )
+            wrong_attempts = flashcard_app.read_question_bank_attempts(
+                db_path,
+                question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
+                result='wrong',
+                limit=10,
+            )
+            self.assertEqual([item['question_bank_id'] for item in correct_attempts['items']], [first_question['question_bank_id']])
+            self.assertEqual(correct_attempts['items'][0]['judgment'], 'correct')
+            self.assertEqual([item['question_bank_id'] for item in wrong_attempts['items']], [second_question['question_bank_id']])
+            self.assertEqual(wrong_attempts['items'][0]['judgment'], 'wrong')
+
     def test_api_question_bank_ai_refine_answer_updates_existing_row(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

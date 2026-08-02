@@ -2419,6 +2419,21 @@ def resolved_question_attempt_judgment(value: str | None, is_correct: bool | Non
         return "wrong"
     return "pending"
 
+def resolved_question_bank_attempt_status(value: str | None, is_correct: bool | None) -> str:
+    judgment = resolved_question_attempt_judgment(value, is_correct)
+    if judgment == "correct":
+        return "correct"
+    if judgment in {"ambiguous", "wrong", "unknown"}:
+        return "wrong"
+    return "unseen"
+
+
+def resolved_question_attempt_judgment_sql(*, judgment_column: str = "judgment", is_correct_column: str = "is_correct") -> str:
+    return (
+        f"CASE WHEN TRIM(COALESCE({judgment_column}, '')) <> '' THEN LOWER(TRIM({judgment_column})) "
+        f"WHEN {is_correct_column} = 1 THEN 'correct' WHEN {is_correct_column} = 0 THEN 'wrong' ELSE 'pending' END"
+    )
+
 
 def normalize_question_attempt_judgment(value: str | None, is_correct: bool | None = None) -> str:
     raw = str(value or "").strip().lower()
@@ -3315,12 +3330,16 @@ def read_question_bank_entries(
         )
         needle = f"%{filters['query'].lower()}%"
         params.extend([needle] * 11)
+    latest_attempt_judgment_sql = resolved_question_attempt_judgment_sql(
+        judgment_column="latest_attempt.judgment",
+        is_correct_column="latest_attempt.is_correct",
+    )
     if filters["attempt_status"] == "unseen":
-        where_clauses.append("(latest_attempt.question_bank_id IS NULL OR latest_attempt.judgment = 'pending')")
+        where_clauses.append(f"(latest_attempt.question_bank_id IS NULL OR {latest_attempt_judgment_sql} = 'pending')")
     elif filters["attempt_status"] == "correct":
-        where_clauses.append("latest_attempt.judgment = 'correct'")
+        where_clauses.append(f"{latest_attempt_judgment_sql} = 'correct'")
     elif filters["attempt_status"] == "wrong":
-        where_clauses.append("latest_attempt.judgment IN ('ambiguous', 'wrong', 'unknown')")
+        where_clauses.append(f"{latest_attempt_judgment_sql} IN ('ambiguous', 'wrong', 'unknown')")
     where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
     latest_attempt_join_sql = """
         LEFT JOIN (
@@ -3371,9 +3390,9 @@ def read_question_bank_entries(
                 SUM(CASE WHEN question_bank.difficulty = '상' THEN 1 ELSE 0 END) AS high_difficulty_count,
                 SUM(CASE WHEN question_bank.difficulty = '중' THEN 1 ELSE 0 END) AS medium_difficulty_count,
                 SUM(CASE WHEN question_bank.difficulty = '하' THEN 1 ELSE 0 END) AS low_difficulty_count,
-                SUM(CASE WHEN latest_attempt.question_bank_id IS NULL OR latest_attempt.judgment = 'pending' THEN 1 ELSE 0 END) AS unseen_count,
-                SUM(CASE WHEN latest_attempt.judgment = 'correct' THEN 1 ELSE 0 END) AS correct_count,
-                SUM(CASE WHEN latest_attempt.judgment IN ('ambiguous', 'wrong', 'unknown') THEN 1 ELSE 0 END) AS wrong_count
+                SUM(CASE WHEN latest_attempt.question_bank_id IS NULL OR {latest_attempt_judgment_sql} = 'pending' THEN 1 ELSE 0 END) AS unseen_count,
+                SUM(CASE WHEN {latest_attempt_judgment_sql} = 'correct' THEN 1 ELSE 0 END) AS correct_count,
+                SUM(CASE WHEN {latest_attempt_judgment_sql} IN ('ambiguous', 'wrong', 'unknown') THEN 1 ELSE 0 END) AS wrong_count
             FROM question_bank
             {latest_attempt_join_sql}
             {where_sql}
@@ -3442,13 +3461,9 @@ def read_question_bank_entries(
     for row in query_rows:
         item = question_bank_row_to_dict(row) or {}
         card = card_map.get(item.get("card_id", ""), {})
-        latest_judgment = str(row["latest_attempt_judgment"] or "").strip().lower()
-        if latest_judgment == "correct":
-            item["question_attempt_status"] = "correct"
-        elif latest_judgment in {"ambiguous", "wrong", "unknown"}:
-            item["question_attempt_status"] = "wrong"
-        else:
-            item["question_attempt_status"] = "unseen"
+        latest_is_correct = None if row["latest_attempt_is_correct"] is None else bool(int(row["latest_attempt_is_correct"]))
+        latest_judgment = resolved_question_attempt_judgment(row["latest_attempt_judgment"], latest_is_correct)
+        item["question_attempt_status"] = resolved_question_bank_attempt_status(row["latest_attempt_judgment"], latest_is_correct)
         item["question_attempt_judgment"] = latest_judgment or "pending"
         item["question_attempt_status_label"] = QUESTION_BANK_ATTEMPT_FILTER_LABELS.get(item["question_attempt_status"], "안푼")
         item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
@@ -5578,7 +5593,7 @@ def read_question_attempts(
         where_clauses.append(f"card_id IN ({placeholders})")
         where_params.extend(selected_ids)
 
-    judgment_sql = "CASE WHEN TRIM(COALESCE(judgment, '')) <> '' THEN LOWER(TRIM(judgment)) WHEN is_correct = 1 THEN 'correct' WHEN is_correct = 0 THEN 'wrong' ELSE 'pending' END"
+    judgment_sql = resolved_question_attempt_judgment_sql()
     base_where = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
     list_clauses = list(where_clauses)
     list_params = list(where_params)
@@ -5727,7 +5742,10 @@ def read_question_bank_attempts(
         where_clauses.append(f"question_attempts.question_bank_id IN ({placeholders})")
         where_params.extend(selected_ids)
 
-    judgment_sql = "CASE WHEN TRIM(COALESCE(question_attempts.judgment, '')) <> '' THEN LOWER(TRIM(question_attempts.judgment)) WHEN question_attempts.is_correct = 1 THEN 'correct' WHEN question_attempts.is_correct = 0 THEN 'wrong' ELSE 'pending' END"
+    judgment_sql = resolved_question_attempt_judgment_sql(
+        judgment_column="question_attempts.judgment",
+        is_correct_column="question_attempts.is_correct",
+    )
     base_where = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
     list_clauses = list(where_clauses)
     list_params = list(where_params)
