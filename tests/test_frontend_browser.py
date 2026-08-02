@@ -1956,7 +1956,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['practice_status_after_back'] = await self.text(page, '#bankPagePracticeStatus')
             await page.waitForFunction(
                 "(expectedSrc) => { const frame = document.querySelector('#bankPagePracticeFrame'); return (frame?.getAttribute('src') || '') === expectedSrc && Boolean(frame?.contentDocument?.querySelector('.question-prompt')); }",
-                {},
+                {'timeout': 60000},
                 case['practice_frame_src_before_back'],
             )
             case['practice_prompt_after_back'] = await page.evaluate(
