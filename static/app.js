@@ -3304,7 +3304,7 @@ button.setAttribute('aria-pressed', String(state.bookmarkFilter));
 function setBookmarkFilter(enabled) {
   state.bookmarkFilter = Boolean(enabled);
   state.index = 0;
-  toggleMenu(false);
+  closeHeaderMenu({restoreFocus: true});
   applyFilters();
   setMessage(state.bookmarkFilter ? '북마크 카드만 표시합니다.' : '북마크 필터를 해제했습니다.');
 }
