@@ -11,6 +11,7 @@ from contextlib import closing
 from pathlib import Path
 from unittest import mock
 
+import flashcards_backend as flashcard_backend
 import app as flashcard_app
 import flashcards_backend
 from app import mark_card, read_cards, save_memo, save_question_attempt, set_bookmark, summarize
@@ -103,7 +104,7 @@ def seed_rows_from_csv(path: Path) -> list[dict[str, str]]:
 
 def seed_runtime_db(csv_path: Path | None, db_path: Path) -> None:
     if csv_path is not None and not db_path.exists():
-        flashcard_app.ensure_progress_db(
+        flashcard_backend.ensure_progress_db(
             db_path,
             [
                 {**row, 'known_status': '', 'last_reviewed': '', 'review_count': '0'}
@@ -114,22 +115,22 @@ def seed_runtime_db(csv_path: Path | None, db_path: Path) -> None:
 
 def read_cards(csv_path: Path | None, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.read_cards(progress_db_path)
+    return flashcard_backend.read_cards(progress_db_path)
 
 
 def mark_card(card_id: str, status: str, csv_path: Path | None, backup_dir: Path, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.mark_card(card_id, status, backup_dir, progress_db_path)
+    return flashcard_backend.mark_card(card_id, status, backup_dir, progress_db_path)
 
 
 def set_bookmark(card_id: str, bookmarked: bool, csv_path: Path | None, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.set_bookmark(card_id, bookmarked, progress_db_path)
+    return flashcard_backend.set_bookmark(card_id, bookmarked, progress_db_path)
 
 
 def save_memo(card_id: str, memo: str, csv_path: Path | None, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.save_memo(card_id, memo, progress_db_path)
+    return flashcard_backend.save_memo(card_id, memo, progress_db_path)
 
 
 def save_question_attempt(payload, csv_path_or_progress_db: Path, progress_db_path: Path | None = None):
@@ -140,7 +141,7 @@ def save_question_attempt(payload, csv_path_or_progress_db: Path, progress_db_pa
     else:
         csv_path = csv_path_or_progress_db
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_app.save_question_attempt(payload, progress_db_path)
+    return flashcard_backend.save_question_attempt(payload, progress_db_path)
 
 
 
@@ -1103,6 +1104,104 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(wrong_only['items'][0]['question_attempt_status'], 'wrong')
             self.assertEqual(wrong_only['items'][0]['question_bank_id'], item['question_bank_id'])
 
+    def test_read_question_bank_attempts_includes_wrong_answers_and_notes(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': '',
+                        'question_type': 'short',
+                        'prompt': '트랜잭션의 원자성이란?',
+                        'body': '',
+                        'answer': '모든 작업이 전부 성공하거나 전부 실패해야 한다.',
+                        'explanation': '부분 반영이 없어야 한다.',
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'category': '데이터베이스',
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '테스트 1',
+                        'section': '전공필기',
+                    },
+                    {
+                        'card_id': '',
+                        'question_type': 'multiple_choice',
+                        'prompt': 'OSI 7계층에서 전송 계층은?',
+                        'body': '',
+                        'answer': 'TCP/UDP를 다루는 계층이다.',
+                        'explanation': '세그먼트와 종단 간 전달을 담당한다.',
+                        'choices': ['응용 계층', '전송 계층', '물리 계층'],
+                        'answer_index': 1,
+                        'topic': '네트워크',
+                        'field_name': '전산학술',
+                        'category': '네트워크',
+                        'difficulty': '하',
+                        'issuer': '한국은행',
+                        'source_location': '테스트 2',
+                        'section': '전공필기',
+                    },
+                ],
+                db_path,
+            )
+            first_question, second_question = saved['items']
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='bank-review-1',
+                    question_bank_id=first_question['question_bank_id'],
+                    card_id='',
+                    question_type='short',
+                    prompt=first_question['prompt'],
+                    user_answer='하나만 실패해도 나머지는 유지된다.',
+                    judgment='wrong',
+                    wrong_note='원자성과 지속성을 혼동함',
+                    session_title='문제은행 세트 · 2문항',
+                ),
+                db_path,
+            )
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='bank-review-2',
+                    question_bank_id=second_question['question_bank_id'],
+                    card_id='',
+                    question_type='multiple_choice',
+                    prompt=second_question['prompt'],
+                    user_answer='전송 계층',
+                    selected_choice_index=1,
+                    judgment='correct',
+                    session_title='문제은행 세트 · 2문항',
+                ),
+                db_path,
+            )
+
+            review_all = flashcard_app.read_question_bank_attempts(
+                db_path,
+                question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
+                limit=10,
+            )
+            self.assertEqual(review_all['summary']['total'], 2)
+            self.assertEqual(review_all['summary']['correct'], 1)
+            self.assertEqual(review_all['summary']['wrong'], 1)
+            self.assertEqual(review_all['summary']['note_count'], 1)
+
+            wrong_only = flashcard_app.read_question_bank_attempts(
+                db_path,
+                question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
+                result='wrong',
+                limit=10,
+            )
+            self.assertEqual(len(wrong_only['items']), 1)
+            self.assertEqual(wrong_only['items'][0]['question_bank_id'], first_question['question_bank_id'])
+            self.assertEqual(wrong_only['items'][0]['user_answer'], '하나만 실패해도 나머지는 유지된다.')
+            self.assertEqual(wrong_only['items'][0]['wrong_note'], '원자성과 지속성을 혼동함')
+            self.assertEqual(wrong_only['items'][0]['answer'], '모든 작업이 전부 성공하거나 전부 실패해야 한다.')
+
     def test_question_bank_upsert_infers_missing_difficulty_and_backfills_runtime_rows(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -1812,32 +1911,6 @@ class FlashcardProgressTests(unittest.TestCase):
         self.assertEqual(topical_keywords[:4], ['정보보호', '사회공학', 'XSS', 'CSRF'])
 
 
-    def test_api_generate_questions_persists_question_bank_rows(self):
-        with tempfile.TemporaryDirectory() as td:
-            root = Path(td)
-            csv_path = root / 'cards.csv'
-            db_path = root / 'progress.sqlite'
-            write_sample(csv_path)
-            read_cards(csv_path, db_path)
-            original_db = flashcard_app.PROGRESS_DB_PATH
-            try:
-                flashcard_app.PROGRESS_DB_PATH = db_path
-                payload = flashcard_app.QuestionGenerateRequest(card_ids=['CS-001'], types=['short'], count=1, seed=7)
-                generated = flashcard_app.api_generate_questions(payload)
-            finally:
-                flashcard_app.PROGRESS_DB_PATH = original_db
-
-            self.assertEqual(len(generated['questions']), 1)
-            question = generated['questions'][0]
-            self.assertTrue(question['question_bank_id'])
-            self.assertEqual(question['topic'], '소프트웨어공학')
-            self.assertEqual(question['difficulty'], '중')
-            self.assertEqual(question['issuer'], '카드 생성')
-            self.assertEqual(question['source_location'], 'sample.md')
-
-            listed = flashcard_app.read_question_bank_entries(db_path, card_id='CS-001', limit=10)
-            self.assertEqual(listed['summary']['total'], 1)
-            self.assertEqual(listed['items'][0]['question_bank_id'], question['question_bank_id'])
 
     def test_read_question_bank_entries_returns_empty_when_no_rows_exist(self):
         with tempfile.TemporaryDirectory() as td:

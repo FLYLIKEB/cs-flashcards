@@ -1,3 +1,5 @@
+import subprocess
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -15,6 +17,16 @@ CALENDAR_JS = (ROOT / 'static' / 'calendar.js').read_text(encoding='utf-8')
 
 
 class StaticFrontendSmokeTests(unittest.TestCase):
+    def run_node(self, script: str) -> str:
+        completed = subprocess.run(
+            ['node', '-e', script],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return completed.stdout.strip()
+
     def test_index_page_smoke_has_core_navigation_and_question_panel(self):
         self.assertIn('id="calendarPageLink"', INDEX_HTML)
         self.assertIn('id="wikiHomeLink"', INDEX_HTML)
@@ -32,11 +44,14 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('<select id="bankPageCategoryInput"', QUESTION_BANK_HTML)
         self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
 
-
         self.assertIn('문제 풀이 · 문제은행', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageTogglePracticeBtn"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageHeaderSummary"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageOverviewCards"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewSummary"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewStats"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewFilters"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewList"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageResetFiltersBtn"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageSelectionSummary"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPagePracticeStatus"', QUESTION_BANK_HTML)
@@ -74,8 +89,26 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function ensureSelectedRowVisible()', QUESTION_BANK_JS)
         self.assertIn('function scheduleLoad()', QUESTION_BANK_JS)
         self.assertIn('id="bankPagePracticeFrame"', QUESTION_BANK_HTML)
-        self.assertIn('id="bankPageCategoryGuideDialog"', QUESTION_BANK_HTML)
-        self.assertIn('question-bank-shell-topbar', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
+        self.assertIn('function practiceFrameUrl()', QUESTION_BANK_JS)
+        self.assertIn('function setPracticeCollapsed(', QUESTION_BANK_JS)
+        self.assertIn('function shouldRefreshPracticeSession()', QUESTION_BANK_JS)
+        self.assertIn('if (shouldRefreshPracticeSession()) launch(index);', QUESTION_BANK_JS)
+        self.assertIn('await loadQuestionBankReview();', QUESTION_BANK_JS)
+        self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
+        self.assertIn("get('question-bank-embed') === '1'", APP_JS)
+        self.assertIn("const QUESTION_BANK_SESSION_SYNC_REQUEST = 'cs-flashcards-question-bank-session-sync-request';", QUESTION_BANK_JS)
+        self.assertIn("const QUESTION_BANK_SESSION_SYNC_RESPONSE = 'cs-flashcards-question-bank-session-sync-response';", QUESTION_BANK_JS)
+        self.assertIn('function syncEmbeddedPracticeSession(startIndex)', QUESTION_BANK_JS)
+        self.assertIn('function restartPracticeFrame(startIndex, sessionState = bankState.practiceSessionState)', QUESTION_BANK_JS)
+        self.assertIn('function practiceLaunchPayload(startIndex, sessionState = bankState.practiceSessionState)', QUESTION_BANK_JS)
+        self.assertIn("if (sessionState && typeof sessionState === 'object') payload.sessionState = sessionState;", QUESTION_BANK_JS)
+        self.assertIn('bankState.practiceSessionState = syncResult?.sessionState && typeof syncResult.sessionState === \'object\' ? syncResult.sessionState : null;', QUESTION_BANK_JS)
+        self.assertIn('restartPracticeFrame(safeStart, syncResult?.sessionState || bankState.practiceSessionState);', QUESTION_BANK_JS)
+        self.assertIn('function confirmPracticeRestart(startIndex)', QUESTION_BANK_JS)
+        self.assertIn('const syncResult = await syncEmbeddedPracticeSession(safeStart);', QUESTION_BANK_JS)
+        self.assertIn('if (syncResult?.preserved) {', QUESTION_BANK_JS)
+        self.assertIn('if (syncResult?.requiresReload && syncResult?.hasInProgress && !confirmPracticeRestart(safeStart)) {', QUESTION_BANK_JS)
 
     def test_calendar_page_smoke_has_tabs_and_detail_drawer(self):
         self.assertIn('id="mainTabCalendarBtn"', CALENDAR_HTML)
@@ -84,6 +117,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('id="calendarDetailCloseBtn"', CALENDAR_HTML)
 
     def test_wiki_page_smoke_has_sidebar_search_and_status_region(self):
+        self.assertIn('id="wikiSearchToggleBtn"', WIKI_HTML)
+        self.assertIn('id="wikiSearch"', WIKI_HTML)
         self.assertIn('id="wikiSidebarToggleBtn"', WIKI_HTML)
         self.assertIn('id="wikiSidebar"', WIKI_HTML)
         self.assertIn('id="wikiSearchToggleBtn"', WIKI_HTML)
@@ -345,6 +380,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-overview-grid', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-review-stats', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-review-list', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-review-item', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-selection-summary', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-status', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-header-chip', TABLE_SHELL_CSS)
@@ -387,6 +425,146 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn("wikiApplyTrustedHtml(preview, wikiTrustedRenderedHtml(data?.html || ''), {emptyText: '미리보기 결과가 비어 있습니다.'});", WIKI_JS)
         self.assertNotIn("wiki$('wikiArticle').innerHTML = page?.html || '<p class=\"muted\">문서가 비어 있습니다.</p>';", WIKI_JS)
         self.assertNotIn("preview.innerHTML = data?.html || '<p class=\"muted\">미리보기 결과가 비어 있습니다.</p>';", WIKI_JS)
+    def test_question_bank_filter_refresh_does_not_auto_launch_practice(self):
+        self.assertNotIn(
+            "if (bankState.items.length && shouldRefreshPracticeSession()) await launch(selectedIndex(bankState.practiceStartIndex), {reveal: false});",
+            QUESTION_BANK_JS,
+        )
+        result = self.run_node(textwrap.dedent(
+            """
+            const fs = require('fs');
+            const source = fs.readFileSync('static/question-bank.js', 'utf8');
+            const start = source.indexOf('async function loadQuestionBankPage() {');
+            const end = source.indexOf('\\nrestoreFilterState();', start);
+            if (start < 0 || end < 0) throw new Error('loadQuestionBankPage not found');
+            const fnSource = source.slice(start, end);
+            const bankState = {
+              loading: false,
+              error: 'stale',
+              items: [],
+              summary: {},
+              selectedId: 'beta',
+              practiceActiveId: '',
+              practiceLoaded: false,
+              practiceCollapsed: true,
+              practiceStartIndex: 4,
+              practiceResultSetKey: 'keep',
+              reviewItems: [],
+              reviewSummary: null,
+              reviewError: '',
+              reviewLoading: false,
+            };
+            let activeQuestionBankLoadRequest = 0;
+            let questionBankLoadAbortController = null;
+            let restoredPracticeState = null;
+            let pendingPracticeLaunch = null;
+            let restorePracticePaneOnReload = false;
+            const window = {AbortController: class { constructor() { this.signal = {}; } abort() {} }};
+            const syncUrl = () => {};
+            const renderTable = () => {};
+            const renderPracticePane = () => {};
+            const filterValues = () => ({topic: '', field_name: '', issuer: '', category: ''});
+            const populateTopicOptions = () => {};
+            const populateFieldNameOptions = () => {};
+            const populateIssuerOptions = () => {};
+            const populateCategoryOptions = () => {};
+            const persistFilterState = () => {};
+            const applyPracticeLaunch = () => {};
+            let launchCalls = 0;
+            let reviewCalls = 0;
+            const loadQuestionBankReview = async () => { reviewCalls += 1; bankState.reviewLoading = false; };
+            const launch = async () => { launchCalls += 1; };
+            const fetchEntries = async () => ({
+              items: [
+                {question_bank_id: 'alpha'},
+                {question_bank_id: 'beta'},
+              ],
+              summary: {total: 2, returned: 2},
+            });
+            eval(fnSource);
+            loadQuestionBankPage().then(() => {
+              process.stdout.write(JSON.stringify({
+                launchCalls,
+                reviewCalls,
+                loading: bankState.loading,
+                selectedId: bankState.selectedId,
+                practiceStartIndex: bankState.practiceStartIndex,
+                itemCount: bankState.items.length,
+                reviewLoading: bankState.reviewLoading,
+              }));
+            }).catch((error) => {
+              console.error(error);
+              process.exit(1);
+            });
+            """
+        ))
+        self.assertEqual(
+            result,
+            '{"launchCalls":0,"reviewCalls":1,"loading":false,"selectedId":"beta","practiceStartIndex":1,"itemCount":2,"reviewLoading":false}',
+        )
+
+    def test_question_bank_explicit_launch_keeps_restart_confirm_contract(self):
+        result = self.run_node(textwrap.dedent(
+            """
+            const fs = require('fs');
+            const source = fs.readFileSync('static/question-bank.js', 'utf8');
+            const start = source.indexOf('async function launch(startIndex = 0, {reveal = true} = {}) {');
+            const end = source.indexOf('\\nasync function loadQuestionBankPage() {', start);
+            if (start < 0 || end < 0) throw new Error('launch not found');
+            const fnSource = source.slice(start, end);
+            const bankState = {
+              items: [
+                {question_bank_id: 'alpha'},
+                {question_bank_id: 'beta'},
+              ],
+              error: '',
+              practiceLoaded: false,
+              practiceCollapsed: true,
+              practiceStartIndex: 0,
+              practiceSessionState: null,
+              selectedId: '',
+            };
+            const selectedIndex = (fallback = 0) => fallback;
+            const setPracticeCollapsed = () => {};
+            const persistFilterState = () => {};
+            const questionBankResultSetKey = () => 'alpha\u001fbeta';
+            const renderTable = () => {};
+            const renderPracticePane = () => {};
+            const ensureSelectedRowVisible = () => {};
+            let syncCalls = 0;
+            const syncEmbeddedPracticeSession = async () => {
+              syncCalls += 1;
+              return {requiresReload: true, hasInProgress: true, sessionState: {draft: 'keep'}};
+            };
+            let confirmCalls = 0;
+            const confirmPracticeRestart = () => {
+              confirmCalls += 1;
+              return false;
+            };
+            let restartCalls = 0;
+            const restartPracticeFrame = () => { restartCalls += 1; };
+            eval(fnSource);
+            launch(1).then((launched) => {
+              process.stdout.write(JSON.stringify({
+                launched,
+                syncCalls,
+                confirmCalls,
+                restartCalls,
+                practiceLoaded: bankState.practiceLoaded,
+                practiceStartIndex: bankState.practiceStartIndex,
+                selectedId: bankState.selectedId,
+                error: bankState.error,
+              }));
+            }).catch((error) => {
+              console.error(error);
+              process.exit(1);
+            });
+            """
+        ))
+        self.assertEqual(
+            result,
+            '{"launched":false,"syncCalls":1,"confirmCalls":1,"restartCalls":0,"practiceLoaded":true,"practiceStartIndex":1,"selectedId":"beta","error":"현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요."}',
+        )
 
 if __name__ == '__main__':
     unittest.main()

@@ -2313,6 +2313,10 @@ def normalize_question_bank_list(values: Any, *, item_limit: int = 255) -> list[
     return normalized
 
 
+def normalize_question_bank_ids(values: Any, *, item_limit: int = 255) -> list[str]:
+    return normalize_question_bank_list(values, item_limit=item_limit)
+
+
 def question_bank_json_text(values: Any, *, item_limit: int = 255) -> str:
     return json.dumps(normalize_question_bank_list(values, item_limit=item_limit), ensure_ascii=False)
 
@@ -5269,12 +5273,120 @@ def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, A
     return stats
 
 
-def save_question_attempt(
-    payload: QuestionAttemptRequest,
+def read_question_bank_attempts(
     progress_db_path: Path | None = None,
+    *,
+    question_bank_ids: list[str] | None = None,
+    result: str = "all",
+    limit: int = 200,
 ) -> dict[str, Any]:
-    card_id = str(payload.card_id or "").strip()[:255]
-    question_bank_id = str(payload.question_bank_id or "").strip()[:255]
+    normalized_result = normalize_question_attempt_result(result)
+    selected_ids = normalize_question_bank_ids(question_bank_ids)
+    safe_limit = max(1, min(int(limit or 200), 500))
+    rows, _ = read_cards(progress_db_path)
+    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path)
+
+    where_clauses = ["TRIM(COALESCE(question_attempts.question_bank_id, '')) <> ''"]
+    where_params: list[Any] = []
+    if selected_ids:
+        placeholders = ", ".join(["?"] * len(selected_ids))
+        where_clauses.append(f"question_attempts.question_bank_id IN ({placeholders})")
+        where_params.extend(selected_ids)
+
+    judgment_sql = "CASE WHEN TRIM(COALESCE(question_attempts.judgment, '')) <> '' THEN LOWER(TRIM(question_attempts.judgment)) WHEN question_attempts.is_correct = 1 THEN 'correct' WHEN question_attempts.is_correct = 0 THEN 'wrong' ELSE 'pending' END"
+    base_where = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    list_clauses = list(where_clauses)
+    list_params = list(where_params)
+    if normalized_result != "all":
+        list_clauses.append(f"{judgment_sql} = ?")
+        list_params.append(normalized_result)
+    list_where = f"WHERE {' AND '.join(list_clauses)}" if list_clauses else ""
+
+    with closing(connect_progress_db(db_path)) as conn:
+        summary_row = conn.execute(
+            f"""
+            SELECT
+                COUNT(*) AS total_count,
+                SUM(CASE WHEN {judgment_sql} = 'correct' THEN 1 ELSE 0 END) AS correct_count,
+                SUM(CASE WHEN {judgment_sql} = 'ambiguous' THEN 1 ELSE 0 END) AS ambiguous_count,
+                SUM(CASE WHEN {judgment_sql} = 'wrong' THEN 1 ELSE 0 END) AS wrong_count,
+                SUM(CASE WHEN {judgment_sql} = 'unknown' THEN 1 ELSE 0 END) AS unknown_count,
+                SUM(CASE WHEN {judgment_sql} = 'pending' THEN 1 ELSE 0 END) AS pending_count,
+                SUM(CASE WHEN TRIM(COALESCE(question_attempts.wrong_note, '')) <> '' THEN 1 ELSE 0 END) AS note_count
+            FROM question_attempts
+            {base_where}
+            """,
+            tuple(where_params),
+        ).fetchone()
+        attempt_rows = conn.execute(
+            f"""
+            SELECT question_attempts.question_id, question_attempts.question_bank_id, question_attempts.card_id,
+                   question_attempts.question_type, question_attempts.prompt, question_attempts.body,
+                   question_attempts.user_answer, question_attempts.selected_choice_index,
+                   question_attempts.is_correct, question_attempts.judgment, question_attempts.wrong_note,
+                   question_attempts.session_id, question_attempts.session_title, question_attempts.session_mode,
+                   question_attempts.section, question_attempts.points, question_attempts.expected_time_seconds,
+                   question_attempts.answer_guide, question_attempts.question_order,
+                   question_attempts.question_elapsed_seconds, question_attempts.session_elapsed_seconds,
+                   question_attempts.time_limit_seconds, question_attempts.question_started_at,
+                   question_attempts.answered_at, question_attempts.created_at, question_attempts.updated_at,
+                   question_bank.answer AS bank_answer, question_bank.explanation AS bank_explanation,
+                   question_bank.topic AS bank_topic, question_bank.field_name AS bank_field_name,
+                   question_bank.category AS bank_category, question_bank.issuer AS bank_issuer,
+                   question_bank.source_location AS bank_source_location,
+                   question_bank.section AS bank_section,
+                   question_bank.keywords_json AS bank_keywords_json
+            FROM question_attempts
+            LEFT JOIN question_bank ON question_bank.id = question_attempts.question_bank_id
+            {list_where}
+            ORDER BY question_attempts.updated_at DESC, question_attempts.created_at DESC, question_attempts.question_id DESC
+            LIMIT ?
+            """,
+            tuple(list_params + [safe_limit]),
+        ).fetchall()
+
+    items: list[dict[str, Any]] = []
+    for row in attempt_rows:
+        item = question_attempt_row_to_dict(row) or {}
+        card = card_map.get(item.get("card_id", ""), {})
+        item["answer"] = row["bank_answer"] or ""
+        item["explanation"] = row["bank_explanation"] or ""
+        item["topic"] = row["bank_topic"] or ""
+        item["field_name"] = row["bank_field_name"] or ""
+        item["category"] = card.get("category") or row["bank_category"] or ""
+        item["issuer"] = row["bank_issuer"] or ""
+        item["source_location"] = row["bank_source_location"] or ""
+        item["section"] = item.get("section") or row["bank_section"] or ""
+        item["keywords"] = question_bank_json_list(row["bank_keywords_json"] if "bank_keywords_json" in row.keys() else [])
+        item["term"] = card.get("term") or card.get("english") or item.get("card_id") or ""
+        item["english"] = card.get("english") or ""
+        item["card_url"] = flashcard_card_url(item.get("card_id") or "") if item.get("card_id") else ""
+        item["result_key"] = item.get("judgment") or "pending"
+        item["result_label"] = QUESTION_ATTEMPT_JUDGMENT_LABELS.get(item["result_key"], QUESTION_ATTEMPT_JUDGMENT_LABELS["pending"])
+        items.append(item)
+
+    return {
+        "items": items,
+        "summary": {
+            "filter": normalized_result,
+            "total": int(summary_row["total_count"] or 0) if summary_row else 0,
+            "correct": int(summary_row["correct_count"] or 0) if summary_row else 0,
+            "ambiguous": int(summary_row["ambiguous_count"] or 0) if summary_row else 0,
+            "wrong": int(summary_row["wrong_count"] or 0) if summary_row else 0,
+            "unknown": int(summary_row["unknown_count"] or 0) if summary_row else 0,
+            "pending": int(summary_row["pending_count"] or 0) if summary_row else 0,
+            "note_count": int(summary_row["note_count"] or 0) if summary_row else 0,
+            "selected_question_bank_count": len(selected_ids),
+            "returned": len(items),
+        },
+    }
+
+
+def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Path | None = None) -> dict[str, Any]:
+    card_id = normalize_question_bank_text(payload.card_id, limit=255)
+    question_bank_id = normalize_question_bank_text(payload.question_bank_id, limit=255)
     if card_id:
         _ensure_card_exists(card_id, progress_db_path)
     elif not question_bank_id:
@@ -8371,6 +8483,25 @@ def api_question_bank(request: Request) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+
+@app.get("/api/question-bank/attempts")
+def api_question_bank_attempts(request: Request) -> dict[str, Any]:
+    raw_limit = str(request.query_params.get("limit") or "200").strip()
+    try:
+        limit = int(raw_limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid limit: {raw_limit}") from exc
+    try:
+        return read_question_bank_attempts(
+            progress_db_path=PROGRESS_DB_PATH,
+            question_bank_ids=request.query_params.getlist("question_bank_id"),
+            result=request.query_params.get("result", "all"),
+            limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 @app.post("/api/questions/attempt")
 def api_question_attempt(payload: QuestionAttemptRequest) -> dict[str, Any]:

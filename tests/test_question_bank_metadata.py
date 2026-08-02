@@ -2,6 +2,7 @@ import app as flashcard_app
 import json
 import tempfile
 
+import tempfile
 from contextlib import closing
 from pathlib import Path
 import sqlite3
@@ -26,6 +27,10 @@ class QuestionBankMetadataTests(unittest.TestCase):
         self.assertIn('<select id="bankPageIssuerInput"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageCategoryGuideBtn"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageCategoryGuideDialog"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewSummary"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewStats"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewFilters"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewList"', QUESTION_BANK_HTML)
         self.assertIn('<input id="questionBankTopicInput"', INDEX_HTML)
         self.assertIn('id="questionBankTopicOptions"', INDEX_HTML)
         self.assertIn('<select id="questionBankAttemptStatusSelect"', INDEX_HTML)
@@ -40,11 +45,18 @@ class QuestionBankMetadataTests(unittest.TestCase):
         self.assertIn('function populateCategoryOptions(', QUESTION_BANK_JS)
         self.assertIn('function normalizeQuestionKeywords(', QUESTION_BANK_JS)
         self.assertIn('function renderQuestionKeywordLinks(', QUESTION_BANK_JS)
+        self.assertIn('function missingCardRows()', QUESTION_BANK_JS)
+        self.assertIn('function questionBankReviewRequestUrl(', QUESTION_BANK_JS)
+        self.assertIn('function renderQuestionBankReview(', QUESTION_BANK_JS)
+        self.assertIn('function loadQuestionBankReview(', QUESTION_BANK_JS)
+        self.assertIn('function renderMissingCardTable()', QUESTION_BANK_JS)
         self.assertIn('card_query=', QUESTION_BANK_JS)
         self.assertIn('available_topics', QUESTION_BANK_JS)
         self.assertIn('available_field_names', QUESTION_BANK_JS)
         self.assertIn('available_issuers', QUESTION_BANK_JS)
         self.assertIn('available_categories', QUESTION_BANK_JS)
+        self.assertIn('missing_cards', QUESTION_BANK_JS)
+        self.assertIn('card_created', QUESTION_BANK_JS)
         self.assertIn('category_breakdown', QUESTION_BANK_JS)
         self.assertIn('function populateQuestionBankTopicOptions(', APP_JS)
         self.assertIn('function populateQuestionBankFieldNameOptions(', APP_JS)
@@ -58,25 +70,39 @@ class QuestionBankMetadataTests(unittest.TestCase):
         self.assertIn('available_issuers', APP_JS)
         self.assertIn('available_categories', APP_JS)
 
-    def test_question_bank_upsert_response_and_readback_preserve_missing_card_keywords(self):
+    def test_question_bank_service_separates_missing_card_tracking_from_linked_keywords(self):
         fieldnames = flashcard_app.content_fieldnames()
         with tempfile.TemporaryDirectory() as td:
             db_path = Path(td) / 'progress.sqlite'
-            flashcard_app.ensure_progress_db(db_path, [{
-                **{field: '' for field in fieldnames},
-                'id': 'CS-001',
-                'term': '테스트',
-                'english': 'Test',
-                'category': '소프트웨어공학',
-                'related_concepts': '[[검증]]',
-                'source_files': 'sample.md',
-                'difficulty': '중',
-                'known_status': '',
-                'last_reviewed': '',
-                'review_count': '0',
-            }])
-
-            saved = flashcard_app.upsert_question_bank_entries([
+            flashcard_app.ensure_progress_db(db_path, [
+                {
+                    **{field: '' for field in fieldnames},
+                    'id': 'CS-001',
+                    'term': '테스트',
+                    'english': 'Test',
+                    'category': '소프트웨어공학',
+                    'related_concepts': '[[검증]]',
+                    'source_files': 'sample.md',
+                    'difficulty': '중',
+                    'known_status': '',
+                    'last_reviewed': '',
+                    'review_count': '0',
+                },
+                {
+                    **{field: '' for field in fieldnames},
+                    'id': 'CS-002',
+                    'term': '추가 카드',
+                    'english': '',
+                    'category': '소프트웨어공학',
+                    'related_concepts': '',
+                    'source_files': 'sample.md',
+                    'difficulty': '중',
+                    'known_status': '',
+                    'last_reviewed': '',
+                    'review_count': '0',
+                },
+            ])
+            flashcard_app.upsert_question_bank_entries([
                 {
                     'card_id': 'CS-001',
                     'question_type': 'short',
@@ -86,19 +112,26 @@ class QuestionBankMetadataTests(unittest.TestCase):
                     'topic': '테스트',
                     'field_name': '소프트웨어공학',
                     'category': '소프트웨어공학',
-                    'keywords': ['테스트', '검증', '없는 카드'],
+                    'keywords': ['테스트', '검증', '추가 카드', '없는 카드'],
                     'difficulty': '중',
                     'issuer': '한국은행',
                     'source_location': '샘플 위치',
                 }
             ], db_path)
 
-            self.assertEqual(saved['items'][0]['keywords'], ['테스트', 'Test', '검증'])
-            self.assertEqual(saved['items'][0]['missing_card_keywords'], ['없는 카드'])
+            listed = flashcard_app.read_question_bank_entries(db_path, limit=10)
+            item = listed['items'][0]
+            self.assertEqual(item['keywords'], ['테스트', 'Test', '검증'])
+            self.assertEqual(item['missing_card_keywords'], ['추가 카드', '없는 카드'])
+            self.assertNotIn('없는 카드', item['keywords'])
+            self.assertEqual(listed['summary']['missing_cards'], [
+                {'keyword': '추가 카드', 'question_count': 1, 'card_created': True, 'card_id': 'CS-002'},
+                {'keyword': '없는 카드', 'question_count': 1, 'card_created': False, 'card_id': ''},
+            ])
 
-            listed = flashcard_app.read_question_bank_entries(db_path, query='없는 카드', limit=10)
-            self.assertEqual(listed['items'][0]['keywords'], ['테스트', 'Test', '검증'])
-            self.assertEqual(listed['items'][0]['missing_card_keywords'], ['없는 카드'])
+            missing_query = flashcard_app.read_question_bank_entries(db_path, query='없는 카드', limit=10)
+            self.assertEqual(missing_query['summary']['total'], 1)
+            self.assertEqual(missing_query['items'][0]['question_bank_id'], item['question_bank_id'])
 
     def test_question_bank_missing_card_summary_uses_full_filtered_result_set(self):
         fieldnames = flashcard_app.content_fieldnames()
@@ -151,7 +184,6 @@ class QuestionBankMetadataTests(unittest.TestCase):
             self.assertEqual(listed['summary']['missing_cards'], [
                 {'keyword': '없는 카드', 'question_count': 2, 'card_created': False, 'card_id': ''},
             ])
-
     def test_question_bank_runtime_rows_use_normalized_difficulty_labels(self):
         with closing(sqlite3.connect(PROGRESS_DB)) as conn:
             invalid_count = conn.execute(

@@ -296,6 +296,129 @@ body.question-bank-dialog-open {
   margin-top: 8px;
 }
 
+.question-bank-review-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.question-bank-review-filters,
+.question-bank-review-item-head,
+.question-bank-review-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.question-bank-review-filters {
+  margin-top: 10px;
+}
+
+.question-bank-review-filter {
+  font: inherit;
+  cursor: pointer;
+}
+
+.question-bank-review-filter.is-active {
+  background: var(--cs-table-text);
+  color: #ffffff;
+  border-color: var(--cs-table-text);
+}
+
+.question-bank-review-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.question-bank-review-empty {
+  margin: 0;
+  padding: 18px 14px;
+  border: 1px dashed var(--cs-table-line-strong);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--cs-table-muted);
+  text-align: center;
+  font-size: 0.82rem;
+}
+
+.question-bank-review-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--cs-table-line);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.question-bank-review-item.is-active {
+  border-color: var(--cs-table-text);
+  box-shadow: inset 3px 0 0 var(--cs-table-text);
+}
+
+.question-bank-review-item-head {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.question-bank-review-item-title {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.38;
+}
+
+.question-bank-review-item-meta {
+  margin: 4px 0 0;
+  color: var(--cs-table-muted);
+  font-size: 0.74rem;
+}
+
+.question-bank-review-result {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--cs-table-line-strong);
+  background: var(--cs-table-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.question-bank-review-result.correct {
+  background: #ecfdf5;
+}
+
+.question-bank-review-result.wrong,
+.question-bank-review-result.ambiguous,
+.question-bank-review-result.unknown {
+  background: #fef2f2;
+}
+
+.question-bank-review-field {
+  display: grid;
+  gap: 4px;
+}
+
+.question-bank-review-field-label {
+  color: var(--cs-table-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.question-bank-review-field-value {
+  margin: 0;
+  color: var(--cs-table-text);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .question-bank-header-chip,
 .question-bank-summary-pill,
 .question-bank-filter-chip,
@@ -390,6 +513,7 @@ body.question-bank-dialog-open {
   grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
   grid-template-areas:
     "hero hero"
+    "review review"
     "table filter"
     "error error";
   align-items: start;
@@ -397,6 +521,10 @@ body.question-bank-dialog-open {
 
 .question-bank-hero-card {
   grid-area: hero;
+}
+
+.question-bank-review-card {
+  grid-area: review;
 }
 
 .question-bank-table-card {
@@ -567,6 +695,13 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
 .question-bank-table-selection-head .cs-table-hint,
 .question-bank-metric-detail {
   font-size: 0.72rem;
+}
+
+.question-bank-review-filter,
+.question-bank-review-jump {
+  min-height: 28px;
+  padding: 0 9px;
+  font-size: 0.74rem;
 }
 
 .question-bank-primary-actions .cs-table-button {
@@ -955,6 +1090,10 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   .cs-table-filter-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .question-bank-review-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 620px) {
@@ -970,6 +1109,10 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
 
   .question-bank-overview-grid,
   .cs-table-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .question-bank-review-stats {
     grid-template-columns: minmax(0, 1fr);
   }
 
