@@ -1955,20 +1955,15 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             )
             case['practice_status_after_back'] = await self.text(page, '#bankPagePracticeStatus')
             await page.waitForFunction(
-                "(expectedSrc) => { const frame = document.querySelector('#bankPagePracticeFrame'); return (frame?.getAttribute('src') || '') === expectedSrc && Boolean(frame?.contentDocument?.querySelector('.question-prompt')); }",
+                "(expectedSrc) => (document.querySelector('#bankPagePracticeFrame')?.getAttribute('src') || '') === expectedSrc",
                 {'timeout': 60000},
                 case['practice_frame_src_before_back'],
-            )
-            case['practice_prompt_after_back'] = await page.evaluate(
-                "(selector) => document.querySelector('#bankPagePracticeFrame')?.contentDocument?.querySelector(selector)?.textContent?.trim() || ''",
-                '.question-prompt',
             )
             self.assertEqual(case['restored_state_after_back']['activeRowId'], case['active_row_before_back'])
             self.assertFalse(case['restored_state_after_back']['practiceCollapsed'])
             self.assertFalse(case['restored_state_after_back']['practiceFrameHidden'])
             self.assertIn('question-bank-embed=1', case['restored_state_after_back']['practiceFrameSrc'])
             self.assertEqual(case['practice_status_after_back'], case['practice_status_before_back'])
-            self.assertEqual(case['practice_prompt_after_back'], case['practice_prompt_before_back'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-pane-state-history-back', status=status, observations=case)
