@@ -705,6 +705,13 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         try:
             await page.goto(self.base_url, waitUntil='networkidle2')
             await page.waitForSelector('#menuBtn')
+            case['card_bookmark_before'] = await self.attr(page, '#bookmarkBtn', 'aria-pressed')
+            if case['card_bookmark_before'] != 'true':
+                await page.click('#bookmarkBtn')
+                await page.waitForFunction("document.querySelector('#bookmarkBtn').getAttribute('aria-pressed') === 'true'")
+            case['card_bookmark_after'] = await self.attr(page, '#bookmarkBtn', 'aria-pressed')
+            self.assertEqual(case['card_bookmark_after'], 'true')
+
             await page.focus('#menuBtn')
             await page.keyboard.press('Enter')
             await page.waitForFunction("document.querySelector('#menuPopover').hidden === false")
@@ -712,6 +719,46 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['focus_after_keyboard_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['focus_after_keyboard_open'], 'wikiHomeLink')
 
+            for _ in range(7):
+                await page.keyboard.press('Tab')
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'bookmarkFilterBtn'")
+            case['focus_before_bookmark_filter_activate'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_before_bookmark_filter_activate'], 'bookmarkFilterBtn')
+
+            case['card_totals_before_filter'] = await page.evaluate('() => ({ total: state.cards.length, filtered: state.filtered.length })')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.querySelector('#menuPopover').hidden === true")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'menuBtn'")
+            await page.waitForFunction("document.querySelector('#bookmarkFilterBtn').getAttribute('aria-pressed') === 'true'")
+            case['focus_after_bookmark_filter_activate'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_after_bookmark_filter_activate'], 'menuBtn')
+            case['bookmark_filter_state_after_keyboard_activate'] = await page.evaluate(
+                """
+                () => ({
+                  menuHidden: document.querySelector('#menuPopover').hidden,
+                  menuExpanded: document.querySelector('#menuBtn')?.getAttribute('aria-expanded') || '',
+                  pressed: document.querySelector('#bookmarkFilterBtn')?.getAttribute('aria-pressed') || '',
+                  bookmarkFilter: state.bookmarkFilter,
+                  filteredCount: state.filtered.length,
+                  allFilteredBookmarked: state.filtered.every((card) => isCardBookmarked(card)),
+                })
+                """
+            )
+            self.assertTrue(case['bookmark_filter_state_after_keyboard_activate']['menuHidden'])
+            self.assertEqual(case['bookmark_filter_state_after_keyboard_activate']['menuExpanded'], 'false')
+            self.assertEqual(case['bookmark_filter_state_after_keyboard_activate']['pressed'], 'true')
+            self.assertTrue(case['bookmark_filter_state_after_keyboard_activate']['bookmarkFilter'])
+            self.assertGreaterEqual(case['bookmark_filter_state_after_keyboard_activate']['filteredCount'], 1)
+            self.assertLessEqual(
+                case['bookmark_filter_state_after_keyboard_activate']['filteredCount'],
+                case['card_totals_before_filter']['total'],
+            )
+            self.assertTrue(case['bookmark_filter_state_after_keyboard_activate']['allFilteredBookmarked'])
+
+            await page.focus('#menuBtn')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.querySelector('#menuPopover').hidden === false")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'wikiHomeLink'")
             await page.keyboard.press('Escape')
             await page.waitForFunction("document.querySelector('#menuPopover').hidden === true")
             case['focus_after_escape'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
