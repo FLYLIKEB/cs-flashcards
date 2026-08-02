@@ -1,24 +1,35 @@
 {
-  "updatedAt": "2026-08-02T13:17:53Z",
-  "status": "ready_for_next_audit",
-  "openIssues": [],
+  "updatedAt": "2026-08-02T13:24:30Z",
+  "status": "round23_in_progress",
+  "openIssues": [
+    {
+      "number": 129,
+      "title": "문제풀이 저장 경로를 백엔드 단일 구현으로 통합하고 API 회귀 테스트 추가",
+      "track": "backend",
+      "branch": "issue-129-question-attempt-backend-path",
+      "worktree": "/private/tmp/cs-opt-129",
+      "state": "implementing"
+    },
+    {
+      "number": 130,
+      "title": "문제은행 launch/review helper 중복 정의 제거",
+      "track": "frontend",
+      "branch": "issue-130-question-bank-helper-dedupe",
+      "worktree": "/private/tmp/cs-opt-130",
+      "state": "implementing"
+    }
+  ],
   "openPullRequests": [],
   "recentlyClosedIssues": [
     {
       "number": 125,
-      "title": "문제은행 AI 답안 보강 경로의 linked card 조회를 단일 lookup으로 축소",
       "mergedPullRequest": 127,
       "mergeCommit": "5c7bf65e70cc3664b424550c53a418a165cd3e3f"
     },
     {
       "number": 126,
-      "title": "문제은행 practice launch/relaunch 시 table 이중 렌더 제거",
       "mergedPullRequest": 128,
       "mergeCommit": "05e2b1fe0329992c051e7b87ab5e199949f5e55a"
     }
-  ],
-  "nextRound": {
-    "round": 23,
-    "state": "pending_audit"
-  }
+  ]
 }

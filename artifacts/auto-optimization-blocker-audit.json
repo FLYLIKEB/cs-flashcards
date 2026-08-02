@@ -1,11 +1,22 @@
 {
-  "timestamp": "2026-08-02T13:17:53Z",
-  "blocked": false,
-  "openIssueCount": 0,
+  "timestamp": "2026-08-02T13:24:30Z",
+  "blocked": true,
+  "openIssueCount": 2,
   "openPullRequestCount": 0,
-  "blockingWorktrees": [],
+  "blockingWorktrees": [
+    {
+      "path": "/private/tmp/cs-opt-129",
+      "branch": "issue-129-question-attempt-backend-path",
+      "reason": "Backend round 23 implementation in progress."
+    },
+    {
+      "path": "/private/tmp/cs-opt-130",
+      "branch": "issue-130-question-bank-helper-dedupe",
+      "reason": "Frontend round 23 implementation in progress."
+    }
+  ],
   "notes": [
-    "Merged PR #127 and PR #128, then removed their issue worktrees and local branches.",
-    "Only the temporary detached orchestrator sync checkout remained during artifact publication; it is excluded from readiness blocking and removed immediately after push."
+    "Issue #129 and #130 were opened from round 23 audit evidence.",
+    "No open PR exists yet; blockers are the newly opened issues and active implementation worktrees."
   ]
 }
