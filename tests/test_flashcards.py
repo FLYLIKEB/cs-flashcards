@@ -1269,6 +1269,42 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(history_ambiguous['items'][0]['section'], '전공논술')
             self.assertEqual(history_ambiguous['items'][0]['points'], 20)
 
+
+    def test_read_question_attempts_uses_targeted_card_context_without_read_cards(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-targeted-history',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='검증',
+                    judgment='wrong',
+                    wrong_note='히스토리 조회는 대상 카드만 확인',
+                ),
+                db_path,
+            )
+
+            with mock.patch.object(
+                flashcard_app,
+                'read_cards',
+                side_effect=AssertionError('read_question_attempts should not reload all cards'),
+            ):
+                history = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], limit=10)
+
+            self.assertEqual(history['summary']['total'], 1)
+            self.assertEqual(history['summary']['selected_card_count'], 1)
+            self.assertEqual(len(history['items']), 1)
+            self.assertEqual(history['items'][0]['card_id'], 'CS-001')
+            self.assertEqual(history['items'][0]['term'], '테스트')
+            self.assertEqual(history['items'][0]['category'], '소프트웨어공학')
     def test_save_question_attempt_one_argument_form_uses_sibling_cards_csv_fallback(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -1781,7 +1817,7 @@ class FlashcardProgressTests(unittest.TestCase):
                         'section': '전공필기',
                     },
                     {
-                        'card_id': '',
+                        'card_id': 'CS-001',
                         'question_type': 'multiple_choice',
                         'prompt': 'OSI 7계층에서 전송 계층은?',
                         'body': '',
@@ -1820,7 +1856,7 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app.QuestionAttemptRequest(
                     question_id='bank-review-2',
                     question_bank_id=second_question['question_bank_id'],
-                    card_id='',
+                    card_id='CS-001',
                     question_type='multiple_choice',
                     prompt=second_question['prompt'],
                     user_answer='전송 계층',
@@ -1831,28 +1867,36 @@ class FlashcardProgressTests(unittest.TestCase):
                 db_path,
             )
 
-            review_all = flashcard_app.read_question_bank_attempts(
-                db_path,
-                question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
-                limit=10,
-            )
+            with mock.patch.object(
+                flashcard_app,
+                'read_cards',
+                side_effect=AssertionError('read_question_bank_attempts should not reload all cards'),
+            ):
+                review_all = flashcard_app.read_question_bank_attempts(
+                    db_path,
+                    question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
+                    limit=10,
+                )
+                wrong_only = flashcard_app.read_question_bank_attempts(
+                    db_path,
+                    question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
+                    result='wrong',
+                    limit=10,
+                )
+
             self.assertEqual(review_all['summary']['total'], 2)
             self.assertEqual(review_all['summary']['correct'], 1)
             self.assertEqual(review_all['summary']['wrong'], 1)
             self.assertEqual(review_all['summary']['note_count'], 1)
+            self.assertEqual(review_all['items'][0]['card_id'], 'CS-001')
+            self.assertEqual(review_all['items'][0]['term'], '테스트')
+            self.assertEqual(review_all['items'][0]['category'], '소프트웨어공학')
 
-            wrong_only = flashcard_app.read_question_bank_attempts(
-                db_path,
-                question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
-                result='wrong',
-                limit=10,
-            )
             self.assertEqual(len(wrong_only['items']), 1)
             self.assertEqual(wrong_only['items'][0]['question_bank_id'], first_question['question_bank_id'])
             self.assertEqual(wrong_only['items'][0]['user_answer'], '하나만 실패해도 나머지는 유지된다.')
             self.assertEqual(wrong_only['items'][0]['wrong_note'], '원자성과 지속성을 혼동함')
             self.assertEqual(wrong_only['items'][0]['answer'], '모든 작업이 전부 성공하거나 전부 실패해야 한다.')
-
     def test_question_bank_upsert_batch_reuses_preloaded_card_context(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

@@ -1569,6 +1569,33 @@ def read_card(progress_db_path: Path | None, card_id: Any) -> dict[str, Any]:
     item["latest_wrong_note_updated_at"] = latest_wrong_note_row["updated_at"] or "" if latest_wrong_note_row else ""
     return item
 
+def read_card_attempt_context(progress_db_path: Path | None, card_ids: list[str] | None) -> dict[str, dict[str, str]]:
+    normalized_ids = sorted(normalize_card_ids(card_ids) or [])
+    if not normalized_ids:
+        return {}
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path, must_exist=True)
+    placeholders = ", ".join(["?"] * len(normalized_ids))
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        rows = conn.execute(
+            f"""
+            SELECT card_id, term, english, category
+            FROM cards
+            WHERE card_id IN ({placeholders})
+            """,
+            tuple(normalized_ids),
+        ).fetchall()
+    return {
+        str(row["card_id"] or "").strip(): {
+            "id": str(row["card_id"] or "").strip(),
+            "term": row["term"] or "",
+            "english": row["english"] or "",
+            "category": row["category"] or "",
+        }
+        for row in rows
+        if str(row["card_id"] or "").strip()
+    }
+
 
 
 
@@ -5529,8 +5556,6 @@ def read_question_attempts(
     normalized_result = normalize_question_attempt_result(result)
     selected_ids = sorted(normalize_card_ids(card_ids) or [])
     safe_limit = max(1, min(int(limit or 200), 500))
-    rows, _ = read_cards(progress_db_path)
-    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path, must_exist=True)
 
@@ -5565,6 +5590,10 @@ def read_question_attempts(
             """,
             tuple(where_params),
         ).fetchone()
+        selected_card_count = len(selected_ids)
+        if not selected_ids:
+            count_row = conn.execute("SELECT COUNT(*) AS total_count FROM cards").fetchone()
+            selected_card_count = int(count_row["total_count"] or 0) if count_row else 0
         attempt_rows = conn.execute(
             f"""
 SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user_answer,
@@ -5581,6 +5610,8 @@ SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user
             tuple(list_params + [safe_limit]),
         ).fetchall()
 
+    attempt_card_ids = [str(row["card_id"] or "").strip() for row in attempt_rows if str(row["card_id"] or "").strip()]
+    card_map = read_card_attempt_context(db_path, attempt_card_ids)
     items: list[dict[str, Any]] = []
     for row in attempt_rows:
         item = question_attempt_row_to_dict(row) or {}
@@ -5603,7 +5634,7 @@ SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user
             "wrong": int(summary_row["wrong_count"] or 0) if summary_row else 0,
             "unknown": int(summary_row["unknown_count"] or 0) if summary_row else 0,
             "pending": int(summary_row["pending_count"] or 0) if summary_row else 0,
-            "selected_card_count": len(selected_ids) if selected_ids else len(rows),
+            "selected_card_count": selected_card_count,
             "returned": len(items),
         },
     }
@@ -5669,8 +5700,6 @@ def read_question_bank_attempts(
     normalized_result = normalize_question_attempt_result(result)
     selected_ids = normalize_question_bank_ids(question_bank_ids)
     safe_limit = max(1, min(int(limit or 200), 500))
-    rows, _ = read_cards(progress_db_path)
-    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
 
@@ -5733,6 +5762,8 @@ def read_question_bank_attempts(
             tuple(list_params + [safe_limit]),
         ).fetchall()
 
+    attempt_card_ids = [str(row["card_id"] or "").strip() for row in attempt_rows if str(row["card_id"] or "").strip()]
+    card_map = read_card_attempt_context(db_path, attempt_card_ids)
     items: list[dict[str, Any]] = []
     for row in attempt_rows:
         item = question_attempt_row_to_dict(row) or {}
