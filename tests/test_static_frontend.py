@@ -444,7 +444,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-panel[hidden]', style_css())
         self.assertIn('display: none !important', style_css())
         self.assertNotIn('id="questionModeBtn"', index_html())
-        self.assertNotIn('id="questionPracticeBtn"', index_html())
+        self.assertIn('id="questionPracticeBtn"', index_html())
         for snippet in [
             'id="questionPanel"',
             'id="questionSessionModeSelect"',

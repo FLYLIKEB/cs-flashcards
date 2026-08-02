@@ -632,9 +632,9 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         status = 'failed'
         try:
             await page.goto(self.base_url, waitUntil='networkidle2')
-            await page.waitForSelector('#menuBtn')
-            await page.focus('#menuBtn')
-            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForSelector('#questionPracticeBtn')
+            await page.focus('#questionPracticeBtn')
+            await page.click('#questionPracticeBtn')
             await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
             case['question_panel_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['question_panel_focus_on_open'], 'closeQuestionModeBtn')
@@ -657,7 +657,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.keyboard.press('Escape')
             await page.waitForFunction("document.querySelector('#questionPanel').hidden === true")
             case['question_panel_focus_after_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
-            self.assertEqual(case['question_panel_focus_after_close'], 'menuBtn')
+            self.assertEqual(case['question_panel_focus_after_close'], 'questionPracticeBtn')
 
             await page.click('#menuBtn')
             await page.click('#memoListBtn')
