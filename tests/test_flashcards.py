@@ -12,7 +12,6 @@ from contextlib import closing
 from pathlib import Path
 from unittest import mock
 
-import flashcards_backend as flashcard_backend
 import app as flashcard_app
 import flashcards_backend
 from app import mark_card, read_cards, save_memo, save_question_attempt, set_bookmark, summarize
@@ -187,6 +186,10 @@ def write_wiki_book(root: Path) -> Path:
 
 
 class FlashcardProgressTests(unittest.TestCase):
+    def test_app_import_keeps_runtime_helpers_local(self):
+        self.assertFalse(hasattr(flashcards_backend, 'normalized_review_count'))
+        self.assertEqual(flashcard_app.normalized_review_count('3'), '3')
+        self.assertEqual(flashcard_app.normalized_bookmarked(True), '1')
     def test_read_cards_adds_review_columns_without_csv_progress(self):
         with tempfile.TemporaryDirectory() as td:
             csv_path = Path(td) / 'cards.csv'
@@ -398,7 +401,7 @@ class FlashcardProgressTests(unittest.TestCase):
             recovery_scan_queries = 0
 
             def tracking_connect_progress_db(*args, **kwargs):
-                conn = flashcard_backend.connect_progress_db(*args, **kwargs)
+                conn = flashcards_backend.connect_progress_db(*args, **kwargs)
 
                 class TrackingConnection:
                     def __init__(self, inner):
