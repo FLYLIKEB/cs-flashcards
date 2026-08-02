@@ -1,43 +1,22 @@
 {
-  "checked_at": "2026-08-02T20:13:35Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T20:19:51Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 1,
-    "open_pr_count": 1,
-    "blocking_worktree_count": 1,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 182,
-      "state": "OPEN",
-      "title": "메인 앱 임베드 문제은행의 동적 select 필터(field/category/issuer) deep-link·reload 복원 누락",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/182"
-    }
-  ],
-  "open_prs": [
-    {
-      "number": 185,
-      "state": "OPEN",
-      "title": "Issue 182: 임베드 문제은행 동적 필터 deep-link 복원",
-      "head": "issue-182-embedded-dynamic-filter-restore",
-      "base": "main",
-      "merge_state_status": "UNSTABLE",
-      "checks": [
-        "frontend-browser:IN_PROGRESS"
-      ],
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/185"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-182",
-      "branch": "issue-182-embedded-dynamic-filter-restore",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
+    {
+      "issue": 182,
+      "pr": 185,
+      "merge_commit": "a90edfef08fc9b3306201a094961d4f5a4aa48bc"
+    },
     {
       "issue": 183,
       "pr": 184,
@@ -45,7 +24,7 @@
     }
   ],
   "notes": [
-    "Issue #182 implementation opened PR #185.",
-    "PR #185 review and checks are in progress."
+    "No blockers remain after PR #185 merge.",
+    "Repository is ready for the next optimization audit round."
   ]
 }
