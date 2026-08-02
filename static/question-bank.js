@@ -41,6 +41,7 @@ const bankState = {
   practiceNonce: 0,
   practiceCollapsed: true,
   filtersCollapsed: true,
+  practiceSummary: null,
 };
 
 let pendingLoadTimer = 0;
@@ -142,6 +143,18 @@ function questionAttemptStatusKey(item) {
 function questionAttemptStatusLabel(item) {
   const explicit = String(item?.question_attempt_status_label || '').trim();
   return explicit || QUESTION_BANK_ATTEMPT_STATUS_LABELS[questionAttemptStatusKey(item)] || QUESTION_BANK_ATTEMPT_STATUS_LABELS.unseen;
+}
+
+function questionAttemptTone(item) {
+  const status = questionAttemptStatusKey(item);
+  if (status === 'wrong') return 'attempt-wrong';
+  if (status === 'correct') return 'attempt-correct';
+  return 'attempt-default';
+}
+
+function finishedPracticeSummary() {
+  if (!bankState.practiceSummary || typeof bankState.practiceSummary !== 'object') return null;
+  return bankState.practiceSummary.finishedAt ? bankState.practiceSummary : null;
 }
 
 function selectedIndex(fallback = 0) {
@@ -246,6 +259,8 @@ function metricCard(label, value, detail = '', tone = '') {
 function summaryBits(item) {
   if (!item) return [];
   const bits = [];
+  const attemptStatus = questionAttemptStatusKey(item);
+  if (attemptStatus !== 'unseen') bits.push(`<span class="question-bank-summary-pill ${questionAttemptTone(item)}">${escapeHtml(questionAttemptStatusLabel(item))}</span>`);
   const typeLabel = questionTypeLabel(item);
   if (typeLabel) bits.push(`<span class="question-bank-summary-pill ${pillTone('type', item.question_type)}">${escapeHtml(typeLabel)}</span>`);
   if (item?.difficulty) bits.push(`<span class="question-bank-summary-pill ${pillTone('difficulty', item.difficulty)}">난이도 ${escapeHtml(item.difficulty)}</span>`);
@@ -483,9 +498,15 @@ function questionBankItemMatchesAttemptStatusFilter(item, attemptStatus = filter
 }
 
 
-function applyEmbeddedQuestionBankUpdate(item) {
+function applyEmbeddedQuestionBankUpdate(item, summary = null, finishedAt = '') {
+  if (summary && typeof summary === 'object') bankState.practiceSummary = {...summary, finishedAt: String(finishedAt || '')};
   const questionBankId = String(item?.question_bank_id || '').trim();
-  if (!questionBankId) return;
+  if (!questionBankId) {
+    renderHeader();
+    renderOverviewCards();
+    renderPracticePane();
+    return;
+  }
   const index = bankState.items.findIndex((entry) => String(entry?.question_bank_id || '') === questionBankId);
   if (index < 0) {
     loadQuestionBankPage().catch(() => {});
@@ -742,11 +763,14 @@ function renderHeader() {
   const filterCount = activeFilterEntries().length;
   const current = selectedIndex(bankState.practiceStartIndex) + 1;
   const showingPractice = bankState.practiceLoaded && !bankState.practiceCollapsed;
+  const practiceSummary = finishedPracticeSummary();
   if (summary) {
     if (bankState.loading) {
       summary.textContent = '문제은행을 정리하는 중입니다.';
     } else if (!bankState.items.length) {
       summary.textContent = bankState.error ? '조회 조건을 확인하고 다시 불러오세요.' : '조건에 맞는 문제를 찾지 못했습니다.';
+    } else if (showingPractice && practiceSummary) {
+      summary.textContent = `채점 완료 · 점수 ${practiceSummary.scoreLabel} · ${practiceSummary.scoreDetail}`;
     } else if (showingPractice) {
       summary.textContent = `${current}번 문제 풀이 화면`;
     } else {
@@ -760,6 +784,7 @@ function renderHeader() {
   chips.innerHTML = showingPractice
     ? [
         practiceChip,
+        practiceSummary ? `<span class="question-bank-header-chip question-bank-header-chip-strong">점수 ${escapeHtml(practiceSummary.scoreLabel)}</span>` : '',
         bankState.items.length ? `<span class="question-bank-header-chip question-bank-header-chip-strong">선택 ${escapeHtml(`${current}번`)}</span>` : '',
       ].join('')
     : [
@@ -779,12 +804,20 @@ function renderOverviewCards() {
   const filterCount = activeFilterEntries().length;
   const selectedLabel = bankState.items.length ? `${selectedIndex(bankState.practiceStartIndex) + 1}번` : '없음';
   const practiceState = bankState.practiceLoaded ? (bankState.practiceCollapsed ? '대기' : '풀이 중') : '미시작';
-  mount.innerHTML = [
-    metricCard('표시', `${returned}${total ? ` / ${total}` : ''}`),
-    metricCard('선택', selectedLabel),
-    metricCard('필터', filterCount ? `${filterCount}개` : '숨김'),
-    metricCard('풀이', practiceState),
-  ].join('');
+  const practiceSummary = finishedPracticeSummary();
+  mount.innerHTML = practiceSummary
+    ? [
+        metricCard('점수', practiceSummary.scoreLabel, practiceSummary.scoreDetail || '', 'score'),
+        metricCard('맞음', String(practiceSummary.correct || 0), `전체 ${practiceSummary.totalQuestions || 0}문항`, 'correct'),
+        metricCard('오답', String(practiceSummary.wrongCount || 0), `틀림 ${practiceSummary.wrong || 0} · 애매 ${practiceSummary.ambiguous || 0} · 모름 ${practiceSummary.unknown || 0}`, 'wrong'),
+        metricCard('풀이', practiceSummary.pending ? `미채점 ${practiceSummary.pending}` : '채점 완료', practiceState),
+      ].join('')
+    : [
+        metricCard('표시', `${returned}${total ? ` / ${total}` : ''}`),
+        metricCard('선택', selectedLabel),
+        metricCard('필터', filterCount ? `${filterCount}개` : '숨김'),
+        metricCard('풀이', practiceState),
+      ].join('');
 }
 
 function bindActiveFilterChipActions() {
@@ -841,15 +874,17 @@ function renderSelectionSummary() {
 function tableRows() {
   return bankState.items.map((item, index) => {
     const active = bankState.selectedId && bankState.selectedId === String(item.question_bank_id || '');
+    const attemptTone = questionAttemptTone(item);
+    const attemptStatus = questionAttemptStatusKey(item);
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
     const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 44);
     return {
       id: String(item.question_bank_id || index + 1),
-      className: active ? 'current-row active' : '',
+      className: [active ? 'current-row active' : '', attemptStatus === 'wrong' ? 'question-bank-row-state-wrong' : '', attemptStatus === 'correct' ? 'question-bank-row-state-correct' : ''].filter(Boolean).join(' '),
       attributes: {'aria-current': active ? 'true' : 'false'},
       cells: {
-        index: `<span class="question-bank-row-number">${index + 1}</span>`,
-        attempt_status: `<span class="question-bank-summary-pill">${escapeHtml(questionAttemptStatusLabel(item))}</span>`,
+        index: `<span class="question-bank-row-number${attemptStatus === 'wrong' ? ' is-wrong' : attemptStatus === 'correct' ? ' is-correct' : ''}">${index + 1}</span>`,
+        attempt_status: `<span class="question-bank-summary-pill ${attemptTone}">${escapeHtml(questionAttemptStatusLabel(item))}</span>`,
         prompt: `<div class="question-bank-row-trigger"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</div>`,
         type: `<span class="question-bank-type-pill ${pillTone('type', item.question_type)}">${escapeHtml(questionTypeLabel(item) || '문제')}</span>`,
         topic: `<div class="question-bank-keyword-list">${renderQuestionKeywordLinks(item.keywords, {limit: 2})}</div>`,
@@ -878,11 +913,17 @@ function renderPracticePane() {
     return;
   }
   const start = bankState.practiceLoaded ? practiceActiveIndex() : selectedIndex(bankState.practiceStartIndex);
-  summary.textContent = `현재 목록 ${bankState.items.length}문항 · ${start + 1}번부터 풀이 중 · ${selectedPrompt(item, `문제 ${start + 1}`).slice(0, 58)}`;
+  const practiceSummary = finishedPracticeSummary();
+  summary.textContent = practiceSummary
+    ? `현재 목록 ${bankState.items.length}문항 · 채점 완료 · 점수 ${practiceSummary.scoreLabel} · ${selectedPrompt(item, `문제 ${start + 1}`).slice(0, 58)}`
+    : `현재 목록 ${bankState.items.length}문항 · ${start + 1}번부터 풀이 중 · ${selectedPrompt(item, `문제 ${start + 1}`).slice(0, 58)}`;
   status.innerHTML = [
     `<span class="question-bank-practice-pill">현재 ${escapeHtml(`${start + 1} / ${bankState.items.length}`)}</span>`,
+    practiceSummary ? `<span class="question-bank-practice-pill attempt-correct">점수 ${escapeHtml(practiceSummary.scoreLabel)}</span>` : '',
+    practiceSummary ? `<span class="question-bank-practice-pill attempt-correct">맞음 ${escapeHtml(String(practiceSummary.correct || 0))}</span>` : '',
+    practiceSummary ? `<span class="question-bank-practice-pill attempt-wrong">오답 ${escapeHtml(String(practiceSummary.wrongCount || 0))}</span>` : '',
     ...summaryBits(item),
-  ].join('');
+  ].filter(Boolean).join('');
   placeholder.textContent = '문제를 선택하면 문제은행은 숨기고 풀이 화면만 보이도록 전환합니다.';
   placeholder.hidden = bankState.practiceLoaded;
   frame.hidden = !bankState.practiceLoaded;
@@ -942,6 +983,7 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
   bankState.practiceActiveId = bankState.selectedId;
   bankState.practiceLoaded = true;
   bankState.practiceStartIndex = safeStart;
+  bankState.practiceSummary = null;
   if (reveal) setPracticeCollapsed(false);
   persistFilterState();
   renderTable();
@@ -1119,5 +1161,5 @@ window.addEventListener('message', (event) => {
   if (event.origin && event.origin !== window.location.origin) return;
   const data = event?.data;
   if (!data || data.type !== 'cs-flashcards-question-bank-updated') return;
-  applyEmbeddedQuestionBankUpdate(data.item || null);
+  applyEmbeddedQuestionBankUpdate(data.item || null, data.summary || null, data.finishedAt || '');
 });

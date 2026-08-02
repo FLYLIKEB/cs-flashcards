@@ -330,6 +330,20 @@ body.question-bank-dialog-open {
   background: #ffffff;
 }
 
+.question-bank-summary-pill.attempt-correct,
+.question-bank-practice-pill.attempt-correct {
+  border-color: rgba(23, 107, 77, .24);
+  background: rgba(228, 248, 240, .96);
+  color: #176b4d;
+}
+
+.question-bank-summary-pill.attempt-wrong,
+.question-bank-practice-pill.attempt-wrong {
+  border-color: rgba(159, 47, 63, .24);
+  background: rgba(255, 232, 236, .96);
+  color: #9f2f3f;
+}
+
 .question-bank-header-chip-button,
 .question-bank-filter-chip {
   font: inherit;
@@ -514,6 +528,18 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   border: 1px solid var(--cs-table-line);
   border-radius: 9px;
   background: #ffffff;
+}
+.question-bank-metric-card.score {
+  border-color: rgba(31, 58, 95, .18);
+  background: linear-gradient(135deg, rgba(241, 246, 255, .98), rgba(255, 255, 255, .98));
+}
+.question-bank-metric-card.correct {
+  border-color: rgba(23, 107, 77, .18);
+  background: rgba(228, 248, 240, .96);
+}
+.question-bank-metric-card.wrong {
+  border-color: rgba(159, 47, 63, .18);
+  background: rgba(255, 232, 236, .96);
 }
 
 .question-bank-metric-value {
@@ -722,6 +748,14 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   box-shadow: inset 3px 0 0 var(--cs-table-text);
 }
 
+.cs-table tbody tr.question-bank-row-state-correct td {
+  background: rgba(228, 248, 240, .42);
+}
+
+.cs-table tbody tr.question-bank-row-state-wrong td {
+  background: rgba(255, 232, 236, .52);
+}
+
 .cs-table tbody tr.current-row .question-bank-row-number,
 .cs-table tbody tr.active .question-bank-row-number {
   color: var(--cs-table-text);
@@ -736,9 +770,34 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
 }
 
 .question-bank-row-number {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.9rem;
   color: var(--cs-table-muted);
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
+}
+
+.question-bank-row-number.is-correct {
+  color: #176b4d;
+  font-weight: 700;
+}
+
+.question-bank-row-number.is-wrong {
+  color: #9f2f3f;
+  font-weight: 700;
+}
+
+.question-bank-row-number.is-wrong::after {
+  content: '';
+  position: absolute;
+  width: 1.65rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: rotate(-28deg);
 }
 
 .question-bank-row-trigger {

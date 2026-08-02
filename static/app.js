@@ -4907,7 +4907,12 @@ function syncUpdatedQuestionBankItem(item, {reloadOnFilterMismatch = true} = {})
 
 function notifyQuestionBankParentUpdate(item) {
   if (!questionBankEmbedMode() || window.parent === window || !item?.question_bank_id) return;
-  window.parent.postMessage({type: 'cs-flashcards-question-bank-updated', item}, '*');
+  window.parent.postMessage({
+    type: 'cs-flashcards-question-bank-updated',
+    item,
+    summary: questionSessionScoreSummary(),
+    finishedAt: state.questionSessionFinishedAt || '',
+  }, '*');
 }
 
 function syncQuestionBankAttemptState(question, {reloadOnFilterMismatch = true} = {}) {
@@ -5436,6 +5441,55 @@ function questionJudgmentCounts() {
   return counts;
 }
 
+function formatQuestionScoreValue(value) {
+  const safe = Math.round((Number(value) || 0) * 10) / 10;
+  return Number.isInteger(safe) ? String(safe) : safe.toFixed(1);
+}
+
+function questionSessionScoreSummary(questions = state.questions) {
+  const items = Array.isArray(questions) ? questions : [];
+  const counts = {correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0};
+  let totalPoints = 0;
+  let earnedPoints = 0;
+  let hasPointScores = false;
+  const missedQuestions = [];
+  items.forEach((item, index) => {
+    const question = hydrateQuestionState(item);
+    const judgment = QUESTION_HISTORY_FILTER_LABELS[question?.judgment] ? question.judgment : 'pending';
+    const scoreWeight = judgment === 'correct' ? 1 : judgment === 'ambiguous' ? 0.5 : 0;
+    counts[judgment] += 1;
+    if (Number.isInteger(question?.points) && question.points > 0) {
+      hasPointScores = true;
+      totalPoints += question.points;
+      earnedPoints += question.points * scoreWeight;
+    }
+    if (['ambiguous', 'wrong', 'unknown'].includes(judgment)) {
+      missedQuestions.push({
+        number: Number.isInteger(question?.questionOrder) ? question.questionOrder : index + 1,
+        judgment,
+        label: questionJudgmentLabel(judgment),
+      });
+    }
+  });
+  const totalQuestions = items.length;
+  const scoreUnits = hasPointScores ? earnedPoints : (counts.correct + counts.ambiguous * 0.5);
+  const scoreBase = hasPointScores ? totalPoints : totalQuestions;
+  const scorePercent = scoreBase ? Math.round((scoreUnits / scoreBase) * 100) : 0;
+  return {
+    ...counts,
+    totalQuestions,
+    wrongCount: counts.ambiguous + counts.wrong + counts.unknown,
+    totalPoints,
+    earnedPoints,
+    earnedPointsDisplay: formatQuestionScoreValue(earnedPoints),
+    hasPointScores,
+    scorePercent,
+    scoreLabel: hasPointScores ? `${formatQuestionScoreValue(earnedPoints)} / ${totalPoints}점` : `${scorePercent}점`,
+    scoreDetail: hasPointScores ? `정답 ${counts.correct}/${totalQuestions} · 애매 반점 포함 환산 ${scorePercent}점` : `정답 ${counts.correct}/${totalQuestions} · 애매 반점 포함`,
+    missedQuestions,
+  };
+}
+
 function currentQuestionSessionElapsedSeconds() {
   const base = Math.max(0, Number.parseInt(state.questionSessionElapsedBaseSeconds || 0, 10) || 0);
   if (!state.questionSessionStartMs) return base;
@@ -5484,7 +5538,7 @@ function updateQuestionSummaryLine() {
       : '현재 필터 기준으로 제한 시간 없이 모의 세트를 생성합니다.';
     return;
   }
-  const counts = questionJudgmentCounts();
+  const sessionSummary = questionSessionScoreSummary();
   const parts = [
     questionSessionModeLabel(current.sessionMode || state.questionSessionMode),
     `${state.questionIndex + 1} / ${total}`,
@@ -5500,12 +5554,15 @@ function updateQuestionSummaryLine() {
   if (Number.isInteger(current.expectedTimeSeconds) && current.expectedTimeSeconds > 0) {
     parts.push(`권장 ${formatElapsedClock(current.expectedTimeSeconds)}`);
   }
-  parts.push(`맞음 ${counts.correct}`);
-  parts.push(`애매 ${counts.ambiguous}`);
-  parts.push(`틀림 ${counts.wrong}`);
-  parts.push(`모름 ${counts.unknown}`);
-  parts.push(`미채점 ${counts.pending}`);
-  if (state.questionSessionFinishedAt) parts.push('세트 종료');
+  parts.push(`맞음 ${sessionSummary.correct}`);
+  parts.push(`애매 ${sessionSummary.ambiguous}`);
+  parts.push(`틀림 ${sessionSummary.wrong}`);
+  parts.push(`모름 ${sessionSummary.unknown}`);
+  parts.push(`미채점 ${sessionSummary.pending}`);
+  if (state.questionSessionFinishedAt) {
+    parts.push(`점수 ${sessionSummary.scorePercent}점`);
+    parts.push('세트 종료');
+  }
   summary.textContent = parts.join(' · ');
 }
 
@@ -5624,6 +5681,20 @@ function questionResultText(question) {
   const current = hydrateQuestionState(question);
   if (!current || current.judgment === 'pending') return '';
   return `${questionJudgmentLabel(current.judgment)} 저장됨`;
+}
+
+function finalizeQuestionJudgment(question, answeredAt = new Date().toISOString()) {
+  const current = hydrateQuestionState(question);
+  if (!current || current.judgment !== 'pending') return false;
+  if (!questionHasSubmittedAnswer(current)) return markUnansweredQuestionWrong(current, answeredAt);
+  if (current.gradedCorrect === true || current.gradedCorrect === false) {
+    current.answerRevealed = true;
+    current.judgment = current.gradedCorrect ? 'correct' : 'wrong';
+    current.answeredAt = current.answeredAt || answeredAt;
+    if (current.judgment === 'correct') current.wrongNote = '';
+    return true;
+  }
+  return false;
 }
 
 function syncUpdatedCard(card) {
@@ -5749,7 +5820,10 @@ async function finishQuestionSession() {
   const finishedAt = new Date().toISOString();
   state.questionSessionFinishedAt = finishedAt;
   state.questions.forEach((question) => {
-    markUnansweredQuestionWrong(question, finishedAt);
+    finalizeQuestionJudgment(question, finishedAt);
+  });
+  state.questions.forEach((question) => {
+    syncQuestionBankAttemptState(question, {reloadOnFilterMismatch: false});
   });
   stopQuestionTimer();
   state.questionSaving = true;
@@ -5780,8 +5854,11 @@ async function finishQuestionSession() {
       syncQuestionBankAttemptState(current, {reloadOnFilterMismatch: index === state.questionIndex});
     });
     if (state.questionHistoryOpen) loadQuestionHistory();
-    const counts = questionJudgmentCounts();
-    const summaryText = `세트 종료 · 총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())} · 맞음 ${counts.correct} · 애매 ${counts.ambiguous} · 틀림 ${counts.wrong} · 모름 ${counts.unknown} · 미채점 ${counts.pending}`;
+    const sessionSummary = questionSessionScoreSummary();
+    const scoreText = sessionSummary.hasPointScores
+      ? `${sessionSummary.scoreLabel} · 환산 ${sessionSummary.scorePercent}점`
+      : sessionSummary.scoreLabel;
+    const summaryText = `세트 종료 · 총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())} · 점수 ${scoreText} · 맞음 ${sessionSummary.correct} · 애매 ${sessionSummary.ambiguous} · 틀림 ${sessionSummary.wrong} · 모름 ${sessionSummary.unknown} · 미채점 ${sessionSummary.pending}`;
     const finishMessage = questionSessionIsBok(state.questionSessionMode) ? `${summaryText} · 이제 정답 확인 가능` : summaryText;
     setMessage(failures ? `${finishMessage} · 저장 실패 ${failures}건` : finishMessage, failures > 0);
   } finally {
@@ -5835,20 +5912,30 @@ function renderQuestionSessionReview() {
     return;
   }
   const current = hydrateQuestionState(currentQuestion());
-  const counts = questionJudgmentCounts();
-  const totalPoints = state.questions.reduce((sum, item) => {
-    const question = hydrateQuestionState(item);
-    return sum + (Number.isInteger(question?.points) ? question.points : 0);
-  }, 0);
+  const sessionSummary = questionSessionScoreSummary();
   const currentSection = String(current?.section || '').trim();
+  const missedHtml = sessionSummary.missedQuestions.length
+    ? `<div class="question-session-missed"><strong>빨간 표시 문제</strong><div class="question-session-missed-chips">${sessionSummary.missedQuestions.map((item) => `<span class="question-session-missed-chip ${escapeHtml(item.judgment)}">${escapeHtml(`${item.number}번 · ${item.label}`)}</span>`).join('')}</div></div>`
+    : '<div class="question-session-missed is-clear"><strong>전체 흐름</strong><p>틀린 문제 없이 마무리했습니다. 애매했던 문항만 한 번 더 회고하면 됩니다.</p></div>';
   review.hidden = false;
   review.innerHTML = `
-    <div class="question-session-summary">
-      <strong>${escapeHtml(state.questionSessionTitle || '모의 세트')}</strong>
-      <p>${escapeHtml(questionSessionModeLabel(current?.sessionMode || state.questionSessionMode))} · 총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())}${totalPoints ? ` · 총 ${totalPoints}점` : ''}${currentSection ? ` · 현재 ${escapeHtml(currentSection)}` : ''}</p>
+    <div class="question-session-summary is-finished">
+      <div class="question-session-summary-head">
+        <div>
+          <strong>${escapeHtml(state.questionSessionTitle || '모의 세트')}</strong>
+          <p>${escapeHtml(questionSessionModeLabel(current?.sessionMode || state.questionSessionMode))} · 총 ${formatElapsedClock(currentQuestionSessionElapsedSeconds())}${currentSection ? ` · 현재 ${escapeHtml(currentSection)}` : ''}</p>
+        </div>
+        <span class="question-session-score-pill">${escapeHtml(`${sessionSummary.scorePercent}점`)}</span>
+      </div>
+      <div class="question-session-score-grid">
+        <article class="question-session-score-card correct"><span>맞춘 문제</span><strong>${escapeHtml(String(sessionSummary.correct))}</strong><p>지금 맞힌 문항</p></article>
+        <article class="question-session-score-card wrong"><span>틀린 문제</span><strong>${escapeHtml(String(sessionSummary.wrongCount))}</strong><p>빨간 표시로 다시 볼 문제</p></article>
+        <article class="question-session-score-card score"><span>점수</span><strong>${escapeHtml(sessionSummary.scoreLabel)}</strong><p>${escapeHtml(sessionSummary.scoreDetail)}${sessionSummary.hasPointScores ? ` · 환산 ${escapeHtml(String(sessionSummary.scorePercent))}점` : ''}</p></article>
+      </div>
+      ${missedHtml}
       <ul>
-        <li>맞음 ${counts.correct} · 애매 ${counts.ambiguous} · 틀림 ${counts.wrong} · 모름 ${counts.unknown} · 미채점 ${counts.pending}</li>
-        <li>${questionSessionIsBok(current?.sessionMode || state.questionSessionMode) ? '정답을 확인하며 문항별 부분점수 관점으로 회고를 남기세요.' : '문항별 채점과 오답노트를 확인하세요.'}</li>
+        <li>상세 분포 · 맞음 ${sessionSummary.correct} · 애매 ${sessionSummary.ambiguous} · 틀림 ${sessionSummary.wrong} · 모름 ${sessionSummary.unknown} · 미채점 ${sessionSummary.pending}</li>
+        <li>${questionSessionIsBok(current?.sessionMode || state.questionSessionMode) ? '정답을 확인하며 문항별 부분점수와 빨간 표시 문제를 함께 회고하세요.' : '틀린 문항은 빨간 표시, 객관식은 정답과 내 선택을 색으로 구분했습니다.'}</li>
       </ul>
     </div>`;
 }
@@ -5920,7 +6007,16 @@ function renderQuestionPanel() {
         ${choices.map((choice, index) => {
           const isAnswer = question.answerRevealed && index === question.answer_index;
           const isSelected = index === question.selectedChoiceIndex;
-          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}>${renderMarkdownInline(choice)}</button></li>`;
+          const isWrongSelection = question.answerRevealed
+            && isSelected
+            && Number.isInteger(question.answer_index)
+            && index !== question.answer_index
+            && ['ambiguous', 'wrong', 'unknown'].includes(question.judgment);
+          const badges = [];
+          if (question.answerRevealed && isAnswer) badges.push('<span class="question-choice-badge answer">정답</span>');
+          if (question.answerRevealed && isWrongSelection) badges.push('<span class="question-choice-badge wrong">내 오답</span>');
+          else if (question.answerRevealed && isSelected) badges.push('<span class="question-choice-badge mine">내 답</span>');
+          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}${isWrongSelection ? ' wrong selected-wrong' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}><span class="question-choice-body">${renderMarkdownInline(choice)}</span>${badges.length ? `<span class="question-choice-badges">${badges.join('')}</span>` : ''}</button></li>`;
         }).join('')}
       </ol>
     </div>` : '';
@@ -5959,6 +6055,7 @@ function renderQuestionPanel() {
         ${reviewCard ? `<div class="question-answer-meta-item"><span class="question-answer-meta-label">원본 카드</span><button class="question-answer-meta-card-button" type="button" data-question-open-card="1">${escapeHtml(reviewCard.term || reviewCard.id || '원본 카드로 이동')}</button></div>` : ''}
       </div>
     </div>` : '';
+  const sessionSummary = questionSessionScoreSummary();
   const resultText = questionResultText(question);
   const resultTone = question.judgment === 'pending' ? '' : question.judgment;
   const resultHtml = resultText ? `<p class="question-grade-status ${resultTone}">${escapeHtml(resultText)}</p>` : '';
@@ -6004,7 +6101,6 @@ function renderQuestionPanel() {
       ${wrongNoteHtml}
     </div>` : '';
 
-
   const sessionMode = question.sessionMode || state.questionSessionMode;
   const sessionModeLabelText = questionSessionModeLabel(sessionMode);
   const lockNoticeHtml = revealLocked ? `
@@ -6020,9 +6116,9 @@ function renderQuestionPanel() {
     </div>` : '';
   const sideStateHtml = revealLocked
     ? lockNoticeHtml
-    : `<div class="question-side-note">
-        <span class="question-side-note-label">풀이 상태</span>
-        <p>${escapeHtml(question.answerRevealed ? '정답과 해설을 확인하고 채점 결과를 남기세요.' : '답안을 먼저 작성한 뒤 정답/해설을 열어 비교하세요.')}</p>
+    : `<div class="question-side-note${state.questionSessionFinishedAt ? ' is-score' : ''}">
+        <span class="question-side-note-label">${state.questionSessionFinishedAt ? '총괄 채점' : '풀이 상태'}</span>
+        <p>${escapeHtml(state.questionSessionFinishedAt ? `맞음 ${sessionSummary.correct} · 틀린 표시 ${sessionSummary.wrongCount} · 점수 ${sessionSummary.scorePercent}점` : question.answerRevealed ? '정답과 해설을 확인하고 채점 결과를 남기세요.' : '답안을 먼저 작성한 뒤 정답/해설을 열어 비교하세요.')}</p>
       </div>`;
   const sessionMeta = [
     state.questionSessionTitle || question.sessionTitle,
@@ -6045,11 +6141,18 @@ function renderQuestionPanel() {
   const judgmentBadgeHtml = question.judgment !== 'pending'
     ? `<span class="badge question-judgment-badge ${escapeHtml(question.judgment)}">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>`
     : '';
+  const embedStatusText = revealLocked
+    ? '정답 잠금 중'
+    : state.questionSessionFinishedAt
+      ? `채점 완료 · ${sessionSummary.scorePercent}점`
+      : question.judgment === 'wrong'
+        ? '틀림 표시됨'
+        : '정답 확인 가능';
   const embedTopbarHtml = questionBankEmbedMode() ? `
-    <div class="question-embed-topbar question-surface${question.judgment === 'wrong' ? ' is-wrong' : ''}">
+    <div class="question-embed-topbar question-surface${question.judgment === 'wrong' ? ' is-wrong' : ''}${state.questionSessionFinishedAt ? ' is-finished' : ''}">
       <div class="question-embed-topbar-copy">
         <strong>${escapeHtml(questionPosition)}</strong>
-        <span class="question-embed-topbar-status${question.judgment === 'wrong' ? ' wrong' : ''}">${escapeHtml(revealLocked ? '정답 잠금 중' : question.judgment === 'wrong' ? '틀림 표시됨' : '정답 확인 가능')}</span>
+        <span class="question-embed-topbar-status${question.judgment === 'wrong' ? ' wrong' : ''}${state.questionSessionFinishedAt ? ' finished' : ''}">${escapeHtml(embedStatusText)}</span>
       </div>
       <div class="question-embed-topbar-actions">
         <button class="question-toolbar-button" type="button" data-question-nav="prev" ${state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionIndex <= 0 ? 'disabled' : ''}>이전</button>
@@ -6060,7 +6163,7 @@ function renderQuestionPanel() {
       </div>
     </div>` : '';
   card.innerHTML = `
-    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}">
+    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
       <div class="question-card-head">
         <div class="question-card-head-copy">
