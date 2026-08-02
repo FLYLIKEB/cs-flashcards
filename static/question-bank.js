@@ -294,6 +294,7 @@ function confirmPracticeRestart(startIndex) {
 
 
 
+
 function practiceFrameUrl() {
   return `/?question-bank-embed=1&question-bank-run=${Date.now()}-${bankState.practiceNonce}`;
 }
@@ -1161,6 +1162,7 @@ async function loadQuestionBankReview() {
   }
 }
 
+
 function bindActiveFilterChipActions() {
   const mount = $('bankPageActiveFilters');
   if (!mount) return;
@@ -1325,41 +1327,38 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
     return false;
   }
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
-const targetId = String(bankState.items[safeStart]?.question_bank_id || '');
-const currentId = String(bankState.practiceActiveId || '');
-if (bankState.practiceLoaded && targetId && targetId === currentId) {
+  const targetId = String(bankState.items[safeStart]?.question_bank_id || '');
+  const currentId = String(bankState.practiceActiveId || '');
+  if (bankState.practiceLoaded && targetId && targetId === currentId) {
+    if (reveal) setPracticeCollapsed(false);
+    ensureSelectedRowVisible();
+    renderTable();
+    renderPracticePane();
+    return false;
+  }
+  if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {
+    bankState.error = '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.';
+    renderTable();
+    renderPracticePane();
+    return false;
+  }
+  pendingPracticeLaunch = bankState.loading
+    ? {startIndex: safeStart, reveal}
+    : null;
+  bankState.selectedId = targetId;
+  bankState.practiceActiveId = targetId;
+  bankState.practiceLoaded = true;
+  bankState.practiceStartIndex = safeStart;
+  bankState.practiceSummary = null;
+  bankState.practiceSessionState = null;
   if (reveal) setPracticeCollapsed(false);
+  persistFilterState();
+  restartPracticeFrame(safeStart, null);
+  bankState.error = '';
+  renderTable();
   ensureSelectedRowVisible();
-  renderTable();
   renderPracticePane();
-  return false;
-}
-if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {
-  bankState.error = '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.';
-  renderTable();
-  renderPracticePane();
-  return false;
-}
-pendingPracticeLaunch = bankState.loading
-  ? {startIndex: safeStart, reveal}
-  : null;
-bankState.selectedId = targetId;
-bankState.practiceActiveId = targetId;
-bankState.practiceLoaded = true;
-bankState.practiceStartIndex = safeStart;
-bankState.practiceSummary = null;
-bankState.practiceSessionState = null;
-if (reveal) setPracticeCollapsed(false);
-persistFilterState();
-renderTable();
-renderPracticePane();
-ensureSelectedRowVisible();
-restartPracticeFrame(safeStart, null);
-bankState.error = '';
-renderTable();
-renderPracticePane();
-return true;
-
+  return true;
 }
 async function loadQuestionBankPage() {
   const requestId = activeQuestionBankLoadRequest + 1;

@@ -74,6 +74,28 @@ class QuestionBankMetadataTests(unittest.TestCase):
         self.assertIn('available_issuers', APP_JS)
         self.assertIn('available_categories', APP_JS)
 
+    def test_question_bank_script_deduplicates_review_and_launch_helpers(self):
+        expected_single_declarations = {
+            'function questionBankResultSetKey(': 1,
+            'function questionBankReviewIds(': 1,
+            'function questionBankReviewCounts(': 1,
+            'function formatQuestionBankAttemptUpdatedAt(': 1,
+            'function questionBankReviewRequestPayload(': 1,
+            'function questionBankReviewItemMatchesFilter(': 1,
+            'function visibleQuestionBankReviewItems(': 1,
+            'function practiceLaunchPayload(': 1,
+            'function persistPracticeLaunch(': 1,
+            'function restartPracticeFrame(': 1,
+            'function confirmPracticeRestart(': 1,
+            'function selectQuestionBankItem(': 1,
+            'function bindQuestionBankReviewActions(': 1,
+            'function reviewFieldHtml(': 1,
+            'function renderQuestionBankReview(': 1,
+            'async function loadQuestionBankReview(': 1,
+        }
+        for snippet, expected_count in expected_single_declarations.items():
+            with self.subTest(snippet=snippet):
+                self.assertEqual(QUESTION_BANK_JS.count(snippet), expected_count)
     def test_question_bank_service_separates_missing_card_tracking_from_linked_keywords(self):
         fieldnames = flashcard_app.content_fieldnames()
         with tempfile.TemporaryDirectory() as td:
