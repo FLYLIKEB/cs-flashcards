@@ -1312,7 +1312,14 @@ def ensure_progress_db(
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_field_name ON question_bank(field_name)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_category ON question_bank(category)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_bank_issuer ON question_bank(issuer)")
-        backfill_question_bank_difficulty_rows(conn)
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS maintenance_state (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL DEFAULT ''
+            )
+            """
+        )
 
 
         summary_table_exists = conn.execute(
@@ -1489,6 +1496,10 @@ def ensure_progress_db(
                     if row.get("id") and progress_row_is_meaningful(row)
                 ],
             )
+        if should_backfill_question_bank_runtime_rows(conn):
+            backfill_question_bank_difficulty_rows(conn)
+            mark_question_bank_runtime_backfill_clean(conn)
+
 
         conn.commit()
 
@@ -5294,6 +5305,49 @@ def infer_question_bank_difficulty(
     return "중"
 
 
+
+def question_bank_runtime_backfill_state(conn: sqlite3.Connection) -> str:
+    card_row = conn.execute(
+        "SELECT COUNT(*) AS count, COALESCE(MAX(updated_at), '') AS updated_at, COALESCE(MAX(card_id), '') AS max_id FROM cards"
+    ).fetchone()
+    question_bank_row = conn.execute(
+        "SELECT COUNT(*) AS count, COALESCE(MAX(updated_at), '') AS updated_at, COALESCE(MAX(id), '') AS max_id FROM question_bank"
+    ).fetchone()
+    payload = {
+        "cards": {
+            "count": int(card_row["count"] if card_row else 0),
+            "updated_at": card_row["updated_at"] if card_row else "",
+            "max_id": card_row["max_id"] if card_row else "",
+        },
+        "question_bank": {
+            "count": int(question_bank_row["count"] if question_bank_row else 0),
+            "updated_at": question_bank_row["updated_at"] if question_bank_row else "",
+            "max_id": question_bank_row["max_id"] if question_bank_row else "",
+        },
+    }
+    return json.dumps(payload, ensure_ascii=False, sort_keys=True)
+
+
+def should_backfill_question_bank_runtime_rows(conn: sqlite3.Connection) -> bool:
+    current_state = question_bank_runtime_backfill_state(conn)
+    row = conn.execute(
+        "SELECT value FROM maintenance_state WHERE key = ?",
+        ("question_bank_runtime_backfill_v1",),
+    ).fetchone()
+    if row is None:
+        return True
+    return str(row["value"] or "") != current_state
+
+
+def mark_question_bank_runtime_backfill_clean(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        INSERT INTO maintenance_state (key, value)
+        VALUES (?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value
+        """,
+        ("question_bank_runtime_backfill_v1", question_bank_runtime_backfill_state(conn)),
+    )
 
 def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
     rows = conn.execute(
