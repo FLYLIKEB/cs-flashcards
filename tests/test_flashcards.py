@@ -278,6 +278,87 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(saved['concept_media_payload'], f'/api/ai-images/{image_name}')
 
 
+    def test_read_cards_rechecks_recovery_after_runtime_image_fields_change(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = Path(td) / 'cards.csv'
+            db_path = Path(td) / 'progress.sqlite'
+            image_dir = Path(td) / 'ai_images'
+            backup_dir = Path(td) / 'backups'
+            write_sample(csv_path, include_image=True)
+            seed_runtime_db(csv_path, db_path)
+            image_dir.mkdir(parents=True, exist_ok=True)
+            image_name = 'CS-001-20260720-223000-deadbeef.png'
+            recovered_url = f'/api/ai-images/{image_name}'
+            (image_dir / image_name).write_bytes(b'\x89PNG\r\n\x1a\nrestored')
+            original_image_dir = flashcard_app.AI_IMAGE_DIR
+            try:
+                flashcard_app.AI_IMAGE_DIR = image_dir
+                read_cards(None, db_path)
+                flashcard_app.update_card_content_fields(
+                    'CS-001',
+                    {'concept_image_url': '', 'concept_media_type': '', 'concept_media_payload': ''},
+                    backup_dir,
+                    db_path,
+                )
+                rows, _ = read_cards(None, db_path)
+            finally:
+                flashcard_app.AI_IMAGE_DIR = original_image_dir
+            self.assertEqual(rows[0]['concept_image_url'], recovered_url)
+            self.assertEqual(rows[0]['concept_media_type'], 'image')
+            self.assertEqual(rows[0]['concept_media_payload'], recovered_url)
+            saved = sqlite_card_status(db_path)
+            self.assertEqual(saved['concept_image_url'], recovered_url)
+            self.assertEqual(saved['concept_media_type'], 'image')
+            self.assertEqual(saved['concept_media_payload'], recovered_url)
+
+    def test_read_cards_skips_ai_image_recovery_scan_when_nothing_changed(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = Path(td) / 'cards.csv'
+            db_path = Path(td) / 'progress.sqlite'
+            image_dir = Path(td) / 'ai_images'
+            write_sample(csv_path, include_image=True)
+            seed_runtime_db(csv_path, db_path)
+            image_dir.mkdir(parents=True, exist_ok=True)
+            image_name = 'CS-001-20260720-223000-deadbeef.png'
+            (image_dir / image_name).write_bytes(b'\x89PNG\r\n\x1a\nrestored')
+            recovery_scan_queries = 0
+
+            def tracking_connect_progress_db(*args, **kwargs):
+                conn = flashcard_backend.connect_progress_db(*args, **kwargs)
+
+                class TrackingConnection:
+                    def __init__(self, inner):
+                        self._inner = inner
+
+                    def execute(self, sql, params=()):
+                        nonlocal recovery_scan_queries
+                        if ' '.join(str(sql).split()) == 'SELECT card_id, concept_image_url, concept_media_type, concept_media_payload FROM cards':
+                            recovery_scan_queries += 1
+                        return self._inner.execute(sql, params)
+
+                    def __getattr__(self, name):
+                        return getattr(self._inner, name)
+
+                return TrackingConnection(conn)
+
+            original_image_dir = flashcard_app.AI_IMAGE_DIR
+            try:
+                flashcard_app.AI_IMAGE_DIR = image_dir
+                with mock.patch.object(
+                    flashcard_app,
+                    'latest_ai_image_urls_by_card_id',
+                    wraps=flashcard_app.latest_ai_image_urls_by_card_id,
+                ) as latest_lookup, mock.patch.object(
+                    flashcard_app,
+                    'connect_progress_db',
+                    side_effect=tracking_connect_progress_db,
+                ):
+                    read_cards(None, db_path)
+                    read_cards(None, db_path)
+            finally:
+                flashcard_app.AI_IMAGE_DIR = original_image_dir
+            self.assertEqual(latest_lookup.call_count, 1)
+            self.assertEqual(recovery_scan_queries, 1)
     def test_api_cards_reads_sqlite_when_runtime_csv_missing(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
