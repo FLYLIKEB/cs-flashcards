@@ -1,76 +1,31 @@
 {
-  "checked_at": "2026-08-02T18:57:16Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T19:00:51Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 2,
-    "open_pr_count": 2,
-    "blocking_worktree_count": 2,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 175,
-      "state": "OPEN",
-      "title": "카드 mark·bookmark·memo 단건 갱신 경로 SQLite 연결 재사용",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/175"
-    },
-    {
-      "number": 174,
-      "state": "OPEN",
-      "title": "메인 필터·기록 토글 버튼에 선택 상태 접근성 노출 추가",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/174"
-    }
-  ],
-  "open_prs": [
-    {
-      "number": 177,
-      "title": "Issue 174: 메인 필터·기록 토글 선택 상태 접근성 노출",
-      "headRefName": "issue-174-main-filter-toggle-a11y",
-      "baseRefName": "main",
-      "reviewDecision": "",
-      "mergeStateStatus": "UNSTABLE",
-      "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/177"
-    },
-    {
-      "number": 176,
-      "title": "Issue 175: 카드 상태 갱신 helper SQLite 연결 재사용",
-      "headRefName": "issue-175-card-mutation-single-connection",
-      "baseRefName": "main",
-      "reviewDecision": "",
-      "mergeStateStatus": "CLEAN",
-      "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/176"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-174",
-      "branch": "issue-174-main-filter-toggle-a11y",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-175",
-      "branch": "issue-175-card-mutation-single-connection",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
     {
-      "issue": 170,
-      "pr": 173,
-      "merge_commit": "c0eac8636c573388912378f2ed2986ead8040a31"
+      "issue": 174,
+      "pr": 177,
+      "merge_commit": "aa104a9a06297a6d133d17b2516ec2708690c70c"
     },
     {
-      "issue": 171,
-      "pr": 172,
-      "merge_commit": "b25772a0aeb5342b8c97aec55c50e62e816a46a7"
+      "issue": 175,
+      "pr": 176,
+      "merge_commit": "054319fe9f411bce0ad1ab70a44a6865daaf5849"
     }
   ],
   "notes": [
-    "PR #176 and PR #177 are the active round 34 review lanes.",
-    "PR #176 is mergeable pending approval; PR #177 still has CI in progress.",
-    "Round 34 cannot advance until both PRs finish and their worktrees are removed."
+    "Issue #174 / PR #177 is merged and cleaned up.",
+    "Issue #175 / PR #176 is merged and cleaned up.",
+    "The next optimization round may start immediately."
   ]
 }

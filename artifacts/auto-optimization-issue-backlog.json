@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-08-02T18:57:16Z",
+  "generated_at": "2026-08-02T19:00:51Z",
   "wave": "2026-08-02-round-34",
-  "queue": [
+  "queue": [],
+  "completed": [
     {
       "issue": 174,
-      "title": "메인 필터·기록 토글 버튼에 선택 상태 접근성 노출 추가",
+      "pr": 177,
       "branch": "issue-174-main-filter-toggle-a11y",
-      "status": "pr_open_review_pending"
+      "status": "merged"
     },
     {
       "issue": 175,
-      "title": "카드 mark·bookmark·memo 단건 갱신 경로 SQLite 연결 재사용",
+      "pr": 176,
       "branch": "issue-175-card-mutation-single-connection",
-      "status": "pr_open_review_pending"
+      "status": "merged"
     }
   ],
-  "completed": [],
   "closed_without_merge": [],
   "held": []
 }
