@@ -4254,7 +4254,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['concept_image_url'], 'https://example.com/test-concept.png')
             self.assertEqual(rows[0]['concept_media_type'], 'mermaid')
 
-    def test_read_cards_reuses_single_connection_without_ai_image_rescan(self):
+    def test_read_card_reuses_single_connection_when_ai_image_rescan_skips(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
@@ -4277,7 +4277,11 @@ class FlashcardProgressTests(unittest.TestCase):
             with mock.patch.object(
                 flashcard_app,
                 '_should_sync_ai_image_files_to_db',
-                return_value=(False, '', flashcard_app.AI_IMAGE_DIR, 0),
+                return_value=(False, (False, 0), flashcard_app.AI_IMAGE_DIR, 0),
+            ), mock.patch.object(
+                flashcard_app,
+                'sync_ai_image_files_to_db',
+                side_effect=AssertionError('read_card should skip ai image rescan'),
             ), mock.patch.object(
                 flashcard_app,
                 'ensure_progress_db',
@@ -4287,16 +4291,70 @@ class FlashcardProgressTests(unittest.TestCase):
                 'connect_progress_db',
                 wraps=flashcard_app.connect_progress_db,
             ) as connect_mock:
-                rows, fields = flashcard_app.read_cards(db_path)
+                card = flashcard_app.read_card(db_path, 'CS-001')
 
-            self.assertEqual(ensure_mock.call_count, 1)
+            self.assertEqual(ensure_mock.call_count, 0)
             self.assertEqual(connect_mock.call_count, 1)
-            self.assertIn('concept_image_url', fields)
-            self.assertEqual(rows[0]['term'], '테스트')
-            self.assertEqual(rows[0]['concept_image_url'], 'https://example.com/test-concept.png')
-            self.assertEqual(rows[0]['question_attempt_count'], 1)
-            self.assertEqual(rows[0]['question_wrong_count'], 1)
-            self.assertEqual(rows[0]['latest_wrong_note'], '핵심 연산 설명 누락')
+            self.assertEqual(card['id'], 'CS-001')
+            self.assertEqual(card['term'], '테스트')
+            self.assertEqual(card['concept_image_url'], 'https://example.com/test-concept.png')
+            self.assertEqual(card['question_attempt_count'], 1)
+            self.assertEqual(card['question_wrong_count'], 1)
+            self.assertEqual(card['latest_wrong_note'], '핵심 연산 설명 누락')
+
+    def test_save_question_attempt_reuses_connection_for_card_lookup_and_response_card(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+
+            with mock.patch.object(
+                flashcard_app,
+                '_should_sync_ai_image_files_to_db',
+                return_value=(False, (False, 0), flashcard_app.AI_IMAGE_DIR, 0),
+            ), mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
+                saved = flashcard_app.save_question_attempt(
+                    flashcard_app.QuestionAttemptRequest(
+                        question_id='q-CS-001-direct-1',
+                        card_id='CS-001',
+                        question_type='short',
+                        prompt='설명에 해당하는 개념은?',
+                        body='정의',
+                        user_answer='검증',
+                        is_correct=False,
+                        judgment='wrong',
+                        wrong_note='정의와 용어를 혼동함',
+                        session_mode='bok',
+                        section='전공필기',
+                        points=10,
+                        expected_time_seconds=720,
+                        answer_guide='정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장',
+                    ),
+                    db_path,
+                )
+
+            self.assertEqual(connect_mock.call_count, 2)
+            self.assertEqual(saved['attempt']['question_id'], 'q-CS-001-direct-1')
+            self.assertEqual(saved['attempt']['card_id'], 'CS-001')
+            self.assertEqual(saved['attempt']['judgment'], 'wrong')
+            self.assertEqual(saved['attempt']['session_mode'], 'bok')
+            self.assertEqual(saved['attempt']['section'], '전공필기')
+            self.assertEqual(saved['attempt']['points'], 10)
+            self.assertEqual(saved['attempt']['expected_time_seconds'], 720)
+            self.assertEqual(saved['attempt']['answer_guide'], '정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장')
+            self.assertIsNotNone(saved['card'])
+            self.assertEqual(saved['card']['id'], 'CS-001')
+            self.assertEqual(saved['card']['term'], '테스트')
+            self.assertEqual(saved['card']['concept_image_url'], 'https://example.com/test-concept.png')
+            self.assertEqual(saved['card']['question_attempt_count'], 1)
+            self.assertEqual(saved['card']['question_wrong_count'], 1)
+            self.assertEqual(saved['card']['latest_wrong_note'], '정의와 용어를 혼동함')
     def test_optional_basic_auth_helper(self):
         original_user = flashcard_app.PUBLIC_USERNAME
         original_password = flashcard_app.PUBLIC_PASSWORD
