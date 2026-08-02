@@ -1,128 +1,22 @@
 {
-  "updatedAt": "2026-08-02T14:39:40Z",
-  "status": "round25_in_progress",
-  "openIssues": [
-    {
-      "number": 136,
-      "title": "문제은행 attempt 상태 판정을 is_correct fallback까지 일관화",
-      "track": "backend",
-      "branch": "issue-136-question-bank-status-fallback",
-      "worktree": "/private/tmp/cs-opt-136",
-      "state": "implementing"
-    },
-    {
-      "number": 137,
-      "title": "문제은행 row trigger를 버튼 semantics로 승격하고 키보드 접근성 고정",
-      "track": "frontend",
-      "branch": "issue-137-question-bank-row-trigger-button",
-      "worktree": "/private/tmp/cs-opt-137",
-      "state": "implementing"
-    }
-  ],
-  "openPullRequests": [],
-  "recentlyClosedIssues": [
-    {
-      "number": 133,
-      "mergedPullRequest": 135,
-      "mergeCommit": "b91e982dab8a6ac2e810517f5f5134cee81a7b34"
-    },
-    {
-      "number": 132,
-      "mergedPullRequest": 134,
-      "mergeCommit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
-    }
-  ],
-  "generated_at": "2026-08-02T15:50:08Z",
-  "wave": "2026-08-02-round-28",
+  "generated_at": "2026-08-02T16:24:11Z",
+  "wave": "2026-08-02-round-29",
   "queue": [
     {
-      "issue": 148,
-      "pr": null,
-      "branch": "issue-148-question-bank-latest-attempt-index",
-      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-148",
-      "surface": "backend",
-      "status": "implementing"
-    },
-    {
-      "issue": 149,
-      "pr": null,
-      "branch": "issue-149-question-panel-entry-button",
-      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-149",
-      "surface": "frontend",
-      "status": "implementing"
-    },
-    {
-      "issue": 150,
-      "pr": null,
-      "branch": "issue-150-embedded-question-bank-debounce",
-      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-150",
-      "surface": "frontend",
-      "status": "implementing"
-    },
-    {
-      "issue": 151,
-      "pr": null,
-      "branch": "issue-151-menu-keyboard-escape",
-      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-151",
-      "surface": "frontend",
-      "status": "implementing"
+      "issue": 157,
+      "title": "카드 목록·상세 조회가 question_attempts 전체를 매번 재집계함",
+      "branch": "issue-157-card-read-attempt-summary-cache",
+      "status": "implementation_in_progress"
     }
   ],
   "completed": [
     {
-      "issue": 125,
-      "pr": 127,
-      "branch": "issue-125-ai-refine-linked-card-lookup",
-      "status": "merged"
-    },
-    {
-      "issue": 126,
-      "pr": 128,
-      "branch": "issue-126-practice-launch-render-dedupe",
-      "status": "merged"
-    },
-    {
-      "issue": 130,
-      "pr": 131,
-      "branch": "issue-130-question-bank-helper-dedupe",
-      "status": "merged"
-    },
-    {
-      "issue": 132,
-      "pr": 134,
-      "branch": "issue-132-question-bank-latest-wrong-answer-restore",
-      "status": "merged"
-    },
-    {
-      "issue": 133,
-      "pr": 135,
-      "branch": "issue-133-question-bank-back-forward-restore",
-      "status": "merged"
-    },
-    {
-      "issue": 136,
-      "pr": 138,
-      "branch": "issue-136-question-bank-status-fallback",
-      "status": "merged"
-    },
-    {
-      "issue": 137,
-      "pr": 139,
-      "branch": "issue-137-question-bank-row-trigger-button",
-      "status": "merged"
-    },
-    {
-      "issue": 140,
-      "pr": 142,
-      "branch": "issue-140-null-card-progress-sentinel",
-      "status": "merged"
-    },
-    {
-      "issue": 141,
-      "pr": 143,
-      "branch": "issue-141-hidden-practice-filter-mismatch",
+      "issue": 156,
+      "pr": 158,
+      "branch": "issue-156-main-symbolic-button-a11y",
       "status": "merged"
     }
   ],
+  "closed_without_merge": [],
   "held": []
 }

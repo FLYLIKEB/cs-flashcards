@@ -1,62 +1,39 @@
 {
-  "checked_at": "2026-08-02T15:50:08Z",
+  "checked_at": "2026-08-02T16:24:11Z",
   "gate_open": false,
   "summary": {
-    "open_issue_count": 4,
+    "open_issue_count": 1,
     "open_pr_count": 0,
-    "blocking_worktree_count": 4
+    "blocking_worktree_count": 1,
+    "reusable_backlog_count": 0
   },
-  "notes": [
-    "Round 28 accepted one backend and three frontend follow-up candidates.",
-    "Implementation worktrees are open for issues #148-#151."
-  ],
   "open_issues": [
     {
-      "number": 151,
+      "number": 157,
       "state": "OPEN",
-      "title": "헤더 메뉴 키보드 포커스와 Escape 닫기 추가",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/151"
-    },
-    {
-      "number": 150,
-      "state": "OPEN",
-      "title": "임베드 문제은행 검색 입력 디바운스 적용",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/150"
-    },
-    {
-      "number": 149,
-      "state": "OPEN",
-      "title": "메인 화면 문제 풀이 패널 진입 버튼 복구",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/149"
-    },
-    {
-      "number": 148,
-      "state": "OPEN",
-      "title": "문제은행 최신 풀이 조인용 복합 인덱스 추가",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/148"
+      "title": "카드 목록·상세 조회가 question_attempts 전체를 매번 재집계함",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/157"
     }
   ],
   "open_prs": [],
   "blocking_worktrees": [
     {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-148",
-      "branch": "issue-148-question-bank-latest-attempt-index",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-149",
-      "branch": "issue-149-question-panel-entry-button",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-150",
-      "branch": "issue-150-embedded-question-bank-debounce",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-151",
-      "branch": "issue-151-menu-keyboard-escape",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-157",
+      "branch": "issue-157-card-read-attempt-summary-cache",
       "status": "tracked-branch-worktree"
     }
+  ],
+  "reusable_backlog": [],
+  "recently_completed": [
+    {
+      "issue": 156,
+      "pr": 158,
+      "merge_commit": "309c492a446ffceb4d2a7010cb345927d3a54ee0"
+    }
+  ],
+  "notes": [
+    "Round 29 frontend candidate #156 merged successfully.",
+    "The readiness gate remains closed because backend issue #157 is still open and its implementation worktree is active.",
+    "No open PR remains after merging #158; the only blocker is the in-flight backend track."
   ]
 }
