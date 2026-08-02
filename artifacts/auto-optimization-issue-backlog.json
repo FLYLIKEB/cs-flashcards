@@ -1,43 +1,19 @@
 {
-  "updatedAt": "2026-08-02T14:01:10Z",
-  "status": "round24_reviewing",
-  "openIssues": [
-    {
-      "number": 132,
-      "title": "문제은행 풀이 저장 시 question_bank_id와 card_id 무결성 강제",
-      "track": "backend",
-      "branch": "issue-132-question-bank-attempt-integrity",
-      "worktree": "/private/tmp/cs-opt-132",
-      "pullRequest": 134,
-      "state": "reviewing"
-    },
+  "updatedAt": "2026-08-02T14:31:10Z",
+  "status": "ready_for_next_audit",
+  "openIssues": [],
+  "openPullRequests": [],
+  "recentlyClosedIssues": [
     {
       "number": 133,
-      "title": "문제은행 뒤로가기/앞으로가기 복귀 시 열린 풀이 세트 복원",
-      "track": "frontend",
-      "branch": "issue-133-question-bank-back-forward-restore",
-      "worktree": "/private/tmp/cs-opt-133",
-      "pullRequest": 135,
-      "state": "reviewing"
-    }
-  ],
-  "openPullRequests": [
-    {
-      "number": 134,
-      "title": "Issue 132: 문제은행 풀이 저장 card_id 무결성 강제",
-      "headRefName": "issue-132-question-bank-attempt-integrity",
-      "baseRefName": "main",
-      "state": "open"
+      "mergedPullRequest": 135,
+      "mergeCommit": "b91e982dab8a6ac2e810517f5f5134cee81a7b34"
     },
     {
-      "number": 135,
-      "title": "Issue 133: 문제은행 back-forward practice 복원",
-      "headRefName": "issue-133-question-bank-back-forward-restore",
-      "baseRefName": "main",
-      "state": "open"
-    }
-  ],
-  "recentlyClosedIssues": [
+      "number": 132,
+      "mergedPullRequest": 134,
+      "mergeCommit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
+    },
     {
       "number": 130,
       "mergedPullRequest": 131,
@@ -48,5 +24,9 @@
       "resolution": "closed_without_code",
       "reason": "latest origin/main already contained the previously reported fix; stale candidate"
     }
-  ]
+  ],
+  "nextRound": {
+    "round": 25,
+    "state": "pending_audit"
+  }
 }

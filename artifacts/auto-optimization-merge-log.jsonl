@@ -1,3 +1,5 @@
 {"timestamp":"2026-08-02T13:15:50Z","issue":125,"pullRequest":127,"title":"문제은행 AI 답안 보강 경로의 linked card 조회를 단일 lookup으로 축소","mergeCommit":"5c7bf65e70cc3664b424550c53a418a165cd3e3f","head":"56dbde4d482f82b9bb7c29a87b03b6f8d055ff11"}
 {"timestamp":"2026-08-02T13:16:11Z","issue":126,"pullRequest":128,"title":"문제은행 practice launch/relaunch 시 table 이중 렌더 제거","mergeCommit":"05e2b1fe0329992c051e7b87ab5e199949f5e55a","head":"161fed681e41266048862622c2334fea9e339d38"}
 {"timestamp":"2026-08-02T13:36:24Z","issue":130,"pullRequest":131,"title":"문제은행 launch/review helper 중복 정의 제거","mergeCommit":"60d0bcd3993dc9de00438ee6e8bf1591ece9beea","head":"9e952b933d7ae9ae40642a643eb01726bd1167a2"}
+{"timestamp":"2026-08-02T14:10:56Z","issue":132,"pullRequest":134,"title":"문제은행 풀이 저장 시 question_bank_id와 card_id 무결성 강제","mergeCommit":"1d9e56d9e8241a43374a2ac0bd7e7154343cb090","head":"bb7db6b14cb364a9db2ca5f801d302d8ef8f8c47"}
+{"timestamp":"2026-08-02T14:29:02Z","issue":133,"pullRequest":135,"title":"문제은행 뒤로가기/앞으로가기 복귀 시 열린 풀이 세트 복원","mergeCommit":"b91e982dab8a6ac2e810517f5f5134cee81a7b34","head":"6416d8df654ad5949d952fab50ef554543db6b37"}

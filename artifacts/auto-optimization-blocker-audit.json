@@ -1,22 +1,11 @@
 {
-  "timestamp": "2026-08-02T14:01:10Z",
-  "blocked": true,
-  "openIssueCount": 2,
-  "openPullRequestCount": 2,
-  "blockingWorktrees": [
-    {
-      "path": "/private/tmp/cs-opt-132",
-      "branch": "issue-132-question-bank-attempt-integrity",
-      "reason": "Backend PR #134 review lane and checks pending."
-    },
-    {
-      "path": "/private/tmp/cs-opt-133",
-      "branch": "issue-133-question-bank-back-forward-restore",
-      "reason": "Frontend PR #135 review lane and checks pending."
-    }
-  ],
+  "timestamp": "2026-08-02T14:31:10Z",
+  "blocked": false,
+  "openIssueCount": 0,
+  "openPullRequestCount": 0,
+  "blockingWorktrees": [],
   "notes": [
-    "Round 24 implementation branches were pushed and PR #134/#135 opened.",
-    "Next gate-open transition requires both PRs merged, worktrees cleaned, and linked issues closed."
+    "Issue #132 merged through PR #134 and its worktree/branch were cleaned up.",
+    "Issue #133 merged through PR #135 and its worktree/branch were cleaned up."
   ]
 }

@@ -1,57 +1,10 @@
 {
   "skill": "cs-auto-optimization-orchestrator",
-  "timestamp": "2026-08-02T14:01:10Z",
-  "canStartRound": false,
-  "waitReasons": [
-    "2 open GitHub issues remain",
-    "2 open GitHub pull requests remain",
-    "2 issue worktrees remain"
-  ],
-  "openIssues": [
-    {
-      "number": 133,
-      "state": "OPEN",
-      "title": "문제은행 뒤로가기/앞으로가기 복귀 시 열린 풀이 세트 복원",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/133"
-    },
-    {
-      "number": 132,
-      "state": "OPEN",
-      "title": "문제은행 풀이 저장 시 question_bank_id와 card_id 무결성 강제",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/132"
-    }
-  ],
-  "openPullRequests": [
-    {
-      "number": 135,
-      "title": "Issue 133: 문제은행 back-forward practice 복원",
-      "headRefName": "issue-133-question-bank-back-forward-restore",
-      "baseRefName": "main",
-      "reviewDecision": "",
-      "mergeStateStatus": "UNSTABLE",
-      "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/135"
-    },
-    {
-      "number": 134,
-      "title": "Issue 132: 문제은행 풀이 저장 card_id 무결성 강제",
-      "headRefName": "issue-132-question-bank-attempt-integrity",
-      "baseRefName": "main",
-      "reviewDecision": "",
-      "mergeStateStatus": "UNSTABLE",
-      "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/134"
-    }
-  ],
-  "blockingWorktrees": [
-    {
-      "path": "/private/tmp/cs-opt-132",
-      "branch": "refs/heads/issue-132-question-bank-attempt-integrity"
-    },
-    {
-      "path": "/private/tmp/cs-opt-133",
-      "branch": "refs/heads/issue-133-question-bank-back-forward-restore"
-    }
-  ],
-  "summary": "라운드 24 이슈 #132/#133은 PR #134/#135 검토와 CI가 끝날 때까지 진행 중이다."
+  "timestamp": "2026-08-02T14:31:10Z",
+  "canStartRound": true,
+  "waitReasons": [],
+  "openIssues": [],
+  "openPullRequests": [],
+  "blockingWorktrees": [],
+  "summary": "이슈 #132/#133과 PR #134/#135 정리까지 끝나 다음 최적화 라운드를 바로 시작할 수 있다."
 }
