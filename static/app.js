@@ -6351,8 +6351,6 @@ function renderQuestionPanel() {
           : `<button class="question-toolbar-button" type="button" data-question-reveal="1" ${state.questionLoading || questionBusy || !question ? 'disabled' : ''}>정답</button>`}
         <button class="question-toolbar-button" type="button" data-question-nav="next" ${state.questionLoading || questionBusy || state.questionIndex >= total - 1 ? 'disabled' : ''}>다음</button>
       </div>
-
-      </div>
     </div>` : '';
   card.innerHTML = `
     <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}">
