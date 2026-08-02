@@ -1,31 +1,39 @@
 {
-  "checked_at": "2026-08-02T17:06:04Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T17:21:33Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 1,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 1,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 165,
+      "state": "OPEN",
+      "title": "단건 카드 조회 경로의 중복 SQLite 연결과 AI 이미지 동기화 재진입 제거",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/165"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-165",
+      "branch": "issue-165-read-card-single-connection",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
-      "issue": 161,
-      "pr": 163,
-      "merge_commit": "3094c3394b11c4453202816bf9f30f56917b8e56"
-    },
-    {
-      "issue": 160,
-      "pr": 162,
-      "merge_commit": "ce4293f09b70fd2efd36648488c92e1693755738"
+      "issue": 164,
+      "pr": 166,
+      "merge_commit": "a836d54305c134ee633b0cfc582929b76e2e5c49"
     }
   ],
   "notes": [
-    "Round 30 frontend candidate #160 merged successfully.",
-    "Round 30 backend candidate #161 merged successfully.",
-    "There are no open issues, open PRs, or active issue worktrees; the next audit round starts immediately from latest origin/main."
+    "Round 31 frontend candidate #164 merged successfully.",
+    "The readiness gate remains closed because backend issue #165 is still in flight and its worktree remains active.",
+    "No open PR remains after merging #166; the only blocker is the active backend lane."
   ]
 }

@@ -1,18 +1,19 @@
 {
-  "generated_at": "2026-08-02T17:06:04Z",
-  "wave": "2026-08-02-round-30",
-  "queue": [],
+  "generated_at": "2026-08-02T17:21:33Z",
+  "wave": "2026-08-02-round-31",
+  "queue": [
+    {
+      "issue": 165,
+      "title": "단건 카드 조회 경로의 중복 SQLite 연결과 AI 이미지 동기화 재진입 제거",
+      "branch": "issue-165-read-card-single-connection",
+      "status": "implementation_in_progress"
+    }
+  ],
   "completed": [
     {
-      "issue": 160,
-      "pr": 162,
-      "branch": "issue-160-filter-input-a11y-labels",
-      "status": "merged"
-    },
-    {
-      "issue": 161,
-      "pr": 163,
-      "branch": "issue-161-read-cards-single-connection",
+      "issue": 164,
+      "pr": 166,
+      "branch": "issue-164-question-practice-toggle",
       "status": "merged"
     }
   ],
