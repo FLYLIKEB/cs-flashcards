@@ -2339,6 +2339,26 @@ def question_bank_json_list(value: Any) -> list[str]:
     return normalize_question_bank_list(parsed)
 
 
+def _ensure_card_exists(card_id: Any, progress_db_path: Path | None = None) -> dict[str, Any]:
+    normalized_card_id = normalize_question_bank_text(card_id, limit=255)
+    if not normalized_card_id:
+        raise KeyError(card_id)
+    rows, _ = read_cards(progress_db_path)
+    card = next(
+        (
+            row
+            for row in rows
+            if str(row.get("id") or row.get("card_id") or "").strip() == normalized_card_id
+        ),
+        None,
+    )
+    if not isinstance(card, dict) or not card:
+        raise KeyError(normalized_card_id)
+    return card
+
+
+
+
 def question_bank_keywords_for_card(card: dict[str, Any]) -> list[str]:
     related = re.split(r"\[\[|\]\]|[,;/\n]", str(card.get("related_concepts") or ""))
     return normalize_question_bank_list([
@@ -2517,9 +2537,7 @@ def normalize_question_bank_entry(
     card_id = normalize_question_bank_text(raw.get("card_id"), limit=255)
     card: dict[str, Any] = {}
     if card_id:
-        _ensure_card_exists(card_id, progress_db_path)
-        rows, _ = read_cards(progress_db_path)
-        card = next((row for row in rows if str(row.get("id") or "").strip() == card_id), {})
+        card = _ensure_card_exists(card_id, progress_db_path)
     choices = normalize_question_bank_list(raw.get("choices"), item_limit=2000)
     answer_index = raw.get("answer_index")
     if answer_index is not None:
@@ -2626,6 +2644,99 @@ def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
 
 
 
+
+
+
+def update_question_bank_entry(
+    question_bank_id: str,
+    payload: QuestionBankEntryRequest | dict[str, Any],
+    progress_db_path: Path | None = None,
+) -> dict[str, Any]:
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path)
+    raw = payload.model_dump() if isinstance(payload, BaseModel) else dict(payload or {})
+    normalized = normalize_question_bank_entry({**raw, "question_bank_id": question_bank_id}, progress_db_path)
+    with closing(connect_progress_db(db_path)) as conn:
+        existing = conn.execute("SELECT id FROM question_bank WHERE id = ?", (question_bank_id,)).fetchone()
+        if existing is None:
+            raise KeyError(question_bank_id)
+        duplicate = conn.execute(
+            "SELECT id FROM question_bank WHERE fingerprint = ? AND id <> ?",
+            (normalized["fingerprint"], question_bank_id),
+        ).fetchone()
+        if duplicate is not None:
+            raise ValueError("수정 결과가 기존 문제은행 문항과 중복되어 저장할 수 없습니다.")
+        now = utc_now_iso()
+        conn.execute(
+            """
+            UPDATE question_bank
+            SET fingerprint = ?,
+                card_id = ?,
+                question_type = ?,
+                prompt = ?,
+                body = ?,
+                answer = ?,
+                explanation = ?,
+                rubric_json = ?,
+                choices_json = ?,
+                answer_index = ?,
+                topic = ?,
+                field_name = ?,
+                category = ?,
+                keywords_json = ?,
+                missing_card_keywords_json = ?,
+                difficulty = ?,
+                issuer = ?,
+                source_location = ?,
+                section = ?,
+                points = ?,
+                expected_time_seconds = ?,
+                answer_guide = ?,
+                session_mode = ?,
+                updated_at = ?
+            WHERE id = ?
+            """,
+            (
+                normalized["fingerprint"],
+                normalized["card_id"] or None,
+                normalized["question_type"],
+                normalized["prompt"],
+                normalized["body"],
+                normalized["answer"],
+                normalized["explanation"],
+                question_bank_json_text(normalized["rubric"], item_limit=2000),
+                question_bank_json_text(normalized["choices"], item_limit=2000),
+                normalized["answer_index"],
+                normalized["topic"],
+                normalized["field_name"],
+                normalized["category"],
+                question_bank_json_text(normalized["keywords"], item_limit=255),
+                question_bank_json_text(normalized.get("missing_card_keywords", []), item_limit=255),
+                normalized["difficulty"],
+                normalized["issuer"],
+                normalized["source_location"],
+                normalized["section"],
+                normalized["points"],
+                normalized["expected_time_seconds"],
+                normalized["answer_guide"],
+                normalized["session_mode"],
+                now,
+                question_bank_id,
+            ),
+        )
+        saved = conn.execute(
+            """
+            SELECT id, card_id, question_type, prompt, body, answer, explanation,
+                   rubric_json, choices_json, answer_index, topic, field_name, category, keywords_json,
+                   missing_card_keywords_json, difficulty, issuer, source_location, section, points, expected_time_seconds,
+                   answer_guide, session_mode, created_at, updated_at
+            FROM question_bank
+            WHERE id = ?
+            """,
+            (question_bank_id,),
+        ).fetchone()
+        conn.commit()
+    return question_bank_row_to_dict(saved) or normalized
 
 
 def update_question_bank_ai_content(
@@ -8441,6 +8552,22 @@ def api_question_bank_upsert(payload: QuestionBankUpsertRequest) -> dict[str, An
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.put("/api/question-bank/{question_bank_id}")
+def api_question_bank_update(question_bank_id: str, payload: QuestionBankEntryRequest) -> dict[str, Any]:
+    try:
+        item = update_question_bank_entry(question_bank_id, payload, progress_db_path=PROGRESS_DB_PATH)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Question bank item not found: {question_bank_id}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "question_bank_id": question_bank_id,
+        "item": item,
+    }
 
 
 @app.post("/api/question-bank/{question_bank_id}/ai-refine-answer")

@@ -1104,6 +1104,89 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(wrong_only['items'][0]['question_attempt_status'], 'wrong')
             self.assertEqual(wrong_only['items'][0]['question_bank_id'], item['question_bank_id'])
 
+    def test_update_question_bank_entry_rewrites_body_and_metadata(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '정규화의 목적을 설명하시오.',
+                        'body': '데이터베이스 설계 관점에서 답하시오.',
+                        'answer': '중복을 줄이고 이상 현상을 방지한다.',
+                        'explanation': '삽입/삭제/갱신 이상을 줄이는 것이 핵심이다.',
+                        'rubric': ['중복 제거'],
+                        'topic': '데이터베이스',
+                        'field_name': '전산학술',
+                        'category': '데이터베이스',
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '2013년 학술파트 1',
+                        'section': '전공필기',
+                        'points': 10,
+                        'expected_time_seconds': 600,
+                        'answer_guide': '핵심 목적을 먼저 쓰기',
+                        'session_mode': 'practice',
+                    }
+                ],
+                db_path,
+            )
+            question_bank_id = saved['items'][0]['question_bank_id']
+
+            updated = flashcard_app.update_question_bank_entry(
+                question_bank_id,
+                flashcard_app.QuestionBankEntryRequest(
+                    card_id='CS-001',
+                    question_type='multiple_choice',
+                    prompt='정규화의 목적과 가장 가까운 설명은?',
+                    body='보기 중 가장 알맞은 것을 고르시오.',
+                    answer='중복을 줄이고 이상 현상을 방지한다.',
+                    explanation='반복 저장을 줄여 갱신 이상을 완화한다.',
+                    rubric=['중복 감소', '이상 현상 방지'],
+                    choices=['중복 저장 확대', '이상 현상 방지', '무결성 무시'],
+                    answer_index=1,
+                    topic='데이터베이스',
+                    field_name='객관식',
+                    category='데이터베이스',
+                    difficulty='상',
+                    issuer='수정 기관',
+                    source_location='수정 출처',
+                    section='객관식 섹션',
+                    points=15,
+                    expected_time_seconds=90,
+                    answer_guide='정답 선지 번호만 쓰기',
+                    session_mode='bok',
+                ),
+                db_path,
+            )
+
+            self.assertEqual(updated['question_bank_id'], question_bank_id)
+            self.assertEqual(updated['question_type'], 'multiple_choice')
+            self.assertEqual(updated['prompt'], '정규화의 목적과 가장 가까운 설명은?')
+            self.assertEqual(updated['body'], '보기 중 가장 알맞은 것을 고르시오.')
+            self.assertEqual(updated['choices'], ['중복 저장 확대', '이상 현상 방지', '무결성 무시'])
+            self.assertEqual(updated['answer_index'], 1)
+            self.assertEqual(updated['field_name'], '객관식')
+            self.assertEqual(updated['difficulty'], '상')
+            self.assertEqual(updated['issuer'], '수정 기관')
+            self.assertEqual(updated['source_location'], '수정 출처')
+            self.assertEqual(updated['section'], '객관식 섹션')
+            self.assertEqual(updated['points'], 15)
+            self.assertEqual(updated['expected_time_seconds'], 90)
+            self.assertEqual(updated['answer_guide'], '정답 선지 번호만 쓰기')
+            self.assertEqual(updated['session_mode'], 'bok')
+
+            listed = flashcard_app.read_question_bank_entries(db_path, issuer='수정 기관', limit=10)
+            self.assertEqual(listed['summary']['total'], 1)
+            self.assertEqual(listed['items'][0]['question_bank_id'], question_bank_id)
+            self.assertEqual(listed['items'][0]['body'], '보기 중 가장 알맞은 것을 고르시오.')
+
     def test_read_question_bank_attempts_includes_wrong_answers_and_notes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

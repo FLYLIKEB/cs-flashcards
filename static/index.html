@@ -508,6 +508,97 @@
     </div>
   </div>
 
+  <div id="questionBankEditDialog" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="questionBankEditTitle" hidden>
+    <div class="modal-card question-bank-edit-modal">
+      <div class="modal-header">
+        <div>
+          <h2 id="questionBankEditTitle">문항 데이터 수정</h2>
+          <p id="questionBankEditSummary" class="muted small question-bank-edit-summary">문제 본문, 정답, 해설, 메타데이터를 바로 수정합니다.</p>
+        </div>
+        <button id="questionBankEditCloseBtn" class="modal-close" type="button" aria-label="문항 데이터 수정 닫기">×</button>
+      </div>
+      <div class="question-bank-edit-body">
+        <div class="question-bank-edit-grid">
+          <label class="question-bank-edit-field">문항 유형
+            <select id="questionBankEditTypeInput">
+              <option value="short">주관식</option>
+              <option value="subjective">서술형</option>
+              <option value="multiple_choice">객관식</option>
+              <option value="essay">논술형</option>
+            </select>
+          </label>
+          <label class="question-bank-edit-field">세트 모드
+            <select id="questionBankEditSessionModeInput">
+              <option value="practice">일반</option>
+              <option value="bok">한은</option>
+            </select>
+          </label>
+          <label class="question-bank-edit-field question-bank-edit-field-wide">문제
+            <textarea id="questionBankEditPromptInput" class="question-bank-edit-textarea" rows="4" maxlength="4000" placeholder="문제 제목 또는 질문"></textarea>
+          </label>
+          <label class="question-bank-edit-field question-bank-edit-field-wide">문제 본문
+            <textarea id="questionBankEditBodyInput" class="question-bank-edit-textarea" rows="6" maxlength="12000" placeholder="본문, 지문, 표 설명 등을 입력"></textarea>
+          </label>
+          <label class="question-bank-edit-field question-bank-edit-field-wide">정답/모범답안
+            <textarea id="questionBankEditAnswerInput" class="question-bank-edit-textarea" rows="6" maxlength="20000" placeholder="정답 또는 모범답안"></textarea>
+          </label>
+          <label class="question-bank-edit-field question-bank-edit-field-wide">해설
+            <textarea id="questionBankEditExplanationInput" class="question-bank-edit-textarea" rows="7" maxlength="50000" placeholder="풀이 해설"></textarea>
+          </label>
+          <label class="question-bank-edit-field question-bank-edit-field-wide">채점 포인트 (줄바꿈 구분)
+            <textarea id="questionBankEditRubricInput" class="question-bank-edit-textarea question-bank-edit-textarea-mono" rows="4" placeholder="핵심 근거 1&#10;핵심 근거 2"></textarea>
+          </label>
+          <label class="question-bank-edit-field question-bank-edit-field-wide">선지 (객관식, 줄바꿈 구분)
+            <textarea id="questionBankEditChoicesInput" class="question-bank-edit-textarea question-bank-edit-textarea-mono" rows="5" placeholder="선지 1&#10;선지 2&#10;선지 3"></textarea>
+          </label>
+          <label class="question-bank-edit-field">정답 번호 (객관식, 1부터)
+            <input id="questionBankEditAnswerIndexInput" type="number" min="1" max="101" inputmode="numeric" placeholder="예: 2" />
+          </label>
+          <label class="question-bank-edit-field">문제유형
+            <input id="questionBankEditTopicInput" type="text" maxlength="255" placeholder="예: 데이터베이스" />
+          </label>
+          <label class="question-bank-edit-field">분야
+            <input id="questionBankEditFieldNameInput" type="text" maxlength="255" placeholder="예: 전산학술" />
+          </label>
+          <label class="question-bank-edit-field">카테고리
+            <input id="questionBankEditCategoryInput" type="text" maxlength="128" placeholder="기존 카드 카테고리와 맞춰 입력" />
+          </label>
+          <label class="question-bank-edit-field">난이도
+            <select id="questionBankEditDifficultyInput">
+              <option value="">자동/미지정</option>
+              <option value="상">상</option>
+              <option value="중">중</option>
+              <option value="하">하</option>
+            </select>
+          </label>
+          <label class="question-bank-edit-field">기관
+            <input id="questionBankEditIssuerInput" type="text" maxlength="255" placeholder="예: 한국은행" />
+          </label>
+          <label class="question-bank-edit-field">출처
+            <input id="questionBankEditSourceLocationInput" type="text" maxlength="255" placeholder="예: 2013년 학술파트 1" />
+          </label>
+          <label class="question-bank-edit-field">섹션
+            <input id="questionBankEditSectionInput" type="text" maxlength="64" placeholder="예: 전공필기" />
+          </label>
+          <label class="question-bank-edit-field">배점
+            <input id="questionBankEditPointsInput" type="number" min="0" max="1000" inputmode="numeric" placeholder="예: 10" />
+          </label>
+          <label class="question-bank-edit-field">권장 시간(초)
+            <input id="questionBankEditExpectedTimeSecondsInput" type="number" min="0" max="86400" inputmode="numeric" placeholder="예: 600" />
+          </label>
+          <label class="question-bank-edit-field question-bank-edit-field-wide">답안 가이드
+            <textarea id="questionBankEditAnswerGuideInput" class="question-bank-edit-textarea" rows="3" maxlength="255" placeholder="답안을 쓸 때 먼저 확인할 가이드"></textarea>
+          </label>
+        </div>
+        <p id="questionBankEditError" class="error-text question-bank-edit-error"></p>
+        <div class="question-bank-edit-actions">
+          <button id="questionBankEditSaveBtn" class="question-toolbar-button is-primary" type="button">저장</button>
+          <button id="questionBankEditCancelBtn" class="question-toolbar-button" type="button">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="conceptImageDialog" class="modal-backdrop concept-image-dialog" role="dialog" aria-modal="true" aria-labelledby="conceptImageDialogTitle" hidden>
     <div class="modal-card concept-image-modal">
       <div class="modal-header">
