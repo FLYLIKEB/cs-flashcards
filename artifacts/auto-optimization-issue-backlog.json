@@ -32,9 +32,26 @@
       "mergeCommit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
     }
   ],
-  "generated_at": "2026-08-02T15:30:05Z",
-  "wave": "2026-08-02-round-26-complete",
-  "queue": [],
+  "generated_at": "2026-08-02T15:37:57Z",
+  "wave": "2026-08-02-round-27",
+  "queue": [
+    {
+      "issue": 144,
+      "pr": 147,
+      "branch": "issue-144-question-bank-upsert-context",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-144",
+      "surface": "backend",
+      "status": "in-review"
+    },
+    {
+      "issue": 145,
+      "pr": 146,
+      "branch": "issue-145-embedded-filter-a11y-labels",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-145",
+      "surface": "frontend",
+      "status": "in-review"
+    }
+  ],
   "completed": [
     {
       "issue": 125,

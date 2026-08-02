@@ -1,27 +1,61 @@
 {
-  "checked_at": "2026-08-02T15:30:05Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T15:37:57Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
-    "open_pr_count": 0,
-    "blocking_worktree_count": 0,
-    "reusable_backlog_count": 2
+    "open_issue_count": 2,
+    "open_pr_count": 2,
+    "blocking_worktree_count": 2,
+    "reusable_backlog_count": 0
   },
-  "open_issues": [],
-  "open_prs": [],
-  "blocking_worktrees": [],
-  "reusable_backlog": [
+  "open_issues": [
     {
-      "surface": "backend",
-      "title": "문제은행 저장 시 전체 카드 대시보드 재로딩 제거",
-      "status": "ready-for-next-round"
+      "number": 145,
+      "state": "OPEN",
+      "title": "임베드 문제은행 필터에 접근성 이름 보강",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/145"
     },
     {
-      "surface": "frontend",
-      "title": "임베드 문제은행 필터 접근성 이름 보강",
-      "status": "ready-for-next-round"
+      "number": 144,
+      "state": "OPEN",
+      "title": "문제은행 저장 시 전체 카드 대시보드 재로딩 제거",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/144"
     }
   ],
+  "open_prs": [
+    {
+      "baseRefName": "main",
+      "headRefName": "issue-144-question-bank-upsert-context",
+      "isDraft": false,
+      "mergeStateStatus": "UNSTABLE",
+      "number": 147,
+      "reviewDecision": "",
+      "title": "Issue 144: 문제은행 저장 read_cards 재로딩 제거",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/147"
+    },
+    {
+      "baseRefName": "main",
+      "headRefName": "issue-145-embedded-filter-a11y-labels",
+      "isDraft": false,
+      "mergeStateStatus": "CLEAN",
+      "number": 146,
+      "reviewDecision": "",
+      "title": "Issue 145: 임베드 문제은행 필터 접근성 이름 보강",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/146"
+    }
+  ],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-144",
+      "branch": "issue-144-question-bank-upsert-context",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-145",
+      "branch": "issue-145-embedded-filter-a11y-labels",
+      "status": "tracked-branch-worktree"
+    }
+  ],
+  "reusable_backlog": [],
   "recently_completed": [
     {
       "issue": 141,
@@ -40,7 +74,7 @@
     }
   ],
   "notes": [
-    "Round 26 is complete and the next optimization gate is open.",
-    "Deferred backlog still contains one backend and one frontend candidate."
+    "Round 27 is in PR review state.",
+    "Both issue branches are isolated worktrees with focused verification already complete."
   ]
 }
