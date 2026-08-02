@@ -6280,7 +6280,6 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
     if is_correct_value == 1:
         wrong_note = ""
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
     now = utc_now_iso()
     answered_at = str(payload.answered_at or now)[:64]
     question_started_at = str(payload.question_started_at or "")[:64]
@@ -6290,6 +6289,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
     section = str(payload.section or "")[:64]
     answer_guide = str(payload.answer_guide or "")[:255]
     with closing(connect_progress_db(db_path)) as conn:
+        ensure_progress_db(db_path, conn=conn)
         if question_bank_id:
             linked = conn.execute("SELECT id, card_id FROM question_bank WHERE id = ?", (question_bank_id,)).fetchone()
             if linked is None:
