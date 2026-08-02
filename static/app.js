@@ -106,6 +106,18 @@ const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
 const PENDING_QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
+const QUESTION_BANK_FILTER_FIELDS = [
+  {key: 'q', id: 'questionBankQueryInput'},
+  {key: 'attempt_status', id: 'questionBankAttemptStatusSelect'},
+  {key: 'topic', id: 'questionBankTopicInput'},
+  {key: 'field_name', id: 'questionBankFieldInput'},
+  {key: 'category', id: 'questionBankCategoryInput'},
+  {key: 'issuer', id: 'questionBankIssuerInput'},
+  {key: 'source_location', id: 'questionBankSourceInput'},
+  {key: 'difficulty', id: 'questionBankDifficultySelect'},
+  {key: 'question_type', id: 'questionBankTypeSelect'},
+  {key: 'section', id: 'questionBankSectionInput'},
+];
 const FLASHCARD_TABLE_COLUMN_ORDER_KEY = 'csFlashcardsTableColumnOrder:v1';
 const FLASHCARD_TABLE_DEFAULT_COLUMNS = ['bookmark', 'index', 'term', 'english', 'category', 'status'];
 const FLASHCARD_TABLE_COLUMNS = {
@@ -5336,6 +5348,34 @@ function questionBankFilterValues() {
   };
 }
 
+function questionBankSearchParams(search = window.location.search) {
+  try {
+    return new URLSearchParams(typeof search === 'string' ? search : '');
+  } catch (_error) {
+    return new URLSearchParams();
+  }
+}
+
+function questionBankUrlFilterValue(params, key) {
+  if (!(params instanceof URLSearchParams)) return '';
+  if (key === 'attempt_status') return params.get('attempt_status') || params.get('status') || '';
+  return params.get(key) || '';
+}
+
+function questionBankHasUrlFilters(search = window.location.search) {
+  const params = questionBankSearchParams(search);
+  return QUESTION_BANK_FILTER_FIELDS.some(({key}) => Boolean(String(questionBankUrlFilterValue(params, key) || '').trim()));
+}
+
+function applyQuestionBankFiltersFromUrl(search = window.location.search) {
+  const params = questionBankSearchParams(search);
+  QUESTION_BANK_FILTER_FIELDS.forEach(({key, id}) => {
+    const input = $(id);
+    if (input) input.value = questionBankUrlFilterValue(params, key);
+  });
+  return questionBankHasUrlFilters(search);
+}
+
 function questionBankQueryString(filters = questionBankFilterValues()) {
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
@@ -5343,6 +5383,41 @@ function questionBankQueryString(filters = questionBankFilterValues()) {
     params.set(key, value);
   });
   return params.toString();
+}
+
+function syncQuestionBankBrowserUrl(filters = questionBankFilterValues(), {clear = false} = {}) {
+  try {
+    const params = questionBankSearchParams(window.location.search);
+    QUESTION_BANK_FILTER_FIELDS.forEach(({key}) => params.delete(key));
+    params.delete('status');
+    if (!clear) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (!value || key === 'limit') return;
+        params.set(key, value);
+      });
+    }
+    const nextSearch = params.toString();
+    const next = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ''}${window.location.hash || ''}`;
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash || ''}`;
+    if (current !== next) window.history.replaceState({}, '', next);
+  } catch (_error) {}
+}
+
+function resetQuestionBankFilters() {
+  QUESTION_BANK_FILTER_FIELDS.forEach(({id}) => {
+    const input = $(id);
+    if (input) input.value = '';
+  });
+  syncQuestionBankBrowserUrl(questionBankFilterValues(), {clear: true});
+  loadQuestionBankBrowser().catch(() => {});
+}
+
+function restoreQuestionBankBrowserFromUrl(search = window.location.search) {
+  const restored = applyQuestionBankFiltersFromUrl(search);
+  if (!restored) return false;
+  state.questionMode = true;
+  state.questionBankOpen = true;
+  return true;
 }
 
 async function fetchQuestionBankEntries() {
@@ -5518,6 +5593,7 @@ async function loadQuestionBankBrowser() {
   const controller = typeof window.AbortController === 'function' ? new window.AbortController() : null;
   questionBankAbortController = controller;
   const filters = questionBankFilterValues();
+  syncQuestionBankBrowserUrl(filters);
   const selectedIdBeforeRequest = String(state.questionBankSelectedId || '');
   state.questionBankLoading = true;
   state.questionBankError = '';
@@ -6093,7 +6169,7 @@ function saveCurrentWrongNote() {
 }
 
 function setQuestionControlsDisabled(disabled) {
-  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankLoadBtn', 'questionBankCloseBtn', 'questionBankQueryInput', 'questionBankAttemptStatusSelect', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
+  ['generateQuestionsBtn', 'openAiQuizSearchBtn', 'questionHistoryBtn', 'prevQuestionBtn', 'revealAnswerBtn', 'nextQuestionBtn', 'openQuestionCardBtn', 'questionCountSelect', 'questionTimeLimitSelect', 'questionSessionModeSelect', 'finishQuestionSessionBtn', 'openQuestionImportBtn', 'questionImportApplyBtn', 'questionBankToggleBtn', 'questionBankRefreshBtn', 'questionBankResetFiltersBtn', 'questionBankLoadBtn', 'questionBankCloseBtn', 'questionBankQueryInput', 'questionBankAttemptStatusSelect', 'questionBankTopicInput', 'questionBankFieldInput', 'questionBankCategoryInput', 'questionBankIssuerInput', 'questionBankSourceInput', 'questionBankDifficultySelect', 'questionBankTypeSelect', 'questionBankSectionInput'].forEach((id) => {
 
     const element = $(id);
     if (element) element.disabled = disabled;
@@ -7206,6 +7282,7 @@ $('generateQuestionsBtn')?.addEventListener('click', generateQuestionsFromCurren
 $('openQuestionImportBtn')?.addEventListener('click', openQuestionImportDialog);
 $('questionBankToggleBtn')?.addEventListener('click', () => toggleQuestionBankBrowser());
 $('questionBankRefreshBtn')?.addEventListener('click', () => loadQuestionBankBrowser().catch(() => {}));
+$('questionBankResetFiltersBtn')?.addEventListener('click', resetQuestionBankFilters);
 $('questionBankLoadBtn')?.addEventListener('click', () => openQuestionBankSession(0));
 $('questionBankCloseBtn')?.addEventListener('click', () => toggleQuestionBankBrowser(false));
 ['questionBankQueryInput', 'questionBankTopicInput', 'questionBankSourceInput', 'questionBankSectionInput'].forEach((id) => {
@@ -7572,6 +7649,7 @@ renderAudioPresets();
 populateSpeechVoiceSelect();
 updateRandomButtons();
 updateQuestionPracticeButton();
+restoreQuestionBankBrowserFromUrl();
 document.body.classList.toggle('question-bank-embed', questionBankEmbedMode());
 
 if (!bootstrapFlashcardTablePopupWindow() && !bootstrapMindMapPopupWindow()) {
