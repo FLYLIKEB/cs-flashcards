@@ -412,6 +412,15 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function closeDetailDrawer({ restoreFocus = true } = {})', calendar_js())
         self.assertIn("if (event.key === 'Escape' && calendarState.detailOpen)", calendar_js())
 
+    def test_embedded_question_bank_filters_expose_accessible_names(self):
+        for snippet in [
+            'id="questionBankSourceInput" type="search" aria-label="출제위치"',
+            'id="questionBankDifficultySelect" aria-label="난이도"',
+            'id="questionBankTypeSelect" aria-label="형식"',
+            'id="questionBankSectionInput" type="search" aria-label="섹션"',
+        ]:
+            self.assertIn(snippet, index_html())
+
     def test_wiki_js_smoke_keeps_sidebar_persistence_and_status_updates(self):
         self.assertIn("const WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1';", wiki_js())
         self.assertIn('function toggleWikiSidebar(force = !wikiState.sidebarOpen)', wiki_js())
