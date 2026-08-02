@@ -1,10 +1,35 @@
 {
   "skill": "cs-auto-optimization-orchestrator",
-  "timestamp": "2026-08-02T13:37:10Z",
-  "canStartRound": true,
-  "waitReasons": [],
-  "openIssues": [],
+  "timestamp": "2026-08-02T13:49:20Z",
+  "canStartRound": false,
+  "waitReasons": [
+    "2 open GitHub issues remain",
+    "2 issue worktrees remain"
+  ],
+  "openIssues": [
+    {
+      "number": 133,
+      "state": "OPEN",
+      "title": "문제은행 뒤로가기/앞으로가기 복귀 시 열린 풀이 세트 복원",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/133"
+    },
+    {
+      "number": 132,
+      "state": "OPEN",
+      "title": "문제은행 풀이 저장 시 question_bank_id와 card_id 무결성 강제",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/132"
+    }
+  ],
   "openPullRequests": [],
-  "blockingWorktrees": [],
-  "summary": "이슈 #130 / PR #131 정리까지 끝나 다음 최적화 라운드를 바로 시작할 수 있다."
+  "blockingWorktrees": [
+    {
+      "path": "/private/tmp/cs-opt-132",
+      "branch": "refs/heads/issue-132-question-bank-attempt-integrity"
+    },
+    {
+      "path": "/private/tmp/cs-opt-133",
+      "branch": "refs/heads/issue-133-question-bank-back-forward-restore"
+    }
+  ],
+  "summary": "라운드 24 이슈 #132/#133을 생성하고 구현 worktree를 열어 게이트가 다시 닫혀 있다."
 }

@@ -1,11 +1,22 @@
 {
-  "timestamp": "2026-08-02T13:37:10Z",
-  "blocked": false,
-  "openIssueCount": 0,
+  "timestamp": "2026-08-02T13:49:20Z",
+  "blocked": true,
+  "openIssueCount": 2,
   "openPullRequestCount": 0,
-  "blockingWorktrees": [],
+  "blockingWorktrees": [
+    {
+      "path": "/private/tmp/cs-opt-132",
+      "branch": "issue-132-question-bank-attempt-integrity",
+      "reason": "Backend round 24 implementation in progress."
+    },
+    {
+      "path": "/private/tmp/cs-opt-133",
+      "branch": "issue-133-question-bank-back-forward-restore",
+      "reason": "Frontend round 24 implementation in progress."
+    }
+  ],
   "notes": [
-    "Issue #129 was closed without code as a stale candidate after latest origin/main re-check.",
-    "Issue #130 merged through PR #131, and the issue worktree/branch were cleaned up."
+    "Latest-head audits accepted backend issue #132 and frontend issue #133.",
+    "No PRs are open yet; blockers are the newly opened issues and active implementation worktrees."
   ]
 }
