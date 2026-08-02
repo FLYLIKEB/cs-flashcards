@@ -1698,10 +1698,7 @@ def update_card_content_fields(
     ensure_progress_db(db_path)
     sync_ai_image_files_to_db(db_path)
 
-    rows, _ = read_card_content(db_path)
-    target = next((row for row in rows if row.get("id") == card_id), None)
-    if target is None:
-        raise KeyError(card_id)
+    target = read_card(db_path, card_id)
     changed_updates: dict[str, str] = {}
     for field, value in updates.items():
         normalized = normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
@@ -2130,10 +2127,7 @@ def update_card_ai_content(
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
     db_path = progress_db_for(progress_db_path)
-    rows, _ = read_cards(db_path)
-    target = next((row for row in rows if row.get("id") == card_id), None)
-    if target is None:
-        raise KeyError(card_id)
+    target = read_card(db_path, card_id)
     updates = {
         "definition": payload.definition,
         "detailed_explanation": payload.detailed_explanation,
@@ -2149,12 +2143,8 @@ def update_card_ai_content(
             changed_updates[field] = normalized
     if not changed_updates:
         return target, None
-    updated_row, backup_path = update_card_content_fields(card_id, changed_updates, backup_dir, db_path)
-    updated_rows, _ = read_cards(db_path)
-    for row in updated_rows:
-        if row.get("id") == card_id:
-            return row, backup_path
-    return updated_row, backup_path
+    _, backup_path = update_card_content_fields(card_id, changed_updates, backup_dir, db_path)
+    return read_card(db_path, card_id), backup_path
 
 
 def update_card_concept_media(
@@ -2177,12 +2167,8 @@ def update_card_concept_media(
         updates["concept_image_alt"] = normalized_card_text(payload.concept_image_alt, limit=AI_REWRITE_FIELD_LIMITS["concept_image_alt"])
     if media_type in {"image", "gif"} and media_payload:
         updates["concept_image_url"] = media_payload
-    updated_row, backup_path = update_card_content_fields(card_id, updates, backup_dir, progress_db_path)
-    refreshed_rows, _ = read_cards(progress_db_for(progress_db_path))
-    for row in refreshed_rows:
-        if row.get("id") == card_id:
-            return row, backup_path
-    return updated_row, backup_path
+    _, backup_path = update_card_content_fields(card_id, updates, backup_dir, progress_db_path)
+    return read_card(progress_db_for(progress_db_path), card_id), backup_path
 
 
 
@@ -2342,10 +2328,7 @@ def apply_ai_concept_image(
     preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
 ) -> tuple[dict[str, str], Path | None, str]:
     db_path = progress_db_for(progress_db_path)
-    rows, _ = read_cards(db_path)
-    target = next((row for row in rows if row.get("id") == card_id), None)
-    if target is None:
-        raise KeyError(card_id)
+    target = read_card(db_path, card_id)
     preview_path, metadata = read_ai_image_preview(payload.preview_name, preview_dir=preview_dir)
     if str(metadata.get("card_id") or "").strip() != card_id:
         raise ValueError("다른 카드용 AI 이미지 미리보기입니다.")
@@ -2356,7 +2339,7 @@ def apply_ai_concept_image(
     shutil.copy2(preview_path, final_path)
     next_url = f"/api/ai-images/{final_name}"
     next_alt = normalized_card_text(metadata.get("alt", concept_image_alt_text(target)), limit=4000)
-    updated_row, backup_path = update_card_content_fields(
+    _, backup_path = update_card_content_fields(
         card_id,
         {"concept_image_url": next_url, "concept_image_alt": next_alt, "concept_media_type": "image", "concept_media_payload": next_url},
         backup_dir,
@@ -2372,11 +2355,7 @@ def apply_ai_concept_image(
         meta_path = preview_path.with_suffix(".json")
         if meta_path.exists():
             meta_path.unlink()
-    updated_rows, _ = read_cards(db_path)
-    for row in updated_rows:
-        if row.get("id") == card_id:
-            return row, backup_path, next_url
-    return updated_row, backup_path, next_url
+    return read_card(db_path, card_id), backup_path, next_url
 
 
 def discard_ai_concept_image_preview(
@@ -8644,12 +8623,7 @@ def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
 @app.post("/api/cards/{card_id}/ai-rewrite/preview")
 def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
-
-        current = next((row for row in rows if row.get("id") == card_id), None)
-        if current is None:
-            raise KeyError(card_id)
+        current = read_card(PROGRESS_DB_PATH, card_id)
         proposal = rewrite_card_with_codex(current, payload.instruction)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -8668,9 +8642,7 @@ def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> 
 def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict[str, Any]:
     try:
         card, backup_path = update_card_ai_content(card_id, payload, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
-
+        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except ValueError as exc:
@@ -8679,7 +8651,7 @@ def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {
         "card": card,
-        "summary": summarize(rows),
+        "summary": summary,
         "backup_path": str(backup_path) if backup_path else "",
     }
 
@@ -8688,8 +8660,7 @@ def api_card_ai_rewrite_apply(card_id: str, payload: CardAiApplyRequest) -> dict
 def api_card_concept_media(card_id: str, payload: CardConceptMediaRequest) -> dict[str, Any]:
     try:
         card, backup_path = update_card_concept_media(card_id, payload, backup_dir=BACKUP_DIR, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
+        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except ValueError as exc:
@@ -8698,7 +8669,7 @@ def api_card_concept_media(card_id: str, payload: CardConceptMediaRequest) -> di
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {
         "card": card,
-        "summary": summarize(rows),
+        "summary": summary,
         "backup_path": str(backup_path) if backup_path else "",
     }
 
@@ -8731,16 +8702,10 @@ def api_ai_image_file(image_name: str) -> FileResponse:
     return FileResponse(image_path)
 
 
-
 @app.post("/api/cards/{card_id}/ai-image/preview")
 def api_card_ai_image_preview(card_id: str) -> dict[str, Any]:
     try:
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
-
-        current = next((row for row in rows if row.get("id") == card_id), None)
-        if current is None:
-            raise KeyError(card_id)
+        current = read_card(PROGRESS_DB_PATH, card_id)
         preview = generate_ai_concept_image_preview(current, preview_dir=AI_IMAGE_PREVIEW_DIR)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
@@ -8769,7 +8734,6 @@ def api_card_ai_image_discard(card_id: str, payload: CardAiImageApplyRequest) ->
     return {"ok": True, "card_id": card_id}
 
 
-
 @app.post("/api/cards/{card_id}/ai-image/apply")
 def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> dict[str, Any]:
     try:
@@ -8781,9 +8745,7 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
             image_dir=AI_IMAGE_DIR,
             preview_dir=AI_IMAGE_PREVIEW_DIR,
         )
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
-
+        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except FileNotFoundError as exc:
@@ -8794,7 +8756,7 @@ def api_card_ai_image_apply(card_id: str, payload: CardAiImageApplyRequest) -> d
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {
         "card": card,
-        "summary": summarize(rows),
+        "summary": summary,
         "backup_path": str(backup_path) if backup_path else "",
         "image_url": image_url,
     }
