@@ -759,7 +759,7 @@ class QuestionBankUpsertRequest(BaseModel):
 class QuestionAttemptRequest(BaseModel):
     question_id: str = Field(min_length=1, max_length=255)
     question_bank_id: str | None = Field(default=None, max_length=255)
-    card_id: str = Field(min_length=1, max_length=255)
+    card_id: str = Field(default="", max_length=255)
     question_type: str = Field(min_length=1, max_length=64)
     prompt: str = Field(default="", max_length=4000)
     body: str = Field(default="", max_length=12000)
@@ -5070,7 +5070,7 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
     return {
         "question_id": row["question_id"],
         "question_bank_id": row["question_bank_id"] if "question_bank_id" in row.keys() else "",
-        "card_id": row["card_id"],
+        "card_id": row["card_id"] or "",
         "question_type": row["question_type"],
         "prompt": row["prompt"] or "",
         "body": row["body"] or "",
@@ -5273,7 +5273,12 @@ def save_question_attempt(
     payload: QuestionAttemptRequest,
     progress_db_path: Path | None = None,
 ) -> dict[str, Any]:
-    _ensure_card_exists(payload.card_id, progress_db_path)
+    card_id = str(payload.card_id or "").strip()[:255]
+    question_bank_id = str(payload.question_bank_id or "").strip()[:255]
+    if card_id:
+        _ensure_card_exists(card_id, progress_db_path)
+    elif not question_bank_id:
+        raise ValueError("card_id or question_bank_id is required")
     question_type = str(payload.question_type or "").strip().lower()
     if question_type not in SUPPORTED_QUESTION_TYPES:
         raise ValueError(f"Unsupported question type: {payload.question_type}")
@@ -5297,7 +5302,6 @@ def save_question_attempt(
     session_mode = str(payload.session_mode or "practice")[:32] or "practice"
     section = str(payload.section or "")[:64]
     answer_guide = str(payload.answer_guide or "")[:255]
-    question_bank_id = str(payload.question_bank_id or "").strip()[:255]
     with closing(connect_progress_db(db_path)) as conn:
         conn.execute(
             """
@@ -5305,7 +5309,7 @@ def save_question_attempt(
             VALUES (?, '', '', 0, 0, '', '', ?)
             ON CONFLICT(card_id) DO NOTHING
             """,
-            (payload.card_id, now),
+            (card_id, now),
         )
         if question_bank_id:
             linked = conn.execute("SELECT id FROM question_bank WHERE id = ?", (question_bank_id,)).fetchone()
@@ -5355,7 +5359,7 @@ def save_question_attempt(
             (
                 question_id,
                 question_bank_id or None,
-                payload.card_id,
+                card_id,
                 question_type,
                 str(payload.prompt or "")[:4000],
                 str(payload.body or "")[:12000],
@@ -5396,10 +5400,12 @@ def save_question_attempt(
             (question_id,),
         ).fetchone()
 
-    updated_rows, _ = read_cards(db_path)
-    updated_card = next((row for row in updated_rows if row.get("id") == payload.card_id), None)
-    if updated_card is None:
-        raise KeyError(payload.card_id)
+    updated_card = None
+    if card_id:
+        updated_rows, _ = read_cards(db_path)
+        updated_card = next((row for row in updated_rows if row.get("id") == card_id), None)
+        if updated_card is None:
+            raise KeyError(card_id)
     return {
         "attempt": question_attempt_row_to_dict(saved),
         "card": updated_card,

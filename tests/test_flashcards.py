@@ -1037,6 +1037,72 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(breakdown[0]['unseen_count'], 0)
             self.assertEqual(listed['items'][0]['question_bank_id'], item['question_bank_id'])
 
+    def test_question_bank_attempt_without_card_id_persists_by_question_bank_id(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            saved = flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': '',
+                        'question_type': 'multiple_choice',
+                        'prompt': '다음 중 가장 적절한 설명은?',
+                        'body': '연결되지 않은 문제은행 문항 저장 경로를 검증한다.',
+                        'answer': '정답',
+                        'explanation': 'card_id 없이도 question_bank_id 기준으로 시도 저장이 가능해야 한다.',
+                        'choices': ['오답', '정답', '보류'],
+                        'answer_index': 1,
+                        'topic': '테스트',
+                        'field_name': '전산학술',
+                        'category': '테스트',
+                        'keywords': ['문제은행', 'attempt'],
+                        'difficulty': '중',
+                        'issuer': '한국은행',
+                        'source_location': '회귀 테스트',
+                        'section': '전공필기',
+                        'points': 5,
+                        'expected_time_seconds': 90,
+                        'answer_guide': '선지 근거를 1문장으로 설명',
+                        'session_mode': 'practice',
+                    }
+                ],
+                db_path,
+            )
+            item = saved['items'][0]
+
+            attempt = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='bank-unlinked-1',
+                    question_bank_id=item['question_bank_id'],
+                    card_id='',
+                    question_type='multiple_choice',
+                    prompt=item['prompt'],
+                    body=item['body'],
+                    user_answer='정답 아님',
+                    selected_choice_index=0,
+                    is_correct=False,
+                    judgment='wrong',
+                    wrong_note='연결 카드 없이도 오답 저장',
+                ),
+                csv_path,
+                db_path,
+            )
+
+            self.assertEqual(attempt['attempt']['question_bank_id'], item['question_bank_id'])
+            self.assertEqual(attempt['attempt']['card_id'], '')
+            self.assertEqual(attempt['attempt']['judgment'], 'wrong')
+            self.assertIsNone(attempt['card'])
+
+            wrong_only = flashcard_app.read_question_bank_entries(db_path, attempt_status='wrong', limit=10)
+            self.assertEqual(wrong_only['summary']['total'], 1)
+            self.assertEqual(wrong_only['summary']['category_breakdown'][0]['wrong_count'], 1)
+            self.assertEqual(wrong_only['items'][0]['question_attempt_status'], 'wrong')
+            self.assertEqual(wrong_only['items'][0]['question_bank_id'], item['question_bank_id'])
+
     def test_question_bank_upsert_infers_missing_difficulty_and_backfills_runtime_rows(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

@@ -5700,7 +5700,7 @@ async function postQuestionAttempt(question) {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await responseErrorText(res));
   return res.json();
 }
 

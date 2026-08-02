@@ -235,6 +235,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'googleAiSearchUrl(aiQuizSearchPrompt())',
             'question-mode-active',
             '/api/questions/attempt',
+            'responseErrorText(res)',
             'function saveQuestionAttempt(question, {quiet = false} = {})',
             'function setQuestionJudgment(judgment)',
             'syncQuestionBankAttemptState(current);',
