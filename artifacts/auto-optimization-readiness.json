@@ -1,15 +1,39 @@
 {
-  "checked_at": "2026-08-02T18:39:10Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T18:44:29Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 175,
+      "state": "OPEN",
+      "title": "카드 mark·bookmark·memo 단건 갱신 경로 SQLite 연결 재사용",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/175"
+    },
+    {
+      "number": 174,
+      "state": "OPEN",
+      "title": "메인 필터·기록 토글 버튼에 선택 상태 접근성 노출 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/174"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-174",
+      "branch": "issue-174-main-filter-toggle-a11y",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-175",
+      "branch": "issue-175-card-mutation-single-connection",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,8 +48,8 @@
     }
   ],
   "notes": [
-    "Round 33 frontend candidate #170 merged successfully as PR #173.",
-    "Round 33 backend candidate #171 merged successfully as PR #172.",
-    "All round 33 issue branches, PRs, and blocking worktrees are cleaned up."
+    "Round 34 accepted one frontend and one backend candidate from latest main.",
+    "Issue #174 covers main filter and history toggle accessibility semantics in static/app.js.",
+    "Issue #175 covers reduced-connection reuse for mark/bookmark/memo single-card mutations in app.py."
   ]
 }

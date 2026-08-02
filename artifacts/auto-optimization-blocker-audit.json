@@ -1,15 +1,39 @@
 {
-  "checked_at": "2026-08-02T18:39:10Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T18:44:29Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 175,
+      "state": "OPEN",
+      "title": "카드 mark·bookmark·memo 단건 갱신 경로 SQLite 연결 재사용",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/175"
+    },
+    {
+      "number": 174,
+      "state": "OPEN",
+      "title": "메인 필터·기록 토글 버튼에 선택 상태 접근성 노출 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/174"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-174",
+      "branch": "issue-174-main-filter-toggle-a11y",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-175",
+      "branch": "issue-175-card-mutation-single-connection",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,8 +48,8 @@
     }
   ],
   "notes": [
-    "Issue #170 / PR #173 is merged and cleaned up.",
-    "Issue #171 / PR #172 is merged and cleaned up.",
-    "The next optimization round may start immediately."
+    "Issue #174 and #175 are the active round 34 lanes.",
+    "Round 34 frontend audit subagent returned no candidate payload; the accepted candidate was confirmed directly from latest app.js/tests evidence.",
+    "Round 34 backend audit subagent failed with a tool error; the accepted candidate was confirmed directly from latest app.py/tests evidence."
   ]
 }
