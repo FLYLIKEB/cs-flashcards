@@ -1178,6 +1178,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.click('#bankPageLaunchBtn')
             await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
             embed_frame = await self.wait_for_embed_frame(page)
+            await embed_frame.waitForSelector('[data-choice-index="0"]')
 
             await embed_frame.click('[data-choice-index="0"]')
             await embed_frame.click('[data-question-nav="next"]')
@@ -1276,6 +1277,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.click('#bankPageLaunchBtn')
             await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
             embed_frame = await self.wait_for_embed_frame(page)
+            await embed_frame.waitForSelector('[data-choice-index="0"]')
 
             await embed_frame.click('[data-choice-index="0"]')
             await embed_frame.click('[data-question-nav="next"]')
