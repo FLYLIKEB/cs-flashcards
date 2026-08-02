@@ -3264,6 +3264,7 @@ def read_question_bank_entries(
     source_location: str = "",
     query: str = "",
     attempt_status: str = "",
+    include_missing_cards: bool = False,
     limit: int = 200,
 ) -> dict[str, Any]:
     db_path = progress_db_for(progress_db_path)
@@ -3398,34 +3399,43 @@ def read_question_bank_entries(
             """,
             tuple(params + [safe_limit]),
         ).fetchall()
-        if total_count <= len(query_rows):
-            missing_card_summary_rows = [dict(row) for row in query_rows]
-        else:
-            missing_card_summary_rows = [
-                dict(row)
-                for row in conn.execute(
-                    f"""
-                    SELECT question_bank.missing_card_keywords_json
-                    FROM question_bank
-                    {latest_attempt_join_sql}
-                    {where_sql}
-                    """,
-                    tuple(params),
-                ).fetchall()
-            ]
         linked_card_ids = {
             normalize_question_bank_text(row["card_id"] if "card_id" in row.keys() else "", limit=255)
             for row in query_rows
             if normalize_question_bank_text(row["card_id"] if "card_id" in row.keys() else "", limit=255)
         }
-        missing_card_keywords: set[str] = set()
-        for row in missing_card_summary_rows:
-            missing_card_keywords.update(question_bank_json_list(row["missing_card_keywords_json"] if "missing_card_keywords_json" in row.keys() else []))
-        card_map, card_keyword_to_card_id = _read_question_bank_card_context(
-            conn,
-            linked_card_ids=linked_card_ids,
-            missing_card_keywords=missing_card_keywords,
-        )
+        card_map: dict[str, dict[str, str]]
+        card_keyword_to_card_id: dict[str, str] = {}
+        if include_missing_cards:
+            if total_count <= len(query_rows):
+                missing_card_summary_rows = [dict(row) for row in query_rows]
+            else:
+                missing_card_summary_rows = [
+                    dict(row)
+                    for row in conn.execute(
+                        f"""
+                        SELECT question_bank.missing_card_keywords_json
+                        FROM question_bank
+                        {latest_attempt_join_sql}
+                        {where_sql}
+                        """,
+                        tuple(params),
+                    ).fetchall()
+                ]
+            missing_card_keywords: set[str] = set()
+            for row in missing_card_summary_rows:
+                missing_card_keywords.update(question_bank_json_list(row["missing_card_keywords_json"] if "missing_card_keywords_json" in row.keys() else []))
+            card_map, card_keyword_to_card_id = _read_question_bank_card_context(
+                conn,
+                linked_card_ids=linked_card_ids,
+                missing_card_keywords=missing_card_keywords,
+            )
+        else:
+            card_map, _ = _read_question_bank_card_context(
+                conn,
+                linked_card_ids=linked_card_ids,
+                missing_card_keywords=set(),
+            )
     items: list[dict[str, Any]] = []
     for row in query_rows:
         item = question_bank_row_to_dict(row) or {}
@@ -3459,7 +3469,7 @@ def read_question_bank_entries(
             "missing_cards": question_bank_missing_card_rows(
                 missing_card_summary_rows,
                 card_keyword_to_card_id=card_keyword_to_card_id,
-            ),
+            ) if include_missing_cards else [],
             "category_breakdown": [
                 {
                     "category": str(row["category"] or "").strip() or "미분류",
@@ -8889,6 +8899,7 @@ def api_question_bank(request: Request) -> dict[str, Any]:
             source_location=request.query_params.get("source_location", ""),
             query=request.query_params.get("q", request.query_params.get("query", "")),
             attempt_status=request.query_params.get("attempt_status", request.query_params.get("status", "")),
+            include_missing_cards=str(request.query_params.get("include_missing_cards", "")).strip().lower() in {"1", "true", "yes", "y", "on"},
             limit=limit,
         )
 
