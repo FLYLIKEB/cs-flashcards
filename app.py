@@ -1742,22 +1742,28 @@ def read_card(
             )
     return _read_card_on_connection(db_path, conn, normalized_card_id)
 
-def read_card_attempt_context(progress_db_path: Path | None, card_ids: list[str] | None) -> dict[str, dict[str, str]]:
+def read_card_attempt_context(
+    progress_db_path: Path | None,
+    card_ids: list[str] | None,
+    conn: sqlite3.Connection | None = None,
+) -> dict[str, dict[str, str]]:
     normalized_ids = sorted(normalize_card_ids(card_ids) or [])
     if not normalized_ids:
         return {}
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path, must_exist=True)
+    if conn is None:
+        ensure_progress_db(db_path, must_exist=True)
+        with closing(connect_progress_db(db_path, must_exist=True)) as db_conn:
+            return read_card_attempt_context(db_path, normalized_ids, db_conn)
     placeholders = ", ".join(["?"] * len(normalized_ids))
-    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
-        rows = conn.execute(
-            f"""
-            SELECT card_id, term, english, category
-            FROM cards
-            WHERE card_id IN ({placeholders})
-            """,
-            tuple(normalized_ids),
-        ).fetchall()
+    rows = conn.execute(
+        f"""
+        SELECT card_id, term, english, category
+        FROM cards
+        WHERE card_id IN ({placeholders})
+        """,
+        tuple(normalized_ids),
+    ).fetchall()
     return {
         str(row["card_id"] or "").strip(): {
             "id": str(row["card_id"] or "").strip(),
@@ -6031,7 +6037,6 @@ def read_question_attempts(
     selected_ids = sorted(normalize_card_ids(card_ids) or [])
     safe_limit = max(1, min(int(limit or 200), 500))
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path, must_exist=True)
 
     where_clauses: list[str] = []
     where_params: list[Any] = []
@@ -6049,7 +6054,8 @@ def read_question_attempts(
         list_params.append(normalized_result)
     list_where = f"WHERE {' AND '.join(list_clauses)}" if list_clauses else ""
 
-    with closing(connect_progress_db(db_path)) as conn:
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        ensure_progress_db(db_path, must_exist=True, conn=conn)
         summary_row = conn.execute(
             f"""
             SELECT
@@ -6084,8 +6090,8 @@ SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user
             tuple(list_params + [safe_limit]),
         ).fetchall()
 
-    attempt_card_ids = [str(row["card_id"] or "").strip() for row in attempt_rows if str(row["card_id"] or "").strip()]
-    card_map = read_card_attempt_context(db_path, attempt_card_ids)
+        attempt_card_ids = [str(row["card_id"] or "").strip() for row in attempt_rows if str(row["card_id"] or "").strip()]
+        card_map = read_card_attempt_context(db_path, attempt_card_ids, conn)
     items: list[dict[str, Any]] = []
     for row in attempt_rows:
         item = question_attempt_row_to_dict(row) or {}
@@ -6152,7 +6158,6 @@ def read_question_bank_attempts(
     selected_ids = normalize_question_bank_ids(question_bank_ids)
     safe_limit = max(1, min(int(limit or 200), 500))
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
 
     where_clauses = ["TRIM(COALESCE(question_attempts.question_bank_id, '')) <> ''"]
     where_params: list[Any] = []
@@ -6174,6 +6179,7 @@ def read_question_bank_attempts(
     list_where = f"WHERE {' AND '.join(list_clauses)}" if list_clauses else ""
 
     with closing(connect_progress_db(db_path)) as conn:
+        ensure_progress_db(db_path, conn=conn)
         summary_row = conn.execute(
             f"""
             SELECT
@@ -6216,8 +6222,8 @@ def read_question_bank_attempts(
             tuple(list_params + [safe_limit]),
         ).fetchall()
 
-    attempt_card_ids = [str(row["card_id"] or "").strip() for row in attempt_rows if str(row["card_id"] or "").strip()]
-    card_map = read_card_attempt_context(db_path, attempt_card_ids)
+        attempt_card_ids = [str(row["card_id"] or "").strip() for row in attempt_rows if str(row["card_id"] or "").strip()]
+        card_map = read_card_attempt_context(db_path, attempt_card_ids, conn)
     items: list[dict[str, Any]] = []
     for row in attempt_rows:
         item = question_attempt_row_to_dict(row) or {}
