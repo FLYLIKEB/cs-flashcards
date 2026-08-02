@@ -24,14 +24,45 @@ from uuid import uuid4
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request as UrlRequest, urlopen
-from PIL import Image, ImageDraw, ImageFont
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 import flashcards_backend
-from question_generator import SUPPORTED_QUESTION_TYPES, generate_questions, normalize_card_ids
+
+SUPPORTED_QUESTION_TYPES = ("short", "subjective", "multiple_choice", "essay")
+
+_QUESTION_GENERATOR_MODULE: Any | None = None
+_PIL_MODULES: tuple[Any, Any, Any] | None = None
+
+
+def _question_generator_module():
+    global _QUESTION_GENERATOR_MODULE
+    if _QUESTION_GENERATOR_MODULE is None:
+        import question_generator as module
+
+        _QUESTION_GENERATOR_MODULE = module
+    return _QUESTION_GENERATOR_MODULE
+
+
+def generate_questions(*args, **kwargs):
+    return _question_generator_module().generate_questions(*args, **kwargs)
+
+
+def normalize_card_ids(card_ids):
+    return _question_generator_module().normalize_card_ids(card_ids)
+
+
+def _pil_modules() -> tuple[Any, Any, Any]:
+    global _PIL_MODULES
+    if _PIL_MODULES is None:
+        from PIL import Image as image_module
+        from PIL import ImageDraw as image_draw_module
+        from PIL import ImageFont as image_font_module
+
+        _PIL_MODULES = (image_module, image_draw_module, image_font_module)
+    return _PIL_MODULES
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_PROGRESS_DB_PATH = ROOT / "state" / "progress.sqlite"
@@ -41,7 +72,6 @@ BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).e
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 PUBLIC_WIKI_ASSET_DIR = STATIC_DIR / "wiki-assets"
-PUBLIC_WIKI_ASSET_DIR.mkdir(parents=True, exist_ok=True)
 PUBLIC_AUTH_BYPASS_PREFIXES = (
     "/public/wiki-assets",
 )
@@ -699,8 +729,8 @@ def render_recruitment_schedule_wiki_page(markdown_text: str) -> str:
 
 
 app = FastAPI(title="CS Encyclopedia Flashcards", version="1.0.0")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-app.mount("/public/wiki-assets", StaticFiles(directory=PUBLIC_WIKI_ASSET_DIR), name="public-wiki-assets")
+app.mount("/static", StaticFiles(directory=STATIC_DIR, check_dir=False), name="static")
+app.mount("/public/wiki-assets", StaticFiles(directory=PUBLIC_WIKI_ASSET_DIR, check_dir=False), name="public-wiki-assets")
 
 
 @app.on_event("startup")
@@ -6901,13 +6931,14 @@ def wrap_wiki_gif_label(value: str, max_lines: int = 2, line_width: int = 9) -> 
 
 
 def load_wiki_gif_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    _, _, image_font_module = _pil_modules()
     for candidate in WIKI_GIF_FONT_CANDIDATES:
         if Path(candidate).exists():
             try:
-                return ImageFont.truetype(candidate, size=size)
+                return image_font_module.truetype(candidate, size=size)
             except OSError:
                 continue
-    return ImageFont.load_default()
+    return image_font_module.load_default()
 
 
 
@@ -7179,6 +7210,7 @@ def draw_wrapped_centered_text(draw: ImageDraw.ImageDraw, box: tuple[float, floa
 
 
 def render_wiki_gif_plan(plan: dict[str, Any]) -> bytes:
+    image_module, image_draw_module, _ = _pil_modules()
     validated = validate_wiki_gif_plan(plan)
     canvas_width, canvas_height = WIKI_GIF_CANVAS_SIZE
     bg_color = (248, 250, 252, 255)
@@ -7197,8 +7229,8 @@ def render_wiki_gif_plan(plan: dict[str, Any]) -> bytes:
         for step in range(subframes):
             progress = 0.0 if subframes == 1 else step / (subframes - 1)
             pulse = 0.5 + 0.5 * math.sin(progress * math.pi)
-            frame = Image.new("RGBA", (canvas_width, canvas_height), bg_color)
-            draw = ImageDraw.Draw(frame, "RGBA")
+            frame = image_module.new("RGBA", (canvas_width, canvas_height), bg_color)
+            draw = image_draw_module.Draw(frame, "RGBA")
             for edge in edges:
                 start_node = node_lookup[edge["from"]]
                 end_node = node_lookup[edge["to"]]
@@ -7257,7 +7289,7 @@ def render_wiki_gif_plan(plan: dict[str, Any]) -> bytes:
                 dot_fill = (37, 99, 235, 255) if active_dot else (203, 213, 225, 255)
                 radius = dot_radius + (2 if active_dot else 0)
                 draw.ellipse([cx - radius, progress_y - radius, cx + radius, progress_y + radius], fill=dot_fill)
-            frames.append(frame.convert("P", palette=Image.Palette.ADAPTIVE))
+            frames.append(frame.convert("P", palette=image_module.Palette.ADAPTIVE))
     out = io.BytesIO()
     frames[0].save(
         out,
@@ -7274,10 +7306,11 @@ def render_wiki_gif_plan(plan: dict[str, Any]) -> bytes:
 
 
 def normalize_wiki_gif_frame_image(image_bytes: bytes, size: tuple[int, int] = WIKI_GIF_CANVAS_SIZE) -> Image.Image:
-    resampling = getattr(getattr(Image, "Resampling", Image), "LANCZOS", Image.LANCZOS)
-    with Image.open(io.BytesIO(image_bytes)) as original:
+    image_module, _, _ = _pil_modules()
+    resampling = getattr(getattr(image_module, "Resampling", image_module), "LANCZOS", image_module.LANCZOS)
+    with image_module.open(io.BytesIO(image_bytes)) as original:
         base = original.convert("RGBA")
-    canvas = Image.new("RGBA", size, (248, 250, 252, 255))
+    canvas = image_module.new("RGBA", size, (248, 250, 252, 255))
     scale = min(size[0] / max(1, base.width), size[1] / max(1, base.height))
     target = (max(1, int(base.width * scale)), max(1, int(base.height * scale)))
     resized = base.resize(target, resampling)
@@ -7345,8 +7378,9 @@ def build_wiki_gif_playback_indices(stage_count: int) -> list[int]:
 
 
 def gif_from_api_frame_bytes(frame_bytes_list: list[bytes], playback_indices: list[int]) -> bytes:
+    image_module, _, _ = _pil_modules()
     normalized_frames = [normalize_wiki_gif_frame_image(frame_bytes) for frame_bytes in frame_bytes_list]
-    rendered_frames = [normalized_frames[index].convert("P", palette=Image.Palette.ADAPTIVE) for index in playback_indices]
+    rendered_frames = [normalized_frames[index].convert("P", palette=image_module.Palette.ADAPTIVE) for index in playback_indices]
     out = io.BytesIO()
     rendered_frames[0].save(
         out,
