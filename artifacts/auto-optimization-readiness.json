@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-02T14:58:22Z",
+  "checked_at": "2026-08-02T15:27:29Z",
   "gate_open": false,
   "summary": {
     "open_issue_count": 2,
@@ -7,56 +7,56 @@
     "blocking_worktree_count": 2
   },
   "notes": [
-    "Round 25 implementation finished and both branches were pushed.",
-    "PR #138 and PR #139 are open and under review."
+    "Round 26 issues #140 and #141 are open with implementation branches pushed.",
+    "PR #142 and PR #143 are open and waiting on review/check completion."
   ],
   "open_issues": [
     {
-      "number": 137,
+      "number": 141,
       "state": "OPEN",
-      "title": "문제은행 row trigger를 버튼 semantics로 승격하고 키보드 접근성 고정",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/137"
+      "title": "문제은행 숨김 풀이 세트가 필터 변경 뒤 다른 문제로 보이는 상태 꼬임 수정",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/141"
     },
     {
-      "number": 136,
+      "number": 140,
       "state": "OPEN",
-      "title": "문제은행 attempt 상태 판정을 is_correct fallback까지 일관화",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/136"
+      "title": "연결 카드 없는 문제은행 풀이가 빈 진행 행을 만들지 않도록 정리",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/140"
     }
   ],
   "open_prs": [
     {
       "baseRefName": "main",
-      "headRefName": "issue-137-question-bank-row-trigger-button",
+      "headRefName": "issue-141-hidden-practice-filter-mismatch",
       "isDraft": false,
       "mergeStateStatus": "CLEAN",
-      "number": 139,
+      "number": 143,
       "reviewDecision": "",
-      "title": "Issue 137: 문제은행 row trigger 버튼 semantics 적용",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/139"
+      "title": "Issue 141: 문제은행 숨김 풀이 세트 필터 충돌 정리",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/143"
     },
     {
       "baseRefName": "main",
-      "headRefName": "issue-136-question-bank-status-fallback",
+      "headRefName": "issue-140-null-card-progress-sentinel",
       "isDraft": false,
       "mergeStateStatus": "CLEAN",
-      "number": 138,
+      "number": 142,
       "reviewDecision": "",
-      "title": "Issue 136: 문제은행 attempt 상태 fallback 일관화",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/138"
+      "title": "Issue 140: 연결 없는 문제은행 시도 sentinel 제거",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/142"
     }
   ],
   "blocking_worktrees": [
     {
-      "path": "/private/tmp/cs-opt-136",
-      "branch": "issue-136-question-bank-status-fallback",
-      "head": "68597089ca692d8f09f8bb79f2890ce3d0a743ed",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-140",
+      "branch": "issue-140-null-card-progress-sentinel",
+      "head": "305ebf21b6d88f9d01d55bba238fe6ccf22736b4",
       "status": "tracked-branch-worktree"
     },
     {
-      "path": "/private/tmp/cs-opt-137",
-      "branch": "issue-137-question-bank-row-trigger-button",
-      "head": "2d610359eac13ec328df2b3b2ba73cdbec611ef2",
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-141",
+      "branch": "issue-141-hidden-practice-filter-mismatch",
+      "head": "2b2fde67e0e67dbd3240c76eec88227a6c16ddcb",
       "status": "tracked-branch-worktree"
     }
   ]

@@ -32,22 +32,22 @@
       "mergeCommit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
     }
   ],
-  "generated_at": "2026-08-02T14:58:22Z",
-  "wave": "2026-08-02-round-25",
+  "generated_at": "2026-08-02T15:27:29Z",
+  "wave": "2026-08-02-round-26",
   "queue": [
     {
-      "issue": 136,
-      "pr": 138,
-      "branch": "issue-136-question-bank-status-fallback",
-      "worktree": "/private/tmp/cs-opt-136",
+      "issue": 140,
+      "pr": 142,
+      "branch": "issue-140-null-card-progress-sentinel",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-140",
       "surface": "backend",
       "status": "in-review"
     },
     {
-      "issue": 137,
-      "pr": 139,
-      "branch": "issue-137-question-bank-row-trigger-button",
-      "worktree": "/private/tmp/cs-opt-137",
+      "issue": 141,
+      "pr": 143,
+      "branch": "issue-141-hidden-practice-filter-mismatch",
+      "worktree": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-141",
       "surface": "frontend",
       "status": "in-review"
     }
@@ -81,6 +81,18 @@
       "issue": 133,
       "pr": 135,
       "branch": "issue-133-question-bank-back-forward-restore",
+      "status": "merged"
+    },
+    {
+      "issue": 136,
+      "pr": 138,
+      "branch": "issue-136-question-bank-status-fallback",
+      "status": "merged"
+    },
+    {
+      "issue": 137,
+      "pr": 139,
+      "branch": "issue-137-question-bank-row-trigger-button",
       "status": "merged"
     }
   ],
