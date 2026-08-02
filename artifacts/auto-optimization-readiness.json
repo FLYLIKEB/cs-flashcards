@@ -1,71 +1,29 @@
 {
-  "checked_at": "2026-08-02T20:32:35Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T20:50:02Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 2,
-    "open_pr_count": 2,
-    "blocking_worktree_count": 2,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 187,
-      "state": "OPEN",
-      "title": "save_question_attempt 초기 스키마 보장에서 남아 있는 중복 SQLite 재연결 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/187"
-    },
-    {
-      "number": 186,
-      "state": "OPEN",
-      "title": "헤더 메뉴의 북마크 필터 토글 후 포커스 복귀 누락",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/186"
-    }
-  ],
-  "open_prs": [
-    {
-      "number": 188,
-      "state": "OPEN",
-      "title": "Issue 187: save_question_attempt 연결 재사용",
-      "head": "issue-187-save-attempt-single-connection",
-      "base": "main",
-      "merge_state_status": "UNSTABLE",
-      "checks": [
-        "frontend-browser:IN_PROGRESS"
-      ],
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/188"
-    },
-    {
-      "number": 189,
-      "state": "OPEN",
-      "title": "Issue 186: 북마크 필터 메뉴 포커스 복귀",
-      "head": "issue-186-bookmark-filter-focus-return",
-      "base": "main",
-      "merge_state_status": "UNKNOWN",
-      "checks": [],
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/189"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-186",
-      "branch": "issue-186-bookmark-filter-focus-return",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-187",
-      "branch": "issue-187-save-attempt-single-connection",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
     {
-      "issue": 182,
-      "pr": 185,
-      "merge_commit": "a90edfef08fc9b3306201a094961d4f5a4aa48bc"
+      "issue": 186,
+      "pr": 189,
+      "merge_commit": "b2ed9885b4483a1d23f72b992512f4c7c1be896f"
+    },
+    {
+      "issue": 187,
+      "pr": 188,
+      "merge_commit": "e6fa6f1abbe509024ce5fd302a0e7116963f1939"
     }
   ],
   "notes": [
-    "Issues #186 and #187 have open PRs (#189, #188)."
+    "Round 37 PRs #188 and #189 merged; readiness gate reopened."
   ]
 }
