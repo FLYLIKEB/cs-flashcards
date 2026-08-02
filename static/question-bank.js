@@ -656,7 +656,9 @@ function applyPracticeViewState() {
 }
 
 function applyFilterViewState() {
+  const region = $('bankPageFiltersRegion');
   document.body.classList.toggle('question-bank-filters-collapsed', bankState.filtersCollapsed);
+  if (region) region.hidden = bankState.filtersCollapsed;
 }
 
 function reviewNeedsRefresh() {
@@ -708,6 +710,7 @@ function renderFilterToggle() {
   toggleButton.textContent = bankState.filtersCollapsed
     ? `필터 열기${count ? ` (${count})` : ''}`
     : '필터 숨기기';
+  toggleButton.setAttribute('aria-controls', 'bankPageFiltersRegion');
   toggleButton.setAttribute('aria-expanded', String(!bankState.filtersCollapsed));
 }
 

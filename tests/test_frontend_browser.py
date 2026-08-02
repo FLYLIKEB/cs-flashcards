@@ -736,14 +736,42 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             case['initial_summary'] = await self.text(page, '#bankPageSummary')
             self.assertIn('문항', case['initial_summary'])
-            case['filters_collapsed_initially'] = await page.evaluate("document.body.classList.contains('question-bank-filters-collapsed')")
-            self.assertTrue(case['filters_collapsed_initially'])
+            case['filter_region_initial'] = await page.evaluate(
+                """
+                () => ({
+                  bodyCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  regionHidden: document.querySelector('#bankPageFiltersRegion')?.hidden,
+                  toggleExpanded: document.querySelector('#bankPageToggleFiltersBtn')?.getAttribute('aria-expanded'),
+                  toggleControls: document.querySelector('#bankPageToggleFiltersBtn')?.getAttribute('aria-controls'),
+                })
+                """
+            )
+            self.assertTrue(case['filter_region_initial']['bodyCollapsed'])
+            self.assertTrue(case['filter_region_initial']['regionHidden'])
+            self.assertEqual(case['filter_region_initial']['toggleExpanded'], 'false')
+            self.assertEqual(case['filter_region_initial']['toggleControls'], 'bankPageFiltersRegion')
             await page.click('#bankPageToggleFiltersBtn')
-            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed') && !document.querySelector('#bankPageFiltersRegion').hidden")
             await page.type('#bankPageQueryInput', '데이터베이스')
             await page.waitForFunction("window.location.search.includes('q=%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4')")
             await page.waitForFunction("document.querySelector('#bankPageActiveFilters').textContent.includes('통합 검색')")
             case['active_filters'] = await self.text(page, '#bankPageActiveFilters')
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("document.body.classList.contains('question-bank-filters-collapsed') && document.querySelector('#bankPageFiltersRegion').hidden")
+            case['filter_region_after_recollapse'] = await page.evaluate(
+                """
+                () => ({
+                  regionHidden: document.querySelector('#bankPageFiltersRegion')?.hidden,
+                  toggleExpanded: document.querySelector('#bankPageToggleFiltersBtn')?.getAttribute('aria-expanded'),
+                })
+                """
+            )
+            case['active_filters_after_recollapse'] = await self.text(page, '#bankPageActiveFilters')
+            self.assertTrue(case['filter_region_after_recollapse']['regionHidden'])
+            self.assertEqual(case['filter_region_after_recollapse']['toggleExpanded'], 'false')
+            self.assertIn('통합 검색', case['active_filters_after_recollapse'])
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed') && !document.querySelector('#bankPageFiltersRegion').hidden")
             await page.click('#bankPageLaunchBtn')
             await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
             case['practice_frame_src'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
@@ -1337,11 +1365,19 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 "document.querySelector('#bankPageQueryInput').value === '데이터베이스' && document.querySelector('#bankPageDifficultySelect').value === '중'"
             )
             case['filters_expanded_after_reload'] = await page.evaluate(
-                "!document.body.classList.contains('question-bank-filters-collapsed')"
+                """
+                () => ({
+                  bodyCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  regionHidden: document.querySelector('#bankPageFiltersRegion')?.hidden,
+                  toggleExpanded: document.querySelector('#bankPageToggleFiltersBtn')?.getAttribute('aria-expanded'),
+                })
+                """
             )
             case['query_after_reload'] = await page.Jeval('#bankPageQueryInput', '(node) => node.value')
             case['difficulty_after_reload'] = await page.Jeval('#bankPageDifficultySelect', '(node) => node.value')
-            self.assertTrue(case['filters_expanded_after_reload'])
+            self.assertFalse(case['filters_expanded_after_reload']['bodyCollapsed'])
+            self.assertFalse(case['filters_expanded_after_reload']['regionHidden'])
+            self.assertEqual(case['filters_expanded_after_reload']['toggleExpanded'], 'true')
             self.assertEqual(case['query_after_reload'], '데이터베이스')
             self.assertEqual(case['difficulty_after_reload'], '중')
 

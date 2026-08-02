@@ -296,6 +296,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
 
     def test_question_bank_page_smoke_has_filter_table_and_practice_shell(self):
         self.assertIn('id="bankPageToggleFiltersBtn"', question_bank_html())
+        self.assertIn('aria-controls="bankPageFiltersRegion"', question_bank_html())
+        self.assertIn('id="bankPageFiltersRegion"', question_bank_html())
         self.assertIn('id="bankPageList"', question_bank_html())
         self.assertIn('<input id="bankPageTopicInput"', question_bank_html())
         self.assertIn('id="bankPageTopicOptions"', question_bank_html())
@@ -399,6 +401,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function launch(startIndex = 0, {reveal = true} = {})', question_bank_js())
         self.assertIn('window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY', question_bank_js())
         self.assertIn('question-bank-filters-collapsed', question_bank_js())
+        self.assertIn("const region = $('bankPageFiltersRegion');", question_bank_js())
+        self.assertIn("if (region) region.hidden = bankState.filtersCollapsed;", question_bank_js())
+        self.assertIn("toggleButton.setAttribute('aria-controls', 'bankPageFiltersRegion');", question_bank_js())
         self.assertIn('let restorePracticePaneOnReload = isReloadNavigation() && Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();', question_bank_js())
         self.assertIn('loaded: bankState.practiceLoaded,', question_bank_js())
     def test_calendar_js_smoke_keeps_tab_and_drawer_focus_handlers(self):
