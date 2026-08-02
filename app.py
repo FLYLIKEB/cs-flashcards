@@ -1743,16 +1743,14 @@ def mark_card(
     if status not in VALID_STATUSES:
         raise ValueError("known_status must be O, X, or empty")
 
-    rows, _ = read_cards(progress_db_path)
-    if not any(row.get("id") == card_id for row in rows):
-        raise KeyError(card_id)
-
+    card = read_card(progress_db_path, card_id)
+    normalized_card_id = str(card.get("id") or card_id)
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
         existing = conn.execute(
             "SELECT review_count FROM card_progress WHERE card_id = ?",
-            (card_id,),
+            (normalized_card_id,),
         ).fetchone()
         try:
             count = int(existing["review_count"] if existing else 0)
@@ -1762,6 +1760,7 @@ def mark_card(
         if status:
             count += 1
             last_reviewed = utc_now_iso()
+        now = utc_now_iso()
         conn.execute(
             """
             INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
@@ -1772,26 +1771,23 @@ def mark_card(
                 review_count = excluded.review_count,
                 updated_at = excluded.updated_at
             """,
-            (card_id, status, last_reviewed, max(0, count), utc_now_iso()),
+            (normalized_card_id, status, last_reviewed, max(0, count), now),
         )
         conn.commit()
-
-    updated_rows, _ = read_cards(db_path)
-    for row in updated_rows:
-        if row.get("id") == card_id:
-            return row
-    raise KeyError(card_id)
+    return read_card(db_path, normalized_card_id)
 
 
-def _ensure_card_exists(card_id: str, progress_db_path: Path | None = None) -> None:
-    read_card(progress_db_path, card_id)
+def _ensure_card_exists(card_id: str, progress_db_path: Path | None = None) -> dict[str, Any]:
+    return read_card(progress_db_path, card_id)
+
 
 def set_bookmark(
     card_id: str,
     bookmarked: bool,
     progress_db_path: Path | None = None,
 ) -> dict[str, str]:
-    _ensure_card_exists(card_id, progress_db_path)
+    card = _ensure_card_exists(card_id, progress_db_path)
+    normalized_card_id = str(card.get("id") or card_id)
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
@@ -1803,15 +1799,10 @@ def set_bookmark(
                 bookmarked = excluded.bookmarked,
                 updated_at = excluded.updated_at
             """,
-            (card_id, 1 if bookmarked else 0, utc_now_iso()),
+            (normalized_card_id, 1 if bookmarked else 0, utc_now_iso()),
         )
         conn.commit()
-
-    updated_rows, _ = read_cards(db_path)
-    for row in updated_rows:
-        if row.get("id") == card_id:
-            return row
-    raise KeyError(card_id)
+    return read_card(db_path, normalized_card_id)
 
 
 def save_memo(
@@ -1819,7 +1810,8 @@ def save_memo(
     memo: str,
     progress_db_path: Path | None = None,
 ) -> dict[str, str]:
-    _ensure_card_exists(card_id, progress_db_path)
+    card = _ensure_card_exists(card_id, progress_db_path)
+    normalized_card_id = str(card.get("id") or card_id)
     normalized_memo = str(memo or "")[:20000]
     memo_updated_at = utc_now_iso() if normalized_memo.strip() else ""
     db_path = progress_db_for(progress_db_path)
@@ -1834,15 +1826,50 @@ def save_memo(
                 memo_updated_at = excluded.memo_updated_at,
                 updated_at = excluded.updated_at
             """,
-            (card_id, normalized_memo, memo_updated_at, utc_now_iso()),
+            (normalized_card_id, normalized_memo, memo_updated_at, utc_now_iso()),
         )
         conn.commit()
+    return read_card(db_path, normalized_card_id)
 
-    updated_rows, _ = read_cards(db_path)
-    for row in updated_rows:
-        if row.get("id") == card_id:
-            return row
-    raise KeyError(card_id)
+
+def read_card_mutation_summary(progress_db_path: Path | None = None) -> dict[str, Any]:
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path, must_exist=True)
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        summary_row = conn.execute(
+            """
+            SELECT
+                COUNT(cards.card_id) AS total_count,
+                SUM(CASE WHEN card_progress.known_status = 'O' THEN 1 ELSE 0 END) AS known_count,
+                SUM(CASE WHEN card_progress.known_status = 'X' THEN 1 ELSE 0 END) AS unknown_count,
+                SUM(CASE WHEN COALESCE(card_progress.bookmarked, 0) = 1 THEN 1 ELSE 0 END) AS bookmarked_count,
+                SUM(CASE WHEN TRIM(COALESCE(card_progress.memo, '')) <> '' THEN 1 ELSE 0 END) AS memo_count
+            FROM cards
+            LEFT JOIN card_progress ON card_progress.card_id = cards.card_id
+            """
+        ).fetchone()
+        category_rows = conn.execute(
+            """
+            SELECT DISTINCT category
+            FROM cards
+            WHERE TRIM(COALESCE(category, '')) <> ''
+            ORDER BY category COLLATE NOCASE
+            """
+        ).fetchall()
+    total = int(summary_row["total_count"] or 0) if summary_row else 0
+    known = int(summary_row["known_count"] or 0) if summary_row else 0
+    unknown = int(summary_row["unknown_count"] or 0) if summary_row else 0
+    return {
+        "total": total,
+        "known": known,
+        "unknown": unknown,
+        "unreviewed": max(0, total - known - unknown),
+        "bookmarked": int(summary_row["bookmarked_count"] or 0) if summary_row else 0,
+        "memo_count": int(summary_row["memo_count"] or 0) if summary_row else 0,
+        "categories": [row["category"] for row in category_rows if str(row["category"] or "").strip()],
+        "content_db_path": str(PROGRESS_DB_PATH),
+        "progress_db_path": str(PROGRESS_DB_PATH),
+    }
 
 
 AI_REWRITE_FIELD_LIMITS = {
@@ -8584,42 +8611,36 @@ def api_cards() -> dict[str, Any]:
 def api_mark(card_id: str, payload: MarkRequest) -> dict[str, Any]:
     try:
         card = mark_card(card_id, payload.known_status, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
-
+        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
-    return {"card": card, "summary": summarize(rows)}
+    return {"card": card, "summary": summary}
 
 
 @app.post("/api/cards/{card_id}/bookmark")
 def api_bookmark(card_id: str, payload: BookmarkRequest) -> dict[str, Any]:
     try:
         card = set_bookmark(card_id, payload.bookmarked, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
-
+        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
-    return {"card": card, "summary": summarize(rows)}
+    return {"card": card, "summary": summary}
 
 
 @app.post("/api/cards/{card_id}/memo")
 def api_memo(card_id: str, payload: MemoRequest) -> dict[str, Any]:
     try:
         card = save_memo(card_id, payload.memo, progress_db_path=PROGRESS_DB_PATH)
-        rows, _ = read_cards(progress_db_path=PROGRESS_DB_PATH)
-
-
+        summary = read_card_mutation_summary(PROGRESS_DB_PATH)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Card not found: {card_id}") from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
-    return {"card": card, "summary": summarize(rows)}
+    return {"card": card, "summary": summary}
 @app.post("/api/cards/{card_id}/ai-rewrite/preview")
 def api_card_ai_rewrite_preview(card_id: str, payload: CardAiRewriteRequest) -> dict[str, Any]:
     try:

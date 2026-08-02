@@ -539,6 +539,30 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(cleared['memo'], '')
             self.assertEqual(cleared['memo_updated_at'], '')
 
+    def test_card_mutation_helpers_do_not_reload_whole_catalog(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            with mock.patch.object(flashcard_app, 'read_cards', side_effect=AssertionError('read_cards should not be used for card mutations')):
+                marked = mark_card('CS-001', 'O', csv_path, root / 'backups', db_path)
+                bookmarked = set_bookmark('CS-001', True, csv_path, db_path)
+                memoed = save_memo('CS-001', '단건 갱신 메모', csv_path, db_path)
+
+            self.assertEqual(marked['known_status'], 'O')
+            self.assertEqual(bookmarked['bookmarked'], '1')
+            self.assertEqual(memoed['memo'], '단건 갱신 메모')
+            with closing(sqlite3.connect(db_path)) as conn:
+                saved = conn.execute(
+                    'SELECT known_status, review_count, bookmarked, memo FROM card_progress WHERE card_id=?',
+                    ('CS-001',),
+                ).fetchone()
+            self.assertEqual(saved, ('O', 1, 1, '단건 갱신 메모'))
+
+
     def test_update_card_ai_content_updates_sqlite_content(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -888,6 +912,30 @@ class FlashcardProgressTests(unittest.TestCase):
             finally:
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.BACKUP_DIR = original_backup
+
+    def test_card_mutation_apis_do_not_reload_whole_catalog(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            try:
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                with mock.patch.object(flashcard_app, 'read_cards', side_effect=AssertionError('read_cards should not be used for card mutations')):
+                    marked = flashcard_app.api_mark('CS-001', flashcard_app.MarkRequest(known_status='O'))
+                    bookmarked = flashcard_app.api_bookmark('CS-001', flashcard_app.BookmarkRequest(bookmarked=True))
+                    memoed = flashcard_app.api_memo('CS-001', flashcard_app.MemoRequest(memo='API 메모'))
+                self.assertEqual(marked['card']['known_status'], 'O')
+                self.assertEqual(marked['summary']['known'], 1)
+                self.assertEqual(marked['summary']['unreviewed'], 0)
+                self.assertEqual(bookmarked['card']['bookmarked'], '1')
+                self.assertEqual(bookmarked['summary']['bookmarked'], 1)
+                self.assertEqual(memoed['card']['memo'], 'API 메모')
+                self.assertEqual(memoed['summary']['memo_count'], 1)
+            finally:
+                flashcard_app.PROGRESS_DB_PATH = original_db
 
     def test_api_card_ai_image_discard_removes_preview_file(self):
         with tempfile.TemporaryDirectory() as td:
