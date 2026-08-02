@@ -1046,6 +1046,111 @@ def connect_progress_db(progress_db_path: Path, *, must_exist: bool = False) -> 
 
 
 
+def _ensure_question_attempts_nullable_card_id(conn: sqlite3.Connection) -> None:
+    columns = conn.execute("PRAGMA table_info(question_attempts)").fetchall()
+    card_id_column = next((row for row in columns if row["name"] == "card_id"), None)
+    if card_id_column is None or not int(card_id_column["notnull"] or 0):
+        return
+    conn.commit()
+    conn.execute("PRAGMA foreign_keys=OFF")
+    try:
+        conn.execute(
+            """
+            CREATE TABLE question_attempts__migrated (
+                question_id TEXT PRIMARY KEY,
+                question_bank_id TEXT,
+                card_id TEXT,
+                question_type TEXT NOT NULL,
+                prompt TEXT NOT NULL DEFAULT '',
+                body TEXT NOT NULL DEFAULT '',
+                user_answer TEXT NOT NULL DEFAULT '',
+                selected_choice_index INTEGER,
+                is_correct INTEGER,
+                judgment TEXT NOT NULL DEFAULT 'pending',
+                wrong_note TEXT NOT NULL DEFAULT '',
+                session_id TEXT NOT NULL DEFAULT '',
+                session_title TEXT NOT NULL DEFAULT '',
+                session_mode TEXT NOT NULL DEFAULT 'practice',
+                section TEXT NOT NULL DEFAULT '',
+                points INTEGER,
+                expected_time_seconds INTEGER,
+                answer_guide TEXT NOT NULL DEFAULT '',
+                question_order INTEGER,
+                question_elapsed_seconds INTEGER,
+                session_elapsed_seconds INTEGER,
+                time_limit_seconds INTEGER,
+                question_started_at TEXT NOT NULL DEFAULT '',
+                answered_at TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE,
+                FOREIGN KEY(question_bank_id) REFERENCES question_bank(id) ON DELETE SET NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO question_attempts__migrated (
+                question_id, question_bank_id, card_id, question_type, prompt, body,
+                user_answer, selected_choice_index, is_correct, judgment, wrong_note,
+                session_id, session_title, session_mode, section, points,
+                expected_time_seconds, answer_guide, question_order,
+                question_elapsed_seconds, session_elapsed_seconds, time_limit_seconds,
+                question_started_at, answered_at, created_at, updated_at
+            )
+            SELECT
+                question_id,
+                question_bank_id,
+                NULLIF(TRIM(COALESCE(card_id, '')), ''),
+                question_type,
+                prompt,
+                body,
+                user_answer,
+                selected_choice_index,
+                is_correct,
+                judgment,
+                wrong_note,
+                session_id,
+                session_title,
+                session_mode,
+                section,
+                points,
+                expected_time_seconds,
+                answer_guide,
+                question_order,
+                question_elapsed_seconds,
+                session_elapsed_seconds,
+                time_limit_seconds,
+                question_started_at,
+                answered_at,
+                created_at,
+                updated_at
+            FROM question_attempts
+            """
+        )
+        conn.execute("DROP TABLE question_attempts")
+        conn.execute("ALTER TABLE question_attempts__migrated RENAME TO question_attempts")
+        conn.commit()
+    finally:
+        conn.execute("PRAGMA foreign_keys=ON")
+
+
+def _drop_empty_card_progress_sentinel(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        DELETE FROM card_progress
+        WHERE card_id = ''
+          AND COALESCE(known_status, '') = ''
+          AND COALESCE(last_reviewed, '') = ''
+          AND COALESCE(review_count, 0) = 0
+          AND COALESCE(bookmarked, 0) = 0
+          AND COALESCE(memo, '') = ''
+          AND COALESCE(memo_updated_at, '') = ''
+        """
+    )
+
+
+
 def ensure_progress_db(
     progress_db_path: Path,
     seed_rows: list[dict[str, Any]] | None = None,
@@ -1209,7 +1314,7 @@ def ensure_progress_db(
             CREATE TABLE IF NOT EXISTS question_attempts (
                 question_id TEXT PRIMARY KEY,
                 question_bank_id TEXT,
-                card_id TEXT NOT NULL,
+                card_id TEXT,
                 question_type TEXT NOT NULL,
                 prompt TEXT NOT NULL DEFAULT '',
                 body TEXT NOT NULL DEFAULT '',
@@ -1238,6 +1343,7 @@ def ensure_progress_db(
             )
             """
         )
+        _ensure_question_attempts_nullable_card_id(conn)
         question_columns = {row["name"] for row in conn.execute("PRAGMA table_info(question_attempts)").fetchall()}
         question_column_definitions = {
             "question_bank_id": "TEXT",
@@ -1263,6 +1369,7 @@ def ensure_progress_db(
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_bank_id ON question_attempts(question_bank_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
+        _drop_empty_card_progress_sentinel(conn)
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS wiki_ai_jobs (
@@ -5876,14 +5983,15 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                 card_id = linked_card_id
         if card_id:
             _ensure_card_exists(card_id, db_path)
-        conn.execute(
-            """
-            INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
-            VALUES (?, '', '', 0, 0, '', '', ?)
-            ON CONFLICT(card_id) DO NOTHING
-            """,
-            (card_id, now),
-        )
+            conn.execute(
+                """
+                INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
+                VALUES (?, '', '', 0, 0, '', '', ?)
+                ON CONFLICT(card_id) DO NOTHING
+                """,
+                (card_id, now),
+            )
+
         existing = conn.execute(
             "SELECT created_at, question_started_at FROM question_attempts WHERE question_id = ?",
             (question_id,),
@@ -5928,7 +6036,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
             (
                 question_id,
                 question_bank_id or None,
-                card_id,
+                card_id or None,
                 question_type,
                 str(payload.prompt or "")[:4000],
                 str(payload.body or "")[:12000],
