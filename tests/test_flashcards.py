@@ -1595,8 +1595,14 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app,
                 'read_cards',
                 side_effect=AssertionError('read_question_attempts should not reload all cards'),
-            ):
+            ), mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
                 history = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], limit=10)
+
+            self.assertEqual(connect_mock.call_count, 1)
 
             self.assertEqual(history['summary']['total'], 1)
             self.assertEqual(history['summary']['selected_card_count'], 1)
@@ -2819,18 +2825,24 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app,
                 'read_cards',
                 side_effect=AssertionError('read_question_bank_attempts should not reload all cards'),
-            ):
+            ), mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
                 review_all = flashcard_app.read_question_bank_attempts(
                     db_path,
                     question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
                     limit=10,
                 )
+                self.assertEqual(connect_mock.call_count, 1)
                 wrong_only = flashcard_app.read_question_bank_attempts(
                     db_path,
                     question_bank_ids=[first_question['question_bank_id'], second_question['question_bank_id']],
                     result='wrong',
                     limit=10,
                 )
+                self.assertEqual(connect_mock.call_count, 2)
 
             self.assertEqual(review_all['summary']['total'], 2)
             self.assertEqual(review_all['summary']['correct'], 1)
