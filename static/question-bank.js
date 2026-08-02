@@ -1380,7 +1380,7 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
   const currentId = String(bankState.practiceActiveId || '');
   if (bankState.practiceLoaded && targetId && targetId === currentId) {
     if (reveal) setPracticeCollapsed(false);
-    renderLaunchState();
+    ensureSelectedRowVisible();
     return false;
   }
   if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {

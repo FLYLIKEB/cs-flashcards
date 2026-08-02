@@ -793,8 +793,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 })
                 """
             )
-            self.assertEqual(case['same_target_reveal_counts']['renderTable'], 1)
-            self.assertEqual(case['same_target_reveal_counts']['renderPracticePane'], 1)
+            self.assertEqual(case['same_target_reveal_counts']['renderTable'], 0)
+            self.assertEqual(case['same_target_reveal_counts']['renderPracticePane'], 0)
 
             await page.evaluate('window.__questionBankRenderTableCalls = 0; window.__questionBankRenderPracticePaneCalls = 0;')
             await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
