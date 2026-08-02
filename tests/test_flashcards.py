@@ -650,25 +650,39 @@ class FlashcardProgressTests(unittest.TestCase):
 
             with mock.patch.object(
                 flashcard_app,
+                '_should_sync_ai_image_files_to_db',
+                return_value=(False, (False, 0), image_dir, 0),
+            ), mock.patch.object(
+                flashcard_app,
                 'read_cards',
                 side_effect=AssertionError('single-card helper should not materialize all cards'),
             ), mock.patch.object(
                 flashcard_app,
                 'read_card_content',
                 side_effect=AssertionError('single-card helper should not materialize all card content'),
-            ):
+            ), mock.patch.object(
+                flashcard_app,
+                'mark_ai_image_recovery_dirty',
+                wraps=flashcard_app.mark_ai_image_recovery_dirty,
+            ) as mark_dirty_mock, mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
                 updated_fields, backup_path = flashcard_app.update_card_content_fields(
                     'CS-001',
                     {'definition': '단건 정의'},
                     backup_dir,
                     db_path,
                 )
+                self.assertEqual(connect_mock.call_count, 1)
                 rewritten, rewrite_backup = flashcard_app.update_card_ai_content(
                     'CS-001',
                     flashcard_app.CardAiApplyRequest(exam_note='단건 AI 적용 포인트'),
                     backup_dir,
                     db_path,
                 )
+                self.assertEqual(connect_mock.call_count, 2)
                 concept_media, media_backup = flashcard_app.update_card_concept_media(
                     'CS-001',
                     flashcard_app.CardConceptMediaRequest(
@@ -679,6 +693,7 @@ class FlashcardProgressTests(unittest.TestCase):
                     backup_dir,
                     db_path,
                 )
+                self.assertEqual(connect_mock.call_count, 3)
                 applied_image, image_backup, image_url = flashcard_app.apply_ai_concept_image(
                     'CS-001',
                     flashcard_app.CardAiImageApplyRequest(preview_name=preview_name),
@@ -687,6 +702,7 @@ class FlashcardProgressTests(unittest.TestCase):
                     image_dir,
                     preview_dir,
                 )
+                self.assertEqual(connect_mock.call_count, 4)
 
             self.assertEqual(updated_fields['definition'], '단건 정의')
             self.assertIsNotNone(backup_path)
@@ -699,6 +715,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(applied_image['concept_media_type'], 'image')
             self.assertEqual(applied_image['concept_media_payload'], image_url)
             self.assertIsNotNone(image_backup)
+            self.assertEqual(mark_dirty_mock.call_count, 2)
             self.assertFalse((preview_dir / preview_name).exists())
 
     def test_rewrite_card_with_codex_parses_json_output(self):

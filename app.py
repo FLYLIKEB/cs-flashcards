@@ -1905,6 +1905,38 @@ def sync_ai_image_files_to_db(
 
 
 
+def _update_card_content_fields_on_connection(
+    progress_db_path: Path,
+    conn: sqlite3.Connection,
+    card_id: str,
+    updates: dict[str, str],
+    backup_dir: Path,
+    *,
+    target: dict[str, Any] | None = None,
+) -> tuple[dict[str, str], Path | None]:
+    normalized_card_id = normalize_question_bank_text(card_id, limit=255)
+    if not normalized_card_id:
+        raise KeyError(card_id)
+    current = dict(target) if target is not None else read_card(progress_db_path, normalized_card_id, conn=conn)
+    changed_updates: dict[str, str] = {}
+    for field, value in updates.items():
+        normalized = normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
+        if str(current.get(field) or "") != normalized:
+            changed_updates[field] = normalized
+    if not changed_updates:
+        return dict(current), None
+    backup_path = backup_progress_db(progress_db_path, backup_dir, conn=conn)
+    assignments = ", ".join(f"{field}=?" for field in changed_updates)
+    conn.execute(
+        f"UPDATE cards SET {assignments}, updated_at=? WHERE card_id=?",
+        [*changed_updates.values(), utc_now_iso(), normalized_card_id],
+    )
+    conn.commit()
+    if AI_IMAGE_RECOVERY_FIELDS.intersection(changed_updates):
+        mark_ai_image_recovery_dirty(progress_db_path)
+    return _read_card_on_connection(progress_db_path, conn, normalized_card_id, should_scan=False), backup_path
+
+
 def update_card_content_fields(
     card_id: str,
     updates: dict[str, str],
@@ -1912,38 +1944,29 @@ def update_card_content_fields(
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
     db_path = progress_db_for(progress_db_path)
-    ensure_progress_db(db_path)
-    sync_ai_image_files_to_db(db_path)
-
-    target = read_card(db_path, card_id)
-    changed_updates: dict[str, str] = {}
-    for field, value in updates.items():
-        normalized = normalized_card_text(value, limit=AI_CARD_FIELD_LIMITS[field])
-        if str(target.get(field) or "") != normalized:
-            changed_updates[field] = normalized
-    backup_path = backup_progress_db(db_path, backup_dir) if changed_updates else None
-    if changed_updates:
-        assignments = ", ".join(f"{field}=?" for field in changed_updates)
-        with closing(connect_progress_db(db_path)) as conn:
-            conn.execute(
-                f"UPDATE cards SET {assignments}, updated_at=? WHERE card_id=?",
-                [*changed_updates.values(), utc_now_iso(), card_id],
-            )
-            conn.commit()
-        if AI_IMAGE_RECOVERY_FIELDS.intersection(changed_updates):
-            mark_ai_image_recovery_dirty(db_path)
-        target.update(changed_updates)
-    return dict(target), backup_path
+    with closing(connect_progress_db(db_path)) as conn:
+        ensure_progress_db(db_path, conn=conn)
+        sync_ai_image_files_to_db(db_path, conn=conn)
+        return _update_card_content_fields_on_connection(db_path, conn, card_id, updates, backup_dir)
 
 
-def backup_progress_db(progress_db_path: Path = PROGRESS_DB_PATH, backup_dir: Path = BACKUP_DIR) -> Path | None:
+def backup_progress_db(
+    progress_db_path: Path = PROGRESS_DB_PATH,
+    backup_dir: Path = BACKUP_DIR,
+    *,
+    conn: sqlite3.Connection | None = None,
+) -> Path | None:
     if not progress_db_path.exists():
         return None
     backup_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     dest = backup_dir / f"{progress_db_path.stem}_{stamp}{progress_db_path.suffix}"
-    with closing(connect_progress_db(progress_db_path)) as source_conn, closing(sqlite3.connect(dest)) as dest_conn:
-        source_conn.backup(dest_conn)
+    with closing(sqlite3.connect(dest)) as dest_conn:
+        if conn is None:
+            with closing(connect_progress_db(progress_db_path)) as source_conn:
+                source_conn.backup(dest_conn)
+        else:
+            conn.backup(dest_conn)
     return dest
 
 
@@ -2348,25 +2371,17 @@ def update_card_ai_content(
     backup_dir: Path = BACKUP_DIR,
     progress_db_path: Path | None = None,
 ) -> tuple[dict[str, str], Path | None]:
-    db_path = progress_db_for(progress_db_path)
-    target = read_card(db_path, card_id)
-    updates = {
+    updates: dict[str, str] = {}
+    for field, value in {
         "definition": payload.definition,
         "detailed_explanation": payload.detailed_explanation,
         "exam_note": payload.exam_note,
         "concept_image_alt": payload.concept_image_alt,
-    }
-    changed_updates: dict[str, str] = {}
-    for field, value in updates.items():
+    }.items():
         if value is None:
             continue
-        normalized = normalized_card_text(value, limit=AI_REWRITE_FIELD_LIMITS[field])
-        if str(target.get(field, "")) != normalized:
-            changed_updates[field] = normalized
-    if not changed_updates:
-        return target, None
-    _, backup_path = update_card_content_fields(card_id, changed_updates, backup_dir, db_path)
-    return read_card(db_path, card_id), backup_path
+        updates[field] = normalized_card_text(value, limit=AI_REWRITE_FIELD_LIMITS[field])
+    return update_card_content_fields(card_id, updates, backup_dir, progress_db_path)
 
 
 def update_card_concept_media(
@@ -2389,8 +2404,7 @@ def update_card_concept_media(
         updates["concept_image_alt"] = normalized_card_text(payload.concept_image_alt, limit=AI_REWRITE_FIELD_LIMITS["concept_image_alt"])
     if media_type in {"image", "gif"} and media_payload:
         updates["concept_image_url"] = media_payload
-    _, backup_path = update_card_content_fields(card_id, updates, backup_dir, progress_db_path)
-    return read_card(progress_db_for(progress_db_path), card_id), backup_path
+    return update_card_content_fields(card_id, updates, backup_dir, progress_db_path)
 
 
 
@@ -2550,7 +2564,6 @@ def apply_ai_concept_image(
     preview_dir: Path = AI_IMAGE_PREVIEW_DIR,
 ) -> tuple[dict[str, str], Path | None, str]:
     db_path = progress_db_for(progress_db_path)
-    target = read_card(db_path, card_id)
     preview_path, metadata = read_ai_image_preview(payload.preview_name, preview_dir=preview_dir)
     if str(metadata.get("card_id") or "").strip() != card_id:
         raise ValueError("다른 카드용 AI 이미지 미리보기입니다.")
@@ -2560,13 +2573,19 @@ def apply_ai_concept_image(
     final_path = ai_image_file_path(image_root, final_name)
     shutil.copy2(preview_path, final_path)
     next_url = f"/api/ai-images/{final_name}"
-    next_alt = normalized_card_text(metadata.get("alt", concept_image_alt_text(target)), limit=4000)
-    _, backup_path = update_card_content_fields(
-        card_id,
-        {"concept_image_url": next_url, "concept_image_alt": next_alt, "concept_media_type": "image", "concept_media_payload": next_url},
-        backup_dir,
-        db_path,
-    )
+    with closing(connect_progress_db(db_path)) as conn:
+        ensure_progress_db(db_path, conn=conn)
+        sync_ai_image_files_to_db(db_path, conn=conn)
+        target = read_card(db_path, card_id, conn=conn)
+        next_alt = normalized_card_text(metadata.get("alt", concept_image_alt_text(target)), limit=4000)
+        updated_row, backup_path = _update_card_content_fields_on_connection(
+            db_path,
+            conn,
+            card_id,
+            {"concept_image_url": next_url, "concept_image_alt": next_alt, "concept_media_type": "image", "concept_media_payload": next_url},
+            backup_dir,
+            target=target,
+        )
     try:
         preview_path.unlink(missing_ok=True)
         preview_path.with_suffix(".json").unlink(missing_ok=True)
@@ -2577,7 +2596,7 @@ def apply_ai_concept_image(
         meta_path = preview_path.with_suffix(".json")
         if meta_path.exists():
             meta_path.unlink()
-    return read_card(db_path, card_id), backup_path, next_url
+    return updated_row, backup_path, next_url
 
 
 def discard_ai_concept_image_preview(
