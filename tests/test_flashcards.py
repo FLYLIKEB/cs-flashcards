@@ -931,6 +931,62 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(saved['attempt']['judgment'], 'wrong')
             self.assertTrue(db_path.exists())
 
+    def test_save_question_attempt_does_not_reload_full_card_set(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            with mock.patch.object(
+                flashcard_app,
+                'read_cards',
+                side_effect=AssertionError('save_question_attempt should not reload all cards'),
+            ):
+                saved = flashcard_app.save_question_attempt(
+                    flashcard_app.QuestionAttemptRequest(
+                        question_id='q-CS-001-no-full-read',
+                        card_id='CS-001',
+                        question_type='short',
+                        prompt='설명에 해당하는 개념은?',
+                        body='정의',
+                        user_answer='검증',
+                        judgment='wrong',
+                        wrong_note='전체 카드 재조회 없이 저장',
+                    ),
+                    db_path,
+                )
+
+            self.assertEqual(saved['attempt']['card_id'], 'CS-001')
+            self.assertEqual(saved['attempt']['judgment'], 'wrong')
+            self.assertIsNone(saved['card'])
+            rows, _ = read_cards(csv_path, db_path)
+            self.assertEqual(rows[0]['question_attempt_count'], 1)
+            self.assertEqual(rows[0]['question_wrong_count'], 1)
+            self.assertEqual(rows[0]['latest_wrong_note'], '전체 카드 재조회 없이 저장')
+
+    def test_ensure_card_exists_uses_targeted_lookup_without_read_cards(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            with mock.patch.object(
+                flashcard_app,
+                'read_cards',
+                side_effect=AssertionError('_ensure_card_exists should not materialize all cards'),
+            ):
+                card = flashcard_app._ensure_card_exists('CS-001', db_path)
+                with self.assertRaises(KeyError):
+                    flashcard_app._ensure_card_exists('CS-404', db_path)
+
+            self.assertEqual(card['id'], 'CS-001')
+            self.assertEqual(card['category'], '소프트웨어공학')
+            self.assertEqual(card['question_attempt_count'], 0)
+
     def test_mark_card_survives_csv_replacement(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
