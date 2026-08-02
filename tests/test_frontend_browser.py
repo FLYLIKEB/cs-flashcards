@@ -494,6 +494,10 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 const url = typeof input === 'string' ? input : input.url;
                 const parsed = new URL(url, window.location.origin);
                 if (parsed.pathname !== routePath) return originalFetch(input, init);
+                window.__testRouteFetchLog = window.__testRouteFetchLog || {};
+                const bucket = Array.isArray(window.__testRouteFetchLog[routePath]) ? window.__testRouteFetchLog[routePath] : [];
+                bucket.push({key: parsed.searchParams.get(keyParam) || '', url: parsed.toString(), at: Date.now()});
+                window.__testRouteFetchLog[routePath] = bucket;
                 const key = parsed.searchParams.get(keyParam) || '';
                 const config = responses[key];
                 if (!config) return originalFetch(input, init);
@@ -510,6 +514,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             """,
             {'routePath': route_path, 'keyParam': key_param, 'responses': responses},
         )
+
 
     async def set_input_value(self, page, selector: str, value: str, *, submit: bool = False) -> None:
         await page.evaluate(
@@ -2409,6 +2414,76 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         finally:
             self.record_case(case_id='embedded-question-bank-filter-reload', status=status, observations=case)
             await page.close()
+    async def test_embedded_question_bank_text_filters_debounce_requests(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.click('#questionBankToggleBtn')
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await page.waitForFunction("document.querySelectorAll('#questionBankList tr').length > 0")
+            await self.install_delayed_json_route(
+                page,
+                route_path='/api/question-bank',
+                key_param='q',
+                responses={
+                    'a': {'delayMs': 0, 'payload': self.question_bank_payload('a')},
+                    'al': {'delayMs': 0, 'payload': self.question_bank_payload('al')},
+                    'alpha': {'delayMs': 0, 'payload': self.question_bank_payload('alpha')},
+                },
+            )
+            await self.set_input_value(page, '#questionBankQueryInput', 'a')
+            await self.set_input_value(page, '#questionBankQueryInput', 'al')
+            await self.set_input_value(page, '#questionBankQueryInput', 'alpha')
+            await asyncio.sleep(0.08)
+            case['fetch_count_before_debounce'] = await page.evaluate("() => (window.__testRouteFetchLog?.['/api/question-bank'] || []).length")
+            self.assertEqual(case['fetch_count_before_debounce'], 0)
+            await page.waitForFunction("(window.__testRouteFetchLog?.['/api/question-bank'] || []).length === 1")
+            await page.waitForFunction("document.querySelector('#questionBankList').textContent.includes('alpha prompt')")
+            await asyncio.sleep(0.25)
+            case['fetch_log'] = await page.evaluate("() => (window.__testRouteFetchLog?.['/api/question-bank'] || []).map((entry) => entry.key)")
+            case['question_bank_text'] = await self.text(page, '#questionBankList')
+            self.assertEqual(case['fetch_log'], ['alpha'])
+            self.assertIn('alpha prompt', case['question_bank_text'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='embedded-question-bank-filter-debounce', status=status, observations=case)
+            await page.close()
+
+    async def test_embedded_question_bank_enter_triggers_immediate_refresh(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.click('#questionBankToggleBtn')
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await page.waitForFunction("document.querySelectorAll('#questionBankList tr').length > 0")
+            await self.install_delayed_json_route(
+                page,
+                route_path='/api/question-bank',
+                key_param='q',
+                responses={
+                    'enter-now': {'delayMs': 0, 'payload': self.question_bank_payload('enter-now')},
+                },
+            )
+            await self.set_input_value(page, '#questionBankQueryInput', 'enter-now', submit=True)
+            await asyncio.sleep(0.08)
+            case['fetch_count_before_debounce'] = await page.evaluate("() => (window.__testRouteFetchLog?.['/api/question-bank'] || []).length")
+            self.assertEqual(case['fetch_count_before_debounce'], 1)
+            await asyncio.sleep(0.25)
+            case['fetch_log'] = await page.evaluate("() => (window.__testRouteFetchLog?.['/api/question-bank'] || []).map((entry) => entry.key)")
+            self.assertEqual(case['fetch_log'], ['enter-now'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='embedded-question-bank-enter-refresh', status=status, observations=case)
+            await page.close()
+
     async def test_embedded_question_bank_and_history_reject_stale_responses(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
