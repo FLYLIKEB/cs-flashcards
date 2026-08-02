@@ -1,55 +1,31 @@
 {
-  "checked_at": "2026-08-02T18:36:53Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T18:39:10Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 1,
-    "open_pr_count": 1,
-    "blocking_worktree_count": 1,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 170,
-      "state": "OPEN",
-      "title": "문제 풀이 선지·채점 버튼에 선택 상태 접근성 노출 추가",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/170"
-    }
-  ],
-  "open_prs": [
-    {
-      "number": 173,
-      "title": "Issue 170: 문제 풀이 선지·채점 버튼 선택 상태 접근성 노출",
-      "headRefName": "issue-170-question-controls-a11y",
-      "baseRefName": "main",
-      "reviewDecision": "",
-      "mergeStateStatus": "UNSTABLE",
-      "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/173"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-170",
-      "branch": "issue-170-question-controls-a11y",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
+    {
+      "issue": 170,
+      "pr": 173,
+      "merge_commit": "c0eac8636c573388912378f2ed2986ead8040a31"
+    },
     {
       "issue": 171,
       "pr": 172,
       "merge_commit": "b25772a0aeb5342b8c97aec55c50e62e816a46a7"
-    },
-    {
-      "issue": 168,
-      "pr": 169,
-      "merge_commit": "b2121b5c53e28c4869915dbed9f08505bcb2f592"
     }
   ],
   "notes": [
-    "PR #173 is the active review lane for round 33.",
-    "Issue #171 / PR #172 is merged and no longer blocks the round.",
-    "The next readiness-open state depends solely on finishing #170 / PR #173."
+    "Issue #170 / PR #173 is merged and cleaned up.",
+    "Issue #171 / PR #172 is merged and cleaned up.",
+    "The next optimization round may start immediately."
   ]
 }

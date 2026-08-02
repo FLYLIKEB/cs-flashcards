@@ -1,15 +1,14 @@
 {
-  "generated_at": "2026-08-02T18:36:53Z",
+  "generated_at": "2026-08-02T18:39:10Z",
   "wave": "2026-08-02-round-33",
-  "queue": [
+  "queue": [],
+  "completed": [
     {
       "issue": 170,
-      "title": "문제 풀이 선지·채점 버튼에 선택 상태 접근성 노출 추가",
+      "pr": 173,
       "branch": "issue-170-question-controls-a11y",
-      "status": "pr_open_review_pending"
-    }
-  ],
-  "completed": [
+      "status": "merged"
+    },
     {
       "issue": 171,
       "pr": 172,
