@@ -646,6 +646,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
 
             await page.click('#openQuestionImportBtn')
             await page.waitForFunction("document.querySelector('#questionImportDialog').hidden === false")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'questionImportInput'")
             case['question_import_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['question_import_focus_on_open'], 'questionImportInput')
 
