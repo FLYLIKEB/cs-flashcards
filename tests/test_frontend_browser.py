@@ -465,6 +465,14 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.evaluateOnNewDocument(script, local_storage)
         return page
 
+    async def wait_for_embed_frame(self, page, url_part: str = 'question-bank-embed=1'):
+        for _ in range(60):
+            for frame in page.frames:
+                if url_part in frame.url:
+                    return frame
+            await asyncio.sleep(0.05)
+        self.fail(f'Embed frame containing {url_part!r} did not appear.')
+
     async def text(self, page, selector: str) -> str:
         return await page.Jeval(selector, '(node) => (node.textContent || "").trim()')
 
@@ -1169,7 +1177,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelectorAll('#bankPageList tbody tr').length === 2")
             await page.click('#bankPageLaunchBtn')
             await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
-            embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            embed_frame = await self.wait_for_embed_frame(page)
 
             await embed_frame.click('[data-choice-index="0"]')
             await embed_frame.click('[data-question-nav="next"]')
@@ -1267,7 +1275,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelectorAll('#bankPageList tbody tr').length === 2")
             await page.click('#bankPageLaunchBtn')
             await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
-            embed_frame = next(frame for frame in page.frames if 'question-bank-embed=1' in frame.url)
+            embed_frame = await self.wait_for_embed_frame(page)
 
             await embed_frame.click('[data-choice-index="0"]')
             await embed_frame.click('[data-question-nav="next"]')
