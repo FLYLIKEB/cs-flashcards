@@ -784,6 +784,86 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='main-symbolic-button-a11y', status=status, observations=case)
             await page.close()
 
+    async def test_main_filter_and_history_toggles_expose_pressed_state(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#bookmarkFilterBtn')
+            case['bookmark_initial'] = await self.attr(page, '#bookmarkFilterBtn', 'aria-pressed')
+            self.assertEqual(case['bookmark_initial'], 'false')
+            await page.evaluate("document.querySelector('#bookmarkFilterBtn').click()")
+            await page.waitForFunction("document.querySelector('#bookmarkFilterBtn').getAttribute('aria-pressed') === 'true'")
+            case['bookmark_after_click'] = await self.attr(page, '#bookmarkFilterBtn', 'aria-pressed')
+            self.assertEqual(case['bookmark_after_click'], 'true')
+
+            case['status_initial'] = await page.evaluate(
+                """
+                () => ({
+                  all: document.querySelector('#filterAllBtn')?.getAttribute('aria-pressed') || '',
+                  known: document.querySelector('#filterKnownBtn')?.getAttribute('aria-pressed') || '',
+                  unknown: document.querySelector('#filterUnknownBtn')?.getAttribute('aria-pressed') || '',
+                  unreviewed: document.querySelector('#filterUnreviewedBtn')?.getAttribute('aria-pressed') || '',
+                })
+                """
+            )
+            self.assertEqual(case['status_initial']['all'], 'true')
+            self.assertEqual(case['status_initial']['known'], 'false')
+            self.assertEqual(case['status_initial']['unknown'], 'false')
+            self.assertEqual(case['status_initial']['unreviewed'], 'false')
+
+            await page.evaluate("document.querySelector('#filterUnknownBtn').click()")
+            await page.waitForFunction("document.querySelector('#filterUnknownBtn').getAttribute('aria-pressed') === 'true'")
+            case['status_after_unknown'] = await page.evaluate(
+                """
+                () => ({
+                  all: document.querySelector('#filterAllBtn')?.getAttribute('aria-pressed') || '',
+                  known: document.querySelector('#filterKnownBtn')?.getAttribute('aria-pressed') || '',
+                  unknown: document.querySelector('#filterUnknownBtn')?.getAttribute('aria-pressed') || '',
+                  unreviewed: document.querySelector('#filterUnreviewedBtn')?.getAttribute('aria-pressed') || '',
+                })
+                """
+            )
+            self.assertEqual(case['status_after_unknown']['all'], 'false')
+            self.assertEqual(case['status_after_unknown']['known'], 'false')
+            self.assertEqual(case['status_after_unknown']['unknown'], 'true')
+            self.assertEqual(case['status_after_unknown']['unreviewed'], 'false')
+
+            await page.evaluate("document.querySelector('#questionHistoryBtn').click()")
+            await page.waitForFunction("document.querySelector('#questionHistoryDialog').hidden === false")
+            case['history_initial'] = await page.evaluate(
+                """
+                () => ({
+                  all: document.querySelector('[data-question-history-filter="all"]')?.getAttribute('aria-pressed') || '',
+                  correct: document.querySelector('[data-question-history-filter="correct"]')?.getAttribute('aria-pressed') || '',
+                  wrong: document.querySelector('[data-question-history-filter="wrong"]')?.getAttribute('aria-pressed') || '',
+                })
+                """
+            )
+            self.assertEqual(case['history_initial']['all'], 'true')
+            self.assertEqual(case['history_initial']['correct'], 'false')
+            self.assertEqual(case['history_initial']['wrong'], 'false')
+
+            await page.evaluate("document.querySelector('[data-question-history-filter=\"wrong\"]').click()")
+            await page.waitForFunction("document.querySelector('[data-question-history-filter=\"wrong\"]').getAttribute('aria-pressed') === 'true'")
+            case['history_after_wrong'] = await page.evaluate(
+                """
+                () => ({
+                  all: document.querySelector('[data-question-history-filter="all"]')?.getAttribute('aria-pressed') || '',
+                  correct: document.querySelector('[data-question-history-filter="correct"]')?.getAttribute('aria-pressed') || '',
+                  wrong: document.querySelector('[data-question-history-filter="wrong"]')?.getAttribute('aria-pressed') || '',
+                })
+                """
+            )
+            self.assertEqual(case['history_after_wrong']['all'], 'false')
+            self.assertEqual(case['history_after_wrong']['correct'], 'false')
+            self.assertEqual(case['history_after_wrong']['wrong'], 'true')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='main-filter-toggle-pressed-state', status=status, observations=case)
+            await page.close()
+
     async def test_filter_inputs_expose_explicit_accessible_names(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
