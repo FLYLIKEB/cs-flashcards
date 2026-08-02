@@ -1364,11 +1364,15 @@ function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
   launch(startIndex, {reveal}).catch(() => {});
 }
 
+function renderLaunchState() {
+  renderTable();
+  ensureSelectedRowVisible();
+  renderPracticePane();
+}
 async function launch(startIndex = 0, {reveal = true} = {}) {
   if (!bankState.items.length) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
-    renderTable();
-    renderPracticePane();
+    renderLaunchState();
     return false;
   }
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
@@ -1377,14 +1381,11 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
   if (bankState.practiceLoaded && targetId && targetId === currentId) {
     if (reveal) setPracticeCollapsed(false);
     ensureSelectedRowVisible();
-    renderTable();
-    renderPracticePane();
     return false;
   }
   if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {
     bankState.error = '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.';
-    renderTable();
-    renderPracticePane();
+    renderLaunchState();
     return false;
   }
   pendingPracticeLaunch = bankState.loading
@@ -1400,9 +1401,7 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
   persistFilterState();
   restartPracticeFrame(safeStart, null);
   bankState.error = '';
-  renderTable();
-  ensureSelectedRowVisible();
-  renderPracticePane();
+  renderLaunchState();
   return true;
 }
 async function loadQuestionBankPage() {

@@ -727,6 +727,96 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         finally:
             self.record_case(case_id='concept-image-modal-focus', status=status, observations=case)
             await page.close()
+    async def test_question_bank_launch_path_avoids_duplicate_full_renders(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                () => {
+                  window.__questionBankRenderTableCalls = 0;
+                  window.__questionBankRenderPracticePaneCalls = 0;
+                  const wrapRenderFns = () => {
+                    const originalRenderTable = window.renderTable;
+                    if (typeof originalRenderTable === 'function' && !originalRenderTable.__wrappedQuestionBankCounter) {
+                      const wrappedRenderTable = (...args) => {
+                        window.__questionBankRenderTableCalls += 1;
+                        return originalRenderTable(...args);
+                      };
+                      wrappedRenderTable.__wrappedQuestionBankCounter = true;
+                      window.renderTable = wrappedRenderTable;
+                    }
+                    const originalRenderPracticePane = window.renderPracticePane;
+                    if (typeof originalRenderPracticePane === 'function' && !originalRenderPracticePane.__wrappedQuestionBankCounter) {
+                      const wrappedRenderPracticePane = (...args) => {
+                        window.__questionBankRenderPracticePaneCalls += 1;
+                        return originalRenderPracticePane(...args);
+                      };
+                      wrappedRenderPracticePane.__wrappedQuestionBankCounter = true;
+                      window.renderPracticePane = wrappedRenderPracticePane;
+                    }
+                  };
+                  document.addEventListener('DOMContentLoaded', () => {
+                    window.setTimeout(wrapRenderFns, 0);
+                  }, {once: true});
+                }
+                """
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.waitForFunction("typeof window.renderTable === 'function' && window.renderTable.__wrappedQuestionBankCounter === true")
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.evaluate('window.__questionBankRenderTableCalls = 0; window.__questionBankRenderPracticePaneCalls = 0;')
+            await page.evaluate('document.querySelector("#bankPageLaunchBtn")?.click()')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            case['initial_launch_counts'] = await page.evaluate(
+                """
+                () => ({
+                  renderTable: window.__questionBankRenderTableCalls,
+                  renderPracticePane: window.__questionBankRenderPracticePaneCalls,
+                })
+                """
+            )
+            self.assertEqual(case['initial_launch_counts']['renderTable'], 1)
+            self.assertEqual(case['initial_launch_counts']['renderPracticePane'], 1)
+
+            await page.evaluate('window.__questionBankRenderTableCalls = 0; window.__questionBankRenderPracticePaneCalls = 0;')
+            await page.evaluate('document.querySelector("#bankPageLaunchBtn")?.click()')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-practice-collapsed')")
+            case['same_target_reveal_counts'] = await page.evaluate(
+                """
+                () => ({
+                  renderTable: window.__questionBankRenderTableCalls,
+                  renderPracticePane: window.__questionBankRenderPracticePaneCalls,
+                })
+                """
+            )
+            self.assertEqual(case['same_target_reveal_counts']['renderTable'], 0)
+            self.assertEqual(case['same_target_reveal_counts']['renderPracticePane'], 0)
+
+            await page.evaluate('window.__questionBankRenderTableCalls = 0; window.__questionBankRenderPracticePaneCalls = 0;')
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
+            await page.waitForFunction(
+                '(counts) => window.__questionBankRenderTableCalls >= counts.table && window.__questionBankRenderPracticePaneCalls >= counts.pane',
+                {},
+                {'table': 1, 'pane': 1},
+            )
+            case['row_change_counts'] = await page.evaluate(
+                """
+                () => ({
+                  renderTable: window.__questionBankRenderTableCalls,
+                  renderPracticePane: window.__questionBankRenderPracticePaneCalls,
+                })
+                """
+            )
+            self.assertEqual(case['row_change_counts']['renderTable'], 1)
+            self.assertEqual(case['row_change_counts']['renderPracticePane'], 1)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-launch-render-dedupe', status=status, observations=case)
+            await page.close()
     async def test_question_bank_page_loads_filters_and_launches_embedded_practice(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
