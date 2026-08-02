@@ -1,13 +1,19 @@
 {
-  "checked_at": "2026-08-02T20:24:30Z",
+  "checked_at": "2026-08-02T20:27:02Z",
   "gate_open": false,
   "summary": {
-    "open_issue_count": 1,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 1,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
   "open_issues": [
+    {
+      "number": 187,
+      "state": "OPEN",
+      "title": "save_question_attempt 초기 스키마 보장에서 남아 있는 중복 SQLite 재연결 제거",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/187"
+    },
     {
       "number": 186,
       "state": "OPEN",
@@ -21,6 +27,11 @@
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-186",
       "branch": "issue-186-bookmark-filter-focus-return",
       "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-187",
+      "branch": "issue-187-save-attempt-single-connection",
+      "status": "tracked-branch-worktree"
     }
   ],
   "reusable_backlog": [],
@@ -32,7 +43,6 @@
     }
   ],
   "notes": [
-    "Round 37 frontend candidate accepted and issue #186 opened.",
-    "Round 37 backend audit retry is still pending."
+    "Round 37 frontend issue #186 and backend issue #187 are the active lanes."
   ]
 }

@@ -1,11 +1,17 @@
 {
-  "generated_at": "2026-08-02T20:24:30Z",
+  "generated_at": "2026-08-02T20:27:02Z",
   "wave": "2026-08-02-round-37",
   "queue": [
     {
       "issue": 186,
       "title": "헤더 메뉴의 북마크 필터 토글 후 포커스 복귀 누락",
       "branch": "issue-186-bookmark-filter-focus-return",
+      "status": "implementation_in_progress"
+    },
+    {
+      "issue": 187,
+      "title": "save_question_attempt 초기 스키마 보장에서 남아 있는 중복 SQLite 재연결 제거",
+      "branch": "issue-187-save-attempt-single-connection",
       "status": "implementation_in_progress"
     }
   ],
