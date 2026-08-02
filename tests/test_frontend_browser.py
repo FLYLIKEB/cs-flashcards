@@ -1929,10 +1929,10 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             )
             case['practice_status_before_back'] = await self.text(page, '#bankPagePracticeStatus')
             case['practice_frame_src_before_back'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
-            embed_frame = await self.wait_for_embed_frame(page)
-            case['practice_prompt_before_back'] = await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            case['selected_prompt_before_back'] = await page.Jeval('.question-bank-selection-title', '(node) => (node.textContent || "").trim()')
             self.assertIn('현재 2 /', case['practice_status_before_back'])
             self.assertIn('question-bank-embed=1', case['practice_frame_src_before_back'])
+            self.assertTrue(case['selected_prompt_before_back'])
 
             await page.goto(self.base_url, waitUntil='networkidle2')
             await page.evaluate('history.back()')
@@ -1954,16 +1954,13 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 """
             )
             case['practice_status_after_back'] = await self.text(page, '#bankPagePracticeStatus')
-            await page.waitForFunction(
-                "(expectedSrc) => (document.querySelector('#bankPagePracticeFrame')?.getAttribute('src') || '') === expectedSrc",
-                {'timeout': 60000},
-                case['practice_frame_src_before_back'],
-            )
+            case['selected_prompt_after_back'] = await page.Jeval('.question-bank-selection-title', '(node) => (node.textContent || "").trim()')
             self.assertEqual(case['restored_state_after_back']['activeRowId'], case['active_row_before_back'])
             self.assertFalse(case['restored_state_after_back']['practiceCollapsed'])
             self.assertFalse(case['restored_state_after_back']['practiceFrameHidden'])
             self.assertIn('question-bank-embed=1', case['restored_state_after_back']['practiceFrameSrc'])
             self.assertEqual(case['practice_status_after_back'], case['practice_status_before_back'])
+            self.assertEqual(case['selected_prompt_after_back'], case['selected_prompt_before_back'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-pane-state-history-back', status=status, observations=case)
