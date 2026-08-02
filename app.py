@@ -1494,6 +1494,82 @@ def read_cards(progress_db_path: Path | None = None) -> tuple[list[dict[str, str
     rows = merge_progress(card_rows, read_progress(db_path), read_question_attempt_stats(db_path))
     return rows, fieldnames
 
+def read_card(progress_db_path: Path | None, card_id: Any) -> dict[str, Any]:
+    normalized_card_id = normalize_question_bank_text(card_id, limit=255)
+    if not normalized_card_id:
+        raise KeyError(card_id)
+    db_path = progress_db_for(progress_db_path)
+    ensure_progress_db(db_path, must_exist=True)
+    sync_ai_image_files_to_db(db_path)
+    select_fields = ["card_id", *CARD_CONTENT_DB_COLUMNS]
+    with closing(connect_progress_db(db_path, must_exist=True)) as conn:
+        row = conn.execute(
+            f"SELECT {', '.join(select_fields)} FROM cards WHERE card_id = ?",
+            (normalized_card_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(normalized_card_id)
+        item = {"id": row["card_id"] or ""}
+        for field in CARD_CONTENT_DB_COLUMNS:
+            item[field] = row[field] or ""
+        item["concept_image_url"] = normalized_runtime_media_url(item.get("concept_image_url"))
+        media_type = normalized_concept_media_type(item.get("concept_media_type")) if item.get("concept_media_type") else ""
+        if media_type in {"image", "gif", "video"}:
+            item["concept_media_payload"] = normalized_runtime_media_url(item.get("concept_media_payload"))
+        progress_row = conn.execute(
+            """
+            SELECT known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at
+            FROM card_progress
+            WHERE card_id = ?
+            """,
+            (normalized_card_id,),
+        ).fetchone()
+        if progress_row is not None:
+            item.update({
+                "known_status": progress_row["known_status"] if progress_row["known_status"] in VALID_STATUSES else "",
+                "last_reviewed": progress_row["last_reviewed"] or "",
+                "review_count": normalized_review_count(str(progress_row["review_count"])),
+                "bookmarked": normalized_bookmarked(progress_row["bookmarked"]),
+                "memo": progress_row["memo"] or "",
+                "memo_updated_at": progress_row["memo_updated_at"] or "",
+            })
+        stats_row = conn.execute(
+            """
+            SELECT
+                COUNT(*) AS question_attempt_count,
+                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS question_correct_count,
+                SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS question_wrong_count
+            FROM question_attempts
+            WHERE card_id = ?
+            """,
+            (normalized_card_id,),
+        ).fetchone()
+        item["question_attempt_count"] = int(stats_row["question_attempt_count"] or 0) if stats_row else 0
+        item["question_correct_count"] = int(stats_row["question_correct_count"] or 0) if stats_row else 0
+        item["question_wrong_count"] = int(stats_row["question_wrong_count"] or 0) if stats_row else 0
+        latest_wrong_note_row = conn.execute(
+            """
+            SELECT wrong_note, updated_at
+            FROM question_attempts
+            WHERE card_id = ?
+              AND judgment IN ('ambiguous', 'wrong', 'unknown')
+              AND TRIM(COALESCE(wrong_note, '')) <> ''
+            ORDER BY updated_at DESC, created_at DESC, question_id DESC
+            LIMIT 1
+            """,
+            (normalized_card_id,),
+        ).fetchone()
+    item["known_status"] = item.get("known_status") or ""
+    item["last_reviewed"] = item.get("last_reviewed") or ""
+    item["review_count"] = normalized_review_count(item.get("review_count"))
+    item["bookmarked"] = normalized_bookmarked(item.get("bookmarked"))
+    item["memo"] = item.get("memo") or ""
+    item["memo_updated_at"] = item.get("memo_updated_at") or ""
+    item["latest_wrong_note"] = latest_wrong_note_row["wrong_note"] or "" if latest_wrong_note_row else ""
+    item["latest_wrong_note_updated_at"] = latest_wrong_note_row["updated_at"] or "" if latest_wrong_note_row else ""
+    return item
+
+
 
 
 def runtime_ai_image_url(name: str) -> str:
@@ -1649,9 +1725,7 @@ def mark_card(
 
 
 def _ensure_card_exists(card_id: str, progress_db_path: Path | None = None) -> None:
-    rows, _ = read_cards(progress_db_path)
-    if not any(row.get("id") == card_id for row in rows):
-        raise KeyError(card_id)
+    read_card(progress_db_path, card_id)
 
 
 def set_bookmark(
@@ -2379,12 +2453,7 @@ def _ensure_card_exists(
     if not normalized_card_id:
         raise KeyError(card_id)
     if card_map is None:
-        rows, _ = read_cards(progress_db_path)
-        card_map = {
-            normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255): row
-            for row in rows
-            if normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255)
-        }
+        return read_card(progress_db_path, normalized_card_id)
     card = card_map.get(normalized_card_id)
     if not isinstance(card, dict) or not card:
         raise KeyError(normalized_card_id)
@@ -5693,15 +5762,10 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
             (question_id,),
         ).fetchone()
 
-    updated_card = None
-    if card_id:
-        updated_rows, _ = read_cards(db_path)
-        updated_card = next((row for row in updated_rows if row.get("id") == card_id), None)
-        if updated_card is None:
-            raise KeyError(card_id)
+    refreshed_card = read_card(db_path, card_id) if card_id else None
     return {
         "attempt": question_attempt_row_to_dict(saved),
-        "card": updated_card,
+        "card": refreshed_card,
     }
 
 
