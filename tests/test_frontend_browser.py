@@ -1603,12 +1603,13 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
             await page.click('#questionBankToggleBtn')
             await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
-            await page.waitForFunction("document.querySelectorAll('#questionBankList tbody tr').length > 0")
+            await page.waitForFunction("document.querySelectorAll('#questionBankList tr').length > 0")
             await self.set_input_value(page, '#questionBankQueryInput', self.difficulty_regression_prompt)
             await page.select('#questionBankAttemptStatusSelect', 'unseen')
             await page.waitForFunction(
-                "document.querySelector('#questionBankQueryInput').value === value && document.querySelector('#questionBankAttemptStatusSelect').value === 'unseen' && window.location.search.includes('q=') && window.location.search.includes('attempt_status=unseen')",
-                {'value': self.difficulty_regression_prompt},
+                "(value) => document.querySelector('#questionBankQueryInput').value === value && document.querySelector('#questionBankAttemptStatusSelect').value === 'unseen' && window.location.search.includes('q=') && window.location.search.includes('attempt_status=unseen')",
+                {},
+                self.difficulty_regression_prompt,
             )
             case['url_after_filter'] = await page.evaluate('window.location.search')
             self.assertIn('attempt_status=unseen', case['url_after_filter'])
@@ -1618,8 +1619,9 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
             await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
             await page.waitForFunction(
-                "document.querySelector('#questionBankQueryInput').value === value && document.querySelector('#questionBankAttemptStatusSelect').value === 'unseen'",
-                {'value': self.difficulty_regression_prompt},
+                "(value) => document.querySelector('#questionBankQueryInput').value === value && document.querySelector('#questionBankAttemptStatusSelect').value === 'unseen'",
+                {},
+                self.difficulty_regression_prompt,
             )
             case['query_after_reload'] = await page.Jeval('#questionBankQueryInput', '(node) => node.value')
             case['attempt_status_after_reload'] = await page.Jeval('#questionBankAttemptStatusSelect', '(node) => node.value')
