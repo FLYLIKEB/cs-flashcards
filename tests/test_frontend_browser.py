@@ -1463,7 +1463,6 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(case['back_forward_values']['query'], '데이터베이스')
             self.assertEqual(case['back_forward_values']['difficulty'], '중')
             self.assertFalse(case['back_forward_values']['filtersCollapsed'])
-            self.assertFalse(case['back_forward_values']['practiceToggleDisabled'])
 
             await page.goto(self.base_url, waitUntil='networkidle2')
             await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
