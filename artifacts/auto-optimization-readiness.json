@@ -1,15 +1,39 @@
 {
-  "checked_at": "2026-08-02T21:09:30Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T21:13:44Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 195,
+      "state": "OPEN",
+      "title": "접힌 듣기 설정 패널이 키보드 포커스와 스크린리더에서 숨겨지지 않음",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/195"
+    },
+    {
+      "number": 194,
+      "state": "OPEN",
+      "title": "카드별 문제 시도 히스토리 조회에 복합 인덱스가 없어 누적 데이터에서 정렬 비용이 커짐",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/194"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-194",
+      "branch": "issue-194-card-attempt-latest-index",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-195",
+      "branch": "issue-195-controls-panel-hidden",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,6 +48,6 @@
     }
   ],
   "notes": [
-    "Round 38 PRs #192 and #193 merged; readiness gate reopened."
+    "Round 39 issues #194 and #195 opened; implementation running in separate worktrees."
   ]
 }

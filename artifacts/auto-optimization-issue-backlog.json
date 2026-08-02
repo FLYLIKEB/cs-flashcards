@@ -1,27 +1,23 @@
 {
-  "generated_at": "2026-08-02T21:09:30Z",
-  "wave": "2026-08-02-round-38",
-  "queue": [],
-  "completed": [
+  "generated_at": "2026-08-02T21:13:44Z",
+  "wave": "2026-08-02-round-39",
+  "queue": [
     {
-      "issue": 190,
-      "title": "문제은행 전용 페이지 URL 동기화가 해시 딥링크를 지우지 않도록 수정",
-      "branch": "issue-190-question-bank-hash-sync",
-      "pr": 192,
-      "status": "merged",
-      "merge_commit": "6e9eba8f5cfd036a333d2672055e011a0144ecbc",
-      "merged_at": "2026-08-02T21:04:12Z"
+      "issue": 194,
+      "title": "카드별 문제 시도 히스토리 조회에 복합 인덱스가 없어 누적 데이터에서 정렬 비용이 커짐",
+      "branch": "issue-194-card-attempt-latest-index",
+      "pr": null,
+      "status": "implementation_running"
     },
     {
-      "issue": 191,
-      "title": "읽기/풀이 요청마다 문제은행 전체 백필을 다시 돌리지 않기",
-      "branch": "issue-191-question-bank-backfill-gate",
-      "pr": 193,
-      "status": "merged",
-      "merge_commit": "7905101b78ad17bee20e4fe3e80322e9b079c629",
-      "merged_at": "2026-08-02T21:08:51Z"
+      "issue": 195,
+      "title": "접힌 듣기 설정 패널이 키보드 포커스와 스크린리더에서 숨겨지지 않음",
+      "branch": "issue-195-controls-panel-hidden",
+      "pr": null,
+      "status": "implementation_running"
     }
   ],
+  "completed": [],
   "closed_without_merge": [],
   "held": []
 }
