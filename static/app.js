@@ -747,7 +747,8 @@ function trapTabKeyWithinDialog(event, dialog) {
     ? (currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1)
     : (currentIndex < 0 || currentIndex === focusable.length - 1 ? 0 : currentIndex + 1);
   const movingOutside = event.shiftKey ? document.activeElement === focusable[0] : document.activeElement === focusable[focusable.length - 1];
-  if (currentIndex < 0 || movingOutside) {
+  const nextTag = focusable[nextIndex]?.tagName || '';
+  if (currentIndex < 0 || movingOutside || nextTag === 'IFRAME') {
     event.preventDefault();
     focusElement(focusable[nextIndex]);
     return true;
@@ -2278,10 +2279,21 @@ function bindConceptMediaFrameResize() {
   window.__csFlashcardsConceptMediaFrameBound = true;
   window.addEventListener('message', (event) => {
     const data = event?.data;
-    if (!data || data.type !== 'cs-flashcards-concept-media-height') return;
-    const height = Math.max(180, Math.min(960, Number(data.height) || 0));
+    if (!data) return;
     const mainFrame = $('backConceptHtmlFrame');
     const dialogFrame = $('conceptImageDialogStage')?.querySelector('iframe');
+    if (data.type === 'cs-flashcards-concept-media-focus-prev') {
+      if (dialogFrame && dialogFrame.contentWindow === event.source) {
+        focusElement($('conceptImageDialogCloseBtn') || $('conceptImageDialog'));
+        return;
+      }
+      if (mainFrame && mainFrame.contentWindow === event.source) {
+        focusElement($('conceptImageZoomBtn') || $('card'));
+      }
+      return;
+    }
+    if (data.type !== 'cs-flashcards-concept-media-height') return;
+    const height = Math.max(180, Math.min(960, Number(data.height) || 0));
     [mainFrame, dialogFrame].forEach((frame) => {
       if (frame && frame.contentWindow === event.source) frame.style.height = `${height}px`;
     });
@@ -2329,6 +2341,11 @@ function conceptMediaIframeSrcdoc(payload, alt = '') {
     };
     new MutationObserver(postSize).observe(document.body, {subtree: true, childList: true, attributes: true, characterData: true});
     if ('ResizeObserver' in window) new ResizeObserver(postSize).observe(document.body);
+    window.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab' || !event.shiftKey) return;
+      event.preventDefault();
+      parent.postMessage({type: 'cs-flashcards-concept-media-focus-prev'}, '*');
+    });
     window.addEventListener('load', () => {
       postSize();
       window.setTimeout(postSize, 120);
@@ -2445,6 +2462,12 @@ async function renderConceptImageDialogContent(card) {
     frame.sandbox = 'allow-scripts';
     frame.referrerPolicy = 'no-referrer';
     frame.title = alt || '개념 동적 시각화';
+    frame.tabIndex = 0;
+    frame.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+      event.preventDefault();
+      focusElement($('conceptImageDialogCloseBtn') || $('conceptImageDialog'));
+    });
     frame.dataset.payload = conceptWidgetPayloadValue(payload);
     frame.dataset.alt = alt;
     frame.srcdoc = conceptMediaIframeSrcdoc(payload, alt);
