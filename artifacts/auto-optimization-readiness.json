@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-02T16:33:34Z",
+  "checked_at": "2026-08-02T17:06:04Z",
   "gate_open": true,
   "summary": {
     "open_issue_count": 0,
@@ -13,19 +13,19 @@
   "reusable_backlog": [],
   "recently_completed": [
     {
-      "issue": 157,
-      "pr": 159,
-      "merge_commit": "31f0b3212386c62078eef705b25f4ccbfe1682c7"
+      "issue": 161,
+      "pr": 163,
+      "merge_commit": "3094c3394b11c4453202816bf9f30f56917b8e56"
     },
     {
-      "issue": 156,
-      "pr": 158,
-      "merge_commit": "309c492a446ffceb4d2a7010cb345927d3a54ee0"
+      "issue": 160,
+      "pr": 162,
+      "merge_commit": "ce4293f09b70fd2efd36648488c92e1693755738"
     }
   ],
   "notes": [
-    "Round 29 backend candidate #157 merged successfully.",
-    "There are no open issues, open PRs, or active issue worktrees.",
-    "The gate is open and the next optimization audit round starts immediately from latest origin/main."
+    "Round 30 frontend candidate #160 merged successfully.",
+    "Round 30 backend candidate #161 merged successfully.",
+    "There are no open issues, open PRs, or active issue worktrees; the next audit round starts immediately from latest origin/main."
   ]
 }

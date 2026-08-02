@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-08-02T16:33:34Z",
-  "wave": "2026-08-02-round-29",
+  "generated_at": "2026-08-02T17:06:04Z",
+  "wave": "2026-08-02-round-30",
   "queue": [],
   "completed": [
     {
-      "issue": 156,
-      "pr": 158,
-      "branch": "issue-156-main-symbolic-button-a11y",
+      "issue": 160,
+      "pr": 162,
+      "branch": "issue-160-filter-input-a11y-labels",
       "status": "merged"
     },
     {
-      "issue": 157,
-      "pr": 159,
-      "branch": "issue-157-card-read-attempt-summary-cache",
+      "issue": 161,
+      "pr": 163,
+      "branch": "issue-161-read-cards-single-connection",
       "status": "merged"
     }
   ],
