@@ -1,23 +1,26 @@
 {
-  "generated_at": "2026-08-02T20:55:11Z",
+  "generated_at": "2026-08-02T21:04:57Z",
   "wave": "2026-08-02-round-38",
   "queue": [
-    {
-      "issue": 190,
-      "title": "문제은행 전용 페이지 URL 동기화가 해시 딥링크를 지우지 않도록 수정",
-      "branch": "issue-190-question-bank-hash-sync",
-      "pr": null,
-      "status": "implementation_running"
-    },
     {
       "issue": 191,
       "title": "읽기/풀이 요청마다 문제은행 전체 백필을 다시 돌리지 않기",
       "branch": "issue-191-question-bank-backfill-gate",
-      "pr": null,
-      "status": "implementation_running"
+      "pr": 193,
+      "status": "pr_open_blocked"
     }
   ],
-  "completed": [],
+  "completed": [
+    {
+      "issue": 190,
+      "title": "문제은행 전용 페이지 URL 동기화가 해시 딥링크를 지우지 않도록 수정",
+      "branch": "issue-190-question-bank-hash-sync",
+      "pr": 192,
+      "status": "merged",
+      "merge_commit": "6e9eba8f5cfd036a333d2672055e011a0144ecbc",
+      "merged_at": "2026-08-02T21:04:12Z"
+    }
+  ],
   "closed_without_merge": [],
   "held": []
 }
