@@ -3289,7 +3289,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertFalse(missing_cards['새키워드']['card_created'])
             self.assertEqual(missing_cards['새키워드']['card_id'], '')
 
-    def test_read_question_bank_entries_filters_attempt_status_on_real_rows(self):
+    def test_read_question_bank_entries_uses_latest_attempt_index_without_changing_filters(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
@@ -3322,13 +3322,25 @@ class FlashcardProgressTests(unittest.TestCase):
             )
             seeded_item = saved['items'][0]
 
+            with closing(sqlite3.connect(db_path)) as conn:
+                index_row = conn.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = ?",
+                    ('idx_question_attempts_bank_latest',),
+                ).fetchone()
+            self.assertIsNotNone(index_row)
+            self.assertIn(
+                "ON question_attempts(question_bank_id, updated_at DESC, created_at DESC, question_id DESC)",
+                index_row[0],
+            )
+
             unseen = flashcard_app.read_question_bank_entries(db_path, attempt_status='unseen', limit=10)
             self.assertEqual(unseen['summary']['total'], 1)
             self.assertEqual(unseen['items'][0]['question_attempt_status'], 'unseen')
+            self.assertEqual(unseen['summary']['category_breakdown'][0]['unseen_count'], 1)
 
             save_question_attempt(
                 flashcard_app.QuestionAttemptRequest(
-                    question_id='bank-test-1',
+                    question_id='bank-test-older',
                     question_bank_id=seeded_item['question_bank_id'],
                     card_id='CS-001',
                     question_type=seeded_item['question_type'],
@@ -3339,14 +3351,9 @@ class FlashcardProgressTests(unittest.TestCase):
                 ),
                 db_path,
             )
-            correct = flashcard_app.read_question_bank_entries(db_path, attempt_status='correct', limit=10)
-            self.assertEqual(correct['summary']['total'], 1)
-            self.assertEqual(correct['items'][0]['question_attempt_status'], 'correct')
-            self.assertEqual(flashcard_app.read_question_bank_entries(db_path, attempt_status='wrong', limit=10)['summary']['total'], 0)
-
             save_question_attempt(
                 flashcard_app.QuestionAttemptRequest(
-                    question_id='bank-test-1',
+                    question_id='bank-test-latest',
                     question_bank_id=seeded_item['question_bank_id'],
                     card_id='CS-001',
                     question_type=seeded_item['question_type'],
@@ -3357,11 +3364,29 @@ class FlashcardProgressTests(unittest.TestCase):
                 ),
                 db_path,
             )
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute(
+                    "UPDATE question_attempts SET updated_at = ?, created_at = ? WHERE question_id = ?",
+                    ('2026-08-01T00:00:00Z', '2026-08-01T00:00:00Z', 'bank-test-older'),
+                )
+                conn.execute(
+                    "UPDATE question_attempts SET updated_at = ?, created_at = ? WHERE question_id = ?",
+                    ('2026-08-02T00:00:00Z', '2026-08-02T00:00:00Z', 'bank-test-latest'),
+                )
+                conn.commit()
+
+            listed = flashcard_app.read_question_bank_entries(db_path, topic='데이터베이스', issuer='테스트', limit=10)
+            self.assertEqual(listed['summary']['total'], 1)
+            self.assertEqual(listed['items'][0]['question_bank_id'], seeded_item['question_bank_id'])
+            self.assertEqual(listed['items'][0]['question_attempt_status'], 'wrong')
+            self.assertEqual(listed['items'][0]['question_attempt_judgment'], 'wrong')
+
             wrong = flashcard_app.read_question_bank_entries(db_path, attempt_status='wrong', limit=10)
             self.assertEqual(wrong['summary']['total'], 1)
             self.assertEqual(wrong['items'][0]['question_attempt_status'], 'wrong')
+            self.assertEqual(wrong['items'][0]['question_bank_id'], seeded_item['question_bank_id'])
             self.assertEqual(flashcard_app.read_question_bank_entries(db_path, attempt_status='correct', limit=10)['summary']['total'], 0)
-
     def test_question_bank_entry_and_attempt_views_share_legacy_is_correct_fallback(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
