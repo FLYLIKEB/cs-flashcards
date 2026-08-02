@@ -679,6 +679,34 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='modal-focus-restore', status=status, observations=case)
             await page.close()
 
+    async def test_header_menu_keyboard_focus_and_escape_restore(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#menuBtn')
+            await page.focus('#menuBtn')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.querySelector('#menuPopover').hidden === false")
+            case['focus_after_keyboard_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_after_keyboard_open'], 'wikiHomeLink')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("document.querySelector('#menuPopover').hidden === true")
+            case['focus_after_escape'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_after_escape'], 'menuBtn')
+
+            await page.click('#menuBtn')
+            await page.click('#memoListBtn')
+            await page.waitForFunction("document.querySelector('#memoListDialog').hidden === false")
+            case['memo_dialog_opened_via_click'] = await page.evaluate("document.querySelector('#memoListDialog').hidden === false")
+            self.assertTrue(case['memo_dialog_opened_via_click'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='header-menu-keyboard-focus', status=status, observations=case)
+            await page.close()
+
     async def test_concept_image_dialog_focus_traps_embedded_media_and_restores_opener(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

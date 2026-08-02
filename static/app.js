@@ -710,6 +710,23 @@ function modalFocusableElements(dialog) {
   return [...dialog.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)].filter((element) => !element.hasAttribute('hidden') && !element.closest('[hidden]'));
 }
 
+function headerMenuFocusableElements() {
+  const popover = $('menuPopover');
+  if (!popover || popover.hidden) return [];
+  return [...popover.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)].filter((element) => !element.hasAttribute('hidden') && !element.closest('[hidden]'));
+}
+
+function focusHeaderMenuFirstItem() {
+  return focusElement(headerMenuFocusableElements()[0] || $('menuPopover'));
+}
+
+function closeHeaderMenu({restoreFocus = false} = {}) {
+  if (!state.menuOpen) return false;
+  toggleMenu(false);
+  if (restoreFocus) focusElement($('menuBtn'));
+  return true;
+}
+
 function activeModalEntry() {
   return state.modalStack[state.modalStack.length - 1] || null;
 }
@@ -3256,12 +3273,17 @@ async function saveMemo() {
   }
 }
 
-function toggleMenu(open = !state.menuOpen) {
+function toggleMenu(open = !state.menuOpen, {focusFirstItem = Boolean(open) && !state.menuOpen} = {}) {
   state.menuOpen = Boolean(open);
   const popover = $('menuPopover');
   const button = $('menuBtn');
   if (popover) popover.hidden = !state.menuOpen;
   if (button) button.setAttribute('aria-expanded', String(state.menuOpen));
+  if (state.menuOpen && focusFirstItem) {
+    window.setTimeout(() => {
+      focusHeaderMenuFirstItem();
+    }, 0);
+  }
   updateBookmarkFilterButton();
 }
 
@@ -7459,6 +7481,14 @@ $('menuBtn').addEventListener('click', (event) => {
   event.stopPropagation();
   toggleMenu();
 });
+$('menuBtn').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    event.stopPropagation();
+    if (state.menuOpen) closeHeaderMenu({restoreFocus: true});
+    else toggleMenu(true, {focusFirstItem: true});
+  }
+});
 $('memoListBtn').addEventListener('click', openMemoList);
 $('bookmarkListBtn').addEventListener('click', openBookmarkList);
 $('flashcardTableBtn')?.addEventListener('click', openFlashcardTableWindow);
@@ -7593,22 +7623,30 @@ $('conceptGraph').addEventListener('mousedown', (e) => {
 }, true);
 
 document.addEventListener('keydown', (e) => {
-  if (document.activeElement?.id === 'memoInput' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+  const activeElement = document.activeElement;
+  if (activeElement?.id === 'memoInput' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
     e.preventDefault();
     saveMemo();
     return;
   }
   if (handleOpenModalKeydown(e)) return;
   if (activeModalDialog()) return;
-  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+  if (state.menuOpen && activeElement?.closest('#menuPopover')) {
     if (e.key === 'Escape') {
-      document.activeElement.blur();
+      e.preventDefault();
+      closeHeaderMenu({restoreFocus: true});
+    }
+    return;
+  }
+  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(activeElement?.tagName)) {
+    if (e.key === 'Escape') {
+      activeElement.blur();
       focusAppCard();
     }
     return;
   }
 
-const key = e.key.toLowerCase();
+  const key = e.key.toLowerCase();
 if (state.questionMode) {
   if (e.key === 'Escape' || key === 'q') { e.preventDefault(); toggleQuestionMode(false); return; }
   if (e.key === 'ArrowLeft') { e.preventDefault(); moveQuestion(-1); return; }
