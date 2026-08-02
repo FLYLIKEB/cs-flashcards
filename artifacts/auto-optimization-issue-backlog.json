@@ -1,21 +1,15 @@
 {
-  "generated_at": "2026-08-02T17:50:51Z",
-  "wave": "2026-08-02-round-31",
-  "queue": [],
-  "completed": [
+  "generated_at": "2026-08-02T17:59:39Z",
+  "wave": "2026-08-02-round-32",
+  "queue": [
     {
-      "issue": 164,
-      "pr": 166,
-      "branch": "issue-164-question-practice-toggle",
-      "status": "merged"
-    },
-    {
-      "issue": 165,
-      "pr": 167,
-      "branch": "issue-165-read-card-single-connection",
-      "status": "merged"
+      "issue": 168,
+      "title": "문제은행 뷰 전환·리뷰 필터 버튼에 토글 접근성 상태 추가",
+      "branch": "issue-168-question-bank-toggle-a11y",
+      "status": "implementation_in_progress"
     }
   ],
+  "completed": [],
   "closed_without_merge": [],
   "held": []
 }

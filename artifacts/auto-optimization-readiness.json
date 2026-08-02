@@ -1,15 +1,28 @@
 {
-  "checked_at": "2026-08-02T17:50:51Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T17:59:39Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 1,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 1,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 168,
+      "state": "OPEN",
+      "title": "문제은행 뷰 전환·리뷰 필터 버튼에 토글 접근성 상태 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/168"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-168",
+      "branch": "issue-168-question-bank-toggle-a11y",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,8 +37,8 @@
     }
   ],
   "notes": [
-    "Round 31 backend candidate #165 merged successfully as PR #167.",
-    "All round 31 issue branches, PRs, and blocking worktrees are cleaned up.",
-    "The readiness gate is open for the next optimization audit round."
+    "Round 32 audit found no backend candidate worth shipping from app.py/tests.test_flashcards on latest main.",
+    "Frontend candidate #168 was accepted for question-bank toggle accessibility semantics and is now in progress.",
+    "The readiness gate is closed until issue #168 and its worktree are completed."
   ]
 }
