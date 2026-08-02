@@ -960,7 +960,10 @@ class FlashcardProgressTests(unittest.TestCase):
 
             self.assertEqual(saved['attempt']['card_id'], 'CS-001')
             self.assertEqual(saved['attempt']['judgment'], 'wrong')
-            self.assertIsNone(saved['card'])
+            self.assertEqual(saved['card']['id'], 'CS-001')
+            self.assertEqual(saved['card']['question_attempt_count'], 1)
+            self.assertEqual(saved['card']['question_wrong_count'], 1)
+            self.assertEqual(saved['card']['latest_wrong_note'], '전체 카드 재조회 없이 저장')
             rows, _ = read_cards(csv_path, db_path)
             self.assertEqual(rows[0]['question_attempt_count'], 1)
             self.assertEqual(rows[0]['question_wrong_count'], 1)

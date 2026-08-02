@@ -5762,9 +5762,10 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
             (question_id,),
         ).fetchone()
 
+    refreshed_card = read_card(db_path, card_id) if card_id else None
     return {
         "attempt": question_attempt_row_to_dict(saved),
-        "card": None,
+        "card": refreshed_card,
     }
 
 
