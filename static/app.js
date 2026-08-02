@@ -3291,8 +3291,9 @@ function updateBookmarkFilterButton() {
   const button = $('bookmarkFilterBtn');
   if (!button) return;
   const count = bookmarkFilteredCards().length;
-  button.textContent = state.bookmarkFilter ? `북마크 필터 해제 (${count})` : `북마크만 보기 (${count})`;
-  button.classList.toggle('active', state.bookmarkFilter);
+button.textContent = state.bookmarkFilter ? `북마크 필터 해제 (${count})` : `북마크만 보기 (${count})`;
+button.classList.toggle('active', state.bookmarkFilter);
+button.setAttribute('aria-pressed', String(state.bookmarkFilter));
 }
 
 function setBookmarkFilter(enabled) {
@@ -4553,9 +4554,11 @@ function questionHistoryRequestUrl({filter = state.questionHistoryFilter, cardId
 function renderQuestionHistoryDialog() {
   const summaryEl = $('questionHistorySummary');
   const body = $('questionHistoryBody');
-  document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
-    button.classList.toggle('active', button.dataset.questionHistoryFilter === state.questionHistoryFilter);
-  });
+document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
+  const active = button.dataset.questionHistoryFilter === state.questionHistoryFilter;
+  button.classList.toggle('active', active);
+  button.setAttribute('aria-pressed', String(active));
+});
   if (summaryEl) {
     if (state.questionHistoryLoading) {
       summaryEl.textContent = '현재 필터 기준 문제 기록을 불러오는 중입니다.';
@@ -7278,9 +7281,11 @@ cardEl.addEventListener('click', (e) => {
   renderCard();
 });
 function updateStatFilterButtons() {
-  document.querySelectorAll('[data-status-filter]').forEach((button) => {
-    button.classList.toggle('active', button.dataset.statusFilter === state.statusFilter);
-  });
+document.querySelectorAll('[data-status-filter]').forEach((button) => {
+  const active = button.dataset.statusFilter === state.statusFilter;
+  button.classList.toggle('active', active);
+  button.setAttribute('aria-pressed', String(active));
+});
 }
 
 function setStatusFilter(status) {
