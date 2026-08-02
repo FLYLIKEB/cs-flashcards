@@ -121,6 +121,8 @@ const QUESTION_BANK_FILTER_FIELDS = [
   {key: 'question_type', id: 'questionBankTypeSelect'},
   {key: 'section', id: 'questionBankSectionInput'},
 ];
+const QUESTION_BANK_DYNAMIC_SELECT_FIELDS = new Set(['field_name', 'category', 'issuer']);
+const questionBankPendingDynamicFilters = {field_name: '', category: '', issuer: ''};
 const FLASHCARD_TABLE_COLUMN_ORDER_KEY = 'csFlashcardsTableColumnOrder:v1';
 const FLASHCARD_TABLE_DEFAULT_COLUMNS = ['bookmark', 'index', 'term', 'english', 'category', 'status'];
 const FLASHCARD_TABLE_COLUMNS = {
@@ -2812,6 +2814,9 @@ async function loadCards({preserveQuestionSession = false} = {}) {
     state.initialCardQueryApplied = true;
     if (!keepQuestionSession) applyInitialCardQuery();
   }
+  if (state.questionMode && state.questionBankOpen && !state.questionBankItems.length) {
+    loadQuestionBankBrowser().catch(() => {});
+  }
   $('contentDbPath').textContent = data.summary.content_db_path;
   setAudioButtons();
   updateAudioEstimate();
@@ -5360,14 +5365,28 @@ async function importQuestionsFromText() {
   }
 }
 
+function questionBankDynamicSelectFilterValue(key, id) {
+  const input = $(id);
+  const value = input?.value?.trim() || '';
+  if (value) {
+    if (QUESTION_BANK_DYNAMIC_SELECT_FIELDS.has(key)) questionBankPendingDynamicFilters[key] = value;
+    return value;
+  }
+  if (!QUESTION_BANK_DYNAMIC_SELECT_FIELDS.has(key)) return value;
+  const pending = String(questionBankPendingDynamicFilters[key] || '').trim();
+  const hasResolvedOptions = Number(input?.options?.length || 0) > 1;
+  if (hasResolvedOptions) questionBankPendingDynamicFilters[key] = '';
+  return hasResolvedOptions ? '' : pending;
+}
+
 function questionBankFilterValues() {
   return {
     q: $('questionBankQueryInput')?.value?.trim() || '',
     attempt_status: $('questionBankAttemptStatusSelect')?.value || '',
     topic: $('questionBankTopicInput')?.value?.trim() || '',
-    field_name: $('questionBankFieldInput')?.value?.trim() || '',
-    category: $('questionBankCategoryInput')?.value?.trim() || '',
-    issuer: $('questionBankIssuerInput')?.value?.trim() || '',
+    field_name: questionBankDynamicSelectFilterValue('field_name', 'questionBankFieldInput'),
+    category: questionBankDynamicSelectFilterValue('category', 'questionBankCategoryInput'),
+    issuer: questionBankDynamicSelectFilterValue('issuer', 'questionBankIssuerInput'),
     source_location: $('questionBankSourceInput')?.value?.trim() || '',
     difficulty: $('questionBankDifficultySelect')?.value || '',
     question_type: $('questionBankTypeSelect')?.value || '',
@@ -5399,7 +5418,9 @@ function applyQuestionBankFiltersFromUrl(search = window.location.search) {
   const params = questionBankSearchParams(search);
   QUESTION_BANK_FILTER_FIELDS.forEach(({key, id}) => {
     const input = $(id);
-    if (input) input.value = questionBankUrlFilterValue(params, key);
+    const value = questionBankUrlFilterValue(params, key);
+    if (QUESTION_BANK_DYNAMIC_SELECT_FIELDS.has(key)) questionBankPendingDynamicFilters[key] = String(value || '').trim();
+    if (input) input.value = value;
   });
   return questionBankHasUrlFilters(search);
 }
@@ -5432,8 +5453,9 @@ function syncQuestionBankBrowserUrl(filters = questionBankFilterValues(), {clear
 }
 
 function resetQuestionBankFilters() {
-  QUESTION_BANK_FILTER_FIELDS.forEach(({id}) => {
+  QUESTION_BANK_FILTER_FIELDS.forEach(({key, id}) => {
     const input = $(id);
+    if (QUESTION_BANK_DYNAMIC_SELECT_FIELDS.has(key)) questionBankPendingDynamicFilters[key] = '';
     if (input) input.value = '';
   });
   window.clearTimeout(pendingQuestionBankLoadTimer);
@@ -5463,7 +5485,7 @@ async function fetchQuestionBankEntries() {
 function populateQuestionBankIssuerOptions(issuers, selected = '') {
   const select = $('questionBankIssuerInput');
   if (!select) return;
-  const selectedValue = String(selected || select.value || '').trim();
+  const selectedValue = String(selected || questionBankPendingDynamicFilters.issuer || select.value || '').trim();
   const options = ['<option value="">출제기관 *</option>'];
   (Array.isArray(issuers) ? issuers : []).forEach((issuer) => {
     const value = String(issuer || '').trim();
@@ -5472,12 +5494,13 @@ function populateQuestionBankIssuerOptions(issuers, selected = '') {
   });
   select.innerHTML = options.join('');
   select.value = (Array.isArray(issuers) && issuers.includes(selectedValue)) ? selectedValue : '';
+  questionBankPendingDynamicFilters.issuer = select.value || '';
 }
 
 function populateQuestionBankCategoryOptions(categories, selected = '') {
   const select = $('questionBankCategoryInput');
   if (!select) return;
-  const selectedValue = String(selected || select.value || '').trim();
+  const selectedValue = String(selected || questionBankPendingDynamicFilters.category || select.value || '').trim();
   const options = ['<option value="">카테고리 *</option>'];
   (Array.isArray(categories) ? categories : []).forEach((category) => {
     const value = String(category || '').trim();
@@ -5486,6 +5509,7 @@ function populateQuestionBankCategoryOptions(categories, selected = '') {
   });
   select.innerHTML = options.join('');
   select.value = (Array.isArray(categories) && categories.includes(selectedValue)) ? selectedValue : '';
+  questionBankPendingDynamicFilters.category = select.value || '';
 }
 
 function populateQuestionBankTopicOptions(topics, selected = '') {
@@ -5505,7 +5529,7 @@ function populateQuestionBankTopicOptions(topics, selected = '') {
 function populateQuestionBankFieldNameOptions(fieldNames, selected = '') {
   const select = $('questionBankFieldInput');
   if (!select) return;
-  const selectedValue = String(selected || select.value || '').trim();
+  const selectedValue = String(selected || questionBankPendingDynamicFilters.field_name || select.value || '').trim();
   const options = ['<option value="">분야 *</option>'];
   (Array.isArray(fieldNames) ? fieldNames : []).forEach((fieldName) => {
     const value = String(fieldName || '').trim();
@@ -5514,6 +5538,7 @@ function populateQuestionBankFieldNameOptions(fieldNames, selected = '') {
   });
   select.innerHTML = options.join('');
   select.value = (Array.isArray(fieldNames) && fieldNames.includes(selectedValue)) ? selectedValue : '';
+  questionBankPendingDynamicFilters.field_name = select.value || '';
 }
 
 
