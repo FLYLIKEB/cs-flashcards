@@ -539,6 +539,93 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(cleared['memo'], '')
             self.assertEqual(cleared['memo_updated_at'], '')
 
+    def test_mark_card_reuses_connection_for_lookup_write_and_response(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+
+            with mock.patch.object(
+                flashcard_app,
+                '_should_sync_ai_image_files_to_db',
+                return_value=(False, (False, 0), flashcard_app.AI_IMAGE_DIR, 0),
+            ), mock.patch.object(
+                flashcard_app,
+                'ensure_progress_db',
+                return_value=None,
+            ) as ensure_mock, mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
+                updated = flashcard_app.mark_card('CS-001', 'O', progress_db_path=db_path)
+
+            self.assertEqual(ensure_mock.call_count, 1)
+            self.assertEqual(connect_mock.call_count, 1)
+            self.assertEqual(updated['id'], 'CS-001')
+            self.assertEqual(updated['known_status'], 'O')
+            self.assertEqual(updated['review_count'], '1')
+
+    def test_set_bookmark_reuses_connection_for_lookup_write_and_response(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+
+            with mock.patch.object(
+                flashcard_app,
+                '_should_sync_ai_image_files_to_db',
+                return_value=(False, (False, 0), flashcard_app.AI_IMAGE_DIR, 0),
+            ), mock.patch.object(
+                flashcard_app,
+                'ensure_progress_db',
+                return_value=None,
+            ) as ensure_mock, mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
+                updated = flashcard_app.set_bookmark('CS-001', True, progress_db_path=db_path)
+
+            self.assertEqual(ensure_mock.call_count, 1)
+            self.assertEqual(connect_mock.call_count, 1)
+            self.assertEqual(updated['id'], 'CS-001')
+            self.assertEqual(updated['bookmarked'], '1')
+            self.assertEqual(updated['known_status'], '')
+
+    def test_save_memo_reuses_connection_for_lookup_write_and_response(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path, include_image=True)
+            flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+
+            with mock.patch.object(
+                flashcard_app,
+                '_should_sync_ai_image_files_to_db',
+                return_value=(False, (False, 0), flashcard_app.AI_IMAGE_DIR, 0),
+            ), mock.patch.object(
+                flashcard_app,
+                'ensure_progress_db',
+                return_value=None,
+            ) as ensure_mock, mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
+                updated = flashcard_app.save_memo('CS-001', '연결 재사용 메모', progress_db_path=db_path)
+
+            self.assertEqual(ensure_mock.call_count, 1)
+            self.assertEqual(connect_mock.call_count, 1)
+            self.assertEqual(updated['id'], 'CS-001')
+            self.assertEqual(updated['memo'], '연결 재사용 메모')
+            self.assertTrue(updated['memo_updated_at'])
+
     def test_card_mutation_helpers_do_not_reload_whole_catalog(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
