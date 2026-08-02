@@ -1,10 +1,35 @@
 {
   "skill": "cs-auto-optimization-orchestrator",
-  "timestamp": "2026-08-02T14:31:10Z",
-  "canStartRound": true,
-  "waitReasons": [],
-  "openIssues": [],
+  "timestamp": "2026-08-02T14:39:40Z",
+  "canStartRound": false,
+  "waitReasons": [
+    "2 open GitHub issues remain",
+    "2 issue worktrees remain"
+  ],
+  "openIssues": [
+    {
+      "number": 137,
+      "state": "OPEN",
+      "title": "문제은행 row trigger를 버튼 semantics로 승격하고 키보드 접근성 고정",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/137"
+    },
+    {
+      "number": 136,
+      "state": "OPEN",
+      "title": "문제은행 attempt 상태 판정을 is_correct fallback까지 일관화",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/136"
+    }
+  ],
   "openPullRequests": [],
-  "blockingWorktrees": [],
-  "summary": "이슈 #132/#133과 PR #134/#135 정리까지 끝나 다음 최적화 라운드를 바로 시작할 수 있다."
+  "blockingWorktrees": [
+    {
+      "path": "/private/tmp/cs-opt-136",
+      "branch": "refs/heads/issue-136-question-bank-status-fallback"
+    },
+    {
+      "path": "/private/tmp/cs-opt-137",
+      "branch": "refs/heads/issue-137-question-bank-row-trigger-button"
+    }
+  ],
+  "summary": "라운드 25 이슈 #136/#137을 생성하고 구현 worktree를 열어 게이트가 다시 닫혀 있다."
 }

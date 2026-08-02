@@ -1,7 +1,24 @@
 {
-  "updatedAt": "2026-08-02T14:31:10Z",
-  "status": "ready_for_next_audit",
-  "openIssues": [],
+  "updatedAt": "2026-08-02T14:39:40Z",
+  "status": "round25_in_progress",
+  "openIssues": [
+    {
+      "number": 136,
+      "title": "문제은행 attempt 상태 판정을 is_correct fallback까지 일관화",
+      "track": "backend",
+      "branch": "issue-136-question-bank-status-fallback",
+      "worktree": "/private/tmp/cs-opt-136",
+      "state": "implementing"
+    },
+    {
+      "number": 137,
+      "title": "문제은행 row trigger를 버튼 semantics로 승격하고 키보드 접근성 고정",
+      "track": "frontend",
+      "branch": "issue-137-question-bank-row-trigger-button",
+      "worktree": "/private/tmp/cs-opt-137",
+      "state": "implementing"
+    }
+  ],
   "openPullRequests": [],
   "recentlyClosedIssues": [
     {
@@ -13,20 +30,6 @@
       "number": 132,
       "mergedPullRequest": 134,
       "mergeCommit": "1d9e56d9e8241a43374a2ac0bd7e7154343cb090"
-    },
-    {
-      "number": 130,
-      "mergedPullRequest": 131,
-      "mergeCommit": "60d0bcd3993dc9de00438ee6e8bf1591ece9beea"
-    },
-    {
-      "number": 129,
-      "resolution": "closed_without_code",
-      "reason": "latest origin/main already contained the previously reported fix; stale candidate"
     }
-  ],
-  "nextRound": {
-    "round": 25,
-    "state": "pending_audit"
-  }
+  ]
 }

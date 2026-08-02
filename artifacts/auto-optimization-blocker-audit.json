@@ -1,11 +1,22 @@
 {
-  "timestamp": "2026-08-02T14:31:10Z",
-  "blocked": false,
-  "openIssueCount": 0,
+  "timestamp": "2026-08-02T14:39:40Z",
+  "blocked": true,
+  "openIssueCount": 2,
   "openPullRequestCount": 0,
-  "blockingWorktrees": [],
+  "blockingWorktrees": [
+    {
+      "path": "/private/tmp/cs-opt-136",
+      "branch": "issue-136-question-bank-status-fallback",
+      "reason": "Backend round 25 implementation in progress."
+    },
+    {
+      "path": "/private/tmp/cs-opt-137",
+      "branch": "issue-137-question-bank-row-trigger-button",
+      "reason": "Frontend round 25 implementation in progress."
+    }
+  ],
   "notes": [
-    "Issue #132 merged through PR #134 and its worktree/branch were cleaned up.",
-    "Issue #133 merged through PR #135 and its worktree/branch were cleaned up."
+    "Latest-head audits accepted backend issue #136 and frontend issue #137.",
+    "No PRs are open yet; blockers are the newly opened issues and active implementation worktrees."
   ]
 }
