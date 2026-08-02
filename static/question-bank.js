@@ -2,7 +2,6 @@ const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const QUESTION_BANK_COLUMN_ORDER_KEY = 'csQuestionBankTableColumnOrder:v1';
 const QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1';
 const QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1';
-const QUESTION_BANK_SESSION_RESTORE_KEY = 'csQuestionBankSessionRestore:v1';
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_BANK_ATTEMPT_STATUS_LABELS = {unseen: '안푼', wrong: '틀린', correct: '맞은'};
 const QUESTION_ATTEMPT_RESULT_LABELS = {correct: '맞음', ambiguous: '애매함', wrong: '틀림', unknown: '모름', pending: '미채점'};
@@ -329,6 +328,13 @@ function persistedPracticeCollapsed() {
     return true;
   }
 }
+function persistPracticeCollapsedState(collapsed) {
+  try {
+    window.localStorage.setItem(QUESTION_BANK_PRACTICE_COLLAPSED_KEY, collapsed ? '1' : '0');
+  } catch (_error) {
+    // Ignore storage failures.
+  }
+}
 
 function navigationType() {
   return window.performance?.getEntriesByType?.('navigation')?.[0]?.type || '';
@@ -340,19 +346,7 @@ function isHistoryNavigation() {
   return navigationType() === 'back_forward';
 }
 function shouldRestorePersistedQuestionBankState() {
-  if (isReloadNavigation() || isHistoryNavigation()) return true;
-  try {
-    return window.sessionStorage.getItem(QUESTION_BANK_SESSION_RESTORE_KEY) === '1';
-  } catch (_error) {
-    return false;
-  }
-}
-function markQuestionBankSessionState() {
-  try {
-    window.sessionStorage.setItem(QUESTION_BANK_SESSION_RESTORE_KEY, '1');
-  } catch (_error) {
-    // Ignore storage failures.
-  }
+  return isReloadNavigation() || isHistoryNavigation();
 }
 const canRestorePersistedQuestionBankState = shouldRestorePersistedQuestionBankState();
 function persistedSelectionRestoreState() {
@@ -790,11 +784,7 @@ function setPracticeCollapsed(collapsed, {persist = true} = {}) {
   renderHeader();
   if (bankState.practiceCollapsed) ensureSelectedRowVisible();
   if (!persist) return;
-  try {
-    window.localStorage.setItem(QUESTION_BANK_PRACTICE_COLLAPSED_KEY, bankState.practiceCollapsed ? '1' : '0');
-  } catch (_error) {
-    // Ignore storage failures.
-  }
+  persistPracticeCollapsedState(bankState.practiceCollapsed);
 }
 
 function togglePracticeCollapsed() {
@@ -1526,8 +1516,8 @@ async function loadQuestionBankPage() {
 }
 
 restoreFilterState();
-markQuestionBankSessionState();
 setPracticeCollapsed(canRestorePersistedQuestionBankState ? persistedPracticeCollapsed() : true, {persist: false});
+if (!canRestorePersistedQuestionBankState) persistPracticeCollapsedState(true);
 setFiltersCollapsed(persistedFiltersCollapsed(), {persist: false});
 setReviewCollapsed(true);
 renderTable();
