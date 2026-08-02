@@ -6333,7 +6333,7 @@ function renderQuestionPanel() {
           if (question.answerRevealed && isAnswer) badges.push('<span class="question-choice-badge answer">정답</span>');
           if (question.answerRevealed && isWrongSelection) badges.push('<span class="question-choice-badge wrong">내 오답</span>');
           else if (question.answerRevealed && isSelected) badges.push('<span class="question-choice-badge mine">내 답</span>');
-          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}${isWrongSelection ? ' wrong selected-wrong' : ''}" type="button" data-choice-index="${index}" ${questionSaveBusy ? 'disabled' : ''}><span class="question-choice-body">${renderMarkdownInline(choice)}</span>${badges.length ? `<span class="question-choice-badges">${badges.join('')}</span>` : ''}</button></li>`;
+return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}${isWrongSelection ? ' wrong selected-wrong' : ''}" type="button" data-choice-index="${index}" aria-pressed="${isSelected ? 'true' : 'false'}" ${questionSaveBusy ? 'disabled' : ''}><span class="question-choice-body">${renderMarkdownInline(choice)}</span>${badges.length ? `<span class="question-choice-badges">${badges.join('')}</span>` : ''}</button></li>`;
         }).join('')}
       </ol>
     </div>` : '';
@@ -6390,7 +6390,7 @@ function renderQuestionPanel() {
           ['ambiguous', '애매함'],
           ['wrong', '틀림'],
           ['unknown', '모름'],
-        ].map(([key, label]) => `<button class="question-grade-button ${key}${question.judgment === key ? ' active' : ''}" type="button" data-question-judgment="${key}" ${questionSaveBusy ? 'disabled' : ''}>${label} 저장</button>`).join('')}
+        ].map(([key, label]) => `<button class="question-grade-button ${key}${question.judgment === key ? ' active' : ''}" type="button" data-question-judgment="${key}" aria-pressed="${question.judgment === key ? 'true' : 'false'}" ${questionSaveBusy ? 'disabled' : ''}>${label} 저장</button>`).join('')}
 
 
       </div>
