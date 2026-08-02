@@ -795,7 +795,8 @@ function renderPracticeToggle() {
   if (!toggleButton) return;
   const showingPractice = bankState.practiceLoaded && !bankState.practiceCollapsed;
   toggleButton.textContent = showingPractice ? '문제은행 보기' : '문제 풀이 보기';
-  toggleButton.setAttribute('aria-expanded', String(showingPractice));
+  toggleButton.setAttribute('aria-pressed', String(showingPractice));
+  toggleButton.removeAttribute('aria-expanded');
   toggleButton.disabled = !bankState.practiceLoaded;
 }
 
@@ -1110,7 +1111,8 @@ function renderQuestionBankReview() {
   if (filters) {
     filters.innerHTML = Object.entries(QUESTION_BANK_REVIEW_FILTER_LABELS).map(([key, label]) => {
       const count = key === 'wrong' ? counts.wrongish : key === 'note' ? counts.notes : counts.attempted;
-      return `<button type="button" class="cs-table-button question-bank-review-filter${bankState.reviewFilter === key ? ' is-active' : ''}" data-review-filter="${escapeHtml(key)}">${escapeHtml(label)} ${escapeHtml(String(count))}</button>`;
+      const active = bankState.reviewFilter === key;
+      return `<button type="button" class="cs-table-button question-bank-review-filter${active ? ' is-active' : ''}" data-review-filter="${escapeHtml(key)}" aria-pressed="${active ? 'true' : 'false'}">${escapeHtml(label)} ${escapeHtml(String(count))}</button>`;
     }).join('');
   }
   if (bankState.loading || bankState.reviewLoading) {

@@ -1037,6 +1037,16 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertIn('통합 검색', case['active_filters_after_recollapse'])
             await page.click('#bankPageToggleFiltersBtn')
             await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed') && !document.querySelector('#bankPageFiltersRegion').hidden")
+            case['practice_toggle_before_launch'] = await page.evaluate(
+                """
+                () => ({
+                  pressed: document.querySelector('#bankPageTogglePracticeBtn')?.getAttribute('aria-pressed') || '',
+                  disabled: Boolean(document.querySelector('#bankPageTogglePracticeBtn')?.disabled),
+                })
+                """
+            )
+            self.assertEqual(case['practice_toggle_before_launch']['pressed'], 'false')
+            self.assertTrue(case['practice_toggle_before_launch']['disabled'])
             await page.click('#bankPageLaunchBtn')
             await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
             case['practice_frame_src'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
@@ -1051,6 +1061,16 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 QUESTION_BANK_LAUNCH_KEY,
             )
             self.assertFalse(case['launch_state_present'])
+            case['practice_toggle_after_launch'] = await page.evaluate(
+                """
+                () => ({
+                  pressed: document.querySelector('#bankPageTogglePracticeBtn')?.getAttribute('aria-pressed') || '',
+                  disabled: Boolean(document.querySelector('#bankPageTogglePracticeBtn')?.disabled),
+                })
+                """
+            )
+            self.assertEqual(case['practice_toggle_after_launch']['pressed'], 'true')
+            self.assertFalse(case['practice_toggle_after_launch']['disabled'])
             case['practice_status'] = await self.text(page, '#bankPagePracticeStatus')
             self.assertIn('현재 1 /', case['practice_status'])
             await page.evaluate('document.querySelector("#bankPageRefreshBtn").click()')
@@ -1058,10 +1078,168 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['practice_frame_src_after_refresh'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
             self.assertEqual(case['practice_frame_src_after_refresh'], case['practice_frame_src'])
             case['practice_status_after_refresh'] = await self.text(page, '#bankPagePracticeStatus')
+            case['practice_toggle_after_refresh'] = await page.evaluate(
+                """
+                () => ({
+                  pressed: document.querySelector('#bankPageTogglePracticeBtn')?.getAttribute('aria-pressed') || '',
+                  disabled: Boolean(document.querySelector('#bankPageTogglePracticeBtn')?.disabled),
+                })
+                """
+            )
+            self.assertEqual(case['practice_toggle_after_refresh']['pressed'], 'true')
+            self.assertFalse(case['practice_toggle_after_refresh']['disabled'])
             self.assertIn('현재 1 /', case['practice_status_after_refresh'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_review_filter_buttons_expose_pressed_state(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        review_payload = {
+            'items': [
+                {
+                    'question_bank_id': 'review-wrong-1',
+                    'prompt': '틀린 문항 prompt',
+                    'term': '틀린 문항',
+                    'category': '테스트',
+                    'question_type': 'subjective',
+                    'session_title': '복습 세트',
+                    'updated_at': '2026-08-01T00:00:00Z',
+                    'result_key': 'wrong',
+                    'result_label': '틀림',
+                    'user_answer': '오답',
+                    'wrong_note': '개념 연결을 다시 볼 것',
+                    'answer': '정답 해설',
+                },
+                {
+                    'question_bank_id': 'review-correct-1',
+                    'prompt': '맞은 문항 prompt',
+                    'term': '맞은 문항',
+                    'category': '테스트',
+                    'question_type': 'subjective',
+                    'session_title': '복습 세트',
+                    'updated_at': '2026-08-01T00:05:00Z',
+                    'result_key': 'correct',
+                    'result_label': '맞음',
+                    'user_answer': '정답',
+                    'wrong_note': '',
+                    'answer': '정답 해설',
+                },
+            ],
+            'summary': {
+                'total': 2,
+                'correct': 1,
+                'ambiguous': 0,
+                'wrong': 1,
+                'unknown': 0,
+                'pending': 0,
+                'note_count': 1,
+                'selected_question_bank_count': 2,
+            },
+        }
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (reviewPayload) => {
+                  const originalFetch = window.fetch.bind(window);
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/question-bank/attempts/query' && method === 'POST') {
+                      return Promise.resolve(new Response(JSON.stringify(reviewPayload), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                review_payload,
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.click('#bankPageToggleReviewBtn')
+            await page.waitForFunction(
+                """
+                () => {
+                  const body = document.getElementById('bankPageReviewBody');
+                  const filters = document.querySelectorAll('#bankPageReviewFilters [data-review-filter]');
+                  const items = document.querySelectorAll('#bankPageReviewList .question-bank-review-item');
+                  return body && body.hidden === false && filters.length === 3 && items.length === 2;
+                }
+                """
+            )
+            case['initial_filters'] = await page.evaluate(
+                """
+                () => Object.fromEntries(
+                  [...document.querySelectorAll('#bankPageReviewFilters [data-review-filter]')].map((button) => [
+                    button.dataset.reviewFilter,
+                    {
+                      pressed: button.getAttribute('aria-pressed') || '',
+                      active: button.classList.contains('is-active'),
+                    },
+                  ])
+                )
+                """
+            )
+            self.assertEqual(case['initial_filters']['attempted']['pressed'], 'true')
+            self.assertTrue(case['initial_filters']['attempted']['active'])
+            self.assertEqual(case['initial_filters']['wrong']['pressed'], 'false')
+            self.assertEqual(case['initial_filters']['note']['pressed'], 'false')
+
+            await page.click('#bankPageReviewFilters [data-review-filter="wrong"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('#bankPageReviewFilters [data-review-filter="wrong"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 1
+                  && document.querySelector('#bankPageReviewList')?.textContent.includes('틀린 문항 prompt')
+                """
+            )
+            case['wrong_filter'] = await page.evaluate(
+                """
+                () => ({
+                  attempted: document.querySelector('#bankPageReviewFilters [data-review-filter="attempted"]')?.getAttribute('aria-pressed') || '',
+                  wrong: document.querySelector('#bankPageReviewFilters [data-review-filter="wrong"]')?.getAttribute('aria-pressed') || '',
+                  note: document.querySelector('#bankPageReviewFilters [data-review-filter="note"]')?.getAttribute('aria-pressed') || '',
+                  visibleCount: document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length,
+                })
+                """
+            )
+            self.assertEqual(case['wrong_filter']['attempted'], 'false')
+            self.assertEqual(case['wrong_filter']['wrong'], 'true')
+            self.assertEqual(case['wrong_filter']['note'], 'false')
+            self.assertEqual(case['wrong_filter']['visibleCount'], 1)
+
+            await page.click('#bankPageReviewFilters [data-review-filter="note"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('#bankPageReviewFilters [data-review-filter="note"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 1
+                  && document.querySelector('#bankPageReviewList')?.textContent.includes('틀린 문항 prompt')
+                """
+            )
+            case['note_filter'] = await page.evaluate(
+                """
+                () => ({
+                  attempted: document.querySelector('#bankPageReviewFilters [data-review-filter="attempted"]')?.getAttribute('aria-pressed') || '',
+                  wrong: document.querySelector('#bankPageReviewFilters [data-review-filter="wrong"]')?.getAttribute('aria-pressed') || '',
+                  note: document.querySelector('#bankPageReviewFilters [data-review-filter="note"]')?.getAttribute('aria-pressed') || '',
+                  visibleCount: document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length,
+                })
+                """
+            )
+            self.assertEqual(case['note_filter']['attempted'], 'false')
+            self.assertEqual(case['note_filter']['wrong'], 'false')
+            self.assertEqual(case['note_filter']['note'], 'true')
+            self.assertEqual(case['note_filter']['visibleCount'], 1)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-review-filter-pressed-state', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_row_trigger_supports_tab_enter_and_space_activation(self):
@@ -1268,6 +1446,16 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.body.classList.contains('question-bank-practice-collapsed')")
             case['practice_collapsed_after_toggle'] = await page.evaluate("document.body.classList.contains('question-bank-practice-collapsed')")
             self.assertTrue(case['practice_collapsed_after_toggle'])
+            case['practice_toggle_after_collapse'] = await page.evaluate(
+                """
+                () => ({
+                  pressed: document.querySelector('#bankPageTogglePracticeBtn')?.getAttribute('aria-pressed') || '',
+                  disabled: Boolean(document.querySelector('#bankPageTogglePracticeBtn')?.disabled),
+                })
+                """
+            )
+            self.assertEqual(case['practice_toggle_after_collapse']['pressed'], 'false')
+            self.assertFalse(case['practice_toggle_after_collapse']['disabled'])
 
             await page.click('#bankPageToggleFiltersBtn')
             await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
