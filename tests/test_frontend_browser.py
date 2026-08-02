@@ -1408,6 +1408,98 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-filter-reload', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_page_preserves_dynamic_select_filter_on_deep_link_and_reload(self):
+        case = {'path': '/question-bank?field_name=전산학술'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        payload = self.question_bank_payload(
+            'dynamic-field',
+            items=[self.question_bank_item('전산학술 문항', field_name='전산학술', category='데이터베이스', issuer='한국은행')],
+        )
+        payload['summary']['available_field_names'] = ['전산학술', '테스트분야']
+        payload['summary']['available_categories'] = ['데이터베이스']
+        payload['summary']['available_issuers'] = ['한국은행']
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (responsePayload) => {
+                  window.__questionBankRequestQueries = [];
+                  const originalFetch = window.fetch.bind(window);
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname !== '/api/question-bank') return originalFetch(input, init);
+                    window.__questionBankRequestQueries.push({
+                      field_name: parsed.searchParams.get('field_name') || '',
+                      category: parsed.searchParams.get('category') || '',
+                      issuer: parsed.searchParams.get('issuer') || '',
+                      limit: parsed.searchParams.get('limit') || '',
+                    });
+                    return Promise.resolve(new Response(JSON.stringify(responsePayload), {
+                      status: 200,
+                      headers: {'Content-Type': 'application/json'},
+                    }));
+                  };
+                }
+                """,
+                payload,
+            )
+            await page.goto(f'{self.base_url}/question-bank?field_name=%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction("document.querySelector('#bankPageFieldInput').value === '전산학술'")
+            case['initial_request'] = await page.evaluate('window.__questionBankRequestQueries[0]')
+            case['initial_state'] = await page.evaluate(
+                """
+                () => ({
+                  fieldName: document.querySelector('#bankPageFieldInput')?.value || '',
+                  activeFilters: document.querySelector('#bankPageActiveFilters')?.textContent || '',
+                  search: window.location.search,
+                })
+                """
+            )
+            self.assertEqual(case['initial_request']['field_name'], '전산학술')
+            self.assertEqual(case['initial_state']['fieldName'], '전산학술')
+            self.assertIn('전산학술', case['initial_state']['activeFilters'])
+            self.assertIn('field_name=%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0', case['initial_state']['search'])
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction("document.querySelector('#bankPageFieldInput').value === '전산학술'")
+            case['reload_request'] = await page.evaluate('window.__questionBankRequestQueries[0]')
+            case['reload_state'] = await page.evaluate(
+                """
+                () => ({
+                  fieldName: document.querySelector('#bankPageFieldInput')?.value || '',
+                  activeFilters: document.querySelector('#bankPageActiveFilters')?.textContent || '',
+                  search: window.location.search,
+                })
+                """
+            )
+            self.assertEqual(case['reload_request']['field_name'], '전산학술')
+            self.assertEqual(case['reload_state']['fieldName'], '전산학술')
+            self.assertIn('전산학술', case['reload_state']['activeFilters'])
+            self.assertIn('field_name=%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0', case['reload_state']['search'])
+
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('history.back()')
+            await page.waitForFunction("window.location.pathname === '/question-bank'")
+            await page.waitForFunction("document.querySelector('#bankPageFieldInput').value === '전산학술'")
+            case['back_forward_state'] = await page.evaluate(
+                """
+                () => ({
+                  fieldName: document.querySelector('#bankPageFieldInput')?.value || '',
+                  activeFilters: document.querySelector('#bankPageActiveFilters')?.textContent || '',
+                  search: window.location.search,
+                })
+                """
+            )
+            self.assertEqual(case['back_forward_state']['fieldName'], '전산학술')
+            self.assertIn('전산학술', case['back_forward_state']['activeFilters'])
+            self.assertIn('field_name=%EC%A0%84%EC%82%B0%ED%95%99%EC%88%A0', case['back_forward_state']['search'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-dynamic-filter-deeplink-reload', status=status, observations=case)
+            await page.close()
     async def test_question_bank_page_ignores_stale_filters_on_same_tab_fresh_entry_without_url_params(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

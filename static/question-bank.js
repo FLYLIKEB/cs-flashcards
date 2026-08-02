@@ -618,12 +618,35 @@ function handleOpenCategoryGuideDialogKeydown(event) {
 function fieldByKey(key) {
   return FILTER_FIELDS.find((field) => field.key === key) || null;
 }
+function ensureSelectValue(select, value = '') {
+  if (!select) return;
+  const normalizedValue = String(value || '').trim();
+  [...select.querySelectorAll('option[data-dynamic-filter-value="true"]')].forEach((option) => option.remove());
+  if (!normalizedValue) {
+    select.value = '';
+    return;
+  }
+  const hasMatchingOption = [...select.options].some((option) => String(option.value || '').trim() === normalizedValue);
+  if (!hasMatchingOption) {
+    const option = document.createElement('option');
+    option.value = normalizedValue;
+    option.textContent = normalizedValue;
+    option.dataset.dynamicFilterValue = 'true';
+    select.append(option);
+  }
+  select.value = normalizedValue;
+}
 
 function setFilterValue(key, value = '') {
   const field = fieldByKey(key);
   if (!field) return;
   const node = $(field.id);
-  if (node) node.value = value;
+  if (!node) return;
+  if (node.tagName === 'SELECT') {
+    ensureSelectValue(node, value);
+    return;
+  }
+  node.value = value;
 }
 
 function clearFilterField(key) {
@@ -814,16 +837,16 @@ function hasUrlFilterState() {
 
 function applyFiltersFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  if ($('bankPageQueryInput')) $('bankPageQueryInput').value = params.get('q') || '';
-  if ($('bankPageAttemptStatusSelect')) $('bankPageAttemptStatusSelect').value = params.get('attempt_status') || params.get('status') || '';
-  if ($('bankPageTopicInput')) $('bankPageTopicInput').value = params.get('topic') || '';
-  if ($('bankPageFieldInput')) $('bankPageFieldInput').value = params.get('field_name') || '';
-  if ($('bankPageCategoryInput')) $('bankPageCategoryInput').value = params.get('category') || params.get('card_category') || '';
-  if ($('bankPageIssuerInput')) $('bankPageIssuerInput').value = params.get('issuer') || '';
-  if ($('bankPageSourceInput')) $('bankPageSourceInput').value = params.get('source_location') || '';
-  if ($('bankPageDifficultySelect')) $('bankPageDifficultySelect').value = params.get('difficulty') || '';
-  if ($('bankPageTypeSelect')) $('bankPageTypeSelect').value = params.get('question_type') || '';
-  if ($('bankPageSectionInput')) $('bankPageSectionInput').value = params.get('section') || '';
+  setFilterValue('q', params.get('q') || '');
+  setFilterValue('attempt_status', params.get('attempt_status') || params.get('status') || '');
+  setFilterValue('topic', params.get('topic') || '');
+  setFilterValue('field_name', params.get('field_name') || '');
+  setFilterValue('category', params.get('category') || params.get('card_category') || '');
+  setFilterValue('issuer', params.get('issuer') || '');
+  setFilterValue('source_location', params.get('source_location') || '');
+  setFilterValue('difficulty', params.get('difficulty') || '');
+  setFilterValue('question_type', params.get('question_type') || '');
+  setFilterValue('section', params.get('section') || '');
 }
 
 function applyFiltersFromState(filters = {}) {
@@ -854,7 +877,7 @@ function populateIssuerOptions(issuers, selected = '') {
     options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
   });
   select.innerHTML = options.join('');
-  select.value = (Array.isArray(issuers) && issuers.includes(selectedValue)) ? selectedValue : '';
+  ensureSelectValue(select, selectedValue);
 }
 
 function populateCategoryOptions(categories, selected = '') {
@@ -868,7 +891,7 @@ function populateCategoryOptions(categories, selected = '') {
     options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
   });
   select.innerHTML = options.join('');
-  select.value = (Array.isArray(categories) && categories.includes(selectedValue)) ? selectedValue : '';
+  ensureSelectValue(select, selectedValue);
 }
 
 function populateTopicOptions(topics, selected = '') {
@@ -896,7 +919,7 @@ function populateFieldNameOptions(fieldNames, selected = '') {
     options.push(`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`);
   });
   select.innerHTML = options.join('');
-  select.value = (Array.isArray(fieldNames) && fieldNames.includes(selectedValue)) ? selectedValue : '';
+  ensureSelectValue(select, selectedValue);
 }
 
 function queryString() {
