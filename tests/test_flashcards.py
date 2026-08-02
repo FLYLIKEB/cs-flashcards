@@ -4355,6 +4355,26 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(saved['card']['question_attempt_count'], 1)
             self.assertEqual(saved['card']['question_wrong_count'], 1)
             self.assertEqual(saved['card']['latest_wrong_note'], '정의와 용어를 혼동함')
+            with closing(sqlite3.connect(db_path)) as conn:
+                persisted = conn.execute(
+                    "SELECT question_id, card_id, judgment, wrong_note, session_mode, section, points, expected_time_seconds, answer_guide FROM question_attempts WHERE question_id = ?",
+                    ('q-CS-001-direct-1',),
+                ).fetchone()
+            self.assertIsNotNone(persisted)
+            self.assertEqual(persisted[0], 'q-CS-001-direct-1')
+            self.assertEqual(persisted[1], 'CS-001')
+            self.assertEqual(persisted[2], 'wrong')
+            self.assertEqual(persisted[3], '정의와 용어를 혼동함')
+            self.assertEqual(persisted[4], 'bok')
+            self.assertEqual(persisted[5], '전공필기')
+            self.assertEqual(persisted[6], 10)
+            self.assertEqual(persisted[7], 720)
+            self.assertEqual(persisted[8], '정의 → 원리 → 장단점/비교 → 예시 → 금융IT 적용 순으로 5~7문장')
+
+            fresh_card = flashcard_app.read_card(db_path, 'CS-001')
+            self.assertEqual(fresh_card['question_attempt_count'], 1)
+            self.assertEqual(fresh_card['question_wrong_count'], 1)
+            self.assertEqual(fresh_card['latest_wrong_note'], '정의와 용어를 혼동함')
     def test_optional_basic_auth_helper(self):
         original_user = flashcard_app.PUBLIC_USERNAME
         original_password = flashcard_app.PUBLIC_PASSWORD
