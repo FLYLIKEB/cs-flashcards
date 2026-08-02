@@ -641,6 +641,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.focus('#questionPracticeBtn')
             await page.click('#questionPracticeBtn')
             await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'closeQuestionModeBtn'")
             case['question_panel_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['question_panel_focus_on_open'], 'closeQuestionModeBtn')
 
@@ -668,6 +669,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.click('#menuBtn')
             await page.click('#memoListBtn')
             await page.waitForFunction("document.querySelector('#memoListDialog').hidden === false")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'memoListCloseBtn'")
             case['memo_dialog_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['memo_dialog_focus_on_open'], 'memoListCloseBtn')
 
