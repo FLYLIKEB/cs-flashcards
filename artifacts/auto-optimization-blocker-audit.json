@@ -1,91 +1,46 @@
 {
-  "checked_at": "2026-08-02T15:27:29Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T15:30:05Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 2,
-    "open_pr_count": 2,
-    "blocking_worktree_count": 2,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 2
   },
-  "open_issues": [
-    {
-      "number": 141,
-      "state": "OPEN",
-      "title": "문제은행 숨김 풀이 세트가 필터 변경 뒤 다른 문제로 보이는 상태 꼬임 수정",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/141"
-    },
-    {
-      "number": 140,
-      "state": "OPEN",
-      "title": "연결 카드 없는 문제은행 풀이가 빈 진행 행을 만들지 않도록 정리",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/140"
-    }
-  ],
-  "open_prs": [
-    {
-      "baseRefName": "main",
-      "headRefName": "issue-141-hidden-practice-filter-mismatch",
-      "isDraft": false,
-      "mergeStateStatus": "CLEAN",
-      "number": 143,
-      "reviewDecision": "",
-      "title": "Issue 141: 문제은행 숨김 풀이 세트 필터 충돌 정리",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/143"
-    },
-    {
-      "baseRefName": "main",
-      "headRefName": "issue-140-null-card-progress-sentinel",
-      "isDraft": false,
-      "mergeStateStatus": "CLEAN",
-      "number": 142,
-      "reviewDecision": "",
-      "title": "Issue 140: 연결 없는 문제은행 시도 sentinel 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/142"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-140",
-      "branch": "issue-140-null-card-progress-sentinel",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-141",
-      "branch": "issue-141-hidden-practice-filter-mismatch",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [
     {
       "surface": "backend",
       "title": "문제은행 저장 시 전체 카드 대시보드 재로딩 제거",
-      "status": "deferred-after-140"
+      "status": "ready-for-next-round"
     },
     {
       "surface": "frontend",
       "title": "임베드 문제은행 필터 접근성 이름 보강",
-      "status": "deferred-after-141"
+      "status": "ready-for-next-round"
     }
   ],
   "recently_completed": [
     {
+      "issue": 141,
+      "pr": 143,
+      "merge_commit": "57401cd7bab445e027eabb7c5a5190a7084ac9f6"
+    },
+    {
+      "issue": 140,
+      "pr": 142,
+      "merge_commit": "0fd42031884098e5942db5bfecd8f99e88671b5c"
+    },
+    {
       "issue": 137,
       "pr": 139,
       "merge_commit": "d03ecd591c08813f6d04ea67adefddfe85bacbe3"
-    },
-    {
-      "issue": 136,
-      "pr": 138,
-      "merge_commit": "fd58317be410cfcb13aea90f097ea6934308a7a1"
-    },
-    {
-      "issue": 133,
-      "pr": 135,
-      "merge_commit": "b91e982dab8a6ac2e810517f5f5134cee81a7b34"
     }
   ],
   "notes": [
-    "Round 26 is in PR review state.",
-    "Focused local verification already passed in both issue worktrees before PR creation."
+    "Round 26 is complete and the next optimization gate is open.",
+    "Deferred backlog still contains one backend and one frontend candidate."
   ]
 }

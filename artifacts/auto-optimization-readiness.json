@@ -1,63 +1,16 @@
 {
-  "checked_at": "2026-08-02T15:27:29Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T15:30:05Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 2,
-    "open_pr_count": 2,
-    "blocking_worktree_count": 2
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0
   },
   "notes": [
-    "Round 26 issues #140 and #141 are open with implementation branches pushed.",
-    "PR #142 and PR #143 are open and waiting on review/check completion."
+    "Round 26 merged cleanly: PR #142 and PR #143 landed.",
+    "Issue worktrees were removed and the repository gate is open again."
   ],
-  "open_issues": [
-    {
-      "number": 141,
-      "state": "OPEN",
-      "title": "문제은행 숨김 풀이 세트가 필터 변경 뒤 다른 문제로 보이는 상태 꼬임 수정",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/141"
-    },
-    {
-      "number": 140,
-      "state": "OPEN",
-      "title": "연결 카드 없는 문제은행 풀이가 빈 진행 행을 만들지 않도록 정리",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/140"
-    }
-  ],
-  "open_prs": [
-    {
-      "baseRefName": "main",
-      "headRefName": "issue-141-hidden-practice-filter-mismatch",
-      "isDraft": false,
-      "mergeStateStatus": "CLEAN",
-      "number": 143,
-      "reviewDecision": "",
-      "title": "Issue 141: 문제은행 숨김 풀이 세트 필터 충돌 정리",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/143"
-    },
-    {
-      "baseRefName": "main",
-      "headRefName": "issue-140-null-card-progress-sentinel",
-      "isDraft": false,
-      "mergeStateStatus": "CLEAN",
-      "number": 142,
-      "reviewDecision": "",
-      "title": "Issue 140: 연결 없는 문제은행 시도 sentinel 제거",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/142"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-140",
-      "branch": "issue-140-null-card-progress-sentinel",
-      "head": "305ebf21b6d88f9d01d55bba238fe6ccf22736b4",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-141",
-      "branch": "issue-141-hidden-practice-filter-mismatch",
-      "head": "2b2fde67e0e67dbd3240c76eec88227a6c16ddcb",
-      "status": "tracked-branch-worktree"
-    }
-  ]
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": []
 }
