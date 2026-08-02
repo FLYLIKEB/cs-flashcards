@@ -301,6 +301,12 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'function markQuestionSourceCard(status)',
             'data-question-mark',
             'data-question-judgment',
+            'data-question-edit="1"',
+            'questionBankEditDialog',
+            'questionBankEditPromptInput',
+            'function openQuestionBankEditDialog()',
+            'function saveCurrentQuestionBankEdit()',
+            '/api/question-bank/',
             'data-question-answer-refine',
             'questionAnswerRefineInstruction',
             'function refineCurrentQuestionAnswer()',
@@ -341,6 +347,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('id="questionImportDialog"', INDEX_HTML)
         self.assertIn('id="questionImportInput"', INDEX_HTML)
         self.assertIn('id="questionImportApplyBtn"', INDEX_HTML)
+        self.assertIn('id="questionBankEditDialog"', INDEX_HTML)
+        self.assertIn('id="questionBankEditPromptInput"', INDEX_HTML)
         self.assertIn('data-question-history-filter="ambiguous"', INDEX_HTML)
         self.assertIn('data-question-history-filter="unknown"', INDEX_HTML)
         self.assertIn('.question-history-filter-row', STYLE_CSS)
@@ -352,6 +360,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-history-session-meta', STYLE_CSS)
         self.assertIn('.question-import-body', STYLE_CSS)
         self.assertIn('.question-import-input', STYLE_CSS)
+        self.assertIn('.question-bank-edit-body', STYLE_CSS)
+        self.assertIn('.question-inline-toolbar', STYLE_CSS)
         self.assertIn('question-toolbar-button', INDEX_HTML)
         self.assertIn('question-toolbar-eyebrow', INDEX_HTML)
         self.assertIn('question-stage', INDEX_HTML)
