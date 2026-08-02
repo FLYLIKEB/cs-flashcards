@@ -2999,6 +2999,73 @@ class FlashcardProgressTests(unittest.TestCase):
             finally:
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.OPENAI_API_KEY = original_key
+    def test_api_question_bank_ai_refine_answer_tolerates_stale_linked_card_id_without_read_cards(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+            saved = flashcard_app.upsert_question_bank_entries([
+                {
+                    'card_id': 'CS-001',
+                    'question_type': 'subjective',
+                    'prompt': '정규화의 목적은?',
+                    'body': '중복과 이상 현상 관점에서 설명하시오.',
+                    'answer': '데이터 중복을 줄이고 이상 현상을 방지한다.',
+                    'explanation': '정규화는 스키마 일관성을 높인다.',
+                    'rubric': ['중복 감소', '이상 현상 방지'],
+                    'topic': '데이터베이스',
+                    'field_name': '테스트',
+                    'keywords': ['정규화'],
+                    'difficulty': '중',
+                    'issuer': '테스트',
+                    'source_location': '테스트 문제 2',
+                    'section': '연습문제',
+                    'points': 10,
+                    'expected_time_seconds': 300,
+                    'answer_guide': '정의 → 목적',
+                    'session_mode': 'practice',
+                }
+            ], db_path)
+            seeded_item = saved['items'][0]
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute(
+                    "UPDATE question_bank SET card_id = ? WHERE id = ?",
+                    ('STALE-CARD', seeded_item['question_bank_id']),
+                )
+                conn.commit()
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                with mock.patch.object(
+                    flashcard_app,
+                    'read_cards',
+                    side_effect=AssertionError('question-bank ai refine should not reload all cards'),
+                ), mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    return_value=FakeUrlopenResponse({
+                        'output_text': json.dumps({
+                            'answer': '정규화는 데이터 중복과 이상 현상을 함께 줄이도록 테이블 구조를 정리하는 원칙이다.',
+                            'explanation': '연결 카드가 없어도 문제은행 보강은 계속된다.',
+                            'rubric': ['중복 제거', '이상 현상 방지'],
+                            'answer_guide': '정의 → 목적 → 효과 순으로 답안 작성',
+                        }, ensure_ascii=False),
+                    }),
+                ):
+                    data = flashcard_app.api_question_bank_ai_refine_answer(
+                        seeded_item['question_bank_id'],
+                        flashcard_app.QuestionBankAiRefineRequest(instruction='연결 카드가 없어도 보강 계속'),
+                    )
+                self.assertEqual(data['question_bank_id'], seeded_item['question_bank_id'])
+                self.assertIn('이상', data['item']['answer'])
+                self.assertEqual(data['item']['rubric'], ['중복 제거', '이상 현상 방지'])
+            finally:
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.OPENAI_API_KEY = original_key
     def test_old_progress_schema_migrates_for_bookmark_and_memo_columns(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
