@@ -1980,11 +1980,11 @@ def mark_card(
     if status not in VALID_STATUSES:
         raise ValueError("known_status must be O, X, or empty")
 
-    card = read_card(progress_db_path, card_id)
-    normalized_card_id = str(card.get("id") or card_id)
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
+        card = _ensure_card_exists(card_id, db_path, conn=conn)
+        normalized_card_id = str(card.get("id") or card_id)
         existing = conn.execute(
             "SELECT review_count FROM card_progress WHERE card_id = ?",
             (normalized_card_id,),
@@ -2011,7 +2011,7 @@ def mark_card(
             (normalized_card_id, status, last_reviewed, max(0, count), now),
         )
         conn.commit()
-    return read_card(db_path, normalized_card_id)
+        return read_card(db_path, normalized_card_id, conn=conn)
 
 
 def _ensure_card_exists(
@@ -2028,11 +2028,11 @@ def set_bookmark(
     bookmarked: bool,
     progress_db_path: Path | None = None,
 ) -> dict[str, str]:
-    card = _ensure_card_exists(card_id, progress_db_path)
-    normalized_card_id = str(card.get("id") or card_id)
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
+        card = _ensure_card_exists(card_id, db_path, conn=conn)
+        normalized_card_id = str(card.get("id") or card_id)
         conn.execute(
             """
             INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
@@ -2044,7 +2044,7 @@ def set_bookmark(
             (normalized_card_id, 1 if bookmarked else 0, utc_now_iso()),
         )
         conn.commit()
-    return read_card(db_path, normalized_card_id)
+        return read_card(db_path, normalized_card_id, conn=conn)
 
 
 def save_memo(
@@ -2052,13 +2052,13 @@ def save_memo(
     memo: str,
     progress_db_path: Path | None = None,
 ) -> dict[str, str]:
-    card = _ensure_card_exists(card_id, progress_db_path)
-    normalized_card_id = str(card.get("id") or card_id)
     normalized_memo = str(memo or "")[:20000]
     memo_updated_at = utc_now_iso() if normalized_memo.strip() else ""
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     with closing(connect_progress_db(db_path)) as conn:
+        card = _ensure_card_exists(card_id, db_path, conn=conn)
+        normalized_card_id = str(card.get("id") or card_id)
         conn.execute(
             """
             INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, bookmarked, memo, memo_updated_at, updated_at)
@@ -2071,7 +2071,7 @@ def save_memo(
             (normalized_card_id, normalized_memo, memo_updated_at, utc_now_iso()),
         )
         conn.commit()
-    return read_card(db_path, normalized_card_id)
+        return read_card(db_path, normalized_card_id, conn=conn)
 
 
 def read_card_mutation_summary(progress_db_path: Path | None = None) -> dict[str, Any]:
