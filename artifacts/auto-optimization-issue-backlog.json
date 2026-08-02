@@ -1,19 +1,18 @@
 {
-  "generated_at": "2026-08-02T16:24:11Z",
+  "generated_at": "2026-08-02T16:33:34Z",
   "wave": "2026-08-02-round-29",
-  "queue": [
-    {
-      "issue": 157,
-      "title": "카드 목록·상세 조회가 question_attempts 전체를 매번 재집계함",
-      "branch": "issue-157-card-read-attempt-summary-cache",
-      "status": "implementation_in_progress"
-    }
-  ],
+  "queue": [],
   "completed": [
     {
       "issue": 156,
       "pr": 158,
       "branch": "issue-156-main-symbolic-button-a11y",
+      "status": "merged"
+    },
+    {
+      "issue": 157,
+      "pr": 159,
+      "branch": "issue-157-card-read-attempt-summary-cache",
       "status": "merged"
     }
   ],

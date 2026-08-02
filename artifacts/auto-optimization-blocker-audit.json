@@ -1,30 +1,22 @@
 {
-  "checked_at": "2026-08-02T16:24:11Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T16:33:34Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 1,
+    "open_issue_count": 0,
     "open_pr_count": 0,
-    "blocking_worktree_count": 1,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 157,
-      "state": "OPEN",
-      "title": "카드 목록·상세 조회가 question_attempts 전체를 매번 재집계함",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/157"
-    }
-  ],
+  "open_issues": [],
   "open_prs": [],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-157",
-      "branch": "issue-157-card-read-attempt-summary-cache",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
+    {
+      "issue": 157,
+      "pr": 159,
+      "merge_commit": "31f0b3212386c62078eef705b25f4ccbfe1682c7"
+    },
     {
       "issue": 156,
       "pr": 158,
@@ -32,8 +24,8 @@
     }
   ],
   "notes": [
-    "Issue #156 / PR #158 is merged and cleaned up.",
-    "Issue #157 is the only remaining in-flight optimization lane.",
-    "Round 29 will resume automatically from backend implementation once that lane finishes review and merge."
+    "Issue #157 / PR #159 is merged and cleaned up.",
+    "No blocking issue/PR/worktree remains at the end of round 29.",
+    "A fresh audit round should begin immediately on latest main."
   ]
 }
