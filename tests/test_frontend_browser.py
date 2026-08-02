@@ -707,6 +707,63 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='header-menu-keyboard-focus', status=status, observations=case)
             await page.close()
 
+    async def test_main_symbolic_buttons_expose_explicit_accessible_names(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#menuBtn')
+            case['controls'] = await page.evaluate(
+                """
+                () => {
+                  const specs = [
+                    ['filterAllBtn', '전체', '전체', 'Σ'],
+                    ['filterKnownBtn', '안다', '안다', 'O'],
+                    ['filterUnknownBtn', '모른다', '모른다', 'X'],
+                    ['filterUnreviewedBtn', '미학습', '미학습', '–'],
+                    ['questionPracticeBtn', '문제 풀이', '문제 풀이', 'Q'],
+                    ['menuBtn', '메뉴', '메뉴', '☰'],
+                    ['collapsedPlayBtn', '자동 듣기 재생', '재생', '▶'],
+                    ['collapsedStopBtn', '자동 듣기 정지', '정지', '■'],
+                    ['playAudioBtn', '자동 듣기 재생', '재생', '▶'],
+                    ['stopAudioBtn', '자동 듣기 정지', '정지', '■'],
+                    ['prevQuestionBtn', '이전 문제', '이전 문제', '←'],
+                    ['nextQuestionBtn', '다음 문제', '다음 문제', '→'],
+                    ['knownBtn', '안다', '안다', 'O'],
+                    ['unknownBtn', '모른다', '모른다', 'X'],
+                    ['unreviewedBtn', '미학습으로 되돌리기', '미학습으로 되돌리기', '–'],
+                  ];
+                  return Object.fromEntries(
+                    specs.map(([id, expectedLabel, expectedTitle, expectedText]) => {
+                      const node = document.getElementById(id);
+                      return [
+                        id,
+                        {
+                          exists: Boolean(node),
+                          ariaLabel: node?.getAttribute('aria-label') || '',
+                          title: node?.getAttribute('title') || '',
+                          text: (node?.textContent || '').replace(/\s+/g, ' ').trim(),
+                          expectedLabel,
+                          expectedTitle,
+                          expectedText,
+                        },
+                      ];
+                    }),
+                  );
+                }
+                """
+            )
+            for control_id, snapshot in case['controls'].items():
+                self.assertTrue(snapshot['exists'], control_id)
+                self.assertEqual(snapshot['ariaLabel'], snapshot['expectedLabel'], control_id)
+                self.assertEqual(snapshot['title'], snapshot['expectedTitle'], control_id)
+                self.assertTrue(snapshot['text'].startswith(snapshot['expectedText']), control_id)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='main-symbolic-button-a11y', status=status, observations=case)
+            await page.close()
+
     async def test_concept_image_dialog_focus_traps_embedded_media_and_restores_opener(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
