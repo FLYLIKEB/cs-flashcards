@@ -5336,20 +5336,30 @@ def should_backfill_question_bank_runtime_rows(conn: sqlite3.Connection) -> bool
     ).fetchone()
     if row is None:
         return True
-    return str(row["value"] or "") != current_state
+    stored_state = str(row["value"] or "")
+    if stored_state == current_state:
+        return False
+    if stored_state == "dirty" or stored_state.startswith("dirty:"):
+        return True
+    difficulty_updates, keyword_updates = question_bank_runtime_backfill_updates(conn)
+    if difficulty_updates or keyword_updates:
+        return True
+    mark_question_bank_runtime_backfill_clean(conn, current_state=current_state)
+    return False
 
 
-def mark_question_bank_runtime_backfill_clean(conn: sqlite3.Connection) -> None:
+def mark_question_bank_runtime_backfill_clean(conn: sqlite3.Connection, *, current_state: str | None = None) -> None:
     conn.execute(
         """
         INSERT INTO maintenance_state (key, value)
         VALUES (?, ?)
         ON CONFLICT(key) DO UPDATE SET value = excluded.value
         """,
-        ("question_bank_runtime_backfill_v1", question_bank_runtime_backfill_state(conn)),
+        ("question_bank_runtime_backfill_v1", current_state or question_bank_runtime_backfill_state(conn)),
     )
 
-def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
+
+def question_bank_runtime_backfill_updates(conn: sqlite3.Connection) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
     rows = conn.execute(
         """
         SELECT id, card_id, question_type, prompt, body, answer, explanation, difficulty, keywords_json, missing_card_keywords_json
@@ -5357,7 +5367,7 @@ def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
         """
     ).fetchall()
     if not rows:
-        return
+        return [], []
     card_ids = sorted({str(row["card_id"] or "").strip() for row in rows if str(row["card_id"] or "").strip()})
     card_map: dict[str, dict[str, Any]] = {}
     if card_ids:
@@ -5404,6 +5414,11 @@ def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
                 expected_difficulty = QUESTION_BANK_DEFAULT_DIFFICULTY
         if current_difficulty != expected_difficulty:
             difficulty_updates.append((expected_difficulty, row["id"]))
+    return difficulty_updates, keyword_updates
+
+
+def backfill_question_bank_difficulty_rows(conn: sqlite3.Connection) -> None:
+    difficulty_updates, keyword_updates = question_bank_runtime_backfill_updates(conn)
     if keyword_updates:
         conn.executemany("UPDATE question_bank SET keywords_json = ? WHERE id = ?", keyword_updates)
     if difficulty_updates:

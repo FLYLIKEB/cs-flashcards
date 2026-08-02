@@ -3047,7 +3047,13 @@ class FlashcardProgressTests(unittest.TestCase):
                 )
                 conn.commit()
 
-            flashcard_app.ensure_progress_db(db_path)
+            with mock.patch.object(
+                flashcard_app,
+                'backfill_question_bank_difficulty_rows',
+                wraps=flashcard_app.backfill_question_bank_difficulty_rows,
+            ) as backfill_mock:
+                flashcard_app.ensure_progress_db(db_path)
+            backfill_mock.assert_called_once()
             with closing(sqlite3.connect(db_path)) as conn:
                 conn.row_factory = sqlite3.Row
                 repaired = conn.execute(
@@ -3086,10 +3092,8 @@ class FlashcardProgressTests(unittest.TestCase):
                 ],
                 db_path,
             )
-            flashcard_app.ensure_progress_db(db_path)
-
             with mock.patch.object(flashcard_app, 'backfill_question_bank_difficulty_rows') as backfill_mock:
-                flashcard_app.ensure_progress_db(db_path)
+                flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
                 flashcard_app.ensure_progress_db(db_path)
 
             backfill_mock.assert_not_called()
