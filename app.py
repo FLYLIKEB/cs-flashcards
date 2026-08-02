@@ -1309,6 +1309,9 @@ def ensure_progress_db(
         backfill_question_bank_difficulty_rows(conn)
 
 
+        summary_table_exists = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'question_attempt_card_summary'"
+        ).fetchone() is not None
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS question_attempts (
@@ -1376,7 +1379,22 @@ def ensure_progress_db(
         )
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_result ON question_attempts(is_correct)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_session_id ON question_attempts(session_id)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS question_attempt_card_summary (
+                card_id TEXT PRIMARY KEY,
+                question_attempt_count INTEGER NOT NULL DEFAULT 0,
+                question_correct_count INTEGER NOT NULL DEFAULT 0,
+                question_wrong_count INTEGER NOT NULL DEFAULT 0,
+                latest_wrong_note TEXT NOT NULL DEFAULT '',
+                latest_wrong_note_updated_at TEXT NOT NULL DEFAULT ''
+            )
+            """
+        )
+        if not summary_table_exists:
+            _rebuild_question_attempt_card_summary_cache(conn)
         _drop_empty_card_progress_sentinel(conn)
+
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS wiki_ai_jobs (
@@ -1647,40 +1665,29 @@ def read_card(progress_db_path: Path | None, card_id: Any) -> dict[str, Any]:
                 "memo": progress_row["memo"] or "",
                 "memo_updated_at": progress_row["memo_updated_at"] or "",
             })
-        stats_row = conn.execute(
-            """
-            SELECT
-                COUNT(*) AS question_attempt_count,
-                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS question_correct_count,
-                SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS question_wrong_count
-            FROM question_attempts
-            WHERE card_id = ?
-            """,
-            (normalized_card_id,),
-        ).fetchone()
-        item["question_attempt_count"] = int(stats_row["question_attempt_count"] or 0) if stats_row else 0
-        item["question_correct_count"] = int(stats_row["question_correct_count"] or 0) if stats_row else 0
-        item["question_wrong_count"] = int(stats_row["question_wrong_count"] or 0) if stats_row else 0
-        latest_wrong_note_row = conn.execute(
-            """
-            SELECT wrong_note, updated_at
-            FROM question_attempts
-            WHERE card_id = ?
-              AND judgment IN ('ambiguous', 'wrong', 'unknown')
-              AND TRIM(COALESCE(wrong_note, '')) <> ''
-            ORDER BY updated_at DESC, created_at DESC, question_id DESC
-            LIMIT 1
-            """,
-            (normalized_card_id,),
-        ).fetchone()
+        summary = _question_attempt_summary_dict(
+            conn.execute(
+                """
+                SELECT
+                    question_attempt_count,
+                    question_correct_count,
+                    question_wrong_count,
+                    latest_wrong_note,
+                    latest_wrong_note_updated_at
+                FROM question_attempt_card_summary
+                WHERE card_id = ?
+                """,
+                (normalized_card_id,),
+            ).fetchone()
+        )
     item["known_status"] = item.get("known_status") or ""
     item["last_reviewed"] = item.get("last_reviewed") or ""
     item["review_count"] = normalized_review_count(item.get("review_count"))
     item["bookmarked"] = normalized_bookmarked(item.get("bookmarked"))
     item["memo"] = item.get("memo") or ""
     item["memo_updated_at"] = item.get("memo_updated_at") or ""
-    item["latest_wrong_note"] = latest_wrong_note_row["wrong_note"] or "" if latest_wrong_note_row else ""
-    item["latest_wrong_note_updated_at"] = latest_wrong_note_row["updated_at"] or "" if latest_wrong_note_row else ""
+    item.update(summary)
+
     return item
 
 def read_card_attempt_context(progress_db_path: Path | None, card_ids: list[str] | None) -> dict[str, dict[str, str]]:
@@ -2547,6 +2554,138 @@ def resolved_question_attempt_judgment_sql(*, judgment_column: str = "judgment",
         f"CASE WHEN TRIM(COALESCE({judgment_column}, '')) <> '' THEN LOWER(TRIM({judgment_column})) "
         f"WHEN {is_correct_column} = 1 THEN 'correct' WHEN {is_correct_column} = 0 THEN 'wrong' ELSE 'pending' END"
     )
+
+
+def _question_attempt_summary_dict(row: sqlite3.Row | None) -> dict[str, Any]:
+    return {
+        "question_attempt_count": int(row["question_attempt_count"] or 0) if row else 0,
+        "question_correct_count": int(row["question_correct_count"] or 0) if row else 0,
+        "question_wrong_count": int(row["question_wrong_count"] or 0) if row else 0,
+        "latest_wrong_note": row["latest_wrong_note"] or "" if row else "",
+        "latest_wrong_note_updated_at": row["latest_wrong_note_updated_at"] or "" if row else "",
+    }
+
+
+def _rebuild_question_attempt_card_summary_cache(conn: sqlite3.Connection) -> None:
+    judgment_sql = resolved_question_attempt_judgment_sql(
+        judgment_column="qa.judgment",
+        is_correct_column="qa.is_correct",
+    )
+    conn.execute("DELETE FROM question_attempt_card_summary")
+    conn.execute(
+        f"""
+        INSERT INTO question_attempt_card_summary (
+            card_id,
+            question_attempt_count,
+            question_correct_count,
+            question_wrong_count,
+            latest_wrong_note,
+            latest_wrong_note_updated_at
+        )
+        WITH attempt_counts AS (
+            SELECT
+                qa.card_id,
+                COUNT(*) AS question_attempt_count,
+                SUM(CASE WHEN {judgment_sql} = 'correct' THEN 1 ELSE 0 END) AS question_correct_count,
+                SUM(CASE WHEN {judgment_sql} IN ('ambiguous', 'wrong', 'unknown') THEN 1 ELSE 0 END) AS question_wrong_count
+            FROM question_attempts AS qa
+            WHERE TRIM(COALESCE(qa.card_id, '')) <> ''
+            GROUP BY qa.card_id
+        ),
+        latest_wrong_notes AS (
+            SELECT card_id, wrong_note, updated_at
+            FROM (
+                SELECT
+                    qa.card_id,
+                    qa.wrong_note,
+                    qa.updated_at,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY qa.card_id
+                        ORDER BY qa.updated_at DESC, qa.answered_at DESC, qa.question_order DESC, qa.question_id DESC
+                    ) AS row_number
+                FROM question_attempts AS qa
+                WHERE TRIM(COALESCE(qa.card_id, '')) <> ''
+                  AND {judgment_sql} IN ('ambiguous', 'wrong', 'unknown')
+                  AND TRIM(COALESCE(qa.wrong_note, '')) <> ''
+            )
+            WHERE row_number = 1
+        )
+        SELECT
+            attempt_counts.card_id,
+            attempt_counts.question_attempt_count,
+            attempt_counts.question_correct_count,
+            attempt_counts.question_wrong_count,
+            COALESCE(latest_wrong_notes.wrong_note, '') AS latest_wrong_note,
+            COALESCE(latest_wrong_notes.updated_at, '') AS latest_wrong_note_updated_at
+        FROM attempt_counts
+        LEFT JOIN latest_wrong_notes ON latest_wrong_notes.card_id = attempt_counts.card_id
+        """
+    )
+
+
+def _refresh_question_attempt_card_summary_cache(conn: sqlite3.Connection, card_ids: list[str] | None) -> None:
+    normalized_ids = sorted(normalize_card_ids(card_ids) or [])
+    if not normalized_ids:
+        return
+    judgment_sql = resolved_question_attempt_judgment_sql(
+        judgment_column="qa.judgment",
+        is_correct_column="qa.is_correct",
+    )
+    for card_id in normalized_ids:
+        row = conn.execute(
+            f"""
+            WITH latest_wrong_note AS (
+                SELECT qa.wrong_note, qa.updated_at
+                FROM question_attempts AS qa
+                WHERE qa.card_id = ?
+                  AND {judgment_sql} IN ('ambiguous', 'wrong', 'unknown')
+                  AND TRIM(COALESCE(qa.wrong_note, '')) <> ''
+                ORDER BY qa.updated_at DESC, qa.answered_at DESC, qa.question_order DESC, qa.question_id DESC
+                LIMIT 1
+            )
+            SELECT
+                COUNT(*) AS question_attempt_count,
+                SUM(CASE WHEN {judgment_sql} = 'correct' THEN 1 ELSE 0 END) AS question_correct_count,
+                SUM(CASE WHEN {judgment_sql} IN ('ambiguous', 'wrong', 'unknown') THEN 1 ELSE 0 END) AS question_wrong_count,
+                COALESCE((SELECT wrong_note FROM latest_wrong_note), '') AS latest_wrong_note,
+                COALESCE((SELECT updated_at FROM latest_wrong_note), '') AS latest_wrong_note_updated_at
+            FROM question_attempts AS qa
+            WHERE qa.card_id = ?
+            """,
+            (card_id, card_id),
+        ).fetchone()
+        summary = _question_attempt_summary_dict(row)
+        if summary["question_attempt_count"] <= 0:
+            conn.execute("DELETE FROM question_attempt_card_summary WHERE card_id = ?", (card_id,))
+            continue
+        conn.execute(
+            """
+            INSERT INTO question_attempt_card_summary (
+                card_id,
+                question_attempt_count,
+                question_correct_count,
+                question_wrong_count,
+                latest_wrong_note,
+                latest_wrong_note_updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(card_id) DO UPDATE SET
+                question_attempt_count = excluded.question_attempt_count,
+                question_correct_count = excluded.question_correct_count,
+                question_wrong_count = excluded.question_wrong_count,
+                latest_wrong_note = excluded.latest_wrong_note,
+                latest_wrong_note_updated_at = excluded.latest_wrong_note_updated_at
+            """,
+            (
+                card_id,
+                summary["question_attempt_count"],
+                summary["question_correct_count"],
+                summary["question_wrong_count"],
+                summary["latest_wrong_note"],
+                summary["latest_wrong_note_updated_at"],
+            ),
+        )
+
 
 
 def normalize_question_attempt_judgment(value: str | None, is_correct: bool | None = None) -> str:
@@ -5868,52 +6007,19 @@ def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, A
     with closing(connect_progress_db(progress_db_path)) as conn:
         for row in conn.execute(
             """
-            WITH attempt_counts AS (
-                SELECT
-                    card_id,
-                    COUNT(*) AS question_attempt_count,
-                    SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS question_correct_count,
-                    SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS question_wrong_count
-                FROM question_attempts
-                GROUP BY card_id
-            ),
-            latest_wrong_notes AS (
-                SELECT card_id, wrong_note, updated_at
-                FROM (
-                    SELECT
-                        card_id,
-                        wrong_note,
-                        updated_at,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY card_id
-                            ORDER BY updated_at DESC, answered_at DESC, question_order DESC, question_id DESC
-                        ) AS row_number
-                    FROM question_attempts
-                    WHERE is_correct = 0
-                      AND TRIM(COALESCE(wrong_note, '')) <> ''
-                )
-                WHERE row_number = 1
-            )
             SELECT
-                attempt_counts.card_id,
-                attempt_counts.question_attempt_count,
-                attempt_counts.question_correct_count,
-                attempt_counts.question_wrong_count,
-                COALESCE(latest_wrong_notes.wrong_note, '') AS latest_wrong_note,
-                COALESCE(latest_wrong_notes.updated_at, '') AS latest_wrong_note_updated_at
-            FROM attempt_counts
-            LEFT JOIN latest_wrong_notes
-                ON latest_wrong_notes.card_id = attempt_counts.card_id
+                card_id,
+                question_attempt_count,
+                question_correct_count,
+                question_wrong_count,
+                latest_wrong_note,
+                latest_wrong_note_updated_at
+            FROM question_attempt_card_summary
             """
         ).fetchall():
-            stats[row["card_id"]] = {
-                "question_attempt_count": int(row["question_attempt_count"] or 0),
-                "question_correct_count": int(row["question_correct_count"] or 0),
-                "question_wrong_count": int(row["question_wrong_count"] or 0),
-                "latest_wrong_note": row["latest_wrong_note"] or "",
-                "latest_wrong_note_updated_at": row["latest_wrong_note_updated_at"] or "",
-            }
+            stats[row["card_id"]] = _question_attempt_summary_dict(row)
     return stats
+
 
 
 
@@ -6081,9 +6187,10 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
             )
 
         existing = conn.execute(
-            "SELECT created_at, question_started_at FROM question_attempts WHERE question_id = ?",
+            "SELECT created_at, question_started_at, card_id FROM question_attempts WHERE question_id = ?",
             (question_id,),
         ).fetchone()
+        existing_card_id = normalize_question_bank_text(existing["card_id"] if existing else "", limit=255)
         conn.execute(
             """
             INSERT INTO question_attempts (
@@ -6150,6 +6257,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                 now,
             ),
         )
+        _refresh_question_attempt_card_summary_cache(conn, [existing_card_id, card_id])
         conn.commit()
         saved = conn.execute(
             """

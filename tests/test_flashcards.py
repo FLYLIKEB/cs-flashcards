@@ -1271,7 +1271,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(history_ambiguous['items'][0]['section'], '전공논술')
             self.assertEqual(history_ambiguous['items'][0]['points'], 20)
 
-    def test_read_question_attempt_stats_avoids_full_wrong_history_scan(self):
+    def test_read_question_attempt_stats_uses_summary_cache_for_read_card_and_read_cards(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             csv_path = root / 'cards.csv'
@@ -1329,11 +1329,8 @@ class FlashcardProgressTests(unittest.TestCase):
 
                 def execute(self, sql, parameters=()):
                     normalized_sql = ' '.join(sql.split())
-                    if (
-                        'SELECT card_id, wrong_note, updated_at FROM question_attempts' in normalized_sql
-                        and 'ORDER BY updated_at DESC, answered_at DESC, question_order DESC, question_id DESC' in normalized_sql
-                    ):
-                        raise AssertionError('legacy full wrong-attempt scan should not run')
+                    if normalized_sql.startswith('SELECT') and 'FROM question_attempts' in normalized_sql:
+                        raise AssertionError('card attempt reads should use question_attempt_card_summary')
                     return self._inner.execute(sql, parameters)
 
                 def close(self):
@@ -1348,6 +1345,7 @@ class FlashcardProgressTests(unittest.TestCase):
                 side_effect=lambda *args, **kwargs: GuardedConnection(real_connect(*args, **kwargs)),
             ):
                 stats = flashcard_app.read_question_attempt_stats(db_path)
+                card = flashcard_app.read_card(db_path, 'CS-001')
                 rows, _ = read_cards(csv_path, db_path)
 
             self.assertEqual(first['card']['latest_wrong_note'], '이전 오답 메모')
@@ -1356,8 +1354,14 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(stats['CS-001']['question_wrong_count'], 2)
             self.assertEqual(stats['CS-001']['latest_wrong_note'], '최신 오답 메모')
             self.assertEqual(stats['CS-001']['latest_wrong_note_updated_at'], latest['attempt']['updated_at'])
+            self.assertEqual(card['question_attempt_count'], 3)
+            self.assertEqual(card['question_correct_count'], 1)
+            self.assertEqual(card['question_wrong_count'], 2)
+            self.assertEqual(card['latest_wrong_note'], '최신 오답 메모')
+            self.assertEqual(card['latest_wrong_note_updated_at'], latest['attempt']['updated_at'])
             self.assertEqual(rows[0]['latest_wrong_note'], '최신 오답 메모')
             self.assertEqual(rows[0]['latest_wrong_note_updated_at'], latest['attempt']['updated_at'])
+
 
     def test_read_question_attempts_uses_targeted_card_context_without_read_cards(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1456,6 +1460,86 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['question_attempt_count'], 1)
             self.assertEqual(rows[0]['question_wrong_count'], 1)
             self.assertEqual(rows[0]['latest_wrong_note'], '전체 카드 재조회 없이 저장')
+
+    def test_same_question_attempt_resave_refreshes_cached_card_summary(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-resave-cache',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='첫 답안',
+                    judgment='wrong',
+                    wrong_note='처음 오답 메모',
+                    answered_at='2026-07-19T09:00:10+09:00',
+                ),
+                db_path,
+            )
+            updated = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-resave-cache',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='정정 답안',
+                    judgment='correct',
+                    answered_at='2026-07-19T09:05:10+09:00',
+                ),
+                db_path,
+            )
+
+            real_connect = flashcard_app.connect_progress_db
+
+            class GuardedConnection:
+                def __init__(self, inner):
+                    self._inner = inner
+
+                def execute(self, sql, parameters=()):
+                    normalized_sql = ' '.join(sql.split())
+                    if normalized_sql.startswith('SELECT') and 'FROM question_attempts' in normalized_sql:
+                        raise AssertionError('read_card/read_cards should use question_attempt_card_summary after resave')
+                    return self._inner.execute(sql, parameters)
+
+                def close(self):
+                    self._inner.close()
+
+                def __getattr__(self, name):
+                    return getattr(self._inner, name)
+
+            with mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                side_effect=lambda *args, **kwargs: GuardedConnection(real_connect(*args, **kwargs)),
+            ):
+                card = flashcard_app.read_card(db_path, 'CS-001')
+                rows, _ = read_cards(csv_path, db_path)
+
+            self.assertEqual(updated['card']['question_correct_count'], 1)
+
+            self.assertEqual(updated['card']['question_attempt_count'], 1)
+            self.assertEqual(updated['card']['question_correct_count'], 1)
+            self.assertEqual(updated['card']['question_wrong_count'], 0)
+            self.assertEqual(updated['card']['latest_wrong_note'], '')
+            self.assertEqual(card['question_attempt_count'], 1)
+            self.assertEqual(card['question_correct_count'], 1)
+            self.assertEqual(card['question_wrong_count'], 0)
+            self.assertEqual(card['latest_wrong_note'], '')
+            self.assertEqual(card['latest_wrong_note_updated_at'], '')
+            self.assertEqual(rows[0]['question_attempt_count'], 1)
+            self.assertEqual(rows[0]['question_correct_count'], 1)
+            self.assertEqual(rows[0]['question_wrong_count'], 0)
+            self.assertEqual(rows[0]['latest_wrong_note'], '')
+            self.assertEqual(rows[0]['latest_wrong_note_updated_at'], '')
+
 
     def test_ensure_card_exists_uses_targeted_lookup_without_read_cards(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1706,6 +1790,183 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(row_map['CS-002']['question_attempt_count'], 1)
             self.assertEqual(row_map['CS-002']['question_wrong_count'], 1)
             self.assertEqual(row_map['CS-002']['latest_wrong_note'], '연결 카드 기준으로 저장돼야 한다.')
+
+    def test_question_bank_linked_resave_moves_cached_summary_to_linked_card(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            with csv_path.open('w', encoding='utf-8-sig', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=BASE_FIELDS)
+                writer.writeheader()
+                writer.writerow({
+                    'id': 'CS-001',
+                    'term': '트랜잭션',
+                    'english': 'Transaction',
+                    'category': '소프트웨어공학',
+                    'definition': '모든 작업이 전부 성공하거나 전부 실패하는 성질',
+                    'detailed_explanation': '상세',
+                    'related_concepts': '[[검증]]',
+                    'source_files': 'sample.md',
+                    'exam_note': '포인트',
+                    'bok_appeared': 'O',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+                writer.writerow({
+                    'id': 'CS-002',
+                    'term': '원자성',
+                    'english': 'Atomicity',
+                    'category': '소프트웨어공학',
+                    'definition': '트랜잭션이 쪼개지지 않는 성질',
+                    'detailed_explanation': '상세',
+                    'related_concepts': '[[검증]]',
+                    'source_files': 'sample.md',
+                    'exam_note': '포인트',
+                    'bok_appeared': 'O',
+                    'importance': '상',
+                    'difficulty': '중',
+                })
+            seed_runtime_db(csv_path, db_path)
+            flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'question_bank_id': 'bank-linked-resave',
+                        'card_id': 'CS-002',
+                        'question_type': 'subjective',
+                        'prompt': '원자성을 설명하시오.',
+                        'answer': '중간 상태가 남지 않도록 전부 반영되거나 전부 취소되어야 한다.',
+                        'explanation': '트랜잭션의 all-or-nothing 성질이다.',
+                        'category': '소프트웨어공학',
+                        'issuer': '테스트',
+                    },
+                ],
+                progress_db_path=db_path,
+            )
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-linked-resave-cache',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='잘못 연결된 카드에서 먼저 저장',
+                    body='임시 본문',
+                    user_answer='잘못된 첫 답안',
+                    judgment='wrong',
+                    wrong_note='연결 카드로 이동해야 한다.',
+                ),
+                db_path,
+            )
+            moved = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-linked-resave-cache',
+                    question_bank_id='bank-linked-resave',
+                    card_id='',
+                    question_type='subjective',
+                    prompt='원자성을 설명하시오.',
+                    body='트랜잭션이 all-or-nothing 으로 처리된다.',
+                    user_answer='정답으로 연결 카드에 다시 저장',
+                    judgment='wrong',
+                    wrong_note='연결 카드로 이동해야 한다.',
+                ),
+                db_path,
+            )
+
+            self.assertEqual(moved['attempt']['card_id'], 'CS-002')
+            self.assertEqual(moved['card']['id'], 'CS-002')
+            card = flashcard_app.read_card(db_path, 'CS-002')
+            rows, _ = flashcard_app.read_cards(db_path)
+            row_map = {row['id']: row for row in rows}
+            self.assertEqual(row_map['CS-001']['question_attempt_count'], 0)
+            self.assertEqual(row_map['CS-001']['question_wrong_count'], 0)
+            self.assertEqual(row_map['CS-001']['latest_wrong_note'], '')
+            self.assertEqual(row_map['CS-002']['question_attempt_count'], 1)
+            self.assertEqual(row_map['CS-002']['question_wrong_count'], 1)
+            self.assertEqual(row_map['CS-002']['latest_wrong_note'], '연결 카드로 이동해야 한다.')
+            self.assertEqual(card['question_attempt_count'], 1)
+            self.assertEqual(card['question_wrong_count'], 1)
+            self.assertEqual(card['latest_wrong_note'], '연결 카드로 이동해야 한다.')
+
+    def test_question_attempt_summary_backfill_preserves_legacy_blank_judgment_fallback(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-legacy-correct',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='정답 사례',
+                    body='정의',
+                    user_answer='정답',
+                    judgment='correct',
+                ),
+                db_path,
+            )
+            wrong = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-legacy-wrong',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='오답 사례',
+                    body='정의',
+                    user_answer='오답',
+                    judgment='wrong',
+                    wrong_note='레거시 빈 judgment 오답',
+                ),
+                db_path,
+            )
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute('DROP TABLE question_attempt_card_summary')
+                conn.execute("UPDATE question_attempts SET judgment = '' WHERE question_id IN (?, ?)", (
+                    'q-CS-001-legacy-correct',
+                    'q-CS-001-legacy-wrong',
+                ))
+                conn.commit()
+
+            flashcard_app.ensure_progress_db(db_path)
+
+            real_connect = flashcard_app.connect_progress_db
+
+            class GuardedConnection:
+                def __init__(self, inner):
+                    self._inner = inner
+
+                def execute(self, sql, parameters=()):
+                    normalized_sql = ' '.join(sql.split())
+                    if normalized_sql.startswith('SELECT') and 'FROM question_attempts' in normalized_sql:
+                        raise AssertionError('post-backfill reads should use question_attempt_card_summary')
+                    return self._inner.execute(sql, parameters)
+
+                def close(self):
+                    self._inner.close()
+
+                def __getattr__(self, name):
+                    return getattr(self._inner, name)
+
+            with mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                side_effect=lambda *args, **kwargs: GuardedConnection(real_connect(*args, **kwargs)),
+            ):
+                card = flashcard_app.read_card(db_path, 'CS-001')
+                rows, _ = read_cards(csv_path, db_path)
+
+            self.assertEqual(card['question_attempt_count'], 2)
+            self.assertEqual(card['question_correct_count'], 1)
+            self.assertEqual(card['question_wrong_count'], 1)
+            self.assertEqual(card['latest_wrong_note'], '레거시 빈 judgment 오답')
+            self.assertEqual(card['latest_wrong_note_updated_at'], wrong['attempt']['updated_at'])
+            self.assertEqual(rows[0]['question_attempt_count'], 2)
+            self.assertEqual(rows[0]['question_correct_count'], 1)
+            self.assertEqual(rows[0]['question_wrong_count'], 1)
+            self.assertEqual(rows[0]['latest_wrong_note'], '레거시 빈 judgment 오답')
+            self.assertEqual(rows[0]['latest_wrong_note_updated_at'], wrong['attempt']['updated_at'])
 
     def test_linked_question_bank_attempt_rejects_mismatched_card_id(self):
         with tempfile.TemporaryDirectory() as td:
