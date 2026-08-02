@@ -150,7 +150,10 @@ class QuestionBankMetadataTests(unittest.TestCase):
             self.assertEqual(item['keywords'], ['테스트', 'Test', '검증'])
             self.assertEqual(item['missing_card_keywords'], ['추가 카드', '없는 카드'])
             self.assertNotIn('없는 카드', item['keywords'])
-            self.assertEqual(listed['summary']['missing_cards'], [
+            self.assertEqual(listed['summary']['missing_cards'], [])
+
+            listed_with_missing_cards = flashcard_app.read_question_bank_entries(db_path, limit=10, include_missing_cards=True)
+            self.assertEqual(listed_with_missing_cards['summary']['missing_cards'], [
                 {'keyword': '추가 카드', 'question_count': 1, 'card_created': True, 'card_id': 'CS-002'},
                 {'keyword': '없는 카드', 'question_count': 1, 'card_created': False, 'card_id': ''},
             ])
@@ -207,7 +210,10 @@ class QuestionBankMetadataTests(unittest.TestCase):
             listed = flashcard_app.read_question_bank_entries(db_path, query='없는 카드', limit=1)
             self.assertEqual(listed['summary']['total'], 2)
             self.assertEqual(listed['summary']['returned'], 1)
-            self.assertEqual(listed['summary']['missing_cards'], [
+            self.assertEqual(listed['summary']['missing_cards'], [])
+
+            listed_with_missing_cards = flashcard_app.read_question_bank_entries(db_path, query='없는 카드', limit=1, include_missing_cards=True)
+            self.assertEqual(listed_with_missing_cards['summary']['missing_cards'], [
                 {'keyword': '없는 카드', 'question_count': 2, 'card_created': False, 'card_id': ''},
             ])
     def test_question_bank_runtime_rows_use_normalized_difficulty_labels(self):

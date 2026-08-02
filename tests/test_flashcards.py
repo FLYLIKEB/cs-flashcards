@@ -1725,11 +1725,14 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed['summary']['total'], 3)
             self.assertEqual(listed['summary']['returned'], 2)
             self.assertEqual([item['question_bank_id'] for item in listed['items']], ['qb-page-1', 'qb-page-2'])
+            self.assertEqual(listed['summary']['missing_cards'], [])
+            self.assertEqual(listed['summary']['category_breakdown'][0]['total'], 3)
+
+            listed_with_missing_cards = flashcard_app.read_question_bank_entries(db_path, category='데이터베이스', limit=2, include_missing_cards=True)
             self.assertEqual(
-                listed['summary']['missing_cards'],
+                listed_with_missing_cards['summary']['missing_cards'],
                 [{'keyword': '페이지 부재', 'question_count': 1, 'card_created': False, 'card_id': ''}],
             )
-            self.assertEqual(listed['summary']['category_breakdown'][0]['total'], 3)
 
     def test_question_bank_attempt_without_card_id_persists_by_question_bank_id(self):
         with tempfile.TemporaryDirectory() as td:
@@ -2846,8 +2849,11 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(linked_item['english'], 'Test')
             self.assertEqual(linked_item['card_category'], '소프트웨어공학')
             self.assertEqual(linked_item['keywords'], ['테스트', 'Test', '검증'])
+            self.assertEqual(listed['summary']['missing_cards'], [])
 
-            missing_cards = {item['keyword']: item for item in listed['summary']['missing_cards']}
+            with mock.patch.object(flashcard_app, 'read_cards', side_effect=AssertionError('read_cards should not be called')):
+                listed_with_missing_cards = flashcard_app.read_question_bank_entries(db_path, issuer='테스트', limit=10, include_missing_cards=True)
+            missing_cards = {item['keyword']: item for item in listed_with_missing_cards['summary']['missing_cards']}
             self.assertTrue(missing_cards['검증']['card_created'])
             self.assertEqual(missing_cards['검증']['card_id'], 'CS-001')
             self.assertFalse(missing_cards['새키워드']['card_created'])
