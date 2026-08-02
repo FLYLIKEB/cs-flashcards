@@ -1408,6 +1408,83 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-filter-reload', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_page_ignores_stale_filters_on_fresh_entry_without_url_params(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        fresh_page = None
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.body.classList.contains('question-bank-filters-collapsed')")
+            await page.type('#bankPageQueryInput', '데이터베이스')
+            await page.select('#bankPageDifficultySelect', '중')
+            await page.waitForFunction(
+                "document.querySelector('#bankPageActiveFilters').textContent.includes('데이터베이스') && document.querySelector('#bankPageActiveFilters').textContent.includes('중')"
+            )
+            case['stored_filter_state_before_reload'] = await page.evaluate(
+                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertEqual(case['stored_filter_state_before_reload']['filters']['q'], '데이터베이스')
+            self.assertEqual(case['stored_filter_state_before_reload']['filters']['difficulty'], '중')
+            self.assertFalse(case['stored_filter_state_before_reload']['filtersCollapsed'])
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.waitForFunction(
+                "document.querySelector('#bankPageQueryInput').value === '데이터베이스' && document.querySelector('#bankPageDifficultySelect').value === '중'"
+            )
+            case['reload_values'] = await page.evaluate(
+                """
+                () => ({
+                  query: document.querySelector('#bankPageQueryInput')?.value || '',
+                  difficulty: document.querySelector('#bankPageDifficultySelect')?.value || '',
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                })
+                """
+            )
+            self.assertEqual(case['reload_values']['query'], '데이터베이스')
+            self.assertEqual(case['reload_values']['difficulty'], '중')
+            self.assertFalse(case['reload_values']['filtersCollapsed'])
+
+            fresh_page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+            await fresh_page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await fresh_page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await fresh_page.waitForFunction(
+                "document.querySelector('#bankPageQueryInput').value === '' && document.querySelector('#bankPageDifficultySelect').value === ''"
+            )
+            case['fresh_entry_values'] = await fresh_page.evaluate(
+                """
+                () => ({
+                  query: document.querySelector('#bankPageQueryInput')?.value || '',
+                  difficulty: document.querySelector('#bankPageDifficultySelect')?.value || '',
+                  activeFilters: document.querySelector('#bankPageActiveFilters')?.textContent || '',
+                  filtersCollapsed: document.body.classList.contains('question-bank-filters-collapsed'),
+                  filtersRegionHidden: document.querySelector('#bankPageFiltersRegion')?.hidden,
+                })
+                """
+            )
+            case['stored_filter_state_after_fresh_entry'] = await fresh_page.evaluate(
+                '(key) => JSON.parse(window.localStorage.getItem(key) || "null")',
+                QUESTION_BANK_FILTER_STATE_KEY,
+            )
+            self.assertEqual(case['fresh_entry_values']['query'], '')
+            self.assertEqual(case['fresh_entry_values']['difficulty'], '')
+            self.assertNotIn('데이터베이스', case['fresh_entry_values']['activeFilters'])
+            self.assertNotIn('중', case['fresh_entry_values']['activeFilters'])
+            self.assertTrue(case['fresh_entry_values']['filtersCollapsed'])
+            self.assertTrue(case['fresh_entry_values']['filtersRegionHidden'])
+            self.assertEqual(case['stored_filter_state_after_fresh_entry']['filters']['q'], '')
+            self.assertEqual(case['stored_filter_state_after_fresh_entry']['filters']['difficulty'], '')
+            status = 'passed'
+        finally:
+            if fresh_page is not None:
+                await fresh_page.close()
+            self.record_case(case_id='question-bank-fresh-entry-filters', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_page_restores_filter_and_practice_pane_state_across_reload(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
