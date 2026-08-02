@@ -1,19 +1,13 @@
 {
-  "checked_at": "2026-08-02T19:06:35Z",
+  "checked_at": "2026-08-02T19:45:31Z",
   "gate_open": false,
   "summary": {
-    "open_issue_count": 2,
-    "open_pr_count": 0,
-    "blocking_worktree_count": 2,
+    "open_issue_count": 1,
+    "open_pr_count": 1,
+    "blocking_worktree_count": 1,
     "reusable_backlog_count": 0
   },
   "open_issues": [
-    {
-      "number": 179,
-      "state": "OPEN",
-      "title": "카드 상태 갱신 API summary 재조회 연결 축소",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/179"
-    },
     {
       "number": 178,
       "state": "OPEN",
@@ -21,35 +15,43 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/178"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "number": 181,
+      "state": "OPEN",
+      "title": "Issue 178: 카드 상태 토글 버튼 선택 상태 접근성 노출",
+      "head": "issue-178-card-state-toggle-a11y",
+      "base": "main",
+      "merge_state_status": "UNSTABLE",
+      "checks": [
+        "frontend-browser:IN_PROGRESS"
+      ],
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/181"
+    }
+  ],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-178",
       "branch": "issue-178-card-state-toggle-a11y",
-      "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-179",
-      "branch": "issue-179-api-mutation-summary-conn",
       "status": "tracked-branch-worktree"
     }
   ],
   "reusable_backlog": [],
   "recently_completed": [
     {
+      "issue": 179,
+      "pr": 180,
+      "merge_commit": "d94217fd6391aef1cfeb3d6f34e8c8dfddcce1f8"
+    },
+    {
       "issue": 174,
       "pr": 177,
       "merge_commit": "aa104a9a06297a6d133d17b2516ec2708690c70c"
-    },
-    {
-      "issue": 175,
-      "pr": 176,
-      "merge_commit": "054319fe9f411bce0ad1ab70a44a6865daaf5849"
     }
   ],
   "notes": [
-    "Round 35 accepted one frontend and one backend candidate from latest main.",
-    "Issue #178 covers card state toggle accessibility semantics in static/app.js.",
-    "Issue #179 covers reduced-connection summary assembly for mark/bookmark/memo API paths in app.py."
+    "Issue #179 merged as PR #180 and its worktree was removed.",
+    "Issue #178 remains active through PR #181.",
+    "PR #181 initial frontend-browser run failed on an unrelated focus assertion; local full tests passed and the GitHub check was rerun."
   ]
 }

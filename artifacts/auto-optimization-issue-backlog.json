@@ -1,21 +1,24 @@
 {
-  "generated_at": "2026-08-02T19:06:35Z",
+  "generated_at": "2026-08-02T19:45:31Z",
   "wave": "2026-08-02-round-35",
   "queue": [
     {
       "issue": 178,
       "title": "카드 상태 토글 버튼에 선택 상태 접근성 노출 추가",
       "branch": "issue-178-card-state-toggle-a11y",
-      "status": "implementation_in_progress"
-    },
-    {
-      "issue": 179,
-      "title": "카드 상태 갱신 API summary 재조회 연결 축소",
-      "branch": "issue-179-api-mutation-summary-conn",
-      "status": "implementation_in_progress"
+      "pr": 181,
+      "status": "pr_open_checks_rerunning"
     }
   ],
-  "completed": [],
+  "completed": [
+    {
+      "issue": 179,
+      "pr": 180,
+      "branch": "issue-179-api-mutation-summary-conn",
+      "merge_commit": "d94217fd6391aef1cfeb3d6f34e8c8dfddcce1f8",
+      "status": "merged"
+    }
+  ],
   "closed_without_merge": [],
   "held": []
 }
