@@ -331,6 +331,12 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function loadQuestionBankBrowser()', app_js())
         self.assertIn('function openQuestionBankSession(startIndex = 0)', app_js())
         self.assertIn('questionBankToggleBtn', app_js())
+        self.assertIn('function applyQuestionBankFiltersFromUrl(search = window.location.search)', app_js())
+        self.assertIn('function syncQuestionBankBrowserUrl(filters = questionBankFilterValues(), {clear = false} = {})', app_js())
+        self.assertIn('function resetQuestionBankFilters()', app_js())
+        self.assertIn('function restoreQuestionBankBrowserFromUrl(search = window.location.search)', app_js())
+        self.assertIn("$('questionBankResetFiltersBtn')?.addEventListener('click', resetQuestionBankFilters);", app_js())
+        self.assertIn('restoreQuestionBankBrowserFromUrl();', app_js())
 
     def test_question_bank_js_smoke_keeps_load_launch_and_persistence_hooks(self):
         self.assertIn("const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';", question_bank_js())
@@ -403,6 +409,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'id="questionBankSectionInput"',
             'id="questionBankList"',
             'id="questionBankLoadBtn"',
+            'id="questionBankResetFiltersBtn"',
             'id="questionBankCloseBtn"',
             'class="question-bank-table"',
 
@@ -441,6 +448,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             "cache: 'no-store'",
             "params.set('__ts', String(Date.now()))",
             'function openQuestionBankSession(startIndex = 0)',
+            'const QUESTION_BANK_FILTER_FIELDS = [',
             'function consumePendingQuestionBankLaunch()',
             'PENDING_QUESTION_BANK_LAUNCH_KEY',
             'function renderQuestionMarkdown(source)',

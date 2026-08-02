@@ -1593,6 +1593,54 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-stale-query', status=status, observations=case)
             await page.close()
 
+    async def test_embedded_question_bank_filters_survive_reload_until_explicit_reset(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.click('#questionBankToggleBtn')
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await page.waitForFunction("document.querySelectorAll('#questionBankList tbody tr').length > 0")
+            await self.set_input_value(page, '#questionBankQueryInput', self.difficulty_regression_prompt)
+            await page.select('#questionBankAttemptStatusSelect', 'unseen')
+            await page.waitForFunction(
+                "document.querySelector('#questionBankQueryInput').value === value && document.querySelector('#questionBankAttemptStatusSelect').value === 'unseen' && window.location.search.includes('q=') && window.location.search.includes('attempt_status=unseen')",
+                {'value': self.difficulty_regression_prompt},
+            )
+            case['url_after_filter'] = await page.evaluate('window.location.search')
+            self.assertIn('attempt_status=unseen', case['url_after_filter'])
+            self.assertIn('q=', case['url_after_filter'])
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await page.waitForFunction(
+                "document.querySelector('#questionBankQueryInput').value === value && document.querySelector('#questionBankAttemptStatusSelect').value === 'unseen'",
+                {'value': self.difficulty_regression_prompt},
+            )
+            case['query_after_reload'] = await page.Jeval('#questionBankQueryInput', '(node) => node.value')
+            case['attempt_status_after_reload'] = await page.Jeval('#questionBankAttemptStatusSelect', '(node) => node.value')
+            self.assertEqual(case['query_after_reload'], self.difficulty_regression_prompt)
+            self.assertEqual(case['attempt_status_after_reload'], 'unseen')
+
+            await page.click('#questionBankResetFiltersBtn')
+            await page.waitForFunction(
+                "document.querySelector('#questionBankQueryInput').value === '' && document.querySelector('#questionBankAttemptStatusSelect').value === '' && window.location.search === ''"
+            )
+            case['url_after_reset'] = await page.evaluate('window.location.search')
+            self.assertEqual(case['url_after_reset'], '')
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === true")
+            case['question_panel_hidden_after_reset_reload'] = await page.evaluate("document.querySelector('#questionPanel').hidden")
+            self.assertTrue(case['question_panel_hidden_after_reset_reload'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='embedded-question-bank-filter-reload', status=status, observations=case)
+            await page.close()
     async def test_embedded_question_bank_and_history_reject_stale_responses(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
