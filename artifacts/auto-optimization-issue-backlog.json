@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-08-02T19:00:51Z",
-  "wave": "2026-08-02-round-34",
-  "queue": [],
-  "completed": [
+  "generated_at": "2026-08-02T19:06:35Z",
+  "wave": "2026-08-02-round-35",
+  "queue": [
     {
-      "issue": 174,
-      "pr": 177,
-      "branch": "issue-174-main-filter-toggle-a11y",
-      "status": "merged"
+      "issue": 178,
+      "title": "카드 상태 토글 버튼에 선택 상태 접근성 노출 추가",
+      "branch": "issue-178-card-state-toggle-a11y",
+      "status": "implementation_in_progress"
     },
     {
-      "issue": 175,
-      "pr": 176,
-      "branch": "issue-175-card-mutation-single-connection",
-      "status": "merged"
+      "issue": 179,
+      "title": "카드 상태 갱신 API summary 재조회 연결 축소",
+      "branch": "issue-179-api-mutation-summary-conn",
+      "status": "implementation_in_progress"
     }
   ],
+  "completed": [],
   "closed_without_merge": [],
   "held": []
 }

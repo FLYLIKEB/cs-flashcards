@@ -1,15 +1,39 @@
 {
-  "checked_at": "2026-08-02T19:00:51Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T19:06:35Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 179,
+      "state": "OPEN",
+      "title": "카드 상태 갱신 API summary 재조회 연결 축소",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/179"
+    },
+    {
+      "number": 178,
+      "state": "OPEN",
+      "title": "카드 상태 토글 버튼에 선택 상태 접근성 노출 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/178"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-178",
+      "branch": "issue-178-card-state-toggle-a11y",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-179",
+      "branch": "issue-179-api-mutation-summary-conn",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,8 +48,8 @@
     }
   ],
   "notes": [
-    "Round 34 frontend candidate #174 merged successfully as PR #177.",
-    "Round 34 backend candidate #175 merged successfully as PR #176.",
-    "All round 34 issue branches, PRs, and blocking worktrees are cleaned up."
+    "Round 35 accepted one frontend and one backend candidate from latest main.",
+    "Issue #178 covers card state toggle accessibility semantics in static/app.js.",
+    "Issue #179 covers reduced-connection summary assembly for mark/bookmark/memo API paths in app.py."
   ]
 }

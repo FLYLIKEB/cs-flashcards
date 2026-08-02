@@ -1,15 +1,39 @@
 {
-  "checked_at": "2026-08-02T19:00:51Z",
-  "gate_open": true,
+  "checked_at": "2026-08-02T19:06:35Z",
+  "gate_open": false,
   "summary": {
-    "open_issue_count": 0,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 0,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
-  "open_issues": [],
+  "open_issues": [
+    {
+      "number": 179,
+      "state": "OPEN",
+      "title": "카드 상태 갱신 API summary 재조회 연결 축소",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/179"
+    },
+    {
+      "number": 178,
+      "state": "OPEN",
+      "title": "카드 상태 토글 버튼에 선택 상태 접근성 노출 추가",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/178"
+    }
+  ],
   "open_prs": [],
-  "blocking_worktrees": [],
+  "blocking_worktrees": [
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-178",
+      "branch": "issue-178-card-state-toggle-a11y",
+      "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-179",
+      "branch": "issue-179-api-mutation-summary-conn",
+      "status": "tracked-branch-worktree"
+    }
+  ],
   "reusable_backlog": [],
   "recently_completed": [
     {
@@ -24,8 +48,8 @@
     }
   ],
   "notes": [
-    "Issue #174 / PR #177 is merged and cleaned up.",
-    "Issue #175 / PR #176 is merged and cleaned up.",
-    "The next optimization round may start immediately."
+    "Issue #178 and #179 are the active round 35 lanes.",
+    "Round 35 frontend audit subagent was cancelled before returning a candidate payload; the accepted candidate was confirmed directly from latest app.js/tests evidence.",
+    "Round 35 backend audit retry returned an empty payload; the accepted candidate was confirmed directly from latest app.py/tests evidence."
   ]
 }
