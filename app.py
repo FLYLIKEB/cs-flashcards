@@ -3149,6 +3149,74 @@ def upsert_question_bank_entries(
 
 
 
+def _read_question_bank_card_context(
+    conn: sqlite3.Connection,
+    *,
+    linked_card_ids: set[str],
+    missing_card_keywords: set[str],
+) -> tuple[dict[str, dict[str, str]], dict[str, str]]:
+    normalized_card_ids = {
+        normalize_question_bank_text(value, limit=255)
+        for value in linked_card_ids
+        if normalize_question_bank_text(value, limit=255)
+    }
+    normalized_keywords = {
+        normalize_question_bank_text(value, limit=255).casefold()
+        for value in missing_card_keywords
+        if normalize_question_bank_text(value, limit=255)
+    }
+    if not normalized_card_ids and not normalized_keywords:
+        return {}, {}
+
+    where_clauses: list[str] = []
+    params: list[Any] = []
+    if normalized_card_ids:
+        placeholders = ", ".join("?" for _ in normalized_card_ids)
+        where_clauses.append(f"TRIM(COALESCE(card_id, '')) IN ({placeholders})")
+        params.extend(sorted(normalized_card_ids))
+    if normalized_keywords:
+        keyword_predicates: list[str] = []
+        keyword_placeholders = ", ".join("?" for _ in normalized_keywords)
+        keyword_predicates.append(f"LOWER(TRIM(COALESCE(term, ''))) IN ({keyword_placeholders})")
+        params.extend(sorted(normalized_keywords))
+        keyword_predicates.append(f"LOWER(TRIM(COALESCE(english, ''))) IN ({keyword_placeholders})")
+        params.extend(sorted(normalized_keywords))
+        related_predicates: list[str] = []
+        for keyword in sorted(normalized_keywords):
+            related_predicates.append("LOWER(COALESCE(related_concepts, '')) LIKE ?")
+            params.append(f"%{keyword}%")
+        keyword_predicates.append("(" + " OR ".join(related_predicates) + ")")
+        where_clauses.append("(" + " OR ".join(keyword_predicates) + ")")
+
+    rows = conn.execute(
+        f"""
+        SELECT card_id, term, english, category, related_concepts
+        FROM cards
+        WHERE {' OR '.join(where_clauses)}
+        ORDER BY sort_order ASC, card_id ASC
+        """,
+        tuple(params),
+    ).fetchall()
+    card_map: dict[str, dict[str, str]] = {}
+    card_keyword_to_card_id: dict[str, str] = {}
+    for row in rows:
+        card_id_value = str(row["card_id"] or "").strip()
+        if not card_id_value:
+            continue
+        card = {
+            "id": card_id_value,
+            "term": str(row["term"] or ""),
+            "english": str(row["english"] or ""),
+            "category": str(row["category"] or ""),
+            "related_concepts": str(row["related_concepts"] or ""),
+        }
+        if card_id_value in normalized_card_ids:
+            card_map[card_id_value] = card
+        for keyword in question_bank_keywords_for_card(card):
+            card_keyword_to_card_id.setdefault(keyword.casefold(), card_id_value)
+    return card_map, card_keyword_to_card_id
+
+
 def read_question_bank_entries(
     progress_db_path: Path | None = None,
     *,
@@ -3237,15 +3305,6 @@ def read_question_bank_entries(
         ) AS latest_attempt
         ON latest_attempt.question_bank_id = question_bank.id
     """
-    rows, _ = read_cards(db_path)
-    card_map = {str(row.get("id") or "").strip(): row for row in rows if str(row.get("id") or "").strip()}
-    card_keyword_to_card_id: dict[str, str] = {}
-    for row in rows:
-        card_id_value = str(row.get("id") or "").strip()
-        if not card_id_value:
-            continue
-        for keyword in question_bank_keywords_for_card(row):
-            card_keyword_to_card_id.setdefault(keyword.casefold(), card_id_value)
     with closing(connect_progress_db(db_path)) as conn:
         total_row = conn.execute(
             f"SELECT COUNT(*) AS total_count FROM question_bank {latest_attempt_join_sql} {where_sql}",
@@ -3321,6 +3380,19 @@ def read_question_bank_entries(
                     tuple(params),
                 ).fetchall()
             ]
+        linked_card_ids = {
+            normalize_question_bank_text(row["card_id"] if "card_id" in row.keys() else "", limit=255)
+            for row in query_rows
+            if normalize_question_bank_text(row["card_id"] if "card_id" in row.keys() else "", limit=255)
+        }
+        missing_card_keywords: set[str] = set()
+        for row in missing_card_summary_rows:
+            missing_card_keywords.update(question_bank_json_list(row["missing_card_keywords_json"] if "missing_card_keywords_json" in row.keys() else []))
+        card_map, card_keyword_to_card_id = _read_question_bank_card_context(
+            conn,
+            linked_card_ids=linked_card_ids,
+            missing_card_keywords=missing_card_keywords,
+        )
     items: list[dict[str, Any]] = []
     for row in query_rows:
         item = question_bank_row_to_dict(row) or {}

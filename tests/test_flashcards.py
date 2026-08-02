@@ -2444,6 +2444,77 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(listed['summary']['returned'], 0)
             self.assertEqual(listed['items'], [])
 
+    def test_read_question_bank_entries_uses_targeted_card_context_without_read_cards(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            flashcard_app.upsert_question_bank_entries(
+                [
+                    {
+                        'card_id': 'CS-001',
+                        'question_type': 'subjective',
+                        'prompt': '정규화 핵심은?',
+                        'body': '연관 개념까지 함께 설명하시오.',
+                        'answer': '중복을 줄이고 이상 현상을 막는다.',
+                        'explanation': '검증 가능한 스키마 설계가 중요하다.',
+                        'rubric': ['중복 감소', '검증'],
+                        'topic': '데이터베이스',
+                        'field_name': '핵심',
+                        'keywords': ['검증'],
+                        'difficulty': '중',
+                        'issuer': '테스트',
+                        'source_location': '문항 1',
+                        'section': '연습문제',
+                        'points': 10,
+                        'expected_time_seconds': 120,
+                        'answer_guide': '핵심만 답하라',
+                        'session_mode': 'practice',
+                    },
+                    {
+                        'card_id': '',
+                        'question_type': 'short',
+                        'prompt': '검증되지 않은 키워드는?',
+                        'body': '누락 카드 요약을 확인하기 위한 문항이다.',
+                        'answer': '새 키워드 확인',
+                        'explanation': '기존 카드와 연결되지 않은 키워드를 찾는다.',
+                        'rubric': ['누락 카드'],
+                        'topic': '데이터베이스',
+                        'field_name': '점검',
+                        'keywords': ['검증', '새키워드'],
+                        'difficulty': '하',
+                        'category': '소프트웨어공학',
+                        'issuer': '테스트',
+                        'source_location': '문항 2',
+                        'section': '연습문제',
+                        'points': 5,
+                        'expected_time_seconds': 60,
+                        'answer_guide': '키워드만 답하라',
+                        'session_mode': 'practice',
+                    },
+                ],
+                db_path,
+            )
+
+            with mock.patch.object(flashcard_app, 'read_cards', side_effect=AssertionError('read_cards should not be called')):
+                listed = flashcard_app.read_question_bank_entries(db_path, issuer='테스트', limit=10)
+
+            self.assertEqual(listed['summary']['total'], 2)
+            linked_item = next(item for item in listed['items'] if item['card_id'] == 'CS-001')
+            self.assertEqual(linked_item['term'], '테스트')
+            self.assertEqual(linked_item['english'], 'Test')
+            self.assertEqual(linked_item['card_category'], '소프트웨어공학')
+            self.assertEqual(linked_item['keywords'], ['테스트', 'Test', '검증'])
+
+            missing_cards = {item['keyword']: item for item in listed['summary']['missing_cards']}
+            self.assertTrue(missing_cards['검증']['card_created'])
+            self.assertEqual(missing_cards['검증']['card_id'], 'CS-001')
+            self.assertFalse(missing_cards['새키워드']['card_created'])
+            self.assertEqual(missing_cards['새키워드']['card_id'], '')
+
     def test_read_question_bank_entries_filters_attempt_status_on_real_rows(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
