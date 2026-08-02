@@ -1,57 +1,30 @@
 {
-  "checked_at": "2026-08-02T19:45:31Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T19:50:35Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 1,
-    "open_pr_count": 1,
-    "blocking_worktree_count": 1,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 178,
-      "state": "OPEN",
-      "title": "카드 상태 토글 버튼에 선택 상태 접근성 노출 추가",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/178"
-    }
-  ],
-  "open_prs": [
-    {
-      "number": 181,
-      "state": "OPEN",
-      "title": "Issue 178: 카드 상태 토글 버튼 선택 상태 접근성 노출",
-      "head": "issue-178-card-state-toggle-a11y",
-      "base": "main",
-      "merge_state_status": "UNSTABLE",
-      "checks": [
-        "frontend-browser:IN_PROGRESS"
-      ],
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/181"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-178",
-      "branch": "issue-178-card-state-toggle-a11y",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
+    {
+      "issue": 178,
+      "pr": 181,
+      "merge_commit": "5c9b7ba5e3a8ea2571446ba0ac03d4af13ea8a3b"
+    },
     {
       "issue": 179,
       "pr": 180,
       "merge_commit": "d94217fd6391aef1cfeb3d6f34e8c8dfddcce1f8"
-    },
-    {
-      "issue": 174,
-      "pr": 177,
-      "merge_commit": "aa104a9a06297a6d133d17b2516ec2708690c70c"
     }
   ],
   "notes": [
-    "Round 35 backend lane (#179) is finished and merged.",
-    "Round 35 frontend lane (#178) is waiting on PR #181 review/CI convergence.",
-    "No new optimization round may start until PR #181 merges and its worktree is removed."
+    "No blockers remain after PR #181 merge.",
+    "Repository is ready for the next optimization audit round."
   ]
 }

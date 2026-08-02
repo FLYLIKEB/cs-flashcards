@@ -1,16 +1,15 @@
 {
-  "generated_at": "2026-08-02T19:45:31Z",
-  "wave": "2026-08-02-round-35",
-  "queue": [
+  "generated_at": "2026-08-02T19:50:35Z",
+  "wave": "2026-08-02-round-35-closeout",
+  "queue": [],
+  "completed": [
     {
       "issue": 178,
-      "title": "카드 상태 토글 버튼에 선택 상태 접근성 노출 추가",
-      "branch": "issue-178-card-state-toggle-a11y",
       "pr": 181,
-      "status": "pr_open_checks_rerunning"
-    }
-  ],
-  "completed": [
+      "branch": "issue-178-card-state-toggle-a11y",
+      "merge_commit": "5c9b7ba5e3a8ea2571446ba0ac03d4af13ea8a3b",
+      "status": "merged"
+    },
     {
       "issue": 179,
       "pr": 180,
