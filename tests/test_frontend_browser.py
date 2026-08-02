@@ -1913,6 +1913,67 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-pane-state-reload', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_page_restores_open_practice_pane_across_history_back(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
+            await page.waitForFunction(
+                "!document.body.classList.contains('question-bank-practice-collapsed') && !document.querySelector('#bankPagePracticeFrame').hidden"
+            )
+            case['active_row_before_back'] = await page.evaluate(
+                "document.querySelector('#bankPageList [aria-current=\"true\"]')?.getAttribute('data-table-row-id') || ''"
+            )
+            case['practice_status_before_back'] = await self.text(page, '#bankPagePracticeStatus')
+            case['practice_frame_src_before_back'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+            embed_frame = await self.wait_for_embed_frame(page)
+            case['practice_prompt_before_back'] = await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            self.assertIn('현재 2 /', case['practice_status_before_back'])
+            self.assertIn('question-bank-embed=1', case['practice_frame_src_before_back'])
+
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('history.back()')
+            await page.waitForFunction("window.location.pathname === '/question-bank'")
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.waitForFunction(
+                "(expectedId) => { const frame = document.querySelector('#bankPagePracticeFrame'); const activeRow = document.querySelector('#bankPageList [aria-current=\"true\"]'); return activeRow && activeRow.getAttribute('data-table-row-id') === expectedId && !document.body.classList.contains('question-bank-practice-collapsed') && frame && !frame.hidden; }",
+                {},
+                case['active_row_before_back'],
+            )
+            case['restored_state_after_back'] = await page.evaluate(
+                """
+                () => ({
+                  activeRowId: document.querySelector('#bankPageList [aria-current="true"]')?.getAttribute('data-table-row-id') || '',
+                  practiceCollapsed: document.body.classList.contains('question-bank-practice-collapsed'),
+                  practiceFrameHidden: document.querySelector('#bankPagePracticeFrame')?.hidden,
+                  practiceFrameSrc: document.querySelector('#bankPagePracticeFrame')?.getAttribute('src') || '',
+                })
+                """
+            )
+            case['practice_status_after_back'] = await self.text(page, '#bankPagePracticeStatus')
+            await page.waitForFunction(
+                "(expectedSrc) => { const frame = document.querySelector('#bankPagePracticeFrame'); return (frame?.getAttribute('src') || '') === expectedSrc && Boolean(frame?.contentDocument?.querySelector('.question-prompt')); }",
+                {},
+                case['practice_frame_src_before_back'],
+            )
+            case['practice_prompt_after_back'] = await page.evaluate(
+                "(selector) => document.querySelector('#bankPagePracticeFrame')?.contentDocument?.querySelector(selector)?.textContent?.trim() || ''",
+                '.question-prompt',
+            )
+            self.assertEqual(case['restored_state_after_back']['activeRowId'], case['active_row_before_back'])
+            self.assertFalse(case['restored_state_after_back']['practiceCollapsed'])
+            self.assertFalse(case['restored_state_after_back']['practiceFrameHidden'])
+            self.assertIn('question-bank-embed=1', case['restored_state_after_back']['practiceFrameSrc'])
+            self.assertEqual(case['practice_status_after_back'], case['practice_status_before_back'])
+            self.assertEqual(case['practice_prompt_after_back'], case['practice_prompt_before_back'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-pane-state-history-back', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_page_restores_row_selection_without_reopening_practice_on_reload(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

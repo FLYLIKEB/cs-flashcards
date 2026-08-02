@@ -357,7 +357,7 @@ function persistedPracticeRestoreState() {
 }
 let restoredSelectionState = persistedSelectionRestoreState();
 let restoredPracticeState = persistedPracticeRestoreState();
-let restorePracticePaneOnReload = isReloadNavigation() && Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();
+let shouldRestorePracticePane = canRestorePersistedQuestionBankState && Boolean(restoredPracticeState?.loaded) && !persistedPracticeCollapsed();
 
 function persistedFilterState() {
   try {
@@ -1458,7 +1458,7 @@ async function loadQuestionBankPage() {
     const preservingHiddenPractice = bankState.practiceLoaded && bankState.practiceCollapsed && !pendingPracticeLaunch;
     if (!bankState.items.length) {
       pendingPracticeLaunch = null;
-      restorePracticePaneOnReload = false;
+      shouldRestorePracticePane = false;
       restoredSelectionState = null;
       restoredPracticeState = null;
       bankState.selectedId = '';
@@ -1471,15 +1471,15 @@ async function loadQuestionBankPage() {
     } else if (pendingPracticeLaunch) {
       const launchRequest = pendingPracticeLaunch;
       pendingPracticeLaunch = null;
-      restorePracticePaneOnReload = false;
+      shouldRestorePracticePane = false;
       restoredPracticeState = null;
       persistFilterState();
       applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal});
-    } else if (restorePracticePaneOnReload && !bankState.practiceLoaded) {
+    } else if (shouldRestorePracticePane && !bankState.practiceLoaded) {
       const restoreIndex = nextIndex >= 0
         ? nextIndex
         : Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(restoredPracticeState?.startIndex) ? restoredPracticeState.startIndex : bankState.practiceStartIndex));
-      restorePracticePaneOnReload = false;
+      shouldRestorePracticePane = false;
       restoredPracticeState = null;
       persistFilterState();
       applyPracticeLaunch(restoreIndex, {reveal: true});
