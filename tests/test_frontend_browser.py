@@ -644,6 +644,22 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.activeElement && document.activeElement.id === 'closeQuestionModeBtn'")
             case['question_panel_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['question_panel_focus_on_open'], 'closeQuestionModeBtn')
+            case['question_panel_button_state_on_open'] = await page.evaluate("() => { const button = document.querySelector('#questionPracticeBtn'); return { pressed: button?.getAttribute('aria-pressed'), active: button?.classList.contains('active') }; }")
+            self.assertEqual(case['question_panel_button_state_on_open']['pressed'], 'true')
+            self.assertTrue(case['question_panel_button_state_on_open']['active'])
+
+            await page.click('#questionPracticeBtn')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === true")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'questionPracticeBtn'")
+            case['question_panel_focus_after_toggle_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['question_panel_focus_after_toggle_close'], 'questionPracticeBtn')
+            case['question_panel_button_state_after_toggle_close'] = await page.evaluate("() => { const button = document.querySelector('#questionPracticeBtn'); return { pressed: button?.getAttribute('aria-pressed'), active: button?.classList.contains('active') }; }")
+            self.assertEqual(case['question_panel_button_state_after_toggle_close']['pressed'], 'false')
+            self.assertFalse(case['question_panel_button_state_after_toggle_close']['active'])
+
+            await page.click('#questionPracticeBtn')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'closeQuestionModeBtn'")
 
             await page.click('#openQuestionImportBtn')
             await page.waitForFunction("document.querySelector('#questionImportDialog').hidden === false")
