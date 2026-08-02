@@ -94,23 +94,18 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('id="bankPagePracticePlaceholder"', QUESTION_BANK_HTML)
         self.assertIn('function practiceFrameUrl()', QUESTION_BANK_JS)
         self.assertIn('function setPracticeCollapsed(', QUESTION_BANK_JS)
-        self.assertIn('function shouldRefreshPracticeSession()', QUESTION_BANK_JS)
-        self.assertIn('if (shouldRefreshPracticeSession()) launch(index);', QUESTION_BANK_JS)
+        self.assertIn('function embeddedPracticeHasUnsavedState()', QUESTION_BANK_JS)
+        self.assertIn('onRowActivate: (_row, index) => {', QUESTION_BANK_JS)
+        self.assertIn('launch(index);', QUESTION_BANK_JS)
         self.assertIn('function ensureQuestionBankReviewLoaded(', QUESTION_BANK_JS)
         self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
         self.assertIn("get('question-bank-embed') === '1'", APP_JS)
-        self.assertIn("const QUESTION_BANK_SESSION_SYNC_REQUEST = 'cs-flashcards-question-bank-session-sync-request';", QUESTION_BANK_JS)
-        self.assertIn("const QUESTION_BANK_SESSION_SYNC_RESPONSE = 'cs-flashcards-question-bank-session-sync-response';", QUESTION_BANK_JS)
-        self.assertIn('function syncEmbeddedPracticeSession(startIndex)', QUESTION_BANK_JS)
         self.assertIn('function restartPracticeFrame(startIndex, sessionState = bankState.practiceSessionState)', QUESTION_BANK_JS)
         self.assertIn('function practiceLaunchPayload(startIndex, sessionState = bankState.practiceSessionState)', QUESTION_BANK_JS)
         self.assertIn("if (sessionState && typeof sessionState === 'object') payload.sessionState = sessionState;", QUESTION_BANK_JS)
-        self.assertIn('bankState.practiceSessionState = syncResult?.sessionState && typeof syncResult.sessionState === \'object\' ? syncResult.sessionState : null;', QUESTION_BANK_JS)
-        self.assertIn('restartPracticeFrame(safeStart, syncResult?.sessionState || bankState.practiceSessionState);', QUESTION_BANK_JS)
         self.assertIn('function confirmPracticeRestart(startIndex)', QUESTION_BANK_JS)
-        self.assertIn('const syncResult = await syncEmbeddedPracticeSession(safeStart);', QUESTION_BANK_JS)
-        self.assertIn('if (syncResult?.preserved) {', QUESTION_BANK_JS)
-        self.assertIn('if (syncResult?.requiresReload && syncResult?.hasInProgress && !confirmPracticeRestart(safeStart)) {', QUESTION_BANK_JS)
+        self.assertIn('if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {', QUESTION_BANK_JS)
+        self.assertIn('restartPracticeFrame(safeStart, null);', QUESTION_BANK_JS)
 
     def test_calendar_page_smoke_has_tabs_and_detail_drawer(self):
         self.assertIn('id="mainTabCalendarBtn"', CALENDAR_HTML)
@@ -589,24 +584,21 @@ class StaticFrontendSmokeTests(unittest.TestCase):
                 {question_bank_id: 'beta'},
               ],
               error: '',
-              practiceLoaded: false,
-              practiceCollapsed: true,
+              loading: false,
+              practiceLoaded: true,
+              practiceCollapsed: false,
               practiceStartIndex: 0,
               practiceSessionState: null,
-              selectedId: '',
+              practiceActiveId: 'alpha',
+              selectedId: 'alpha',
+              practiceSummary: null,
             };
-            const selectedIndex = (fallback = 0) => fallback;
             const setPracticeCollapsed = () => {};
             const persistFilterState = () => {};
-            const questionBankResultSetKey = () => 'alpha\u001fbeta';
             const renderTable = () => {};
             const renderPracticePane = () => {};
             const ensureSelectedRowVisible = () => {};
-            let syncCalls = 0;
-            const syncEmbeddedPracticeSession = async () => {
-              syncCalls += 1;
-              return {requiresReload: true, hasInProgress: true, sessionState: {draft: 'keep'}};
-            };
+            const embeddedPracticeHasUnsavedState = () => true;
             let confirmCalls = 0;
             const confirmPracticeRestart = () => {
               confirmCalls += 1;
@@ -614,16 +606,18 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             };
             let restartCalls = 0;
             const restartPracticeFrame = () => { restartCalls += 1; };
+            let pendingPracticeLaunch = null;
             eval(fnSource);
             launch(1).then((launched) => {
               process.stdout.write(JSON.stringify({
                 launched,
-                syncCalls,
                 confirmCalls,
                 restartCalls,
+                pendingPracticeLaunch,
                 practiceLoaded: bankState.practiceLoaded,
                 practiceStartIndex: bankState.practiceStartIndex,
                 selectedId: bankState.selectedId,
+                practiceActiveId: bankState.practiceActiveId,
                 error: bankState.error,
               }));
             }).catch((error) => {
@@ -634,7 +628,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         ))
         self.assertEqual(
             result,
-            '{"launched":false,"syncCalls":1,"confirmCalls":1,"restartCalls":0,"practiceLoaded":true,"practiceStartIndex":1,"selectedId":"beta","error":"현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요."}',
+            '{"launched":false,"confirmCalls":1,"restartCalls":0,"pendingPracticeLaunch":null,"practiceLoaded":true,"practiceStartIndex":0,"selectedId":"alpha","practiceActiveId":"alpha","error":"현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요."}',
         )
 
 if __name__ == '__main__':

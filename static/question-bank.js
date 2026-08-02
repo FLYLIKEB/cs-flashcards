@@ -1,5 +1,3 @@
-const QUESTION_BANK_SESSION_SYNC_REQUEST = 'cs-flashcards-question-bank-session-sync-request';
-const QUESTION_BANK_SESSION_SYNC_RESPONSE = 'cs-flashcards-question-bank-session-sync-response';
 const QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const QUESTION_BANK_COLUMN_ORDER_KEY = 'csQuestionBankTableColumnOrder:v1';
 const QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1';
@@ -294,39 +292,6 @@ function confirmPracticeRestart(startIndex) {
   return window.confirm(`현재 풀이 세트의 작성 내용이 새 세트를 다시 열 때까지 화면에서 사라집니다. ${nextNumber}번 문제로 다시 시작할까요?`);
 }
 
-function syncEmbeddedPracticeSession(startIndex) {
-  const frame = $('bankPagePracticeFrame');
-  if (!frame?.contentWindow) return Promise.resolve(null);
-  const requestId = `bank-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  return new Promise((resolve) => {
-    let settled = false;
-    const finish = (value) => {
-      if (settled) return;
-      settled = true;
-      window.clearTimeout(timerId);
-      window.removeEventListener('message', handleMessage);
-      resolve(value);
-    };
-    const handleMessage = (event) => {
-      if (event.source !== frame.contentWindow) return;
-      if (event.origin && event.origin !== window.location.origin) return;
-      const data = event?.data;
-      if (!data || data.type !== QUESTION_BANK_SESSION_SYNC_RESPONSE || data.requestId !== requestId) return;
-      finish(data);
-    };
-    const timerId = window.setTimeout(() => finish(null), 500);
-    window.addEventListener('message', handleMessage);
-    try {
-      frame.contentWindow.postMessage({
-        type: QUESTION_BANK_SESSION_SYNC_REQUEST,
-        requestId,
-        session: practiceLaunchPayload(startIndex),
-      }, window.location.origin || '*');
-    } catch (_error) {
-      finish(null);
-    }
-  });
-}
 
 
 function practiceFrameUrl() {
@@ -335,7 +300,7 @@ function practiceFrameUrl() {
 
 function practiceFrameDocument() {
   const frame = $('bankPagePracticeFrame');
-  if (!frame || frame.hidden) return null;
+  if (!frame) return null;
   try {
     return frame.contentWindow?.document || null;
   } catch (_error) {
@@ -1332,11 +1297,7 @@ function renderTable() {
     tableMinWidth: '960px',
     emptyText: '조건에 맞는 문제가 없습니다.',
     onRowActivate: (_row, index) => {
-      bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
-      bankState.practiceStartIndex = index;
-      renderTable();
-      renderPracticePane();
-      if (shouldRefreshPracticeSession()) launch(index);
+      launch(index);
     },
     onColumnMove: (sourceKey, targetKey) => {
       window.CSTableShell.moveColumnOrder(QUESTION_BANK_COLUMN_ORDER_KEY, QUESTION_BANK_COLUMNS.map((column) => column.key), sourceKey, targetKey);
@@ -1351,9 +1312,6 @@ function ensureSelectedRowVisible() {
   row.scrollIntoView({block: 'nearest', inline: 'nearest'});
 }
 
-function shouldRefreshPracticeSession() {
-  return !bankState.practiceCollapsed;
-}
 
 function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
   launch(startIndex, {reveal}).catch(() => {});
@@ -1366,47 +1324,43 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
     renderPracticePane();
     return false;
   }
-  const safeStart = selectedIndex(startIndex);
-  bankState.selectedId = String(bankState.items[safeStart]?.question_bank_id || '');
-  bankState.practiceActiveId = bankState.selectedId;
-  bankState.practiceLoaded = true;
-  bankState.practiceStartIndex = safeStart;
-  bankState.practiceSummary = null;
+  const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
+const targetId = String(bankState.items[safeStart]?.question_bank_id || '');
+const currentId = String(bankState.practiceActiveId || '');
+if (bankState.practiceLoaded && targetId && targetId === currentId) {
   if (reveal) setPracticeCollapsed(false);
-  persistFilterState();
+  ensureSelectedRowVisible();
   renderTable();
   renderPracticePane();
-  ensureSelectedRowVisible();
-  try {
-    const syncResult = await syncEmbeddedPracticeSession(safeStart);
-    bankState.practiceSessionState = syncResult?.sessionState && typeof syncResult.sessionState === 'object' ? syncResult.sessionState : null;
-    if (syncResult?.preserved) {
-      bankState.error = '';
-      bankState.practiceResultSetKey = questionBankResultSetKey();
-      renderTable();
-      renderPracticePane();
-      return true;
-    }
-    if (syncResult?.requiresReload && syncResult?.hasInProgress && !confirmPracticeRestart(safeStart)) {
-      bankState.error = '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.';
-      renderTable();
-      renderPracticePane();
-      return false;
-    }
-    restartPracticeFrame(safeStart, syncResult?.sessionState || bankState.practiceSessionState);
-    bankState.error = '';
-    renderTable();
-    renderPracticePane();
-    return true;
-  } catch (error) {
-    bankState.error = error.message || String(error);
-    renderTable();
-    renderPracticePane();
-    return false;
-  }
+  return false;
+}
+if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {
+  bankState.error = '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.';
+  renderTable();
+  renderPracticePane();
+  return false;
+}
+pendingPracticeLaunch = bankState.loading
+  ? {startIndex: safeStart, reveal}
+  : null;
+bankState.selectedId = targetId;
+bankState.practiceActiveId = targetId;
+bankState.practiceLoaded = true;
+bankState.practiceStartIndex = safeStart;
+bankState.practiceSummary = null;
+bankState.practiceSessionState = null;
+if (reveal) setPracticeCollapsed(false);
+persistFilterState();
+renderTable();
+renderPracticePane();
+ensureSelectedRowVisible();
+restartPracticeFrame(safeStart, null);
+bankState.error = '';
+renderTable();
+renderPracticePane();
+return true;
 
 }
-
 async function loadQuestionBankPage() {
   const requestId = activeQuestionBankLoadRequest + 1;
   activeQuestionBankLoadRequest = requestId;
