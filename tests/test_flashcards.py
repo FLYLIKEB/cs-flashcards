@@ -104,7 +104,7 @@ def seed_rows_from_csv(path: Path) -> list[dict[str, str]]:
 
 def seed_runtime_db(csv_path: Path | None, db_path: Path) -> None:
     if csv_path is not None and not db_path.exists():
-        flashcard_backend.ensure_progress_db(
+        flashcard_app.ensure_progress_db(
             db_path,
             [
                 {**row, 'known_status': '', 'last_reviewed': '', 'review_count': '0'}
@@ -115,33 +115,32 @@ def seed_runtime_db(csv_path: Path | None, db_path: Path) -> None:
 
 def read_cards(csv_path: Path | None, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_backend.read_cards(progress_db_path)
+    return flashcard_app.read_cards(progress_db_path)
 
 
 def mark_card(card_id: str, status: str, csv_path: Path | None, backup_dir: Path, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_backend.mark_card(card_id, status, backup_dir, progress_db_path)
+    return flashcard_app.mark_card(card_id, status, backup_dir, progress_db_path)
 
 
 def set_bookmark(card_id: str, bookmarked: bool, csv_path: Path | None, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_backend.set_bookmark(card_id, bookmarked, progress_db_path)
+    return flashcard_app.set_bookmark(card_id, bookmarked, progress_db_path)
 
 
 def save_memo(card_id: str, memo: str, csv_path: Path | None, progress_db_path: Path):
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_backend.save_memo(card_id, memo, progress_db_path)
+    return flashcard_app.save_memo(card_id, memo, progress_db_path)
 
 
 def save_question_attempt(payload, csv_path_or_progress_db: Path, progress_db_path: Path | None = None):
     if progress_db_path is None:
+        csv_path = None
         progress_db_path = csv_path_or_progress_db
-        sibling_csv_path = progress_db_path.with_name('cards.csv')
-        csv_path = sibling_csv_path if sibling_csv_path.exists() else None
     else:
         csv_path = csv_path_or_progress_db
     seed_runtime_db(csv_path, progress_db_path)
-    return flashcard_backend.save_question_attempt(payload, progress_db_path)
+    return flashcard_app.save_question_attempt(payload, progress_db_path)
 
 
 
@@ -1284,6 +1283,79 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(wrong_only['items'][0]['user_answer'], '하나만 실패해도 나머지는 유지된다.')
             self.assertEqual(wrong_only['items'][0]['wrong_note'], '원자성과 지속성을 혼동함')
             self.assertEqual(wrong_only['items'][0]['answer'], '모든 작업이 전부 성공하거나 전부 실패해야 한다.')
+
+    def test_question_bank_upsert_batch_reuses_preloaded_card_context(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            entries = [
+                {
+                    'card_id': 'CS-001',
+                    'question_type': 'subjective',
+                    'prompt': '형상관리의 목적을 설명하시오.',
+                    'body': '소프트웨어 변경 통제 관점에서 답하시오.',
+                    'answer': '변경 이력과 기준선을 관리해 일관성을 유지한다.',
+                    'explanation': '버전, 변경 승인, 릴리스 구성을 함께 관리해야 한다.',
+                    'category': '',
+                    'topic': '형상관리',
+                    'field_name': '전산학술',
+                    'difficulty': '중',
+                    'issuer': '한국은행',
+                    'source_location': '배치 테스트 1',
+                    'section': '전공필기',
+                    'keywords': ['테스트', '검증', '추가'],
+                },
+                {
+                    'card_id': 'CS-001',
+                    'question_type': 'short',
+                    'prompt': '기준선이란?',
+                    'body': '형상관리에서 기준선의 의미를 쓰시오.',
+                    'answer': '승인된 산출물의 기준 버전이다.',
+                    'explanation': '변경 통제의 기준점이 된다.',
+                    'category': '소프트웨어공학',
+                    'topic': '형상관리',
+                    'field_name': '전산학술',
+                    'difficulty': '하',
+                    'issuer': '한국은행',
+                    'source_location': '배치 테스트 2',
+                    'section': '전공필기',
+                    'keywords': ['테스트'],
+                },
+                {
+                    'card_id': '',
+                    'question_type': 'short',
+                    'prompt': 'TCP의 흐름 제어 목적은?',
+                    'body': '네트워크 혼잡과 수신 측 처리 속도 관점에서 설명하시오.',
+                    'answer': '송신 속도를 조절해 수신 측이 감당 가능한 범위로 유지한다.',
+                    'explanation': '윈도우 기반 제어로 과도한 전송을 막는다.',
+                    'category': '',
+                    'topic': '네트워크',
+                    'field_name': '전산학술',
+                    'difficulty': '중',
+                    'issuer': '한국은행',
+                    'source_location': '배치 테스트 3',
+                    'section': '전공필기',
+                    'keywords': ['흐름 제어'],
+                },
+            ]
+
+            with mock.patch.object(flashcard_app, 'read_cards', wraps=flashcard_app.read_cards) as read_cards_mock:
+                saved = flashcard_app.upsert_question_bank_entries(entries, db_path)
+
+            self.assertEqual(read_cards_mock.call_count, 1)
+            self.assertEqual(saved['count'], 3)
+            self.assertEqual(saved['items'][0]['category'], '소프트웨어공학')
+            self.assertEqual(saved['items'][0]['keywords'], ['테스트', 'Test', '검증'])
+            self.assertEqual(saved['items'][0]['missing_card_keywords'], ['추가'])
+            self.assertEqual(saved['items'][1]['category'], '소프트웨어공학')
+            self.assertEqual(saved['items'][1]['keywords'], ['테스트', 'Test', '검증'])
+            self.assertEqual(saved['items'][2]['category'], '네트워크')
+            self.assertEqual(saved['items'][2]['keywords'], [])
+            self.assertEqual(saved['items'][2]['missing_card_keywords'], ['흐름 제어'])
 
     def test_question_bank_upsert_infers_missing_difficulty_and_backfills_runtime_rows(self):
         with tempfile.TemporaryDirectory() as td:

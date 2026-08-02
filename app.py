@@ -2369,24 +2369,26 @@ def question_bank_json_list(value: Any) -> list[str]:
     return normalize_question_bank_list(parsed)
 
 
-def _ensure_card_exists(card_id: Any, progress_db_path: Path | None = None) -> dict[str, Any]:
+def _ensure_card_exists(
+    card_id: Any,
+    progress_db_path: Path | None = None,
+    *,
+    card_map: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     normalized_card_id = normalize_question_bank_text(card_id, limit=255)
     if not normalized_card_id:
         raise KeyError(card_id)
-    rows, _ = read_cards(progress_db_path)
-    card = next(
-        (
-            row
+    if card_map is None:
+        rows, _ = read_cards(progress_db_path)
+        card_map = {
+            normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255): row
             for row in rows
-            if str(row.get("id") or row.get("card_id") or "").strip() == normalized_card_id
-        ),
-        None,
-    )
+            if normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255)
+        }
+    card = card_map.get(normalized_card_id)
     if not isinstance(card, dict) or not card:
         raise KeyError(normalized_card_id)
     return card
-
-
 
 
 def question_bank_keywords_for_card(card: dict[str, Any]) -> list[str]:
@@ -2470,9 +2472,13 @@ QUESTION_BANK_CATEGORY_HINTS: dict[str, tuple[str, ...]] = {
 }
 
 
-
-def question_bank_categories_from_cards(progress_db_path: Path | None = None) -> list[str]:
-    rows, _ = read_cards(progress_db_path)
+def question_bank_categories_from_cards(
+    progress_db_path: Path | None = None,
+    *,
+    rows: list[dict[str, Any]] | None = None,
+) -> list[str]:
+    if rows is None:
+        rows, _ = read_cards(progress_db_path)
     seen: set[str] = set()
     categories: list[str] = []
     for category in QUESTION_BANK_CATEGORIES:
@@ -2493,7 +2499,6 @@ def question_bank_categories_from_cards(progress_db_path: Path | None = None) ->
     return categories
 
 
-
 def infer_question_bank_category(
     raw_category: Any,
     *,
@@ -2502,8 +2507,10 @@ def infer_question_bank_category(
     prompt: Any = "",
     body: Any = "",
     progress_db_path: Path | None = None,
+    allowed_categories: list[str] | None = None,
 ) -> str:
-    allowed_categories = question_bank_categories_from_cards(progress_db_path)
+    if allowed_categories is None:
+        allowed_categories = question_bank_categories_from_cards(progress_db_path)
     allowed_lookup = {item.casefold(): item for item in allowed_categories}
     for candidate in (raw_category, card_category):
         normalized = normalize_question_bank_text(candidate, limit=128)
@@ -2556,6 +2563,9 @@ def question_bank_fingerprint(entry: dict[str, Any]) -> str:
 def normalize_question_bank_entry(
     payload: QuestionBankEntryRequest | dict[str, Any],
     progress_db_path: Path | None = None,
+    *,
+    card_map: dict[str, dict[str, Any]] | None = None,
+    allowed_categories: list[str] | None = None,
 ) -> dict[str, Any]:
     raw = payload.model_dump() if isinstance(payload, BaseModel) else dict(payload or {})
     question_type = str(raw.get("question_type") or "").strip().lower()
@@ -2567,7 +2577,7 @@ def normalize_question_bank_entry(
     card_id = normalize_question_bank_text(raw.get("card_id"), limit=255)
     card: dict[str, Any] = {}
     if card_id:
-        card = _ensure_card_exists(card_id, progress_db_path)
+        card = _ensure_card_exists(card_id, progress_db_path, card_map=card_map)
     choices = normalize_question_bank_list(raw.get("choices"), item_limit=2000)
     answer_index = raw.get("answer_index")
     if answer_index is not None:
@@ -2609,7 +2619,8 @@ def normalize_question_bank_entry(
             topic=topic,
             prompt=prompt,
             body=body,
-                progress_db_path=progress_db_path,
+            progress_db_path=progress_db_path,
+            allowed_categories=allowed_categories,
         ),
         "keywords": linked_keywords,
         "missing_card_keywords": missing_card_keywords,
@@ -2628,6 +2639,7 @@ def normalize_question_bank_entry(
     normalized["fingerprint"] = question_bank_fingerprint(normalized)
     normalized["question_bank_id"] = normalized["question_bank_id"] or f"qb-{normalized['fingerprint'][:24]}"
     return normalized
+
 
 
 def question_bank_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
@@ -2891,7 +2903,22 @@ def upsert_question_bank_entries(
     entries: list[QuestionBankEntryRequest | dict[str, Any]],
     progress_db_path: Path | None = None,
 ) -> dict[str, Any]:
-    normalized_entries = [normalize_question_bank_entry(entry, progress_db_path) for entry in entries]
+    rows, _ = read_cards(progress_db_path)
+    card_map = {
+        normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255): row
+        for row in rows
+        if normalize_question_bank_text(row.get("id") or row.get("card_id"), limit=255)
+    }
+    allowed_categories = question_bank_categories_from_cards(rows=rows)
+    normalized_entries = [
+        normalize_question_bank_entry(
+            entry,
+            progress_db_path,
+            card_map=card_map,
+            allowed_categories=allowed_categories,
+        )
+        for entry in entries
+    ]
     db_path = progress_db_for(progress_db_path)
     ensure_progress_db(db_path)
     saved_items: list[dict[str, Any]] = []
