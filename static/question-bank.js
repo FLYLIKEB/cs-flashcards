@@ -934,8 +934,9 @@ function queryString() {
 
 function syncUrl() {
   const qs = queryString();
-  const next = qs ? `/question-bank?${qs}` : '/question-bank';
-  if (`${window.location.pathname}${window.location.search}` !== next) window.history.replaceState({}, '', next);
+  const hash = window.location.hash || '';
+  const next = `${qs ? `/question-bank?${qs}` : '/question-bank'}${hash}`;
+  if (`${window.location.pathname}${window.location.search}${window.location.hash}` !== next) window.history.replaceState({}, '', next);
 }
 
 async function fetchEntries({signal} = {}) {
