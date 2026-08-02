@@ -1,13 +1,19 @@
 {
-  "checked_at": "2026-08-02T19:55:22Z",
+  "checked_at": "2026-08-02T19:57:46Z",
   "gate_open": false,
   "summary": {
-    "open_issue_count": 1,
+    "open_issue_count": 2,
     "open_pr_count": 0,
-    "blocking_worktree_count": 1,
+    "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
   "open_issues": [
+    {
+      "number": 183,
+      "state": "OPEN",
+      "title": "문항 이력 조회 경로의 카드 컨텍스트 재조회용 중복 SQLite 연결 제거",
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/183"
+    },
     {
       "number": 182,
       "state": "OPEN",
@@ -21,6 +27,11 @@
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-182",
       "branch": "issue-182-embedded-dynamic-filter-restore",
       "status": "tracked-branch-worktree"
+    },
+    {
+      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-183",
+      "branch": "issue-183-attempt-context-single-connection",
+      "status": "tracked-branch-worktree"
     }
   ],
   "reusable_backlog": [],
@@ -32,7 +43,6 @@
     }
   ],
   "notes": [
-    "Round 36 frontend candidate accepted and issue #182 opened.",
-    "Round 36 backend audit retry is still pending."
+    "Round 36 frontend issue #182 and backend issue #183 are the active lanes."
   ]
 }

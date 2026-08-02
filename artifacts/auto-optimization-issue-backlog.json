@@ -1,11 +1,17 @@
 {
-  "generated_at": "2026-08-02T19:55:22Z",
+  "generated_at": "2026-08-02T19:57:46Z",
   "wave": "2026-08-02-round-36",
   "queue": [
     {
       "issue": 182,
       "title": "메인 앱 임베드 문제은행의 동적 select 필터(field/category/issuer) deep-link·reload 복원 누락",
       "branch": "issue-182-embedded-dynamic-filter-restore",
+      "status": "implementation_in_progress"
+    },
+    {
+      "issue": 183,
+      "title": "문항 이력 조회 경로의 카드 컨텍스트 재조회용 중복 SQLite 연결 제거",
+      "branch": "issue-183-attempt-context-single-connection",
       "status": "implementation_in_progress"
     }
   ],
