@@ -69,75 +69,77 @@
               <p class="cs-table-hint">기본 숨김. 필요할 때만 엽니다.</p>
             </div>
             <div class="cs-table-toolbar question-bank-filter-actions">
-              <button id="bankPageToggleFiltersBtn" class="cs-table-button" type="button" aria-expanded="false">필터 열기</button>
+              <button id="bankPageToggleFiltersBtn" class="cs-table-button" type="button" aria-expanded="false" aria-controls="bankPageFiltersRegion">필터 열기</button>
               <button id="bankPageResetFiltersBtn" class="cs-table-button" type="button">초기화</button>
             </div>
           </div>
 
-          <div class="cs-table-filter-grid">
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">통합 검색</span>
-              <input id="bankPageQueryInput" class="cs-table-control" type="search" placeholder="문제/정답/키워드" />
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">풀이상태</span>
-              <select id="bankPageAttemptStatusSelect" class="cs-table-control" aria-label="풀이상태">
-                <option value="">풀이상태</option>
-                <option value="unseen">안푼</option>
-                <option value="wrong">틀린</option>
-                <option value="correct">맞은</option>
-              </select>
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">문제유형 검색</span>
-              <input id="bankPageTopicInput" class="cs-table-control" type="search" list="bankPageTopicOptions" aria-label="문제유형 검색" placeholder="예: 데이터베이스" />
-              <datalist id="bankPageTopicOptions"></datalist>
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">분야</span>
-              <select id="bankPageFieldInput" class="cs-table-control" aria-label="분야">
-                <option value="">분야</option>
-              </select>
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">카테고리</span>
-              <select id="bankPageCategoryInput" class="cs-table-control" aria-label="카테고리">
-                <option value="">카테고리</option>
-              </select>
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">출제기관</span>
-              <select id="bankPageIssuerInput" class="cs-table-control" aria-label="출제기관">
-                <option value="">출제기관</option>
-              </select>
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">출제위치</span>
-              <input id="bankPageSourceInput" class="cs-table-control" type="search" placeholder="예: 2013 학술파트 1" />
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">난이도</span>
-              <select id="bankPageDifficultySelect" class="cs-table-control">
-                <option value="">난이도</option>
-                <option value="상">상</option>
-                <option value="중">중</option>
-                <option value="하">하</option>
-              </select>
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">형식</span>
-              <select id="bankPageTypeSelect" class="cs-table-control">
-                <option value="">형식</option>
-                <option value="short">주관식</option>
-                <option value="subjective">서술형</option>
-                <option value="multiple_choice">객관식</option>
-                <option value="essay">논술형</option>
-              </select>
-            </label>
-            <label class="question-bank-filter-field">
-              <span class="question-bank-filter-label">섹션</span>
-              <input id="bankPageSectionInput" class="cs-table-control" type="search" placeholder="예: 전공필기" />
-            </label>
+          <div id="bankPageFiltersRegion" class="question-bank-filters-region" hidden>
+            <div class="cs-table-filter-grid">
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">통합 검색</span>
+                <input id="bankPageQueryInput" class="cs-table-control" type="search" placeholder="문제/정답/키워드" />
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">풀이상태</span>
+                <select id="bankPageAttemptStatusSelect" class="cs-table-control" aria-label="풀이상태">
+                  <option value="">풀이상태</option>
+                  <option value="unseen">안푼</option>
+                  <option value="wrong">틀린</option>
+                  <option value="correct">맞은</option>
+                </select>
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">문제유형 검색</span>
+                <input id="bankPageTopicInput" class="cs-table-control" type="search" list="bankPageTopicOptions" aria-label="문제유형 검색" placeholder="예: 데이터베이스" />
+                <datalist id="bankPageTopicOptions"></datalist>
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">분야</span>
+                <select id="bankPageFieldInput" class="cs-table-control" aria-label="분야">
+                  <option value="">분야</option>
+                </select>
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">카테고리</span>
+                <select id="bankPageCategoryInput" class="cs-table-control" aria-label="카테고리">
+                  <option value="">카테고리</option>
+                </select>
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">출제기관</span>
+                <select id="bankPageIssuerInput" class="cs-table-control" aria-label="출제기관">
+                  <option value="">출제기관</option>
+                </select>
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">출제위치</span>
+                <input id="bankPageSourceInput" class="cs-table-control" type="search" placeholder="예: 2013 학술파트 1" />
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">난이도</span>
+                <select id="bankPageDifficultySelect" class="cs-table-control">
+                  <option value="">난이도</option>
+                  <option value="상">상</option>
+                  <option value="중">중</option>
+                  <option value="하">하</option>
+                </select>
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">형식</span>
+                <select id="bankPageTypeSelect" class="cs-table-control">
+                  <option value="">형식</option>
+                  <option value="short">주관식</option>
+                  <option value="subjective">서술형</option>
+                  <option value="multiple_choice">객관식</option>
+                  <option value="essay">논술형</option>
+                </select>
+              </label>
+              <label class="question-bank-filter-field">
+                <span class="question-bank-filter-label">섹션</span>
+                <input id="bankPageSectionInput" class="cs-table-control" type="search" placeholder="예: 전공필기" />
+              </label>
+            </div>
           </div>
 
           <div id="bankPageActiveFilters" class="question-bank-active-filters" aria-live="polite"></div>
