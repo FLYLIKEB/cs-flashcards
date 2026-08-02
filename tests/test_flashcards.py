@@ -1975,12 +1975,219 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(attempt['attempt']['card_id'], '')
             self.assertEqual(attempt['attempt']['judgment'], 'wrong')
             self.assertIsNone(attempt['card'])
+            with closing(sqlite3.connect(db_path)) as conn:
+                stored_attempt = conn.execute(
+                    'SELECT card_id FROM question_attempts WHERE question_id=?',
+                    ('bank-unlinked-1',),
+                ).fetchone()
+                empty_progress_count = conn.execute(
+                    "SELECT COUNT(*) FROM card_progress WHERE card_id = ''"
+                ).fetchone()[0]
+            self.assertIsNone(stored_attempt[0])
+            self.assertEqual(empty_progress_count, 0)
 
             wrong_only = flashcard_app.read_question_bank_entries(db_path, attempt_status='wrong', limit=10)
             self.assertEqual(wrong_only['summary']['total'], 1)
             self.assertEqual(wrong_only['summary']['category_breakdown'][0]['wrong_count'], 1)
             self.assertEqual(wrong_only['items'][0]['question_attempt_status'], 'wrong')
             self.assertEqual(wrong_only['items'][0]['question_bank_id'], item['question_bank_id'])
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                saved_attempt = conn.execute(
+                    'SELECT card_id FROM question_attempts WHERE question_id=?',
+                    ('bank-unlinked-1',),
+                ).fetchone()
+                sentinel_count = conn.execute(
+                    "SELECT COUNT(*) FROM card_progress WHERE card_id=''",
+                ).fetchone()[0]
+            self.assertIsNone(saved_attempt[0])
+            self.assertEqual(sentinel_count, 0)
+
+    def test_ensure_progress_db_migrates_legacy_unlinked_question_attempts_off_empty_card_id(self):
+        with tempfile.TemporaryDirectory() as td:
+            db_path = Path(td) / 'progress.sqlite'
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute(
+                    """
+                    CREATE TABLE card_progress (
+                        card_id TEXT PRIMARY KEY,
+                        known_status TEXT NOT NULL DEFAULT '',
+                        last_reviewed TEXT NOT NULL DEFAULT '',
+                        review_count INTEGER NOT NULL DEFAULT 0,
+                        bookmarked INTEGER NOT NULL DEFAULT 0,
+                        memo TEXT NOT NULL DEFAULT '',
+                        memo_updated_at TEXT NOT NULL DEFAULT '',
+                        updated_at TEXT NOT NULL
+                    )
+                    """
+                )
+                conn.execute(
+                    """
+                    CREATE TABLE question_bank (
+                        id TEXT PRIMARY KEY,
+                        fingerprint TEXT NOT NULL UNIQUE,
+                        card_id TEXT,
+                        question_type TEXT NOT NULL,
+                        prompt TEXT NOT NULL DEFAULT '',
+                        body TEXT NOT NULL DEFAULT '',
+                        answer TEXT NOT NULL DEFAULT '',
+                        explanation TEXT NOT NULL DEFAULT '',
+                        rubric_json TEXT NOT NULL DEFAULT '[]',
+                        choices_json TEXT NOT NULL DEFAULT '[]',
+                        answer_index INTEGER,
+                        topic TEXT NOT NULL DEFAULT '',
+                        field_name TEXT NOT NULL DEFAULT '',
+                        category TEXT NOT NULL DEFAULT '',
+                        keywords_json TEXT NOT NULL DEFAULT '[]',
+                        missing_card_keywords_json TEXT NOT NULL DEFAULT '[]',
+                        difficulty TEXT NOT NULL DEFAULT '',
+                        issuer TEXT NOT NULL DEFAULT '',
+                        source_location TEXT NOT NULL DEFAULT '',
+                        section TEXT NOT NULL DEFAULT '',
+                        points INTEGER,
+                        expected_time_seconds INTEGER,
+                        answer_guide TEXT NOT NULL DEFAULT '',
+                        session_mode TEXT NOT NULL DEFAULT 'practice',
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL
+                    )
+                    """
+                )
+                conn.execute(
+                    """
+                    CREATE TABLE question_attempts (
+                        question_id TEXT PRIMARY KEY,
+                        question_bank_id TEXT,
+                        card_id TEXT NOT NULL,
+                        question_type TEXT NOT NULL,
+                        prompt TEXT NOT NULL DEFAULT '',
+                        body TEXT NOT NULL DEFAULT '',
+                        user_answer TEXT NOT NULL DEFAULT '',
+                        selected_choice_index INTEGER,
+                        is_correct INTEGER,
+                        judgment TEXT NOT NULL DEFAULT 'pending',
+                        wrong_note TEXT NOT NULL DEFAULT '',
+                        session_id TEXT NOT NULL DEFAULT '',
+                        session_title TEXT NOT NULL DEFAULT '',
+                        session_mode TEXT NOT NULL DEFAULT 'practice',
+                        section TEXT NOT NULL DEFAULT '',
+                        points INTEGER,
+                        expected_time_seconds INTEGER,
+                        answer_guide TEXT NOT NULL DEFAULT '',
+                        question_order INTEGER,
+                        question_elapsed_seconds INTEGER,
+                        session_elapsed_seconds INTEGER,
+                        time_limit_seconds INTEGER,
+                        question_started_at TEXT NOT NULL DEFAULT '',
+                        answered_at TEXT NOT NULL DEFAULT '',
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL,
+                        FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE,
+                        FOREIGN KEY(question_bank_id) REFERENCES question_bank(id) ON DELETE SET NULL
+                    )
+                    """
+                )
+                conn.execute(
+                    "INSERT INTO card_progress (card_id, updated_at) VALUES (?, ?)",
+                    ('', '2026-07-19T09:00:00+09:00'),
+                )
+                conn.execute(
+                    """
+                    INSERT INTO question_bank (
+                        id, fingerprint, card_id, question_type, prompt, body, answer, explanation,
+                        rubric_json, choices_json, answer_index, topic, field_name, category,
+                        keywords_json, missing_card_keywords_json, difficulty, issuer,
+                        source_location, section, points, expected_time_seconds, answer_guide,
+                        session_mode, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        'qb-legacy-unlinked',
+                        'legacy-fingerprint',
+                        None,
+                        'multiple_choice',
+                        '레거시 문항',
+                        '본문',
+                        '정답',
+                        '해설',
+                        '[]',
+                        '["오답", "정답"]',
+                        1,
+                        '테스트',
+                        '전산학술',
+                        '테스트',
+                        '["문제은행"]',
+                        '[]',
+                        '중',
+                        '한국은행',
+                        '레거시',
+                        '전공필기',
+                        5,
+                        90,
+                        '근거를 1문장으로 설명',
+                        'practice',
+                        '2026-07-19T09:00:00+09:00',
+                        '2026-07-19T09:00:00+09:00',
+                    ),
+                )
+                conn.execute(
+                    """
+                    INSERT INTO question_attempts (
+                        question_id, question_bank_id, card_id, question_type, prompt, body,
+                        user_answer, selected_choice_index, is_correct, judgment, wrong_note,
+                        session_id, session_title, session_mode, section, points,
+                        expected_time_seconds, answer_guide, question_order,
+                        question_elapsed_seconds, session_elapsed_seconds, time_limit_seconds,
+                        question_started_at, answered_at, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        'legacy-attempt-1',
+                        'qb-legacy-unlinked',
+                        '',
+                        'multiple_choice',
+                        '레거시 문항',
+                        '본문',
+                        '오답 선택',
+                        0,
+                        0,
+                        'wrong',
+                        '센티넬 마이그레이션',
+                        '',
+                        '',
+                        'practice',
+                        '전공필기',
+                        5,
+                        90,
+                        '근거를 1문장으로 설명',
+                        1,
+                        10,
+                        10,
+                        90,
+                        '',
+                        '2026-07-19T09:00:10+09:00',
+                        '2026-07-19T09:00:10+09:00',
+                        '2026-07-19T09:00:10+09:00',
+                    ),
+                )
+                conn.commit()
+
+            flashcard_app.ensure_progress_db(db_path)
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.row_factory = sqlite3.Row
+                columns = conn.execute("PRAGMA table_info(question_attempts)").fetchall()
+                card_id_column = next(row for row in columns if row['name'] == 'card_id')
+                migrated_attempt = conn.execute(
+                    'SELECT card_id FROM question_attempts WHERE question_id=?',
+                    ('legacy-attempt-1',),
+                ).fetchone()
+                sentinel_count = conn.execute(
+                    "SELECT COUNT(*) FROM card_progress WHERE card_id=''",
+                ).fetchone()[0]
+            self.assertEqual(card_id_column['notnull'], 0)
+            self.assertIsNone(migrated_attempt['card_id'])
+            self.assertEqual(sentinel_count, 0)
 
     def test_update_question_bank_entry_rewrites_body_and_metadata(self):
         with tempfile.TemporaryDirectory() as td:
@@ -3568,6 +3775,126 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertIn('memo', columns)
             self.assertIn('memo_updated_at', columns)
 
+    def test_old_question_attempt_schema_migrates_empty_card_id_to_null(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            with closing(sqlite3.connect(db_path)) as conn:
+                conn.execute('''
+                    CREATE TABLE cards (
+                        card_id TEXT PRIMARY KEY,
+                        term TEXT NOT NULL DEFAULT '',
+                        english TEXT NOT NULL DEFAULT '',
+                        category TEXT NOT NULL DEFAULT '',
+                        alphabet_index TEXT NOT NULL DEFAULT '',
+                        korean_initial TEXT NOT NULL DEFAULT '',
+                        definition TEXT NOT NULL DEFAULT '',
+                        detailed_explanation TEXT NOT NULL DEFAULT '',
+                        related_concepts TEXT NOT NULL DEFAULT '',
+                        source_files TEXT NOT NULL DEFAULT '',
+                        exam_note TEXT NOT NULL DEFAULT '',
+                        bok_appeared TEXT NOT NULL DEFAULT '',
+                        importance TEXT NOT NULL DEFAULT '',
+                        difficulty TEXT NOT NULL DEFAULT '',
+                        concept_image_url TEXT NOT NULL DEFAULT '',
+                        concept_image_alt TEXT NOT NULL DEFAULT '',
+                        concept_media_type TEXT NOT NULL DEFAULT '',
+                        concept_media_payload TEXT NOT NULL DEFAULT '',
+                        sort_order INTEGER NOT NULL DEFAULT 0,
+                        updated_at TEXT NOT NULL DEFAULT ''
+                    )
+                ''')
+                conn.execute('''
+                    CREATE TABLE card_progress (
+                        card_id TEXT PRIMARY KEY,
+                        known_status TEXT NOT NULL DEFAULT '',
+                        last_reviewed TEXT NOT NULL DEFAULT '',
+                        review_count INTEGER NOT NULL DEFAULT 0,
+                        updated_at TEXT NOT NULL
+                    )
+                ''')
+                conn.execute('''
+                    CREATE TABLE question_bank (
+                        id TEXT PRIMARY KEY,
+                        fingerprint TEXT NOT NULL UNIQUE,
+                        card_id TEXT,
+                        question_type TEXT NOT NULL,
+                        prompt TEXT NOT NULL DEFAULT '',
+                        body TEXT NOT NULL DEFAULT '',
+                        answer TEXT NOT NULL DEFAULT '',
+                        explanation TEXT NOT NULL DEFAULT '',
+                        rubric_json TEXT NOT NULL DEFAULT '[]',
+                        choices_json TEXT NOT NULL DEFAULT '[]',
+                        answer_index INTEGER,
+                        topic TEXT NOT NULL DEFAULT '',
+                        field_name TEXT NOT NULL DEFAULT '',
+                        category TEXT NOT NULL DEFAULT '',
+                        keywords_json TEXT NOT NULL DEFAULT '[]',
+                        missing_card_keywords_json TEXT NOT NULL DEFAULT '[]',
+                        difficulty TEXT NOT NULL DEFAULT '',
+                        issuer TEXT NOT NULL DEFAULT '',
+                        source_location TEXT NOT NULL DEFAULT '',
+                        section TEXT NOT NULL DEFAULT '',
+                        points INTEGER,
+                        expected_time_seconds INTEGER,
+                        answer_guide TEXT NOT NULL DEFAULT '',
+                        session_mode TEXT NOT NULL DEFAULT 'practice',
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL
+                    )
+                ''')
+                conn.execute('''
+                    CREATE TABLE question_attempts (
+                        question_id TEXT PRIMARY KEY,
+                        question_bank_id TEXT,
+                        card_id TEXT NOT NULL,
+                        question_type TEXT NOT NULL,
+                        prompt TEXT NOT NULL DEFAULT '',
+                        body TEXT NOT NULL DEFAULT '',
+                        user_answer TEXT NOT NULL DEFAULT '',
+                        selected_choice_index INTEGER,
+                        is_correct INTEGER,
+                        judgment TEXT NOT NULL DEFAULT 'pending',
+                        wrong_note TEXT NOT NULL DEFAULT '',
+                        session_id TEXT NOT NULL DEFAULT '',
+                        session_title TEXT NOT NULL DEFAULT '',
+                        session_mode TEXT NOT NULL DEFAULT 'practice',
+                        section TEXT NOT NULL DEFAULT '',
+                        points INTEGER,
+                        expected_time_seconds INTEGER,
+                        answer_guide TEXT NOT NULL DEFAULT '',
+                        question_order INTEGER,
+                        question_elapsed_seconds INTEGER,
+                        session_elapsed_seconds INTEGER,
+                        time_limit_seconds INTEGER,
+                        question_started_at TEXT NOT NULL DEFAULT '',
+                        answered_at TEXT NOT NULL DEFAULT '',
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL,
+                        FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE,
+                        FOREIGN KEY(question_bank_id) REFERENCES question_bank(id) ON DELETE SET NULL
+                    )
+                ''')
+                conn.execute(
+                    "INSERT INTO card_progress (card_id, known_status, last_reviewed, review_count, updated_at) VALUES (?, ?, ?, ?, ?)",
+                    ('', '', '', 0, '2026-08-03T00:00:00Z'),
+                )
+                conn.execute(
+                    "INSERT INTO question_attempts (question_id, question_bank_id, card_id, question_type, prompt, body, user_answer, selected_choice_index, is_correct, judgment, wrong_note, session_id, session_title, session_mode, section, points, expected_time_seconds, answer_guide, question_order, question_elapsed_seconds, session_elapsed_seconds, time_limit_seconds, question_started_at, answered_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    ('legacy-unlinked', None, '', 'short', 'prompt', 'body', 'answer', None, 0, 'wrong', 'note', '', '', 'practice', '', None, None, '', None, None, None, None, '', '2026-08-03T00:00:00Z', '2026-08-03T00:00:00Z', '2026-08-03T00:00:00Z'),
+                )
+                conn.commit()
+
+            flashcard_app.ensure_progress_db(db_path, seed_rows_from_csv(csv_path))
+            with closing(sqlite3.connect(db_path)) as conn:
+                card_id_column = next(row for row in conn.execute('PRAGMA table_info(question_attempts)').fetchall() if row[1] == 'card_id')
+                stored_attempt = conn.execute("SELECT card_id FROM question_attempts WHERE question_id=?", ('legacy-unlinked',)).fetchone()
+                empty_progress_count = conn.execute("SELECT COUNT(*) FROM card_progress WHERE card_id = ''").fetchone()[0]
+            self.assertEqual(card_id_column[3], 0)
+            self.assertIsNone(stored_attempt[0])
+            self.assertEqual(empty_progress_count, 0)
     def test_mark_card_can_reset_to_unreviewed(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
