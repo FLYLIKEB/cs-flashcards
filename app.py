@@ -1591,26 +1591,40 @@ def mark_ai_image_recovery_dirty(progress_db_path: Path, image_dir: Path | None 
     with _AI_IMAGE_RECOVERY_GATE_LOCK:
         state = _AI_IMAGE_RECOVERY_GATE.get(key)
         if state is None:
-            _AI_IMAGE_RECOVERY_GATE[key] = {"dirty": True}
+            _AI_IMAGE_RECOVERY_GATE[key] = {"dirty": True, "generation": 1}
             return
         state["dirty"] = True
+        state["generation"] = int(state.get("generation") or 0) + 1
 
 
-def _should_sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = None) -> tuple[bool, tuple[bool, int], Path]:
+def _should_sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = None) -> tuple[bool, tuple[bool, int], Path, int]:
     root = _ai_image_recovery_root(image_dir)
     dir_stamp = _ai_image_recovery_dir_stamp(root)
     key = (str(progress_db_for(progress_db_path)), str(root))
     with _AI_IMAGE_RECOVERY_GATE_LOCK:
         state = _AI_IMAGE_RECOVERY_GATE.get(key)
+        generation = int(state.get("generation") or 0) if state else 0
         if state and not state.get("dirty") and state.get("dir_stamp") == dir_stamp:
-            return False, dir_stamp, root
-    return True, dir_stamp, root
+            return False, dir_stamp, root, generation
+    return True, dir_stamp, root, generation
 
 
-def _mark_ai_image_recovery_clean(progress_db_path: Path, dir_stamp: tuple[bool, int], image_dir: Path | None = None) -> None:
+def _mark_ai_image_recovery_clean(
+    progress_db_path: Path,
+    dir_stamp: tuple[bool, int],
+    scan_generation: int,
+    image_dir: Path | None = None,
+) -> None:
     key = (str(progress_db_for(progress_db_path)), str(_ai_image_recovery_root(image_dir)))
     with _AI_IMAGE_RECOVERY_GATE_LOCK:
-        _AI_IMAGE_RECOVERY_GATE[key] = {"dirty": False, "dir_stamp": dir_stamp}
+        state = _AI_IMAGE_RECOVERY_GATE.get(key)
+        if state is None:
+            _AI_IMAGE_RECOVERY_GATE[key] = {"dirty": False, "dir_stamp": dir_stamp, "generation": scan_generation}
+            return
+        if int(state.get("generation") or 0) != scan_generation:
+            return
+        state["dirty"] = False
+        state["dir_stamp"] = dir_stamp
 
 
 def runtime_ai_image_url(name: str) -> str:
@@ -1640,12 +1654,12 @@ def latest_ai_image_urls_by_card_id(image_dir: Path | None = None) -> dict[str, 
 
 
 def sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = None) -> bool:
-    should_scan, dir_stamp, root = _should_sync_ai_image_files_to_db(progress_db_path, image_dir)
+    should_scan, dir_stamp, root, scan_generation = _should_sync_ai_image_files_to_db(progress_db_path, image_dir)
     if not should_scan:
         return False
     recovered_urls = latest_ai_image_urls_by_card_id(root)
     if not recovered_urls:
-        _mark_ai_image_recovery_clean(progress_db_path, dir_stamp, root)
+        _mark_ai_image_recovery_clean(progress_db_path, dir_stamp, scan_generation, root)
         return False
     ensure_progress_db(progress_db_path)
     changed = False
@@ -1673,7 +1687,7 @@ def sync_ai_image_files_to_db(progress_db_path: Path, image_dir: Path | None = N
             )
             changed = True
         conn.commit()
-    _mark_ai_image_recovery_clean(progress_db_path, _ai_image_recovery_dir_stamp(root), root)
+    _mark_ai_image_recovery_clean(progress_db_path, _ai_image_recovery_dir_stamp(root), scan_generation, root)
     return changed
 
 
