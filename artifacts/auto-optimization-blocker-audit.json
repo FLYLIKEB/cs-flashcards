@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-08-02T18:19:41Z",
+  "checked_at": "2026-08-02T18:31:01Z",
   "gate_open": false,
   "summary": {
     "open_issue_count": 2,
-    "open_pr_count": 0,
+    "open_pr_count": 1,
     "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
@@ -21,7 +21,18 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/170"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "number": 172,
+      "title": "Issue 171: 단건 카드 수정 helper SQLite 연결 재사용",
+      "headRefName": "issue-171-single-card-mutation-connection",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "UNSTABLE",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/172"
+    }
+  ],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-170",
@@ -48,8 +59,8 @@
     }
   ],
   "notes": [
-    "Issue #170 and #171 are the active round 33 lanes.",
-    "The frontend audit subagent returned no candidate payload; the accepted candidate was confirmed directly from latest app.js/tests evidence.",
-    "The backend audit subagent failed with a tool error; the accepted candidate was confirmed directly from latest app.py/tests evidence."
+    "PR #172 is the active review lane for backend issue #171.",
+    "Issue #170 remains open without a PR yet.",
+    "Round 33 cannot advance until issue #170 and PR #172 both clear."
   ]
 }

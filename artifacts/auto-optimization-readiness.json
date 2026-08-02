@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-08-02T18:19:41Z",
+  "checked_at": "2026-08-02T18:31:01Z",
   "gate_open": false,
   "summary": {
     "open_issue_count": 2,
-    "open_pr_count": 0,
+    "open_pr_count": 1,
     "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
@@ -21,7 +21,18 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/170"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "number": 172,
+      "title": "Issue 171: 단건 카드 수정 helper SQLite 연결 재사용",
+      "headRefName": "issue-171-single-card-mutation-connection",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "UNSTABLE",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/172"
+    }
+  ],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-170",
@@ -48,8 +59,8 @@
     }
   ],
   "notes": [
-    "Round 33 accepted one frontend and one backend candidate from latest main.",
-    "Issue #170 covers question interaction pressed-state accessibility in static/app.js.",
-    "Issue #171 covers single-card mutation helper connection reuse in app.py."
+    "PR #172 is open for backend issue #171 and is waiting on latest review plus frontend-browser CI.",
+    "Frontend issue #170 is still in implementation in its isolated worktree.",
+    "The readiness gate remains closed until both round 33 lanes finish."
   ]
 }
