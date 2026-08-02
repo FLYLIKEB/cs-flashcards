@@ -1874,20 +1874,26 @@ class FlashcardProgressTests(unittest.TestCase):
                 question_bank_count = conn.execute('SELECT COUNT(*) FROM question_bank').fetchone()[0]
             self.assertEqual(question_bank_count, 1)
 
-            attempt = save_question_attempt(
-                flashcard_app.QuestionAttemptRequest(
-                    question_id='bank-linked-1',
-                    question_bank_id=item['question_bank_id'],
-                    card_id='CS-001',
-                    question_type='subjective',
-                    prompt='정규화의 목적을 설명하시오.',
-                    body='데이터베이스 설계 관점에서 답하시오.',
-                    user_answer='중복 제거와 이상 현상 방지',
-                    is_correct=True,
-                    judgment='correct',
-                ),
-                db_path,
-            )
+            with mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
+                attempt = save_question_attempt(
+                    flashcard_app.QuestionAttemptRequest(
+                        question_id='bank-linked-1',
+                        question_bank_id=item['question_bank_id'],
+                        card_id='CS-001',
+                        question_type='subjective',
+                        prompt='정규화의 목적을 설명하시오.',
+                        body='데이터베이스 설계 관점에서 답하시오.',
+                        user_answer='중복 제거와 이상 현상 방지',
+                        is_correct=True,
+                        judgment='correct',
+                    ),
+                    db_path,
+                )
+            self.assertEqual(connect_mock.call_count, 1)
             self.assertEqual(attempt['attempt']['question_bank_id'], item['question_bank_id'])
 
             listed = flashcard_app.read_question_bank_entries(
@@ -2426,24 +2432,29 @@ class FlashcardProgressTests(unittest.TestCase):
             )
             item = saved['items'][0]
 
-            attempt = save_question_attempt(
-                flashcard_app.QuestionAttemptRequest(
-                    question_id='bank-unlinked-1',
-                    question_bank_id=item['question_bank_id'],
-                    card_id='',
-                    question_type='multiple_choice',
-                    prompt=item['prompt'],
-                    body=item['body'],
-                    user_answer='정답 아님',
-                    selected_choice_index=0,
-                    is_correct=False,
-                    judgment='wrong',
-                    wrong_note='연결 카드 없이도 오답 저장',
-                ),
-                csv_path,
-                db_path,
-            )
-
+            with mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                wraps=flashcard_app.connect_progress_db,
+            ) as connect_mock:
+                attempt = save_question_attempt(
+                    flashcard_app.QuestionAttemptRequest(
+                        question_id='bank-unlinked-1',
+                        question_bank_id=item['question_bank_id'],
+                        card_id='',
+                        question_type='multiple_choice',
+                        prompt=item['prompt'],
+                        body=item['body'],
+                        user_answer='정답 아님',
+                        selected_choice_index=0,
+                        is_correct=False,
+                        judgment='wrong',
+                        wrong_note='연결 카드 없이도 오답 저장',
+                    ),
+                    csv_path,
+                    db_path,
+                )
+            self.assertEqual(connect_mock.call_count, 1)
             self.assertEqual(attempt['attempt']['question_bank_id'], item['question_bank_id'])
             self.assertEqual(attempt['attempt']['card_id'], '')
             self.assertEqual(attempt['attempt']['judgment'], 'wrong')
@@ -4534,6 +4545,10 @@ class FlashcardProgressTests(unittest.TestCase):
                 return_value=(False, (False, 0), flashcard_app.AI_IMAGE_DIR, 0),
             ), mock.patch.object(
                 flashcard_app,
+                'ensure_progress_db',
+                wraps=flashcard_app.ensure_progress_db,
+            ) as ensure_mock, mock.patch.object(
+                flashcard_app,
                 'connect_progress_db',
                 wraps=flashcard_app.connect_progress_db,
             ) as connect_mock:
@@ -4557,7 +4572,8 @@ class FlashcardProgressTests(unittest.TestCase):
                     db_path,
                 )
 
-            self.assertEqual(connect_mock.call_count, 2)
+            self.assertEqual(ensure_mock.call_count, 1)
+            self.assertEqual(connect_mock.call_count, 1)
             self.assertEqual(saved['attempt']['question_id'], 'q-CS-001-direct-1')
             self.assertEqual(saved['attempt']['card_id'], 'CS-001')
             self.assertEqual(saved['attempt']['judgment'], 'wrong')
