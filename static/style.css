@@ -5667,6 +5667,23 @@ select,
   padding-top: .78rem;
   border-top: 1px solid rgba(31, 58, 95, .08);
 }
+.question-answer-choice {
+  margin-top: .72rem;
+  padding: .72rem .8rem;
+  border-radius: 16px;
+  border: 1px solid rgba(23, 107, 77, .14);
+  background: rgba(236, 253, 245, .9);
+}
+.question-answer-choice strong {
+  display: block;
+  margin-bottom: .28rem;
+  color: #166b4d;
+  font-size: .78rem;
+}
+.question-answer-choice-value {
+  color: #0f172a;
+  line-height: 1.5;
+}
 .question-answer-refine-box {
   margin-top: .9rem;
   padding-top: .82rem;

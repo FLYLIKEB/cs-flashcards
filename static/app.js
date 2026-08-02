@@ -6159,8 +6159,10 @@ function renderQuestionPanel() {
   }
 
   const revealLocked = questionRevealLocked(question);
-  const questionBusy = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionBankEditSaving;
+  const questionBusy = state.questionLoading || state.markSaving || state.questionAnswerRefineLoading || state.questionBankEditSaving;
+  const questionSaveBusy = questionBusy || state.questionSaving;
   const reviewDisabled = questionBusy || !reviewCard;
+
   const reviewStatus = reviewCard?.known_status || '';
   const reviewStatusText = reviewCard
     ? `카드 상태 ${statusLabel(reviewStatus)}`
@@ -6193,7 +6195,7 @@ function renderQuestionPanel() {
           if (question.answerRevealed && isAnswer) badges.push('<span class="question-choice-badge answer">정답</span>');
           if (question.answerRevealed && isWrongSelection) badges.push('<span class="question-choice-badge wrong">내 오답</span>');
           else if (question.answerRevealed && isSelected) badges.push('<span class="question-choice-badge mine">내 답</span>');
-          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}${isWrongSelection ? ' wrong selected-wrong' : ''}" type="button" data-choice-index="${index}" ${state.questionSaving || state.markSaving || state.questionAnswerRefineLoading ? 'disabled' : ''}><span class="question-choice-body">${renderMarkdownInline(choice)}</span>${badges.length ? `<span class="question-choice-badges">${badges.join('')}</span>` : ''}</button></li>`;
+          return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelected ? ' selected' : ''}${isWrongSelection ? ' wrong selected-wrong' : ''}" type="button" data-choice-index="${index}" ${questionSaveBusy ? 'disabled' : ''}><span class="question-choice-body">${renderMarkdownInline(choice)}</span>${badges.length ? `<span class="question-choice-badges">${badges.join('')}</span>` : ''}</button></li>`;
         }).join('')}
       </ol>
     </div>` : '';
@@ -6207,7 +6209,8 @@ function renderQuestionPanel() {
   const draftHtml = questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft question-surface">
       <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
-      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${questionBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
+      <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
+
       ${answerGuideHtml}
     </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
@@ -6215,6 +6218,10 @@ function renderQuestionPanel() {
       <strong>채점 포인트</strong>
       <ul>${question.rubric.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
     </div>` : '';
+  const multipleChoiceAnswerHtml = question.answerRevealed && question.type === 'multiple_choice' && Number.isInteger(question.answer_index) && question.answer_index >= 0 && question.answer_index < choices.length
+    ? `<div class="question-answer-choice"><strong>정답 선지</strong><div class="question-answer-choice-value">${renderMarkdownInline(`${question.answer_index + 1}. ${String(choices[question.answer_index] || '')}`)}</div></div>`
+    : '';
+
   const answerMetaFields = [
     {label: '문제유형', value: question.topic || ''},
     {label: '키워드', html: answerKeywordHtml},
@@ -6245,7 +6252,8 @@ function renderQuestionPanel() {
           ['ambiguous', '애매함'],
           ['wrong', '틀림'],
           ['unknown', '모름'],
-        ].map(([key, label]) => `<button class="question-grade-button ${key}${question.judgment === key ? ' active' : ''}" type="button" data-question-judgment="${key}" ${questionBusy ? 'disabled' : ''}>${label} 저장</button>`).join('')}
+        ].map(([key, label]) => `<button class="question-grade-button ${key}${question.judgment === key ? ' active' : ''}" type="button" data-question-judgment="${key}" ${questionSaveBusy ? 'disabled' : ''}>${label} 저장</button>`).join('')}
+
 
       </div>
       ${resultHtml}
@@ -6253,18 +6261,20 @@ function renderQuestionPanel() {
   const wrongNoteHtml = question.answerRevealed && ['ambiguous', 'wrong', 'unknown'].includes(question.judgment) ? `
     <div class="question-wrong-note-box">
       <label class="question-answer-label" for="questionWrongNoteInput">오답노트</label>
-      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 애매했는지, 왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${questionBusy ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
+      <textarea id="questionWrongNoteInput" class="question-wrong-note" rows="3" placeholder="왜 애매했는지, 왜 틀렸는지, 다음에 무엇을 다시 볼지 적으세요." ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.wrongNote || '')}</textarea>
       <div class="question-wrong-note-actions">
-        <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${questionBusy ? 'disabled' : ''}>오답노트 저장</button>
+        <button class="question-grade-button wrong-note-save" type="button" data-question-wrong-note-save="1" ${questionSaveBusy ? 'disabled' : ''}>오답노트 저장</button>
+
 
       </div>
     </div>` : '';
   const answerRefineHtml = question.answerRevealed && question.questionBankId ? `
     <div class="question-answer-refine-box">
       <label class="question-answer-label" for="questionAnswerRefineInstruction">답안 구체화 요청</label>
-      <textarea id="questionAnswerRefineInstruction" class="question-answer-refine-instruction" rows="2" placeholder="선택: 더 보강하고 싶은 요구사항을 적으세요. 비워두면 답안과 해설을 자동으로 구체화합니다." ${questionBusy ? 'disabled' : ''}>${escapeHtml(question.answerRefineInstruction || '')}</textarea>
+      <textarea id="questionAnswerRefineInstruction" class="question-answer-refine-instruction" rows="2" placeholder="선택: 더 보강하고 싶은 요구사항을 적으세요. 비워두면 답안과 해설을 자동으로 구체화합니다." ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.answerRefineInstruction || '')}</textarea>
       <div class="question-answer-refine-actions">
-        <button class="question-toolbar-button is-primary question-answer-refine-button" type="button" data-question-answer-refine="1" ${questionBusy ? 'disabled' : ''}>${state.questionAnswerRefineLoading ? '구체화 중…' : '답안 구체화'}</button>
+        <button class="question-toolbar-button is-primary question-answer-refine-button" type="button" data-question-answer-refine="1" ${questionSaveBusy ? 'disabled' : ''}>${state.questionAnswerRefineLoading ? '구체화 중…' : '답안 구체화'}</button>
+
 
         <p class="question-answer-refine-help">버튼만 눌러도 수정됩니다. 추가 요청을 쓰면 함께 반영합니다.</p>
       </div>
@@ -6272,6 +6282,7 @@ function renderQuestionPanel() {
   const answer = question.answerRevealed ? `
     <div class="question-answer question-surface question-answer-surface">
       <strong>정답/모범답안</strong>
+      ${multipleChoiceAnswerHtml}
       <div class="question-answer-markdown">${renderQuestionMarkdown(question.answer || '')}</div>
       ${question.explanation ? `<div class="question-explanation-markdown">${renderQuestionMarkdown(question.explanation)}</div>` : ''}
       ${answerMetaHtml}
@@ -6280,13 +6291,14 @@ function renderQuestionPanel() {
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+
   const editToolbarHtml = question.questionBankId ? `
     <div class="question-inline-toolbar question-surface">
       <div class="question-inline-toolbar-copy">
         <span class="question-side-note-label">문항 데이터</span>
         <p>문제 본문, 정답, 해설, 메타데이터를 현재 풀이 화면에서 바로 수정합니다.</p>
       </div>
-      <button class="question-toolbar-button" type="button" data-question-edit="1" ${questionBusy ? 'disabled' : ''}>${state.questionBankEditSaving ? '저장 중…' : '수정'}</button>
+      <button class="question-toolbar-button" type="button" data-question-edit="1" ${questionSaveBusy ? 'disabled' : ''}>${state.questionBankEditSaving ? '저장 중…' : '수정'}</button>
     </div>` : '';
 
 
