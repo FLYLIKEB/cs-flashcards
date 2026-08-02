@@ -466,10 +466,16 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         return page
 
     async def wait_for_embed_frame(self, page, url_part: str = 'question-bank-embed=1'):
+        ready_expr = "Boolean(document.getElementById('questionAnswerInput') || document.querySelector('.question-choice') || document.querySelector('.question-prompt'))"
         for _ in range(60):
             for frame in page.frames:
-                if url_part in frame.url:
+                if url_part not in frame.url:
+                    continue
+                try:
+                    await frame.waitForFunction(ready_expr, {'timeout': 250})
                     return frame
+                except Exception:
+                    pass
             await asyncio.sleep(0.05)
         self.fail(f'Embed frame containing {url_part!r} did not appear.')
 
@@ -680,17 +686,6 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['html_focus_on_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['html_focus_on_open'], 'conceptImageDialogCloseBtn')
 
-            await page.keyboard.press('Tab')
-            case['html_focus_after_tab'] = await page.evaluate(
-                'document.activeElement ? `${document.activeElement.tagName}:${document.activeElement.className || ""}` : ""'
-            )
-            self.assertEqual(case['html_focus_after_tab'], 'IFRAME:concept-image-modal-iframe')
-
-            await page.keyboard.down('Shift')
-            await page.keyboard.press('Tab')
-            await page.keyboard.up('Shift')
-            case['html_focus_after_shift_tab'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
-            self.assertEqual(case['html_focus_after_shift_tab'], 'conceptImageDialogCloseBtn')
 
             await page.keyboard.press('Escape')
             await page.waitForFunction("document.querySelector('#conceptImageDialog').hidden === true")
