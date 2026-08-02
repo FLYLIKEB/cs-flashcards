@@ -216,6 +216,61 @@ class StaticFrontendSmokeTests(unittest.TestCase):
                   error: bankState.error,
                 };
               },
+              relaunchRenderPass: async () => {
+                const fnSource = sliceBetween('async function launch(startIndex = 0, {reveal = true} = {}) {', '\\nasync function loadQuestionBankPage() {', 'launch');
+                const bankState = {
+                  items: [
+                    {question_bank_id: 'alpha'},
+                    {question_bank_id: 'beta'},
+                  ],
+                  error: 'stale',
+                  loading: false,
+                  practiceLoaded: true,
+                  practiceCollapsed: true,
+                  practiceStartIndex: 0,
+                  practiceSessionState: null,
+                  practiceActiveId: 'alpha',
+                  selectedId: 'alpha',
+                  practiceSummary: {scoreLabel: '50 / 100점'},
+                };
+                const setPracticeCollapsed = (value) => { bankState.practiceCollapsed = Boolean(value); };
+                const persistFilterState = () => {};
+                let renderTableCalls = 0;
+                const renderTable = () => { renderTableCalls += 1; };
+                let renderPracticePaneCalls = 0;
+                const renderPracticePane = () => { renderPracticePaneCalls += 1; };
+                let ensureSelectedRowVisibleCalls = 0;
+                let ensureSelectedRowVisibleSawRender = false;
+                let ensureSelectedRowVisibleId = '';
+                const ensureSelectedRowVisible = () => {
+                  ensureSelectedRowVisibleCalls += 1;
+                  ensureSelectedRowVisibleSawRender = renderTableCalls > 0;
+                  ensureSelectedRowVisibleId = bankState.selectedId;
+                };
+                const embeddedPracticeHasUnsavedState = () => false;
+                const confirmPracticeRestart = () => true;
+                let restartCalls = 0;
+                const restartPracticeFrame = () => { restartCalls += 1; };
+                let pendingPracticeLaunch = null;
+                eval(fnSource);
+                const launched = await launch(1);
+                return {
+                  launched,
+                  renderTableCalls,
+                  renderPracticePaneCalls,
+                  ensureSelectedRowVisibleCalls,
+                  ensureSelectedRowVisibleSawRender,
+                  ensureSelectedRowVisibleId,
+                  restartCalls,
+                  pendingPracticeLaunch,
+                  practiceCollapsed: bankState.practiceCollapsed,
+                  practiceStartIndex: bankState.practiceStartIndex,
+                  selectedId: bankState.selectedId,
+                  practiceActiveId: bankState.practiceActiveId,
+                  practiceSummary: bankState.practiceSummary,
+                  error: bankState.error,
+                };
+              },
             };
             (async () => {
               const results = {};
@@ -696,6 +751,26 @@ class StaticFrontendSmokeTests(unittest.TestCase):
                     'selectedId': 'alpha',
                     'practiceActiveId': 'alpha',
                     'error': '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.',
+                },
+            )
+        with self.subTest(contract='relaunch_render_pass'):
+            self.assertEqual(
+                results['relaunchRenderPass'],
+                {
+                    'launched': True,
+                    'renderTableCalls': 1,
+                    'renderPracticePaneCalls': 1,
+                    'ensureSelectedRowVisibleCalls': 1,
+                    'ensureSelectedRowVisibleSawRender': True,
+                    'ensureSelectedRowVisibleId': 'beta',
+                    'restartCalls': 1,
+                    'pendingPracticeLaunch': None,
+                    'practiceCollapsed': False,
+                    'practiceStartIndex': 1,
+                    'selectedId': 'beta',
+                    'practiceActiveId': 'beta',
+                    'practiceSummary': None,
+                    'error': '',
                 },
             )
 
