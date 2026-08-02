@@ -630,6 +630,77 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(saved['concept_image_alt'], '동적 개념 위젯')
             self.assertEqual(saved['concept_image_url'], 'https://example.com/test-concept.png')
 
+    def test_single_card_content_helpers_use_targeted_lookup_only(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            backup_dir = root / 'backups'
+            image_dir = root / 'ai_images'
+            preview_dir = root / 'previews'
+            write_sample(csv_path, include_image=True)
+            seed_runtime_db(csv_path, db_path)
+            preview_dir.mkdir(parents=True, exist_ok=True)
+            preview_name = 'targeted-preview.png'
+            (preview_dir / preview_name).write_bytes(b'\x89PNG\r\n\x1a\npreview')
+            (preview_dir / 'targeted-preview.json').write_text(json.dumps({
+                'card_id': 'CS-001',
+                'alt': '타깃 조회 이미지 설명',
+            }, ensure_ascii=False), encoding='utf-8')
+
+            with mock.patch.object(
+                flashcard_app,
+                'read_cards',
+                side_effect=AssertionError('single-card helper should not materialize all cards'),
+            ), mock.patch.object(
+                flashcard_app,
+                'read_card_content',
+                side_effect=AssertionError('single-card helper should not materialize all card content'),
+            ):
+                updated_fields, backup_path = flashcard_app.update_card_content_fields(
+                    'CS-001',
+                    {'definition': '단건 정의'},
+                    backup_dir,
+                    db_path,
+                )
+                rewritten, rewrite_backup = flashcard_app.update_card_ai_content(
+                    'CS-001',
+                    flashcard_app.CardAiApplyRequest(exam_note='단건 AI 적용 포인트'),
+                    backup_dir,
+                    db_path,
+                )
+                concept_media, media_backup = flashcard_app.update_card_concept_media(
+                    'CS-001',
+                    flashcard_app.CardConceptMediaRequest(
+                        concept_media_type='html',
+                        concept_media_payload='<div>단건 위젯</div>',
+                        concept_image_alt='단건 개념 미디어',
+                    ),
+                    backup_dir,
+                    db_path,
+                )
+                applied_image, image_backup, image_url = flashcard_app.apply_ai_concept_image(
+                    'CS-001',
+                    flashcard_app.CardAiImageApplyRequest(preview_name=preview_name),
+                    backup_dir,
+                    db_path,
+                    image_dir,
+                    preview_dir,
+                )
+
+            self.assertEqual(updated_fields['definition'], '단건 정의')
+            self.assertIsNotNone(backup_path)
+            self.assertEqual(rewritten['exam_note'], '단건 AI 적용 포인트')
+            self.assertIsNotNone(rewrite_backup)
+            self.assertEqual(concept_media['concept_media_type'], 'html')
+            self.assertEqual(concept_media['concept_image_alt'], '단건 개념 미디어')
+            self.assertIsNotNone(media_backup)
+            self.assertEqual(applied_image['concept_image_alt'], '타깃 조회 이미지 설명')
+            self.assertEqual(applied_image['concept_media_type'], 'image')
+            self.assertEqual(applied_image['concept_media_payload'], image_url)
+            self.assertIsNotNone(image_backup)
+            self.assertFalse((preview_dir / preview_name).exists())
+
     def test_rewrite_card_with_codex_parses_json_output(self):
         original_key = flashcard_app.OPENAI_API_KEY
         try:
@@ -913,6 +984,92 @@ class FlashcardProgressTests(unittest.TestCase):
                 flashcard_app.PROGRESS_DB_PATH = original_db
                 flashcard_app.BACKUP_DIR = original_backup
 
+    def test_single_card_ai_apis_do_not_materialize_catalog(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            backup_dir = root / 'backups'
+            image_dir = root / 'ai_images'
+            preview_dir = root / 'previews'
+            write_sample(csv_path, include_image=True)
+            read_cards(csv_path, db_path)
+            original_db = flashcard_app.PROGRESS_DB_PATH
+            original_backup = flashcard_app.BACKUP_DIR
+            original_image_dir = flashcard_app.AI_IMAGE_DIR
+            original_preview_dir = flashcard_app.AI_IMAGE_PREVIEW_DIR
+            original_key = flashcard_app.OPENAI_API_KEY
+            try:
+                flashcard_app.PROGRESS_DB_PATH = db_path
+                flashcard_app.BACKUP_DIR = backup_dir
+                flashcard_app.AI_IMAGE_DIR = image_dir
+                flashcard_app.AI_IMAGE_PREVIEW_DIR = preview_dir
+                flashcard_app.OPENAI_API_KEY = 'test-key'
+                with mock.patch.object(
+                    flashcard_app,
+                    'read_cards',
+                    side_effect=AssertionError('single-card API should not materialize all cards'),
+                ), mock.patch.object(
+                    flashcard_app,
+                    'read_card_content',
+                    side_effect=AssertionError('single-card API should not materialize all card content'),
+                ), mock.patch.object(
+                    flashcard_app,
+                    'urlopen',
+                    side_effect=[
+                        FakeUrlopenResponse({
+                            'output_text': json.dumps({
+                                'definition': '타깃 미리보기 정의',
+                                'detailed_explanation': '의미: 단건 조회 미리보기입니다. 활용: 전체 재로딩을 막습니다.',
+                                'exam_note': '단건 미리보기 포인트',
+                                'concept_image_alt': '단건 미리보기 이미지 설명',
+                            }, ensure_ascii=False),
+                        }),
+                        FakeUrlopenResponse({
+                            'data': [
+                                {'b64_json': base64.b64encode(b'\x89PNG\r\n\x1a\napi-preview').decode('ascii')},
+                            ],
+                        }),
+                    ],
+                ):
+                    preview = flashcard_app.api_card_ai_rewrite_preview('CS-001', flashcard_app.CardAiRewriteRequest(instruction='단건 미리보기'))
+                    applied = flashcard_app.api_card_ai_rewrite_apply(
+                        'CS-001',
+                        flashcard_app.CardAiApplyRequest(
+                            definition='타깃 적용 정의',
+                            exam_note='타깃 적용 포인트',
+                        ),
+                    )
+                    concept_media = flashcard_app.api_card_concept_media(
+                        'CS-001',
+                        flashcard_app.CardConceptMediaRequest(
+                            concept_media_type='mermaid',
+                            concept_media_payload='graph TD\n  A[단건] --> B[조회]',
+                            concept_image_alt='단건 API 개념 미디어',
+                        ),
+                    )
+                    image_preview = flashcard_app.api_card_ai_image_preview('CS-001')
+                    image_applied = flashcard_app.api_card_ai_image_apply(
+                        'CS-001',
+                        flashcard_app.CardAiImageApplyRequest(preview_name=image_preview['preview_name']),
+                    )
+
+                self.assertEqual(preview['proposal']['definition'], '타깃 미리보기 정의')
+                self.assertEqual(applied['card']['definition'], '타깃 적용 정의')
+                self.assertEqual(applied['summary']['total'], 1)
+                self.assertTrue(applied['backup_path'])
+                self.assertEqual(concept_media['card']['concept_media_type'], 'mermaid')
+                self.assertEqual(concept_media['summary']['categories'], ['소프트웨어공학'])
+                self.assertEqual(image_preview['card_id'], 'CS-001')
+                self.assertTrue(image_applied['image_url'].startswith('/api/ai-images/'))
+                self.assertEqual(image_applied['card']['concept_media_payload'], image_applied['image_url'])
+                self.assertEqual(image_applied['summary']['memo_count'], 0)
+            finally:
+                flashcard_app.PROGRESS_DB_PATH = original_db
+                flashcard_app.BACKUP_DIR = original_backup
+                flashcard_app.AI_IMAGE_DIR = original_image_dir
+                flashcard_app.AI_IMAGE_PREVIEW_DIR = original_preview_dir
+                flashcard_app.OPENAI_API_KEY = original_key
     def test_card_mutation_apis_do_not_reload_whole_catalog(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
