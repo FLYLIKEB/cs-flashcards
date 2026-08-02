@@ -135,12 +135,14 @@ def save_memo(card_id: str, memo: str, csv_path: Path | None, progress_db_path: 
 
 def save_question_attempt(payload, csv_path_or_progress_db: Path, progress_db_path: Path | None = None):
     if progress_db_path is None:
-        csv_path = None
         progress_db_path = csv_path_or_progress_db
+        sibling_csv_path = progress_db_path.with_name('cards.csv')
+        csv_path = sibling_csv_path if sibling_csv_path.exists() else None
     else:
         csv_path = csv_path_or_progress_db
     seed_runtime_db(csv_path, progress_db_path)
     return flashcard_app.save_question_attempt(payload, progress_db_path)
+
 
 
 
@@ -812,6 +814,7 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(first['attempt']['question_elapsed_seconds'], 48)
             self.assertEqual(first['attempt']['session_elapsed_seconds'], 48)
 
+
             second = save_question_attempt(
                 flashcard_app.QuestionAttemptRequest(
                     question_id='q-CS-001-multiple_choice-2',
@@ -902,6 +905,31 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(history_ambiguous['items'][0]['session_mode'], 'bok')
             self.assertEqual(history_ambiguous['items'][0]['section'], '전공논술')
             self.assertEqual(history_ambiguous['items'][0]['points'], 20)
+
+    def test_save_question_attempt_one_argument_form_uses_sibling_cards_csv_fallback(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            saved = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-sibling-fallback',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='검증',
+                    judgment='wrong',
+                    wrong_note='형제 cards.csv 자동 시드 확인',
+                ),
+                db_path,
+            )
+
+            self.assertEqual(saved['attempt']['card_id'], 'CS-001')
+            self.assertEqual(saved['attempt']['judgment'], 'wrong')
+            self.assertTrue(db_path.exists())
 
     def test_mark_card_survives_csv_replacement(self):
         with tempfile.TemporaryDirectory() as td:
