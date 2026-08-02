@@ -165,9 +165,27 @@ function questionAttemptTone(item) {
   return 'attempt-default';
 }
 
+function practiceSummaryQuestionBankIds(summary) {
+  return Array.isArray(summary?.questionBankIds)
+    ? summary.questionBankIds.map((value) => String(value || '').trim()).filter(Boolean)
+    : [];
+}
+
+function questionBankSliceMatchesPracticeSummary(summary = bankState.practiceSummary) {
+  if (!summary || typeof summary !== 'object') return false;
+  const summaryIds = practiceSummaryQuestionBankIds(summary);
+  if (!summaryIds.length) return false;
+  const currentIds = bankState.items
+    .map((item) => String(item?.question_bank_id || '').trim())
+    .filter(Boolean);
+  if (currentIds.length !== summaryIds.length) return false;
+  return currentIds.every((value, index) => value === summaryIds[index]);
+}
+
 function finishedPracticeSummary() {
   if (!bankState.practiceSummary || typeof bankState.practiceSummary !== 'object') return null;
-  return bankState.practiceSummary.finishedAt ? bankState.practiceSummary : null;
+  if (!bankState.practiceSummary.finishedAt) return null;
+  return questionBankSliceMatchesPracticeSummary(bankState.practiceSummary) ? bankState.practiceSummary : null;
 }
 
 function selectedIndex(fallback = 0) {
@@ -1345,6 +1363,9 @@ async function loadQuestionBankPage() {
     const targetSelectedId = currentSelectedId || selectedIdBeforeRequest || restoredPracticeSelectedId;
     bankState.items = Array.isArray(data.items) ? data.items : [];
     bankState.summary = data.summary || {total: bankState.items.length, returned: bankState.items.length};
+    if (bankState.practiceSummary && !questionBankSliceMatchesPracticeSummary(bankState.practiceSummary)) {
+      bankState.practiceSummary = null;
+    }
     populateTopicOptions(bankState.summary?.available_topics || [], filterValues().topic);
     populateFieldNameOptions(bankState.summary?.available_field_names || [], filterValues().field_name);
     populateIssuerOptions(bankState.summary?.available_issuers || [], filterValues().issuer);

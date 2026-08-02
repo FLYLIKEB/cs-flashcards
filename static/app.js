@@ -5487,6 +5487,7 @@ function questionSessionScoreSummary(questions = state.questions) {
     scoreLabel: hasPointScores ? `${formatQuestionScoreValue(earnedPoints)} / ${totalPoints}점` : `${scorePercent}점`,
     scoreDetail: hasPointScores ? `정답 ${counts.correct}/${totalQuestions} · 애매 반점 포함 환산 ${scorePercent}점` : `정답 ${counts.correct}/${totalQuestions} · 애매 반점 포함`,
     missedQuestions,
+    questionBankIds: items.map((item) => String(item?.questionBankId || '').trim()).filter(Boolean),
   };
 }
 
