@@ -782,6 +782,12 @@ class QuestionAttemptRequest(BaseModel):
     question_started_at: str = Field(default="", max_length=64)
     answered_at: str = Field(default="", max_length=64)
 
+
+class QuestionBankAttemptQueryRequest(BaseModel):
+    question_bank_ids: list[str] | None = Field(default=None, max_length=500)
+    result: str = Field(default="all", max_length=32)
+    limit: int = Field(default=200, ge=1, le=500)
+
 class WikiChecklistRequest(BaseModel):
     source_path: str = Field(min_length=1, max_length=4096)
     line_number: int = Field(ge=1, le=200000)
@@ -8497,6 +8503,21 @@ def api_question_bank_attempts(request: Request) -> dict[str, Any]:
             question_bank_ids=request.query_params.getlist("question_bank_id"),
             result=request.query_params.get("result", "all"),
             limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/api/question-bank/attempts/query")
+def api_question_bank_attempts_query(payload: QuestionBankAttemptQueryRequest) -> dict[str, Any]:
+    try:
+        return read_question_bank_attempts(
+            progress_db_path=PROGRESS_DB_PATH,
+            question_bank_ids=payload.question_bank_ids,
+            result=payload.result,
+            limit=payload.limit,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

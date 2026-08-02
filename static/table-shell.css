@@ -296,11 +296,18 @@ body.question-bank-dialog-open {
   margin-top: 8px;
 }
 
+.question-bank-review-body[hidden] {
+  display: none !important;
+}
+
+.question-bank-review-body {
+  margin-top: 10px;
+}
+
 .question-bank-review-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
-  margin-top: 8px;
 }
 
 .question-bank-review-filters,

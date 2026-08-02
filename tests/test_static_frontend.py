@@ -49,6 +49,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('id="bankPageHeaderSummary"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageOverviewCards"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageReviewSummary"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageToggleReviewBtn"', QUESTION_BANK_HTML)
+        self.assertIn('id="bankPageReviewBody"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageReviewStats"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageReviewFilters"', QUESTION_BANK_HTML)
         self.assertIn('id="bankPageReviewList"', QUESTION_BANK_HTML)
@@ -94,7 +96,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function setPracticeCollapsed(', QUESTION_BANK_JS)
         self.assertIn('function shouldRefreshPracticeSession()', QUESTION_BANK_JS)
         self.assertIn('if (shouldRefreshPracticeSession()) launch(index);', QUESTION_BANK_JS)
-        self.assertIn('await loadQuestionBankReview();', QUESTION_BANK_JS)
+        self.assertIn('function ensureQuestionBankReviewLoaded(', QUESTION_BANK_JS)
         self.assertIn('question-bank-embed=1', QUESTION_BANK_JS)
         self.assertIn("get('question-bank-embed') === '1'", APP_JS)
         self.assertIn("const QUESTION_BANK_SESSION_SYNC_REQUEST = 'cs-flashcards-question-bank-session-sync-request';", QUESTION_BANK_JS)
@@ -381,9 +383,10 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-practice-collapsed', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-placeholder[hidden]', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-overview-grid', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-review-body[hidden]', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-review-stats', TABLE_SHELL_CSS)
-        self.assertIn('.question-bank-review-list', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-review-item', TABLE_SHELL_CSS)
+        self.assertIn('.question-bank-review-list', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-selection-summary', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-practice-status', TABLE_SHELL_CSS)
         self.assertIn('.question-bank-header-chip', TABLE_SHELL_CSS)
@@ -452,6 +455,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
               practiceCollapsed: true,
               practiceStartIndex: 4,
               practiceResultSetKey: 'keep',
+              reviewCollapsed: true,
+              reviewLoaded: false,
+              reviewDirty: true,
               reviewItems: [],
               reviewSummary: null,
               reviewError: '',
@@ -466,6 +472,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             const syncUrl = () => {};
             const renderTable = () => {};
             const renderPracticePane = () => {};
+            const renderQuestionBankReview = () => {};
             const filterValues = () => ({topic: '', field_name: '', issuer: '', category: ''});
             const populateTopicOptions = () => {};
             const populateFieldNameOptions = () => {};
@@ -473,9 +480,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             const populateCategoryOptions = () => {};
             const persistFilterState = () => {};
             const applyPracticeLaunch = () => {};
+            const ensureQuestionBankReviewLoaded = async () => { reviewCalls += 1; };
             let launchCalls = 0;
             let reviewCalls = 0;
-            const loadQuestionBankReview = async () => { reviewCalls += 1; bankState.reviewLoading = false; };
             const launch = async () => { launchCalls += 1; };
             const fetchEntries = async () => ({
               items: [
@@ -503,7 +510,58 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         ))
         self.assertEqual(
             result,
-            '{"launchCalls":0,"reviewCalls":1,"loading":false,"selectedId":"beta","practiceStartIndex":1,"itemCount":2,"reviewLoading":false}',
+            '{"launchCalls":0,"reviewCalls":0,"loading":false,"selectedId":"beta","practiceStartIndex":1,"itemCount":2,"reviewLoading":false}',
+        )
+
+    def test_question_bank_review_opens_before_fetching_attempt_data(self):
+        result = self.run_node(textwrap.dedent(
+            """
+            const fs = require('fs');
+            const source = fs.readFileSync('static/question-bank.js', 'utf8');
+            const start = source.indexOf('function reviewNeedsRefresh() {');
+            const end = source.indexOf('\\nfunction renderFilterToggle() {', start);
+            if (start < 0 || end < 0) throw new Error('review toggle block not found');
+            const fnSource = source.slice(start, end);
+            const elements = {
+              bankPageToggleReviewBtn: {textContent: '', attrs: {}, setAttribute(name, value) { this.attrs[name] = value; }},
+              bankPageReviewBody: {hidden: true},
+            };
+            const bankState = {
+              loading: false,
+              reviewCollapsed: true,
+              reviewLoaded: false,
+              reviewDirty: true,
+              reviewError: '',
+            };
+            const $ = (id) => elements[id] || null;
+            let renderCalls = 0;
+            const renderQuestionBankReview = () => { renderCalls += 1; };
+            let loadCalls = 0;
+            const loadQuestionBankReview = async () => {
+              loadCalls += 1;
+              bankState.reviewLoaded = true;
+              bankState.reviewDirty = false;
+            };
+            eval(fnSource);
+            setReviewCollapsed(false);
+            Promise.resolve().then(() => {
+              process.stdout.write(JSON.stringify({
+                collapsed: bankState.reviewCollapsed,
+                loadCalls,
+                renderCalls,
+                buttonText: elements.bankPageToggleReviewBtn.textContent,
+                expanded: elements.bankPageToggleReviewBtn.attrs['aria-expanded'],
+                hidden: elements.bankPageReviewBody.hidden,
+              }));
+            }).catch((error) => {
+              console.error(error);
+              process.exit(1);
+            });
+            """
+        ))
+        self.assertEqual(
+            result,
+            '{"collapsed":false,"loadCalls":1,"renderCalls":0,"buttonText":"리뷰 숨기기","expanded":"true","hidden":false}',
         )
 
     def test_question_bank_explicit_launch_keeps_restart_confirm_contract(self):

@@ -48,6 +48,9 @@ const bankState = {
   practiceSummary: null,
   practiceResultSetKey: '',
   practiceSessionState: null,
+  reviewCollapsed: true,
+  reviewLoaded: false,
+  reviewDirty: true,
   reviewItems: [],
   reviewSummary: null,
   reviewLoading: false,
@@ -251,10 +254,11 @@ function formatQuestionBankAttemptUpdatedAt(value) {
   return date.toLocaleString('ko-KR', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'});
 }
 
-function questionBankReviewRequestUrl(questionBankIds = questionBankReviewIds()) {
-  const params = new URLSearchParams({limit: '200'});
-  questionBankIds.forEach((questionBankId) => params.append('question_bank_id', questionBankId));
-  return `/api/question-bank/attempts?${params.toString()}`;
+function questionBankReviewRequestPayload(questionBankIds = questionBankReviewIds()) {
+  return {
+    question_bank_ids: questionBankIds,
+    limit: 200,
+  };
 }
 
 function questionBankReviewItemMatchesFilter(item, filter = bankState.reviewFilter) {
@@ -663,13 +667,19 @@ function applyEmbeddedQuestionBankUpdate(item, summary = null, finishedAt = '') 
   }
   const nextItem = {...bankState.items[index], ...item};
   bankState.items[index] = nextItem;
+  bankState.reviewLoaded = false;
+  bankState.reviewDirty = true;
   if (!questionBankItemMatchesAttemptStatusFilter(nextItem)) {
     loadQuestionBankPage().catch(() => {});
     return;
   }
   renderTable();
   renderPracticePane();
-  loadQuestionBankReview().catch(() => {});
+  if (!bankState.reviewCollapsed) {
+    loadQuestionBankReview().catch(() => {});
+    return;
+  }
+  renderQuestionBankReview();
 }
 
 
@@ -681,6 +691,48 @@ function applyPracticeViewState() {
 
 function applyFilterViewState() {
   document.body.classList.toggle('question-bank-filters-collapsed', bankState.filtersCollapsed);
+}
+
+function reviewNeedsRefresh() {
+  return !bankState.reviewLoaded || bankState.reviewDirty || Boolean(bankState.reviewError);
+}
+
+function renderReviewToggle() {
+  const toggleButton = $('bankPageToggleReviewBtn');
+  const body = $('bankPageReviewBody');
+  if (toggleButton) {
+    toggleButton.textContent = bankState.reviewCollapsed ? '리뷰 열기' : '리뷰 숨기기';
+    toggleButton.setAttribute('aria-expanded', String(!bankState.reviewCollapsed));
+  }
+  if (body) body.hidden = bankState.reviewCollapsed;
+}
+
+async function ensureQuestionBankReviewLoaded({force = false} = {}) {
+  renderReviewToggle();
+  if (bankState.reviewCollapsed || bankState.loading) {
+    renderQuestionBankReview();
+    return false;
+  }
+  if (!force && !reviewNeedsRefresh()) {
+    renderQuestionBankReview();
+    return false;
+  }
+  await loadQuestionBankReview();
+  return true;
+}
+
+function setReviewCollapsed(collapsed) {
+  bankState.reviewCollapsed = Boolean(collapsed);
+  renderReviewToggle();
+  if (bankState.reviewCollapsed) {
+    renderQuestionBankReview();
+    return;
+  }
+  ensureQuestionBankReviewLoaded().catch(() => {});
+}
+
+function toggleReviewCollapsed() {
+  setReviewCollapsed(!bankState.reviewCollapsed);
 }
 
 function renderFilterToggle() {
@@ -1002,14 +1054,22 @@ function reviewFieldHtml(label, value, emptyText = '—') {
 
 function renderQuestionBankReview() {
   const summary = $('bankPageReviewSummary');
+  const body = $('bankPageReviewBody');
   const stats = $('bankPageReviewStats');
   const filters = $('bankPageReviewFilters');
   const list = $('bankPageReviewList');
   const counts = questionBankReviewCounts();
   const selectedCount = questionBankReviewIds().length;
   const visibleItems = visibleQuestionBankReviewItems();
+  renderReviewToggle();
   if (summary) {
-    if (bankState.loading || bankState.reviewLoading) {
+    if (bankState.reviewCollapsed) {
+      summary.textContent = bankState.loading
+        ? '문제은행을 불러오는 중입니다.'
+        : !selectedCount
+          ? '현재 목록에 리뷰할 문제은행 문항이 없습니다.'
+          : `현재 목록 ${selectedCount}문항 · 리뷰 닫힘 · 열면 풀이 기록과 오답노트를 불러옵니다.`;
+    } else if (bankState.loading || bankState.reviewLoading) {
       summary.textContent = '현재 문제은행 풀이 기록을 불러오는 중입니다.';
     } else if (bankState.reviewError) {
       summary.textContent = `풀이 기록 로딩 실패: ${bankState.reviewError}`;
@@ -1017,6 +1077,7 @@ function renderQuestionBankReview() {
       summary.textContent = `현재 목록 ${selectedCount}문항 중 풀었던 문제 ${counts.attempted}개 · 틀린/애매 ${counts.wrongish}개 · 오답노트 ${counts.notes}개`;
     }
   }
+  if (!body || body.hidden || !stats || !filters || !list) return;
   if (stats) {
     stats.innerHTML = [
       metricCard('푼 문제', String(counts.attempted)),
@@ -1031,7 +1092,6 @@ function renderQuestionBankReview() {
       return `<button type="button" class="cs-table-button question-bank-review-filter${bankState.reviewFilter === key ? ' is-active' : ''}" data-review-filter="${escapeHtml(key)}">${escapeHtml(label)} ${escapeHtml(String(count))}</button>`;
     }).join('');
   }
-  if (!list) return;
   if (bankState.loading || bankState.reviewLoading) {
     list.innerHTML = '<p class="question-bank-review-empty">현재 문제은행 풀이 기록을 불러오는 중입니다.</p>';
     bindQuestionBankReviewActions();
@@ -1099,6 +1159,8 @@ async function loadQuestionBankReview() {
     bankState.reviewItems = [];
     bankState.reviewSummary = {total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0, note_count: 0, selected_question_bank_count: 0};
     bankState.reviewError = '';
+    bankState.reviewLoaded = true;
+    bankState.reviewDirty = false;
     bankState.reviewLoading = false;
     renderQuestionBankReview();
     return;
@@ -1107,16 +1169,25 @@ async function loadQuestionBankReview() {
   bankState.reviewError = '';
   renderQuestionBankReview();
   try {
-    const res = await fetch(questionBankReviewRequestUrl(questionBankIds), {cache: 'no-store'});
+    const res = await fetch('/api/question-bank/attempts/query', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      cache: 'no-store',
+      body: JSON.stringify(questionBankReviewRequestPayload(questionBankIds)),
+    });
     if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
     if (requestNonce !== bankState.reviewNonce) return;
     bankState.reviewItems = Array.isArray(data.items) ? data.items : [];
     bankState.reviewSummary = data.summary || null;
+    bankState.reviewLoaded = true;
+    bankState.reviewDirty = false;
   } catch (error) {
     if (requestNonce !== bankState.reviewNonce) return;
     bankState.reviewItems = [];
     bankState.reviewSummary = null;
+    bankState.reviewLoaded = false;
+    bankState.reviewDirty = true;
     bankState.reviewError = error.message || String(error);
   } finally {
     if (requestNonce !== bankState.reviewNonce) return;
@@ -1351,8 +1422,10 @@ async function loadQuestionBankPage() {
   bankState.error = '';
   bankState.reviewItems = [];
   bankState.reviewSummary = null;
+  bankState.reviewLoaded = false;
+  bankState.reviewDirty = true;
   bankState.reviewError = '';
-  bankState.reviewLoading = true;
+  bankState.reviewLoading = false;
   syncUrl();
   renderTable();
   renderPracticePane();
@@ -1415,6 +1488,8 @@ async function loadQuestionBankPage() {
     bankState.summary = {total: 0, returned: 0};
     bankState.reviewItems = [];
     bankState.reviewSummary = null;
+    bankState.reviewLoaded = false;
+    bankState.reviewDirty = true;
     bankState.reviewError = '';
     bankState.reviewLoading = false;
     populateTopicOptions([], filterValues().topic);
@@ -1436,17 +1511,21 @@ async function loadQuestionBankPage() {
     renderPracticePane();
     if (!bankState.items.length) {
       bankState.practiceResultSetKey = '';
-      bankState.reviewLoading = false;
       renderQuestionBankReview();
       return;
     }
-    await loadQuestionBankReview();
+    if (bankState.reviewCollapsed) {
+      renderQuestionBankReview();
+      return;
+    }
+    await ensureQuestionBankReviewLoaded({force: true});
   }
 }
 
 restoreFilterState();
 setPracticeCollapsed(persistedPracticeCollapsed(), {persist: false});
 setFiltersCollapsed(persistedFiltersCollapsed(), {persist: false});
+setReviewCollapsed(true);
 renderTable();
 renderPracticePane();
 loadQuestionBankPage().catch(() => {});
@@ -1456,6 +1535,7 @@ $('bankPageLaunchBtn')?.addEventListener('click', () => launch(0));
 $('bankPageLaunchSelectedBtn')?.addEventListener('click', () => launch(selectedIndex(bankState.practiceStartIndex)));
 $('bankPageTogglePracticeBtn')?.addEventListener('click', togglePracticeCollapsed);
 $('bankPageToggleFiltersBtn')?.addEventListener('click', toggleFiltersCollapsed);
+$('bankPageToggleReviewBtn')?.addEventListener('click', toggleReviewCollapsed);
 $('bankPageResetFiltersBtn')?.addEventListener('click', resetFilters);
 $('bankPageCategoryGuideBtn')?.addEventListener('click', openCategoryGuideDialog);
 $('bankPageCategoryGuideCloseBtn')?.addEventListener('click', () => closeCategoryGuideDialog());
