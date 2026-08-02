@@ -1,9 +1,10 @@
 {
   "skill": "cs-auto-optimization-orchestrator",
-  "timestamp": "2026-08-02T13:49:20Z",
+  "timestamp": "2026-08-02T14:01:10Z",
   "canStartRound": false,
   "waitReasons": [
     "2 open GitHub issues remain",
+    "2 open GitHub pull requests remain",
     "2 issue worktrees remain"
   ],
   "openIssues": [
@@ -20,7 +21,28 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/132"
     }
   ],
-  "openPullRequests": [],
+  "openPullRequests": [
+    {
+      "number": 135,
+      "title": "Issue 133: 문제은행 back-forward practice 복원",
+      "headRefName": "issue-133-question-bank-back-forward-restore",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "UNSTABLE",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/135"
+    },
+    {
+      "number": 134,
+      "title": "Issue 132: 문제은행 풀이 저장 card_id 무결성 강제",
+      "headRefName": "issue-132-question-bank-attempt-integrity",
+      "baseRefName": "main",
+      "reviewDecision": "",
+      "mergeStateStatus": "UNSTABLE",
+      "isDraft": false,
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/134"
+    }
+  ],
   "blockingWorktrees": [
     {
       "path": "/private/tmp/cs-opt-132",
@@ -31,5 +53,5 @@
       "branch": "refs/heads/issue-133-question-bank-back-forward-restore"
     }
   ],
-  "summary": "라운드 24 이슈 #132/#133을 생성하고 구현 worktree를 열어 게이트가 다시 닫혀 있다."
+  "summary": "라운드 24 이슈 #132/#133은 PR #134/#135 검토와 CI가 끝날 때까지 진행 중이다."
 }
