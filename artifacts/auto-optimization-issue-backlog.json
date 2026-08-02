@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T19:57:46Z",
+  "generated_at": "2026-08-02T20:01:32Z",
   "wave": "2026-08-02-round-36",
   "queue": [
     {
@@ -12,7 +12,8 @@
       "issue": 183,
       "title": "문항 이력 조회 경로의 카드 컨텍스트 재조회용 중복 SQLite 연결 제거",
       "branch": "issue-183-attempt-context-single-connection",
-      "status": "implementation_in_progress"
+      "pr": 184,
+      "status": "pr_open_review_running"
     }
   ],
   "completed": [],

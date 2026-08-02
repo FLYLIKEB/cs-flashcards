@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-08-02T19:57:46Z",
+  "checked_at": "2026-08-02T20:01:32Z",
   "gate_open": false,
   "summary": {
     "open_issue_count": 2,
-    "open_pr_count": 0,
+    "open_pr_count": 1,
     "blocking_worktree_count": 2,
     "reusable_backlog_count": 0
   },
@@ -21,7 +21,20 @@
       "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/182"
     }
   ],
-  "open_prs": [],
+  "open_prs": [
+    {
+      "number": 184,
+      "state": "OPEN",
+      "title": "Issue 183: 문항 이력 조회 카드 컨텍스트 연결 재사용",
+      "head": "issue-183-attempt-context-single-connection",
+      "base": "main",
+      "merge_state_status": "UNSTABLE",
+      "checks": [
+        "frontend-browser:IN_PROGRESS"
+      ],
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/184"
+    }
+  ],
   "blocking_worktrees": [
     {
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-182",
@@ -43,6 +56,7 @@
     }
   ],
   "notes": [
-    "Round 36 frontend issue #182 and backend issue #183 are the active lanes."
+    "Issue #183 implementation opened PR #184.",
+    "Issue #182 implementation is still running."
   ]
 }
