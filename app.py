@@ -1011,7 +1011,6 @@ def progress_db_for(progress_db_path: Path | None = None) -> Path:
 
 
 
-
 def progress_row_is_meaningful(row: dict[str, str]) -> bool:
     return bool(
         row.get("known_status") in {"O", "X"}
@@ -1023,13 +1022,11 @@ def progress_row_is_meaningful(row: dict[str, str]) -> bool:
 
 def normalized_runtime_media_url(value: Any) -> str:
     return str(value or "").strip()
-
 def normalized_concept_media_type(value: Any) -> str:
     media_type = str(value or "").strip().lower()
     if media_type not in CONCEPT_MEDIA_TYPES:
         raise ValueError("지원하지 않는 개념 미디어 형식입니다.")
     return media_type
-
 
 
 def progress_db_must_exist() -> bool:
@@ -1788,7 +1785,6 @@ def mark_card(
 
 def _ensure_card_exists(card_id: str, progress_db_path: Path | None = None) -> None:
     read_card(progress_db_path, card_id)
-
 
 def set_bookmark(
     card_id: str,
