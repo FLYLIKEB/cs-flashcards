@@ -1239,6 +1239,8 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(rows[0]['question_correct_count'], 1)
             self.assertEqual(rows[0]['question_wrong_count'], 2)
             self.assertEqual(rows[0]['latest_wrong_note'], '정의는 맞췄지만 장단점 비교가 빠짐')
+            self.assertEqual(rows[0]['latest_wrong_note_updated_at'], third['attempt']['updated_at'])
+
 
             with closing(sqlite3.connect(db_path)) as conn:
                 saved = conn.execute(
@@ -1269,6 +1271,93 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(history_ambiguous['items'][0]['section'], '전공논술')
             self.assertEqual(history_ambiguous['items'][0]['points'], 20)
 
+    def test_read_question_attempt_stats_avoids_full_wrong_history_scan(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+            seed_runtime_db(csv_path, db_path)
+
+            first = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-scan-1',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='첫 답안',
+                    judgment='wrong',
+                    wrong_note='이전 오답 메모',
+                    answered_at='2026-07-19T09:00:10+09:00',
+                ),
+                db_path,
+            )
+            latest = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-scan-2',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='둘째 답안',
+                    judgment='ambiguous',
+                    wrong_note='최신 오답 메모',
+                    answered_at='2026-07-19T09:05:10+09:00',
+                ),
+                db_path,
+            )
+            save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-scan-3',
+                    card_id='CS-001',
+                    question_type='short',
+                    prompt='설명에 해당하는 개념은?',
+                    body='정의',
+                    user_answer='정답',
+                    judgment='correct',
+                    answered_at='2026-07-19T09:10:10+09:00',
+                ),
+                db_path,
+            )
+
+            real_connect = flashcard_app.connect_progress_db
+
+            class GuardedConnection:
+                def __init__(self, inner):
+                    self._inner = inner
+
+                def execute(self, sql, parameters=()):
+                    normalized_sql = ' '.join(sql.split())
+                    if (
+                        'SELECT card_id, wrong_note, updated_at FROM question_attempts' in normalized_sql
+                        and 'ORDER BY updated_at DESC, answered_at DESC, question_order DESC, question_id DESC' in normalized_sql
+                    ):
+                        raise AssertionError('legacy full wrong-attempt scan should not run')
+                    return self._inner.execute(sql, parameters)
+
+                def close(self):
+                    self._inner.close()
+
+                def __getattr__(self, name):
+                    return getattr(self._inner, name)
+
+            with mock.patch.object(
+                flashcard_app,
+                'connect_progress_db',
+                side_effect=lambda *args, **kwargs: GuardedConnection(real_connect(*args, **kwargs)),
+            ):
+                stats = flashcard_app.read_question_attempt_stats(db_path)
+                rows, _ = read_cards(csv_path, db_path)
+
+            self.assertEqual(first['card']['latest_wrong_note'], '이전 오답 메모')
+            self.assertEqual(stats['CS-001']['question_attempt_count'], 3)
+            self.assertEqual(stats['CS-001']['question_correct_count'], 1)
+            self.assertEqual(stats['CS-001']['question_wrong_count'], 2)
+            self.assertEqual(stats['CS-001']['latest_wrong_note'], '최신 오답 메모')
+            self.assertEqual(stats['CS-001']['latest_wrong_note_updated_at'], latest['attempt']['updated_at'])
+            self.assertEqual(rows[0]['latest_wrong_note'], '최신 오답 메모')
+            self.assertEqual(rows[0]['latest_wrong_note_updated_at'], latest['attempt']['updated_at'])
 
     def test_read_question_attempts_uses_targeted_card_context_without_read_cards(self):
         with tempfile.TemporaryDirectory() as td:

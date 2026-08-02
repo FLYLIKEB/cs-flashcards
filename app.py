@@ -5646,48 +5646,53 @@ def read_question_attempt_stats(progress_db_path: Path) -> dict[str, dict[str, A
     with closing(connect_progress_db(progress_db_path)) as conn:
         for row in conn.execute(
             """
+            WITH attempt_counts AS (
+                SELECT
+                    card_id,
+                    COUNT(*) AS question_attempt_count,
+                    SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS question_correct_count,
+                    SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS question_wrong_count
+                FROM question_attempts
+                GROUP BY card_id
+            ),
+            latest_wrong_notes AS (
+                SELECT card_id, wrong_note, updated_at
+                FROM (
+                    SELECT
+                        card_id,
+                        wrong_note,
+                        updated_at,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY card_id
+                            ORDER BY updated_at DESC, answered_at DESC, question_order DESC, question_id DESC
+                        ) AS row_number
+                    FROM question_attempts
+                    WHERE is_correct = 0
+                      AND TRIM(COALESCE(wrong_note, '')) <> ''
+                )
+                WHERE row_number = 1
+            )
             SELECT
-                card_id,
-                COUNT(*) AS question_attempt_count,
-                SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) AS question_correct_count,
-                SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS question_wrong_count
-            FROM question_attempts
-            GROUP BY card_id
+                attempt_counts.card_id,
+                attempt_counts.question_attempt_count,
+                attempt_counts.question_correct_count,
+                attempt_counts.question_wrong_count,
+                COALESCE(latest_wrong_notes.wrong_note, '') AS latest_wrong_note,
+                COALESCE(latest_wrong_notes.updated_at, '') AS latest_wrong_note_updated_at
+            FROM attempt_counts
+            LEFT JOIN latest_wrong_notes
+                ON latest_wrong_notes.card_id = attempt_counts.card_id
             """
         ).fetchall():
             stats[row["card_id"]] = {
                 "question_attempt_count": int(row["question_attempt_count"] or 0),
                 "question_correct_count": int(row["question_correct_count"] or 0),
                 "question_wrong_count": int(row["question_wrong_count"] or 0),
-                "latest_wrong_note": "",
-                "latest_wrong_note_updated_at": "",
+                "latest_wrong_note": row["latest_wrong_note"] or "",
+                "latest_wrong_note_updated_at": row["latest_wrong_note_updated_at"] or "",
             }
-        seen_cards: set[str] = set()
-        for row in conn.execute(
-            """
-            SELECT card_id, wrong_note, updated_at
-            FROM question_attempts
-            WHERE is_correct = 0 AND TRIM(wrong_note) <> ''
-            ORDER BY updated_at DESC, answered_at DESC, question_order DESC, question_id DESC
-            """
-        ).fetchall():
-            card_id = row["card_id"]
-            if card_id in seen_cards:
-                continue
-            seen_cards.add(card_id)
-            bucket = stats.setdefault(
-                card_id,
-                {
-                    "question_attempt_count": 0,
-                    "question_correct_count": 0,
-                    "question_wrong_count": 0,
-                    "latest_wrong_note": "",
-                    "latest_wrong_note_updated_at": "",
-                },
-            )
-            bucket["latest_wrong_note"] = row["wrong_note"] or ""
-            bucket["latest_wrong_note_updated_at"] = row["updated_at"] or ""
     return stats
+
 
 
 def read_question_bank_attempts(
