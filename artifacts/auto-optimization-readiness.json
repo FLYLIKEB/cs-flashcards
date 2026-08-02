@@ -1,19 +1,13 @@
 {
-  "checked_at": "2026-08-02T18:31:01Z",
+  "checked_at": "2026-08-02T18:36:53Z",
   "gate_open": false,
   "summary": {
-    "open_issue_count": 2,
+    "open_issue_count": 1,
     "open_pr_count": 1,
-    "blocking_worktree_count": 2,
+    "blocking_worktree_count": 1,
     "reusable_backlog_count": 0
   },
   "open_issues": [
-    {
-      "number": 171,
-      "state": "OPEN",
-      "title": "단건 카드 수정 helper의 중복 SQLite 연결 축소",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/171"
-    },
     {
       "number": 170,
       "state": "OPEN",
@@ -23,14 +17,14 @@
   ],
   "open_prs": [
     {
-      "number": 172,
-      "title": "Issue 171: 단건 카드 수정 helper SQLite 연결 재사용",
-      "headRefName": "issue-171-single-card-mutation-connection",
+      "number": 173,
+      "title": "Issue 170: 문제 풀이 선지·채점 버튼 선택 상태 접근성 노출",
+      "headRefName": "issue-170-question-controls-a11y",
       "baseRefName": "main",
       "reviewDecision": "",
       "mergeStateStatus": "UNSTABLE",
       "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/172"
+      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/173"
     }
   ],
   "blocking_worktrees": [
@@ -38,29 +32,24 @@
       "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-170",
       "branch": "issue-170-question-controls-a11y",
       "status": "tracked-branch-worktree"
-    },
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-171",
-      "branch": "issue-171-single-card-mutation-connection",
-      "status": "tracked-branch-worktree"
     }
   ],
   "reusable_backlog": [],
   "recently_completed": [
     {
+      "issue": 171,
+      "pr": 172,
+      "merge_commit": "b25772a0aeb5342b8c97aec55c50e62e816a46a7"
+    },
+    {
       "issue": 168,
       "pr": 169,
       "merge_commit": "b2121b5c53e28c4869915dbed9f08505bcb2f592"
-    },
-    {
-      "issue": 165,
-      "pr": 167,
-      "merge_commit": "39dbbad9db813044e9db12436c0af0f3c7c4d1a8"
     }
   ],
   "notes": [
-    "PR #172 is open for backend issue #171 and is waiting on latest review plus frontend-browser CI.",
-    "Frontend issue #170 is still in implementation in its isolated worktree.",
-    "The readiness gate remains closed until both round 33 lanes finish."
+    "Backend issue #171 merged successfully as PR #172 and its worktree is cleaned up.",
+    "Frontend issue #170 is pushed as PR #173 and remains the only active round 33 blocker.",
+    "The readiness gate stays closed until PR #173 clears review and verification."
   ]
 }
