@@ -690,6 +690,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.focus('#menuBtn')
             await page.keyboard.press('Enter')
             await page.waitForFunction("document.querySelector('#menuPopover').hidden === false")
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'wikiHomeLink'")
             case['focus_after_keyboard_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['focus_after_keyboard_open'], 'wikiHomeLink')
 
