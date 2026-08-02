@@ -1,55 +1,31 @@
 {
-  "checked_at": "2026-08-02T18:10:30Z",
-  "gate_open": false,
+  "checked_at": "2026-08-02T18:14:04Z",
+  "gate_open": true,
   "summary": {
-    "open_issue_count": 1,
-    "open_pr_count": 1,
-    "blocking_worktree_count": 1,
+    "open_issue_count": 0,
+    "open_pr_count": 0,
+    "blocking_worktree_count": 0,
     "reusable_backlog_count": 0
   },
-  "open_issues": [
-    {
-      "number": 168,
-      "state": "OPEN",
-      "title": "문제은행 뷰 전환·리뷰 필터 버튼에 토글 접근성 상태 추가",
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/issues/168"
-    }
-  ],
-  "open_prs": [
-    {
-      "number": 169,
-      "title": "Issue 168: 문제은행 뷰 전환·리뷰 필터 토글 접근성 상태 추가",
-      "headRefName": "issue-168-question-bank-toggle-a11y",
-      "baseRefName": "main",
-      "reviewDecision": "",
-      "mergeStateStatus": "UNSTABLE",
-      "isDraft": false,
-      "url": "https://github.com/FLYLIKEB/cs-flashcards/pull/169"
-    }
-  ],
-  "blocking_worktrees": [
-    {
-      "path": "/Users/jwp/macDocuments/금융공기업준비/cs_flashcards-opt-168",
-      "branch": "issue-168-question-bank-toggle-a11y",
-      "status": "tracked-branch-worktree"
-    }
-  ],
+  "open_issues": [],
+  "open_prs": [],
+  "blocking_worktrees": [],
   "reusable_backlog": [],
   "recently_completed": [
+    {
+      "issue": 168,
+      "pr": 169,
+      "merge_commit": "b2121b5c53e28c4869915dbed9f08505bcb2f592"
+    },
     {
       "issue": 165,
       "pr": 167,
       "merge_commit": "39dbbad9db813044e9db12436c0af0f3c7c4d1a8"
-    },
-    {
-      "issue": 164,
-      "pr": 166,
-      "merge_commit": "a836d54305c134ee633b0cfc582929b76e2e5c49"
     }
   ],
   "notes": [
-    "PR #169 is awaiting latest review and the frontend-browser GitHub check.",
-    "Issue #168 remains open until the PR merges and the worktree is removed.",
-    "The next readiness-open state depends solely on finishing #168 / PR #169."
+    "Issue #168 / PR #169 is merged and cleaned up.",
+    "No open issues, open PRs, or blocking issue worktrees remain.",
+    "The next optimization round may start immediately."
   ]
 }

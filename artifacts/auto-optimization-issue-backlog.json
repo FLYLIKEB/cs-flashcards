@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-08-02T18:10:30Z",
+  "generated_at": "2026-08-02T18:14:04Z",
   "wave": "2026-08-02-round-32",
-  "queue": [
+  "queue": [],
+  "completed": [
     {
       "issue": 168,
-      "title": "문제은행 뷰 전환·리뷰 필터 버튼에 토글 접근성 상태 추가",
+      "pr": 169,
       "branch": "issue-168-question-bank-toggle-a11y",
-      "status": "pr_open_review_pending"
+      "status": "merged"
     }
   ],
-  "completed": [],
   "closed_without_merge": [],
   "held": []
 }
