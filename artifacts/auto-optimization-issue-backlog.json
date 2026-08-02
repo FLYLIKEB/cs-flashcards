@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-08-02T17:59:39Z",
+  "generated_at": "2026-08-02T18:10:30Z",
   "wave": "2026-08-02-round-32",
   "queue": [
     {
       "issue": 168,
       "title": "문제은행 뷰 전환·리뷰 필터 버튼에 토글 접근성 상태 추가",
       "branch": "issue-168-question-bank-toggle-a11y",
-      "status": "implementation_in_progress"
+      "status": "pr_open_review_pending"
     }
   ],
   "completed": [],
