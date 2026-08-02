@@ -19,14 +19,14 @@
       <input id="searchInput" type="search" placeholder="검색" />
     </div>
     <div class="stats" aria-live="polite">
-      <button id="filterAllBtn" class="stat-filter active has-tip" type="button" data-status-filter="" title="전체" data-tip="전체">Σ <strong id="statTotal">0</strong></button>
-      <button id="filterKnownBtn" class="stat-filter has-tip" type="button" data-status-filter="O" title="안다" data-tip="안다">O <strong id="statKnown">0</strong></button>
-      <button id="filterUnknownBtn" class="stat-filter has-tip" type="button" data-status-filter="X" title="모른다" data-tip="모른다">X <strong id="statUnknown">0</strong></button>
-      <button id="filterUnreviewedBtn" class="stat-filter has-tip" type="button" data-status-filter="unreviewed" title="미학습" data-tip="미학습">– <strong id="statUnreviewed">0</strong></button>
+      <button id="filterAllBtn" class="stat-filter active has-tip" type="button" data-status-filter="" title="전체" data-tip="전체" aria-label="전체">Σ <strong id="statTotal">0</strong></button>
+      <button id="filterKnownBtn" class="stat-filter has-tip" type="button" data-status-filter="O" title="안다" data-tip="안다" aria-label="안다">O <strong id="statKnown">0</strong></button>
+      <button id="filterUnknownBtn" class="stat-filter has-tip" type="button" data-status-filter="X" title="모른다" data-tip="모른다" aria-label="모른다">X <strong id="statUnknown">0</strong></button>
+      <button id="filterUnreviewedBtn" class="stat-filter has-tip" type="button" data-status-filter="unreviewed" title="미학습" data-tip="미학습" aria-label="미학습">– <strong id="statUnreviewed">0</strong></button>
     </div>
     <div class="header-actions">
-      <button id="questionPracticeBtn" class="menu-button has-tip" type="button" aria-pressed="false" aria-controls="questionPanel" title="문제 풀이" data-tip="문제 풀이">Q</button>
-      <button id="menuBtn" class="menu-button has-tip" type="button" aria-expanded="false" aria-controls="menuPopover" title="메뉴" data-tip="메뉴">☰</button>
+      <button id="questionPracticeBtn" class="menu-button has-tip" type="button" aria-pressed="false" aria-controls="questionPanel" title="문제 풀이" data-tip="문제 풀이" aria-label="문제 풀이">Q</button>
+      <button id="menuBtn" class="menu-button has-tip" type="button" aria-expanded="false" aria-controls="menuPopover" title="메뉴" data-tip="메뉴" aria-label="메뉴">☰</button>
       <div id="menuPopover" class="menu-popover" hidden>
         <a id="wikiHomeLink" href="/wiki" target="_blank" rel="noopener noreferrer">학습 위키</a>
         <a id="questionBankPageLink" href="/question-bank" target="_blank" rel="noopener noreferrer">문제 풀이 · 문제은행</a>
@@ -43,8 +43,8 @@
   <main class="layout">
     <aside id="controlsPanel" class="panel controls">
       <div class="collapsed-quick-actions" aria-label="빠른 자동 듣기">
-        <button id="collapsedPlayBtn" class="has-tip collapsed-audio-main" type="button" title="재생" data-tip="자동 듣기 재생">▶</button>
-        <button id="collapsedStopBtn" class="has-tip collapsed-audio-main" type="button" title="정지" data-tip="자동 듣기 정지">■</button>
+        <button id="collapsedPlayBtn" class="has-tip collapsed-audio-main" type="button" title="재생" data-tip="자동 듣기 재생" aria-label="자동 듣기 재생">▶</button>
+        <button id="collapsedStopBtn" class="has-tip collapsed-audio-main" type="button" title="정지" data-tip="자동 듣기 정지" aria-label="자동 듣기 정지">■</button>
       </div>
       <button id="controlsToggle" class="controls-toggle has-tip" type="button" aria-expanded="true" aria-controls="controlsBody" data-tip="듣기 설정">검색/필터 접기</button>
       <div id="controlsBody" class="controls-body">
@@ -121,8 +121,8 @@
         <p class="voice-install-hint">더 자연스럽게: 기기 설정에서 한국어 고품질/Siri/Google/Microsoft 음성을 무료로 설치한 뒤 새로고침하세요.</p>
         <div id="audioEstimate" class="audio-estimate" aria-live="polite">예상 재생시간 계산 중...</div>
         <div class="audio-buttons">
-          <button id="playAudioBtn" class="has-tip" type="button" title="재생" data-tip="자동 듣기 재생">▶</button>
-          <button id="stopAudioBtn" class="has-tip" type="button" title="정지" data-tip="자동 듣기 정지">■</button>
+          <button id="playAudioBtn" class="has-tip" type="button" title="재생" data-tip="자동 듣기 재생" aria-label="자동 듣기 재생">▶</button>
+          <button id="stopAudioBtn" class="has-tip" type="button" title="정지" data-tip="자동 듣기 정지" aria-label="자동 듣기 정지">■</button>
         </div>
         <div class="audio-preset-panel" aria-label="재생 설정 프리셋">
           <div class="audio-preset-header">
@@ -315,9 +315,9 @@
           <section id="questionSessionReview" class="question-session-review" hidden aria-live="polite"></section>
         </div>
         <div class="question-actions">
-          <button id="prevQuestionBtn" class="question-action-button" type="button" title="이전 문제">←</button>
+          <button id="prevQuestionBtn" class="question-action-button" type="button" title="이전 문제" aria-label="이전 문제">←</button>
           <button id="revealAnswerBtn" class="question-action-button question-action-wide" type="button" title="정답/해설 보기">정답</button>
-          <button id="nextQuestionBtn" class="question-action-button" type="button" title="다음 문제">→</button>
+          <button id="nextQuestionBtn" class="question-action-button" type="button" title="다음 문제" aria-label="다음 문제">→</button>
           <button id="openQuestionCardBtn" class="question-action-button" type="button" title="원본 카드 보기">카드</button>
         </div>
       </section>
@@ -442,9 +442,9 @@
       </article>
 
       <div class="mark-row">
-        <button id="knownBtn" class="mark known has-tip" type="button" title="안다" data-tip="안다">O</button>
-        <button id="unknownBtn" class="mark unknown has-tip" type="button" title="모른다" data-tip="모른다">X</button>
-        <button id="unreviewedBtn" class="mark unreviewed has-tip" type="button" title="미학습으로 되돌리기" data-tip="미학습">–</button>
+        <button id="knownBtn" class="mark known has-tip" type="button" title="안다" data-tip="안다" aria-label="안다">O</button>
+        <button id="unknownBtn" class="mark unknown has-tip" type="button" title="모른다" data-tip="모른다" aria-label="모른다">X</button>
+        <button id="unreviewedBtn" class="mark unreviewed has-tip" type="button" title="미학습으로 되돌리기" data-tip="미학습" aria-label="미학습으로 되돌리기">–</button>
       </div>
     </section>
   </main>
