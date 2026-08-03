@@ -36,7 +36,7 @@ class TableShellSharedTest(unittest.TestCase):
         self.assertIn("width: min(1440px, calc(100% - 32px));", TABLE_SHELL_CSS)
         self.assertIn('grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);', TABLE_SHELL_CSS)
         self.assertIn('@media (max-width: 1240px)', TABLE_SHELL_CSS)
-        self.assertIn('"review"', TABLE_SHELL_CSS)
+        self.assertIn('@media (max-width: 1240px) {\n  .question-bank-shell-table-pane {\n    grid-template-columns: minmax(0, 1fr);\n    grid-template-areas:\n      "hero"\n      "review"\n      "filter"\n      "table"\n      "error";', TABLE_SHELL_CSS)
         self.assertIn('overflow-wrap: anywhere;', TABLE_SHELL_CSS)
         self.assertIn("{key: 'prompt', label: '문제', width: '24rem'", QUESTION_BANK_JS)
         self.assertIn("tableMinWidth: '960px'", QUESTION_BANK_JS)

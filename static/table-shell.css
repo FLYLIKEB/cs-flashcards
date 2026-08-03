@@ -1092,6 +1092,7 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "hero"
+      "review"
       "filter"
       "table"
       "error";
@@ -1112,7 +1113,6 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
     position: static;
   }
 
-      "review"
   .question-bank-shell-topbar-inner,
   .question-bank-shell-topbar-main,
   .question-bank-card-head,
