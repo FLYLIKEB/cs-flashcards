@@ -698,6 +698,10 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   background: rgba(255, 232, 236, .96);
 }
 
+.question-bank-hero-copy {
+  min-width: 0;
+}
+
 .question-bank-metric-value {
   display: block;
   margin-top: 1px;
@@ -1203,15 +1207,98 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
     padding: 14px;
   }
 
-  .question-bank-primary-actions,
   .question-bank-review-actions,
   .question-bank-filter-actions,
   .question-bank-selection-actions,
   .question-bank-shell-header-chips,
-  .question-bank-overview-grid,
   .cs-table-filter-grid,
   .question-bank-review-stats {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .question-bank-shell-pane {
+    gap: 8px;
+  }
+
+  .question-bank-shell-table-pane {
+    grid-template-columns: minmax(0, 1fr) minmax(116px, 132px);
+    grid-template-areas:
+      "review review"
+      "hero hero"
+      "filter filter"
+      "table table"
+      "error error";
+    gap: 8px;
+    align-items: start;
+  }
+
+  .question-bank-primary-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .question-bank-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .question-bank-hero-card,
+  .question-bank-review-card {
+    padding: 8px;
+  }
+
+  .question-bank-hero-meta,
+  .question-bank-review-card .question-bank-card-head {
+    gap: 6px;
+    margin-bottom: 0;
+  }
+
+  .question-bank-primary-actions .cs-table-button,
+  .question-bank-review-actions .cs-table-button {
+    padding: 0 6px;
+    font-size: 0.68rem;
+    line-height: 1.15;
+  }
+
+  .question-bank-review-actions {
+    display: flex;
+  }
+
+  .question-bank-metric-card {
+    padding: 5px 6px;
+  }
+
+  .question-bank-metric-label {
+    font-size: 0.62rem;
+    margin-bottom: 1px;
+  }
+
+  .question-bank-hero-card .question-bank-section-kicker,
+  .question-bank-review-card .question-bank-section-kicker,
+  .question-bank-review-card .cs-table-summary {
+    display: none;
+  }
+
+  .question-bank-metric-value,
+  .question-bank-hero-card .cs-table-title,
+  .question-bank-review-card .cs-table-title {
+    font-size: 0.82rem;
+    line-height: 1.12;
+  }
+
+  .question-bank-hero-card .cs-table-summary {
+    font-size: 0.7rem;
+    line-height: 1.22;
+  }
+
+  .question-bank-hero-card .cs-table-hint {
+    display: none;
+  }
+
+  .question-bank-metric-detail {
+    font-size: 0.66rem;
+    line-height: 1.18;
   }
 
   .question-bank-dialog-backdrop {

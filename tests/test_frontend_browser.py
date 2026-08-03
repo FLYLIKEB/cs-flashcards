@@ -1518,25 +1518,46 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelectorAll('#bankPageOverviewCards > *').length === 4")
             case['overview_layout'] = await page.evaluate(
                 """
-                () => {
-                  const grid = document.querySelector('#bankPageOverviewCards');
-                  const cards = [...document.querySelectorAll('#bankPageOverviewCards > *')];
-                  const firstTop = cards[0]?.getBoundingClientRect().top || 0;
-                  const secondTop = cards[1]?.getBoundingClientRect().top || 0;
-                  return {
-                    columnCount: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
-                    firstRowSharesTop: Math.abs(firstTop - secondTop) < 2,
-                    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-                  };
-                }
-                """
+() => {
+  const grid = document.querySelector('#bankPageOverviewCards');
+  const hero = document.querySelector('.question-bank-hero-card');
+  const reviewCard = document.querySelector('.question-bank-review-card');
+  const cards = [...document.querySelectorAll('#bankPageOverviewCards > *')];
+  const buttons = [...document.querySelectorAll('.question-bank-primary-actions .cs-table-button')];
+  const rowCount = (nodes) => new Set(nodes.map((node) => Math.round(node.getBoundingClientRect().top))).size;
+  const firstTop = cards[0]?.getBoundingClientRect().top || 0;
+  const secondTop = cards[1]?.getBoundingClientRect().top || 0;
+  const heroHeight = hero?.getBoundingClientRect().height || 0;
+  const gridHeight = grid?.getBoundingClientRect().height || 0;
+  const reviewTop = reviewCard?.getBoundingClientRect().top || 0;
+  return {
+    metricCount: cards.length,
+    buttonCount: buttons.length,
+    columnCount: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+    metricRows: rowCount(cards),
+    actionRows: rowCount(buttons),
+    firstRowSharesTop: Math.abs(firstTop - secondTop) < 2,
+    heroViewportShare: Number((heroHeight / window.innerHeight).toFixed(3)),
+    gridViewportShare: Number((gridHeight / window.innerHeight).toFixed(3)),
+    reviewTopShare: Number((reviewTop / window.innerHeight).toFixed(3)),
+    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  };
+}
+"""
             )
+            self.assertEqual(case['overview_layout']['metricCount'], 4)
+            self.assertEqual(case['overview_layout']['buttonCount'], 3)
             self.assertEqual(case['overview_layout']['columnCount'], 2)
+            self.assertEqual(case['overview_layout']['metricRows'], 2)
             self.assertTrue(case['overview_layout']['firstRowSharesTop'])
+            self.assertEqual(case['overview_layout']['actionRows'], 1)
+            self.assertLess(case['overview_layout']['heroViewportShare'], 0.27)
+            self.assertLess(case['overview_layout']['gridViewportShare'], 0.13)
+            self.assertLess(case['overview_layout']['reviewTopShare'], 0.34)
             self.assertLessEqual(case['overview_layout']['pageOverflow'], 2)
             status = 'passed'
         finally:
-            self.record_case(case_id='question-bank-mobile-overview-two-column', status=status, observations=case)
+            self.record_case(case_id='question-bank-mobile-overview-compact', status=status, observations=case)
             await page.close()
 
 
