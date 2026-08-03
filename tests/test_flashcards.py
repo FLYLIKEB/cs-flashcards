@@ -1453,7 +1453,16 @@ class FlashcardProgressTests(unittest.TestCase):
                     'SELECT COUNT(*), SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) FROM question_attempts WHERE card_id=?',
                     ('CS-001',),
                 ).fetchone()
+                latest_index_row = conn.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = ?",
+                    ('idx_question_attempts_card_latest',),
+                ).fetchone()
             self.assertEqual(saved, (3, 2))
+            self.assertIsNotNone(latest_index_row)
+            self.assertIn(
+                "ON question_attempts(card_id, updated_at DESC, created_at DESC, question_id DESC)",
+                latest_index_row[0],
+            )
 
             history_all = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], result='all', limit=10)
             self.assertEqual(history_all['summary']['total'], 3)
