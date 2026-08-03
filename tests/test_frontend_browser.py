@@ -1322,6 +1322,105 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         finally:
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
             await page.close()
+    async def test_question_bank_page_mobile_layout_stacks_actions_without_overflow(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 900, 'height': 1180})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.querySelector('#bankPageFiltersRegion').hidden")
+            case['initial_layout'] = await page.evaluate(
+                """
+                () => {
+                  const viewportWidth = window.innerWidth;
+                  const rect = (selector) => {
+                    const node = document.querySelector(selector);
+                    if (!node) return null;
+                    const box = node.getBoundingClientRect();
+                    return {left: box.left, right: box.right, width: box.width};
+                  };
+                  const fits = (selector) => [...document.querySelectorAll(selector)].every((node) => {
+                    const box = node.getBoundingClientRect();
+                    return box.left >= -1 && box.right <= viewportWidth + 1;
+                  });
+                  return {
+                    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                    primaryActionsDisplay: getComputedStyle(document.querySelector('.question-bank-primary-actions')).display,
+                    filterActionsDisplay: getComputedStyle(document.querySelector('.question-bank-filter-actions')).display,
+                    headerChipsDisplay: getComputedStyle(document.querySelector('#bankPageHeaderChips')).display,
+                    filterGridColumns: getComputedStyle(document.querySelector('.cs-table-filter-grid')).gridTemplateColumns.split(' ').length,
+                    primaryButtonsFit: fits('.question-bank-primary-actions .cs-table-button'),
+                    filterButtonsFit: fits('.question-bank-filter-actions .cs-table-button'),
+                    headerChipsFit: fits('#bankPageHeaderChips > *'),
+                    shellRect: rect('.cs-table-shell.question-bank-shell'),
+                    topbarRect: rect('.question-bank-shell-topbar-inner'),
+                  };
+                }
+                """
+            )
+            self.assertLessEqual(case['initial_layout']['pageOverflow'], 2)
+            self.assertEqual(case['initial_layout']['primaryActionsDisplay'], 'grid')
+            self.assertEqual(case['initial_layout']['filterActionsDisplay'], 'grid')
+            self.assertEqual(case['initial_layout']['headerChipsDisplay'], 'grid')
+            self.assertEqual(case['initial_layout']['filterGridColumns'], 2)
+            self.assertTrue(case['initial_layout']['primaryButtonsFit'])
+            self.assertTrue(case['initial_layout']['filterButtonsFit'])
+            self.assertTrue(case['initial_layout']['headerChipsFit'])
+            self.assertLessEqual(case['initial_layout']['shellRect']['right'], 901)
+            self.assertLessEqual(case['initial_layout']['topbarRect']['right'], 901)
+
+            await page.click('#bankPageCategoryGuideBtn')
+            await page.waitForFunction("document.querySelector('#bankPageCategoryGuideDialog') && !document.querySelector('#bankPageCategoryGuideDialog').hidden")
+            case['dialog_layout'] = await page.evaluate(
+                """
+                () => {
+                  const viewportWidth = window.innerWidth;
+                  const card = document.querySelector('.question-bank-dialog-card');
+                  const box = card.getBoundingClientRect();
+                  return {
+                    width: box.width,
+                    right: box.right,
+                    viewportWidth,
+                  };
+                }
+                """
+            )
+            self.assertLessEqual(case['dialog_layout']['right'], case['dialog_layout']['viewportWidth'] + 1)
+            await page.click('#bankPageCategoryGuideCloseBtn')
+            await page.waitForFunction("document.querySelector('#bankPageCategoryGuideDialog').hidden")
+
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction("document.body.classList.contains('question-bank-practice-focus') && !document.querySelector('#bankPagePracticeFrame').hidden")
+            case['practice_layout'] = await page.evaluate(
+                """
+                () => {
+                  const viewportWidth = window.innerWidth;
+                  const frame = document.querySelector('#bankPagePracticeFrame');
+                  const exitButton = document.querySelector('#bankPagePracticeExitBtn');
+                  const frameBox = frame.getBoundingClientRect();
+                  const exitBox = exitButton.getBoundingClientRect();
+                  return {
+                    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                    frameRight: frameBox.right,
+                    frameWidth: frameBox.width,
+                    exitRight: exitBox.right,
+                    exitTop: exitBox.top,
+                    viewportWidth,
+                  };
+                }
+                """
+            )
+            self.assertLessEqual(case['practice_layout']['pageOverflow'], 2)
+            self.assertLessEqual(case['practice_layout']['frameRight'], case['practice_layout']['viewportWidth'] + 1)
+            self.assertLessEqual(case['practice_layout']['exitRight'], case['practice_layout']['viewportWidth'] + 1)
+            self.assertGreater(case['practice_layout']['frameWidth'], 0)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-mobile-layout', status=status, observations=case)
+            await page.close()
+
 
     async def test_question_bank_review_filter_buttons_expose_pressed_state(self):
         case = {'path': '/question-bank'}
@@ -3047,6 +3146,54 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='embedded-question-bank-filter-reload', status=status, observations=case)
+            await page.close()
+    async def test_embedded_question_bank_mobile_layout_stacks_controls_without_overflow(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 390, 'height': 844})
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate('toggleQuestionMode(true)')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.click('#questionBankToggleBtn')
+            await page.waitForFunction("document.querySelector('#questionBankBrowser').hidden === false")
+            await page.waitForFunction("document.querySelectorAll('#questionBankList tr').length > 0")
+            case['layout'] = await page.evaluate(
+                """
+                () => {
+                  const viewportWidth = window.innerWidth;
+                  const rect = (selector) => {
+                    const node = document.querySelector(selector);
+                    if (!node) return null;
+                    const box = node.getBoundingClientRect();
+                    return {left: box.left, right: box.right, width: box.width};
+                  };
+                  const fits = (selector) => [...document.querySelectorAll(selector)].every((node) => {
+                    const box = node.getBoundingClientRect();
+                    return box.left >= -1 && box.right <= viewportWidth + 1;
+                  });
+                  return {
+                    browserRect: rect('#questionBankBrowser'),
+                    tableWrapRect: rect('.question-bank-table-wrap'),
+                    headDirection: getComputedStyle(document.querySelector('.question-bank-head')).flexDirection,
+                    actionsDisplay: getComputedStyle(document.querySelector('.question-bank-actions')).display,
+                    filterColumns: getComputedStyle(document.querySelector('.question-bank-filter-grid')).gridTemplateColumns.split(' ').length,
+                    actionButtonsFit: fits('.question-bank-actions .question-toolbar-button'),
+                    filterControlsFit: fits('.question-bank-filter-grid > *'),
+                  };
+                }
+                """
+            )
+            self.assertEqual(case['layout']['headDirection'], 'column')
+            self.assertEqual(case['layout']['actionsDisplay'], 'grid')
+            self.assertEqual(case['layout']['filterColumns'], 1)
+            self.assertTrue(case['layout']['actionButtonsFit'])
+            self.assertTrue(case['layout']['filterControlsFit'])
+            self.assertLessEqual(case['layout']['browserRect']['right'], 391)
+            self.assertLessEqual(case['layout']['tableWrapRect']['right'], case['layout']['browserRect']['right'] + 1)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='embedded-question-bank-mobile-layout', status=status, observations=case)
             await page.close()
     async def test_embedded_question_bank_dynamic_select_deep_link_survives_first_request_and_reload(self):
         case = {'path': '/?field_name=전산학술&q=embedded&attempt_status=wrong'}
