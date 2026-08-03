@@ -5,7 +5,7 @@ const QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1';
 const QUESTION_TYPE_LABELS = {short: '주관식', subjective: '서술형', multiple_choice: '객관식', essay: '논술형'};
 const QUESTION_BANK_ATTEMPT_STATUS_LABELS = {unseen: '안푼', wrong: '틀린', correct: '맞은'};
 const QUESTION_ATTEMPT_RESULT_LABELS = {correct: '맞음', ambiguous: '애매함', wrong: '틀림', unknown: '모름', pending: '미채점'};
-const QUESTION_BANK_REVIEW_FILTER_LABELS = {attempted: '푼 문제', wrong: '틀린·애매', note: '오답노트'};
+const QUESTION_BANK_REVIEW_FILTER_LABELS = {attempted: '푼 문제', pending: '미채점', wrong: '틀린·애매', note: '오답노트'};
 const QUESTION_BANK_COLUMNS = [
   {key: 'index', label: '#', width: '56px'},
   {key: 'attempt_status', label: '풀이상태', width: '6rem'},
@@ -55,6 +55,7 @@ const bankState = {
   reviewError: '',
   reviewFilter: 'attempted',
   reviewNonce: 0,
+  reviewSavingId: '',
 };
 
 
@@ -223,8 +224,33 @@ function questionBankReviewIds(items = bankState.items) {
     });
 }
 
+function questionBankReviewResultKey(item) {
+  const resultKey = String(item?.result_key || item?.judgment || 'pending').trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(QUESTION_ATTEMPT_RESULT_LABELS, resultKey) ? resultKey : 'pending';
+}
+
+function questionBankReviewSummaryFromItems(items = bankState.reviewItems) {
+  const summary = {
+    total: 0,
+    correct: 0,
+    ambiguous: 0,
+    wrong: 0,
+    unknown: 0,
+    pending: 0,
+    note_count: 0,
+    selected_question_bank_count: questionBankReviewIds().length,
+  };
+  (Array.isArray(items) ? items : []).forEach((item) => {
+    const resultKey = questionBankReviewResultKey(item);
+    summary.total += 1;
+    summary[resultKey] += 1;
+    if (String(item?.wrong_note || '').trim()) summary.note_count += 1;
+  });
+  return summary;
+}
+
 function questionBankReviewCounts(summary = bankState.reviewSummary) {
-  const source = summary && typeof summary === 'object' ? summary : {};
+  const source = summary && typeof summary === 'object' ? summary : questionBankReviewSummaryFromItems();
   const attempted = Number(source.total || bankState.reviewItems.length || 0);
   const correct = Number(source.correct || 0);
   const ambiguous = Number(source.ambiguous || 0);
@@ -260,7 +286,9 @@ function questionBankReviewRequestPayload(questionBankIds = questionBankReviewId
 }
 
 function questionBankReviewItemMatchesFilter(item, filter = bankState.reviewFilter) {
-  if (filter === 'wrong') return ['ambiguous', 'wrong', 'unknown'].includes(String(item?.result_key || item?.judgment || 'pending'));
+  const resultKey = questionBankReviewResultKey(item);
+  if (filter === 'pending') return resultKey === 'pending';
+  if (filter === 'wrong') return ['ambiguous', 'wrong', 'unknown'].includes(resultKey);
   if (filter === 'note') return Boolean(String(item?.wrong_note || '').trim());
   return true;
 }
@@ -269,37 +297,147 @@ function visibleQuestionBankReviewItems() {
   return (Array.isArray(bankState.reviewItems) ? bankState.reviewItems : []).filter((item) => questionBankReviewItemMatchesFilter(item));
 }
 
-function questionBankReviewLaunchSessionState(item) {
+function questionBankReviewAttemptSnapshot(item) {
   const questionBankId = String(item?.question_bank_id || '').trim();
   if (!questionBankId) return null;
   return {
+    question_bank_id: questionBankId,
+    question_id: String(item?.question_id || '').trim(),
+    user_answer: String(item?.user_answer || ''),
+    selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
+    judgment: questionBankReviewResultKey(item),
+    wrong_note: String(item?.wrong_note || ''),
+    session_id: String(item?.session_id || '').trim(),
+    session_title: String(item?.session_title || '').trim(),
+    session_mode: String(item?.session_mode || '').trim(),
+    section: String(item?.section || '').trim(),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || '').trim(),
+    question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
+    question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
+    session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
+    time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
+    question_started_at: String(item?.question_started_at || '').trim(),
+    answered_at: String(item?.answered_at || '').trim(),
+    updated_at: String(item?.updated_at || '').trim(),
+    answer_revealed: true,
+  };
+}
+
+function questionBankReviewLaunchSessionState(item, reviewItems = visibleQuestionBankReviewItems()) {
+  const questionBankId = String(item?.question_bank_id || '').trim();
+  if (!questionBankId) return null;
+  const sessionItems = (Array.isArray(reviewItems) ? reviewItems : [])
+    .map((entry) => questionBankReviewAttemptSnapshot(entry))
+    .filter(Boolean);
+  if (!sessionItems.length) return null;
+  return {
     reviewQuestionBankId: questionBankId,
+    reviewQuestionBankIds: sessionItems.map((entry) => entry.question_bank_id),
+    attemptsByQuestionBankId: Object.fromEntries(sessionItems.map((entry) => [entry.question_bank_id, entry])),
+  };
+}
+
+function questionAttemptStatusFromReviewJudgment(judgment = 'pending') {
+  if (judgment === 'correct') return 'correct';
+  if (['ambiguous', 'wrong', 'unknown'].includes(judgment)) return 'wrong';
+  return 'unseen';
+}
+
+function syncPracticeSessionReviewAttempt(item) {
+  const snapshot = questionBankReviewAttemptSnapshot(item);
+  if (!snapshot || !bankState.practiceSessionState || typeof bankState.practiceSessionState !== 'object') return;
+  const attempts = bankState.practiceSessionState.attemptsByQuestionBankId && typeof bankState.practiceSessionState.attemptsByQuestionBankId === 'object'
+    ? bankState.practiceSessionState.attemptsByQuestionBankId
+    : {};
+  bankState.practiceSessionState = {
+    ...bankState.practiceSessionState,
     attemptsByQuestionBankId: {
-      [questionBankId]: {
-        question_bank_id: questionBankId,
-        question_id: String(item?.question_id || '').trim(),
-        user_answer: String(item?.user_answer || ''),
-        selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
-        judgment: String(item?.result_key || item?.judgment || 'pending').trim().toLowerCase() || 'pending',
-        wrong_note: String(item?.wrong_note || ''),
-        session_id: String(item?.session_id || '').trim(),
-        session_title: String(item?.session_title || '').trim(),
-        session_mode: String(item?.session_mode || '').trim(),
-        section: String(item?.section || '').trim(),
-        points: Number.isInteger(item?.points) ? item.points : null,
-        expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
-        answer_guide: String(item?.answer_guide || '').trim(),
-        question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
-        question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
-        session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
-        time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
-        question_started_at: String(item?.question_started_at || '').trim(),
-        answered_at: String(item?.answered_at || '').trim(),
-        updated_at: String(item?.updated_at || '').trim(),
-        answer_revealed: true,
-      },
+      ...attempts,
+      [snapshot.question_bank_id]: snapshot,
     },
   };
+}
+
+function updateQuestionBankReviewItem(questionBankId, updates = {}) {
+  const targetId = String(questionBankId || '').trim();
+  if (!targetId) return null;
+  const index = bankState.reviewItems.findIndex((entry) => String(entry?.question_bank_id || '') === targetId);
+  if (index < 0) return null;
+  const resultKey = questionBankReviewResultKey({result_key: updates.result_key || updates.judgment || bankState.reviewItems[index]?.result_key || bankState.reviewItems[index]?.judgment || 'pending'});
+  const nextItem = {
+    ...bankState.reviewItems[index],
+    ...updates,
+    result_key: resultKey,
+    judgment: resultKey,
+    result_label: QUESTION_ATTEMPT_RESULT_LABELS[resultKey] || String(updates.result_label || bankState.reviewItems[index]?.result_label || ''),
+  };
+  bankState.reviewItems[index] = nextItem;
+  bankState.reviewSummary = questionBankReviewSummaryFromItems();
+  syncPracticeSessionReviewAttempt(nextItem);
+  return nextItem;
+}
+
+function questionBankReviewAttemptPayload(item, judgment = questionBankReviewResultKey(item)) {
+  const questionBankId = String(item?.question_bank_id || '').trim();
+  if (!questionBankId) return null;
+  return {
+    question_id: String(item?.question_id || '').trim(),
+    question_bank_id: questionBankId,
+    card_id: String(item?.card_id || '').trim(),
+    question_type: String(item?.question_type || 'subjective'),
+    prompt: String(item?.prompt || ''),
+    body: String(item?.body || ''),
+    user_answer: String(item?.user_answer || ''),
+    selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
+    is_correct: judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(judgment) ? false : null,
+    judgment,
+    wrong_note: judgment === 'correct' ? '' : String(item?.wrong_note || ''),
+    session_id: String(item?.session_id || '').trim(),
+    session_title: String(item?.session_title || '').trim(),
+    session_mode: String(item?.session_mode || 'practice').trim(),
+    section: String(item?.section || '').trim(),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || '').trim(),
+    question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
+    question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
+    session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
+    time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
+    question_started_at: String(item?.question_started_at || '').trim(),
+    answered_at: String(item?.answered_at || new Date().toISOString()),
+  };
+}
+
+async function saveQuestionBankReviewJudgment(questionBankId, judgment) {
+  const normalizedId = String(questionBankId || '').trim();
+  const normalizedJudgment = String(judgment || '').trim().toLowerCase();
+  if (!normalizedId || !Object.prototype.hasOwnProperty.call(QUESTION_ATTEMPT_RESULT_LABELS, normalizedJudgment)) return;
+  if (bankState.reviewSavingId || bankState.reviewLoading) return;
+  const currentItem = (Array.isArray(bankState.reviewItems) ? bankState.reviewItems : []).find((item) => String(item?.question_bank_id || '') === normalizedId);
+  if (!currentItem) return;
+  const payload = questionBankReviewAttemptPayload(currentItem, normalizedJudgment);
+  if (!payload) return;
+  bankState.reviewSavingId = normalizedId;
+  bankState.reviewError = '';
+  renderQuestionBankReview();
+  try {
+    const res = await fetch('/api/questions/attempt', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    updateQuestionBankReviewItem(normalizedId, data.attempt || payload);
+    renderQuestionBankReview();
+  } catch (error) {
+    bankState.reviewError = error.message || String(error);
+  } finally {
+    bankState.reviewSavingId = '';
+    renderQuestionBankReview();
+  }
 }
 
 function practiceLaunchPayload(startIndex, sessionState = bankState.practiceSessionState) {
@@ -709,19 +847,27 @@ function applyEmbeddedQuestionBankUpdate(item, summary = null, finishedAt = '') 
   }
   const nextItem = {...bankState.items[index], ...item};
   bankState.items[index] = nextItem;
-  bankState.reviewLoaded = false;
-  bankState.reviewDirty = true;
+  if (bankState.reviewLoaded) {
+    const updatedReviewItem = updateQuestionBankReviewItem(questionBankId, {
+      result_key: String(item?.question_attempt_judgment || item?.result_key || '').trim().toLowerCase(),
+      judgment: String(item?.question_attempt_judgment || item?.judgment || '').trim().toLowerCase(),
+      updated_at: String(item?.question_attempt_updated_at || item?.updated_at || '').trim(),
+    });
+    if (!updatedReviewItem) {
+      bankState.reviewLoaded = false;
+      bankState.reviewDirty = true;
+    }
+  } else {
+    bankState.reviewLoaded = false;
+    bankState.reviewDirty = true;
+  }
   if (!questionBankItemMatchesAttemptStatusFilter(nextItem)) {
     loadQuestionBankPage().catch(() => {});
     return;
   }
   renderTable();
   renderPracticePane();
-  if (!bankState.reviewCollapsed) {
-    loadQuestionBankReview().catch(() => {});
-    return;
-  }
-  renderQuestionBankReview();
+  if (!bankState.reviewCollapsed) renderQuestionBankReview();
 }
 
 
@@ -1107,8 +1253,14 @@ function bindQuestionBankReviewActions() {
       renderQuestionBankReview();
     });
   });
-  $('bankPageReviewList')?.querySelectorAll('[data-question-bank-review-id]').forEach((button) => {
+  $('bankPageReviewList')?.querySelectorAll('.question-bank-review-jump[data-question-bank-review-id]').forEach((button) => {
     button.addEventListener('click', () => launchQuestionBankReview(button.dataset.questionBankReviewId || ''));
+  });
+  $('bankPageReviewList')?.querySelectorAll('[data-question-bank-review-id][data-question-bank-review-judgment]').forEach((button) => {
+    button.addEventListener('click', () => saveQuestionBankReviewJudgment(
+      button.dataset.questionBankReviewId || '',
+      button.dataset.questionBankReviewJudgment || 'pending',
+    ).catch(() => {}));
   });
 }
 
@@ -1153,7 +1305,13 @@ function renderQuestionBankReview() {
   }
   if (filters) {
     filters.innerHTML = Object.entries(QUESTION_BANK_REVIEW_FILTER_LABELS).map(([key, label]) => {
-      const count = key === 'wrong' ? counts.wrongish : key === 'note' ? counts.notes : counts.attempted;
+      const count = key === 'wrong'
+        ? counts.wrongish
+        : key === 'note'
+          ? counts.notes
+          : key === 'pending'
+            ? counts.pending
+            : counts.attempted;
       const active = bankState.reviewFilter === key;
       return `<button type="button" class="cs-table-button question-bank-review-filter${active ? ' is-active' : ''}" data-review-filter="${escapeHtml(key)}" aria-pressed="${active ? 'true' : 'false'}">${escapeHtml(label)} ${escapeHtml(String(count))}</button>`;
     }).join('');
@@ -1186,6 +1344,7 @@ function renderQuestionBankReview() {
   list.innerHTML = visibleItems.map((item) => {
     const questionBankId = String(item?.question_bank_id || '');
     const active = bankState.selectedId && bankState.selectedId === questionBankId;
+    const saving = bankState.reviewSavingId === questionBankId;
     const updatedAt = formatQuestionBankAttemptUpdatedAt(item?.updated_at || '');
     const meta = [
       String(item?.term || '').trim(),
@@ -1194,11 +1353,11 @@ function renderQuestionBankReview() {
       String(item?.session_title || '').trim(),
       updatedAt ? `저장 ${updatedAt}` : '',
     ].filter(Boolean).join(' · ');
-    const resultKey = String(item?.result_key || item?.judgment || 'pending');
+    const resultKey = questionBankReviewResultKey(item);
     const resultLabel = QUESTION_ATTEMPT_RESULT_LABELS[resultKey] || String(item?.result_label || '기록');
     const answerText = markdownPreviewText(item?.answer || '').slice(0, 280);
     return `
-      <article class="question-bank-review-item${active ? ' is-active' : ''}">
+      <article class="question-bank-review-item${active ? ' is-active' : ''}${saving ? ' is-saving' : ''}">
         <div class="question-bank-review-item-head">
           <div>
             <h3 class="question-bank-review-item-title">${escapeHtml(markdownPreviewText(item?.prompt || '문제'))}</h3>
@@ -1210,7 +1369,15 @@ function renderQuestionBankReview() {
         ${String(item?.wrong_note || '').trim() ? reviewFieldHtml('오답노트', String(item?.wrong_note || '').trim()) : ''}
         ${answerText ? reviewFieldHtml('정답/해설', answerText) : ''}
         <div class="question-bank-review-item-actions">
-          <button type="button" class="cs-table-button question-bank-review-jump" data-question-bank-review-id="${escapeHtml(questionBankId)}">문제로 이동</button>
+          <button type="button" class="cs-table-button question-bank-review-jump" data-question-bank-review-id="${escapeHtml(questionBankId)}" ${saving ? 'disabled' : ''}>풀이 보기</button>
+          <div class="question-bank-review-judgments" aria-label="풀이 기록 채점 버튼">
+            ${[
+              ['correct', '맞음'],
+              ['ambiguous', '애매함'],
+              ['wrong', '틀림'],
+              ['unknown', '모름'],
+            ].map(([key, label]) => `<button type="button" class="cs-table-button question-bank-review-judgment${resultKey === key ? ' is-active' : ''}" data-question-bank-review-id="${escapeHtml(questionBankId)}" data-question-bank-review-judgment="${escapeHtml(key)}" aria-pressed="${resultKey === key ? 'true' : 'false'}" ${saving ? 'disabled' : ''}>${escapeHtml(label)}</button>`).join('')}
+          </div>
         </div>
       </article>`;
   }).join('');
@@ -1449,9 +1616,16 @@ function resetPracticeSession({message = '', collapse = true} = {}) {
 }
 
 async function launch(startIndex = 0, {reveal = true} = {}) {
+  const syncLaunchUi = typeof renderLaunchState === 'function'
+    ? renderLaunchState
+    : () => {
+      renderTable();
+      ensureSelectedRowVisible();
+      renderPracticePane();
+    };
   if (!bankState.items.length) {
     bankState.error = '문제은행 목록이 비어 있습니다.';
-    renderLaunchState();
+    syncLaunchUi();
     return false;
   }
   const options = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : {};
@@ -1466,7 +1640,7 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
   }
   if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {
     bankState.error = '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.';
-    renderLaunchState();
+    syncLaunchUi();
     return false;
   }
   pendingPracticeLaunch = bankState.loading
@@ -1482,7 +1656,7 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
   persistFilterState();
   restartPracticeFrame(safeStart, nextSessionState);
   bankState.error = '';
-  renderLaunchState();
+  syncLaunchUi();
   return true;
 }
 async function loadQuestionBankPage() {
@@ -1495,10 +1669,22 @@ async function loadQuestionBankPage() {
   questionBankLoadAbortController = controller;
   const selectedIdBeforeRequest = String(bankState.selectedId || '');
   const practiceActiveIdBeforeRequest = String(bankState.practiceActiveId || '');
-  const restoredSelectionSelectedId = String(restoredSelectionState?.selectedId || '');
-  const restoredPracticeSelectedId = String(restoredPracticeState?.selectedId || '');
-  const shouldPreferPracticeSelection = Boolean(restoredPracticeState?.loaded);
-  const shouldRestoreSelectionByIndex = !selectedIdBeforeRequest && !bankState.practiceLoaded && !shouldPreferPracticeSelection && Number.isInteger(restoredSelectionState?.startIndex);
+  let currentRestoredSelectionState = null;
+  let currentRestoredPracticeState = null;
+  let restorePracticePane = false;
+  try {
+    currentRestoredSelectionState = restoredSelectionState ?? null;
+  } catch (_error) {}
+  try {
+    currentRestoredPracticeState = restoredPracticeState ?? null;
+  } catch (_error) {}
+  try {
+    restorePracticePane = Boolean(shouldRestorePracticePane);
+  } catch (_error) {}
+  const restoredSelectionSelectedId = String(currentRestoredSelectionState?.selectedId || '');
+  const restoredPracticeSelectedId = String(currentRestoredPracticeState?.selectedId || '');
+  const shouldPreferPracticeSelection = Boolean(currentRestoredPracticeState?.loaded);
+  const shouldRestoreSelectionByIndex = !selectedIdBeforeRequest && !bankState.practiceLoaded && !shouldPreferPracticeSelection && Number.isInteger(currentRestoredSelectionState?.startIndex);
   bankState.loading = true;
   bankState.error = '';
   bankState.reviewItems = [];
@@ -1532,16 +1718,16 @@ async function loadQuestionBankPage() {
     const resolvedSelectionIndex = nextIndex >= 0
       ? nextIndex
       : shouldRestoreSelectionByIndex
-        ? Math.max(0, Math.min(bankState.items.length - 1, restoredSelectionState.startIndex))
+        ? Math.max(0, Math.min(bankState.items.length - 1, currentRestoredSelectionState.startIndex))
         : 0;
     bankState.selectedId = String(bankState.items[resolvedSelectionIndex]?.question_bank_id || '');
     bankState.practiceStartIndex = resolvedSelectionIndex;
     const preservingHiddenPractice = bankState.practiceLoaded && bankState.practiceCollapsed && !pendingPracticeLaunch;
     if (!bankState.items.length) {
       pendingPracticeLaunch = null;
-      shouldRestorePracticePane = false;
-      restoredSelectionState = null;
-      restoredPracticeState = null;
+      if (typeof shouldRestorePracticePane !== 'undefined') shouldRestorePracticePane = false;
+      if (typeof restoredSelectionState !== 'undefined') restoredSelectionState = null;
+      if (typeof restoredPracticeState !== 'undefined') restoredPracticeState = null;
       bankState.selectedId = '';
       bankState.practiceStartIndex = 0;
       if (preservingHiddenPractice) {
@@ -1555,16 +1741,16 @@ async function loadQuestionBankPage() {
     } else if (pendingPracticeLaunch) {
       const launchRequest = pendingPracticeLaunch;
       pendingPracticeLaunch = null;
-      shouldRestorePracticePane = false;
-      restoredPracticeState = null;
+      if (typeof shouldRestorePracticePane !== 'undefined') shouldRestorePracticePane = false;
+      if (typeof restoredPracticeState !== 'undefined') restoredPracticeState = null;
       persistFilterState();
       applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal, sessionState: launchRequest.sessionState});
-    } else if (shouldRestorePracticePane && !bankState.practiceLoaded) {
+    } else if (restorePracticePane && !bankState.practiceLoaded) {
       const restoreIndex = nextIndex >= 0
         ? nextIndex
-        : Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(restoredPracticeState?.startIndex) ? restoredPracticeState.startIndex : bankState.practiceStartIndex));
-      shouldRestorePracticePane = false;
-      restoredPracticeState = null;
+        : Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(currentRestoredPracticeState?.startIndex) ? currentRestoredPracticeState.startIndex : bankState.practiceStartIndex));
+      if (typeof shouldRestorePracticePane !== 'undefined') shouldRestorePracticePane = false;
+      if (typeof restoredPracticeState !== 'undefined') restoredPracticeState = null;
       persistFilterState();
       applyPracticeLaunch(restoreIndex, {reveal: true});
     } else if (bankState.practiceLoaded && nextIndex < 0) {

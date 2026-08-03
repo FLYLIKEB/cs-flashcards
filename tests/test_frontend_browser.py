@@ -911,6 +911,358 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='main-filter-toggle-pressed-state', status=status, observations=case)
             await page.close()
 
+    async def test_question_history_pending_filter_and_inline_judgment_update(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        history_items = [
+            {
+                'question_id': 'history-pending-1',
+                'question_bank_id': 'history-qb-1',
+                'card_id': 'CS-001',
+                'term': '미채점 기록',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '미채점 기록 prompt',
+                'body': '미채점 기록 body',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '임시 답안',
+                'wrong_note': '',
+                'session_title': '문제 기록 세트',
+                'session_mode': 'practice',
+                'question_order': 1,
+                'updated_at': '2026-08-01T00:00:00Z',
+            },
+            {
+                'question_id': 'history-wrong-1',
+                'question_bank_id': 'history-qb-2',
+                'card_id': 'CS-002',
+                'term': '오답 기록',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '오답 기록 prompt',
+                'body': '오답 기록 body',
+                'result_key': 'wrong',
+                'result_label': '틀림',
+                'user_answer': '오답',
+                'wrong_note': '개념 확인',
+                'session_title': '문제 기록 세트',
+                'session_mode': 'practice',
+                'question_order': 2,
+                'updated_at': '2026-08-01T00:05:00Z',
+            },
+        ]
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ historyItems }) => {
+                  const originalFetch = window.fetch.bind(window);
+                  const items = historyItems.map((item) => ({...item}));
+                  const summarize = () => ({
+                    selected_card_count: 2,
+                    total: items.length,
+                    correct: items.filter((item) => item.result_key === 'correct').length,
+                    ambiguous: items.filter((item) => item.result_key === 'ambiguous').length,
+                    wrong: items.filter((item) => item.result_key === 'wrong').length,
+                    unknown: items.filter((item) => item.result_key === 'unknown').length,
+                    pending: items.filter((item) => item.result_key === 'pending').length,
+                    returned: items.length,
+                  });
+                  window.__historyAttemptCalls = [];
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/questions/attempts' && method === 'GET') {
+                      const result = (parsed.searchParams.get('result') || 'all').toLowerCase();
+                      const filtered = result === 'all' ? items : items.filter((item) => item.result_key === result);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        items: filtered,
+                        summary: {...summarize(), filter: result, returned: filtered.length},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/questions/attempt' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      window.__historyAttemptCalls.push(payload);
+                      const index = items.findIndex((item) => item.question_id === payload.question_id);
+                      if (index >= 0) {
+                        items[index] = {
+                          ...items[index],
+                          ...payload,
+                          result_key: payload.judgment,
+                          result_label: payload.judgment === 'correct' ? '맞음' : payload.judgment === 'ambiguous' ? '애매함' : payload.judgment === 'wrong' ? '틀림' : payload.judgment,
+                          wrong_note: payload.judgment === 'correct' ? '' : (items[index].wrong_note || ''),
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                        };
+                      }
+                      return Promise.resolve(new Response(JSON.stringify({
+                        attempt: {
+                          ...payload,
+                          result_key: payload.judgment,
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                        },
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                {'historyItems': history_items},
+            )
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate("document.querySelector('#questionHistoryBtn').click()")
+            await page.waitForFunction("document.querySelector('#questionHistoryDialog').hidden === false")
+
+            await page.click('[data-question-history-filter="pending"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('[data-question-history-filter="pending"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#questionHistoryBody .question-history-item').length === 1
+                  && document.querySelector('#questionHistoryBody')?.textContent.includes('미채점 기록 prompt')
+                """
+            )
+            await page.click('[data-question-history-judgment="correct"]')
+            await page.waitForFunction("document.querySelector('#questionHistoryBody')?.textContent.includes('선택한 조건에 해당하는 문제 기록이 없습니다.')")
+            await page.click('[data-question-history-filter="all"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('[data-question-history-filter="all"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelector('#questionHistoryBody .question-history-result')?.textContent.includes('맞음')
+                """
+            )
+            case['after_inline_judgment'] = await page.evaluate(
+                """
+                () => ({
+                  chip: document.querySelector('#questionHistoryBody .question-history-result')?.textContent.trim() || '',
+                  pendingPressed: document.querySelector('[data-question-history-filter="pending"]')?.getAttribute('aria-pressed') || '',
+                  allPressed: document.querySelector('[data-question-history-filter="all"]')?.getAttribute('aria-pressed') || '',
+                  calls: window.__historyAttemptCalls || [],
+                })
+                """
+            )
+            self.assertEqual(case['after_inline_judgment']['chip'], '맞음')
+            self.assertEqual(case['after_inline_judgment']['pendingPressed'], 'false')
+            self.assertEqual(case['after_inline_judgment']['allPressed'], 'true')
+            self.assertEqual(len(case['after_inline_judgment']['calls']), 1)
+            self.assertEqual(case['after_inline_judgment']['calls'][0]['judgment'], 'correct')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-history-pending-inline-judgment', status=status, observations=case)
+            await page.close()
+
+    async def test_question_history_review_launch_keeps_pending_answers_across_next_question(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        history_items = [
+            {
+                'question_id': 'history-review-1',
+                'question_bank_id': 'history-review-qb-1',
+                'card_id': 'CS-001',
+                'term': '히스토리 리뷰 첫 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 첫 문제 prompt',
+                'body': '히스토리 리뷰 첫 문제 body',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '첫 답안',
+                'wrong_note': '',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 1,
+                'updated_at': '2026-08-01T00:00:00Z',
+            },
+            {
+                'question_id': 'history-review-2',
+                'question_bank_id': 'history-review-qb-2',
+                'card_id': 'CS-002',
+                'term': '히스토리 리뷰 두 번째 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 두 번째 문제 prompt',
+                'body': '히스토리 리뷰 두 번째 문제 body',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '둘째 답안',
+                'wrong_note': '',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 2,
+                'updated_at': '2026-08-01T00:03:00Z',
+            },
+        ]
+        review_items = [
+            {
+                'question_id': 'history-review-1',
+                'question_bank_id': 'history-review-qb-1',
+                'card_id': 'CS-001',
+                'term': '히스토리 리뷰 첫 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 첫 문제 prompt',
+                'body': '히스토리 리뷰 첫 문제 body',
+                'answer': '히스토리 첫 정답 해설',
+                'explanation': '히스토리 첫 정답 추가 설명',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '첫 답안',
+                'wrong_note': '',
+                'session_id': 'history-review-session',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 1,
+                'updated_at': '2026-08-01T00:00:00Z',
+            },
+            {
+                'question_id': 'history-review-2',
+                'question_bank_id': 'history-review-qb-2',
+                'card_id': 'CS-002',
+                'term': '히스토리 리뷰 두 번째 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 두 번째 문제 prompt',
+                'body': '히스토리 리뷰 두 번째 문제 body',
+                'answer': '히스토리 둘째 정답 해설',
+                'explanation': '히스토리 둘째 정답 추가 설명',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '둘째 답안',
+                'wrong_note': '',
+                'session_id': 'history-review-session',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 2,
+                'updated_at': '2026-08-01T00:03:00Z',
+            },
+        ]
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ historyItems, reviewItems }) => {
+                  const originalFetch = window.fetch.bind(window);
+                  const attempts = historyItems.map((item) => ({...item}));
+                  const reviews = reviewItems.map((item) => ({...item}));
+                  const summarize = () => ({
+                    selected_card_count: 2,
+                    total: attempts.length,
+                    correct: attempts.filter((item) => item.result_key === 'correct').length,
+                    ambiguous: attempts.filter((item) => item.result_key === 'ambiguous').length,
+                    wrong: attempts.filter((item) => item.result_key === 'wrong').length,
+                    unknown: attempts.filter((item) => item.result_key === 'unknown').length,
+                    pending: attempts.filter((item) => item.result_key === 'pending').length,
+                    returned: attempts.length,
+                  });
+                  window.__historyReviewAttemptCalls = [];
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/questions/attempts' && method === 'GET') {
+                      const result = (parsed.searchParams.get('result') || 'all').toLowerCase();
+                      const filtered = result === 'all' ? attempts : attempts.filter((item) => item.result_key === result);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        items: filtered,
+                        summary: {...summarize(), filter: result, returned: filtered.length},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/question-bank/attempts/query' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      const ordered = Array.isArray(payload.question_bank_ids) ? payload.question_bank_ids : [];
+                      const filtered = ordered.map((questionBankId) => reviews.find((item) => item.question_bank_id === questionBankId)).filter(Boolean);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        items: filtered,
+                        summary: {total: filtered.length, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: filtered.length, note_count: 0, selected_question_bank_count: filtered.length},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/questions/attempt' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      window.__historyReviewAttemptCalls.push(payload);
+                      const updateResult = (items) => items.map((item) => item.question_id === payload.question_id
+                        ? {
+                            ...item,
+                            result_key: payload.judgment,
+                            result_label: payload.judgment === 'correct' ? '맞음' : payload.judgment === 'ambiguous' ? '애매함' : payload.judgment === 'wrong' ? '틀림' : payload.judgment,
+                            updated_at: '2026-08-01T00:10:00Z',
+                            answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                            wrong_note: payload.judgment === 'correct' ? '' : (item.wrong_note || ''),
+                          }
+                        : item);
+                      const nextAttempts = updateResult(attempts);
+                      attempts.splice(0, attempts.length, ...nextAttempts);
+                      const nextReviews = updateResult(reviews);
+                      reviews.splice(0, reviews.length, ...nextReviews);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        attempt: {
+                          ...payload,
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                        },
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                {'historyItems': history_items, 'reviewItems': review_items},
+            )
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate("document.querySelector('#questionHistoryBtn').click()")
+            await page.waitForFunction("document.querySelector('#questionHistoryDialog').hidden === false")
+            await page.click('[data-question-history-filter="pending"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('[data-question-history-filter="pending"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#questionHistoryBody .question-history-item').length === 2
+                  && document.querySelector('#questionHistoryBody')?.textContent.includes('히스토리 리뷰 첫 문제 prompt')
+                """
+            )
+            await page.click('[data-question-history-review-id="history-review-1"]')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('히스토리 리뷰 첫 문제 prompt')")
+            await page.waitForFunction("document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('히스토리 첫 정답 해설')")
+            case['first_question'] = {
+                'answer': await page.Jeval('#questionAnswerInput', '(node) => node.value'),
+                'solution': await page.Jeval('.question-answer', '(node) => (node.textContent || "").trim()'),
+            }
+            await page.click('[data-question-judgment="correct"]')
+            await page.waitForFunction("document.querySelector('[data-question-judgment=\"correct\"]')?.getAttribute('aria-pressed') === 'true'")
+            await page.click('#nextQuestionBtn')
+            await page.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('히스토리 리뷰 두 번째 문제 prompt')")
+            await page.waitForFunction("document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('히스토리 둘째 정답 해설')")
+            case['second_question'] = {
+                'answer': await page.Jeval('#questionAnswerInput', '(node) => node.value'),
+                'solution': await page.Jeval('.question-answer', '(node) => (node.textContent || "").trim()'),
+                'calls': await page.evaluate('window.__historyReviewAttemptCalls || []'),
+            }
+            self.assertEqual(case['first_question']['answer'], '첫 답안')
+            self.assertIn('히스토리 첫 정답 해설', case['first_question']['solution'])
+            self.assertEqual(case['second_question']['answer'], '둘째 답안')
+            self.assertIn('히스토리 둘째 정답 해설', case['second_question']['solution'])
+            self.assertEqual(len(case['second_question']['calls']), 1)
+            self.assertEqual(case['second_question']['calls'][0]['judgment'], 'correct')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-history-review-launch-sequence', status=status, observations=case)
+            await page.close()
     async def test_card_state_toggles_expose_pressed_state(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

@@ -584,8 +584,12 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'function openQuestionHistory()',
             'function loadQuestionHistory()',
             'function setQuestionHistoryFilter(filter)',
+            'function saveQuestionHistoryJudgment(questionId, judgment)',
+            'function openQuestionHistoryReview(questionId)',
             'questionHistoryBtn',
             'data-question-history-filter',
+            'data-question-history-review-id',
+            'data-question-history-judgment-id',
             'function markQuestionSourceCard(status)',
             'data-question-mark',
             'data-question-judgment',
@@ -718,6 +722,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-metric-card.score', table_shell_css())
         self.assertIn('.question-bank-summary-pill.attempt-wrong', table_shell_css())
         self.assertIn('function questionBankSliceMatchesPracticeSummary(summary = bankState.practiceSummary)', question_bank_js())
+        self.assertIn('function saveQuestionBankReviewJudgment(questionBankId, judgment)', question_bank_js())
         self.assertIn('if (bankState.practiceSummary && !questionBankSliceMatchesPracticeSummary(bankState.practiceSummary)) {', question_bank_js())
         self.assertIn('.question-bank-row-number.is-wrong::after', table_shell_css())
         self.assertIn('.question-choice.wrong', style_css())

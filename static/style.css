@@ -4352,6 +4352,7 @@ select,
 .question-action-button,
 .question-history-filter-row button,
 .question-history-open-card,
+.question-history-open-review,
 .question-grade-button {
   display: inline-flex;
   align-items: center;
@@ -4373,6 +4374,7 @@ select,
 .question-action-button:hover,
 .question-history-filter-row button:hover,
 .question-history-open-card:hover,
+.question-history-open-review:hover,
 .question-grade-button:hover,
 .question-choice:hover {
   border-color: var(--line-strong);
@@ -4539,11 +4541,28 @@ select,
   color: #5b3f7f;
 }
 
-.question-history-item-actions {
+.question-history-judgments {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: .42rem;
   margin-top: .62rem;
 }
+
+.question-history-item-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .42rem;
+  margin-top: .62rem;
+}
+
+.question-history-item-actions-start {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .42rem;
+}
+
 .question-type-row {
   display: flex;
   flex-wrap: wrap;
@@ -5381,6 +5400,7 @@ select,
 .question-action-button,
 .question-history-filter-row button,
 .question-history-open-card,
+.question-history-open-review,
 .question-grade-button {
   min-height: 2.7rem;
   padding: .58rem .9rem;
@@ -5419,6 +5439,7 @@ select,
 .question-action-button:hover,
 .question-history-filter-row button:hover,
 .question-history-open-card:hover,
+.question-history-open-review:hover,
 .question-grade-button:hover,
 .question-choice:hover,
 .question-bank-item:hover {
