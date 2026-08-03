@@ -6443,17 +6443,14 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
     : '';
 
   const answerMetaFields = [
-    {label: '문제유형', value: question.topic || ''},
     {label: '키워드', html: answerKeywordHtml},
-    {label: '기관', value: question.issuer || ''},
-    {label: '출처', value: question.sourceLocation || ''},
     {label: '분야', value: question.fieldName || ''},
     {label: '섹션', value: question.section || ''},
     {label: '난이도', value: question.difficulty || ''},
   ].filter((item) => item.value || item.html);
   const answerMetaHtml = question.answerRevealed && (answerMetaFields.length || reviewCard) ? `
     <div class="question-answer-meta">
-      <strong>문항 정보</strong>
+      <strong class="question-answer-meta-title">문항 정보</strong>
       <div class="question-answer-meta-grid">
         ${answerMetaFields.map((item) => `<div class="question-answer-meta-item"><span class="question-answer-meta-label">${escapeHtml(item.label)}</span><div class="question-answer-meta-value${item.label === '키워드' ? ' question-keyword-list' : ''}">${item.html || escapeHtml(item.value)}</div></div>`).join('')}
         ${reviewCard ? `<div class="question-answer-meta-item"><span class="question-answer-meta-label">원본 카드</span><button class="question-answer-meta-card-button" type="button" data-question-open-card="1">${escapeHtml(reviewCard.term || reviewCard.id || '원본 카드로 이동')}</button></div>` : ''}
