@@ -84,6 +84,9 @@ const state = {
   questionHistoryItems: [],
   questionHistorySummary: null,
   questionHistoryError: '',
+  questionHistorySavingId: '',
+  questionHistoryReviewLoading: false,
+  questionHistoryReviewLaunchId: '',
   questionBankOpen: false,
   questionBankLoading: false,
   questionBankItems: [],
@@ -4585,21 +4588,247 @@ function questionHistoryRequestUrl({filter = state.questionHistoryFilter, cardId
   return `/api/questions/attempts?${params.toString()}`;
 }
 
+function questionHistorySummaryFallback() {
+  return {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0};
+}
+
+function questionHistoryItemId(item) {
+  return String(item?.question_id || item?.question_bank_id || item?.card_id || '').trim();
+}
+
+function questionHistoryResultKey(item) {
+  const value = String(item?.result_key || item?.judgment || 'pending').trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, value) ? value : 'pending';
+}
+
+function questionHistoryItemMatchesFilter(item, filter = state.questionHistoryFilter) {
+  const resultKey = questionHistoryResultKey(item);
+  if (filter === 'all') return true;
+  return resultKey === filter;
+}
+
+
+function questionHistoryShiftSummary(summary, previousJudgment, nextJudgment) {
+  const nextSummary = {
+    ...(summary && typeof summary === 'object' ? summary : questionHistorySummaryFallback()),
+    total: Number(summary?.total || 0),
+    correct: Number(summary?.correct || 0),
+    ambiguous: Number(summary?.ambiguous || 0),
+    wrong: Number(summary?.wrong || 0),
+    unknown: Number(summary?.unknown || 0),
+    pending: Number(summary?.pending || 0),
+  };
+  if (Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, previousJudgment) && previousJudgment !== nextJudgment) {
+    nextSummary[previousJudgment] = Math.max(0, Number(nextSummary[previousJudgment] || 0) - 1);
+  }
+  if (Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, nextJudgment) && previousJudgment !== nextJudgment) {
+    nextSummary[nextJudgment] = Number(nextSummary[nextJudgment] || 0) + 1;
+  }
+  return nextSummary;
+}
+
+function questionHistoryAttemptPayload(item, judgment = questionHistoryResultKey(item)) {
+  const questionId = questionHistoryItemId(item);
+  if (!questionId) return null;
+  return {
+    question_id: questionId,
+    question_bank_id: String(item?.question_bank_id || '').trim(),
+    card_id: String(item?.card_id || ''),
+    question_type: String(item?.question_type || 'subjective'),
+    prompt: String(item?.prompt || ''),
+    body: String(item?.body || ''),
+    user_answer: String(item?.user_answer || ''),
+    selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
+    is_correct: judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(judgment) ? false : null,
+    judgment,
+    wrong_note: judgment === 'correct' ? '' : String(item?.wrong_note || ''),
+    session_id: String(item?.session_id || ''),
+    session_title: String(item?.session_title || ''),
+    session_mode: String(item?.session_mode || 'practice'),
+    section: String(item?.section || ''),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || ''),
+    question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
+    question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
+    session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
+    time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
+    question_started_at: String(item?.question_started_at || ''),
+    answered_at: String(item?.answered_at || new Date().toISOString()),
+  };
+}
+
+function mergeSavedQuestionHistoryItem(currentItem, attempt) {
+  if (!currentItem) return currentItem;
+  const resultKey = questionHistoryResultKey(attempt);
+  return {
+    ...currentItem,
+    ...attempt,
+    result_key: resultKey,
+    result_label: QUESTION_HISTORY_FILTER_LABELS[resultKey] || currentItem?.result_label || '기록',
+    wrong_note: resultKey === 'correct' ? '' : String(attempt?.wrong_note || currentItem?.wrong_note || ''),
+    updated_at: String(attempt?.updated_at || currentItem?.updated_at || ''),
+    answered_at: String(attempt?.answered_at || currentItem?.answered_at || ''),
+  };
+}
+
+function questionHistoryAttemptSnapshot(item, judgment = questionHistoryResultKey(item)) {
+  const questionBankId = String(item?.question_bank_id || '').trim();
+  if (!questionBankId) return null;
+  return {
+    question_bank_id: questionBankId,
+    question_id: questionHistoryItemId(item),
+    user_answer: String(item?.user_answer || ''),
+    selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
+    judgment,
+    wrong_note: judgment === 'correct' ? '' : String(item?.wrong_note || ''),
+    session_id: String(item?.session_id || '').trim(),
+    session_title: String(item?.session_title || '').trim(),
+    session_mode: String(item?.session_mode || '').trim(),
+    section: String(item?.section || '').trim(),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || '').trim(),
+    question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
+    question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
+    session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
+    time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
+    question_started_at: String(item?.question_started_at || '').trim(),
+    answered_at: String(item?.answered_at || '').trim(),
+    updated_at: String(item?.updated_at || '').trim(),
+    answer_revealed: true,
+  };
+}
+
+function questionHistoryReviewItemToQuestionBankItem(item) {
+  return {
+    question_bank_id: String(item?.question_bank_id || ''),
+    card_id: String(item?.card_id || ''),
+    question_type: String(item?.question_type || 'subjective'),
+    prompt: String(item?.prompt || ''),
+    body: String(item?.body || ''),
+    answer: String(item?.answer || ''),
+    explanation: String(item?.explanation || ''),
+    rubric: Array.isArray(item?.rubric) ? item.rubric : [],
+    choices: Array.isArray(item?.choices) ? item.choices : [],
+    answer_index: Number.isInteger(item?.answer_index) ? item.answer_index : null,
+    topic: String(item?.topic || ''),
+    field_name: String(item?.field_name || ''),
+    category: String(item?.category || ''),
+    keywords: Array.isArray(item?.keywords) ? item.keywords : [],
+    difficulty: String(item?.difficulty || ''),
+    issuer: String(item?.issuer || ''),
+    source_location: String(item?.source_location || ''),
+    section: String(item?.section || ''),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || ''),
+    session_mode: String(item?.session_mode || 'practice'),
+  };
+}
+
+async function saveQuestionHistoryJudgment(questionId, judgment) {
+  const normalizedId = String(questionId || '').trim();
+  const normalizedJudgment = String(judgment || '').trim().toLowerCase();
+  if (!normalizedId || !Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, normalizedJudgment)) return;
+  const historyIndex = (Array.isArray(state.questionHistoryItems) ? state.questionHistoryItems : []).findIndex((item) => questionHistoryItemId(item) === normalizedId);
+  if (historyIndex < 0 || state.questionHistorySavingId || state.questionHistoryReviewLoading) return;
+  const currentItem = state.questionHistoryItems[historyIndex];
+  const previousJudgment = questionHistoryResultKey(currentItem);
+  const payload = questionHistoryAttemptPayload(currentItem, normalizedJudgment);
+  if (!payload) return;
+  state.questionHistorySavingId = normalizedId;
+  state.questionHistoryError = '';
+  renderQuestionHistoryDialog();
+  try {
+    const res = await fetch('/api/questions/attempt', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const nextItem = mergeSavedQuestionHistoryItem(currentItem, data.attempt || payload);
+    state.questionHistoryItems.splice(historyIndex, 1, nextItem);
+    if (!questionHistoryItemMatchesFilter(nextItem, state.questionHistoryFilter)) {
+      state.questionHistoryItems = state.questionHistoryItems.filter((item) => questionHistoryItemId(item) !== normalizedId);
+    }
+    state.questionHistorySummary = questionHistoryShiftSummary(state.questionHistorySummary, previousJudgment, questionHistoryResultKey(nextItem));
+    renderQuestionHistoryDialog();
+  } catch (error) {
+    state.questionHistoryError = error.message || String(error);
+  } finally {
+    state.questionHistorySavingId = '';
+    renderQuestionHistoryDialog();
+  }
+}
+
+async function openQuestionHistoryReview(questionId) {
+  const normalizedId = String(questionId || '').trim();
+  if (!normalizedId || state.questionHistorySavingId || state.questionHistoryReviewLoading) return;
+  const visibleItems = (Array.isArray(state.questionHistoryItems) ? state.questionHistoryItems : []).filter((item) => String(item?.question_bank_id || '').trim());
+  const targetItem = visibleItems.find((item) => questionHistoryItemId(item) === normalizedId);
+  const targetQuestionBankId = String(targetItem?.question_bank_id || '').trim();
+  if (!targetQuestionBankId) {
+    setMessage('문제은행에 연결된 풀이 기록만 바로 열 수 있습니다.', true);
+    return;
+  }
+  state.questionHistoryReviewLoading = true;
+  state.questionHistoryReviewLaunchId = normalizedId;
+  state.questionHistoryError = '';
+  renderQuestionHistoryDialog();
+  try {
+    const orderedIds = visibleItems.map((item) => String(item?.question_bank_id || '').trim()).filter(Boolean);
+    const res = await fetch('/api/question-bank/attempts/query', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      cache: 'no-store',
+      body: JSON.stringify({question_bank_ids: orderedIds, limit: Math.max(orderedIds.length, 1), result: 'all'}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const reviewItemsById = new Map((Array.isArray(data.items) ? data.items : []).map((item) => [String(item?.question_bank_id || '').trim(), item]));
+    const reviewItems = orderedIds.map((questionBankId) => reviewItemsById.get(questionBankId)).filter(Boolean);
+    const launchItems = reviewItems.map((item) => questionHistoryReviewItemToQuestionBankItem(item));
+    const attemptsByQuestionBankId = {};
+    reviewItems.forEach((item) => {
+      const snapshot = questionHistoryAttemptSnapshot(item);
+      if (!snapshot?.question_bank_id) return;
+      attemptsByQuestionBankId[snapshot.question_bank_id] = snapshot;
+    });
+    const startIndex = reviewItems.findIndex((item) => String(item?.question_bank_id || '').trim() === targetQuestionBankId);
+    closeQuestionHistory();
+    openQuestionBankSession(startIndex >= 0 ? startIndex : 0, {
+      launchItems,
+      sessionState: {attemptsByQuestionBankId},
+      title: `풀이 기록 리뷰 · ${launchItems.length}문항`,
+      message: `풀이 기록 ${launchItems.length}문항을 불러왔습니다.`,
+    });
+  } catch (error) {
+    state.questionHistoryError = error.message || String(error);
+    renderQuestionHistoryDialog();
+  } finally {
+    state.questionHistoryReviewLoading = false;
+    state.questionHistoryReviewLaunchId = '';
+    if (state.questionHistoryOpen) renderQuestionHistoryDialog();
+  }
+}
+
 function renderQuestionHistoryDialog() {
   const summaryEl = $('questionHistorySummary');
   const body = $('questionHistoryBody');
-document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
-  const active = button.dataset.questionHistoryFilter === state.questionHistoryFilter;
-  button.classList.toggle('active', active);
-  button.setAttribute('aria-pressed', String(active));
-});
+  document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
+    const active = button.dataset.questionHistoryFilter === state.questionHistoryFilter;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
   if (summaryEl) {
     if (state.questionHistoryLoading) {
       summaryEl.textContent = '현재 필터 기준 문제 기록을 불러오는 중입니다.';
     } else if (state.questionHistoryError) {
       summaryEl.textContent = `문제 기록 로딩 실패: ${state.questionHistoryError}`;
     } else {
-      const summary = state.questionHistorySummary || {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0};
+      const summary = state.questionHistorySummary || questionHistorySummaryFallback();
       summaryEl.textContent = `카드 ${summary.selected_card_count || 0} · 전체 ${summary.total || 0} · 맞음 ${summary.correct || 0} · 애매 ${summary.ambiguous || 0} · 틀림 ${summary.wrong || 0} · 모름 ${summary.unknown || 0} · 미채점 ${summary.pending || 0}`;
     }
   }
@@ -4618,15 +4847,21 @@ document.querySelectorAll('[data-question-history-filter]').forEach((button) => 
     return;
   }
   body.innerHTML = items.map((item) => {
+    const itemId = questionHistoryItemId(item);
+    const resultKey = questionHistoryResultKey(item);
     const title = escapeHtml(item.term || item.card_id || '카드');
     const typeLabel = escapeHtml(QUESTION_TYPE_LABELS[item.question_type] || item.question_type || '문제');
     const category = escapeHtml(item.category || '미분류');
-    const resultLabel = escapeHtml(QUESTION_HISTORY_FILTER_LABELS[item.result_key] || item.result_label || '기록');
+    const resultLabel = escapeHtml(QUESTION_HISTORY_FILTER_LABELS[resultKey] || item.result_label || '기록');
     const updatedAt = formatQuestionAttemptUpdatedAt(item.updated_at);
     const prompt = String(item.prompt || '').trim();
     const bodyText = String(item.body || '').trim();
     const answerText = escapeHtml(item.user_answer || '미입력');
     const wrongNote = String(item.wrong_note || '').trim();
+    const canReview = Boolean(String(item?.question_bank_id || '').trim());
+    const saving = itemId && state.questionHistorySavingId === itemId;
+    const launching = itemId && state.questionHistoryReviewLaunchId === itemId && state.questionHistoryReviewLoading;
+    const disabled = saving || launching || state.questionHistoryLoading;
     const sessionMeta = [
       String(item.session_title || '').trim(),
       questionSessionModeLabel(item.session_mode || 'practice'),
@@ -4638,14 +4873,14 @@ document.querySelectorAll('[data-question-history-filter]').forEach((button) => 
       updatedAt ? `저장 ${escapeHtml(updatedAt)}` : '',
     ].filter(Boolean).join(' · ');
     return `
-      <article class="question-history-item">
+      <article class="question-history-item${saving || launching ? ' is-saving' : ''}">
         <div class="question-history-item-head">
           <div class="question-history-item-heading">
             <strong>${title}</strong>
             <p class="question-history-item-meta">${category} · ${typeLabel}</p>
             ${sessionMeta ? `<p class="question-history-session-meta">${sessionMeta}</p>` : ''}
           </div>
-          <span class="question-history-result ${escapeHtml(item.result_key || 'pending')}">${resultLabel}</span>
+          <span class="question-history-result ${escapeHtml(resultKey)}">${resultLabel}</span>
         </div>
         <div class="question-history-copy">
           ${prompt ? `<p class="question-history-item-prompt">${escapeHtml(prompt)}</p>` : ''}
@@ -4655,8 +4890,18 @@ document.querySelectorAll('[data-question-history-filter]').forEach((button) => 
           <p class="question-history-field"><span>내 답</span><strong>${answerText}</strong></p>
           ${wrongNote ? `<p class="question-history-field note"><span>오답</span><strong>${escapeHtml(wrongNote)}</strong></p>` : ''}
         </div>
+        <div class="question-history-judgments" aria-label="문제 기록 채점 버튼">
+          ${[
+            ['correct', '맞음'],
+            ['ambiguous', '애매함'],
+            ['wrong', '틀림'],
+          ].map(([key, label]) => `<button class="question-grade-button${resultKey === key ? ' active' : ''}" type="button" data-question-history-judgment-id="${escapeHtml(itemId)}" data-question-history-judgment="${escapeHtml(key)}" aria-pressed="${resultKey === key ? 'true' : 'false'}" ${disabled || !itemId ? 'disabled' : ''}>${escapeHtml(label)}</button>`).join('')}
+        </div>
         <div class="question-history-item-actions">
-          <button class="question-history-open-card" type="button" data-question-history-card-id="${escapeHtml(item.card_id || '')}">카드</button>
+          <div class="question-history-item-actions-start">
+            ${canReview ? `<button class="question-history-open-review" type="button" data-question-history-review-id="${escapeHtml(itemId)}" ${disabled ? 'disabled' : ''}>${launching ? '불러오는 중…' : '풀이 보기'}</button>` : ''}
+          </div>
+          <button class="question-history-open-card" type="button" data-question-history-card-id="${escapeHtml(item.card_id || '')}" ${disabled ? 'disabled' : ''}>카드</button>
         </div>
       </article>`;
   }).join('');
@@ -4677,7 +4922,7 @@ async function loadQuestionHistory() {
   const cardIds = questionHistoryCardIds();
   if (state.cards.length && !cardIds.length) {
     state.questionHistoryItems = [];
-    state.questionHistorySummary = {selected_card_count: 0, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0, returned: 0, filter};
+    state.questionHistorySummary = {...questionHistorySummaryFallback(), selected_card_count: 0, returned: 0, filter};
     state.questionHistoryLoading = false;
     renderQuestionHistoryDialog();
     return;
@@ -5696,29 +5941,42 @@ function renderQuestionBankBrowser() {
 }
 
 function openQuestionBankSession(startIndex = 0) {
-  if (!state.questionBankItems.length) {
+  const rawOptions = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : null;
+  const hasLaunchOptions = Boolean(rawOptions && (
+    Object.prototype.hasOwnProperty.call(rawOptions, 'sessionState')
+    || Object.prototype.hasOwnProperty.call(rawOptions, 'launchItems')
+    || Object.prototype.hasOwnProperty.call(rawOptions, 'title')
+    || Object.prototype.hasOwnProperty.call(rawOptions, 'message')
+  ));
+  const options = hasLaunchOptions ? rawOptions : {};
+  const sessionState = hasLaunchOptions
+    ? (options.sessionState && typeof options.sessionState === 'object' ? options.sessionState : null)
+    : rawOptions;
+  const launchItems = Array.isArray(options.launchItems)
+    ? options.launchItems.filter((item) => item && typeof item === 'object')
+    : state.questionBankItems;
+  if (!launchItems.length) {
     setMessage('문제은행 목록이 비어 있습니다.', true);
     return;
   }
-  const sessionState = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : null;
   commitCurrentQuestionElapsed();
   resetQuestionSessionState();
   state.questionMode = true;
-  const questions = state.questionBankItems.map((item, index) => questionBankItemToQuestion(item, index));
+  const questions = launchItems.map((item, index) => questionBankItemToQuestion(item, index));
   const start = Math.max(0, Math.min(questions.length - 1, startIndex));
   const firstMode = questions.find((item) => item?.sessionMode)?.sessionMode || 'practice';
   prepareQuestionSession(questions, {
-    title: `문제은행 세트 · ${state.questionBankItems.length}문항`,
+    title: String(options.title || '').trim() || `문제은행 세트 · ${launchItems.length}문항`,
     mode: firstMode,
   });
   applyQuestionBankLaunchSessionState(state.questions, sessionState);
   state.questionIndex = start;
   state.answerRevealed = Boolean(state.questions[start]?.answerRevealed);
   state.selectedChoiceIndex = Number.isInteger(state.questions[start]?.selectedChoiceIndex) ? state.questions[start].selectedChoiceIndex : null;
-  state.questionBankSelectedId = String(state.questionBankItems[start]?.question_bank_id || '');
+  state.questionBankSelectedId = String(launchItems[start]?.question_bank_id || '');
   activateCurrentQuestionTimer();
   renderQuestionPanel();
-  setMessage(`문제은행 ${state.questionBankItems.length}문항을 불러왔습니다.`);
+  setMessage(String(options.message || `문제은행 ${launchItems.length}문항을 불러왔습니다.`));
 }
 
 function scheduleQuestionBankBrowserLoad() {
@@ -7652,8 +7910,21 @@ $('bookmarkListBody').addEventListener('click', (event) => {
   if (item) jumpToBookmarkCard(item.dataset.cardId);
 });
 $('questionHistoryBody')?.addEventListener('click', (event) => {
-  const trigger = event.target.closest('[data-question-history-card-id]');
-  if (trigger) jumpToQuestionHistoryCard(trigger.dataset.questionHistoryCardId);
+  const reviewTrigger = event.target.closest('[data-question-history-review-id]');
+  if (reviewTrigger) {
+    openQuestionHistoryReview(reviewTrigger.dataset.questionHistoryReviewId || '').catch(() => {});
+    return;
+  }
+  const judgmentTrigger = event.target.closest('[data-question-history-judgment-id][data-question-history-judgment]');
+  if (judgmentTrigger) {
+    saveQuestionHistoryJudgment(
+      judgmentTrigger.dataset.questionHistoryJudgmentId || '',
+      judgmentTrigger.dataset.questionHistoryJudgment || 'pending',
+    ).catch(() => {});
+    return;
+  }
+  const cardTrigger = event.target.closest('[data-question-history-card-id]');
+  if (cardTrigger) jumpToQuestionHistoryCard(cardTrigger.dataset.questionHistoryCardId);
 });
 document.addEventListener('click', (event) => {
   if (state.menuOpen && !event.target.closest('.header-actions')) toggleMenu(false);
