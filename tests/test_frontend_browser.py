@@ -1013,6 +1013,192 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='card-state-toggle-pressed-state', status=status, observations=case)
             await page.close()
 
+    async def test_flashcard_table_popup_stays_mounted_across_rerenders(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        popup = None
+        popup_name = 'csFlashcardTableWindow'
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelector('#flashcardTableBtn') && state.filtered.length > 0")
+            await page.evaluate(
+                """
+                () => {
+                  window.open = (url, name = '', _features = '') => {
+                    const selector = `iframe[data-test-popup-name="${name}"]`;
+                    document.querySelector(selector)?.remove();
+                    const frame = document.createElement('iframe');
+                    frame.dataset.testPopupName = name;
+                    frame.setAttribute('aria-hidden', 'true');
+                    frame.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1280px;height:900px;border:0;';
+                    document.body.appendChild(frame);
+                    const popupWindow = frame.contentWindow;
+                    try {
+                      Object.defineProperty(popupWindow, 'opener', {value: window, configurable: true});
+                    } catch (_error) {
+                      try { popupWindow.opener = window; } catch (__error) {}
+                    }
+                    frame.src = url;
+                    return popupWindow;
+                  };
+                }
+                """
+            )
+            case['initial_main_state'] = await page.evaluate(
+                """
+                () => ({
+                  filteredCount: state.filtered.length,
+                  currentCardId: state.filtered[state.index]?.id || '',
+                  currentTerm: state.filtered[state.index]?.term || '',
+                  currentStatus: state.filtered[state.index]?.known_status || '',
+                })
+                """
+            )
+            self.assertGreater(case['initial_main_state']['filteredCount'], 0)
+            self.assertTrue(case['initial_main_state']['currentCardId'])
+
+            await page.click('#menuBtn')
+            await page.waitForFunction("document.querySelector('#menuPopover') && document.querySelector('#menuPopover').hidden === false")
+            await page.click('#flashcardTableBtn')
+            await page.waitForSelector(f'iframe[data-test-popup-name="{popup_name}"]')
+            popup_handle = await page.querySelector(f'iframe[data-test-popup-name="{popup_name}"]')
+            self.assertIsNotNone(popup_handle)
+            popup = await popup_handle.contentFrame()
+            self.assertIsNotNone(popup)
+            await popup.waitForFunction("document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length > 0")
+            case['popup_initial'] = await popup.evaluate(
+                """
+                () => ({
+                  helperReady: typeof window.__csFlashcardTableRender === 'function',
+                  summary: document.querySelector('.summary')?.textContent || '',
+                  rowCount: document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length,
+                  currentRowCardId: document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId || '',
+                })
+                """
+            )
+            self.assertTrue(case['popup_initial']['helperReady'])
+            self.assertEqual(case['popup_initial']['rowCount'], case['initial_main_state']['filteredCount'])
+            self.assertEqual(case['popup_initial']['currentRowCardId'], case['initial_main_state']['currentCardId'])
+
+            next_status = 'X' if case['initial_main_state']['currentStatus'] == 'O' else 'O'
+            case['status_toggle_target'] = {
+                'cardId': case['initial_main_state']['currentCardId'],
+                'nextStatus': next_status,
+                'openerAvailable': await popup.evaluate(
+                    """
+                    () => Boolean(window.opener && typeof window.opener.__csFlashcardsSetStatusFromTable === 'function')
+                    """
+                ),
+            }
+            self.assertTrue(case['status_toggle_target']['openerAvailable'])
+            await popup.evaluate(
+                """
+                (cardId, nextStatus) => window.opener.__csFlashcardsSetStatusFromTable(cardId, nextStatus)
+                """,
+                case['initial_main_state']['currentCardId'],
+                next_status,
+            )
+            await page.waitForFunction(
+                """
+                (cardId, nextStatus) => state.cards.find((item) => item.id === cardId)?.known_status === nextStatus
+                """,
+                {},
+                case['initial_main_state']['currentCardId'],
+                next_status,
+            )
+            await popup.waitForFunction(
+                """
+                (cardId, nextStatus, expectedCount) => {
+                  const rows = document.querySelectorAll('#flashcardTableMount [data-row-card-id]');
+                  const pressed = document.querySelector(`[data-row-card-id="${cardId}"] [data-status-value="${nextStatus}"]`);
+                  return rows.length === expectedCount
+                    && rows.length > 0
+                    && !!document.querySelector('#flashcardTableMount .cs-table')
+                    && !!pressed
+                    && pressed.getAttribute('aria-pressed') === 'true';
+                }
+                """,
+                {},
+                case['initial_main_state']['currentCardId'],
+                next_status,
+                case['initial_main_state']['filteredCount'],
+            )
+            case['popup_after_status_toggle'] = await popup.evaluate(
+                """
+                () => ({
+                  summary: document.querySelector('.summary')?.textContent || '',
+                  rowCount: document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length,
+                  currentRowCardId: document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId || '',
+                  tablePresent: Boolean(document.querySelector('#flashcardTableMount .cs-table')),
+                })
+                """
+            )
+            self.assertTrue(case['popup_after_status_toggle']['tablePresent'])
+            self.assertEqual(case['popup_after_status_toggle']['rowCount'], case['initial_main_state']['filteredCount'])
+            self.assertEqual(case['popup_after_status_toggle']['currentRowCardId'], case['initial_main_state']['currentCardId'])
+
+            await self.set_input_value(page, '#searchInput', case['initial_main_state']['currentTerm'])
+            await page.waitForFunction(
+                """
+                (term) => state.filtered.length > 0
+                  && state.filtered.every((card) => String(card.term || '').includes(term))
+                """,
+                {},
+                case['initial_main_state']['currentTerm'],
+            )
+            case['main_after_filter'] = await page.evaluate(
+                """
+                () => ({
+                  filteredCount: state.filtered.length,
+                  currentCardId: state.filtered[state.index]?.id || '',
+                })
+                """
+            )
+            await popup.waitForFunction(
+                """
+                (expectedCount, currentCardId, term) => {
+                  const rows = document.querySelectorAll('#flashcardTableMount [data-row-card-id]');
+                  const summary = document.querySelector('.summary')?.textContent || '';
+                  return rows.length === expectedCount
+                    && rows.length > 0
+                    && !!document.querySelector('#flashcardTableMount .cs-table')
+                    && document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId === currentCardId
+                    && summary.includes(`검색 ${term}`);
+                }
+                """,
+                {},
+                case['main_after_filter']['filteredCount'],
+                case['main_after_filter']['currentCardId'],
+                case['initial_main_state']['currentTerm'],
+            )
+            case['popup_after_filter'] = await popup.evaluate(
+                """
+                () => ({
+                  summary: document.querySelector('.summary')?.textContent || '',
+                  rowCount: document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length,
+                  currentRowCardId: document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId || '',
+                  tablePresent: Boolean(document.querySelector('#flashcardTableMount .cs-table')),
+                })
+                """
+            )
+            self.assertTrue(case['popup_after_filter']['tablePresent'])
+            self.assertEqual(case['popup_after_filter']['rowCount'], case['main_after_filter']['filteredCount'])
+            self.assertEqual(case['popup_after_filter']['currentRowCardId'], case['main_after_filter']['currentCardId'])
+            self.assertIn(f"검색 {case['initial_main_state']['currentTerm']}", case['popup_after_filter']['summary'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='flashcard-table-popup-rerender-regression', status=status, observations=case)
+            await page.evaluate(
+                """
+                (name) => {
+                  document.querySelector(`iframe[data-test-popup-name="${name}"]`)?.remove();
+                }
+                """,
+                popup_name,
+            )
+            await page.close()
+
     async def test_filter_inputs_expose_explicit_accessible_names(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
