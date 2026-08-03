@@ -1,0 +1,6 @@
+interface:
+  display_name: "CS 자료 카드화"
+  short_description: "새 CS 자료를 중복 없이 카드 후보로 변환"
+  default_prompt: "Use $cs-source-ingestion 로 새 CS 자료를 플래시카드 후보로 변환해줘."
+policy:
+  allow_implicit_invocation: true

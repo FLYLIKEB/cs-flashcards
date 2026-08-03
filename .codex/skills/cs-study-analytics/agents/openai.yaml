@@ -1,0 +1,6 @@
+interface:
+  display_name: "CS 학습 분석"
+  short_description: "학습 진행상태 분석과 복습 큐 생성"
+  default_prompt: "Use $cs-study-analytics 로 내 플래시카드 학습 현황을 분석하고 복습 계획을 만들어줘."
+policy:
+  allow_implicit_invocation: true
