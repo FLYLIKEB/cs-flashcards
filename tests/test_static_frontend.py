@@ -379,8 +379,10 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('id="wikiSearchToggleBtn"', wiki_html())
         self.assertIn('id="wikiSearch"', wiki_html())
         self.assertIn('id="wikiSidebarToggleBtn"', wiki_html())
+        self.assertIn('id="wikiSidebarTopbarBtn"', wiki_html())
+        self.assertIn('id="wikiSidebarCloseBtn"', wiki_html())
+        self.assertIn('id="wikiSidebarBackdrop"', wiki_html())
         self.assertIn('id="wikiSidebar"', wiki_html())
-        self.assertIn('id="wikiSearchToggleBtn"', wiki_html())
         self.assertIn('id="wikiStatus"', wiki_html())
 
     def test_app_js_smoke_keeps_embedded_question_bank_browser_hooks(self):
@@ -423,10 +425,17 @@ class StaticFrontendSmokeTests(unittest.TestCase):
 
     def test_wiki_js_smoke_keeps_sidebar_persistence_and_status_updates(self):
         self.assertIn("const WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1';", wiki_js())
+        self.assertIn('function wikiIsMobileViewport()', wiki_js())
         self.assertIn('function toggleWikiSidebar(force = !wikiState.sidebarOpen)', wiki_js())
+        self.assertIn('function closeWikiSidebarOnMobile({restoreFocus = false} = {})', wiki_js())
         self.assertIn('function wikiStatus(text, isError = false)', wiki_js())
         self.assertIn('wikiStatus(`검색 결과 ${matches.length}건`);', wiki_js())
 
+    def test_wiki_css_smoke_keeps_mobile_sidebar_drawer_rules(self):
+        self.assertIn('.wiki-sidebar-toggle-topbar', style_css())
+        self.assertIn('.wiki-sidebar-backdrop', style_css())
+        self.assertIn('body.wiki-mobile-sidebar-open .wiki-sidebar', style_css())
+        self.assertIn('.wiki-inline-image-prompt-actions .header-link', style_css())
     def test_css_smoke_keeps_question_and_table_shell_visibility_rules(self):
         self.assertIn('.question-panel[hidden]', style_css())
         self.assertIn('display: none !important', style_css())
@@ -616,10 +625,10 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'question-history-field',
             'question-session-meta',
             'question-history-session-meta',
+            'questionBankReviewLaunchSessionState(',
+            'question-bank-review-judgment',
+            'reviewSavingId',
         ]:
-            'function questionMarkdownListMatch(line)',
-            'function renderQuestionMarkdownListLevel(lines, startIndex, indent, ordered)',
-
             self.assertIn(snippet, app_js())
         self.assertIn('id="questionHistoryDialog"', index_html())
         self.assertIn('id="questionHistoryBody"', index_html())

@@ -43,6 +43,7 @@ const wikiAiTools = window.CsAiTools || null;
 let wikiMarkdownEditor = null;
 let wikiMarkdownPreviewSideBySide = false;
 let wikiPreviewRequestToken = 0;
+let wikiSidebarReturnFocusEl = null;
 
 const WIKI_AI_TEMPLATE_STORAGE_KEY = 'csFlashcardsWikiAiPromptTemplates:v1';
 const WIKI_AI_PROMPT_TEMPLATES = Object.freeze([
@@ -167,6 +168,14 @@ function wikiDefaultSidebarOpen() {
   return window.matchMedia('(min-width: 721px)').matches;
 }
 
+function wikiIsMobileViewport() {
+  return window.matchMedia('(max-width: 720px)').matches;
+}
+
+function wikiSidebarToggleButtons() {
+  return [wiki$('wikiSidebarToggleBtn'), wiki$('wikiSidebarTopbarBtn')].filter(Boolean);
+}
+
 function readSavedWikiSidebarState() {
   try {
     const saved = window.localStorage.getItem(WIKI_SIDEBAR_STATE_KEY);
@@ -202,6 +211,42 @@ function saveWikiBatchAiMode() {
   }
 }
 
+function wikiRememberSidebarFocusTarget(element) {
+  if (!element || typeof element.focus !== 'function') return;
+  wikiSidebarReturnFocusEl = element;
+}
+
+function wikiRestoreSidebarFocus() {
+  const fallback = wiki$('wikiSidebarTopbarBtn') || wiki$('wikiSidebarToggleBtn');
+  const target = wikiSidebarReturnFocusEl || fallback;
+  wikiSidebarReturnFocusEl = null;
+  target?.focus?.({preventScroll: true});
+}
+
+function wikiFocusMobileSidebarCloseButton() {
+  if (!wikiIsMobileViewport() || !wikiState.sidebarOpen) return;
+  const closeButton = wiki$('wikiSidebarCloseBtn');
+  if (!closeButton) return;
+  const focus = () => {
+    if (!wikiIsMobileViewport() || !wikiState.sidebarOpen) return;
+    closeButton.focus({preventScroll: true});
+  };
+  window.requestAnimationFrame(() => {
+    focus();
+    window.setTimeout(focus, 0);
+  });
+}
+
+function wikiApplyMobileSidebarState() {
+  const mobileOpen = wikiIsMobileViewport() && wikiState.sidebarOpen;
+  document.body.classList.toggle('wiki-mobile-sidebar-open', mobileOpen);
+  const backdrop = wiki$('wikiSidebarBackdrop');
+  if (backdrop) {
+    backdrop.hidden = !mobileOpen;
+    backdrop.setAttribute('aria-hidden', String(!mobileOpen));
+  }
+}
+
 function applyWikiBatchAiMode({persist = true} = {}) {
   document.body.classList.toggle('wiki-batch-ai-mode', wikiState.batchAiMode);
   const panel = wiki$('wikiBatchAiPanel');
@@ -224,19 +269,24 @@ function applyWikiBatchAiMode({persist = true} = {}) {
 function applyWikiSidebarState({persist = true} = {}) {
   document.body.classList.toggle('wiki-sidebar-collapsed', !wikiState.sidebarOpen);
   wiki$('wikiSidebar')?.setAttribute('aria-hidden', String(!wikiState.sidebarOpen));
-  const toggleBtn = wiki$('wikiSidebarToggleBtn');
-  if (toggleBtn) {
+  wikiSidebarToggleButtons().forEach((toggleBtn) => {
     toggleBtn.textContent = '목차';
     toggleBtn.setAttribute('aria-expanded', String(wikiState.sidebarOpen));
     toggleBtn.setAttribute('aria-label', wikiState.sidebarOpen ? '목차 숨기기' : '목차 보기');
     toggleBtn.setAttribute('title', wikiState.sidebarOpen ? '목차 숨기기' : '목차 보기');
-  }
+  });
+  wikiApplyMobileSidebarState();
   if (persist) saveWikiSidebarState();
 }
 
 function toggleWikiSidebar(force = !wikiState.sidebarOpen) {
-  wikiState.sidebarOpen = Boolean(force);
+  const nextOpen = Boolean(force);
+  if (nextOpen && wikiIsMobileViewport()) closeWikiSearch();
+  wikiState.sidebarOpen = nextOpen;
   applyWikiSidebarState();
+  if (nextOpen && wikiIsMobileViewport()) {
+    wikiFocusMobileSidebarCloseButton();
+  }
 }
 
 function toggleWikiBatchAiMode(force = !wikiState.batchAiMode) {
@@ -244,10 +294,15 @@ function toggleWikiBatchAiMode(force = !wikiState.batchAiMode) {
   applyWikiBatchAiMode();
 }
 
-function closeWikiSidebarOnMobile() {
-  if (!window.matchMedia('(max-width: 720px)').matches) return;
+function closeWikiSidebar({restoreFocus = false} = {}) {
   if (!wikiState.sidebarOpen) return;
   toggleWikiSidebar(false);
+  if (restoreFocus) wikiRestoreSidebarFocus();
+}
+
+function closeWikiSidebarOnMobile({restoreFocus = false} = {}) {
+  if (!wikiIsMobileViewport()) return;
+  closeWikiSidebar({restoreFocus});
 }
 
 function applyWikiSearchState({focus = false} = {}) {
@@ -275,13 +330,18 @@ function applyWikiSearchState({focus = false} = {}) {
 }
 
 function toggleWikiSearch(force = !wikiState.searchOpen, {focus = true} = {}) {
-  wikiState.searchOpen = Boolean(force);
+  const nextOpen = Boolean(force);
+  if (nextOpen && wikiIsMobileViewport() && wikiState.sidebarOpen) {
+    closeWikiSidebarOnMobile();
+  }
+  wikiState.searchOpen = nextOpen;
   applyWikiSearchState({focus: wikiState.searchOpen && focus});
 }
 
-function closeWikiSearch() {
+function closeWikiSearch({restoreFocus = false} = {}) {
   if (!wikiState.searchOpen) return;
   toggleWikiSearch(false, {focus: false});
+  if (restoreFocus) wiki$('wikiSearchToggleBtn')?.focus({preventScroll: true});
 }
 
 function wikiShowSearchResults() {
@@ -1802,8 +1862,7 @@ wiki$('wikiSearchInput')?.addEventListener('input', (event) => {
 wiki$('wikiSearchInput')?.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     event.preventDefault();
-    closeWikiSearch();
-    wiki$('wikiSearchToggleBtn')?.focus({preventScroll: true});
+    closeWikiSearch({restoreFocus: true});
     return;
   }
   if (event.key !== 'Enter') return;
@@ -1831,7 +1890,20 @@ wiki$('wikiToc')?.addEventListener('click', (event) => {
   toggleWikiTocBranch(toggle.dataset.wikiTocToggle || '');
 });
 
-wiki$('wikiSidebarToggleBtn')?.addEventListener('click', () => toggleWikiSidebar());
+wiki$('wikiSidebarTopbarBtn')?.addEventListener('click', (event) => {
+  if (!wikiState.sidebarOpen) wikiRememberSidebarFocusTarget(event.currentTarget);
+  toggleWikiSidebar();
+});
+wiki$('wikiSidebarCloseBtn')?.addEventListener('click', () => {
+  closeWikiSidebarOnMobile({restoreFocus: true});
+});
+wiki$('wikiSidebarBackdrop')?.addEventListener('click', () => {
+  closeWikiSidebarOnMobile({restoreFocus: true});
+});
+wiki$('wikiSidebarToggleBtn')?.addEventListener('click', (event) => {
+  if (!wikiState.sidebarOpen) wikiRememberSidebarFocusTarget(event.currentTarget);
+  toggleWikiSidebar();
+});
 wiki$('wikiEditBtn')?.addEventListener('click', () => {
   wikiStartEdit();
 });
@@ -1865,6 +1937,9 @@ window.addEventListener('popstate', () => {
   }).catch((error) => {
     wikiStatus(`문서 이동 실패: ${error.message || error}`, true);
   });
+});
+window.addEventListener('resize', () => {
+  applyWikiSidebarState({persist: false});
 });
 
 window.addEventListener('beforeunload', (event) => {
@@ -1938,6 +2013,11 @@ document.addEventListener('input', (event) => {
   });
 });
 document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && wikiIsMobileViewport() && wikiState.sidebarOpen) {
+    event.preventDefault();
+    closeWikiSidebarOnMobile({restoreFocus: true});
+    return;
+  }
   if (!wikiState.editorOpen) return;
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();

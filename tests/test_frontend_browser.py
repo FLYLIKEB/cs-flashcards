@@ -1421,6 +1421,37 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-mobile-layout', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_mobile_overview_keeps_two_column_metrics(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 390, 'height': 844})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageOverviewCards > *').length === 4")
+            case['overview_layout'] = await page.evaluate(
+                """
+                () => {
+                  const grid = document.querySelector('#bankPageOverviewCards');
+                  const cards = [...document.querySelectorAll('#bankPageOverviewCards > *')];
+                  const firstTop = cards[0]?.getBoundingClientRect().top || 0;
+                  const secondTop = cards[1]?.getBoundingClientRect().top || 0;
+                  return {
+                    columnCount: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+                    firstRowSharesTop: Math.abs(firstTop - secondTop) < 2,
+                    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                  };
+                }
+                """
+            )
+            self.assertEqual(case['overview_layout']['columnCount'], 2)
+            self.assertTrue(case['overview_layout']['firstRowSharesTop'])
+            self.assertLessEqual(case['overview_layout']['pageOverflow'], 2)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-mobile-overview-two-column', status=status, observations=case)
+            await page.close()
+
+
 
     async def test_question_bank_review_filter_buttons_expose_pressed_state(self):
         case = {'path': '/question-bank'}
@@ -1456,16 +1487,30 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                     'wrong_note': '',
                     'answer': '정답 해설',
                 },
+                {
+                    'question_bank_id': 'review-pending-1',
+                    'prompt': '미채점 문항 prompt',
+                    'term': '미채점 문항',
+                    'category': '테스트',
+                    'question_type': 'subjective',
+                    'session_title': '복습 세트',
+                    'updated_at': '2026-08-01T00:10:00Z',
+                    'result_key': 'pending',
+                    'result_label': '미채점',
+                    'user_answer': '보류 답안',
+                    'wrong_note': '',
+                    'answer': '미채점 정답 해설',
+                },
             ],
             'summary': {
-                'total': 2,
+                'total': 3,
                 'correct': 1,
                 'ambiguous': 0,
                 'wrong': 1,
                 'unknown': 0,
-                'pending': 0,
+                'pending': 1,
                 'note_count': 1,
-                'selected_question_bank_count': 2,
+                'selected_question_bank_count': 3,
             },
         }
         try:
@@ -1498,7 +1543,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                   const body = document.getElementById('bankPageReviewBody');
                   const filters = document.querySelectorAll('#bankPageReviewFilters [data-review-filter]');
                   const items = document.querySelectorAll('#bankPageReviewList .question-bank-review-item');
-                  return body && body.hidden === false && filters.length === 3 && items.length === 2;
+                  return body && body.hidden === false && filters.length === 4 && items.length === 3;
                 }
                 """
             )
@@ -1517,8 +1562,34 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             )
             self.assertEqual(case['initial_filters']['attempted']['pressed'], 'true')
             self.assertTrue(case['initial_filters']['attempted']['active'])
+            self.assertEqual(case['initial_filters']['pending']['pressed'], 'false')
             self.assertEqual(case['initial_filters']['wrong']['pressed'], 'false')
             self.assertEqual(case['initial_filters']['note']['pressed'], 'false')
+
+            await page.click('#bankPageReviewFilters [data-review-filter="pending"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('#bankPageReviewFilters [data-review-filter="pending"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 1
+                  && document.querySelector('#bankPageReviewList')?.textContent.includes('미채점 문항 prompt')
+                """
+            )
+            case['pending_filter'] = await page.evaluate(
+                """
+                () => ({
+                  attempted: document.querySelector('#bankPageReviewFilters [data-review-filter="attempted"]')?.getAttribute('aria-pressed') || '',
+                  pending: document.querySelector('#bankPageReviewFilters [data-review-filter="pending"]')?.getAttribute('aria-pressed') || '',
+                  wrong: document.querySelector('#bankPageReviewFilters [data-review-filter="wrong"]')?.getAttribute('aria-pressed') || '',
+                  note: document.querySelector('#bankPageReviewFilters [data-review-filter="note"]')?.getAttribute('aria-pressed') || '',
+                  visibleCount: document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length,
+                })
+                """
+            )
+            self.assertEqual(case['pending_filter']['attempted'], 'false')
+            self.assertEqual(case['pending_filter']['pending'], 'true')
+            self.assertEqual(case['pending_filter']['wrong'], 'false')
+            self.assertEqual(case['pending_filter']['note'], 'false')
+            self.assertEqual(case['pending_filter']['visibleCount'], 1)
 
             await page.click('#bankPageReviewFilters [data-review-filter="wrong"]')
             await page.waitForFunction(
@@ -1532,6 +1603,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 """
                 () => ({
                   attempted: document.querySelector('#bankPageReviewFilters [data-review-filter="attempted"]')?.getAttribute('aria-pressed') || '',
+                  pending: document.querySelector('#bankPageReviewFilters [data-review-filter="pending"]')?.getAttribute('aria-pressed') || '',
                   wrong: document.querySelector('#bankPageReviewFilters [data-review-filter="wrong"]')?.getAttribute('aria-pressed') || '',
                   note: document.querySelector('#bankPageReviewFilters [data-review-filter="note"]')?.getAttribute('aria-pressed') || '',
                   visibleCount: document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length,
@@ -1539,6 +1611,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 """
             )
             self.assertEqual(case['wrong_filter']['attempted'], 'false')
+            self.assertEqual(case['wrong_filter']['pending'], 'false')
             self.assertEqual(case['wrong_filter']['wrong'], 'true')
             self.assertEqual(case['wrong_filter']['note'], 'false')
             self.assertEqual(case['wrong_filter']['visibleCount'], 1)
@@ -1555,6 +1628,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 """
                 () => ({
                   attempted: document.querySelector('#bankPageReviewFilters [data-review-filter="attempted"]')?.getAttribute('aria-pressed') || '',
+                  pending: document.querySelector('#bankPageReviewFilters [data-review-filter="pending"]')?.getAttribute('aria-pressed') || '',
                   wrong: document.querySelector('#bankPageReviewFilters [data-review-filter="wrong"]')?.getAttribute('aria-pressed') || '',
                   note: document.querySelector('#bankPageReviewFilters [data-review-filter="note"]')?.getAttribute('aria-pressed') || '',
                   visibleCount: document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length,
@@ -1562,6 +1636,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 """
             )
             self.assertEqual(case['note_filter']['attempted'], 'false')
+            self.assertEqual(case['note_filter']['pending'], 'false')
             self.assertEqual(case['note_filter']['wrong'], 'false')
             self.assertEqual(case['note_filter']['note'], 'true')
             self.assertEqual(case['note_filter']['visibleCount'], 1)
@@ -1570,37 +1645,37 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-review-filter-pressed-state', status=status, observations=case)
             await page.close()
 
-    async def test_question_bank_review_jump_restores_saved_answer_and_solution(self):
+    async def test_question_bank_review_inline_judgment_updates_pending_record(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
         status = 'failed'
         bank_item = self.question_bank_item(
-            '리뷰 이동',
-            question_bank_id='review-jump-1',
-            prompt='리뷰 이동 prompt',
-            answer='리뷰 정답 해설',
-            explanation='리뷰 정답 추가 설명',
+            '인라인 채점',
+            question_bank_id='review-inline-1',
+            prompt='인라인 채점 prompt',
+            answer='인라인 정답 해설',
             question_type='subjective',
         )
-        question_bank_payload = self.question_bank_payload('review-jump', items=[bank_item])
+        question_bank_payload = self.question_bank_payload('review-inline', items=[bank_item])
         review_payload = {
             'items': [
                 {
-                    'question_id': 'review-jump-attempt-1',
-                    'question_bank_id': 'review-jump-1',
-                    'prompt': '리뷰 이동 prompt',
-                    'term': '리뷰 이동',
+                    'question_id': 'review-inline-attempt-1',
+                    'question_bank_id': 'review-inline-1',
+                    'prompt': '인라인 채점 prompt',
+                    'term': '인라인 채점',
                     'category': '테스트',
                     'question_type': 'subjective',
-                    'session_id': 'review-session-1',
-                    'session_title': '복습 세트',
+                    'card_id': 'review-inline-card-1',
+                    'session_id': 'review-inline-session',
+                    'session_title': '인라인 복습 세트',
                     'session_mode': 'practice',
                     'updated_at': '2026-08-01T00:00:00Z',
-                    'result_key': 'wrong',
-                    'result_label': '틀림',
-                    'user_answer': '내가 쓴 답',
-                    'wrong_note': '핵심 키워드 누락',
-                    'answer': '리뷰 정답 해설',
+                    'result_key': 'pending',
+                    'result_label': '미채점',
+                    'user_answer': '임시 답안',
+                    'wrong_note': '',
+                    'answer': '인라인 정답 해설',
                     'question_order': 1,
                 },
             ],
@@ -1608,11 +1683,192 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 'total': 1,
                 'correct': 0,
                 'ambiguous': 0,
-                'wrong': 1,
+                'wrong': 0,
                 'unknown': 0,
-                'pending': 0,
-                'note_count': 1,
+                'pending': 1,
+                'note_count': 0,
                 'selected_question_bank_count': 1,
+            },
+        }
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ questionBankPayload, reviewPayload }) => {
+                  const originalFetch = window.fetch.bind(window);
+                  window.__reviewAttemptCalls = [];
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/question-bank' && method === 'GET') {
+                      return Promise.resolve(new Response(JSON.stringify(questionBankPayload), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/question-bank/attempts/query' && method === 'POST') {
+                      return Promise.resolve(new Response(JSON.stringify(reviewPayload), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/questions/attempt' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      window.__reviewAttemptCalls.push(payload);
+                      reviewPayload.items = reviewPayload.items.map((item) => item.question_bank_id === payload.question_bank_id
+                        ? {
+                            ...item,
+                            result_key: payload.judgment,
+                            result_label: payload.judgment === 'correct' ? '맞음' : payload.judgment,
+                            updated_at: '2026-08-01T00:10:00Z',
+                            answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                            wrong_note: payload.judgment === 'correct' ? '' : (item.wrong_note || ''),
+                          }
+                        : item);
+                      reviewPayload.summary = {
+                        total: 1,
+                        correct: payload.judgment === 'correct' ? 1 : 0,
+                        ambiguous: payload.judgment === 'ambiguous' ? 1 : 0,
+                        wrong: payload.judgment === 'wrong' ? 1 : 0,
+                        unknown: payload.judgment === 'unknown' ? 1 : 0,
+                        pending: payload.judgment === 'pending' ? 1 : 0,
+                        note_count: 0,
+                        selected_question_bank_count: 1,
+                      };
+                      return Promise.resolve(new Response(JSON.stringify({
+                        attempt: {
+                          ...payload,
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                        },
+                        card: {id: payload.card_id || 'review-inline-card-1'},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                {'questionBankPayload': question_bank_payload, 'reviewPayload': review_payload},
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length === 1")
+            await page.click('#bankPageToggleReviewBtn')
+            await page.waitForFunction(
+                """
+                () => document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 1
+                  && document.querySelector('#bankPageReviewList')?.textContent.includes('임시 답안')
+                """
+            )
+            await page.click('#bankPageReviewFilters [data-review-filter="pending"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('#bankPageReviewFilters [data-review-filter="pending"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 1
+                """
+            )
+            await page.click('[data-question-bank-review-judgment="correct"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('#bankPageReviewList')?.textContent.includes('선택한 필터에 해당하는 풀이 기록이 없습니다.')
+                """
+            )
+            await page.click('#bankPageReviewFilters [data-review-filter="attempted"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('#bankPageReviewFilters [data-review-filter="attempted"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelector('#bankPageReviewList .question-bank-review-result')?.textContent.includes('맞음')
+                """
+            )
+            case['after_inline_save'] = await page.evaluate(
+                """
+                () => ({
+                  chip: document.querySelector('#bankPageReviewList .question-bank-review-result')?.textContent.trim() || '',
+                  pressed: document.querySelector('#bankPageReviewList [data-question-bank-review-judgment="correct"]')?.getAttribute('aria-pressed') || '',
+                  attemptCalls: window.__reviewAttemptCalls || [],
+                })
+                """
+            )
+            self.assertEqual(case['after_inline_save']['chip'], '맞음')
+            self.assertEqual(case['after_inline_save']['pressed'], 'true')
+            self.assertEqual(len(case['after_inline_save']['attemptCalls']), 1)
+            self.assertEqual(case['after_inline_save']['attemptCalls'][0]['judgment'], 'correct')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-review-inline-judgment', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_review_jump_restores_saved_answer_and_solution(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        first_bank_item = self.question_bank_item(
+            '리뷰 이동 첫 문제',
+            question_bank_id='review-jump-1',
+            prompt='리뷰 이동 첫 문제 prompt',
+            answer='리뷰 첫 정답 해설',
+            explanation='리뷰 첫 정답 추가 설명',
+            question_type='subjective',
+        )
+        second_bank_item = self.question_bank_item(
+            '리뷰 이동 두 번째 문제',
+            question_bank_id='review-jump-2',
+            prompt='리뷰 이동 두 번째 문제 prompt',
+            answer='리뷰 둘째 정답 해설',
+            explanation='리뷰 둘째 정답 추가 설명',
+            question_type='subjective',
+        )
+        question_bank_payload = self.question_bank_payload('review-jump', items=[first_bank_item, second_bank_item])
+        review_payload = {
+            'items': [
+                {
+                    'question_id': 'review-jump-attempt-1',
+                    'question_bank_id': 'review-jump-1',
+                    'prompt': '리뷰 이동 첫 문제 prompt',
+                    'term': '리뷰 이동 첫 문제',
+                    'category': '테스트',
+                    'question_type': 'subjective',
+                    'session_id': 'review-session-1',
+                    'session_title': '복습 세트',
+                    'session_mode': 'practice',
+                    'updated_at': '2026-08-01T00:00:00Z',
+                    'result_key': 'pending',
+                    'result_label': '미채점',
+                    'user_answer': '첫 답안',
+                    'wrong_note': '',
+                    'answer': '리뷰 첫 정답 해설',
+                    'question_order': 1,
+                },
+                {
+                    'question_id': 'review-jump-attempt-2',
+                    'question_bank_id': 'review-jump-2',
+                    'prompt': '리뷰 이동 두 번째 문제 prompt',
+                    'term': '리뷰 이동 두 번째 문제',
+                    'category': '테스트',
+                    'question_type': 'subjective',
+                    'session_id': 'review-session-1',
+                    'session_title': '복습 세트',
+                    'session_mode': 'practice',
+                    'updated_at': '2026-08-01T00:03:00Z',
+                    'result_key': 'pending',
+                    'result_label': '미채점',
+                    'user_answer': '둘째 답안',
+                    'wrong_note': '',
+                    'answer': '리뷰 둘째 정답 해설',
+                    'question_order': 2,
+                },
+            ],
+            'summary': {
+                'total': 2,
+                'correct': 0,
+                'ambiguous': 0,
+                'wrong': 0,
+                'unknown': 0,
+                'pending': 2,
+                'note_count': 0,
+                'selected_question_bank_count': 2,
             },
         }
         try:
@@ -1643,12 +1899,19 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 {'questionBankPayload': question_bank_payload, 'reviewPayload': review_payload},
             )
             await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
-            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length === 1")
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length === 2")
             await page.click('#bankPageToggleReviewBtn')
             await page.waitForFunction(
                 """
-                () => document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 1
-                  && document.querySelector('#bankPageReviewList')?.textContent.includes('내가 쓴 답')
+                () => document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 2
+                  && document.querySelector('#bankPageReviewList')?.textContent.includes('첫 답안')
+                """
+            )
+            await page.click('#bankPageReviewFilters [data-review-filter="pending"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('#bankPageReviewFilters [data-review-filter="pending"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 2
                 """
             )
             await page.click('.question-bank-review-jump')
@@ -1656,19 +1919,31 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             embed_frame = await self.wait_for_embed_frame(page)
             await embed_frame.waitForSelector('#questionAnswerInput')
             await embed_frame.waitForFunction(
-                "document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('리뷰 정답 해설')"
+                "document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('리뷰 첫 정답 해설')"
             )
-            case['practice_prompt'] = await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
-            case['restored_answer'] = await embed_frame.Jeval('#questionAnswerInput', '(node) => node.value')
-            case['answer_panel_text'] = await embed_frame.Jeval('.question-answer', '(node) => (node.textContent || "").trim()')
-            case['result_buttons'] = await embed_frame.evaluate(
-                "() => [...document.querySelectorAll('[data-question-judgment]')].map((node) => (node.textContent || '').trim())"
+            case['first_question'] = {
+                'prompt': await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()'),
+                'answer': await embed_frame.Jeval('#questionAnswerInput', '(node) => node.value'),
+                'solution': await embed_frame.Jeval('.question-answer', '(node) => (node.textContent || "").trim()'),
+            }
+            await embed_frame.click('[data-question-nav="next"]')
+            await embed_frame.waitForFunction(
+                "document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('리뷰 이동 두 번째 문제 prompt')"
             )
-            self.assertIn('리뷰 이동 prompt', case['practice_prompt'])
-            self.assertEqual(case['restored_answer'], '내가 쓴 답')
-            self.assertIn('리뷰 정답 해설', case['answer_panel_text'])
-            self.assertIn('맞음 저장', case['result_buttons'])
-            self.assertIn('틀림 저장', case['result_buttons'])
+            await embed_frame.waitForFunction(
+                "document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('리뷰 둘째 정답 해설')"
+            )
+            case['second_question'] = {
+                'prompt': await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()'),
+                'answer': await embed_frame.Jeval('#questionAnswerInput', '(node) => node.value'),
+                'solution': await embed_frame.Jeval('.question-answer', '(node) => (node.textContent || "").trim()'),
+            }
+            self.assertIn('리뷰 이동 첫 문제 prompt', case['first_question']['prompt'])
+            self.assertEqual(case['first_question']['answer'], '첫 답안')
+            self.assertIn('리뷰 첫 정답 해설', case['first_question']['solution'])
+            self.assertIn('리뷰 이동 두 번째 문제 prompt', case['second_question']['prompt'])
+            self.assertEqual(case['second_question']['answer'], '둘째 답안')
+            self.assertIn('리뷰 둘째 정답 해설', case['second_question']['solution'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-review-jump-restores-answer', status=status, observations=case)
@@ -3596,5 +3871,131 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.close()
 
 
+    async def test_wiki_mobile_layout_uses_focus_safe_drawer_without_overflow(self):
+        case = {'path': '/wiki'}
+        page = await self.new_page(viewport={'width': 390, 'height': 844})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/wiki', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#wikiToc .wiki-toc-link').length > 0")
+            case['initial_layout'] = await page.evaluate(
+                """
+                () => {
+                  const viewportWidth = window.innerWidth;
+                  const mainBox = document.querySelector('.wiki-main').getBoundingClientRect();
+                  return {
+                    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                    viewportWidth,
+                    mainRight: mainBox.right,
+                    topbarToggleDisplay: getComputedStyle(document.querySelector('#wikiSidebarTopbarBtn')).display,
+                    dockDisplay: getComputedStyle(document.querySelector('.wiki-sidebar-dock')).display,
+                  };
+                }
+                """
+            )
+            self.assertLessEqual(case['initial_layout']['pageOverflow'], 2)
+            self.assertLessEqual(case['initial_layout']['mainRight'], case['initial_layout']['viewportWidth'] + 1)
+            self.assertNotEqual(case['initial_layout']['topbarToggleDisplay'], 'none')
+            self.assertEqual(case['initial_layout']['dockDisplay'], 'none')
+
+            await page.click('#wikiSidebarTopbarBtn')
+            await page.waitForFunction("document.body.classList.contains('wiki-mobile-sidebar-open')")
+            case['drawer_open'] = await page.evaluate(
+                """
+                () => {
+                  const sidebar = document.querySelector('#wikiSidebar');
+                  const backdrop = document.querySelector('#wikiSidebarBackdrop');
+                  const box = sidebar.getBoundingClientRect();
+                  return {
+                    bodyClassOpen: document.body.classList.contains('wiki-mobile-sidebar-open'),
+                    backdropHidden: backdrop.hidden,
+                    viewportWidth: window.innerWidth,
+                    sidebarLeft: box.left,
+                    sidebarRight: box.right,
+                    sidebarWidth: box.width,
+                    bodyOverflow: getComputedStyle(document.body).overflow,
+                    topbarExpanded: document.querySelector('#wikiSidebarTopbarBtn').getAttribute('aria-expanded') || '',
+                  };
+                }
+                """
+            )
+            case['focus_after_drawer_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertTrue(case['drawer_open']['bodyClassOpen'])
+            self.assertFalse(case['drawer_open']['backdropHidden'])
+            self.assertLessEqual(case['drawer_open']['sidebarLeft'], 1)
+            self.assertLessEqual(case['drawer_open']['sidebarRight'], case['drawer_open']['viewportWidth'] + 1)
+            self.assertGreater(case['drawer_open']['sidebarWidth'], 200)
+            self.assertEqual(case['drawer_open']['bodyOverflow'], 'hidden')
+            self.assertEqual(case['drawer_open']['topbarExpanded'], 'true')
+
+            await page.keyboard.press('Escape')
+            await page.waitForFunction("!document.body.classList.contains('wiki-mobile-sidebar-open')")
+            case['focus_after_drawer_close'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            case['drawer_closed'] = await page.evaluate(
+                """
+                () => ({
+                  bodyClassOpen: document.body.classList.contains('wiki-mobile-sidebar-open'),
+                  backdropHidden: document.querySelector('#wikiSidebarBackdrop').hidden,
+                  topbarExpanded: document.querySelector('#wikiSidebarTopbarBtn').getAttribute('aria-expanded') || '',
+                })
+                """
+            )
+            self.assertFalse(case['drawer_closed']['bodyClassOpen'])
+            self.assertTrue(case['drawer_closed']['backdropHidden'])
+            self.assertEqual(case['drawer_closed']['topbarExpanded'], 'false')
+
+            await page.click('#wikiSearchToggleBtn')
+            await page.waitForFunction("document.querySelector('#wikiSearch').hidden === false")
+            await page.type('#wikiSearchInput', '심화')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.body.classList.contains('wiki-mobile-sidebar-open')")
+            await page.waitForFunction("document.querySelector('#wikiStatus').textContent.includes('검색 결과 1건')")
+            case['search_results_layout'] = await page.evaluate(
+                """
+                () => {
+                  const inputBox = document.querySelector('#wikiSearchInput').getBoundingClientRect();
+                  const tocLink = document.querySelector('#wikiToc .wiki-toc-link');
+                  return {
+                    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                    searchHidden: document.querySelector('#wikiSearch').hidden,
+                    viewportWidth: window.innerWidth,
+                    searchRight: inputBox.right,
+                    tocLinkText: tocLink ? (tocLink.textContent || '').trim() : '',
+                  };
+                }
+                """
+            )
+            self.assertLessEqual(case['search_results_layout']['pageOverflow'], 2)
+            self.assertTrue(case['search_results_layout']['searchHidden'])
+            self.assertLessEqual(case['search_results_layout']['searchRight'], case['search_results_layout']['viewportWidth'] + 1)
+            self.assertIn('심화 문서', case['search_results_layout']['tocLinkText'])
+
+            await page.evaluate(
+                """
+                () => {
+                  const target = Array.from(document.querySelectorAll('#wikiToc .wiki-toc-link'))
+                    .find((link) => (link.textContent || '').includes('심화 문서'));
+                  if (target) target.click();
+                }
+                """
+            )
+            await page.waitForFunction("window.location.pathname.endsWith('/wiki/page/deep-dive')")
+            await page.waitForFunction("!document.body.classList.contains('wiki-mobile-sidebar-open')")
+            case['post_navigation'] = await page.evaluate(
+                """
+                () => ({
+                  pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                  bodyClassOpen: document.body.classList.contains('wiki-mobile-sidebar-open'),
+                  currentPath: window.location.pathname,
+                })
+                """
+            )
+            self.assertLessEqual(case['post_navigation']['pageOverflow'], 2)
+            self.assertFalse(case['post_navigation']['bodyClassOpen'])
+            self.assertTrue(case['post_navigation']['currentPath'].endswith('/wiki/page/deep-dive'))
+            status = 'passed'
+        finally:
+            self.record_case(case_id='wiki-mobile-layout', status=status, observations=case)
+            await page.close()
 if __name__ == '__main__':
     unittest.main()

@@ -21,6 +21,7 @@
         <h1 id="wikiBookTitle" class="wiki-book-title">불러오는 중...</h1>
       </div>
       <div class="wiki-topbar-controls">
+        <button id="wikiSidebarTopbarBtn" class="wiki-sidebar-toggle wiki-sidebar-toggle-topbar" type="button" aria-controls="wikiSidebar" aria-expanded="true">목차</button>
         <button id="wikiSearchToggleBtn" class="wiki-search-toggle" type="button" aria-controls="wikiSearch" aria-expanded="false" aria-label="검색 열기" title="검색">⌕</button>
         <a class="wiki-home-link" href="/">플래시카드</a>
       </div>
@@ -29,6 +30,7 @@
       <input id="wikiSearchInput" type="search" placeholder="책/문서 제목 검색" tabindex="-1" />
     </div>
   </header>
+  <div id="wikiSidebarBackdrop" class="wiki-sidebar-backdrop" hidden aria-hidden="true"></div>
 
   <main class="wiki-shell">
     <div class="wiki-sidebar-dock">
@@ -39,6 +41,7 @@
         <div class="wiki-sidebar-title-row">
           <span class="wiki-sidebar-caption">목차보기</span>
           <div class="wiki-sidebar-actions">
+            <button id="wikiSidebarCloseBtn" class="wiki-sidebar-close" type="button" aria-label="목차 닫기" title="목차 닫기">닫기</button>
             <button id="wikiBatchAiToggleBtn" class="header-link wiki-batch-ai-toggle" type="button" aria-controls="wikiBatchAiPanel" aria-expanded="false">AI</button>
             <a id="wikiBookIntroLink" class="wiki-book-home-link" href="/wiki/page/_book">책 소개</a>
           </div>
