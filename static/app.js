@@ -37,7 +37,12 @@ const state = {
   speechToken: 0,
   speechKeepAlive: null,
   audioListRepeatIndex: 0,
-  controlsCollapsed: localStorage.getItem('controlsCollapsed') !== '0',
+  controlsCollapsed: (() => {
+    const sessionValue = window.sessionStorage.getItem('controlsCollapsed');
+    if (sessionValue === '0') return false;
+    if (sessionValue === '1') return true;
+    return localStorage.getItem('controlsCollapsed') !== '0';
+  })(),
   filtersCollapsed: (() => {
     const saved = localStorage.getItem('filtersCollapsed');
     if (saved === '0') return false;
@@ -838,17 +843,40 @@ function openCurrentGoogleSearch(event = null) {
 function applyControlsCollapsed() {
   const panel = $('controlsPanel');
   const button = $('controlsToggle');
-  if (!panel || !button) return;
-  panel.classList.toggle('collapsed', state.controlsCollapsed);
-  document.body.classList.toggle('controls-collapsed', state.controlsCollapsed);
-  button.setAttribute('aria-expanded', String(!state.controlsCollapsed));
-  button.textContent = state.controlsCollapsed ? '⚙' : '⚙';
+  const body = $('controlsBody');
+  if (!panel || !button || !body) return;
+  const collapsed = state.controlsCollapsed;
+  panel.classList.toggle('collapsed', collapsed);
+  body.hidden = collapsed;
+  document.body.classList.toggle('controls-collapsed', collapsed);
+  button.setAttribute('aria-expanded', String(!collapsed));
+  button.textContent = collapsed ? '⚙' : '⚙';
+  if (collapsed && body.contains(document.activeElement)) focusElement(button);
 }
 
 function toggleControlsPanel() {
   state.controlsCollapsed = !state.controlsCollapsed;
-  localStorage.setItem('controlsCollapsed', state.controlsCollapsed ? '1' : '0');
+  const nextValue = state.controlsCollapsed ? '1' : '0';
+  localStorage.setItem('controlsCollapsed', nextValue);
+  window.sessionStorage.setItem('controlsCollapsed', nextValue);
   applyControlsCollapsed();
+}
+
+let suppressNextControlsToggleClick = false;
+
+function handleControlsToggleClick() {
+  if (suppressNextControlsToggleClick) {
+    suppressNextControlsToggleClick = false;
+    return;
+  }
+  toggleControlsPanel();
+}
+
+function handleControlsToggleKeydown(event) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  suppressNextControlsToggleClick = true;
+  toggleControlsPanel();
 }
 
 function applyFiltersCollapsed() {
@@ -7381,7 +7409,8 @@ function reloadFromLogo(event) {
 $('logoRefreshBtn').addEventListener('click', reloadFromLogo);
 $('logoRefreshBtn').addEventListener('touchend', reloadFromLogo, {passive: false});
 document.querySelectorAll('[data-status-filter]').forEach((button) => button.addEventListener('click', () => setStatusFilter(button.dataset.statusFilter)));
-$('controlsToggle').addEventListener('click', toggleControlsPanel);
+$('controlsToggle').addEventListener('click', handleControlsToggleClick);
+$('controlsToggle').addEventListener('keydown', handleControlsToggleKeydown);
 $('filterToggleBtn').addEventListener('click', toggleFiltersPanel);
 $('positionInput').addEventListener('change', () => jumpFromInput());
 $('positionInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); jumpFromInput(); $('positionInput').blur(); } });

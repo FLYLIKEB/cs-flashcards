@@ -28,6 +28,8 @@ QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1'
 QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1'
 QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1'
 
+CONTROLS_COLLAPSED_KEY = 'controlsCollapsed'
+
 WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1'
 WAVE_ID_RE = re.compile(r'^(wave-\d+)')
 CANONICAL_COMMAND = '.venv/bin/python -m unittest tests.test_frontend_browser'
@@ -772,6 +774,92 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='header-menu-keyboard-focus', status=status, observations=case)
+            await page.close()
+
+    async def test_controls_panel_collapse_updates_hidden_state_and_tab_order(self):
+        case = {'path': '/'}
+        page = await self.new_page(
+            viewport={'width': 1440, 'height': 1100},
+            local_storage={CONTROLS_COLLAPSED_KEY: '1'},
+        )
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#controlsToggle')
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === true")
+            case['initial_collapsed'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                  storedValue: window.localStorage.getItem('controlsCollapsed') || '',
+                })
+                """
+            )
+            self.assertTrue(case['initial_collapsed']['bodyHidden'])
+            self.assertEqual(case['initial_collapsed']['toggleExpanded'], 'false')
+            self.assertEqual(case['initial_collapsed']['storedValue'], '1')
+
+            await page.focus('#controlsToggle')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === false")
+            case['expanded_state'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                  storedValue: window.localStorage.getItem('controlsCollapsed') || '',
+                })
+                """
+            )
+            self.assertFalse(case['expanded_state']['bodyHidden'])
+            self.assertEqual(case['expanded_state']['toggleExpanded'], 'true')
+            self.assertEqual(case['expanded_state']['storedValue'], '0')
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === false")
+            case['reloaded_open_state'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                })
+                """
+            )
+            self.assertFalse(case['reloaded_open_state']['bodyHidden'])
+            self.assertEqual(case['reloaded_open_state']['toggleExpanded'], 'true')
+
+            await page.focus('#controlsToggle')
+            await page.keyboard.press('Tab')
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'speakTerm'")
+            case['focus_after_tab_when_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_after_tab_when_open'], 'speakTerm')
+
+            await page.focus('#controlsToggle')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === true")
+            case['recollapsed_state'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                  storedValue: window.localStorage.getItem('controlsCollapsed') || '',
+                  focusedId: document.activeElement && document.activeElement.id ? document.activeElement.id : '',
+                })
+                """
+            )
+            self.assertTrue(case['recollapsed_state']['bodyHidden'])
+            self.assertEqual(case['recollapsed_state']['toggleExpanded'], 'false')
+            self.assertEqual(case['recollapsed_state']['storedValue'], '1')
+            self.assertEqual(case['recollapsed_state']['focusedId'], 'controlsToggle')
+
+            await page.keyboard.press('Tab')
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'positionInput'")
+            case['focus_after_tab_when_collapsed'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_after_tab_when_collapsed'], 'positionInput')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='controls-panel-collapse-hidden', status=status, observations=case)
             await page.close()
 
     async def test_main_symbolic_buttons_expose_explicit_accessible_names(self):
