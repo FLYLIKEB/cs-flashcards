@@ -435,13 +435,14 @@ function consumePendingQuestionBankLaunch() {
     if (!items.length) return false;
     const parsedStart = Number.parseInt(String(parsed?.startIndex ?? '0'), 10);
     const startIndex = Number.isInteger(parsedStart) ? parsedStart : 0;
+    const sessionState = parsed?.sessionState && typeof parsed.sessionState === 'object' ? parsed.sessionState : null;
     state.questionBankItems = items;
     state.questionBankSummary = {total: items.length, returned: items.length, limit: items.length};
     state.questionBankError = '';
     state.questionBankOpen = false;
     const selected = items[Math.max(0, Math.min(items.length - 1, startIndex))];
     state.questionBankSelectedId = String(selected?.question_bank_id || '');
-    openQuestionBankSession(startIndex);
+    openQuestionBankSession(startIndex, sessionState);
     return true;
   } catch (_error) {
     return false;
@@ -5574,6 +5575,57 @@ function questionBankItemToQuestion(item, index) {
   });
 }
 
+function questionBankLaunchAttemptSnapshot(sessionState, questionBankId = '') {
+  const targetId = String(questionBankId || '').trim();
+  if (!targetId || !sessionState || typeof sessionState !== 'object') return null;
+  const attempts = sessionState.attemptsByQuestionBankId;
+  if (!attempts || typeof attempts !== 'object') return null;
+  const snapshot = attempts[targetId];
+  return snapshot && typeof snapshot === 'object' ? snapshot : null;
+}
+
+function applyQuestionBankLaunchAttempt(question, snapshot, fallbackOrder = null) {
+  const current = hydrateQuestionState(question);
+  if (!current || !snapshot) return current;
+  const questionId = String(snapshot.question_id || '').trim();
+  const judgment = String(snapshot.judgment || snapshot.result_key || '').trim().toLowerCase();
+  if (questionId) current.id = questionId;
+  if (typeof snapshot.user_answer === 'string') current.userAnswer = snapshot.user_answer;
+  if (Number.isInteger(snapshot.selected_choice_index)) current.selectedChoiceIndex = snapshot.selected_choice_index;
+  else if (snapshot.selected_choice_index === null) current.selectedChoiceIndex = null;
+  if (QUESTION_HISTORY_FILTER_LABELS[judgment]) current.judgment = judgment;
+  if (typeof snapshot.wrong_note === 'string') current.wrongNote = snapshot.wrong_note;
+  if (typeof snapshot.session_id === 'string' && snapshot.session_id.trim()) current.sessionId = snapshot.session_id.trim();
+  if (typeof snapshot.session_title === 'string' && snapshot.session_title.trim()) current.sessionTitle = snapshot.session_title.trim();
+  if (typeof snapshot.session_mode === 'string' && snapshot.session_mode.trim()) current.sessionMode = normalizeQuestionSessionMode(snapshot.session_mode);
+  if (typeof snapshot.section === 'string' && snapshot.section.trim()) current.section = snapshot.section.trim();
+  if (Number.isInteger(snapshot.points)) current.points = snapshot.points;
+  if (Number.isInteger(snapshot.expected_time_seconds)) current.expectedTimeSeconds = snapshot.expected_time_seconds;
+  if (typeof snapshot.answer_guide === 'string' && snapshot.answer_guide.trim()) current.answerGuide = snapshot.answer_guide.trim();
+  if (Number.isInteger(snapshot.question_order)) current.questionOrder = snapshot.question_order;
+  else if (Number.isInteger(fallbackOrder)) current.questionOrder = fallbackOrder;
+  if (Number.isInteger(snapshot.question_elapsed_seconds)) current.questionElapsedSeconds = snapshot.question_elapsed_seconds;
+  if (Number.isInteger(snapshot.session_elapsed_seconds)) current.sessionElapsedSeconds = snapshot.session_elapsed_seconds;
+  if (Number.isInteger(snapshot.time_limit_seconds)) current.timeLimitSeconds = snapshot.time_limit_seconds;
+  if (typeof snapshot.question_started_at === 'string' && snapshot.question_started_at.trim()) current.questionStartedAt = snapshot.question_started_at.trim();
+  if (typeof snapshot.answered_at === 'string' && snapshot.answered_at.trim()) current.answeredAt = snapshot.answered_at.trim();
+  if (typeof snapshot.updated_at === 'string' && snapshot.updated_at.trim()) current.attemptSavedAt = snapshot.updated_at.trim();
+  if (Object.prototype.hasOwnProperty.call(snapshot, 'answer_revealed')) current.answerRevealed = Boolean(snapshot.answer_revealed);
+  else if (current.judgment !== 'pending' || Boolean(String(current.userAnswer || '').trim()) || Number.isInteger(current.selectedChoiceIndex)) current.answerRevealed = true;
+  current.gradedCorrect = current.judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(current.judgment) ? false : null;
+  return current;
+}
+
+function applyQuestionBankLaunchSessionState(questions, sessionState) {
+  if (!Array.isArray(questions) || !sessionState || typeof sessionState !== 'object') return;
+  questions.forEach((question, index) => {
+    const current = hydrateQuestionState(question);
+    const snapshot = questionBankLaunchAttemptSnapshot(sessionState, current?.questionBankId || current?.question_bank_id || '');
+    if (!snapshot) return;
+    applyQuestionBankLaunchAttempt(current, snapshot, index + 1);
+  });
+}
+
 function renderQuestionBankBrowser() {
   const panel = $('questionBankBrowser');
   const list = $('questionBankList');
@@ -5620,6 +5672,7 @@ function openQuestionBankSession(startIndex = 0) {
     setMessage('문제은행 목록이 비어 있습니다.', true);
     return;
   }
+  const sessionState = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : null;
   commitCurrentQuestionElapsed();
   resetQuestionSessionState();
   state.questionMode = true;
@@ -5630,6 +5683,7 @@ function openQuestionBankSession(startIndex = 0) {
     title: `문제은행 세트 · ${state.questionBankItems.length}문항`,
     mode: firstMode,
   });
+  applyQuestionBankLaunchSessionState(state.questions, sessionState);
   state.questionIndex = start;
   state.answerRevealed = Boolean(state.questions[start]?.answerRevealed);
   state.selectedChoiceIndex = Number.isInteger(state.questions[start]?.selectedChoiceIndex) ? state.questions[start].selectedChoiceIndex : null;

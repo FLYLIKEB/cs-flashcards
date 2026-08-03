@@ -269,6 +269,39 @@ function visibleQuestionBankReviewItems() {
   return (Array.isArray(bankState.reviewItems) ? bankState.reviewItems : []).filter((item) => questionBankReviewItemMatchesFilter(item));
 }
 
+function questionBankReviewLaunchSessionState(item) {
+  const questionBankId = String(item?.question_bank_id || '').trim();
+  if (!questionBankId) return null;
+  return {
+    reviewQuestionBankId: questionBankId,
+    attemptsByQuestionBankId: {
+      [questionBankId]: {
+        question_bank_id: questionBankId,
+        question_id: String(item?.question_id || '').trim(),
+        user_answer: String(item?.user_answer || ''),
+        selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
+        judgment: String(item?.result_key || item?.judgment || 'pending').trim().toLowerCase() || 'pending',
+        wrong_note: String(item?.wrong_note || ''),
+        session_id: String(item?.session_id || '').trim(),
+        session_title: String(item?.session_title || '').trim(),
+        session_mode: String(item?.session_mode || '').trim(),
+        section: String(item?.section || '').trim(),
+        points: Number.isInteger(item?.points) ? item.points : null,
+        expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+        answer_guide: String(item?.answer_guide || '').trim(),
+        question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
+        question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
+        session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
+        time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
+        question_started_at: String(item?.question_started_at || '').trim(),
+        answered_at: String(item?.answered_at || '').trim(),
+        updated_at: String(item?.updated_at || '').trim(),
+        answer_revealed: true,
+      },
+    },
+  };
+}
+
 function practiceLaunchPayload(startIndex, sessionState = bankState.practiceSessionState) {
   const payload = {items: bankState.items, startIndex};
   if (sessionState && typeof sessionState === 'object') payload.sessionState = sessionState;
@@ -1033,17 +1066,18 @@ function renderOverviewCards() {
       ].join('');
 }
 
-function selectQuestionBankItem(questionBankId, {launchPractice = false} = {}) {
+function selectQuestionBankItem(questionBankId, {launchPractice = false, sessionState = null} = {}) {
   const index = bankState.items.findIndex((item) => String(item?.question_bank_id || '') === String(questionBankId || ''));
   if (index < 0) return;
   bankState.selectedId = String(bankState.items[index]?.question_bank_id || '');
   bankState.practiceStartIndex = index;
+  bankState.practiceSessionState = sessionState && typeof sessionState === 'object' ? sessionState : null;
   persistFilterState();
 
   renderTable();
   renderPracticePane();
   ensureSelectedRowVisible();
-  if (launchPractice) launch(index);
+  if (launchPractice) launch(index, {sessionState: bankState.practiceSessionState});
 }
 
 function bindQuestionBankRowTriggerActions() {
@@ -1053,6 +1087,14 @@ function bindQuestionBankRowTriggerActions() {
       if (!Number.isInteger(index)) return;
       launch(index);
     });
+  });
+}
+
+function launchQuestionBankReview(questionBankId) {
+  const reviewItem = (Array.isArray(bankState.reviewItems) ? bankState.reviewItems : []).find((item) => String(item?.question_bank_id || '') === String(questionBankId || ''));
+  selectQuestionBankItem(questionBankId, {
+    launchPractice: true,
+    sessionState: questionBankReviewLaunchSessionState(reviewItem),
   });
 }
 
@@ -1066,7 +1108,7 @@ function bindQuestionBankReviewActions() {
     });
   });
   $('bankPageReviewList')?.querySelectorAll('[data-question-bank-review-id]').forEach((button) => {
-    button.addEventListener('click', () => selectQuestionBankItem(button.dataset.questionBankReviewId || ''));
+    button.addEventListener('click', () => launchQuestionBankReview(button.dataset.questionBankReviewId || ''));
   });
 }
 
@@ -1387,8 +1429,8 @@ function ensureSelectedRowVisible() {
 }
 
 
-function applyPracticeLaunch(startIndex = 0, {reveal = true} = {}) {
-  launch(startIndex, {reveal}).catch(() => {});
+function applyPracticeLaunch(startIndex = 0, {reveal = true, sessionState = bankState.practiceSessionState} = {}) {
+  launch(startIndex, {reveal, sessionState}).catch(() => {});
 }
 
 function renderLaunchState() {
@@ -1412,10 +1454,12 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
     renderLaunchState();
     return false;
   }
+  const options = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : {};
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
   const targetId = String(bankState.items[safeStart]?.question_bank_id || '');
   const currentId = String(bankState.practiceActiveId || '');
-  if (bankState.practiceLoaded && targetId && targetId === currentId) {
+  const nextSessionState = options.sessionState && typeof options.sessionState === 'object' ? options.sessionState : null;
+  if (bankState.practiceLoaded && targetId && targetId === currentId && !nextSessionState) {
     if (reveal) setPracticeCollapsed(false);
     ensureSelectedRowVisible();
     return false;
@@ -1426,17 +1470,17 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
     return false;
   }
   pendingPracticeLaunch = bankState.loading
-    ? {startIndex: safeStart, reveal}
+    ? {startIndex: safeStart, reveal, sessionState: nextSessionState}
     : null;
   bankState.selectedId = targetId;
   bankState.practiceActiveId = targetId;
   bankState.practiceLoaded = true;
   bankState.practiceStartIndex = safeStart;
   bankState.practiceSummary = null;
-  bankState.practiceSessionState = null;
+  bankState.practiceSessionState = nextSessionState;
   if (reveal) setPracticeCollapsed(false);
   persistFilterState();
-  restartPracticeFrame(safeStart, null);
+  restartPracticeFrame(safeStart, nextSessionState);
   bankState.error = '';
   renderLaunchState();
   return true;
@@ -1514,7 +1558,7 @@ async function loadQuestionBankPage() {
       shouldRestorePracticePane = false;
       restoredPracticeState = null;
       persistFilterState();
-      applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal});
+      applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal, sessionState: launchRequest.sessionState});
     } else if (shouldRestorePracticePane && !bankState.practiceLoaded) {
       const restoreIndex = nextIndex >= 0
         ? nextIndex

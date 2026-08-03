@@ -1570,6 +1570,110 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='question-bank-review-filter-pressed-state', status=status, observations=case)
             await page.close()
 
+    async def test_question_bank_review_jump_restores_saved_answer_and_solution(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        bank_item = self.question_bank_item(
+            '리뷰 이동',
+            question_bank_id='review-jump-1',
+            prompt='리뷰 이동 prompt',
+            answer='리뷰 정답 해설',
+            explanation='리뷰 정답 추가 설명',
+            question_type='subjective',
+        )
+        question_bank_payload = self.question_bank_payload('review-jump', items=[bank_item])
+        review_payload = {
+            'items': [
+                {
+                    'question_id': 'review-jump-attempt-1',
+                    'question_bank_id': 'review-jump-1',
+                    'prompt': '리뷰 이동 prompt',
+                    'term': '리뷰 이동',
+                    'category': '테스트',
+                    'question_type': 'subjective',
+                    'session_id': 'review-session-1',
+                    'session_title': '복습 세트',
+                    'session_mode': 'practice',
+                    'updated_at': '2026-08-01T00:00:00Z',
+                    'result_key': 'wrong',
+                    'result_label': '틀림',
+                    'user_answer': '내가 쓴 답',
+                    'wrong_note': '핵심 키워드 누락',
+                    'answer': '리뷰 정답 해설',
+                    'question_order': 1,
+                },
+            ],
+            'summary': {
+                'total': 1,
+                'correct': 0,
+                'ambiguous': 0,
+                'wrong': 1,
+                'unknown': 0,
+                'pending': 0,
+                'note_count': 1,
+                'selected_question_bank_count': 1,
+            },
+        }
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ questionBankPayload, reviewPayload }) => {
+                  const originalFetch = window.fetch.bind(window);
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/question-bank' && method === 'GET') {
+                      return Promise.resolve(new Response(JSON.stringify(questionBankPayload), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/question-bank/attempts/query' && method === 'POST') {
+                      return Promise.resolve(new Response(JSON.stringify(reviewPayload), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                {'questionBankPayload': question_bank_payload, 'reviewPayload': review_payload},
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length === 1")
+            await page.click('#bankPageToggleReviewBtn')
+            await page.waitForFunction(
+                """
+                () => document.querySelectorAll('#bankPageReviewList .question-bank-review-item').length === 1
+                  && document.querySelector('#bankPageReviewList')?.textContent.includes('내가 쓴 답')
+                """
+            )
+            await page.click('.question-bank-review-jump')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            embed_frame = await self.wait_for_embed_frame(page)
+            await embed_frame.waitForSelector('#questionAnswerInput')
+            await embed_frame.waitForFunction(
+                "document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('리뷰 정답 해설')"
+            )
+            case['practice_prompt'] = await embed_frame.Jeval('.question-prompt', '(node) => (node.textContent || "").trim()')
+            case['restored_answer'] = await embed_frame.Jeval('#questionAnswerInput', '(node) => node.value')
+            case['answer_panel_text'] = await embed_frame.Jeval('.question-answer', '(node) => (node.textContent || "").trim()')
+            case['result_buttons'] = await embed_frame.evaluate(
+                "() => [...document.querySelectorAll('[data-question-judgment]')].map((node) => (node.textContent || '').trim())"
+            )
+            self.assertIn('리뷰 이동 prompt', case['practice_prompt'])
+            self.assertEqual(case['restored_answer'], '내가 쓴 답')
+            self.assertIn('리뷰 정답 해설', case['answer_panel_text'])
+            self.assertIn('맞음 저장', case['result_buttons'])
+            self.assertIn('틀림 저장', case['result_buttons'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-review-jump-restores-answer', status=status, observations=case)
+            await page.close()
+
     async def test_question_bank_row_trigger_supports_tab_enter_and_space_activation(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
