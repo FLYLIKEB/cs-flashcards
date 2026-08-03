@@ -4415,30 +4415,13 @@ window.__csFlashcardsTableClosed = () => {
   state.flashcardTableWindow = null;
 };
 
-function syncFlashcardTableWindowSelection() {
-  const popup = state.flashcardTableWindow;
-  if (!popup || popup.closed) {
-    state.flashcardTableWindow = null;
-    return false;
-  }
-  const doc = popup.document;
-  const rows = [...doc.querySelectorAll('[data-row-card-id]')];
-  const summary = doc.querySelector('.summary');
-  if (summary) summary.textContent = `${flashcardTableSummaryText()} · ${state.filtered.length}개 · 현재 ${state.filtered.length ? state.index + 1 : 0}`;
-  if (!rows.length) return false;
-  const currentCardId = state.filtered[state.index]?.id || '';
-  rows.forEach((row) => row.classList.toggle('current-row', row.dataset.rowCardId === currentCardId));
-  return true;
+function flashcardTableWindowSummaryLine() {
+  return `${flashcardTableSummaryText()} · ${state.filtered.length}개 · 현재 ${state.filtered.length ? state.index + 1 : 0}`;
 }
-function renderFlashcardTableWindow() {
-  const popup = state.flashcardTableWindow;
-  if (!popup || popup.closed) {
-    state.flashcardTableWindow = null;
-    return;
-  }
+
+function flashcardTableWindowConfig() {
   const rows = state.filtered;
   const currentCardId = rows[state.index]?.id || '';
-  const summaryText = flashcardTableSummaryText();
   const columnOrder = flashcardTableColumnOrder();
   // Shared table shell owns draggable="true", data-column-key, dragstart, and drop-target header behavior.
   const columns = columnOrder.map((key) => {
@@ -4451,7 +4434,7 @@ function renderFlashcardTableWindow() {
       cellClassName: column.className || '',
     };
   });
-  const popupConfig = {
+  return {
     columns,
     rows: rows.map((card, index) => ({
       id: card.id,
@@ -4459,8 +4442,39 @@ function renderFlashcardTableWindow() {
       attributes: {'data-row-card-id': card.id},
       cells: Object.fromEntries(columnOrder.map((key) => [key, FLASHCARD_TABLE_COLUMNS[key].render(card, index)])),
     })),
+    emptyText: '현재 조건에 맞는 카드가 없습니다.',
+    tableMinWidth: '720px',
   };
+}
+
+function syncFlashcardTableWindowSelection() {
+  const popup = state.flashcardTableWindow;
+  if (!popup || popup.closed) {
+    state.flashcardTableWindow = null;
+    return false;
+  }
+  const doc = popup.document;
+  const rows = [...doc.querySelectorAll('[data-row-card-id]')];
+  const summary = doc.querySelector('.summary');
+  if (summary) summary.textContent = flashcardTableWindowSummaryLine();
+  if (!rows.length) return false;
+  const currentCardId = state.filtered[state.index]?.id || '';
+  rows.forEach((row) => row.classList.toggle('current-row', row.dataset.rowCardId === currentCardId));
+  return true;
+}
+function renderFlashcardTableWindow() {
+  const popup = state.flashcardTableWindow;
+  if (!popup || popup.closed) {
+    state.flashcardTableWindow = null;
+    return;
+  }
+  const popupConfig = flashcardTableWindowConfig();
+  const summaryLine = flashcardTableWindowSummaryLine();
+  if (typeof popup.__csFlashcardTableRender === 'function' && popup.document?.getElementById('flashcardTableMount')) {
+    if (popup.__csFlashcardTableRender(popupConfig, summaryLine)) return;
+  }
   const popupConfigJson = JSON.stringify(popupConfig).replace(/</g, '\\u003c');
+  const summaryLineJson = JSON.stringify(summaryLine).replace(/</g, '\\u003c');
   try {
     popup.document.open();
     popup.document.write(`<!doctype html>
@@ -4476,7 +4490,7 @@ function renderFlashcardTableWindow() {
     <div class="cs-table-meta">
       <div>
         <h1 class="cs-table-title">플래시카드 표 목록</h1>
-        <p class="summary cs-table-summary">${escapeHtml(summaryText)} · ${rows.length}개 · 현재 ${rows.length ? state.index + 1 : 0}</p>
+        <p class="summary cs-table-summary">${escapeHtml(summaryLine)}</p>
         <p class="hint cs-table-hint">열 제목 드래그로 순서 변경 · 행 클릭 이동 · 별/O/X/– 바로 수정</p>
       </div>
     </div>
@@ -4495,35 +4509,48 @@ function renderFlashcardTableWindow() {
       }, 0);
       return true;
     };
-    const config = ${popupConfigJson};
-    const mount = document.getElementById('flashcardTableMount');
-    window.CSTableShell.renderTable(mount, {
-      columns: config.columns,
-      rows: config.rows,
-      emptyText: '현재 조건에 맞는 카드가 없습니다.',
-      tableMinWidth: '720px',
-      onAction: (event) => {
-        const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
-        if (bookmarkButton) {
-          event.preventDefault();
-          invokeOpener('__csFlashcardsToggleBookmarkFromTable', bookmarkButton.dataset.bookmarkCardId || '');
-          return true;
-        }
-        const statusButton = event.target.closest('[data-status-card-id]');
-        if (statusButton) {
-          event.preventDefault();
-          invokeOpener('__csFlashcardsSetStatusFromTable', statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
-          return true;
-        }
-        return false;
-      },
-      onRowActivate: (row) => {
-        invokeOpener('__csFlashcardsSelectCardFromTable', row?.attributes?.['data-row-card-id'] || row?.id || '');
-      },
-      onColumnMove: (sourceKey, targetKey) => {
-        invokeOpener('__csFlashcardsMoveTableColumn', sourceKey, targetKey);
-      },
-    });
+    const flashcardTableState = {
+      config: ${popupConfigJson},
+      summaryLine: ${summaryLineJson},
+    };
+    const renderPopupTable = () => {
+      const mount = document.getElementById('flashcardTableMount');
+      const summary = document.querySelector('.summary');
+      if (!mount || !summary || !window.CSTableShell?.renderTable) return false;
+      summary.textContent = flashcardTableState.summaryLine || '';
+      window.CSTableShell.renderTable(mount, {
+        ...flashcardTableState.config,
+        onAction: (event) => {
+          const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
+          if (bookmarkButton) {
+            event.preventDefault();
+            invokeOpener('__csFlashcardsToggleBookmarkFromTable', bookmarkButton.dataset.bookmarkCardId || '');
+            return true;
+          }
+          const statusButton = event.target.closest('[data-status-card-id]');
+          if (statusButton) {
+            event.preventDefault();
+            invokeOpener('__csFlashcardsSetStatusFromTable', statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
+            return true;
+          }
+          return false;
+        },
+        onRowActivate: (row) => {
+          invokeOpener('__csFlashcardsSelectCardFromTable', row?.attributes?.['data-row-card-id'] || row?.id || '');
+        },
+        onColumnMove: (sourceKey, targetKey) => {
+          invokeOpener('__csFlashcardsMoveTableColumn', sourceKey, targetKey);
+        },
+      });
+      return true;
+    };
+    window.__csFlashcardTableRender = (nextConfig, nextSummaryLine) => {
+      if (nextConfig && typeof nextConfig === 'object') flashcardTableState.config = nextConfig;
+      if (typeof nextSummaryLine === 'string') flashcardTableState.summaryLine = nextSummaryLine;
+      return renderPopupTable();
+    };
+    renderPopupTable();
+    window.addEventListener('load', renderPopupTable);
     window.addEventListener('beforeunload', () => {
       invokeOpener('__csFlashcardsTableClosed');
     });
