@@ -4439,7 +4439,7 @@ function renderFlashcardTableWindow() {
   <title>플래시카드 표 목록</title>
   <link rel="stylesheet" href="/static/table-shell.css" />
 </head>
-<body class="cs-table-page">
+<body class="cs-table-page flashcard-table-page">
   <main class="cs-table-shell">
     <div class="cs-table-meta">
       <div>

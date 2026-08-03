@@ -699,6 +699,10 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-row-number.is-wrong::after', table_shell_css())
         self.assertIn('.question-choice.wrong', style_css())
 
+    def test_flashcard_table_popup_has_vertical_scroll_region(self):
+        self.assertIn('body class="cs-table-page flashcard-table-page"', app_js())
+        self.assertIn('.flashcard-table-page .cs-table-wrap', table_shell_css())
+        self.assertIn('max-height: calc(100vh - 150px)', table_shell_css())
     def test_concept_html_widgets_use_trusted_iframe_boundary(self):
         self.assertIn("const TRUSTED_CONCEPT_WIDGET_HTML_KIND = 'concept-widget';", app_js())
         self.assertIn('function trustedConceptWidgetHtml(payload)', app_js())

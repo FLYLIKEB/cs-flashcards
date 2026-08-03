@@ -828,6 +828,18 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
   background: #ffffff;
 }
 
+.flashcard-table-page .cs-table-wrap {
+  max-height: calc(100vh - 150px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.flashcard-table-page .cs-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
 .cs-table {
   width: 100%;
   min-width: 960px;
