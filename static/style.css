@@ -5145,7 +5145,8 @@ select,
   line-height: 1.4;
   word-break: break-word;
 }
-.question-answer-meta .question-keyword-list {
+.question-answer-meta .question-keyword-list,
+.question-info-box .question-keyword-list {
   margin: 0;
 }
 .question-answer-meta-card-button {

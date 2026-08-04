@@ -1322,6 +1322,75 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         finally:
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
             await page.close()
+    async def test_question_bank_embed_question_info_keywords_open_related_card(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        try:
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+            card_info = await page.evaluate(
+                """
+                async () => {
+                  const res = await fetch('/api/cards', {cache: 'no-store'});
+                  const data = await res.json();
+                  const first = Array.isArray(data.cards)
+                    ? data.cards.find((item) => item && String(item.id || '').trim() && String(item.term || '').trim())
+                    : null;
+                  return first ? {id: String(first.id || ''), term: String(first.term || '')} : null;
+                }
+                """
+            )
+            self.assertIsNotNone(card_info)
+            await self.install_delayed_json_route(
+                page,
+                route_path='/api/question-bank',
+                key_param='q',
+                responses={
+                    'keyword-nav': {
+                        'delayMs': 0,
+                        'payload': self.question_bank_payload(
+                            'keyword-nav',
+                            items=[
+                                self.question_bank_item(
+                                    'keyword-nav',
+                                    card_id=card_info['id'],
+                                    keywords=[card_info['term']],
+                                    prompt='키워드 이동 prompt',
+                                )
+                            ],
+                        ),
+                    },
+                },
+            )
+            await page.click('#bankPageToggleFiltersBtn')
+            await page.waitForFunction("!document.querySelector('#bankPageFiltersRegion').hidden")
+            await self.set_input_value(page, '#bankPageQueryInput', 'keyword-nav', submit=True)
+            await page.waitForFunction("document.querySelector('#bankPageList').textContent.includes('키워드 이동 prompt')")
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            frame = await self.wait_for_embed_frame(page)
+            await frame.waitForFunction("document.querySelector('.question-info-box .question-keyword-link') !== null")
+            case['question_info_text'] = await frame.Jeval('.question-info-box', '(node) => (node.textContent || "").trim()')
+            case['keyword_button_card_id'] = await frame.Jeval('.question-info-box .question-keyword-link', '(node) => node.getAttribute("data-question-card-id") || ""')
+            self.assertIn('문항 정보', case['question_info_text'])
+            self.assertIn(card_info['term'], case['question_info_text'])
+            self.assertEqual(case['keyword_button_card_id'], card_info['id'])
+            await frame.click('.question-info-box .question-keyword-link')
+            await frame.waitForFunction(
+                """
+                (term) => !document.body.classList.contains('question-mode-active')
+                  && ((document.querySelector('#backTerm')?.textContent || '').trim() === term)
+                """,
+                {},
+                card_info['term'],
+            )
+            case['back_term_after_click'] = await frame.Jeval('#backTerm', '(node) => (node.textContent || "").trim()')
+            self.assertEqual(case['back_term_after_click'], card_info['term'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-keyword-card-nav', status=status, observations=case)
+            await page.close()
     async def test_question_bank_page_mobile_layout_stacks_actions_without_overflow(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 900, 'height': 1180})

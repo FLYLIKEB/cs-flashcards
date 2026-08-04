@@ -19,14 +19,17 @@ class QuestionBankKeywordTests(unittest.TestCase):
             'function normalizeQuestionKeywords(',
             'function findCardByKeyword(',
             'function renderQuestionKeywordLinks(',
+            'data-question-card-id',
             'function goToQuestionKeyword(',
             'card_query=',
             "[data-question-keyword]",
+            'question-info-box',
         ]:
             self.assertIn(snippet, APP_JS + QUESTION_BANK_JS)
 
     def test_keyword_styles_exist(self):
         self.assertIn('.question-keyword-list', STYLE_CSS)
+        self.assertIn('.question-info-box .question-keyword-list', STYLE_CSS)
         self.assertIn('.question-keyword-link', STYLE_CSS)
         self.assertIn('.question-keyword-link', TABLE_SHELL_CSS)
 
