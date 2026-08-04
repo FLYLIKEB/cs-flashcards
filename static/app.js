@@ -5933,6 +5933,7 @@ function applyQuestionBankLaunchAttempt(question, snapshot, fallbackOrder = null
   if (Object.prototype.hasOwnProperty.call(snapshot, 'answer_revealed')) current.answerRevealed = Boolean(snapshot.answer_revealed);
   else if (current.judgment !== 'pending' || Boolean(String(current.userAnswer || '').trim()) || Number.isInteger(current.selectedChoiceIndex)) current.answerRevealed = true;
   current.gradedCorrect = current.judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(current.judgment) ? false : null;
+  syncQuestionSavedDraft(current, snapshot);
   return current;
 }
 
@@ -5983,7 +5984,15 @@ function renderQuestionBankBrowser() {
     const difficulty = escapeHtml(item.difficulty || '');
     const source = escapeHtml(item.source_location || '');
     const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 96);
-    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}"><td class="question-bank-col-index">${index + 1}</td><td class="question-bank-col-title"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td><td class="question-bank-col-type">${typeLabel || '—'}</td><td class="question-bank-col-field">${topic}</td><td class="question-bank-col-issuer">${issuer || '—'}</td><td class="question-bank-col-difficulty">${difficulty || '—'}</td><td class="question-bank-col-source">${source || '—'}</td></tr>`;
+    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}">
+      <td class="question-bank-col-index" data-label="#">${index + 1}</td>
+      <td class="question-bank-col-title" data-label="문제"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td>
+      <td class="question-bank-col-type" data-label="형식">${typeLabel || '—'}</td>
+      <td class="question-bank-col-field" data-label="키워드">${topic}</td>
+      <td class="question-bank-col-issuer" data-label="기관">${issuer || '—'}</td>
+      <td class="question-bank-col-difficulty" data-label="난이도">${difficulty || '—'}</td>
+      <td class="question-bank-col-source" data-label="출처">${source || '—'}</td>
+    </tr>`;
   }).join('');
 }
 
@@ -6126,6 +6135,11 @@ function hydrateQuestionState(question) {
   if (typeof question.sourceLocation !== 'string') question.sourceLocation = String(question.source_location || '');
   if (!Number.isFinite(question.questionActiveSinceMs)) question.questionActiveSinceMs = 0;
   if (typeof question.answerRefineInstruction !== 'string') question.answerRefineInstruction = '';
+  if (typeof question.savedUserAnswer !== 'string') question.savedUserAnswer = '';
+  if (!Number.isInteger(question.savedSelectedChoiceIndex)) question.savedSelectedChoiceIndex = null;
+  if (typeof question.savedWrongNote !== 'string') question.savedWrongNote = '';
+  if (typeof question.savedJudgment !== 'string' || !QUESTION_HISTORY_FILTER_LABELS[question.savedJudgment]) question.savedJudgment = 'pending';
+  if (typeof question.savedAnswerRevealed !== 'boolean') question.savedAnswerRevealed = false;
   return question;
 }
 
@@ -6373,6 +6387,7 @@ function prepareQuestionSession(questions, options = {}) {
     timeLimitSeconds: Number.isInteger(item?.timeLimitSeconds) ? item.timeLimitSeconds : state.questionTimeLimitSeconds,
     questionActiveSinceMs: 0,
   }));
+  state.questions.forEach((question) => { syncQuestionSavedDraft(question); });
   state.questionIndex = 0;
   state.answerRevealed = false;
   state.selectedChoiceIndex = null;
@@ -6393,6 +6408,107 @@ function questionHasSubmittedAnswer(question) {
   if (!current) return false;
   if (Array.isArray(current.choices) && current.choices.length) return Number.isInteger(current.selectedChoiceIndex);
   return Boolean(String(current.userAnswer || '').trim());
+}
+
+function normalizeQuestionAttemptDraft(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return null;
+  return {
+    userAnswer: selectedAnswerText(current),
+    selectedChoiceIndex: Number.isInteger(current.selectedChoiceIndex) ? current.selectedChoiceIndex : null,
+    wrongNote: String(current.wrongNote || ''),
+    judgment: QUESTION_HISTORY_FILTER_LABELS[current.judgment] ? current.judgment : 'pending',
+    answerRevealed: Boolean(current.answerRevealed),
+  };
+}
+
+function syncQuestionSavedDraft(question, snapshot = null) {
+  const current = hydrateQuestionState(question);
+  if (!current) return null;
+  const draft = normalizeQuestionAttemptDraft(current);
+  const source = snapshot && typeof snapshot === 'object' ? snapshot : null;
+  current.savedUserAnswer = source && typeof source.user_answer === 'string' ? source.user_answer : draft.userAnswer;
+  current.savedSelectedChoiceIndex = source && Object.prototype.hasOwnProperty.call(source, 'selected_choice_index')
+    ? (Number.isInteger(source.selected_choice_index) ? source.selected_choice_index : null)
+    : draft.selectedChoiceIndex;
+  current.savedWrongNote = source && typeof source.wrong_note === 'string' ? source.wrong_note : draft.wrongNote;
+  const savedJudgment = source && typeof source.judgment === 'string'
+    ? source.judgment
+    : source && typeof source.result_key === 'string' ? source.result_key : draft.judgment;
+  current.savedJudgment = QUESTION_HISTORY_FILTER_LABELS[savedJudgment] ? savedJudgment : draft.judgment;
+  current.savedAnswerRevealed = source && Object.prototype.hasOwnProperty.call(source, 'answer_revealed')
+    ? Boolean(source.answer_revealed)
+    : draft.answerRevealed;
+  return current;
+}
+
+function questionAttemptDirty(question) {
+  const current = hydrateQuestionState(question);
+  const draft = normalizeQuestionAttemptDraft(current);
+  if (!current || !draft) return false;
+  return draft.userAnswer !== String(current.savedUserAnswer || '')
+    || draft.selectedChoiceIndex !== (Number.isInteger(current.savedSelectedChoiceIndex) ? current.savedSelectedChoiceIndex : null)
+    || draft.wrongNote !== String(current.savedWrongNote || '')
+    || draft.judgment !== (QUESTION_HISTORY_FILTER_LABELS[current.savedJudgment] ? current.savedJudgment : 'pending')
+    || draft.answerRevealed !== Boolean(current.savedAnswerRevealed);
+}
+
+function questionAttemptHasSavableContent(question) {
+  const draft = normalizeQuestionAttemptDraft(question);
+  if (!draft) return false;
+  return Boolean(
+    String(draft.userAnswer || '').trim()
+    || draft.selectedChoiceIndex !== null
+    || String(draft.wrongNote || '').trim()
+    || draft.judgment !== 'pending'
+    || draft.answerRevealed
+  );
+}
+
+function questionAttemptSavedAtLabel(value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  const match = text.match(/T(\d{2}:\d{2})/);
+  if (match?.[1]) return match[1];
+  return text.slice(0, 16);
+}
+
+function questionAttemptSaveLabel(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return '문항을 불러오면 저장 상태가 표시됩니다.';
+  if (questionAttemptDirty(current)) return '변경 사항을 저장하세요.';
+  if (current.attemptSavedAt) {
+    const savedAt = questionAttemptSavedAtLabel(current.attemptSavedAt);
+    return savedAt ? `문항별 답안 저장됨 · ${savedAt}` : '문항별 답안 저장됨';
+  }
+  return questionAttemptHasSavableContent(current) ? '아직 저장되지 않았습니다.' : '답안을 작성하거나 선택한 뒤 저장하세요.';
+}
+
+function questionAttemptSaveMessage(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return '답안 저장 완료';
+  return current.judgment === 'pending' ? '답안 저장 완료' : (questionResultText(current) || '문제 채점 저장 완료');
+}
+
+function refreshCurrentQuestionSaveState(question = currentQuestion()) {
+  const current = hydrateQuestionState(question);
+  const shell = $('questionCard')?.querySelector('.question-card-shell');
+  if (!shell) return;
+  const dirty = questionAttemptDirty(current);
+  shell.dataset.questionDirty = dirty ? '1' : '0';
+  shell.dataset.questionSaved = current?.attemptSavedAt ? '1' : '0';
+  const status = $('questionAnswerSaveStatus');
+  if (status) {
+    status.textContent = questionAttemptSaveLabel(current);
+    status.classList.toggle('dirty', dirty);
+    status.classList.toggle('saved', !dirty && Boolean(current?.attemptSavedAt));
+    status.classList.toggle('idle', !dirty && !current?.attemptSavedAt);
+  }
+  const button = $('questionAnswerSaveBtn');
+  if (button) {
+    button.disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionBankEditSaving || !dirty;
+    button.classList.toggle('is-primary', dirty);
+  }
 }
 
 function markUnansweredQuestionWrong(question, answeredAt = new Date().toISOString()) {
@@ -6488,6 +6604,7 @@ function questionAttemptPayload(question) {
     time_limit_seconds: Number.isInteger(current.timeLimitSeconds) ? current.timeLimitSeconds : state.questionTimeLimitSeconds,
     question_started_at: current.questionStartedAt || '',
     answered_at: current.answeredAt || '',
+    answer_revealed: Boolean(current.answerRevealed),
   };
 }
 
@@ -6524,14 +6641,21 @@ async function saveQuestionAttempt(question, {quiet = false} = {}) {
     current.answerGuide = String(data.attempt?.answer_guide || current.answerGuide || '');
     current.questionElapsedSeconds = Number.isInteger(data.attempt?.question_elapsed_seconds) ? data.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
     current.sessionElapsedSeconds = Number.isInteger(data.attempt?.session_elapsed_seconds) ? data.attempt.session_elapsed_seconds : current.sessionElapsedSeconds;
-    if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
+    if (Object.prototype.hasOwnProperty.call(data.attempt || {}, 'selected_choice_index')) {
+      current.selectedChoiceIndex = Number.isInteger(data.attempt?.selected_choice_index) ? data.attempt.selected_choice_index : null;
+    }
+    if (Object.prototype.hasOwnProperty.call(data.attempt || {}, 'answer_revealed')) {
+      current.answerRevealed = Boolean(data.attempt?.answer_revealed);
+      state.answerRevealed = Boolean(current.answerRevealed);
+    }
+    syncQuestionSavedDraft(current, data.attempt);
     syncUpdatedCard(data.card);
     syncQuestionBankAttemptState(current);
     if (state.questionHistoryOpen) loadQuestionHistory();
-    if (!quiet) setMessage(questionResultText(current) || '문제 채점 저장 완료');
+    if (!quiet) setMessage(questionAttemptSaveMessage(current));
     return data;
   } catch (error) {
-    if (!quiet) setMessage(`문제 채점 저장 실패: ${error.message || error}`, true);
+    if (!quiet) setMessage(`답안 저장 실패: ${error.message || error}`, true);
     throw error;
   } finally {
     state.questionSaving = false;
@@ -6578,6 +6702,13 @@ async function finishQuestionSession() {
       current.expectedTimeSeconds = Number.isInteger(payload.attempt?.expected_time_seconds) ? payload.attempt.expected_time_seconds : current.expectedTimeSeconds;
       current.answerGuide = String(payload.attempt?.answer_guide || current.answerGuide || '');
       current.questionElapsedSeconds = Number.isInteger(payload.attempt?.question_elapsed_seconds) ? payload.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
+      if (Object.prototype.hasOwnProperty.call(payload.attempt || {}, 'selected_choice_index')) {
+        current.selectedChoiceIndex = Number.isInteger(payload.attempt?.selected_choice_index) ? payload.attempt.selected_choice_index : null;
+      }
+      if (Object.prototype.hasOwnProperty.call(payload.attempt || {}, 'answer_revealed')) {
+        current.answerRevealed = Boolean(payload.attempt?.answer_revealed);
+      }
+      syncQuestionSavedDraft(current, payload.attempt);
       syncUpdatedCard(payload.card);
       syncQuestionBankAttemptState(current, {reloadOnFilterMismatch: index === state.questionIndex});
     });
@@ -6606,6 +6737,22 @@ function setQuestionJudgment(judgment) {
   state.answerRevealed = true;
   renderQuestionPanel();
   saveQuestionAttempt(question).catch(() => {});
+}
+
+function saveCurrentQuestionAnswer({quiet = false} = {}) {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question || state.questionLoading || state.questionSaving) return Promise.resolve(null);
+  if (!questionAttemptDirty(question)) {
+    refreshCurrentQuestionSaveState(question);
+    if (!quiet) setMessage(questionAttemptSaveLabel(question));
+    return Promise.resolve(null);
+  }
+  if (questionAttemptHasSavableContent(question) && !question.answeredAt) {
+    question.answeredAt = new Date().toISOString();
+  }
+  question.userAnswer = selectedAnswerText(question);
+  renderQuestionPanel();
+  return saveQuestionAttempt(question, {quiet});
 }
 
 function saveCurrentWrongNote() {
@@ -6771,6 +6918,18 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
 
       ${answerGuideHtml}
     </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
+  const questionDirty = questionAttemptDirty(question);
+  const saveStatusTone = questionDirty ? 'dirty' : question.attemptSavedAt ? 'saved' : 'idle';
+  const answerSaveHtml = `
+    <div class="question-answer-save question-surface">
+      <div class="question-answer-save-head">
+        <div class="question-inline-toolbar-copy">
+          <span class="question-side-note-label">문항별 답안 저장</span>
+          <p id="questionAnswerSaveStatus" class="question-answer-save-status ${saveStatusTone}">${escapeHtml(questionAttemptSaveLabel(question))}</p>
+        </div>
+        <button id="questionAnswerSaveBtn" class="question-toolbar-button${questionDirty ? ' is-primary' : ''}" type="button" data-question-save-answer="1" ${questionSaveBusy || !questionDirty ? 'disabled' : ''}>${state.questionSaving ? '저장 중…' : '답안 저장'}</button>
+      </div>
+    </div>`;
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
     <div class="question-rubric">
       <strong>채점 포인트</strong>
@@ -6920,7 +7079,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
       </div>
     </div>` : '';
   card.innerHTML = `
-    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}">
+    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}" data-question-dirty="${questionDirty ? '1' : '0'}" data-question-saved="${question.attemptSavedAt ? '1' : '0'}">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
       <div class="question-card-head">
         <div class="question-card-head-copy">
@@ -6948,6 +7107,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
           ${questionInfoHtml}
           ${choiceHtml}
           ${draftHtml}
+          ${answerSaveHtml}
           ${lockActionHtml}
           ${answer}
 
@@ -6973,6 +7133,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
     $('finishQuestionSessionBtn').disabled = state.questionLoading || questionBusy || !total;
     $('finishQuestionSessionBtn').textContent = questionSessionIsBok(question.sessionMode || state.questionSessionMode) && !state.questionSessionFinishedAt ? '제출' : '종료';
   }
+  refreshCurrentQuestionSaveState(question);
 }
 
 async function requestGeneratedQuestions({cardIds, types, count, seed}) {
@@ -7795,6 +7956,10 @@ $('questionCard')?.addEventListener('click', (event) => {
     openQuestionSourceCard();
     return;
   }
+  if (event.target.closest('[data-question-save-answer="1"]')) {
+    saveCurrentQuestionAnswer().catch(() => {});
+    return;
+  }
   const choice = event.target.closest('[data-choice-index]');
   if (choice) {
     selectQuestionChoice(Number.parseInt(choice.dataset.choiceIndex, 10));
@@ -7843,6 +8008,7 @@ $('questionCard')?.addEventListener('input', (event) => {
   if (!question) return;
   if (event.target.matches('.question-answer-input')) {
     question.userAnswer = event.target.value || '';
+    refreshCurrentQuestionSaveState(question);
     return;
   }
   if (event.target.matches('.question-answer-refine-instruction')) {
@@ -7851,6 +8017,7 @@ $('questionCard')?.addEventListener('input', (event) => {
   }
   if (event.target.matches('.question-wrong-note')) {
     question.wrongNote = event.target.value || '';
+    refreshCurrentQuestionSaveState(question);
   }
 });
 $('knownBtn').addEventListener('click', () => mark('O'));

@@ -1333,3 +1333,71 @@ body.question-bank-practice-collapsed .question-bank-shell-practice-pane {
     min-width: 960px;
   }
 }
+@media (max-width: 620px) {
+  .question-bank-shell-table-pane #bankPageList .cs-table-wrap {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table {
+    min-width: 0 !important;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table thead {
+    display: none;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table,
+  .question-bank-shell-table-pane #bankPageList .cs-table tbody,
+  .question-bank-shell-table-pane #bankPageList .cs-table tr,
+  .question-bank-shell-table-pane #bankPageList .cs-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table tbody {
+    display: grid;
+    gap: 8px;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table tbody tr {
+    padding: 10px;
+    border: 1px solid var(--cs-table-line);
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table td {
+    display: grid;
+    grid-template-columns: minmax(4.4rem, 5.4rem) minmax(0, 1fr);
+    gap: 6px;
+    padding: 6px 0;
+    white-space: normal;
+    border-bottom: 1px solid var(--cs-table-line);
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table td::before {
+    content: attr(data-column-label);
+    color: var(--cs-table-muted);
+    font-size: .66rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .cs-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .question-bank-row-trigger {
+    gap: 4px;
+  }
+
+  .question-bank-shell-table-pane #bankPageList .question-bank-item-title,
+  .question-bank-shell-table-pane #bankPageList .question-bank-item-preview,
+  .question-bank-shell-table-pane #bankPageList .question-bank-source-text,
+  .question-bank-shell-table-pane #bankPageList .question-bank-keyword-list {
+    white-space: normal;
+  }
+}

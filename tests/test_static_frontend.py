@@ -45,6 +45,9 @@ def style_css() -> str:
 def table_shell_css() -> str:
     return static_text('table-shell.css')
 
+def table_shell_js() -> str:
+    return static_text('table-shell.js')
+
 
 def calendar_html() -> str:
     return static_text('calendar.html')
@@ -560,6 +563,12 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             '/api/questions/attempt',
             'responseErrorText(res)',
             'function saveQuestionAttempt(question, {quiet = false} = {})',
+            'function questionAttemptDirty(question)',
+            'function saveCurrentQuestionAnswer({quiet = false} = {})',
+            'questionAnswerSaveBtn',
+            'questionAnswerSaveStatus',
+            'answer_revealed: Boolean(current.answerRevealed)',
+            'data-question-dirty',
             'function setQuestionJudgment(judgment)',
             'syncQuestionBankAttemptState(current);',
             "syncQuestionBankAttemptState(current, {reloadOnFilterMismatch: index === state.questionIndex});",
@@ -679,7 +688,29 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('body.question-bank-embed #questionBankToggleBtn', style_css())
         self.assertIn('if (index < 0) {', question_bank_js())
         self.assertIn('body.question-bank-embed #questionBankBrowser', style_css())
+        self.assertIn('.question-answer-save', style_css())
+        self.assertIn('.question-answer-save-status', style_css())
+        self.assertIn('attr(data-column-label)', table_shell_css())
+        self.assertIn('data-column-label', table_shell_js())
 
+    def test_question_answer_save_smoke_has_draft_controls(self):
+        app_block = app_js()
+        self.assertIn('function questionAttemptDirty(question)', app_block)
+        self.assertIn('function saveCurrentQuestionAnswer({quiet = false} = {})', app_block)
+        self.assertIn('questionAnswerSaveBtn', app_block)
+        self.assertIn('questionAnswerSaveStatus', app_block)
+        self.assertIn('answer_revealed: Boolean(current.answerRevealed)', app_block)
+        self.assertIn('data-question-dirty', app_block)
+        css = style_css()
+        self.assertIn('.question-answer-save', css)
+        self.assertIn('.question-answer-save-status', css)
+
+    def test_question_bank_mobile_stack_smoke_uses_column_labels(self):
+        app_block = app_js()
+        self.assertIn('data-label="문제"', app_block)
+        self.assertIn('data-label="키워드"', app_block)
+        self.assertIn('data-column-label', table_shell_js())
+        self.assertIn('attr(data-column-label)', table_shell_css())
     def test_question_answer_meta_is_minimal(self):
         app_block = app_js()
         self.assertIn("class=\"question-answer-meta-title\"", app_block)

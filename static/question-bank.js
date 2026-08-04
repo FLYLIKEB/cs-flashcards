@@ -484,12 +484,8 @@ function embeddedPracticeHasUnsavedState() {
   if (!bankState.practiceLoaded) return false;
   const doc = practiceFrameDocument();
   if (!doc) return false;
-  return Boolean(
-    String(doc.getElementById('questionAnswerInput')?.value || '').trim()
-    || String(doc.getElementById('questionWrongNoteInput')?.value || '').trim()
-    || doc.querySelector('.question-choice.selected')
-    || doc.querySelector('.question-answer')
-  );
+  const shell = doc.querySelector('.question-card-shell');
+  return shell ? shell.dataset.questionDirty === '1' : false;
 }
 
 function persistedPracticeCollapsed() {
