@@ -508,13 +508,33 @@ function findCardByKeyword(keyword) {
     ].some((field) => normalizeTerm(field).includes(target)));
 }
 
-function renderQuestionKeywordLinks(keywords, {interactive = false} = {}) {
+function linkedQuestionKeywordCard(question = null) {
+  const current = question && typeof question === 'object'
+    ? hydrateQuestionState({...question})
+    : hydrateQuestionState(currentQuestion());
+  const linkedCardId = String(current?.card_id || '').trim();
+  if (!linkedCardId) return null;
+  return state.cards.find((card) => String(card?.id || '').trim() === linkedCardId)
+    || {id: linkedCardId, term: String(current?.term || linkedCardId).trim() || linkedCardId};
+}
+
+function questionKeywordTargetCard(keyword, {question = null, reviewCard = null} = {}) {
+  const matchedCard = findCardByKeyword(keyword);
+  if (matchedCard) return matchedCard;
+  const linkedCard = linkedQuestionKeywordCard(question);
+  if (linkedCard) return linkedCard;
+  if (reviewCard && typeof reviewCard === 'object' && String(reviewCard.id || '').trim()) return reviewCard;
+  return null;
+}
+
+function renderQuestionKeywordLinks(keywords, {interactive = false, question = null, reviewCard = null} = {}) {
   const items = normalizeQuestionKeywords(keywords);
   if (!items.length) return '';
   return items.map((keyword) => {
     const text = escapeHtml(keyword);
-    if (interactive && findCardByKeyword(keyword)) {
-      return `<button class="question-keyword-link" type="button" data-question-keyword="${text}">${text}</button>`;
+    const targetCard = interactive ? questionKeywordTargetCard(keyword, {question, reviewCard}) : null;
+    if (interactive && targetCard) {
+      return `<button class="question-keyword-link" type="button" data-question-keyword="${text}" data-question-card-id="${escapeHtml(targetCard.id || '')}">${text}</button>`;
     }
     return `<span class="question-keyword-text">${text}</span>`;
   }).join('<span class="question-keyword-sep">, </span>');
@@ -5953,7 +5973,7 @@ function renderQuestionBankBrowser() {
     const active = state.questionBankSelectedId && state.questionBankSelectedId === String(item.question_bank_id || '');
     const prompt = escapeHtml(markdownPreviewText(item.prompt || `문제 ${index + 1}`) || `문제 ${index + 1}`);
     const typeLabel = escapeHtml(questionTypeBadge(item) || '');
-    const topic = renderQuestionKeywordLinks(item.keywords, {interactive: true})
+    const topic = renderQuestionKeywordLinks(item.keywords, {interactive: true, question: item})
       || escapeHtml([
         String(item.category || item.card_category || '').trim(),
         String(item.topic || '').trim(),
@@ -6732,7 +6752,12 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
         }).join('')}
       </ol>
     </div>` : '';
-  const answerKeywordHtml = renderQuestionKeywordLinks(question.keywords, {interactive: true});
+  const linkedKeywordCard = linkedQuestionKeywordCard(question) || reviewCard;
+  const questionKeywordHtml = renderQuestionKeywordLinks(question.keywords, {
+    interactive: true,
+    question,
+    reviewCard: linkedKeywordCard,
+  });
   const answerGuideHtml = question.answerGuide
     ? `<div class="question-answer-guide question-markdown"><strong>답안 가이드</strong>${renderQuestionMarkdown(question.answerGuide)}</div>`
     : '';
@@ -6755,18 +6780,20 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
     ? `<div class="question-answer-choice"><strong>정답 선지</strong><div class="question-answer-choice-value">${renderMarkdownInline(`${question.answer_index + 1}. ${String(choices[question.answer_index] || '')}`)}</div></div>`
     : '';
 
-  const answerMetaFields = [
-    {label: '키워드', html: answerKeywordHtml},
+  const questionInfoFields = [
+    {label: '키워드', html: questionKeywordHtml},
     {label: '분야', value: question.fieldName || ''},
     {label: '섹션', value: question.section || ''},
     {label: '난이도', value: question.difficulty || ''},
+    {label: '기관', value: question.issuer || ''},
+    {label: '출처', value: question.sourceLocation || ''},
   ].filter((item) => item.value || item.html);
-  const answerMetaHtml = question.answerRevealed && (answerMetaFields.length || reviewCard) ? `
-    <div class="question-answer-meta">
+  const questionInfoHtml = (questionInfoFields.length || linkedKeywordCard) ? `
+    <div class="question-surface question-info-box">
       <strong class="question-answer-meta-title">문항 정보</strong>
       <div class="question-answer-meta-grid">
-        ${answerMetaFields.map((item) => `<div class="question-answer-meta-item"><span class="question-answer-meta-label">${escapeHtml(item.label)}</span><div class="question-answer-meta-value${item.label === '키워드' ? ' question-keyword-list' : ''}">${item.html || escapeHtml(item.value)}</div></div>`).join('')}
-        ${reviewCard ? `<div class="question-answer-meta-item"><span class="question-answer-meta-label">원본 카드</span><button class="question-answer-meta-card-button" type="button" data-question-open-card="1">${escapeHtml(reviewCard.term || reviewCard.id || '원본 카드로 이동')}</button></div>` : ''}
+        ${questionInfoFields.map((item) => `<div class="question-answer-meta-item"><span class="question-answer-meta-label">${escapeHtml(item.label)}</span><div class="question-answer-meta-value${item.label === '키워드' ? ' question-keyword-list' : ''}">${item.html || escapeHtml(item.value)}</div></div>`).join('')}
+        ${linkedKeywordCard ? `<div class="question-answer-meta-item"><span class="question-answer-meta-label">원본 카드</span><button class="question-answer-meta-card-button" type="button" data-question-open-card="1">${escapeHtml(linkedKeywordCard.term || linkedKeywordCard.id || '원본 카드로 이동')}</button></div>` : ''}
       </div>
     </div>` : '';
   const sessionSummary = questionSessionScoreSummary();
@@ -6815,7 +6842,6 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
       ${multipleChoiceAnswerHtml}
       <div class="question-answer-markdown">${renderQuestionMarkdown(question.answer || '')}</div>
       ${question.explanation ? `<div class="question-explanation-markdown">${renderQuestionMarkdown(question.explanation)}</div>` : ''}
-      ${answerMetaHtml}
       ${answerRefineHtml}
       ${rubric}
       ${gradeHtml}
@@ -6868,7 +6894,6 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
   const progressPercent = total ? Math.max(0, Math.min(100, Math.round(((state.questionIndex + 1) / total) * 100))) : 0;
   const questionPosition = total ? `문항 ${state.questionIndex + 1} / ${total}` : '문항';
   const bodyHtml = question.body ? `<div class="question-body question-surface">${renderQuestionMarkdown(question.body)}</div>` : '';
-  const keywordHtml = answerKeywordHtml;
 
   const judgmentBadgeHtml = question.judgment !== 'pending'
     ? `<span class="badge question-judgment-badge ${escapeHtml(question.judgment)}">${escapeHtml(questionJudgmentLabel(question.judgment))}</span>`
@@ -6920,15 +6945,14 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
           ${editToolbarHtml}
           <div class="question-prompt question-surface">${renderQuestionMarkdown(question.prompt || '문제')}</div>
           ${bodyHtml}
+          ${questionInfoHtml}
           ${choiceHtml}
           ${draftHtml}
           ${lockActionHtml}
           ${answer}
 
-
         </div>
         <aside class="question-side-stack">
-          ${keywordHtml ? `<div class="question-side-note"><span class="question-side-note-label">키워드</span><p class="question-keyword-list">${keywordHtml}</p></div>` : ''}
           ${sideStateHtml}
           ${reviewBoxHtml}
         </aside>
@@ -7108,10 +7132,13 @@ function moveQuestion(delta) {
 }
 
 
-function goToQuestionKeyword(keyword) {
+function goToQuestionKeyword(keyword, cardId = '') {
   const text = String(keyword || '').trim();
   if (!text) return false;
-  const card = findCardByKeyword(text);
+  const normalizedCardId = String(cardId || '').trim();
+  const card = normalizedCardId
+    ? state.cards.find((item) => String(item?.id || '').trim() === normalizedCardId) || findCardByKeyword(text)
+    : findCardByKeyword(text);
   if (!card) {
     setMessage(`${text} 키워드와 연결된 카드를 찾지 못했습니다.`, true);
     return false;
@@ -7743,7 +7770,7 @@ $('questionBankList')?.addEventListener('click', (event) => {
   if (keywordButton) {
     event.preventDefault();
     event.stopPropagation();
-    goToQuestionKeyword(keywordButton.dataset.questionKeyword || '');
+    goToQuestionKeyword(keywordButton.dataset.questionKeyword || '', keywordButton.dataset.questionCardId || '');
     return;
   }
   const target = event.target.closest('[data-question-bank-index]');
@@ -7761,7 +7788,7 @@ $('questionCard')?.addEventListener('click', (event) => {
   if (keywordButton) {
     event.preventDefault();
     event.stopPropagation();
-    goToQuestionKeyword(keywordButton.dataset.questionKeyword || '');
+    goToQuestionKeyword(keywordButton.dataset.questionKeyword || '', keywordButton.dataset.questionCardId || '');
     return;
   }
   if (event.target.closest('[data-question-open-card="1"]')) {
