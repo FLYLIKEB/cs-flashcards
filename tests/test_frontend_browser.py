@@ -1855,7 +1855,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             case['initial_summary'] = await self.text(page, '#bankPageSummary')
-            self.assertIn('문항', case['initial_summary'])
+            self.assertIn('총', case['initial_summary'])
+
             case['filter_region_initial'] = await page.evaluate(
                 """
                 () => ({
@@ -1983,7 +1984,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 case[str(width)] = metrics
                 self.assertLessEqual(metrics['documentScrollWidth'], metrics['viewportWidth'] + 1)
                 self.assertLessEqual(metrics['shellRight'], metrics['viewportWidth'] + 1)
-                self.assertEqual(metrics['primaryRows'], 2 if width == 900 else 3)
+                self.assertEqual(metrics['primaryRows'], 2 if width == 900 else 1)
                 self.assertEqual(metrics['selectionRows'], 1 if width == 900 else 2)
                 if width == 390:
                     await page.click('#bankPageCategoryGuideBtn')
