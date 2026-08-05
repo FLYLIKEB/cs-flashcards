@@ -736,6 +736,7 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-practice-status', table_shell_css())
         self.assertIn('.question-bank-header-chip', table_shell_css())
         self.assertIn('.question-bank-filter-chip', table_shell_css())
+
         self.assertIn('.question-choice-badges', style_css())
         self.assertIn('.question-choice-badge.answer', style_css())
         self.assertIn('.question-choice.selected-wrong', style_css())
@@ -758,6 +759,13 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-row-number.is-wrong::after', table_shell_css())
         self.assertIn('.question-choice.wrong', style_css())
 
+    def test_question_bank_responsive_shell_hooks(self):
+        css = table_shell_css()
+        self.assertIn('.question-bank-page .cs-table-button', css)
+        self.assertIn('-webkit-overflow-scrolling: touch', css)
+        self.assertIn('100dvh', css)
+        self.assertIn('@media (max-width: 900px)', css)
+        self.assertIn('function syncCompactQuestionBankViewport()', question_bank_js())
     def test_flashcard_table_popup_has_vertical_scroll_region(self):
         self.assertIn('body class="cs-table-page flashcard-table-page"', app_js())
         self.assertIn('.flashcard-table-page .cs-table-wrap', table_shell_css())
