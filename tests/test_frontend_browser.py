@@ -1322,6 +1322,82 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         finally:
             self.record_case(case_id='question-bank-load-launch', status=status, observations=case)
             await page.close()
+    async def test_question_bank_responsive_layout_at_tablet_and_mobile_widths(self):
+        case = {'path': '/question-bank', 'viewports': [900, 390]}
+        page = await self.new_page(viewport={'width': 900, 'height': 1000})
+        status = 'failed'
+        try:
+            for width, height in ((900, 1000), (390, 844)):
+                await page.setViewport({'width': width, 'height': height})
+                await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+                await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
+                metrics = await page.evaluate(
+                    """
+                    () => {
+                      const tops = (selector) => [...document.querySelectorAll(selector)]
+                        .map((node) => Math.round(node.getBoundingClientRect().top))
+                        .filter((top, index, values) => values.indexOf(top) === index);
+                      const nodes = [
+                        document.querySelector('.question-bank-shell-topbar-inner'),
+                        document.querySelector('.cs-table-shell.question-bank-shell'),
+                      ].filter(Boolean);
+                      const rightmost = nodes.length
+                        ? Math.max(...nodes.map((node) => node.getBoundingClientRect().right))
+                        : 0;
+                      return {
+                        viewportWidth: document.documentElement.clientWidth,
+                        documentScrollWidth: document.documentElement.scrollWidth,
+                        shellRight: Math.round(rightmost),
+                        primaryRows: tops('.question-bank-primary-actions .cs-table-button').length,
+                        selectionRows: tops('.question-bank-selection-actions .cs-table-button').length,
+                      };
+                    }
+                    """
+                )
+                case[str(width)] = metrics
+                self.assertLessEqual(metrics['documentScrollWidth'], metrics['viewportWidth'] + 1)
+                self.assertLessEqual(metrics['shellRight'], metrics['viewportWidth'] + 1)
+                self.assertEqual(metrics['primaryRows'], 2 if width == 900 else 3)
+                self.assertEqual(metrics['selectionRows'], 1 if width == 900 else 2)
+                if width == 390:
+                    await page.click('#bankPageCategoryGuideBtn')
+                    await page.waitForFunction("!document.querySelector('#bankPageCategoryGuideDialog').hidden")
+                    dialog_metrics = await page.evaluate(
+                        """
+                        () => {
+                          const card = document.querySelector('.question-bank-dialog-card')?.getBoundingClientRect();
+                          const close = document.querySelector('#bankPageCategoryGuideCloseBtn')?.getBoundingClientRect();
+                          return {
+                            cardWidth: Math.round(card?.width || 0),
+                            closeWidth: Math.round(close?.width || 0),
+                            viewportWidth: document.documentElement.clientWidth,
+                          };
+                        }
+                        """
+                    )
+                    case['390_dialog'] = dialog_metrics
+                    self.assertLessEqual(dialog_metrics['cardWidth'], dialog_metrics['viewportWidth'])
+                    self.assertGreater(dialog_metrics['closeWidth'], 0)
+                    await page.click('#bankPageCategoryGuideCloseBtn')
+                    await page.waitForFunction("document.querySelector('#bankPageCategoryGuideDialog').hidden")
+
+            await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+            await page.evaluate('document.querySelector("#bankPageLaunchBtn")?.click()')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            case['mobile_practice_scroll_y'] = await page.evaluate('window.scrollY')
+            self.assertLessEqual(case['mobile_practice_scroll_y'], 1)
+            await page.click('#bankPagePracticeExitBtn')
+            await page.waitForFunction("document.body.classList.contains('question-bank-practice-collapsed')")
+            case['mobile_selection_top'] = await page.Jeval(
+                '.question-bank-table-selection',
+                '(node) => node.getBoundingClientRect().top',
+            )
+            self.assertGreaterEqual(case['mobile_selection_top'], -20)
+            self.assertLessEqual(case['mobile_selection_top'], 80)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-responsive-layout', status=status, observations=case)
+            await page.close()
     async def test_question_bank_embed_question_info_keywords_open_related_card(self):
         case = {'path': '/question-bank'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})

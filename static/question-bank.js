@@ -725,6 +725,21 @@ function applyEmbeddedQuestionBankUpdate(item, summary = null, finishedAt = '') 
 }
 
 
+function isCompactQuestionBankViewport() {
+  return typeof window.matchMedia === 'function'
+    ? window.matchMedia('(max-width: 900px)').matches
+    : Number(window.innerWidth || 0) <= 900;
+}
+
+function syncCompactQuestionBankViewport() {
+  if (!bankState.practiceLoaded || !isCompactQuestionBankViewport()) return;
+  if (!bankState.practiceCollapsed) {
+    window.scrollTo?.({top: 0, left: 0, behavior: 'auto'});
+    return;
+  }
+  document.querySelector('.question-bank-table-selection')?.scrollIntoView?.({block: 'start', inline: 'nearest'});
+}
+
 function applyPracticeViewState() {
   const practiceFocus = bankState.practiceLoaded && !bankState.practiceCollapsed;
   document.body.classList.toggle('question-bank-practice-collapsed', !practiceFocus);
@@ -840,6 +855,7 @@ function setPracticeCollapsed(collapsed, {persist = true} = {}) {
   renderOverviewCards();
   renderHeader();
   if (bankState.practiceCollapsed) ensureSelectedRowVisible();
+  syncCompactQuestionBankViewport();
   if (!persist) return;
   persistPracticeCollapsedState(bankState.practiceCollapsed);
 }
