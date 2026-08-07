@@ -6980,6 +6980,7 @@ async function finishQuestionSession() {
   } finally {
     state.questionSaving = false;
     renderQuestionPanel();
+    scrollQuestionCardToTop();
   }
 }
 
@@ -7544,6 +7545,12 @@ function openQuestionPracticeFromMenu() {
   toggleQuestionMode(true);
 }
 
+function scrollQuestionCardToTop() {
+  window.requestAnimationFrame(() => {
+    $('questionCard')?.scrollIntoView({block: 'start', behavior: 'auto'});
+  });
+}
+
 function revealQuestionAnswer() {
   const question = hydrateQuestionState(currentQuestion());
   if (!question) return;
@@ -7554,6 +7561,7 @@ function revealQuestionAnswer() {
   question.answerRevealed = true;
   state.answerRevealed = true;
   renderQuestionPanel();
+  scrollQuestionCardToTop();
 }
 
 function moveQuestion(delta) {
