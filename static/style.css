@@ -9053,3 +9053,19 @@ body.question-bank-embed .question-card-grid.question-pane-layout.question-layou
 .question-card-grid.question-general-answer.question-layout-vertical > .question-side-stack {
   display: none;
 }
+
+.question-card-grid.has-code-editor.question-pane-layout.question-layout-horizontal,
+.question-card-grid.question-general-answer.question-pane-layout.question-layout-horizontal,
+body.question-bank-embed .question-card-grid.has-code-editor.question-pane-layout.question-layout-horizontal,
+body.question-bank-embed .question-card-grid.question-general-answer.question-pane-layout.question-layout-horizontal {
+  grid-template-columns: var(--question-pane-columns, minmax(0, 1fr) 10px minmax(0, 1fr) 10px minmax(0, 1fr));
+}
+
+@media (max-width: 760px) {
+  .question-card-grid.has-code-editor.question-pane-layout.question-layout-horizontal,
+  .question-card-grid.question-general-answer.question-pane-layout.question-layout-horizontal,
+  body.question-bank-embed .question-card-grid.has-code-editor.question-pane-layout.question-layout-horizontal,
+  body.question-bank-embed .question-card-grid.question-general-answer.question-pane-layout.question-layout-horizontal {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

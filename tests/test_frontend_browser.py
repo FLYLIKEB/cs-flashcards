@@ -2704,6 +2704,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertIn('저장 첫 문항 answer', case['revealed_answer'])
             case['pane_names'] = await embed_frame.Jeval('.question-card-grid', '(node) => [...node.querySelectorAll(\':scope > .question-pane\')].map((pane) => pane.dataset.questionPane)')
             case['pane_resizers'] = await embed_frame.Jeval('.question-card-grid', '(node) => node.querySelectorAll("[data-question-pane-resize]").length')
+            case['pane_tops'] = await embed_frame.Jeval('.question-card-grid', '(node) => [...node.querySelectorAll(\':scope > .question-pane\')].map((pane) => Math.round(pane.getBoundingClientRect().top))')
+            self.assertEqual(len(set(case['pane_tops'])), 1)
             self.assertEqual(case['pane_names'], ['problem', 'draft', 'answer'])
             self.assertEqual(case['pane_resizers'], 2)
             await embed_frame.click('[data-question-answer-pane-toggle="1"]')
