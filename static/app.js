@@ -7514,6 +7514,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
         <div class="question-pane-resizer" data-question-pane-resize="0" role="separator" aria-label="문제와 나의 답 너비 조절" tabindex="0"></div>
         <section class="question-pane question-draft-pane" data-question-pane="draft">
           <div class="question-pane-head"><strong>나의 답</strong><div class="question-pane-head-actions">${answerPaneToggleHtml}</div></div>
+          ${codeEditorHtml}
           ${answerDraftHtml}
           ${answerSaveHtml}
         </section>
