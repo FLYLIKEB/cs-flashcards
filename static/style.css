@@ -5788,6 +5788,46 @@ select,
 .question-code-workbench {
   min-width: 0;
 }
+.question-subquestion-draft,
+.question-subquestion-item {
+  min-width: 0;
+}
+.question-subquestion-head,
+.question-subquestion-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+}
+.question-subquestion-head {
+  margin-bottom: .7rem;
+}
+.question-subquestion-head .question-answer-label,
+.question-subquestion-item-head .question-answer-label {
+  margin-bottom: 0;
+}
+.question-subquestion-list {
+  display: grid;
+  gap: .7rem;
+}
+.question-subquestion-item {
+  display: grid;
+  gap: .35rem;
+}
+.question-subquestion-remove {
+  border: 0;
+  background: transparent;
+  color: #7a7a7a;
+  cursor: pointer;
+  font-size: .72rem;
+}
+.question-subquestion-remove:hover {
+  color: #111;
+  text-decoration: underline;
+}
+.question-subquestion-draft .question-answer-input {
+  min-height: 5rem;
+}
 .question-card-grid.has-code-editor.question-layout-vertical {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -5976,6 +6016,7 @@ select,
   }
   .question-code-editor-actions {
     justify-content: flex-start;
+}
   .question-card-grid.has-code-editor.question-layout-horizontal {
     grid-template-columns: minmax(0, 1fr);
   }

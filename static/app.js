@@ -130,6 +130,49 @@ function setQuestionLayoutMode(mode) {
   localStorage.setItem(QUESTION_LAYOUT_MODE_KEY, nextMode);
   return applyQuestionLayoutMode(nextMode);
 }
+
+const QUESTION_SUBANSWER_SEPARATOR = '\n\n--- 소문제 답안 구분 ---\n\n';
+
+function questionSubquestionLabels(question) {
+  const current = question || {};
+  const explicit = current.subquestionLabels || current.subquestion_labels || current.subquestions || current.sub_questions;
+  if (Array.isArray(explicit) && explicit.length) {
+    return explicit.map((item, index) => String(typeof item === 'object' ? item.label || item.title || index + 1 : item).trim() || String(index + 1)).slice(0, 50);
+  }
+  const source = [current.prompt, current.body].filter(Boolean).join('\n');
+  const labels = [];
+  const pattern = /^[ \t]*(?:\(?([0-9]{1,2}|[A-Z가-힣])\)?[.)]|([①②③④⑤⑥⑦⑧⑨⑩]))[ \t]+/gm;
+  let match;
+  while ((match = pattern.exec(source))) labels.push(match[1] || match[2]);
+  if (labels.length >= 2) return [...new Set(labels)].slice(0, 50);
+  if (current.subquestionMode && Array.isArray(current.subquestionLabels) && current.subquestionLabels.length) return current.subquestionLabels;
+  return current.subquestionMode ? ['1', '2'] : [];
+}
+
+function ensureQuestionSubquestionAnswers(question) {
+  if (!question || !question.subquestionMode) return [];
+  const labels = questionSubquestionLabels(question);
+  if (!labels.length) return [];
+  let answers = Array.isArray(question.subquestionAnswers) ? question.subquestionAnswers.map((item) => String(item || '')) : [];
+  if (!answers.length && String(question.userAnswer || '').trim()) {
+    const stored = String(question.userAnswer).split(QUESTION_SUBANSWER_SEPARATOR);
+    answers = stored.length > 1 ? stored : [stored[0]];
+  }
+  while (answers.length < labels.length) answers.push('');
+  answers = answers.slice(0, labels.length);
+  question.subquestionLabels = labels;
+  question.subquestionAnswers = answers;
+  question.userAnswer = answers.map((answer, index) => `[소문제 ${labels[index]}]\n${answer}`).join(QUESTION_SUBANSWER_SEPARATOR);
+  return answers;
+}
+
+function updateQuestionSubquestionAnswer(question, index, value) {
+  const answers = ensureQuestionSubquestionAnswers(question);
+  if (!answers.length || !Number.isInteger(index) || index < 0 || index >= answers.length) return;
+  answers[index] = String(value || '');
+  question.subquestionAnswers = answers;
+  question.userAnswer = answers.map((answer, answerIndex) => `[소문제 ${question.subquestionLabels[answerIndex]}]\n${answer}`).join(QUESTION_SUBANSWER_SEPARATOR);
+}
 const QUESTION_BANK_FILTER_FIELDS = [
   {key: 'q', id: 'questionBankQueryInput'},
   {key: 'attempt_status', id: 'questionBankAttemptStatusSelect'},
@@ -5837,6 +5880,14 @@ function hydrateQuestionState(question) {
   if (typeof question.answerRefineInstruction !== 'string') question.answerRefineInstruction = '';
   if (typeof question.codeLanguage !== 'string') question.codeLanguage = normalizeQuestionCodeLanguage(question.code_language || question.language || '');
   if (typeof question.codeEditorEnabled !== 'boolean') question.codeEditorEnabled = question.type !== 'multiple_choice' && Boolean(questionCodeLanguage(question));
+  if (typeof question.subquestionMode !== 'boolean') question.subquestionMode = false;
+  if (!Array.isArray(question.subquestionAnswers)) question.subquestionAnswers = [];
+  const detectedSubquestionLabels = questionSubquestionLabels(question);
+  if (detectedSubquestionLabels.length >= 2 && question.subquestionModeOverride !== 'off') {
+    question.subquestionMode = true;
+    if (!Array.isArray(question.subquestionLabels) || !question.subquestionLabels.length) question.subquestionLabels = detectedSubquestionLabels;
+  }
+  if (typeof question.subquestionModeOverride !== 'string') question.subquestionModeOverride = '';
   return question;
 }
 
@@ -5914,41 +5965,61 @@ function questionCodeHint(editor) {
   return {list, from: window.CodeMirror.Pos(cursor.line, token.start), to: window.CodeMirror.Pos(cursor.line, cursor.ch)};
 }
 
-let questionCodeMirrorInstance = null;
+let questionCodeMirrorInstances = [];
 
 function destroyQuestionCodeEditor() {
-  if (!questionCodeMirrorInstance) return;
-  questionCodeMirrorInstance.toTextArea();
-  questionCodeMirrorInstance = null;
+  questionCodeMirrorInstances.forEach((editor) => editor.toTextArea());
+  questionCodeMirrorInstances = [];
 }
 
-function questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml = '') {
+function questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml = '', subquestionIndex = null, showControls = true) {
   const language = questionCodeLanguage(question) || 'text';
   const layoutMode = questionLayoutMode();
   const layoutButtonLabel = layoutMode === 'horizontal' ? '세로 보기' : '가로 보기';
-  return `<div class="question-code-editor question-surface" data-code-editor><div class="question-code-editor-toolbar"><div><span class="question-answer-label">코드 답안</span><p class="question-code-editor-hint">${escapeHtml(questionCodeLanguageLabel(language))} · 자동완성 지원</p></div><div class="question-code-editor-actions"><label class="question-code-language-label" for="questionCodeLanguage">언어</label><select id="questionCodeLanguage" class="question-code-language" data-question-code-language aria-label="코드 언어">${questionCodeLanguageOptions(language)}</select><button class="question-toolbar-button" type="button" data-question-layout-toggle aria-pressed="${layoutMode === 'horizontal' ? 'true' : 'false'}">${layoutButtonLabel}</button><button class="question-toolbar-button" type="button" data-question-code-editor-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>일반 답안</button></div></div><textarea id="questionAnswerInput" class="question-answer-input question-code-editor-input" rows="16" data-code-language="${language}" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${escapeHtml(`${questionCodeLanguageLabel(language)} 코드를 작성하세요.`)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea><p class="question-code-editor-status">CodeMirror · 문법 강조 · 줄 번호 · Ctrl-Space 자동완성</p>${answerGuideHtml}</div>`;
+  const isSubquestion = Number.isInteger(subquestionIndex);
+  const answers = isSubquestion ? ensureQuestionSubquestionAnswers(question) : [];
+  const label = isSubquestion ? `소문제 ${question.subquestionLabels[subquestionIndex]}` : '코드 답안';
+  const textareaId = isSubquestion && subquestionIndex > 0 ? `questionSubanswerInput-${subquestionIndex + 1}` : 'questionAnswerInput';
+  const value = isSubquestion ? answers[subquestionIndex] || '' : question.userAnswer || '';
+  const subquestionToggle = !question.subquestionMode ? `<button class="question-toolbar-button" type="button" data-subquestion-toggle="on" ${questionSaveBusy ? 'disabled' : ''}>소문제별 답안</button>` : '';
+  const controlsHtml = showControls ? `<label class="question-code-language-label" for="questionCodeLanguage">언어</label><select id="questionCodeLanguage" class="question-code-language" data-question-code-language aria-label="코드 언어">${questionCodeLanguageOptions(language)}</select><button class="question-toolbar-button" type="button" data-question-layout-toggle aria-pressed="${layoutMode === 'horizontal' ? 'true' : 'false'}">${layoutButtonLabel}</button>${subquestionToggle}<button class="question-toolbar-button" type="button" data-question-code-editor-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>일반 답안</button>` : '';
+  const subquestionAttribute = isSubquestion ? ` data-question-subquestion-index="${subquestionIndex}"` : '';
+  return `<div class="question-code-editor question-surface" data-code-editor${subquestionAttribute}><div class="question-code-editor-toolbar"><div><span class="question-answer-label">${label}</span><p class="question-code-editor-hint">${escapeHtml(questionCodeLanguageLabel(language))} · 자동완성 지원</p></div><div class="question-code-editor-actions">${controlsHtml}</div></div><textarea id="${textareaId}" class="question-answer-input question-code-editor-input" rows="16" data-code-language="${language}"${subquestionAttribute} spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${escapeHtml(`${questionCodeLanguageLabel(language)} 코드를 작성하세요.`)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(value)}</textarea><p class="question-code-editor-status">CodeMirror · 문법 강조 · 줄 번호 · Ctrl-Space 자동완성</p>${answerGuideHtml}</div>`;
 }
 
 function initializeQuestionCodeEditor() {
-  const textarea = $('questionAnswerInput');
-  if (!textarea?.matches('.question-code-editor-input') || typeof window.CodeMirror !== 'function') return;
-  const language = textarea.dataset.codeLanguage || 'text';
-  questionCodeMirrorInstance = window.CodeMirror.fromTextArea(textarea, {
-    mode: questionCodeMirrorMode(language), lineNumbers: true, lineWrapping: false, indentUnit: 4, smartIndent: true, matchBrackets: true, autoCloseBrackets: true,
-    extraKeys: {
-      'Ctrl-Space': (editor) => editor.showHint({hint: questionCodeHint, completeSingle: false}),
-      'Cmd-Space': (editor) => editor.showHint({hint: questionCodeHint, completeSingle: false}),
-    },
+  const textareas = [...document.querySelectorAll('.question-code-editor-input')];
+  if (!textareas.length || typeof window.CodeMirror !== 'function') return;
+  questionCodeMirrorInstances = textareas.map((textarea) => {
+    const language = textarea.dataset.codeLanguage || 'text';
+    const editor = window.CodeMirror.fromTextArea(textarea, {
+      mode: questionCodeMirrorMode(language), lineNumbers: true, lineWrapping: false, indentUnit: 4, smartIndent: true, matchBrackets: true, autoCloseBrackets: true,
+      extraKeys: {
+        'Ctrl-Space': (instance) => instance.showHint({hint: questionCodeHint, completeSingle: false}),
+        'Cmd-Space': (instance) => instance.showHint({hint: questionCodeHint, completeSingle: false}),
+      },
+    });
+    editor.on('inputRead', (instance, change) => {
+      if (change.text?.some((part) => /[A-Za-z_$]/.test(part))) instance.showHint({hint: questionCodeHint, completeSingle: false});
+    });
+    editor.on('change', (instance) => {
+      const question = hydrateQuestionState(currentQuestion());
+      if (!question) return;
+      const index = Number.parseInt(textarea.dataset.questionSubquestionIndex || '', 10);
+      if (Number.isInteger(index)) updateQuestionSubquestionAnswer(question, index, instance.getValue());
+      else question.userAnswer = instance.getValue();
+    });
+    return editor;
   });
-  questionCodeMirrorInstance.on('inputRead', (editor, change) => {
-    if (change.text?.some((part) => /[A-Za-z_$]/.test(part))) editor.showHint({hint: questionCodeHint, completeSingle: false});
-  });
-  questionCodeMirrorInstance.on('change', (editor) => {
-    const question = hydrateQuestionState(currentQuestion());
-    if (question) question.userAnswer = editor.getValue();
-  });
-  window.setTimeout(() => questionCodeMirrorInstance?.refresh(), 0);
+  window.setTimeout(() => questionCodeMirrorInstances.forEach((editor) => editor.refresh()), 0);
 }
+function questionSubquestionDraftHtml(question, questionSaveBusy, answerGuideHtml = '') {
+  const answers = ensureQuestionSubquestionAnswers(question);
+  if (!answers.length) return '';
+  const labels = question.subquestionLabels;
+  return `<div class="question-subquestion-draft question-surface"><div class="question-subquestion-head"><div><span class="question-answer-label">소문제별 답안</span><p class="question-code-editor-hint">각 소문제의 답을 따로 작성합니다.</p></div><div class="question-code-editor-actions"><button class="question-toolbar-button" type="button" data-subquestion-add ${questionSaveBusy ? 'disabled' : ''}>소문제 추가</button><button class="question-toolbar-button" type="button" data-subquestion-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>한 칸 답안</button></div></div><div class="question-subquestion-list">${answers.map((answer, index) => `<div class="question-subquestion-item"><div class="question-subquestion-item-head"><label class="question-answer-label" for="${index === 0 ? 'questionAnswerInput' : `questionSubanswerInput-${index + 1}`}">소문제 ${escapeHtml(labels[index])}</label>${answers.length > 1 ? `<button class="question-subquestion-remove" type="button" data-subquestion-remove="${index}" aria-label="소문제 ${escapeHtml(labels[index])} 삭제" ${questionSaveBusy ? 'disabled' : ''}>삭제</button>` : ''}</div><textarea id="${index === 0 ? 'questionAnswerInput' : `questionSubanswerInput-${index + 1}`}" class="question-answer-input question-subanswer-input" data-question-subquestion-index="${index}" rows="${question.type === 'essay' ? 6 : 4}" placeholder="소문제 ${escapeHtml(labels[index])} 답안을 작성하세요." ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(answer)}</textarea></div>`).join('')}</div>${answerGuideHtml}</div>`;
+}
+
 
 
 
@@ -6587,13 +6658,22 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
     ? '세트 종료 전까지 정답이 공개되지 않습니다. 실전처럼 답안을 먼저 작성하세요.'
     : '여기에 답안을 적고 정답/해설을 본 뒤 결과를 저장하세요.';
   const questionCodeEditorEnabled = questionNeedsManualGrading(question) && question.codeEditorEnabled;
-  const codeEditorHtml = questionCodeEditorEnabled ? questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml) : '';
+  const subquestionAnswers = questionNeedsManualGrading(question) && question.subquestionMode ? ensureQuestionSubquestionAnswers(question) : [];
+  const hasSubquestionAnswers = subquestionAnswers.length > 0;
+  const codeEditorHtml = questionCodeEditorEnabled
+    ? (hasSubquestionAnswers
+      ? subquestionAnswers.map((_answer, index) => questionCodeEditorHtml(question, questionSaveBusy, index === subquestionAnswers.length - 1 ? answerGuideHtml : '', index, index === 0)).join('')
+      : questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml))
+    : '';
   const codeEditorToggleHtml = questionNeedsManualGrading(question) && !questionCodeEditorEnabled
     ? `<button class="question-toolbar-button question-code-editor-open" type="button" data-question-code-editor-toggle="on" ${questionSaveBusy ? 'disabled' : ''}>코드 편집기 사용</button>`
     : '';
-  const answerDraftHtml = questionCodeEditorEnabled ? '' : questionNeedsManualGrading(question) ? `
+  const subquestionToggleHtml = questionNeedsManualGrading(question) && !hasSubquestionAnswers
+    ? `<button class="question-toolbar-button" type="button" data-subquestion-toggle="on" ${questionSaveBusy ? 'disabled' : ''}>소문제별 답안</button>`
+    : '';
+  const answerDraftHtml = questionCodeEditorEnabled ? '' : hasSubquestionAnswers ? questionSubquestionDraftHtml(question, questionSaveBusy, answerGuideHtml) : questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft question-surface">
-      <div class="question-answer-draft-head"><label class="question-answer-label" for="questionAnswerInput">내 답안</label>${codeEditorToggleHtml}</div>
+      <div class="question-answer-draft-head"><label class="question-answer-label" for="questionAnswerInput">내 답안</label><div class="question-code-editor-actions">${subquestionToggleHtml}${codeEditorToggleHtml}</div></div>
       <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
       ${answerGuideHtml}
     </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
@@ -7618,11 +7698,56 @@ $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
 $('revealAnswerBtn')?.addEventListener('click', revealQuestionAnswer);
 $('openQuestionCardBtn')?.addEventListener('click', openQuestionSourceCard);
 $('questionCard')?.addEventListener('click', (event) => {
+  const subquestionToggle = event.target.closest('[data-subquestion-toggle]');
+  if (subquestionToggle) {
+    const question = hydrateQuestionState(currentQuestion());
+    if (!question) return;
+    const enabled = subquestionToggle.dataset.subquestionToggle === 'on';
+    question.subquestionModeOverride = enabled ? 'on' : 'off';
+    if (enabled) {
+      question.subquestionMode = true;
+      const labels = questionSubquestionLabels(question);
+      question.subquestionLabels = labels.length >= 2 ? labels : ['1', '2'];
+      ensureQuestionSubquestionAnswers(question);
+    } else {
+      const answers = ensureQuestionSubquestionAnswers(question);
+      question.subquestionMode = false;
+      question.userAnswer = answers.join('\n\n');
+    }
+    renderQuestionPanel();
+    window.setTimeout(() => (questionCodeMirrorInstances[0] || $('questionAnswerInput'))?.focus(), 0);
+    return;
+  }
+  const addSubquestion = event.target.closest('[data-subquestion-add]');
+  if (addSubquestion) {
+    const question = hydrateQuestionState(currentQuestion());
+    if (!question) return;
+    const answers = ensureQuestionSubquestionAnswers(question);
+    question.subquestionLabels.push(String(question.subquestionLabels.length + 1));
+    question.subquestionAnswers = [...answers, ''];
+    ensureQuestionSubquestionAnswers(question);
+    renderQuestionPanel();
+    window.setTimeout(() => document.querySelector(`#questionSubanswerInput-${question.subquestionLabels.length}`)?.focus(), 0);
+    return;
+  }
+  const removeSubquestion = event.target.closest('[data-subquestion-remove]');
+  if (removeSubquestion) {
+    const question = hydrateQuestionState(currentQuestion());
+    if (!question) return;
+    const index = Number.parseInt(removeSubquestion.dataset.subquestionRemove || '', 10);
+    const answers = ensureQuestionSubquestionAnswers(question);
+    if (answers.length <= 1 || !Number.isInteger(index)) return;
+    question.subquestionLabels.splice(index, 1);
+    question.subquestionAnswers = answers.filter((_answer, answerIndex) => answerIndex !== index);
+    ensureQuestionSubquestionAnswers(question);
+    renderQuestionPanel();
+    return;
+  }
   const layoutToggle = event.target.closest('[data-question-layout-toggle]');
   if (layoutToggle) {
     const nextMode = setQuestionLayoutMode(questionLayoutMode() === 'horizontal' ? 'vertical' : 'horizontal');
     renderQuestionPanel();
-    if (nextMode) window.setTimeout(() => questionCodeMirrorInstance?.focus(), 0);
+    if (nextMode) window.setTimeout(() => questionCodeMirrorInstances[0]?.focus(), 0);
     return;
   }
   const codeToggle = event.target.closest('[data-question-code-editor-toggle]');
@@ -7632,7 +7757,7 @@ $('questionCard')?.addEventListener('click', (event) => {
     question.codeEditorEnabled = codeToggle.dataset.questionCodeEditorToggle === 'on';
     if (question.codeEditorEnabled && !question.codeLanguage) question.codeLanguage = questionCodeLanguage(question) || 'text';
     renderQuestionPanel();
-    if (question.codeEditorEnabled) window.setTimeout(() => questionCodeMirrorInstance?.focus(), 0);
+    if (question.codeEditorEnabled) window.setTimeout(() => questionCodeMirrorInstances[0]?.focus(), 0);
     return;
   }
   const keywordButton = event.target.closest('[data-question-keyword]');
@@ -7703,7 +7828,9 @@ $('questionCard')?.addEventListener('input', (event) => {
   const question = hydrateQuestionState(currentQuestion());
   if (!question) return;
   if (event.target.matches('.question-answer-input')) {
-    question.userAnswer = event.target.value || '';
+    const index = Number.parseInt(event.target.dataset.questionSubquestionIndex || '', 10);
+    if (Number.isInteger(index)) updateQuestionSubquestionAnswer(question, index, event.target.value || '');
+    else question.userAnswer = event.target.value || '';
     return;
   }
   if (event.target.matches('.question-answer-refine-instruction')) {
@@ -7989,7 +8116,16 @@ populateSpeechVoiceSelect();
 updateRandomButtons();
 updateQuestionPracticeButton();
 restoreQuestionBankBrowserFromUrl();
-document.body.classList.toggle('question-bank-embed', questionBankEmbedMode());
+function applyQuestionBankEmbedShell() {
+  if (!questionBankEmbedMode()) return;
+  document.body.classList.add('question-bank-embed');
+  document.body.style.background = '#fff';
+  document.querySelectorAll('.topbar, #controlsPanel, .progress-line, #filterRow, .flashcard, .mark-row, #closeQuestionModeBtn, #questionBankToggleBtn, #questionBankBrowser').forEach((element) => {
+    element.hidden = true;
+  });
+}
+
+applyQuestionBankEmbedShell();
 
 if (!bootstrapFlashcardTablePopupWindow() && !bootstrapMindMapPopupWindow()) {
   bootstrapInitialCardLoad().catch((err) => {
