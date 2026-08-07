@@ -6804,12 +6804,9 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
 
   const editToolbarHtml = question.questionBankId ? `
     <div class="question-inline-toolbar question-surface">
-      <div class="question-inline-toolbar-copy">
-        <span class="question-side-note-label">문항 데이터</span>
-        <p>문제 본문, 정답, 해설, 메타데이터를 현재 풀이 화면에서 바로 수정합니다.</p>
-      </div>
-      <button class="question-toolbar-button" type="button" data-question-edit="1" ${questionSaveBusy ? 'disabled' : ''}>${state.questionBankEditSaving ? '저장 중…' : '수정'}</button>
+      <button class="question-toolbar-button question-edit-button" type="button" data-question-edit="1" aria-label="문항 데이터 수정" title="문항 데이터 수정" ${questionSaveBusy ? 'disabled' : ''}>${state.questionBankEditSaving ? '저장 중…' : '<span class="question-edit-icon" aria-hidden="true">✎</span><span>수정</span>'}</button>
     </div>` : '';
+
 
 
   const sessionMode = question.sessionMode || state.questionSessionMode;

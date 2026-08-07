@@ -5730,16 +5730,16 @@ select,
 .question-inline-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: .8rem;
 }
-.question-inline-toolbar-copy {
-  min-width: 0;
+.question-edit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: .32rem;
 }
-.question-inline-toolbar-copy p {
-  margin: .28rem 0 0;
-  color: #425366;
-  line-height: 1.45;
+.question-edit-icon {
+  line-height: 1;
 }
 .question-answer-refine-help {
   margin: 0;
