@@ -814,6 +814,7 @@ class QuestionAttemptRequest(BaseModel):
     time_limit_seconds: int | None = Field(default=None, ge=0, le=86400)
     question_started_at: str = Field(default="", max_length=64)
     answered_at: str = Field(default="", max_length=64)
+    answer_revealed: bool = False
 
 
 class QuestionBankAttemptQueryRequest(BaseModel):
@@ -1081,6 +1082,7 @@ def _ensure_question_attempts_nullable_card_id(conn: sqlite3.Connection) -> None
                 time_limit_seconds INTEGER,
                 question_started_at TEXT NOT NULL DEFAULT '',
                 answered_at TEXT NOT NULL DEFAULT '',
+                answer_revealed INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 FOREIGN KEY(card_id) REFERENCES card_progress(card_id) ON DELETE CASCADE,
@@ -1377,12 +1379,20 @@ def ensure_progress_db(
             "time_limit_seconds": "INTEGER",
             "question_started_at": "TEXT NOT NULL DEFAULT ''",
             "answered_at": "TEXT NOT NULL DEFAULT ''",
+            "answer_revealed": "INTEGER NOT NULL DEFAULT 0",
         }
         for column, definition in question_column_definitions.items():
             if column not in question_columns:
                 conn.execute(f"ALTER TABLE question_attempts ADD COLUMN {column} {definition}")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_card_id ON question_attempts(card_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_question_attempts_bank_id ON question_attempts(question_bank_id)")
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_question_attempts_card_latest
+            ON question_attempts(card_id, updated_at DESC, created_at DESC, question_id DESC)
+            WHERE TRIM(COALESCE(card_id, '')) <> ''
+            """
+        )
         conn.execute(
             """
             CREATE INDEX IF NOT EXISTS idx_question_attempts_bank_latest
@@ -6033,6 +6043,10 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
     raw_result = row["is_correct"]
     is_correct = None if raw_result is None else bool(int(raw_result))
     judgment = resolved_question_attempt_judgment(row["judgment"] if "judgment" in row.keys() else None, is_correct)
+    if "answer_revealed" in row.keys():
+        answer_revealed = bool(int(row["answer_revealed"] or 0))
+    else:
+        answer_revealed = judgment != "pending" or bool(row["user_answer"] or "") or row["selected_choice_index"] is not None
     return {
         "question_id": row["question_id"],
         "question_bank_id": row["question_bank_id"] if "question_bank_id" in row.keys() else "",
@@ -6059,6 +6073,7 @@ def question_attempt_row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | No
         "time_limit_seconds": row["time_limit_seconds"] if "time_limit_seconds" in row.keys() else None,
         "question_started_at": row["question_started_at"] if "question_started_at" in row.keys() else "",
         "answered_at": row["answered_at"] if "answered_at" in row.keys() else "",
+        "answer_revealed": answer_revealed,
         "created_at": row["created_at"] or "",
         "updated_at": row["updated_at"] or "",
     }
@@ -6150,7 +6165,7 @@ SELECT question_id, question_bank_id, card_id, question_type, prompt, body, user
        session_title, session_mode, section, points, expected_time_seconds,
        answer_guide, question_order, question_elapsed_seconds,
        session_elapsed_seconds, time_limit_seconds, question_started_at,
-       answered_at, created_at, updated_at
+       answered_at, answer_revealed, created_at, updated_at
             FROM question_attempts
             {list_where}
             ORDER BY updated_at DESC, created_at DESC, question_id DESC
@@ -6275,7 +6290,8 @@ def read_question_bank_attempts(
                    question_attempts.answer_guide, question_attempts.question_order,
                    question_attempts.question_elapsed_seconds, question_attempts.session_elapsed_seconds,
                    question_attempts.time_limit_seconds, question_attempts.question_started_at,
-                   question_attempts.answered_at, question_attempts.created_at, question_attempts.updated_at,
+                   question_attempts.answered_at, question_attempts.answer_revealed,
+                   question_attempts.created_at, question_attempts.updated_at,
                    question_bank.answer AS bank_answer, question_bank.explanation AS bank_explanation,
                    question_bank.topic AS bank_topic, question_bank.field_name AS bank_field_name,
                    question_bank.category AS bank_category, question_bank.issuer AS bank_issuer,
@@ -6345,12 +6361,13 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
 
     judgment = normalize_question_attempt_judgment(payload.judgment, payload.is_correct)
     is_correct_value = 1 if judgment == "correct" else 0 if judgment in {"ambiguous", "wrong", "unknown"} else None
+    user_answer = str(payload.user_answer or "")[:20000]
     wrong_note = str(payload.wrong_note or "")[:20000]
     if is_correct_value == 1:
         wrong_note = ""
+    answer_revealed_value = 1 if bool(payload.answer_revealed) else 0
     db_path = progress_db_for(progress_db_path)
     now = utc_now_iso()
-    answered_at = str(payload.answered_at or now)[:64]
     question_started_at = str(payload.question_started_at or "")[:64]
     session_id = str(payload.session_id or "")[:255]
     session_title = str(payload.session_title or "")[:255]
@@ -6380,10 +6397,17 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
             )
 
         existing = conn.execute(
-            "SELECT created_at, question_started_at, card_id FROM question_attempts WHERE question_id = ?",
+            "SELECT created_at, question_started_at, answered_at, card_id FROM question_attempts WHERE question_id = ?",
             (question_id,),
         ).fetchone()
         existing_card_id = normalize_question_bank_text(existing["card_id"] if existing else "", limit=255)
+        answered_at_raw = str(payload.answered_at or "").strip()
+        has_attempt_content = bool(user_answer.strip() or payload.selected_choice_index is not None or wrong_note.strip() or judgment != "pending" or answer_revealed_value)
+        answered_at = answered_at_raw[:64] if answered_at_raw else (
+            str(existing["answered_at"] or "")[:64]
+            if existing and existing["answered_at"]
+            else (now if has_attempt_content else "")
+        )
         conn.execute(
             """
             INSERT INTO question_attempts (
@@ -6392,9 +6416,9 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                 session_id, session_title, session_mode, section, points,
                 expected_time_seconds, answer_guide, question_order, question_elapsed_seconds,
                 session_elapsed_seconds, time_limit_seconds, question_started_at,
-                answered_at, created_at, updated_at
+                answered_at, answer_revealed, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(question_id) DO UPDATE SET
                 question_bank_id = excluded.question_bank_id,
                 card_id = excluded.card_id,
@@ -6419,6 +6443,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                 time_limit_seconds = excluded.time_limit_seconds,
                 question_started_at = excluded.question_started_at,
                 answered_at = excluded.answered_at,
+                answer_revealed = excluded.answer_revealed,
                 updated_at = excluded.updated_at
             """,
             (
@@ -6428,7 +6453,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                 question_type,
                 str(payload.prompt or "")[:4000],
                 str(payload.body or "")[:12000],
-                str(payload.user_answer or "")[:20000],
+                user_answer,
                 payload.selected_choice_index,
                 is_correct_value,
                 judgment,
@@ -6446,6 +6471,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                 payload.time_limit_seconds,
                 question_started_at or (existing["question_started_at"] if existing and existing["question_started_at"] else ""),
                 answered_at,
+                answer_revealed_value,
                 existing["created_at"] if existing else now,
                 now,
             ),
@@ -6459,7 +6485,7 @@ def save_question_attempt(payload: QuestionAttemptRequest, progress_db_path: Pat
                    session_title, session_mode, section, points, expected_time_seconds,
                    answer_guide, question_order, question_elapsed_seconds,
                    session_elapsed_seconds, time_limit_seconds, question_started_at,
-                   answered_at, created_at, updated_at
+                   answered_at, answer_revealed, created_at, updated_at
             FROM question_attempts
             WHERE question_id = ?
             """,
