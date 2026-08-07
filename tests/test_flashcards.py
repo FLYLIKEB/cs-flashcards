@@ -1453,7 +1453,16 @@ class FlashcardProgressTests(unittest.TestCase):
                     'SELECT COUNT(*), SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) FROM question_attempts WHERE card_id=?',
                     ('CS-001',),
                 ).fetchone()
+                latest_index_row = conn.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = ?",
+                    ('idx_question_attempts_card_latest',),
+                ).fetchone()
             self.assertEqual(saved, (3, 2))
+            self.assertIsNotNone(latest_index_row)
+            self.assertIn(
+                "ON question_attempts(card_id, updated_at DESC, created_at DESC, question_id DESC)",
+                latest_index_row[0],
+            )
 
             history_all = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], result='all', limit=10)
             self.assertEqual(history_all['summary']['total'], 3)
@@ -1477,6 +1486,55 @@ class FlashcardProgressTests(unittest.TestCase):
             self.assertEqual(history_ambiguous['items'][0]['section'], '전공논술')
             self.assertEqual(history_ambiguous['items'][0]['points'], 20)
 
+    def test_question_attempt_preserves_answer_revealed_for_saved_draft(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / 'cards.csv'
+            db_path = root / 'progress.sqlite'
+            write_sample(csv_path)
+
+            draft = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-draft-1',
+                    card_id='CS-001',
+                    question_type='subjective',
+                    prompt='초안 prompt',
+                    body='초안 body',
+                    user_answer='임시 초안',
+                    judgment='pending',
+                    answer_revealed=False,
+                ),
+                db_path,
+            )
+            self.assertFalse(draft['attempt']['answer_revealed'])
+            self.assertEqual(draft['attempt']['judgment'], 'pending')
+
+            restored = flashcard_app.read_question_attempts(db_path, card_ids=['CS-001'], result='all', limit=10)
+            matched = next(item for item in restored['items'] if item['question_id'] == 'q-CS-001-draft-1')
+            self.assertFalse(matched['answer_revealed'])
+
+            updated = save_question_attempt(
+                flashcard_app.QuestionAttemptRequest(
+                    question_id='q-CS-001-draft-1',
+                    card_id='CS-001',
+                    question_type='subjective',
+                    prompt='초안 prompt',
+                    body='초안 body',
+                    user_answer='임시 초안',
+                    judgment='ambiguous',
+                    wrong_note='보강 필요',
+                    answer_revealed=True,
+                ),
+                db_path,
+            )
+            self.assertTrue(updated['attempt']['answer_revealed'])
+
+            with closing(sqlite3.connect(db_path)) as conn:
+                row = conn.execute(
+                    'SELECT answer_revealed FROM question_attempts WHERE question_id = ?',
+                    ('q-CS-001-draft-1',),
+                ).fetchone()
+            self.assertEqual(row[0], 1)
     def test_read_question_attempt_stats_uses_summary_cache_for_read_card_and_read_cards(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
