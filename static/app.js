@@ -37,7 +37,12 @@ const state = {
   speechToken: 0,
   speechKeepAlive: null,
   audioListRepeatIndex: 0,
-  controlsCollapsed: localStorage.getItem('controlsCollapsed') !== '0',
+  controlsCollapsed: (() => {
+    const sessionValue = window.sessionStorage.getItem('controlsCollapsed');
+    if (sessionValue === '0') return false;
+    if (sessionValue === '1') return true;
+    return localStorage.getItem('controlsCollapsed') !== '0';
+  })(),
   filtersCollapsed: (() => {
     const saved = localStorage.getItem('filtersCollapsed');
     if (saved === '0') return false;
@@ -79,6 +84,9 @@ const state = {
   questionHistoryItems: [],
   questionHistorySummary: null,
   questionHistoryError: '',
+  questionHistorySavingId: '',
+  questionHistoryReviewLoading: false,
+  questionHistoryReviewLaunchId: '',
   questionBankOpen: false,
   questionBankLoading: false,
   questionBankItems: [],
@@ -922,17 +930,40 @@ function openCurrentGoogleSearch(event = null) {
 function applyControlsCollapsed() {
   const panel = $('controlsPanel');
   const button = $('controlsToggle');
-  if (!panel || !button) return;
-  panel.classList.toggle('collapsed', state.controlsCollapsed);
-  document.body.classList.toggle('controls-collapsed', state.controlsCollapsed);
-  button.setAttribute('aria-expanded', String(!state.controlsCollapsed));
-  button.textContent = state.controlsCollapsed ? '⚙' : '⚙';
+  const body = $('controlsBody');
+  if (!panel || !button || !body) return;
+  const collapsed = state.controlsCollapsed;
+  panel.classList.toggle('collapsed', collapsed);
+  body.hidden = collapsed;
+  document.body.classList.toggle('controls-collapsed', collapsed);
+  button.setAttribute('aria-expanded', String(!collapsed));
+  button.textContent = collapsed ? '⚙' : '⚙';
+  if (collapsed && body.contains(document.activeElement)) focusElement(button);
 }
 
 function toggleControlsPanel() {
   state.controlsCollapsed = !state.controlsCollapsed;
-  localStorage.setItem('controlsCollapsed', state.controlsCollapsed ? '1' : '0');
+  const nextValue = state.controlsCollapsed ? '1' : '0';
+  localStorage.setItem('controlsCollapsed', nextValue);
+  window.sessionStorage.setItem('controlsCollapsed', nextValue);
   applyControlsCollapsed();
+}
+
+let suppressNextControlsToggleClick = false;
+
+function handleControlsToggleClick() {
+  if (suppressNextControlsToggleClick) {
+    suppressNextControlsToggleClick = false;
+    return;
+  }
+  toggleControlsPanel();
+}
+
+function handleControlsToggleKeydown(event) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  suppressNextControlsToggleClick = true;
+  toggleControlsPanel();
 }
 
 function applyFiltersCollapsed() {
@@ -4468,30 +4499,13 @@ window.__csFlashcardsTableClosed = () => {
   state.flashcardTableWindow = null;
 };
 
-function syncFlashcardTableWindowSelection() {
-  const popup = state.flashcardTableWindow;
-  if (!popup || popup.closed) {
-    state.flashcardTableWindow = null;
-    return false;
-  }
-  const doc = popup.document;
-  const rows = [...doc.querySelectorAll('[data-row-card-id]')];
-  const summary = doc.querySelector('.summary');
-  if (summary) summary.textContent = `${flashcardTableSummaryText()} · ${state.filtered.length}개 · 현재 ${state.filtered.length ? state.index + 1 : 0}`;
-  if (!rows.length) return false;
-  const currentCardId = state.filtered[state.index]?.id || '';
-  rows.forEach((row) => row.classList.toggle('current-row', row.dataset.rowCardId === currentCardId));
-  return true;
+function flashcardTableWindowSummaryLine() {
+  return `${flashcardTableSummaryText()} · ${state.filtered.length}개 · 현재 ${state.filtered.length ? state.index + 1 : 0}`;
 }
-function renderFlashcardTableWindow() {
-  const popup = state.flashcardTableWindow;
-  if (!popup || popup.closed) {
-    state.flashcardTableWindow = null;
-    return;
-  }
+
+function flashcardTableWindowConfig() {
   const rows = state.filtered;
   const currentCardId = rows[state.index]?.id || '';
-  const summaryText = flashcardTableSummaryText();
   const columnOrder = flashcardTableColumnOrder();
   // Shared table shell owns draggable="true", data-column-key, dragstart, and drop-target header behavior.
   const columns = columnOrder.map((key) => {
@@ -4504,7 +4518,7 @@ function renderFlashcardTableWindow() {
       cellClassName: column.className || '',
     };
   });
-  const popupConfig = {
+  return {
     columns,
     rows: rows.map((card, index) => ({
       id: card.id,
@@ -4512,8 +4526,39 @@ function renderFlashcardTableWindow() {
       attributes: {'data-row-card-id': card.id},
       cells: Object.fromEntries(columnOrder.map((key) => [key, FLASHCARD_TABLE_COLUMNS[key].render(card, index)])),
     })),
+    emptyText: '현재 조건에 맞는 카드가 없습니다.',
+    tableMinWidth: '720px',
   };
+}
+
+function syncFlashcardTableWindowSelection() {
+  const popup = state.flashcardTableWindow;
+  if (!popup || popup.closed) {
+    state.flashcardTableWindow = null;
+    return false;
+  }
+  const doc = popup.document;
+  const rows = [...doc.querySelectorAll('[data-row-card-id]')];
+  const summary = doc.querySelector('.summary');
+  if (summary) summary.textContent = flashcardTableWindowSummaryLine();
+  if (!rows.length) return false;
+  const currentCardId = state.filtered[state.index]?.id || '';
+  rows.forEach((row) => row.classList.toggle('current-row', row.dataset.rowCardId === currentCardId));
+  return true;
+}
+function renderFlashcardTableWindow() {
+  const popup = state.flashcardTableWindow;
+  if (!popup || popup.closed) {
+    state.flashcardTableWindow = null;
+    return;
+  }
+  const popupConfig = flashcardTableWindowConfig();
+  const summaryLine = flashcardTableWindowSummaryLine();
+  if (typeof popup.__csFlashcardTableRender === 'function' && popup.document?.getElementById('flashcardTableMount')) {
+    if (popup.__csFlashcardTableRender(popupConfig, summaryLine)) return;
+  }
   const popupConfigJson = JSON.stringify(popupConfig).replace(/</g, '\\u003c');
+  const summaryLineJson = JSON.stringify(summaryLine).replace(/</g, '\\u003c');
   try {
     popup.document.open();
     popup.document.write(`<!doctype html>
@@ -4529,7 +4574,7 @@ function renderFlashcardTableWindow() {
     <div class="cs-table-meta">
       <div>
         <h1 class="cs-table-title">플래시카드 표 목록</h1>
-        <p class="summary cs-table-summary">${escapeHtml(summaryText)} · ${rows.length}개 · 현재 ${rows.length ? state.index + 1 : 0}</p>
+        <p class="summary cs-table-summary">${escapeHtml(summaryLine)}</p>
         <p class="hint cs-table-hint">열 제목 드래그로 순서 변경 · 행 클릭 이동 · 별/O/X/– 바로 수정</p>
       </div>
     </div>
@@ -4548,35 +4593,48 @@ function renderFlashcardTableWindow() {
       }, 0);
       return true;
     };
-    const config = ${popupConfigJson};
-    const mount = document.getElementById('flashcardTableMount');
-    window.CSTableShell.renderTable(mount, {
-      columns: config.columns,
-      rows: config.rows,
-      emptyText: '현재 조건에 맞는 카드가 없습니다.',
-      tableMinWidth: '720px',
-      onAction: (event) => {
-        const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
-        if (bookmarkButton) {
-          event.preventDefault();
-          invokeOpener('__csFlashcardsToggleBookmarkFromTable', bookmarkButton.dataset.bookmarkCardId || '');
-          return true;
-        }
-        const statusButton = event.target.closest('[data-status-card-id]');
-        if (statusButton) {
-          event.preventDefault();
-          invokeOpener('__csFlashcardsSetStatusFromTable', statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
-          return true;
-        }
-        return false;
-      },
-      onRowActivate: (row) => {
-        invokeOpener('__csFlashcardsSelectCardFromTable', row?.attributes?.['data-row-card-id'] || row?.id || '');
-      },
-      onColumnMove: (sourceKey, targetKey) => {
-        invokeOpener('__csFlashcardsMoveTableColumn', sourceKey, targetKey);
-      },
-    });
+    const flashcardTableState = {
+      config: ${popupConfigJson},
+      summaryLine: ${summaryLineJson},
+    };
+    const renderPopupTable = () => {
+      const mount = document.getElementById('flashcardTableMount');
+      const summary = document.querySelector('.summary');
+      if (!mount || !summary || !window.CSTableShell?.renderTable) return false;
+      summary.textContent = flashcardTableState.summaryLine || '';
+      window.CSTableShell.renderTable(mount, {
+        ...flashcardTableState.config,
+        onAction: (event) => {
+          const bookmarkButton = event.target.closest('[data-bookmark-card-id]');
+          if (bookmarkButton) {
+            event.preventDefault();
+            invokeOpener('__csFlashcardsToggleBookmarkFromTable', bookmarkButton.dataset.bookmarkCardId || '');
+            return true;
+          }
+          const statusButton = event.target.closest('[data-status-card-id]');
+          if (statusButton) {
+            event.preventDefault();
+            invokeOpener('__csFlashcardsSetStatusFromTable', statusButton.dataset.statusCardId || '', statusButton.dataset.statusValue || '');
+            return true;
+          }
+          return false;
+        },
+        onRowActivate: (row) => {
+          invokeOpener('__csFlashcardsSelectCardFromTable', row?.attributes?.['data-row-card-id'] || row?.id || '');
+        },
+        onColumnMove: (sourceKey, targetKey) => {
+          invokeOpener('__csFlashcardsMoveTableColumn', sourceKey, targetKey);
+        },
+      });
+      return true;
+    };
+    window.__csFlashcardTableRender = (nextConfig, nextSummaryLine) => {
+      if (nextConfig && typeof nextConfig === 'object') flashcardTableState.config = nextConfig;
+      if (typeof nextSummaryLine === 'string') flashcardTableState.summaryLine = nextSummaryLine;
+      return renderPopupTable();
+    };
+    renderPopupTable();
+    window.addEventListener('load', renderPopupTable);
     window.addEventListener('beforeunload', () => {
       invokeOpener('__csFlashcardsTableClosed');
     });
@@ -4641,21 +4699,247 @@ function questionHistoryRequestUrl({filter = state.questionHistoryFilter, cardId
   return `/api/questions/attempts?${params.toString()}`;
 }
 
+function questionHistorySummaryFallback() {
+  return {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0};
+}
+
+function questionHistoryItemId(item) {
+  return String(item?.question_id || item?.question_bank_id || item?.card_id || '').trim();
+}
+
+function questionHistoryResultKey(item) {
+  const value = String(item?.result_key || item?.judgment || 'pending').trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, value) ? value : 'pending';
+}
+
+function questionHistoryItemMatchesFilter(item, filter = state.questionHistoryFilter) {
+  const resultKey = questionHistoryResultKey(item);
+  if (filter === 'all') return true;
+  return resultKey === filter;
+}
+
+
+function questionHistoryShiftSummary(summary, previousJudgment, nextJudgment) {
+  const nextSummary = {
+    ...(summary && typeof summary === 'object' ? summary : questionHistorySummaryFallback()),
+    total: Number(summary?.total || 0),
+    correct: Number(summary?.correct || 0),
+    ambiguous: Number(summary?.ambiguous || 0),
+    wrong: Number(summary?.wrong || 0),
+    unknown: Number(summary?.unknown || 0),
+    pending: Number(summary?.pending || 0),
+  };
+  if (Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, previousJudgment) && previousJudgment !== nextJudgment) {
+    nextSummary[previousJudgment] = Math.max(0, Number(nextSummary[previousJudgment] || 0) - 1);
+  }
+  if (Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, nextJudgment) && previousJudgment !== nextJudgment) {
+    nextSummary[nextJudgment] = Number(nextSummary[nextJudgment] || 0) + 1;
+  }
+  return nextSummary;
+}
+
+function questionHistoryAttemptPayload(item, judgment = questionHistoryResultKey(item)) {
+  const questionId = questionHistoryItemId(item);
+  if (!questionId) return null;
+  return {
+    question_id: questionId,
+    question_bank_id: String(item?.question_bank_id || '').trim(),
+    card_id: String(item?.card_id || ''),
+    question_type: String(item?.question_type || 'subjective'),
+    prompt: String(item?.prompt || ''),
+    body: String(item?.body || ''),
+    user_answer: String(item?.user_answer || ''),
+    selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
+    is_correct: judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(judgment) ? false : null,
+    judgment,
+    wrong_note: judgment === 'correct' ? '' : String(item?.wrong_note || ''),
+    session_id: String(item?.session_id || ''),
+    session_title: String(item?.session_title || ''),
+    session_mode: String(item?.session_mode || 'practice'),
+    section: String(item?.section || ''),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || ''),
+    question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
+    question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
+    session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
+    time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
+    question_started_at: String(item?.question_started_at || ''),
+    answered_at: String(item?.answered_at || new Date().toISOString()),
+  };
+}
+
+function mergeSavedQuestionHistoryItem(currentItem, attempt) {
+  if (!currentItem) return currentItem;
+  const resultKey = questionHistoryResultKey(attempt);
+  return {
+    ...currentItem,
+    ...attempt,
+    result_key: resultKey,
+    result_label: QUESTION_HISTORY_FILTER_LABELS[resultKey] || currentItem?.result_label || '기록',
+    wrong_note: resultKey === 'correct' ? '' : String(attempt?.wrong_note || currentItem?.wrong_note || ''),
+    updated_at: String(attempt?.updated_at || currentItem?.updated_at || ''),
+    answered_at: String(attempt?.answered_at || currentItem?.answered_at || ''),
+  };
+}
+
+function questionHistoryAttemptSnapshot(item, judgment = questionHistoryResultKey(item)) {
+  const questionBankId = String(item?.question_bank_id || '').trim();
+  if (!questionBankId) return null;
+  return {
+    question_bank_id: questionBankId,
+    question_id: questionHistoryItemId(item),
+    user_answer: String(item?.user_answer || ''),
+    selected_choice_index: Number.isInteger(item?.selected_choice_index) ? item.selected_choice_index : null,
+    judgment,
+    wrong_note: judgment === 'correct' ? '' : String(item?.wrong_note || ''),
+    session_id: String(item?.session_id || '').trim(),
+    session_title: String(item?.session_title || '').trim(),
+    session_mode: String(item?.session_mode || '').trim(),
+    section: String(item?.section || '').trim(),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || '').trim(),
+    question_order: Number.isInteger(item?.question_order) ? item.question_order : null,
+    question_elapsed_seconds: Number.isInteger(item?.question_elapsed_seconds) ? item.question_elapsed_seconds : null,
+    session_elapsed_seconds: Number.isInteger(item?.session_elapsed_seconds) ? item.session_elapsed_seconds : null,
+    time_limit_seconds: Number.isInteger(item?.time_limit_seconds) ? item.time_limit_seconds : null,
+    question_started_at: String(item?.question_started_at || '').trim(),
+    answered_at: String(item?.answered_at || '').trim(),
+    updated_at: String(item?.updated_at || '').trim(),
+    answer_revealed: true,
+  };
+}
+
+function questionHistoryReviewItemToQuestionBankItem(item) {
+  return {
+    question_bank_id: String(item?.question_bank_id || ''),
+    card_id: String(item?.card_id || ''),
+    question_type: String(item?.question_type || 'subjective'),
+    prompt: String(item?.prompt || ''),
+    body: String(item?.body || ''),
+    answer: String(item?.answer || ''),
+    explanation: String(item?.explanation || ''),
+    rubric: Array.isArray(item?.rubric) ? item.rubric : [],
+    choices: Array.isArray(item?.choices) ? item.choices : [],
+    answer_index: Number.isInteger(item?.answer_index) ? item.answer_index : null,
+    topic: String(item?.topic || ''),
+    field_name: String(item?.field_name || ''),
+    category: String(item?.category || ''),
+    keywords: Array.isArray(item?.keywords) ? item.keywords : [],
+    difficulty: String(item?.difficulty || ''),
+    issuer: String(item?.issuer || ''),
+    source_location: String(item?.source_location || ''),
+    section: String(item?.section || ''),
+    points: Number.isInteger(item?.points) ? item.points : null,
+    expected_time_seconds: Number.isInteger(item?.expected_time_seconds) ? item.expected_time_seconds : null,
+    answer_guide: String(item?.answer_guide || ''),
+    session_mode: String(item?.session_mode || 'practice'),
+  };
+}
+
+async function saveQuestionHistoryJudgment(questionId, judgment) {
+  const normalizedId = String(questionId || '').trim();
+  const normalizedJudgment = String(judgment || '').trim().toLowerCase();
+  if (!normalizedId || !Object.prototype.hasOwnProperty.call(QUESTION_HISTORY_FILTER_LABELS, normalizedJudgment)) return;
+  const historyIndex = (Array.isArray(state.questionHistoryItems) ? state.questionHistoryItems : []).findIndex((item) => questionHistoryItemId(item) === normalizedId);
+  if (historyIndex < 0 || state.questionHistorySavingId || state.questionHistoryReviewLoading) return;
+  const currentItem = state.questionHistoryItems[historyIndex];
+  const previousJudgment = questionHistoryResultKey(currentItem);
+  const payload = questionHistoryAttemptPayload(currentItem, normalizedJudgment);
+  if (!payload) return;
+  state.questionHistorySavingId = normalizedId;
+  state.questionHistoryError = '';
+  renderQuestionHistoryDialog();
+  try {
+    const res = await fetch('/api/questions/attempt', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const nextItem = mergeSavedQuestionHistoryItem(currentItem, data.attempt || payload);
+    state.questionHistoryItems.splice(historyIndex, 1, nextItem);
+    if (!questionHistoryItemMatchesFilter(nextItem, state.questionHistoryFilter)) {
+      state.questionHistoryItems = state.questionHistoryItems.filter((item) => questionHistoryItemId(item) !== normalizedId);
+    }
+    state.questionHistorySummary = questionHistoryShiftSummary(state.questionHistorySummary, previousJudgment, questionHistoryResultKey(nextItem));
+    renderQuestionHistoryDialog();
+  } catch (error) {
+    state.questionHistoryError = error.message || String(error);
+  } finally {
+    state.questionHistorySavingId = '';
+    renderQuestionHistoryDialog();
+  }
+}
+
+async function openQuestionHistoryReview(questionId) {
+  const normalizedId = String(questionId || '').trim();
+  if (!normalizedId || state.questionHistorySavingId || state.questionHistoryReviewLoading) return;
+  const visibleItems = (Array.isArray(state.questionHistoryItems) ? state.questionHistoryItems : []).filter((item) => String(item?.question_bank_id || '').trim());
+  const targetItem = visibleItems.find((item) => questionHistoryItemId(item) === normalizedId);
+  const targetQuestionBankId = String(targetItem?.question_bank_id || '').trim();
+  if (!targetQuestionBankId) {
+    setMessage('문제은행에 연결된 풀이 기록만 바로 열 수 있습니다.', true);
+    return;
+  }
+  state.questionHistoryReviewLoading = true;
+  state.questionHistoryReviewLaunchId = normalizedId;
+  state.questionHistoryError = '';
+  renderQuestionHistoryDialog();
+  try {
+    const orderedIds = visibleItems.map((item) => String(item?.question_bank_id || '').trim()).filter(Boolean);
+    const res = await fetch('/api/question-bank/attempts/query', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      cache: 'no-store',
+      body: JSON.stringify({question_bank_ids: orderedIds, limit: Math.max(orderedIds.length, 1), result: 'all'}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const reviewItemsById = new Map((Array.isArray(data.items) ? data.items : []).map((item) => [String(item?.question_bank_id || '').trim(), item]));
+    const reviewItems = orderedIds.map((questionBankId) => reviewItemsById.get(questionBankId)).filter(Boolean);
+    const launchItems = reviewItems.map((item) => questionHistoryReviewItemToQuestionBankItem(item));
+    const attemptsByQuestionBankId = {};
+    reviewItems.forEach((item) => {
+      const snapshot = questionHistoryAttemptSnapshot(item);
+      if (!snapshot?.question_bank_id) return;
+      attemptsByQuestionBankId[snapshot.question_bank_id] = snapshot;
+    });
+    const startIndex = reviewItems.findIndex((item) => String(item?.question_bank_id || '').trim() === targetQuestionBankId);
+    closeQuestionHistory();
+    openQuestionBankSession(startIndex >= 0 ? startIndex : 0, {
+      launchItems,
+      sessionState: {attemptsByQuestionBankId},
+      title: `풀이 기록 리뷰 · ${launchItems.length}문항`,
+      message: `풀이 기록 ${launchItems.length}문항을 불러왔습니다.`,
+    });
+  } catch (error) {
+    state.questionHistoryError = error.message || String(error);
+    renderQuestionHistoryDialog();
+  } finally {
+    state.questionHistoryReviewLoading = false;
+    state.questionHistoryReviewLaunchId = '';
+    if (state.questionHistoryOpen) renderQuestionHistoryDialog();
+  }
+}
+
 function renderQuestionHistoryDialog() {
   const summaryEl = $('questionHistorySummary');
   const body = $('questionHistoryBody');
-document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
-  const active = button.dataset.questionHistoryFilter === state.questionHistoryFilter;
-  button.classList.toggle('active', active);
-  button.setAttribute('aria-pressed', String(active));
-});
+  document.querySelectorAll('[data-question-history-filter]').forEach((button) => {
+    const active = button.dataset.questionHistoryFilter === state.questionHistoryFilter;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
   if (summaryEl) {
     if (state.questionHistoryLoading) {
       summaryEl.textContent = '현재 필터 기준 문제 기록을 불러오는 중입니다.';
     } else if (state.questionHistoryError) {
       summaryEl.textContent = `문제 기록 로딩 실패: ${state.questionHistoryError}`;
     } else {
-      const summary = state.questionHistorySummary || {selected_card_count: questionHistoryCardIds().length, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0};
+      const summary = state.questionHistorySummary || questionHistorySummaryFallback();
       summaryEl.textContent = `카드 ${summary.selected_card_count || 0} · 전체 ${summary.total || 0} · 맞음 ${summary.correct || 0} · 애매 ${summary.ambiguous || 0} · 틀림 ${summary.wrong || 0} · 모름 ${summary.unknown || 0} · 미채점 ${summary.pending || 0}`;
     }
   }
@@ -4674,15 +4958,21 @@ document.querySelectorAll('[data-question-history-filter]').forEach((button) => 
     return;
   }
   body.innerHTML = items.map((item) => {
+    const itemId = questionHistoryItemId(item);
+    const resultKey = questionHistoryResultKey(item);
     const title = escapeHtml(item.term || item.card_id || '카드');
     const typeLabel = escapeHtml(QUESTION_TYPE_LABELS[item.question_type] || item.question_type || '문제');
     const category = escapeHtml(item.category || '미분류');
-    const resultLabel = escapeHtml(QUESTION_HISTORY_FILTER_LABELS[item.result_key] || item.result_label || '기록');
+    const resultLabel = escapeHtml(QUESTION_HISTORY_FILTER_LABELS[resultKey] || item.result_label || '기록');
     const updatedAt = formatQuestionAttemptUpdatedAt(item.updated_at);
     const prompt = String(item.prompt || '').trim();
     const bodyText = String(item.body || '').trim();
     const answerText = escapeHtml(item.user_answer || '미입력');
     const wrongNote = String(item.wrong_note || '').trim();
+    const canReview = Boolean(String(item?.question_bank_id || '').trim());
+    const saving = itemId && state.questionHistorySavingId === itemId;
+    const launching = itemId && state.questionHistoryReviewLaunchId === itemId && state.questionHistoryReviewLoading;
+    const disabled = saving || launching || state.questionHistoryLoading;
     const sessionMeta = [
       String(item.session_title || '').trim(),
       questionSessionModeLabel(item.session_mode || 'practice'),
@@ -4694,14 +4984,14 @@ document.querySelectorAll('[data-question-history-filter]').forEach((button) => 
       updatedAt ? `저장 ${escapeHtml(updatedAt)}` : '',
     ].filter(Boolean).join(' · ');
     return `
-      <article class="question-history-item">
+      <article class="question-history-item${saving || launching ? ' is-saving' : ''}">
         <div class="question-history-item-head">
           <div class="question-history-item-heading">
             <strong>${title}</strong>
             <p class="question-history-item-meta">${category} · ${typeLabel}</p>
             ${sessionMeta ? `<p class="question-history-session-meta">${sessionMeta}</p>` : ''}
           </div>
-          <span class="question-history-result ${escapeHtml(item.result_key || 'pending')}">${resultLabel}</span>
+          <span class="question-history-result ${escapeHtml(resultKey)}">${resultLabel}</span>
         </div>
         <div class="question-history-copy">
           ${prompt ? `<p class="question-history-item-prompt">${escapeHtml(prompt)}</p>` : ''}
@@ -4711,8 +5001,18 @@ document.querySelectorAll('[data-question-history-filter]').forEach((button) => 
           <p class="question-history-field"><span>내 답</span><strong>${answerText}</strong></p>
           ${wrongNote ? `<p class="question-history-field note"><span>오답</span><strong>${escapeHtml(wrongNote)}</strong></p>` : ''}
         </div>
+        <div class="question-history-judgments" aria-label="문제 기록 채점 버튼">
+          ${[
+            ['correct', '맞음'],
+            ['ambiguous', '애매함'],
+            ['wrong', '틀림'],
+          ].map(([key, label]) => `<button class="question-grade-button${resultKey === key ? ' active' : ''}" type="button" data-question-history-judgment-id="${escapeHtml(itemId)}" data-question-history-judgment="${escapeHtml(key)}" aria-pressed="${resultKey === key ? 'true' : 'false'}" ${disabled || !itemId ? 'disabled' : ''}>${escapeHtml(label)}</button>`).join('')}
+        </div>
         <div class="question-history-item-actions">
-          <button class="question-history-open-card" type="button" data-question-history-card-id="${escapeHtml(item.card_id || '')}">카드</button>
+          <div class="question-history-item-actions-start">
+            ${canReview ? `<button class="question-history-open-review" type="button" data-question-history-review-id="${escapeHtml(itemId)}" ${disabled ? 'disabled' : ''}>${launching ? '불러오는 중…' : '풀이 보기'}</button>` : ''}
+          </div>
+          <button class="question-history-open-card" type="button" data-question-history-card-id="${escapeHtml(item.card_id || '')}" ${disabled ? 'disabled' : ''}>카드</button>
         </div>
       </article>`;
   }).join('');
@@ -4733,7 +5033,7 @@ async function loadQuestionHistory() {
   const cardIds = questionHistoryCardIds();
   if (state.cards.length && !cardIds.length) {
     state.questionHistoryItems = [];
-    state.questionHistorySummary = {selected_card_count: 0, total: 0, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: 0, returned: 0, filter};
+    state.questionHistorySummary = {...questionHistorySummaryFallback(), selected_card_count: 0, returned: 0, filter};
     state.questionHistoryLoading = false;
     renderQuestionHistoryDialog();
     return;
@@ -5698,6 +5998,7 @@ function applyQuestionBankLaunchAttempt(question, snapshot, fallbackOrder = null
   if (Object.prototype.hasOwnProperty.call(snapshot, 'answer_revealed')) current.answerRevealed = Boolean(snapshot.answer_revealed);
   else if (current.judgment !== 'pending' || Boolean(String(current.userAnswer || '').trim()) || Number.isInteger(current.selectedChoiceIndex)) current.answerRevealed = true;
   current.gradedCorrect = current.judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(current.judgment) ? false : null;
+  syncQuestionSavedDraft(current, snapshot);
   return current;
 }
 
@@ -5748,34 +6049,55 @@ function renderQuestionBankBrowser() {
     const difficulty = escapeHtml(item.difficulty || '');
     const source = escapeHtml(item.source_location || '');
     const preview = markdownPreviewText(item.body || item.answer || item.explanation || '').slice(0, 96);
-    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}"><td class="question-bank-col-index">${index + 1}</td><td class="question-bank-col-title"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td><td class="question-bank-col-type">${typeLabel || '—'}</td><td class="question-bank-col-field">${topic}</td><td class="question-bank-col-issuer">${issuer || '—'}</td><td class="question-bank-col-difficulty">${difficulty || '—'}</td><td class="question-bank-col-source">${source || '—'}</td></tr>`;
+    return `<tr class="question-bank-row${active ? ' active' : ''}" data-question-bank-index="${index}">
+      <td class="question-bank-col-index" data-label="#">${index + 1}</td>
+      <td class="question-bank-col-title" data-label="문제"><button class="question-bank-row-trigger" type="button" data-question-bank-index="${index}"><span class="question-bank-item-title">${prompt}</span>${preview ? `<span class="question-bank-item-preview">${escapeHtml(preview)}</span>` : ''}</button></td>
+      <td class="question-bank-col-type" data-label="형식">${typeLabel || '—'}</td>
+      <td class="question-bank-col-field" data-label="키워드">${topic}</td>
+      <td class="question-bank-col-issuer" data-label="기관">${issuer || '—'}</td>
+      <td class="question-bank-col-difficulty" data-label="난이도">${difficulty || '—'}</td>
+      <td class="question-bank-col-source" data-label="출처">${source || '—'}</td>
+    </tr>`;
   }).join('');
 }
 
 function openQuestionBankSession(startIndex = 0) {
-  if (!state.questionBankItems.length) {
+  const rawOptions = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : null;
+  const hasLaunchOptions = Boolean(rawOptions && (
+    Object.prototype.hasOwnProperty.call(rawOptions, 'sessionState')
+    || Object.prototype.hasOwnProperty.call(rawOptions, 'launchItems')
+    || Object.prototype.hasOwnProperty.call(rawOptions, 'title')
+    || Object.prototype.hasOwnProperty.call(rawOptions, 'message')
+  ));
+  const options = hasLaunchOptions ? rawOptions : {};
+  const sessionState = hasLaunchOptions
+    ? (options.sessionState && typeof options.sessionState === 'object' ? options.sessionState : null)
+    : rawOptions;
+  const launchItems = Array.isArray(options.launchItems)
+    ? options.launchItems.filter((item) => item && typeof item === 'object')
+    : state.questionBankItems;
+  if (!launchItems.length) {
     setMessage('문제은행 목록이 비어 있습니다.', true);
     return;
   }
-  const sessionState = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : null;
   commitCurrentQuestionElapsed();
   resetQuestionSessionState();
   state.questionMode = true;
-  const questions = state.questionBankItems.map((item, index) => questionBankItemToQuestion(item, index));
+  const questions = launchItems.map((item, index) => questionBankItemToQuestion(item, index));
   const start = Math.max(0, Math.min(questions.length - 1, startIndex));
   const firstMode = questions.find((item) => item?.sessionMode)?.sessionMode || 'practice';
   prepareQuestionSession(questions, {
-    title: `문제은행 세트 · ${state.questionBankItems.length}문항`,
+    title: String(options.title || '').trim() || `문제은행 세트 · ${launchItems.length}문항`,
     mode: firstMode,
   });
   applyQuestionBankLaunchSessionState(state.questions, sessionState);
   state.questionIndex = start;
   state.answerRevealed = Boolean(state.questions[start]?.answerRevealed);
   state.selectedChoiceIndex = Number.isInteger(state.questions[start]?.selectedChoiceIndex) ? state.questions[start].selectedChoiceIndex : null;
-  state.questionBankSelectedId = String(state.questionBankItems[start]?.question_bank_id || '');
+  state.questionBankSelectedId = String(launchItems[start]?.question_bank_id || '');
   activateCurrentQuestionTimer();
   renderQuestionPanel();
-  setMessage(`문제은행 ${state.questionBankItems.length}문항을 불러왔습니다.`);
+  setMessage(String(options.message || `문제은행 ${launchItems.length}문항을 불러왔습니다.`));
 }
 
 function scheduleQuestionBankBrowserLoad() {
@@ -5888,6 +6210,11 @@ function hydrateQuestionState(question) {
     if (!Array.isArray(question.subquestionLabels) || !question.subquestionLabels.length) question.subquestionLabels = detectedSubquestionLabels;
   }
   if (typeof question.subquestionModeOverride !== 'string') question.subquestionModeOverride = '';
+  if (typeof question.savedUserAnswer !== 'string') question.savedUserAnswer = '';
+  if (!Number.isInteger(question.savedSelectedChoiceIndex)) question.savedSelectedChoiceIndex = null;
+  if (typeof question.savedWrongNote !== 'string') question.savedWrongNote = '';
+  if (typeof question.savedJudgment !== 'string' || !QUESTION_HISTORY_FILTER_LABELS[question.savedJudgment]) question.savedJudgment = 'pending';
+  if (typeof question.savedAnswerRevealed !== 'boolean') question.savedAnswerRevealed = false;
   return question;
 }
 
@@ -6266,6 +6593,7 @@ function prepareQuestionSession(questions, options = {}) {
     timeLimitSeconds: Number.isInteger(item?.timeLimitSeconds) ? item.timeLimitSeconds : state.questionTimeLimitSeconds,
     questionActiveSinceMs: 0,
   }));
+  state.questions.forEach((question) => { syncQuestionSavedDraft(question); });
   state.questionIndex = 0;
   state.answerRevealed = false;
   state.selectedChoiceIndex = null;
@@ -6286,6 +6614,107 @@ function questionHasSubmittedAnswer(question) {
   if (!current) return false;
   if (Array.isArray(current.choices) && current.choices.length) return Number.isInteger(current.selectedChoiceIndex);
   return Boolean(String(current.userAnswer || '').trim());
+}
+
+function normalizeQuestionAttemptDraft(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return null;
+  return {
+    userAnswer: selectedAnswerText(current),
+    selectedChoiceIndex: Number.isInteger(current.selectedChoiceIndex) ? current.selectedChoiceIndex : null,
+    wrongNote: String(current.wrongNote || ''),
+    judgment: QUESTION_HISTORY_FILTER_LABELS[current.judgment] ? current.judgment : 'pending',
+    answerRevealed: Boolean(current.answerRevealed),
+  };
+}
+
+function syncQuestionSavedDraft(question, snapshot = null) {
+  const current = hydrateQuestionState(question);
+  if (!current) return null;
+  const draft = normalizeQuestionAttemptDraft(current);
+  const source = snapshot && typeof snapshot === 'object' ? snapshot : null;
+  current.savedUserAnswer = source && typeof source.user_answer === 'string' ? source.user_answer : draft.userAnswer;
+  current.savedSelectedChoiceIndex = source && Object.prototype.hasOwnProperty.call(source, 'selected_choice_index')
+    ? (Number.isInteger(source.selected_choice_index) ? source.selected_choice_index : null)
+    : draft.selectedChoiceIndex;
+  current.savedWrongNote = source && typeof source.wrong_note === 'string' ? source.wrong_note : draft.wrongNote;
+  const savedJudgment = source && typeof source.judgment === 'string'
+    ? source.judgment
+    : source && typeof source.result_key === 'string' ? source.result_key : draft.judgment;
+  current.savedJudgment = QUESTION_HISTORY_FILTER_LABELS[savedJudgment] ? savedJudgment : draft.judgment;
+  current.savedAnswerRevealed = source && Object.prototype.hasOwnProperty.call(source, 'answer_revealed')
+    ? Boolean(source.answer_revealed)
+    : draft.answerRevealed;
+  return current;
+}
+
+function questionAttemptDirty(question) {
+  const current = hydrateQuestionState(question);
+  const draft = normalizeQuestionAttemptDraft(current);
+  if (!current || !draft) return false;
+  return draft.userAnswer !== String(current.savedUserAnswer || '')
+    || draft.selectedChoiceIndex !== (Number.isInteger(current.savedSelectedChoiceIndex) ? current.savedSelectedChoiceIndex : null)
+    || draft.wrongNote !== String(current.savedWrongNote || '')
+    || draft.judgment !== (QUESTION_HISTORY_FILTER_LABELS[current.savedJudgment] ? current.savedJudgment : 'pending')
+    || draft.answerRevealed !== Boolean(current.savedAnswerRevealed);
+}
+
+function questionAttemptHasSavableContent(question) {
+  const draft = normalizeQuestionAttemptDraft(question);
+  if (!draft) return false;
+  return Boolean(
+    String(draft.userAnswer || '').trim()
+    || draft.selectedChoiceIndex !== null
+    || String(draft.wrongNote || '').trim()
+    || draft.judgment !== 'pending'
+    || draft.answerRevealed
+  );
+}
+
+function questionAttemptSavedAtLabel(value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  const match = text.match(/T(\d{2}:\d{2})/);
+  if (match?.[1]) return match[1];
+  return text.slice(0, 16);
+}
+
+function questionAttemptSaveLabel(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return '문항을 불러오면 저장 상태가 표시됩니다.';
+  if (questionAttemptDirty(current)) return '변경 사항을 저장하세요.';
+  if (current.attemptSavedAt) {
+    const savedAt = questionAttemptSavedAtLabel(current.attemptSavedAt);
+    return savedAt ? `문항별 답안 저장됨 · ${savedAt}` : '문항별 답안 저장됨';
+  }
+  return questionAttemptHasSavableContent(current) ? '아직 저장되지 않았습니다.' : '답안을 작성하거나 선택한 뒤 저장하세요.';
+}
+
+function questionAttemptSaveMessage(question) {
+  const current = hydrateQuestionState(question);
+  if (!current) return '답안 저장 완료';
+  return current.judgment === 'pending' ? '답안 저장 완료' : (questionResultText(current) || '문제 채점 저장 완료');
+}
+
+function refreshCurrentQuestionSaveState(question = currentQuestion()) {
+  const current = hydrateQuestionState(question);
+  const shell = $('questionCard')?.querySelector('.question-card-shell');
+  if (!shell) return;
+  const dirty = questionAttemptDirty(current);
+  shell.dataset.questionDirty = dirty ? '1' : '0';
+  shell.dataset.questionSaved = current?.attemptSavedAt ? '1' : '0';
+  const status = $('questionAnswerSaveStatus');
+  if (status) {
+    status.textContent = questionAttemptSaveLabel(current);
+    status.classList.toggle('dirty', dirty);
+    status.classList.toggle('saved', !dirty && Boolean(current?.attemptSavedAt));
+    status.classList.toggle('idle', !dirty && !current?.attemptSavedAt);
+  }
+  const button = $('questionAnswerSaveBtn');
+  if (button) {
+    button.disabled = state.questionLoading || state.questionSaving || state.markSaving || state.questionAnswerRefineLoading || state.questionBankEditSaving || !dirty;
+    button.classList.toggle('is-primary', dirty);
+  }
 }
 
 function markUnansweredQuestionWrong(question, answeredAt = new Date().toISOString()) {
@@ -6381,6 +6810,7 @@ function questionAttemptPayload(question) {
     time_limit_seconds: Number.isInteger(current.timeLimitSeconds) ? current.timeLimitSeconds : state.questionTimeLimitSeconds,
     question_started_at: current.questionStartedAt || '',
     answered_at: current.answeredAt || '',
+    answer_revealed: Boolean(current.answerRevealed),
   };
 }
 
@@ -6417,14 +6847,21 @@ async function saveQuestionAttempt(question, {quiet = false} = {}) {
     current.answerGuide = String(data.attempt?.answer_guide || current.answerGuide || '');
     current.questionElapsedSeconds = Number.isInteger(data.attempt?.question_elapsed_seconds) ? data.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
     current.sessionElapsedSeconds = Number.isInteger(data.attempt?.session_elapsed_seconds) ? data.attempt.session_elapsed_seconds : current.sessionElapsedSeconds;
-    if (Number.isInteger(data.attempt?.selected_choice_index)) current.selectedChoiceIndex = data.attempt.selected_choice_index;
+    if (Object.prototype.hasOwnProperty.call(data.attempt || {}, 'selected_choice_index')) {
+      current.selectedChoiceIndex = Number.isInteger(data.attempt?.selected_choice_index) ? data.attempt.selected_choice_index : null;
+    }
+    if (Object.prototype.hasOwnProperty.call(data.attempt || {}, 'answer_revealed')) {
+      current.answerRevealed = Boolean(data.attempt?.answer_revealed);
+      state.answerRevealed = Boolean(current.answerRevealed);
+    }
+    syncQuestionSavedDraft(current, data.attempt);
     syncUpdatedCard(data.card);
     syncQuestionBankAttemptState(current);
     if (state.questionHistoryOpen) loadQuestionHistory();
-    if (!quiet) setMessage(questionResultText(current) || '문제 채점 저장 완료');
+    if (!quiet) setMessage(questionAttemptSaveMessage(current));
     return data;
   } catch (error) {
-    if (!quiet) setMessage(`문제 채점 저장 실패: ${error.message || error}`, true);
+    if (!quiet) setMessage(`답안 저장 실패: ${error.message || error}`, true);
     throw error;
   } finally {
     state.questionSaving = false;
@@ -6471,6 +6908,13 @@ async function finishQuestionSession() {
       current.expectedTimeSeconds = Number.isInteger(payload.attempt?.expected_time_seconds) ? payload.attempt.expected_time_seconds : current.expectedTimeSeconds;
       current.answerGuide = String(payload.attempt?.answer_guide || current.answerGuide || '');
       current.questionElapsedSeconds = Number.isInteger(payload.attempt?.question_elapsed_seconds) ? payload.attempt.question_elapsed_seconds : current.questionElapsedSeconds;
+      if (Object.prototype.hasOwnProperty.call(payload.attempt || {}, 'selected_choice_index')) {
+        current.selectedChoiceIndex = Number.isInteger(payload.attempt?.selected_choice_index) ? payload.attempt.selected_choice_index : null;
+      }
+      if (Object.prototype.hasOwnProperty.call(payload.attempt || {}, 'answer_revealed')) {
+        current.answerRevealed = Boolean(payload.attempt?.answer_revealed);
+      }
+      syncQuestionSavedDraft(current, payload.attempt);
       syncUpdatedCard(payload.card);
       syncQuestionBankAttemptState(current, {reloadOnFilterMismatch: index === state.questionIndex});
     });
@@ -6499,6 +6943,22 @@ function setQuestionJudgment(judgment) {
   state.answerRevealed = true;
   renderQuestionPanel();
   saveQuestionAttempt(question).catch(() => {});
+}
+
+function saveCurrentQuestionAnswer({quiet = false} = {}) {
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question || state.questionLoading || state.questionSaving) return Promise.resolve(null);
+  if (!questionAttemptDirty(question)) {
+    refreshCurrentQuestionSaveState(question);
+    if (!quiet) setMessage(questionAttemptSaveLabel(question));
+    return Promise.resolve(null);
+  }
+  if (questionAttemptHasSavableContent(question) && !question.answeredAt) {
+    question.answeredAt = new Date().toISOString();
+  }
+  question.userAnswer = selectedAnswerText(question);
+  renderQuestionPanel();
+  return saveQuestionAttempt(question, {quiet});
 }
 
 function saveCurrentWrongNote() {
@@ -6677,6 +7137,18 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
       <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
       ${answerGuideHtml}
     </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
+  const questionDirty = questionAttemptDirty(question);
+  const saveStatusTone = questionDirty ? 'dirty' : question.attemptSavedAt ? 'saved' : 'idle';
+  const answerSaveHtml = `
+    <div class="question-answer-save question-surface">
+      <div class="question-answer-save-head">
+        <div class="question-inline-toolbar-copy">
+          <span class="question-side-note-label">문항별 답안 저장</span>
+          <p id="questionAnswerSaveStatus" class="question-answer-save-status ${saveStatusTone}">${escapeHtml(questionAttemptSaveLabel(question))}</p>
+        </div>
+        <button id="questionAnswerSaveBtn" class="question-toolbar-button${questionDirty ? ' is-primary' : ''}" type="button" data-question-save-answer="1" ${questionSaveBusy || !questionDirty ? 'disabled' : ''}>${state.questionSaving ? '저장 중…' : '답안 저장'}</button>
+      </div>
+    </div>`;
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
     <div class="question-rubric">
       <strong>채점 포인트</strong>
@@ -6832,7 +7304,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
     </div>` : '';
 destroyQuestionCodeEditor();
   card.innerHTML = `
-    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}">
+    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}" data-question-dirty="${questionDirty ? '1' : '0'}" data-question-saved="${question.attemptSavedAt ? '1' : '0'}">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
       <div class="question-card-head">
         <div class="question-card-head-copy">
@@ -6860,6 +7332,7 @@ destroyQuestionCodeEditor();
           ${questionInfoHtml}
           ${choiceHtml}
           ${answerDraftHtml}
+          ${answerSaveHtml}
           ${lockActionHtml}
           ${mainAnswerHtml}
         </div>
@@ -6889,6 +7362,7 @@ destroyQuestionCodeEditor();
     $('finishQuestionSessionBtn').disabled = state.questionLoading || questionBusy || !total;
     $('finishQuestionSessionBtn').textContent = questionSessionIsBok(question.sessionMode || state.questionSessionMode) && !state.questionSessionFinishedAt ? '제출' : '종료';
   }
+  refreshCurrentQuestionSaveState(question);
 }
 
 async function requestGeneratedQuestions({cardIds, types, count, seed}) {
@@ -7637,7 +8111,8 @@ function reloadFromLogo(event) {
 $('logoRefreshBtn').addEventListener('click', reloadFromLogo);
 $('logoRefreshBtn').addEventListener('touchend', reloadFromLogo, {passive: false});
 document.querySelectorAll('[data-status-filter]').forEach((button) => button.addEventListener('click', () => setStatusFilter(button.dataset.statusFilter)));
-$('controlsToggle').addEventListener('click', toggleControlsPanel);
+$('controlsToggle').addEventListener('click', handleControlsToggleClick);
+$('controlsToggle').addEventListener('keydown', handleControlsToggleKeydown);
 $('filterToggleBtn').addEventListener('click', toggleFiltersPanel);
 $('positionInput').addEventListener('change', () => jumpFromInput());
 $('positionInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); jumpFromInput(); $('positionInput').blur(); } });
@@ -7772,6 +8247,10 @@ $('questionCard')?.addEventListener('click', (event) => {
     openQuestionSourceCard();
     return;
   }
+  if (event.target.closest('[data-question-save-answer="1"]')) {
+    saveCurrentQuestionAnswer().catch(() => {});
+    return;
+  }
   const choice = event.target.closest('[data-choice-index]');
   if (choice) {
     selectQuestionChoice(Number.parseInt(choice.dataset.choiceIndex, 10));
@@ -7832,6 +8311,7 @@ $('questionCard')?.addEventListener('input', (event) => {
     const index = Number.parseInt(event.target.dataset.questionSubquestionIndex || '', 10);
     if (Number.isInteger(index)) updateQuestionSubquestionAnswer(question, index, event.target.value || '');
     else question.userAnswer = event.target.value || '';
+    refreshCurrentQuestionSaveState(question);
     return;
   }
   if (event.target.matches('.question-answer-refine-instruction')) {
@@ -7840,6 +8320,7 @@ $('questionCard')?.addEventListener('input', (event) => {
   }
   if (event.target.matches('.question-wrong-note')) {
     question.wrongNote = event.target.value || '';
+    refreshCurrentQuestionSaveState(question);
   }
 });
 $('knownBtn').addEventListener('click', () => mark('O'));
@@ -7953,8 +8434,21 @@ $('bookmarkListBody').addEventListener('click', (event) => {
   if (item) jumpToBookmarkCard(item.dataset.cardId);
 });
 $('questionHistoryBody')?.addEventListener('click', (event) => {
-  const trigger = event.target.closest('[data-question-history-card-id]');
-  if (trigger) jumpToQuestionHistoryCard(trigger.dataset.questionHistoryCardId);
+  const reviewTrigger = event.target.closest('[data-question-history-review-id]');
+  if (reviewTrigger) {
+    openQuestionHistoryReview(reviewTrigger.dataset.questionHistoryReviewId || '').catch(() => {});
+    return;
+  }
+  const judgmentTrigger = event.target.closest('[data-question-history-judgment-id][data-question-history-judgment]');
+  if (judgmentTrigger) {
+    saveQuestionHistoryJudgment(
+      judgmentTrigger.dataset.questionHistoryJudgmentId || '',
+      judgmentTrigger.dataset.questionHistoryJudgment || 'pending',
+    ).catch(() => {});
+    return;
+  }
+  const cardTrigger = event.target.closest('[data-question-history-card-id]');
+  if (cardTrigger) jumpToQuestionHistoryCard(cardTrigger.dataset.questionHistoryCardId);
 });
 document.addEventListener('click', (event) => {
   if (state.menuOpen && !event.target.closest('.header-actions')) toggleMenu(false);

@@ -28,6 +28,8 @@ QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1'
 QUESTION_BANK_FILTER_STATE_KEY = 'csQuestionBankFilters:v1'
 QUESTION_BANK_PRACTICE_COLLAPSED_KEY = 'csQuestionBankPracticeCollapsed:v1'
 
+CONTROLS_COLLAPSED_KEY = 'controlsCollapsed'
+
 WIKI_SIDEBAR_STATE_KEY = 'csFlashcardsWikiSidebar:v1'
 WAVE_ID_RE = re.compile(r'^(wave-\d+)')
 CANONICAL_COMMAND = '.venv/bin/python -m unittest tests.test_frontend_browser'
@@ -774,6 +776,92 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='header-menu-keyboard-focus', status=status, observations=case)
             await page.close()
 
+    async def test_controls_panel_collapse_updates_hidden_state_and_tab_order(self):
+        case = {'path': '/'}
+        page = await self.new_page(
+            viewport={'width': 1440, 'height': 1100},
+            local_storage={CONTROLS_COLLAPSED_KEY: '1'},
+        )
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForSelector('#controlsToggle')
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === true")
+            case['initial_collapsed'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                  storedValue: window.localStorage.getItem('controlsCollapsed') || '',
+                })
+                """
+            )
+            self.assertTrue(case['initial_collapsed']['bodyHidden'])
+            self.assertEqual(case['initial_collapsed']['toggleExpanded'], 'false')
+            self.assertEqual(case['initial_collapsed']['storedValue'], '1')
+
+            await page.focus('#controlsToggle')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === false")
+            case['expanded_state'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                  storedValue: window.localStorage.getItem('controlsCollapsed') || '',
+                })
+                """
+            )
+            self.assertFalse(case['expanded_state']['bodyHidden'])
+            self.assertEqual(case['expanded_state']['toggleExpanded'], 'true')
+            self.assertEqual(case['expanded_state']['storedValue'], '0')
+
+            await page.reload({'waitUntil': 'networkidle2'})
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === false")
+            case['reloaded_open_state'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                })
+                """
+            )
+            self.assertFalse(case['reloaded_open_state']['bodyHidden'])
+            self.assertEqual(case['reloaded_open_state']['toggleExpanded'], 'true')
+
+            await page.focus('#controlsToggle')
+            await page.keyboard.press('Tab')
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'speakTerm'")
+            case['focus_after_tab_when_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_after_tab_when_open'], 'speakTerm')
+
+            await page.focus('#controlsToggle')
+            await page.keyboard.press('Enter')
+            await page.waitForFunction("document.querySelector('#controlsBody').hidden === true")
+            case['recollapsed_state'] = await page.evaluate(
+                """
+                () => ({
+                  bodyHidden: document.querySelector('#controlsBody')?.hidden,
+                  toggleExpanded: document.querySelector('#controlsToggle')?.getAttribute('aria-expanded') || '',
+                  storedValue: window.localStorage.getItem('controlsCollapsed') || '',
+                  focusedId: document.activeElement && document.activeElement.id ? document.activeElement.id : '',
+                })
+                """
+            )
+            self.assertTrue(case['recollapsed_state']['bodyHidden'])
+            self.assertEqual(case['recollapsed_state']['toggleExpanded'], 'false')
+            self.assertEqual(case['recollapsed_state']['storedValue'], '1')
+            self.assertEqual(case['recollapsed_state']['focusedId'], 'controlsToggle')
+
+            await page.keyboard.press('Tab')
+            await page.waitForFunction("document.activeElement && document.activeElement.id === 'positionInput'")
+            case['focus_after_tab_when_collapsed'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
+            self.assertEqual(case['focus_after_tab_when_collapsed'], 'positionInput')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='controls-panel-collapse-hidden', status=status, observations=case)
+            await page.close()
+
     async def test_main_symbolic_buttons_expose_explicit_accessible_names(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
@@ -911,6 +999,358 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.record_case(case_id='main-filter-toggle-pressed-state', status=status, observations=case)
             await page.close()
 
+    async def test_question_history_pending_filter_and_inline_judgment_update(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        history_items = [
+            {
+                'question_id': 'history-pending-1',
+                'question_bank_id': 'history-qb-1',
+                'card_id': 'CS-001',
+                'term': '미채점 기록',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '미채점 기록 prompt',
+                'body': '미채점 기록 body',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '임시 답안',
+                'wrong_note': '',
+                'session_title': '문제 기록 세트',
+                'session_mode': 'practice',
+                'question_order': 1,
+                'updated_at': '2026-08-01T00:00:00Z',
+            },
+            {
+                'question_id': 'history-wrong-1',
+                'question_bank_id': 'history-qb-2',
+                'card_id': 'CS-002',
+                'term': '오답 기록',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '오답 기록 prompt',
+                'body': '오답 기록 body',
+                'result_key': 'wrong',
+                'result_label': '틀림',
+                'user_answer': '오답',
+                'wrong_note': '개념 확인',
+                'session_title': '문제 기록 세트',
+                'session_mode': 'practice',
+                'question_order': 2,
+                'updated_at': '2026-08-01T00:05:00Z',
+            },
+        ]
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ historyItems }) => {
+                  const originalFetch = window.fetch.bind(window);
+                  const items = historyItems.map((item) => ({...item}));
+                  const summarize = () => ({
+                    selected_card_count: 2,
+                    total: items.length,
+                    correct: items.filter((item) => item.result_key === 'correct').length,
+                    ambiguous: items.filter((item) => item.result_key === 'ambiguous').length,
+                    wrong: items.filter((item) => item.result_key === 'wrong').length,
+                    unknown: items.filter((item) => item.result_key === 'unknown').length,
+                    pending: items.filter((item) => item.result_key === 'pending').length,
+                    returned: items.length,
+                  });
+                  window.__historyAttemptCalls = [];
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/questions/attempts' && method === 'GET') {
+                      const result = (parsed.searchParams.get('result') || 'all').toLowerCase();
+                      const filtered = result === 'all' ? items : items.filter((item) => item.result_key === result);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        items: filtered,
+                        summary: {...summarize(), filter: result, returned: filtered.length},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/questions/attempt' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      window.__historyAttemptCalls.push(payload);
+                      const index = items.findIndex((item) => item.question_id === payload.question_id);
+                      if (index >= 0) {
+                        items[index] = {
+                          ...items[index],
+                          ...payload,
+                          result_key: payload.judgment,
+                          result_label: payload.judgment === 'correct' ? '맞음' : payload.judgment === 'ambiguous' ? '애매함' : payload.judgment === 'wrong' ? '틀림' : payload.judgment,
+                          wrong_note: payload.judgment === 'correct' ? '' : (items[index].wrong_note || ''),
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                        };
+                      }
+                      return Promise.resolve(new Response(JSON.stringify({
+                        attempt: {
+                          ...payload,
+                          result_key: payload.judgment,
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                        },
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                {'historyItems': history_items},
+            )
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate("document.querySelector('#questionHistoryBtn').click()")
+            await page.waitForFunction("document.querySelector('#questionHistoryDialog').hidden === false")
+
+            await page.click('[data-question-history-filter="pending"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('[data-question-history-filter="pending"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#questionHistoryBody .question-history-item').length === 1
+                  && document.querySelector('#questionHistoryBody')?.textContent.includes('미채점 기록 prompt')
+                """
+            )
+            await page.click('[data-question-history-judgment="correct"]')
+            await page.waitForFunction("document.querySelector('#questionHistoryBody')?.textContent.includes('선택한 조건에 해당하는 문제 기록이 없습니다.')")
+            await page.click('[data-question-history-filter="all"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('[data-question-history-filter="all"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelector('#questionHistoryBody .question-history-result')?.textContent.includes('맞음')
+                """
+            )
+            case['after_inline_judgment'] = await page.evaluate(
+                """
+                () => ({
+                  chip: document.querySelector('#questionHistoryBody .question-history-result')?.textContent.trim() || '',
+                  pendingPressed: document.querySelector('[data-question-history-filter="pending"]')?.getAttribute('aria-pressed') || '',
+                  allPressed: document.querySelector('[data-question-history-filter="all"]')?.getAttribute('aria-pressed') || '',
+                  calls: window.__historyAttemptCalls || [],
+                })
+                """
+            )
+            self.assertEqual(case['after_inline_judgment']['chip'], '맞음')
+            self.assertEqual(case['after_inline_judgment']['pendingPressed'], 'false')
+            self.assertEqual(case['after_inline_judgment']['allPressed'], 'true')
+            self.assertEqual(len(case['after_inline_judgment']['calls']), 1)
+            self.assertEqual(case['after_inline_judgment']['calls'][0]['judgment'], 'correct')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-history-pending-inline-judgment', status=status, observations=case)
+            await page.close()
+
+    async def test_question_history_review_launch_keeps_pending_answers_across_next_question(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        history_items = [
+            {
+                'question_id': 'history-review-1',
+                'question_bank_id': 'history-review-qb-1',
+                'card_id': 'CS-001',
+                'term': '히스토리 리뷰 첫 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 첫 문제 prompt',
+                'body': '히스토리 리뷰 첫 문제 body',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '첫 답안',
+                'wrong_note': '',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 1,
+                'updated_at': '2026-08-01T00:00:00Z',
+            },
+            {
+                'question_id': 'history-review-2',
+                'question_bank_id': 'history-review-qb-2',
+                'card_id': 'CS-002',
+                'term': '히스토리 리뷰 두 번째 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 두 번째 문제 prompt',
+                'body': '히스토리 리뷰 두 번째 문제 body',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '둘째 답안',
+                'wrong_note': '',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 2,
+                'updated_at': '2026-08-01T00:03:00Z',
+            },
+        ]
+        review_items = [
+            {
+                'question_id': 'history-review-1',
+                'question_bank_id': 'history-review-qb-1',
+                'card_id': 'CS-001',
+                'term': '히스토리 리뷰 첫 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 첫 문제 prompt',
+                'body': '히스토리 리뷰 첫 문제 body',
+                'answer': '히스토리 첫 정답 해설',
+                'explanation': '히스토리 첫 정답 추가 설명',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '첫 답안',
+                'wrong_note': '',
+                'session_id': 'history-review-session',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 1,
+                'updated_at': '2026-08-01T00:00:00Z',
+            },
+            {
+                'question_id': 'history-review-2',
+                'question_bank_id': 'history-review-qb-2',
+                'card_id': 'CS-002',
+                'term': '히스토리 리뷰 두 번째 문제',
+                'category': '테스트',
+                'question_type': 'subjective',
+                'prompt': '히스토리 리뷰 두 번째 문제 prompt',
+                'body': '히스토리 리뷰 두 번째 문제 body',
+                'answer': '히스토리 둘째 정답 해설',
+                'explanation': '히스토리 둘째 정답 추가 설명',
+                'result_key': 'pending',
+                'result_label': '미채점',
+                'user_answer': '둘째 답안',
+                'wrong_note': '',
+                'session_id': 'history-review-session',
+                'session_title': '히스토리 리뷰 세트',
+                'session_mode': 'practice',
+                'question_order': 2,
+                'updated_at': '2026-08-01T00:03:00Z',
+            },
+        ]
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                ({ historyItems, reviewItems }) => {
+                  const originalFetch = window.fetch.bind(window);
+                  const attempts = historyItems.map((item) => ({...item}));
+                  const reviews = reviewItems.map((item) => ({...item}));
+                  const summarize = () => ({
+                    selected_card_count: 2,
+                    total: attempts.length,
+                    correct: attempts.filter((item) => item.result_key === 'correct').length,
+                    ambiguous: attempts.filter((item) => item.result_key === 'ambiguous').length,
+                    wrong: attempts.filter((item) => item.result_key === 'wrong').length,
+                    unknown: attempts.filter((item) => item.result_key === 'unknown').length,
+                    pending: attempts.filter((item) => item.result_key === 'pending').length,
+                    returned: attempts.length,
+                  });
+                  window.__historyReviewAttemptCalls = [];
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/questions/attempts' && method === 'GET') {
+                      const result = (parsed.searchParams.get('result') || 'all').toLowerCase();
+                      const filtered = result === 'all' ? attempts : attempts.filter((item) => item.result_key === result);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        items: filtered,
+                        summary: {...summarize(), filter: result, returned: filtered.length},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/question-bank/attempts/query' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      const ordered = Array.isArray(payload.question_bank_ids) ? payload.question_bank_ids : [];
+                      const filtered = ordered.map((questionBankId) => reviews.find((item) => item.question_bank_id === questionBankId)).filter(Boolean);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        items: filtered,
+                        summary: {total: filtered.length, correct: 0, ambiguous: 0, wrong: 0, unknown: 0, pending: filtered.length, note_count: 0, selected_question_bank_count: filtered.length},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/questions/attempt' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      window.__historyReviewAttemptCalls.push(payload);
+                      const updateResult = (items) => items.map((item) => item.question_id === payload.question_id
+                        ? {
+                            ...item,
+                            result_key: payload.judgment,
+                            result_label: payload.judgment === 'correct' ? '맞음' : payload.judgment === 'ambiguous' ? '애매함' : payload.judgment === 'wrong' ? '틀림' : payload.judgment,
+                            updated_at: '2026-08-01T00:10:00Z',
+                            answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                            wrong_note: payload.judgment === 'correct' ? '' : (item.wrong_note || ''),
+                          }
+                        : item);
+                      const nextAttempts = updateResult(attempts);
+                      attempts.splice(0, attempts.length, ...nextAttempts);
+                      const nextReviews = updateResult(reviews);
+                      reviews.splice(0, reviews.length, ...nextReviews);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        attempt: {
+                          ...payload,
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                        },
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                {'historyItems': history_items, 'reviewItems': review_items},
+            )
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.evaluate("document.querySelector('#questionHistoryBtn').click()")
+            await page.waitForFunction("document.querySelector('#questionHistoryDialog').hidden === false")
+            await page.click('[data-question-history-filter="pending"]')
+            await page.waitForFunction(
+                """
+                () => document.querySelector('[data-question-history-filter="pending"]')?.getAttribute('aria-pressed') === 'true'
+                  && document.querySelectorAll('#questionHistoryBody .question-history-item').length === 2
+                  && document.querySelector('#questionHistoryBody')?.textContent.includes('히스토리 리뷰 첫 문제 prompt')
+                """
+            )
+            await page.click('[data-question-history-review-id="history-review-1"]')
+            await page.waitForFunction("document.querySelector('#questionPanel').hidden === false")
+            await page.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('히스토리 리뷰 첫 문제 prompt')")
+            await page.waitForFunction("document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('히스토리 첫 정답 해설')")
+            case['first_question'] = {
+                'answer': await page.Jeval('#questionAnswerInput', '(node) => node.value'),
+                'solution': await page.Jeval('.question-answer', '(node) => (node.textContent || "").trim()'),
+            }
+            await page.click('[data-question-judgment="correct"]')
+            await page.waitForFunction("document.querySelector('[data-question-judgment=\"correct\"]')?.getAttribute('aria-pressed') === 'true'")
+            await page.click('#nextQuestionBtn')
+            await page.waitForFunction("document.querySelector('.question-prompt') && document.querySelector('.question-prompt').textContent.includes('히스토리 리뷰 두 번째 문제 prompt')")
+            await page.waitForFunction("document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('히스토리 둘째 정답 해설')")
+            case['second_question'] = {
+                'answer': await page.Jeval('#questionAnswerInput', '(node) => node.value'),
+                'solution': await page.Jeval('.question-answer', '(node) => (node.textContent || "").trim()'),
+                'calls': await page.evaluate('window.__historyReviewAttemptCalls || []'),
+            }
+            self.assertEqual(case['first_question']['answer'], '첫 답안')
+            self.assertIn('히스토리 첫 정답 해설', case['first_question']['solution'])
+            self.assertEqual(case['second_question']['answer'], '둘째 답안')
+            self.assertIn('히스토리 둘째 정답 해설', case['second_question']['solution'])
+            self.assertEqual(len(case['second_question']['calls']), 1)
+            self.assertEqual(case['second_question']['calls'][0]['judgment'], 'correct')
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-history-review-launch-sequence', status=status, observations=case)
+            await page.close()
     async def test_card_state_toggles_expose_pressed_state(self):
         case = {'path': '/'}
         page = await self.new_page(viewport={'width': 1440, 'height': 1100})
@@ -1011,6 +1451,192 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='card-state-toggle-pressed-state', status=status, observations=case)
+            await page.close()
+
+    async def test_flashcard_table_popup_stays_mounted_across_rerenders(self):
+        case = {'path': '/'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        popup = None
+        popup_name = 'csFlashcardTableWindow'
+        status = 'failed'
+        try:
+            await page.goto(self.base_url, waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelector('#flashcardTableBtn') && state.filtered.length > 0")
+            await page.evaluate(
+                """
+                () => {
+                  window.open = (url, name = '', _features = '') => {
+                    const selector = `iframe[data-test-popup-name="${name}"]`;
+                    document.querySelector(selector)?.remove();
+                    const frame = document.createElement('iframe');
+                    frame.dataset.testPopupName = name;
+                    frame.setAttribute('aria-hidden', 'true');
+                    frame.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1280px;height:900px;border:0;';
+                    document.body.appendChild(frame);
+                    const popupWindow = frame.contentWindow;
+                    try {
+                      Object.defineProperty(popupWindow, 'opener', {value: window, configurable: true});
+                    } catch (_error) {
+                      try { popupWindow.opener = window; } catch (__error) {}
+                    }
+                    frame.src = url;
+                    return popupWindow;
+                  };
+                }
+                """
+            )
+            case['initial_main_state'] = await page.evaluate(
+                """
+                () => ({
+                  filteredCount: state.filtered.length,
+                  currentCardId: state.filtered[state.index]?.id || '',
+                  currentTerm: state.filtered[state.index]?.term || '',
+                  currentStatus: state.filtered[state.index]?.known_status || '',
+                })
+                """
+            )
+            self.assertGreater(case['initial_main_state']['filteredCount'], 0)
+            self.assertTrue(case['initial_main_state']['currentCardId'])
+
+            await page.click('#menuBtn')
+            await page.waitForFunction("document.querySelector('#menuPopover') && document.querySelector('#menuPopover').hidden === false")
+            await page.click('#flashcardTableBtn')
+            await page.waitForSelector(f'iframe[data-test-popup-name="{popup_name}"]')
+            popup_handle = await page.querySelector(f'iframe[data-test-popup-name="{popup_name}"]')
+            self.assertIsNotNone(popup_handle)
+            popup = await popup_handle.contentFrame()
+            self.assertIsNotNone(popup)
+            await popup.waitForFunction("document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length > 0")
+            case['popup_initial'] = await popup.evaluate(
+                """
+                () => ({
+                  helperReady: typeof window.__csFlashcardTableRender === 'function',
+                  summary: document.querySelector('.summary')?.textContent || '',
+                  rowCount: document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length,
+                  currentRowCardId: document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId || '',
+                })
+                """
+            )
+            self.assertTrue(case['popup_initial']['helperReady'])
+            self.assertEqual(case['popup_initial']['rowCount'], case['initial_main_state']['filteredCount'])
+            self.assertEqual(case['popup_initial']['currentRowCardId'], case['initial_main_state']['currentCardId'])
+
+            next_status = 'X' if case['initial_main_state']['currentStatus'] == 'O' else 'O'
+            case['status_toggle_target'] = {
+                'cardId': case['initial_main_state']['currentCardId'],
+                'nextStatus': next_status,
+                'openerAvailable': await popup.evaluate(
+                    """
+                    () => Boolean(window.opener && typeof window.opener.__csFlashcardsSetStatusFromTable === 'function')
+                    """
+                ),
+            }
+            self.assertTrue(case['status_toggle_target']['openerAvailable'])
+            await popup.evaluate(
+                """
+                (cardId, nextStatus) => window.opener.__csFlashcardsSetStatusFromTable(cardId, nextStatus)
+                """,
+                case['initial_main_state']['currentCardId'],
+                next_status,
+            )
+            await page.waitForFunction(
+                """
+                (cardId, nextStatus) => state.cards.find((item) => item.id === cardId)?.known_status === nextStatus
+                """,
+                {},
+                case['initial_main_state']['currentCardId'],
+                next_status,
+            )
+            await popup.waitForFunction(
+                """
+                (cardId, nextStatus, expectedCount) => {
+                  const rows = document.querySelectorAll('#flashcardTableMount [data-row-card-id]');
+                  const pressed = document.querySelector(`[data-row-card-id="${cardId}"] [data-status-value="${nextStatus}"]`);
+                  return rows.length === expectedCount
+                    && rows.length > 0
+                    && !!document.querySelector('#flashcardTableMount .cs-table')
+                    && !!pressed
+                    && pressed.getAttribute('aria-pressed') === 'true';
+                }
+                """,
+                {},
+                case['initial_main_state']['currentCardId'],
+                next_status,
+                case['initial_main_state']['filteredCount'],
+            )
+            case['popup_after_status_toggle'] = await popup.evaluate(
+                """
+                () => ({
+                  summary: document.querySelector('.summary')?.textContent || '',
+                  rowCount: document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length,
+                  currentRowCardId: document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId || '',
+                  tablePresent: Boolean(document.querySelector('#flashcardTableMount .cs-table')),
+                })
+                """
+            )
+            self.assertTrue(case['popup_after_status_toggle']['tablePresent'])
+            self.assertEqual(case['popup_after_status_toggle']['rowCount'], case['initial_main_state']['filteredCount'])
+            self.assertEqual(case['popup_after_status_toggle']['currentRowCardId'], case['initial_main_state']['currentCardId'])
+
+            await self.set_input_value(page, '#searchInput', case['initial_main_state']['currentTerm'])
+            await page.waitForFunction(
+                """
+                (term) => state.filtered.length > 0
+                  && state.filtered.every((card) => String(card.term || '').includes(term))
+                """,
+                {},
+                case['initial_main_state']['currentTerm'],
+            )
+            case['main_after_filter'] = await page.evaluate(
+                """
+                () => ({
+                  filteredCount: state.filtered.length,
+                  currentCardId: state.filtered[state.index]?.id || '',
+                })
+                """
+            )
+            await popup.waitForFunction(
+                """
+                (expectedCount, currentCardId, term) => {
+                  const rows = document.querySelectorAll('#flashcardTableMount [data-row-card-id]');
+                  const summary = document.querySelector('.summary')?.textContent || '';
+                  return rows.length === expectedCount
+                    && rows.length > 0
+                    && !!document.querySelector('#flashcardTableMount .cs-table')
+                    && document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId === currentCardId
+                    && summary.includes(`검색 ${term}`);
+                }
+                """,
+                {},
+                case['main_after_filter']['filteredCount'],
+                case['main_after_filter']['currentCardId'],
+                case['initial_main_state']['currentTerm'],
+            )
+            case['popup_after_filter'] = await popup.evaluate(
+                """
+                () => ({
+                  summary: document.querySelector('.summary')?.textContent || '',
+                  rowCount: document.querySelectorAll('#flashcardTableMount [data-row-card-id]').length,
+                  currentRowCardId: document.querySelector('#flashcardTableMount .current-row')?.dataset.rowCardId || '',
+                  tablePresent: Boolean(document.querySelector('#flashcardTableMount .cs-table')),
+                })
+                """
+            )
+            self.assertTrue(case['popup_after_filter']['tablePresent'])
+            self.assertEqual(case['popup_after_filter']['rowCount'], case['main_after_filter']['filteredCount'])
+            self.assertEqual(case['popup_after_filter']['currentRowCardId'], case['main_after_filter']['currentCardId'])
+            self.assertIn(f"검색 {case['initial_main_state']['currentTerm']}", case['popup_after_filter']['summary'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='flashcard-table-popup-rerender-regression', status=status, observations=case)
+            await page.evaluate(
+                """
+                (name) => {
+                  document.querySelector(`iframe[data-test-popup-name="${name}"]`)?.remove();
+                }
+                """,
+                popup_name,
+            )
             await page.close()
 
     async def test_filter_inputs_expose_explicit_accessible_names(self):
@@ -1229,7 +1855,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
             await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 0")
             case['initial_summary'] = await self.text(page, '#bankPageSummary')
-            self.assertIn('문항', case['initial_summary'])
+            self.assertIn('총', case['initial_summary'])
+
             case['filter_region_initial'] = await page.evaluate(
                 """
                 () => ({
@@ -1357,7 +1984,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 case[str(width)] = metrics
                 self.assertLessEqual(metrics['documentScrollWidth'], metrics['viewportWidth'] + 1)
                 self.assertLessEqual(metrics['shellRight'], metrics['viewportWidth'] + 1)
-                self.assertEqual(metrics['primaryRows'], 2 if width == 900 else 3)
+                self.assertEqual(metrics['primaryRows'], 2 if width == 900 else 1)
                 self.assertEqual(metrics['selectionRows'], 1 if width == 900 else 2)
                 if width == 390:
                     await page.click('#bankPageCategoryGuideBtn')
@@ -1575,25 +2202,46 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelectorAll('#bankPageOverviewCards > *').length === 4")
             case['overview_layout'] = await page.evaluate(
                 """
-                () => {
-                  const grid = document.querySelector('#bankPageOverviewCards');
-                  const cards = [...document.querySelectorAll('#bankPageOverviewCards > *')];
-                  const firstTop = cards[0]?.getBoundingClientRect().top || 0;
-                  const secondTop = cards[1]?.getBoundingClientRect().top || 0;
-                  return {
-                    columnCount: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
-                    firstRowSharesTop: Math.abs(firstTop - secondTop) < 2,
-                    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-                  };
-                }
-                """
+() => {
+  const grid = document.querySelector('#bankPageOverviewCards');
+  const hero = document.querySelector('.question-bank-hero-card');
+  const reviewCard = document.querySelector('.question-bank-review-card');
+  const cards = [...document.querySelectorAll('#bankPageOverviewCards > *')];
+  const buttons = [...document.querySelectorAll('.question-bank-primary-actions .cs-table-button')];
+  const rowCount = (nodes) => new Set(nodes.map((node) => Math.round(node.getBoundingClientRect().top))).size;
+  const firstTop = cards[0]?.getBoundingClientRect().top || 0;
+  const secondTop = cards[1]?.getBoundingClientRect().top || 0;
+  const heroHeight = hero?.getBoundingClientRect().height || 0;
+  const gridHeight = grid?.getBoundingClientRect().height || 0;
+  const reviewTop = reviewCard?.getBoundingClientRect().top || 0;
+  return {
+    metricCount: cards.length,
+    buttonCount: buttons.length,
+    columnCount: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+    metricRows: rowCount(cards),
+    actionRows: rowCount(buttons),
+    firstRowSharesTop: Math.abs(firstTop - secondTop) < 2,
+    heroViewportShare: Number((heroHeight / window.innerHeight).toFixed(3)),
+    gridViewportShare: Number((gridHeight / window.innerHeight).toFixed(3)),
+    reviewTopShare: Number((reviewTop / window.innerHeight).toFixed(3)),
+    pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  };
+}
+"""
             )
+            self.assertEqual(case['overview_layout']['metricCount'], 4)
+            self.assertEqual(case['overview_layout']['buttonCount'], 3)
             self.assertEqual(case['overview_layout']['columnCount'], 2)
+            self.assertEqual(case['overview_layout']['metricRows'], 2)
             self.assertTrue(case['overview_layout']['firstRowSharesTop'])
+            self.assertEqual(case['overview_layout']['actionRows'], 1)
+            self.assertLess(case['overview_layout']['heroViewportShare'], 0.27)
+            self.assertLess(case['overview_layout']['gridViewportShare'], 0.13)
+            self.assertLess(case['overview_layout']['reviewTopShare'], 0.34)
             self.assertLessEqual(case['overview_layout']['pageOverflow'], 2)
             status = 'passed'
         finally:
-            self.record_case(case_id='question-bank-mobile-overview-two-column', status=status, observations=case)
+            self.record_case(case_id='question-bank-mobile-overview-compact', status=status, observations=case)
             await page.close()
 
 
@@ -2464,6 +3112,94 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-row-change-confirm', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_saved_answer_skips_restart_confirm(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 1440, 'height': 1100})
+        status = 'failed'
+        items = [
+            self.question_bank_item('저장 첫 문항', question_bank_id='saved-answer-1'),
+            self.question_bank_item('저장 둘째 문항', question_bank_id='saved-answer-2'),
+        ]
+        payload = self.question_bank_payload('saved-answer', items=items)
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (questionBankPayload) => {
+                  const root = window.top || window;
+                  root.__confirmCalls = root.__confirmCalls || [];
+                  root.__savedQuestionAttempts = root.__savedQuestionAttempts || [];
+                  const originalFetch = window.fetch.bind(window);
+                  window.confirm = (message) => {
+                    root.__confirmCalls.push(message);
+                    return false;
+                  };
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/question-bank' && method === 'GET') {
+                      return Promise.resolve(new Response(JSON.stringify(questionBankPayload), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    if (parsed.pathname === '/api/questions/attempt' && method === 'POST') {
+                      const payload = JSON.parse((init && init.body) || '{}');
+                      root.__savedQuestionAttempts.push(payload);
+                      return Promise.resolve(new Response(JSON.stringify({
+                        attempt: {
+                          ...payload,
+                          updated_at: '2026-08-01T00:10:00Z',
+                          answered_at: payload.answered_at || '2026-08-01T00:10:00Z',
+                          answer_revealed: Boolean(payload.answer_revealed),
+                        },
+                        card: {id: payload.card_id || 'saved-answer-card'},
+                      }), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                payload,
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            case['initial_frame_src'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+
+            embed_frame = await self.wait_for_embed_frame(page)
+            await embed_frame.waitForSelector('#questionAnswerInput')
+            await embed_frame.type('#questionAnswerInput', '저장된 초안 답안')
+            await embed_frame.waitForFunction("document.querySelector('.question-card-shell')?.dataset.questionDirty === '1'")
+            await embed_frame.click('#questionAnswerSaveBtn')
+            await page.waitForFunction('window.__savedQuestionAttempts.length === 1')
+            await embed_frame.waitForFunction(
+                "document.querySelector('.question-card-shell')?.dataset.questionDirty === '0' && (document.querySelector('#questionAnswerSaveStatus')?.textContent || '').includes('저장됨')"
+            )
+            case['save_status'] = await embed_frame.Jeval('#questionAnswerSaveStatus', '(node) => (node.textContent || "").trim()')
+            case['saved_attempt_payload'] = await page.evaluate('window.__savedQuestionAttempts[0]')
+
+            await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
+            await page.waitForFunction(
+                '(initialSrc) => (document.querySelector("#bankPagePracticeFrame")?.getAttribute("src") || "") !== initialSrc',
+                {},
+                case['initial_frame_src'],
+            )
+            case['confirm_calls'] = await page.evaluate('window.__confirmCalls.length')
+            case['frame_src_after_row_change'] = await page.Jeval('#bankPagePracticeFrame', '(node) => node.getAttribute("src") || ""')
+            self.assertEqual(case['confirm_calls'], 0)
+            self.assertNotEqual(case['frame_src_after_row_change'], case['initial_frame_src'])
+            self.assertEqual(case['saved_attempt_payload']['judgment'], 'pending')
+            self.assertFalse(case['saved_attempt_payload']['answer_revealed'])
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-saved-answer-skip-confirm', status=status, observations=case)
             await page.close()
 
     async def test_question_bank_embed_consumes_pending_launch_before_cards_fetch_resolves(self):
@@ -3718,6 +4454,102 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             status = 'passed'
         finally:
             self.record_case(case_id='embedded-question-bank-mobile-layout', status=status, observations=case)
+            await page.close()
+
+    async def test_question_bank_mobile_practice_solve_layout(self):
+        case = {'path': '/question-bank'}
+        page = await self.new_page(viewport={'width': 390, 'height': 844})
+        status = 'failed'
+        payload = self.question_bank_payload('mobile-practice', items=[
+            self.question_bank_item('모바일 첫 문항', question_bank_id='mobile-practice-1'),
+            self.question_bank_item('모바일 둘째 문항', question_bank_id='mobile-practice-2'),
+        ])
+        try:
+            await page.evaluateOnNewDocument(
+                """
+                (questionBankPayload) => {
+                  const originalFetch = window.fetch.bind(window);
+                  window.fetch = (input, init = undefined) => {
+                    const url = typeof input === 'string' ? input : input.url;
+                    const method = ((init && init.method) || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+                    const parsed = new URL(url, window.location.origin);
+                    if (parsed.pathname === '/api/question-bank' && method === 'GET') {
+                      return Promise.resolve(new Response(JSON.stringify(questionBankPayload), {
+                        status: 200,
+                        headers: {'Content-Type': 'application/json'},
+                      }));
+                    }
+                    return originalFetch(input, init);
+                  };
+                }
+                """,
+                payload,
+            )
+            await page.goto(f'{self.base_url}/question-bank', waitUntil='networkidle2')
+            await page.waitForFunction("document.querySelectorAll('#bankPageList [data-table-row-id]').length > 1")
+            case['table_layout'] = await page.evaluate(
+                """
+                () => {
+                  const viewportWidth = window.innerWidth;
+                  const row = document.querySelector('#bankPageList tbody tr');
+                  const cell = row?.querySelector('td');
+                  const wrap = document.querySelector('#bankPageList .cs-table-wrap');
+                  const rowBox = row?.getBoundingClientRect();
+                  const wrapBox = wrap?.getBoundingClientRect();
+                  return {
+                    viewportWidth,
+                    rowDisplay: row ? getComputedStyle(row).display : '',
+                    cellDisplay: cell ? getComputedStyle(cell).display : '',
+                    tableScrollGap: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                    rowRight: rowBox ? rowBox.right : 0,
+                    wrapRight: wrapBox ? wrapBox.right : 0,
+                  };
+                }
+                """
+            )
+            self.assertEqual(case['table_layout']['rowDisplay'], 'block')
+            self.assertEqual(case['table_layout']['cellDisplay'], 'grid')
+            self.assertLessEqual(case['table_layout']['tableScrollGap'], 2)
+            self.assertLessEqual(case['table_layout']['rowRight'], case['table_layout']['viewportWidth'] + 1)
+            self.assertLessEqual(case['table_layout']['wrapRight'], case['table_layout']['viewportWidth'] + 1)
+
+            await page.click('#bankPageLaunchBtn')
+            await page.waitForFunction("!document.querySelector('#bankPagePracticeFrame').hidden")
+            embed_frame = await self.wait_for_embed_frame(page)
+            await embed_frame.waitForSelector('#questionAnswerSaveBtn')
+            case['practice_layout'] = await embed_frame.evaluate(
+                """
+                () => {
+                  const viewportWidth = window.innerWidth;
+                  const shell = document.querySelector('.question-card-shell');
+                  const saveButton = document.getElementById('questionAnswerSaveBtn');
+                  const topbarActions = document.querySelector('.question-embed-topbar-actions');
+                  const rect = (node) => {
+                    if (!node) return null;
+                    const box = node.getBoundingClientRect();
+                    return {left: box.left, right: box.right, width: box.width};
+                  };
+                  return {
+                    viewportWidth,
+                    overflowGap: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                    shell: rect(shell),
+                    saveButton: rect(saveButton),
+                    topbarActions: rect(topbarActions),
+                    topbarActionsDisplay: topbarActions ? getComputedStyle(topbarActions).display : '',
+                    actionColumns: getComputedStyle(document.querySelector('.question-actions')).gridTemplateColumns.split(' ').length,
+                  };
+                }
+                """
+            )
+            self.assertLessEqual(case['practice_layout']['overflowGap'], 2)
+            self.assertLessEqual(case['practice_layout']['shell']['right'], case['practice_layout']['viewportWidth'] + 1)
+            self.assertLessEqual(case['practice_layout']['saveButton']['right'], case['practice_layout']['viewportWidth'] + 1)
+            self.assertLessEqual(case['practice_layout']['topbarActions']['right'], case['practice_layout']['viewportWidth'] + 1)
+            self.assertIn(case['practice_layout']['topbarActionsDisplay'], ('grid', 'flex'))
+            self.assertEqual(case['practice_layout']['actionColumns'], 1)
+            status = 'passed'
+        finally:
+            self.record_case(case_id='question-bank-mobile-practice-solve-layout', status=status, observations=case)
             await page.close()
     async def test_embedded_question_bank_dynamic_select_deep_link_survives_first_request_and_reload(self):
         case = {'path': '/?field_name=전산학술&q=embedded&attempt_status=wrong'}
