@@ -325,6 +325,20 @@ function questionBankReviewAttemptSnapshot(item) {
   };
 }
 
+function practiceLaunchSessionState(launchItems, {forcePractice = false} = {}) {
+  const ids = new Set((Array.isArray(launchItems) ? launchItems : []).map((item) => String(item?.question_bank_id || '').trim()).filter(Boolean));
+  const attempts = {};
+  bankState.reviewItems.forEach((item) => {
+    const questionBankId = String(item?.question_bank_id || '').trim();
+    if (!questionBankId || !ids.has(questionBankId)) return;
+    const snapshot = questionBankReviewAttemptSnapshot(item);
+    if (!snapshot) return;
+    if (forcePractice) snapshot.session_mode = 'practice';
+    attempts[questionBankId] = snapshot;
+  });
+  return Object.keys(attempts).length ? {attemptsByQuestionBankId: attempts} : null;
+}
+
 function questionBankReviewLaunchSessionState(item, reviewItems = visibleQuestionBankReviewItems()) {
   const questionBankId = String(item?.question_bank_id || '').trim();
   if (!questionBankId) return null;
@@ -1652,11 +1666,19 @@ async function launch(startIndex = 0, {reveal = true, single = false} = {}) {
   const frameStartIndex = single ? 0 : safeStart;
   const targetId = String(sourceItem?.question_bank_id || '');
   const currentId = String(bankState.practiceActiveId || '');
-  const nextSessionState = options.sessionState && typeof options.sessionState === 'object' ? options.sessionState : null;
+  let nextSessionState = options.sessionState && typeof options.sessionState === 'object' ? options.sessionState : null;
   if (bankState.practiceLoaded && targetId && targetId === currentId && !nextSessionState && !single) {
     if (reveal) setPracticeCollapsed(false);
     ensureSelectedRowVisible();
     return false;
+  }
+  if (!nextSessionState) {
+    try {
+      if (!bankState.reviewLoaded || bankState.reviewDirty) await loadQuestionBankReview();
+      nextSessionState = practiceLaunchSessionState(launchItems, {forcePractice: single});
+    } catch (_error) {
+      nextSessionState = null;
+    }
   }
   if (bankState.practiceLoaded && embeddedPracticeHasUnsavedState() && !confirmPracticeRestart(safeStart)) {
     bankState.error = '현재 풀이 세트를 유지했습니다. 다시 시작하려면 선택한 행을 다시 누르세요.';

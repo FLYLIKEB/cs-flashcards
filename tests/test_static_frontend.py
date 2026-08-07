@@ -364,6 +364,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('launch(index);', question_bank_js())
         self.assertIn('function ensureQuestionBankReviewLoaded(', question_bank_js())
         self.assertIn('question-bank-embed=1', question_bank_js())
+        self.assertIn('function practiceLaunchSessionState(', question_bank_js())
+        self.assertIn('await loadQuestionBankReview()', question_bank_js())
         self.assertIn("get('question-bank-embed') === '1'", app_js())
         self.assertIn('function restartPracticeFrame(startIndex, sessionState = bankState.practiceSessionState, launchItems = bankState.items)', question_bank_js())
         self.assertIn('function practiceLaunchPayload(startIndex, sessionState = bankState.practiceSessionState, launchItems = bankState.items)', question_bank_js())
