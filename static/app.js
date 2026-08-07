@@ -109,6 +109,27 @@ const VIEW_STATE_KEY = 'csFlashcardsViewState:v1';
 const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
 const PENDING_QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
+const QUESTION_LAYOUT_MODE_KEY = 'csQuestionLayoutMode:v1';
+
+function questionLayoutMode() {
+  return localStorage.getItem(QUESTION_LAYOUT_MODE_KEY) === 'horizontal' ? 'horizontal' : 'vertical';
+}
+
+function applyQuestionLayoutMode(mode = questionLayoutMode()) {
+  const nextMode = mode === 'horizontal' ? 'horizontal' : 'vertical';
+  document.body.classList.toggle('question-layout-horizontal', nextMode === 'horizontal');
+  document.body.classList.toggle('question-layout-vertical', nextMode === 'vertical');
+  if (questionBankEmbedMode() && window.parent !== window) {
+    window.parent.postMessage({type: 'cs-flashcards-question-layout', mode: nextMode}, window.location.origin);
+  }
+  return nextMode;
+}
+
+function setQuestionLayoutMode(mode) {
+  const nextMode = mode === 'horizontal' ? 'horizontal' : 'vertical';
+  localStorage.setItem(QUESTION_LAYOUT_MODE_KEY, nextMode);
+  return applyQuestionLayoutMode(nextMode);
+}
 const QUESTION_BANK_FILTER_FIELDS = [
   {key: 'q', id: 'questionBankQueryInput'},
   {key: 'attempt_status', id: 'questionBankAttemptStatusSelect'},
@@ -5903,7 +5924,9 @@ function destroyQuestionCodeEditor() {
 
 function questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml = '') {
   const language = questionCodeLanguage(question) || 'text';
-  return `<div class="question-code-editor question-surface" data-code-editor><div class="question-code-editor-toolbar"><div><span class="question-answer-label">코드 답안</span><p class="question-code-editor-hint">${escapeHtml(questionCodeLanguageLabel(language))} · 자동완성 지원</p></div><div class="question-code-editor-actions"><label class="question-code-language-label" for="questionCodeLanguage">언어</label><select id="questionCodeLanguage" class="question-code-language" data-question-code-language aria-label="코드 언어">${questionCodeLanguageOptions(language)}</select><button class="question-toolbar-button" type="button" data-question-code-editor-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>일반 답안</button></div></div><textarea id="questionAnswerInput" class="question-answer-input question-code-editor-input" rows="16" data-code-language="${language}" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${escapeHtml(`${questionCodeLanguageLabel(language)} 코드를 작성하세요.`)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea><p class="question-code-editor-status">CodeMirror · 문법 강조 · 줄 번호 · Ctrl-Space 자동완성</p>${answerGuideHtml}</div>`;
+  const layoutMode = questionLayoutMode();
+  const layoutButtonLabel = layoutMode === 'horizontal' ? '세로 보기' : '가로 보기';
+  return `<div class="question-code-editor question-surface" data-code-editor><div class="question-code-editor-toolbar"><div><span class="question-answer-label">코드 답안</span><p class="question-code-editor-hint">${escapeHtml(questionCodeLanguageLabel(language))} · 자동완성 지원</p></div><div class="question-code-editor-actions"><label class="question-code-language-label" for="questionCodeLanguage">언어</label><select id="questionCodeLanguage" class="question-code-language" data-question-code-language aria-label="코드 언어">${questionCodeLanguageOptions(language)}</select><button class="question-toolbar-button" type="button" data-question-layout-toggle aria-pressed="${layoutMode === 'horizontal' ? 'true' : 'false'}">${layoutButtonLabel}</button><button class="question-toolbar-button" type="button" data-question-code-editor-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>일반 답안</button></div></div><textarea id="questionAnswerInput" class="question-answer-input question-code-editor-input" rows="16" data-code-language="${language}" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${escapeHtml(`${questionCodeLanguageLabel(language)} 코드를 작성하세요.`)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea><p class="question-code-editor-status">CodeMirror · 문법 강조 · 줄 번호 · Ctrl-Space 자동완성</p>${answerGuideHtml}</div>`;
 }
 
 function initializeQuestionCodeEditor() {
@@ -6650,6 +6673,10 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+  const activeQuestionLayout = questionCodeEditorEnabled ? questionLayoutMode() : 'vertical';
+  applyQuestionLayoutMode(activeQuestionLayout);
+  const mainAnswerHtml = questionCodeEditorEnabled ? '' : answer;
+  const codeAnswerHtml = questionCodeEditorEnabled ? answer : '';
 
   const editToolbarHtml = question.questionBankId ? `
     <div class="question-inline-toolbar question-surface">
@@ -6743,7 +6770,7 @@ destroyQuestionCodeEditor();
           ${judgmentBadgeHtml}
         </div>
       </div>
-      <div class="question-card-grid${questionCodeEditorEnabled ? ' has-code-editor' : ''}">
+      <div class="question-card-grid${questionCodeEditorEnabled ? ` has-code-editor question-layout-${activeQuestionLayout}` : ''}">
         <div class="question-main-stack">
           ${embedTopbarHtml}
           ${editToolbarHtml}
@@ -6753,10 +6780,13 @@ destroyQuestionCodeEditor();
           ${choiceHtml}
           ${answerDraftHtml}
           ${lockActionHtml}
-          ${answer}
+          ${mainAnswerHtml}
         </div>
         <aside class="question-side-stack">
-          ${codeEditorHtml}
+          <div class="question-code-workbench">
+            ${codeEditorHtml}
+            ${codeAnswerHtml}
+          </div>
           ${sideStateHtml}
           ${reviewBoxHtml}
         </aside>
@@ -7588,6 +7618,13 @@ $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
 $('revealAnswerBtn')?.addEventListener('click', revealQuestionAnswer);
 $('openQuestionCardBtn')?.addEventListener('click', openQuestionSourceCard);
 $('questionCard')?.addEventListener('click', (event) => {
+  const layoutToggle = event.target.closest('[data-question-layout-toggle]');
+  if (layoutToggle) {
+    const nextMode = setQuestionLayoutMode(questionLayoutMode() === 'horizontal' ? 'vertical' : 'horizontal');
+    renderQuestionPanel();
+    if (nextMode) window.setTimeout(() => questionCodeMirrorInstance?.focus(), 0);
+    return;
+  }
   const codeToggle = event.target.closest('[data-question-code-editor-toggle]');
   if (codeToggle) {
     const question = hydrateQuestionState(currentQuestion());

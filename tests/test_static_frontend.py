@@ -543,6 +543,10 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'function questionCodeMirrorMode(language)',
             'function initializeQuestionCodeEditor()',
             'data-question-code-language',
+            'QUESTION_LAYOUT_MODE_KEY',
+            'data-question-layout-toggle',
+            'question-code-workbench',
+            'mainAnswerHtml',
             'function openQuestionImportDialog()',
             'function importQuestionsFromText()',
             'function importedQuestionSetPayload(rawText)',
@@ -655,6 +659,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-code-editor .CodeMirror', style_css())
         self.assertIn('.question-card-grid.has-code-editor', style_css())
         self.assertIn('codemirror@5.65.16', index_html())
+        self.assertIn('cs-flashcards-question-layout', question_bank_js())
+        self.assertIn('.question-bank-layout-horizontal', table_shell_css())
         self.assertIn('.question-inline-toolbar', style_css())
         self.assertIn('question-toolbar-button', index_html())
         self.assertIn('question-toolbar-eyebrow', index_html())

@@ -1691,3 +1691,19 @@ window.addEventListener('message', (event) => {
   if (!data || data.type !== 'cs-flashcards-question-bank-updated') return;
   applyEmbeddedQuestionBankUpdate(data.item || null, data.summary || null, data.finishedAt || '');
 });
+
+function applyQuestionBankLayoutMode(mode) {
+  const horizontal = mode === 'horizontal';
+  document.body.classList.toggle('question-bank-layout-horizontal', horizontal);
+  const practiceCard = document.querySelector('.question-bank-practice-card');
+  if (practiceCard) practiceCard.dataset.layoutMode = horizontal ? 'horizontal' : 'vertical';
+}
+
+window.addEventListener('message', (event) => {
+  const frame = $('bankPagePracticeFrame');
+  if (!frame || event.source !== frame.contentWindow) return;
+  if (event.origin && event.origin !== window.location.origin) return;
+  const data = event?.data;
+  if (!data || data.type !== 'cs-flashcards-question-layout') return;
+  applyQuestionBankLayoutMode(data.mode);
+});
