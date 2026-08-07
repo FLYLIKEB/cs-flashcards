@@ -1434,3 +1434,15 @@ body.question-bank-layout-horizontal .question-bank-practice-frame {
     white-space: normal;
   }
 }
+
+@media (min-width: 761px) and (max-width: 900px) {
+  .question-bank-selection-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .question-bank-selection-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
