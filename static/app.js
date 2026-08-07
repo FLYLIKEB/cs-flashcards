@@ -6468,7 +6468,8 @@ let questionCodeMirrorInstances = [];
 
 function resizeQuestionAnswerTextarea(textarea) {
   if (!textarea || textarea.classList.contains('question-code-editor-input')) return;
-  textarea.style.height = 'auto';
+  textarea.rows = 1;
+  textarea.style.height = '0px';
   textarea.style.overflowY = 'hidden';
   const minimumHeight = Number.parseFloat(window.getComputedStyle(textarea).minHeight) || 0;
   textarea.style.height = `${Math.max(minimumHeight, textarea.scrollHeight)}px`;
@@ -6481,7 +6482,7 @@ function resizeQuestionAnswerTextareas(root = document) {
 function resizeQuestionCodeEditor(editor) {
   if (!editor) return;
   const scrollHeight = editor.getScrollInfo().height;
-  const minimumHeight = 22 * 16;
+  const minimumHeight = 2.4 * 16;
   editor.setSize(null, `${Math.max(minimumHeight, scrollHeight + 16)}px`);
   editor.refresh();
 }

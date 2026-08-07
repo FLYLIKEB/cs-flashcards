@@ -9117,3 +9117,11 @@ body.question-bank-embed .question-pane-shell .question-pane {
 body.question-bank-embed .question-pane .question-answer-input {
   height: auto;
 }
+
+.question-pane .question-answer-input {
+  min-height: 2.4rem;
+}
+.question-pane .question-code-editor .CodeMirror,
+.question-pane .question-code-editor .CodeMirror-scroll {
+  min-height: 2.4rem;
+}
