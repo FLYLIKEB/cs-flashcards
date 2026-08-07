@@ -120,6 +120,7 @@ const PENDING_QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const QUESTION_LAYOUT_MODE_KEY = 'csQuestionLayoutMode:v1';
 const QUESTION_ANSWER_PANE_VISIBLE_KEY = 'csQuestionAnswerPaneVisible:v1';
 const QUESTION_PANE_SIZES_KEY = 'csQuestionPaneSizes:v1';
+const QUESTION_DRAFT_STORAGE_KEY = 'csQuestionDrafts:v1';
 
 function questionLayoutMode() {
   return localStorage.getItem(QUESTION_LAYOUT_MODE_KEY) === 'vertical' ? 'vertical' : 'horizontal';
@@ -213,6 +214,71 @@ function questionPaneResizePointerDown(event) {
   window.addEventListener('pointermove', update, {passive: false});
   window.addEventListener('pointerup', finish, {once: true});
   window.addEventListener('pointercancel', finish, {once: true});
+}
+
+function questionDraftStorageId(question) {
+  const current = question || {};
+  return String(current.questionBankId || current.question_bank_id || current.id || '').trim();
+}
+
+function questionDraftStorageMap() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(QUESTION_DRAFT_STORAGE_KEY) || '{}');
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch (_error) {
+    return {};
+  }
+}
+
+function restoreQuestionDraft(question) {
+  const current = hydrateQuestionState(question);
+  const id = questionDraftStorageId(current);
+  const saved = id ? questionDraftStorageMap()[id] : null;
+  if (!saved || typeof saved !== 'object') return current;
+  if (typeof saved.userAnswer === 'string') current.userAnswer = saved.userAnswer;
+  if (Array.isArray(saved.subquestionAnswers)) current.subquestionAnswers = saved.subquestionAnswers.map((answer) => String(answer || ''));
+  if (Number.isInteger(saved.selectedChoiceIndex)) current.selectedChoiceIndex = saved.selectedChoiceIndex;
+  else if (saved.selectedChoiceIndex === null) current.selectedChoiceIndex = null;
+  return current;
+}
+
+function persistQuestionDraft(question) {
+  const current = hydrateQuestionState(question);
+  const id = questionDraftStorageId(current);
+  if (!id) return;
+  const drafts = questionDraftStorageMap();
+  drafts[id] = {
+    userAnswer: String(current.userAnswer || ''),
+    subquestionAnswers: Array.isArray(current.subquestionAnswers) ? current.subquestionAnswers.map((answer) => String(answer || '')) : [],
+    selectedChoiceIndex: Number.isInteger(current.selectedChoiceIndex) ? current.selectedChoiceIndex : null,
+  };
+  try {
+    localStorage.setItem(QUESTION_DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+  } catch (_error) {
+    // Ignore storage quota and privacy-mode failures.
+  }
+}
+
+function resetQuestionDrafts() {
+  try {
+    localStorage.removeItem(QUESTION_DRAFT_STORAGE_KEY);
+  } catch (_error) {}
+  state.questions.forEach((question) => {
+    const current = hydrateQuestionState(question);
+    current.userAnswer = '';
+    current.subquestionAnswers = [];
+    current.selectedChoiceIndex = null;
+    current.answerRevealed = false;
+    current.gradedCorrect = null;
+    current.judgment = 'pending';
+    current.wrongNote = '';
+    current.answeredAt = '';
+    syncQuestionSavedDraft(current);
+  });
+  state.answerRevealed = false;
+  state.selectedChoiceIndex = null;
+  renderQuestionPanel();
+  setMessage('현재 풀이 답안을 초기화했습니다.');
 }
 
 const QUESTION_SUBANSWER_SEPARATOR = '\n\n--- 소문제 답안 구분 ---\n\n';
@@ -6024,7 +6090,7 @@ function populateQuestionBankFieldNameOptions(fieldNames, selected = '') {
 
 
 function questionBankItemToQuestion(item, index) {
-  return hydrateQuestionState({
+  return restoreQuestionDraft(hydrateQuestionState({
     id: `bank-${item.question_bank_id || index + 1}`,
     questionBankId: String(item.question_bank_id || ''),
     card_id: String(item.card_id || ''),
@@ -6053,7 +6119,7 @@ function questionBankItemToQuestion(item, index) {
     codeLanguage: String(item.code_language || item.codeLanguage || item.language || ''),
     sessionMode: normalizeQuestionSessionMode(item.session_mode || 'practice'),
     questionOrder: index + 1,
-  });
+  }));
 }
 
 function questionBankLaunchAttemptSnapshot(sessionState, questionBankId = '') {
@@ -6095,7 +6161,7 @@ function applyQuestionBankLaunchAttempt(question, snapshot, fallbackOrder = null
   else if (current.judgment !== 'pending' || Boolean(String(current.userAnswer || '').trim()) || Number.isInteger(current.selectedChoiceIndex)) current.answerRevealed = true;
   current.gradedCorrect = current.judgment === 'correct' ? true : ['ambiguous', 'wrong', 'unknown'].includes(current.judgment) ? false : null;
   syncQuestionSavedDraft(current, snapshot);
-  return current;
+  return restoreQuestionDraft(current);
 }
 
 function applyQuestionBankLaunchSessionState(questions, sessionState) {
@@ -6447,6 +6513,7 @@ function initializeQuestionCodeEditor() {
       const index = Number.parseInt(textarea.dataset.questionSubquestionIndex || '', 10);
       if (Number.isInteger(index)) updateQuestionSubquestionAnswer(question, index, instance.getValue());
       else question.userAnswer = instance.getValue();
+      persistQuestionDraft(question);
     });
     return editor;
   });
@@ -7373,9 +7440,13 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
     ? ` has-code-editor question-layout-${activeQuestionLayout} ${horizontalAnswerLayout ? 'question-pane-layout ' : ''}${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}`
     : horizontalAnswerLayout ? ' question-general-answer question-layout-horizontal question-pane-layout' : '';
 
+  const resetQuestionDraftsHtml = questionNeedsManualGrading(question)
+    ? `<button class="question-toolbar-button question-reset-drafts-button" type="button" data-question-reset-drafts="1" title="현재 풀이 답안 초기화" ${questionSaveBusy ? 'disabled' : ''}>초기화</button>`
+    : '';
   const editToolbarHtml = question.questionBankId ? `
     <div class="question-inline-toolbar question-surface">
       <button class="question-toolbar-button question-edit-button" type="button" data-question-edit="1" aria-label="문항 데이터 수정" title="문항 데이터 수정" ${questionSaveBusy ? 'disabled' : ''}>${state.questionBankEditSaving ? '저장 중…' : '<span class="question-edit-icon" aria-hidden="true">✎</span><span>수정</span>'}</button>
+      ${resetQuestionDraftsHtml}
     </div>` : '';
 
 
@@ -7767,6 +7838,7 @@ function selectQuestionChoice(index) {
   if (!question) return;
   question.selectedChoiceIndex = index;
   question.userAnswer = Array.isArray(question.choices) ? String(question.choices[index] || '') : '';
+  persistQuestionDraft(question);
   question.answeredAt = new Date().toISOString();
   state.selectedChoiceIndex = index;
   if (questionRevealLocked(question)) {
@@ -8413,6 +8485,10 @@ $('questionCard')?.addEventListener('click', (event) => {
     renderQuestionPanel();
     return;
   }
+  if (event.target.closest('[data-question-reset-drafts="1"]')) {
+    resetQuestionDrafts();
+    return;
+  }
   const layoutToggle = event.target.closest('[data-question-layout-toggle]');
   if (layoutToggle) {
     const nextMode = setQuestionLayoutMode(questionLayoutMode() === 'horizontal' ? 'vertical' : 'horizontal');
@@ -8517,6 +8593,7 @@ $('questionCard')?.addEventListener('input', (event) => {
     const index = Number.parseInt(event.target.dataset.questionSubquestionIndex || '', 10);
     if (Number.isInteger(index)) updateQuestionSubquestionAnswer(question, index, event.target.value || '');
     else question.userAnswer = event.target.value || '';
+    persistQuestionDraft(question);
     refreshCurrentQuestionSaveState(question);
     return;
   }
