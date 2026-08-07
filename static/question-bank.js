@@ -440,19 +440,19 @@ async function saveQuestionBankReviewJudgment(questionBankId, judgment) {
   }
 }
 
-function practiceLaunchPayload(startIndex, sessionState = bankState.practiceSessionState) {
-  const payload = {items: bankState.items, startIndex};
+function practiceLaunchPayload(startIndex, sessionState = bankState.practiceSessionState, launchItems = bankState.items) {
+  const payload = {items: Array.isArray(launchItems) ? launchItems : bankState.items, startIndex};
   if (sessionState && typeof sessionState === 'object') payload.sessionState = sessionState;
   return payload;
 }
 
-function persistPracticeLaunch(startIndex, sessionState = bankState.practiceSessionState) {
-  window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY, JSON.stringify(practiceLaunchPayload(startIndex, sessionState)));
+function persistPracticeLaunch(startIndex, sessionState = bankState.practiceSessionState, launchItems = bankState.items) {
+  window.sessionStorage.setItem(QUESTION_BANK_LAUNCH_KEY, JSON.stringify(practiceLaunchPayload(startIndex, sessionState, launchItems)));
 }
 
-function restartPracticeFrame(startIndex, sessionState = bankState.practiceSessionState) {
+function restartPracticeFrame(startIndex, sessionState = bankState.practiceSessionState, launchItems = bankState.items) {
   const frame = $('bankPagePracticeFrame');
-  persistPracticeLaunch(startIndex, sessionState);
+  persistPracticeLaunch(startIndex, sessionState, launchItems);
   bankState.practiceNonce += 1;
   bankState.practiceResultSetKey = questionBankResultSetKey();
   if (frame) frame.src = practiceFrameUrl();
@@ -1608,8 +1608,8 @@ function ensureSelectedRowVisible() {
 }
 
 
-function applyPracticeLaunch(startIndex = 0, {reveal = true, sessionState = bankState.practiceSessionState} = {}) {
-  launch(startIndex, {reveal, sessionState}).catch(() => {});
+function applyPracticeLaunch(startIndex = 0, {reveal = true, sessionState = bankState.practiceSessionState, launchItems = null} = {}) {
+  launch(startIndex, {reveal, sessionState, launchItems}).catch(() => {});
 }
 
 function renderLaunchState() {
@@ -1627,7 +1627,7 @@ function resetPracticeSession({message = '', collapse = true} = {}) {
   if (message) bankState.error = message;
 }
 
-async function launch(startIndex = 0, {reveal = true} = {}) {
+async function launch(startIndex = 0, {reveal = true, single = false} = {}) {
   const syncLaunchUi = typeof renderLaunchState === 'function'
     ? renderLaunchState
     : () => {
@@ -1642,10 +1642,18 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
   }
   const options = arguments[1] && typeof arguments[1] === 'object' ? arguments[1] : {};
   const safeStart = Math.max(0, Math.min(bankState.items.length - 1, Number.isInteger(startIndex) ? startIndex : 0));
-  const targetId = String(bankState.items[safeStart]?.question_bank_id || '');
+  const sourceItem = bankState.items[safeStart];
+  const requestedLaunchItems = Array.isArray(options.launchItems) ? options.launchItems.filter((item) => item && typeof item === 'object') : null;
+  const launchItems = requestedLaunchItems?.length
+    ? requestedLaunchItems
+    : single
+      ? [{...sourceItem, session_mode: 'practice', sessionMode: 'practice'}]
+      : bankState.items;
+  const frameStartIndex = single ? 0 : safeStart;
+  const targetId = String(sourceItem?.question_bank_id || '');
   const currentId = String(bankState.practiceActiveId || '');
   const nextSessionState = options.sessionState && typeof options.sessionState === 'object' ? options.sessionState : null;
-  if (bankState.practiceLoaded && targetId && targetId === currentId && !nextSessionState) {
+  if (bankState.practiceLoaded && targetId && targetId === currentId && !nextSessionState && !single) {
     if (reveal) setPracticeCollapsed(false);
     ensureSelectedRowVisible();
     return false;
@@ -1656,7 +1664,7 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
     return false;
   }
   pendingPracticeLaunch = bankState.loading
-    ? {startIndex: safeStart, reveal, sessionState: nextSessionState}
+    ? {startIndex: frameStartIndex, reveal, sessionState: nextSessionState, launchItems}
     : null;
   bankState.selectedId = targetId;
   bankState.practiceActiveId = targetId;
@@ -1666,7 +1674,7 @@ async function launch(startIndex = 0, {reveal = true} = {}) {
   bankState.practiceSessionState = nextSessionState;
   if (reveal) setPracticeCollapsed(false);
   persistFilterState();
-  restartPracticeFrame(safeStart, nextSessionState);
+  restartPracticeFrame(frameStartIndex, nextSessionState, launchItems);
   bankState.error = '';
   syncLaunchUi();
   return true;
@@ -1756,7 +1764,7 @@ async function loadQuestionBankPage() {
       if (typeof shouldRestorePracticePane !== 'undefined') shouldRestorePracticePane = false;
       if (typeof restoredPracticeState !== 'undefined') restoredPracticeState = null;
       persistFilterState();
-      applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal, sessionState: launchRequest.sessionState});
+      applyPracticeLaunch(launchRequest.startIndex, {reveal: launchRequest.reveal, sessionState: launchRequest.sessionState, launchItems: launchRequest.launchItems});
     } else if (restorePracticePane && !bankState.practiceLoaded) {
       const restoreIndex = nextIndex >= 0
         ? nextIndex
@@ -1831,6 +1839,7 @@ loadQuestionBankPage().catch(() => {});
 $('bankPageRefreshBtn')?.addEventListener('click', () => loadQuestionBankPage().catch(() => {}));
 $('bankPageLaunchBtn')?.addEventListener('click', () => launch(0));
 $('bankPageLaunchSelectedBtn')?.addEventListener('click', () => launch(selectedIndex(bankState.practiceStartIndex)));
+$('bankPageLaunchSingleBtn')?.addEventListener('click', () => launch(selectedIndex(bankState.practiceStartIndex), {single: true}));
 $('bankPageTogglePracticeBtn')?.addEventListener('click', togglePracticeCollapsed);
 $('bankPageToggleFiltersBtn')?.addEventListener('click', toggleFiltersCollapsed);
 $('bankPageToggleReviewBtn')?.addEventListener('click', toggleReviewCollapsed);
