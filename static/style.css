@@ -9046,3 +9046,10 @@ body.question-bank-embed .question-card-grid.question-pane-layout.question-layou
     height: auto;
   }
 }
+
+.question-card-grid.question-general-answer.question-layout-vertical {
+  grid-template-columns: minmax(0, 1fr);
+}
+.question-card-grid.question-general-answer.question-layout-vertical > .question-side-stack {
+  display: none;
+}

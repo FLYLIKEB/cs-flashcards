@@ -7438,7 +7438,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
   const codeAnswerHtml = questionCodeEditorEnabled ? answer : '';
   const answerLayoutClass = questionCodeEditorEnabled
     ? ` has-code-editor question-layout-${activeQuestionLayout} ${horizontalAnswerLayout ? 'question-pane-layout ' : ''}${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}`
-    : horizontalAnswerLayout ? ' question-general-answer question-layout-horizontal question-pane-layout' : '';
+    : ` question-general-answer question-layout-${activeQuestionLayout}${horizontalAnswerLayout ? ' question-pane-layout' : ''}`;
 
   const resetQuestionDraftsHtml = questionNeedsManualGrading(question)
     ? `<button class="question-toolbar-button question-reset-drafts-button" type="button" data-question-reset-drafts="1" title="현재 풀이 답안 초기화" ${questionSaveBusy ? 'disabled' : ''}>초기화</button>`
