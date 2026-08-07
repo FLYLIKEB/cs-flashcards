@@ -9124,3 +9124,13 @@ body.question-bank-embed .question-pane .question-answer-input {
 .question-pane .question-code-editor .CodeMirror-scroll {
   min-height: 2.4rem;
 }
+
+.question-subquestion-draft .question-subquestion-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: row;
+}
+.question-subquestion-draft .question-subquestion-item {
+  grid-column: 1;
+  min-width: 0;
+}
