@@ -2706,6 +2706,24 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             case['pane_resizers'] = await embed_frame.Jeval('.question-card-grid', '(node) => node.querySelectorAll("[data-question-pane-resize]").length')
             case['pane_tops'] = await embed_frame.Jeval('.question-card-grid', '(node) => [...node.querySelectorAll(\':scope > .question-pane\')].map((pane) => Math.round(pane.getBoundingClientRect().top))')
             self.assertEqual(len(set(case['pane_tops'])), 1)
+            case['pane_overflow'] = await embed_frame.Jeval('.question-card-grid', '(node) => [...node.querySelectorAll(\':scope > .question-pane\')].map((pane) => getComputedStyle(pane).overflowY)')
+            self.assertEqual(case['pane_overflow'], ['auto', 'auto', 'auto'])
+            case['scroll_positions'] = await embed_frame.evaluate(
+                """
+                () => {
+                  const panes = [...document.querySelectorAll('.question-card-grid > .question-pane')];
+                  panes.forEach((pane) => {
+                    const filler = document.createElement('div');
+                    filler.style.height = '2000px';
+                    filler.setAttribute('aria-hidden', 'true');
+                    pane.appendChild(filler);
+                    pane.scrollTop = 80;
+                  });
+                  return panes.map((pane) => pane.scrollTop);
+                }
+                """
+            )
+            self.assertTrue(all(position > 0 for position in case['scroll_positions']))
             self.assertEqual(case['pane_names'], ['problem', 'draft', 'answer'])
             self.assertEqual(case['pane_resizers'], 2)
             await embed_frame.click('[data-question-answer-pane-toggle="1"]')

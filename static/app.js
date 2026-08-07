@@ -7528,7 +7528,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
       ` : '';
 destroyQuestionCodeEditor();
   card.innerHTML = `
-    <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}" data-question-dirty="${questionDirty ? '1' : '0'}" data-question-saved="${question.attemptSavedAt ? '1' : '0'}">
+    <div class="question-card-shell${horizontalAnswerLayout ? ' question-pane-shell' : ''}${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}" data-question-dirty="${questionDirty ? '1' : '0'}" data-question-saved="${question.attemptSavedAt ? '1' : '0'}">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
       <div class="question-card-head">
         <div class="question-card-head-copy">

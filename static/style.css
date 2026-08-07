@@ -8761,16 +8761,6 @@ body.question-bank-embed .question-card-head {
   display: none;
 }
 
-body.question-bank-embed .question-card-shell {
-  min-height: 100%;
-  padding: .42rem .72rem .56rem;
-  display: grid;
-}
-
-body.question-bank-embed .question-main-stack {
-  gap: .46rem;
-  min-height: 100%;
-}
 
 body.question-bank-embed .question-prompt .question-markdown,
 body.question-bank-embed .question-body .question-markdown,
@@ -8780,11 +8770,6 @@ body.question-bank-embed .question-explanation-markdown {
   line-height: 1.7;
 }
 
-body.question-bank-embed .question-answer-input,
-body.question-bank-embed .question-wrong-note {
-  min-height: 6.8rem;
-  height: 100%;
-}
 
 body.question-bank-embed #openQuestionCardBtn {
   display: none !important;
@@ -9067,5 +9052,48 @@ body.question-bank-embed .question-card-grid.question-general-answer.question-pa
   body.question-bank-embed .question-card-grid.has-code-editor.question-pane-layout.question-layout-horizontal,
   body.question-bank-embed .question-card-grid.question-general-answer.question-pane-layout.question-layout-horizontal {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.question-pane-shell {
+  min-height: 0;
+}
+body.question-bank-embed .question-stage:has(.question-pane-shell) {
+  overflow: hidden;
+}
+body.question-bank-embed .question-card:has(.question-pane-shell),
+body.question-bank-embed .question-pane-shell {
+  height: 100%;
+  min-height: 0;
+}
+body.question-bank-embed .question-pane-shell {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+body.question-bank-embed .question-pane-shell .question-card-grid.question-pane-layout.question-layout-horizontal {
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+}
+body.question-bank-embed .question-pane-shell .question-pane {
+  height: auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+@media (max-width: 760px) {
+  body.question-bank-embed .question-stage:has(.question-pane-shell) {
+    overflow: auto;
+  }
+  body.question-bank-embed .question-card:has(.question-pane-shell),
+  body.question-bank-embed .question-pane-shell {
+    height: auto;
+  }
+  body.question-bank-embed .question-pane-shell .question-card-grid.question-pane-layout.question-layout-horizontal {
+    overflow: visible;
+  }
+  body.question-bank-embed .question-pane-shell .question-pane {
+    height: auto;
+    overflow: visible;
   }
 }
