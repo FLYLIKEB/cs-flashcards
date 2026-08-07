@@ -5843,6 +5843,21 @@ select,
 .question-subquestion-field {
   min-width: 0;
 }
+.question-subquestion-code-list {
+  display: grid;
+  gap: .75rem;
+  min-width: 0;
+}
+.question-card-grid.has-code-editor.question-layout-horizontal .question-subquestion-code-list {
+  grid-column: 2;
+}
+.question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-subquestion-code-list {
+  grid-column: 2 / -1;
+}
+.question-card-grid.has-code-editor.question-layout-horizontal .question-subquestion-code-list .question-code-editor,
+.question-card-grid.has-code-editor.question-layout-horizontal .question-subquestion-code-list .question-subquestion-field {
+  grid-column: auto;
+}
 .question-card-grid.has-code-editor.question-layout-vertical {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -6072,6 +6087,10 @@ select,
     grid-template-columns: minmax(0, 1fr);
   }
   .question-card-grid.question-general-answer.question-layout-horizontal .question-side-stack {
+    grid-column: auto;
+  }
+  .question-card-grid.has-code-editor.question-layout-horizontal .question-subquestion-code-list,
+  .question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-subquestion-code-list {
     grid-column: auto;
   }
 }
@@ -8370,6 +8389,10 @@ body.question-bank-embed .question-card-grid.question-general-answer.question-la
     grid-column: auto;
   }
   body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-code-editor {
+    grid-column: auto;
+  }
+  body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal .question-subquestion-code-list,
+  body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-subquestion-code-list {
     grid-column: auto;
   }
   body.question-bank-embed .question-card-grid.question-general-answer.question-layout-horizontal {
