@@ -5164,6 +5164,9 @@ select,
   padding: .72rem .8rem;
   line-height: 1.58;
 }
+.question-answer-surface {
+  align-self: start;
+}
 .question-answer-meta {
   margin-top: .62rem;
   padding-top: .62rem;
