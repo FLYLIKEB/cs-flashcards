@@ -2765,7 +2765,14 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             )
             case['save_status'] = await embed_frame.Jeval('#questionAnswerSaveStatus', '(node) => (node.textContent || "").trim()')
             case['saved_attempt_payload'] = await page.evaluate('window.__savedQuestionAttempts[0]')
+            await embed_frame.click('#revealAnswerBtn')
+            await embed_frame.waitForFunction(
+                "document.querySelector('.question-answer') && document.querySelector('.question-answer').textContent.includes('저장 첫 문항 answer')"
+            )
+            case['revealed_answer'] = await embed_frame.Jeval('.question-answer', '(node) => (node.textContent || "").trim()')
+            self.assertIn('저장 첫 문항 answer', case['revealed_answer'])
 
+            await embed_frame.evaluate("currentQuestion().savedAnswerRevealed = true; refreshCurrentQuestionSaveState(currentQuestion())")
             await page.evaluate('document.querySelector("#bankPageList tbody tr:nth-child(2) .question-bank-row-trigger").click()')
             await page.waitForFunction(
                 '(initialSrc) => (document.querySelector("#bankPagePracticeFrame")?.getAttribute("src") || "") !== initialSrc',

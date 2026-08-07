@@ -7285,6 +7285,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
   applyQuestionLayoutMode(activeQuestionLayout);
   const mainAnswerHtml = questionCodeEditorEnabled || horizontalAnswerLayout ? '' : answer;
   const sideAnswerDraftHtml = horizontalAnswerLayout && !questionCodeEditorEnabled ? answerDraftHtml : '';
+  const sideAnswerHtml = horizontalAnswerLayout && !questionCodeEditorEnabled ? answer : '';
   const codeAnswerHtml = questionCodeEditorEnabled ? answer : '';
   const answerLayoutClass = questionCodeEditorEnabled
     ? ` has-code-editor question-layout-${activeQuestionLayout} ${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}`
@@ -7387,6 +7388,7 @@ destroyQuestionCodeEditor();
             ${sideAnswerDraftHtml}
             ${horizontalAnswerLayout || questionCodeEditorEnabled ? answerSaveHtml : ''}
             ${codeAnswerHtml}
+            ${sideAnswerHtml}
           </div>
           ${sideStateHtml}
           ${reviewBoxHtml}
