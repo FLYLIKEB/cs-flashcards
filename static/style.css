@@ -4953,6 +4953,40 @@ select,
   color: #516071;
   font-size: .82rem;
 }
+.question-answer-guide-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: .45rem;
+  margin-top: .55rem;
+}
+.question-info-button {
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: 1px solid rgba(31, 58, 95, .18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .78);
+  color: #516071;
+  font-size: .76rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.question-info-button:hover {
+  background: #eef4fb;
+  color: var(--accent);
+}
+.question-answer-guide[hidden] {
+  display: none;
+}
+.question-answer-save-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: .55rem;
+}
+.question-answer-save-button {
+  min-width: 5.5rem;
+}
 
 .question-body {
   margin: 0 0 .62rem;
@@ -5746,14 +5780,6 @@ select,
   color: #617184;
   font-size: .82rem;
   line-height: 1.5;
-}
-.question-lock-action {
-  margin-top: .9rem;
-}
-.question-lock-action p {
-  margin: .45rem 0 .7rem;
-  color: #516071;
-  line-height: 1.55;
 }
 
 .question-answer-input,
@@ -8191,7 +8217,6 @@ body.question-bank-embed #questionSessionReview,
 body.question-bank-embed .question-meta,
 body.question-bank-embed .question-session-meta,
 body.question-bank-embed .question-side-stack,
-body.question-bank-embed .question-answer-guide,
 body.question-bank-embed .question-review-box {
   display: none !important;
 }
