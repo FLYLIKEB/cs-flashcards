@@ -7393,29 +7393,6 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
         <span class="question-side-note-label">${state.questionSessionFinishedAt ? '총괄 채점' : '풀이 상태'}</span>
         <p>${escapeHtml(state.questionSessionFinishedAt ? `맞음 ${sessionSummary.correct} · 틀린 표시 ${sessionSummary.wrongCount} · 점수 ${sessionSummary.scorePercent}점` : question.answerRevealed ? '정답과 해설을 확인하고 채점 결과를 남기세요.' : '답안을 먼저 작성한 뒤 정답/해설을 열어 비교하세요.')}</p>
       </div>`;
-  const horizontalQuestionPaneHtml = horizontalAnswerLayout ? `
-        <section class="question-pane question-problem-pane" data-question-pane="problem">
-          ${embedTopbarHtml}
-          ${editToolbarHtml}
-          <div class="question-prompt question-surface">${renderQuestionMarkdown(question.prompt || '문제')}</div>
-          ${bodyHtml}
-          ${questionInfoHtml}
-          ${choiceHtml}
-        </section>
-        <div class="question-pane-resizer" data-question-pane-resize="0" role="separator" aria-label="문제와 나의 답 너비 조절" tabindex="0"></div>
-        <section class="question-pane question-draft-pane" data-question-pane="draft">
-          <div class="question-pane-head"><strong>나의 답</strong><div class="question-pane-head-actions">${answerPaneToggleHtml}</div></div>
-          ${answerDraftHtml}
-          ${answerSaveHtml}
-        </section>
-        ${answerPaneVisible ? `<div class="question-pane-resizer" data-question-pane-resize="1" role="separator" aria-label="나의 답과 정답 너비 조절" tabindex="0"></div>
-        <section class="question-pane question-answer-pane" data-question-pane="answer">
-          <div class="question-pane-head"><strong>정답</strong></div>
-          ${answer || '<div class="question-answer question-answer-placeholder question-surface"><strong>정답/모범답안</strong><p>정답 잠금이 해제되면 여기에 표시됩니다.</p></div>'}
-          ${sideStateHtml}
-          ${reviewBoxHtml}
-        </section>` : ''}
-      ` : '';
   const sessionMeta = [
     state.questionSessionTitle || question.sessionTitle,
     sessionModeLabelText,
@@ -7454,6 +7431,29 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
         <button class="question-toolbar-button" type="button" data-question-nav="next" ${state.questionLoading || questionBusy || state.questionIndex >= total - 1 ? 'disabled' : ''}>다음</button>
       </div>
     </div>` : '';
+  const horizontalQuestionPaneHtml = horizontalAnswerLayout ? `
+        <section class="question-pane question-problem-pane" data-question-pane="problem">
+          ${embedTopbarHtml}
+          ${editToolbarHtml}
+          <div class="question-prompt question-surface">${renderQuestionMarkdown(question.prompt || '문제')}</div>
+          ${bodyHtml}
+          ${questionInfoHtml}
+          ${choiceHtml}
+        </section>
+        <div class="question-pane-resizer" data-question-pane-resize="0" role="separator" aria-label="문제와 나의 답 너비 조절" tabindex="0"></div>
+        <section class="question-pane question-draft-pane" data-question-pane="draft">
+          <div class="question-pane-head"><strong>나의 답</strong><div class="question-pane-head-actions">${answerPaneToggleHtml}</div></div>
+          ${answerDraftHtml}
+          ${answerSaveHtml}
+        </section>
+        ${answerPaneVisible ? `<div class="question-pane-resizer" data-question-pane-resize="1" role="separator" aria-label="나의 답과 정답 너비 조절" tabindex="0"></div>
+        <section class="question-pane question-answer-pane" data-question-pane="answer">
+          <div class="question-pane-head"><strong>정답</strong></div>
+          ${answer || '<div class="question-answer question-answer-placeholder question-surface"><strong>정답/모범답안</strong><p>정답 잠금이 해제되면 여기에 표시됩니다.</p></div>'}
+          ${sideStateHtml}
+          ${reviewBoxHtml}
+        </section>` : ''}
+      ` : '';
 destroyQuestionCodeEditor();
   card.innerHTML = `
     <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}" data-question-dirty="${questionDirty ? '1' : '0'}" data-question-saved="${question.attemptSavedAt ? '1' : '0'}">
