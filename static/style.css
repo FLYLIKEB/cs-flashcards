@@ -9097,3 +9097,23 @@ body.question-bank-embed .question-pane-shell .question-pane {
     overflow: visible;
   }
 }
+
+.question-pane .question-answer-draft {
+  display: block;
+}
+.question-pane .question-answer-input {
+  height: auto;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  field-sizing: content;
+}
+.question-pane .question-code-editor .CodeMirror {
+  height: auto;
+}
+.question-pane .question-code-editor .CodeMirror-scroll {
+  min-height: 0;
+  overflow-y: hidden;
+}
+body.question-bank-embed .question-pane .question-answer-input {
+  height: auto;
+}

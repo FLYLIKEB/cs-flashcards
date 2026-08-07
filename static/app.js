@@ -6466,6 +6466,26 @@ function questionCodeHint(editor) {
 
 let questionCodeMirrorInstances = [];
 
+function resizeQuestionAnswerTextarea(textarea) {
+  if (!textarea || textarea.classList.contains('question-code-editor-input')) return;
+  textarea.style.height = 'auto';
+  textarea.style.overflowY = 'hidden';
+  const minimumHeight = Number.parseFloat(window.getComputedStyle(textarea).minHeight) || 0;
+  textarea.style.height = `${Math.max(minimumHeight, textarea.scrollHeight)}px`;
+}
+
+function resizeQuestionAnswerTextareas(root = document) {
+  root.querySelectorAll?.('.question-answer-input:not(.question-code-editor-input)').forEach(resizeQuestionAnswerTextarea);
+}
+
+function resizeQuestionCodeEditor(editor) {
+  if (!editor) return;
+  const scrollHeight = editor.getScrollInfo().height;
+  const minimumHeight = 22 * 16;
+  editor.setSize(null, `${Math.max(minimumHeight, scrollHeight + 16)}px`);
+  editor.refresh();
+}
+
 function destroyQuestionCodeEditor() {
   questionCodeMirrorInstances.forEach((editor) => editor.toTextArea());
   questionCodeMirrorInstances = [];
@@ -6514,10 +6534,13 @@ function initializeQuestionCodeEditor() {
       if (Number.isInteger(index)) updateQuestionSubquestionAnswer(question, index, instance.getValue());
       else question.userAnswer = instance.getValue();
       persistQuestionDraft(question);
+      resizeQuestionCodeEditor(editor);
     });
     return editor;
   });
-  window.setTimeout(() => questionCodeMirrorInstances.forEach((editor) => editor.refresh()), 0);
+  window.setTimeout(() => questionCodeMirrorInstances.forEach((editor) => {
+    resizeQuestionCodeEditor(editor);
+  }), 0);
 }
 function questionSubquestionDraftHtml(question, questionSaveBusy, answerGuideHtml = '') {
   const answers = ensureQuestionSubquestionAnswers(question);
@@ -7590,6 +7613,7 @@ destroyQuestionCodeEditor();
     $('finishQuestionSessionBtn').textContent = questionSessionIsBok(question.sessionMode || state.questionSessionMode) && !state.questionSessionFinishedAt ? '제출' : '종료';
   }
   refreshCurrentQuestionSaveState(question);
+  resizeQuestionAnswerTextareas(card);
 }
 
 async function requestGeneratedQuestions({cardIds, types, count, seed}) {
@@ -8594,6 +8618,7 @@ $('questionCard')?.addEventListener('input', (event) => {
     const index = Number.parseInt(event.target.dataset.questionSubquestionIndex || '', 10);
     if (Number.isInteger(index)) updateQuestionSubquestionAnswer(question, index, event.target.value || '');
     else question.userAnswer = event.target.value || '';
+    resizeQuestionAnswerTextarea(event.target);
     persistQuestionDraft(question);
     refreshCurrentQuestionSaveState(question);
     return;

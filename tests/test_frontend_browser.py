@@ -2745,6 +2745,20 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotEqual(case['frame_src_after_row_change'], case['initial_frame_src'])
             self.assertEqual(case['saved_attempt_payload']['judgment'], 'pending')
             self.assertFalse(case['saved_attempt_payload']['answer_revealed'])
+            resized_frame = await self.wait_for_embed_frame(page)
+            await resized_frame.waitForSelector('#questionAnswerInput')
+            case['answer_height'] = await resized_frame.evaluate(
+                """
+                () => {
+                  const input = document.querySelector('#questionAnswerInput');
+                  const before = input.getBoundingClientRect().height;
+                  input.value = Array.from({length: 24}, (_, index) => `답안 ${index + 1}`).join('\\n');
+                  input.dispatchEvent(new Event('input', {bubbles: true}));
+                  return {before, after: input.getBoundingClientRect().height};
+                }
+                """
+            )
+            self.assertGreater(case['answer_height']['after'], case['answer_height']['before'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-saved-answer-skip-confirm', status=status, observations=case)
