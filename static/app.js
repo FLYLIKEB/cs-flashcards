@@ -5590,6 +5590,7 @@ function questionBankItemToQuestion(item, index) {
     points: Number.isInteger(item.points) ? item.points : null,
     expectedTimeSeconds: Number.isInteger(item.expected_time_seconds) ? item.expected_time_seconds : null,
     answerGuide: String(item.answer_guide || ''),
+    codeLanguage: String(item.code_language || item.codeLanguage || item.language || ''),
     sessionMode: normalizeQuestionSessionMode(item.session_mode || 'practice'),
     questionOrder: index + 1,
   });
@@ -5813,8 +5814,119 @@ function hydrateQuestionState(question) {
   if (typeof question.sourceLocation !== 'string') question.sourceLocation = String(question.source_location || '');
   if (!Number.isFinite(question.questionActiveSinceMs)) question.questionActiveSinceMs = 0;
   if (typeof question.answerRefineInstruction !== 'string') question.answerRefineInstruction = '';
+  if (typeof question.codeLanguage !== 'string') question.codeLanguage = normalizeQuestionCodeLanguage(question.code_language || question.language || '');
+  if (typeof question.codeEditorEnabled !== 'boolean') question.codeEditorEnabled = question.type !== 'multiple_choice' && Boolean(questionCodeLanguage(question));
   return question;
 }
+
+
+const QUESTION_CODE_LANGUAGE_LABELS = Object.freeze({
+  text: '일반 텍스트',
+  sql: 'SQL',
+  python: 'Python',
+  java: 'Java',
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  c: 'C',
+  cpp: 'C++',
+});
+
+const QUESTION_CODE_COMPLETIONS = Object.freeze({
+  text: [],
+  sql: ['SELECT', 'FROM', 'WHERE', 'JOIN', 'LEFT JOIN', 'GROUP BY', 'ORDER BY', 'HAVING', 'INSERT INTO', 'UPDATE', 'DELETE FROM', 'CREATE TABLE', 'COUNT', 'SUM', 'AVG', 'DISTINCT', 'CASE', 'WHEN', 'AS', 'AND', 'OR', 'NULL'],
+  python: ['def', 'class', 'import', 'from', 'return', 'if', 'elif', 'else', 'for', 'while', 'try', 'except', 'with', 'lambda', 'True', 'False', 'None', 'print', 'len', 'range', 'enumerate', 'isinstance'],
+  java: ['public', 'private', 'protected', 'class', 'interface', 'static', 'final', 'void', 'int', 'long', 'double', 'boolean', 'String', 'new', 'return', 'if', 'else', 'for', 'while', 'switch', 'System.out.println', 'ArrayList', 'HashMap'],
+  javascript: ['const', 'let', 'var', 'function', 'class', 'return', 'if', 'else', 'for', 'while', 'async', 'await', 'import', 'export', 'new', 'true', 'false', 'null', ['console', 'log'].join('.'), 'map', 'filter', 'reduce'],
+  typescript: ['const', 'let', 'function', 'interface', 'type', 'class', 'public', 'private', 'readonly', 'string', 'number', 'boolean', 'return', 'import', 'export', 'async', 'await'],
+  c: ['#include', 'int', 'char', 'float', 'double', 'void', 'struct', 'typedef', 'const', 'return', 'if', 'else', 'for', 'while', 'sizeof', 'printf', 'scanf'],
+  cpp: ['#include', 'using', 'namespace', 'class', 'public', 'private', 'auto', 'const', 'int', 'string', 'vector', 'map', 'return', 'if', 'else', 'for', 'while', 'std::cout'],
+});
+
+function normalizeQuestionCodeLanguage(value) {
+  const raw = String(value || '').trim().toLowerCase();
+  const aliases = {
+    plain: 'text', plaintext: 'text', text: 'text', sql: 'sql', '에스큐엘': 'sql',
+    python: 'python', py: 'python', '파이썬': 'python', java: 'java', '자바': 'java',
+    javascript: 'javascript', js: 'javascript', '자바스크립트': 'javascript',
+    typescript: 'typescript', ts: 'typescript', '타입스크립트': 'typescript',
+    c: 'c', 'c언어': 'c', cpp: 'cpp', 'c++': 'cpp', '씨플플': 'cpp',
+  };
+  return aliases[raw] || '';
+}
+
+function questionCodeLanguage(question) {
+  const current = question || {};
+  const explicit = normalizeQuestionCodeLanguage(current.codeLanguage || current.code_language || current.language || current.programming_language || '');
+  if (explicit) return explicit;
+  const source = [current.term, current.category, current.topic, current.fieldName, ...(Array.isArray(current.keywords) ? current.keywords : []), current.prompt, current.body].filter(Boolean).join(' ');
+  const fenced = source.match(/```\s*(sql|python|py|java|javascript|js|typescript|ts|c\+\+|cpp|c)\b/i);
+  if (fenced) return normalizeQuestionCodeLanguage(fenced[1]);
+  if (/\bsql\b|에스큐엘|SQL\s*(?:문|쿼리)|(?:select|insert\s+into|update\s+\w+|delete\s+from)\b/i.test(source)) return 'sql';
+  if (/\bpython\b|\bpy\b|파이썬/i.test(source)) return 'python';
+  if (/\bjava\b|자바/i.test(source)) return 'java';
+  if (/\bjavascript\b|\bjs\b|자바스크립트/i.test(source)) return 'javascript';
+  if (/\btypescript\b|\bts\b|타입스크립트/i.test(source)) return 'typescript';
+  if (/\bc\+\+\b|\bcpp\b|씨플플/i.test(source)) return 'cpp';
+  if (/\bC\s*언어\b|\bC\s*programming\b/i.test(source)) return 'c';
+  return '';
+}
+
+function questionCodeLanguageLabel(language) {
+  return QUESTION_CODE_LANGUAGE_LABELS[language] || QUESTION_CODE_LANGUAGE_LABELS.text;
+}
+
+function questionCodeLanguageOptions(selected) {
+  return Object.entries(QUESTION_CODE_LANGUAGE_LABELS).map(([value, label]) => `<option value="${value}"${value === selected ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('');
+}
+
+function questionCodeMirrorMode(language) {
+  return ({sql: 'text/x-sql', python: 'python', java: 'text/x-java', javascript: 'javascript', typescript: 'text/typescript', c: 'text/x-csrc', cpp: 'text/x-c++src', text: 'text/plain'})[language] || 'text/plain';
+}
+
+function questionCodeHint(editor) {
+  const textarea = editor.getTextArea();
+  const language = textarea?.dataset.codeLanguage || 'text';
+  const cursor = editor.getCursor();
+  const token = editor.getTokenAt(cursor);
+  const query = String(token.string || '').toLowerCase();
+  const list = (QUESTION_CODE_COMPLETIONS[language] || []).filter((item) => item.toLowerCase().startsWith(query));
+  return {list, from: window.CodeMirror.Pos(cursor.line, token.start), to: window.CodeMirror.Pos(cursor.line, cursor.ch)};
+}
+
+let questionCodeMirrorInstance = null;
+
+function destroyQuestionCodeEditor() {
+  if (!questionCodeMirrorInstance) return;
+  questionCodeMirrorInstance.toTextArea();
+  questionCodeMirrorInstance = null;
+}
+
+function questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml = '') {
+  const language = questionCodeLanguage(question) || 'text';
+  return `<div class="question-code-editor question-surface" data-code-editor><div class="question-code-editor-toolbar"><div><span class="question-answer-label">코드 답안</span><p class="question-code-editor-hint">${escapeHtml(questionCodeLanguageLabel(language))} · 자동완성 지원</p></div><div class="question-code-editor-actions"><label class="question-code-language-label" for="questionCodeLanguage">언어</label><select id="questionCodeLanguage" class="question-code-language" data-question-code-language aria-label="코드 언어">${questionCodeLanguageOptions(language)}</select><button class="question-toolbar-button" type="button" data-question-code-editor-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>일반 답안</button></div></div><textarea id="questionAnswerInput" class="question-answer-input question-code-editor-input" rows="16" data-code-language="${language}" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${escapeHtml(`${questionCodeLanguageLabel(language)} 코드를 작성하세요.`)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea><p class="question-code-editor-status">CodeMirror · 문법 강조 · 줄 번호 · Ctrl-Space 자동완성</p>${answerGuideHtml}</div>`;
+}
+
+function initializeQuestionCodeEditor() {
+  const textarea = $('questionAnswerInput');
+  if (!textarea?.matches('.question-code-editor-input') || typeof window.CodeMirror !== 'function') return;
+  const language = textarea.dataset.codeLanguage || 'text';
+  questionCodeMirrorInstance = window.CodeMirror.fromTextArea(textarea, {
+    mode: questionCodeMirrorMode(language), lineNumbers: true, lineWrapping: false, indentUnit: 4, smartIndent: true, matchBrackets: true, autoCloseBrackets: true,
+    extraKeys: {
+      'Ctrl-Space': (editor) => editor.showHint({hint: questionCodeHint, completeSingle: false}),
+      'Cmd-Space': (editor) => editor.showHint({hint: questionCodeHint, completeSingle: false}),
+    },
+  });
+  questionCodeMirrorInstance.on('inputRead', (editor, change) => {
+    if (change.text?.some((part) => /[A-Za-z_$]/.test(part))) editor.showHint({hint: questionCodeHint, completeSingle: false});
+  });
+  questionCodeMirrorInstance.on('change', (editor) => {
+    const question = hydrateQuestionState(currentQuestion());
+    if (question) question.userAnswer = editor.getValue();
+  });
+  window.setTimeout(() => questionCodeMirrorInstance?.refresh(), 0);
+}
+
 
 
 function questionTypeBadge(question) {
@@ -6451,11 +6563,15 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
   const draftPlaceholder = revealLocked
     ? '세트 종료 전까지 정답이 공개되지 않습니다. 실전처럼 답안을 먼저 작성하세요.'
     : '여기에 답안을 적고 정답/해설을 본 뒤 결과를 저장하세요.';
-  const draftHtml = questionNeedsManualGrading(question) ? `
+  const questionCodeEditorEnabled = questionNeedsManualGrading(question) && question.codeEditorEnabled;
+  const codeEditorHtml = questionCodeEditorEnabled ? questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml) : '';
+  const codeEditorToggleHtml = questionNeedsManualGrading(question) && !questionCodeEditorEnabled
+    ? `<button class="question-toolbar-button question-code-editor-open" type="button" data-question-code-editor-toggle="on" ${questionSaveBusy ? 'disabled' : ''}>코드 편집기 사용</button>`
+    : '';
+  const answerDraftHtml = questionCodeEditorEnabled ? '' : questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft question-surface">
-      <label class="question-answer-label" for="questionAnswerInput">내 답안</label>
+      <div class="question-answer-draft-head"><label class="question-answer-label" for="questionAnswerInput">내 답안</label>${codeEditorToggleHtml}</div>
       <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
-
       ${answerGuideHtml}
     </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
   const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
@@ -6606,6 +6722,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
         <button class="question-toolbar-button" type="button" data-question-nav="next" ${state.questionLoading || questionBusy || state.questionIndex >= total - 1 ? 'disabled' : ''}>다음</button>
       </div>
     </div>` : '';
+destroyQuestionCodeEditor();
   card.innerHTML = `
     <div class="question-card-shell${question.judgment === 'wrong' ? ' is-judged-wrong' : ''}${state.questionSessionFinishedAt ? ' is-session-finished' : ''}">
       <div class="question-card-progress" aria-hidden="true"><span style="width:${progressPercent}%"></span></div>
@@ -6626,7 +6743,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
           ${judgmentBadgeHtml}
         </div>
       </div>
-      <div class="question-card-grid">
+      <div class="question-card-grid${questionCodeEditorEnabled ? ' has-code-editor' : ''}">
         <div class="question-main-stack">
           ${embedTopbarHtml}
           ${editToolbarHtml}
@@ -6634,18 +6751,19 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
           ${bodyHtml}
           ${questionInfoHtml}
           ${choiceHtml}
-          ${draftHtml}
+          ${answerDraftHtml}
           ${lockActionHtml}
           ${answer}
-
         </div>
         <aside class="question-side-stack">
+          ${codeEditorHtml}
           ${sideStateHtml}
           ${reviewBoxHtml}
         </aside>
       </div>
     </div>
   `;
+  if (questionCodeEditorEnabled) initializeQuestionCodeEditor();
 
   $('prevQuestionBtn').disabled = state.questionLoading || questionBusy || state.questionIndex <= 0;
   $('nextQuestionBtn').disabled = state.questionLoading || questionBusy || state.questionIndex >= total - 1;
@@ -6792,7 +6910,7 @@ function openQuestionPracticeFromMenu() {
   const trigger = event?.currentTarget || $('questionPracticeBtn') || document.activeElement;
   toggleMenu(false);
   rememberQuestionModeOpener(trigger);
-  toggleQuestionMode(!state.questionMode);
+  toggleQuestionMode(true);
 }
 
 function revealQuestionAnswer() {
@@ -7470,6 +7588,16 @@ $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
 $('revealAnswerBtn')?.addEventListener('click', revealQuestionAnswer);
 $('openQuestionCardBtn')?.addEventListener('click', openQuestionSourceCard);
 $('questionCard')?.addEventListener('click', (event) => {
+  const codeToggle = event.target.closest('[data-question-code-editor-toggle]');
+  if (codeToggle) {
+    const question = hydrateQuestionState(currentQuestion());
+    if (!question) return;
+    question.codeEditorEnabled = codeToggle.dataset.questionCodeEditorToggle === 'on';
+    if (question.codeEditorEnabled && !question.codeLanguage) question.codeLanguage = questionCodeLanguage(question) || 'text';
+    renderQuestionPanel();
+    if (question.codeEditorEnabled) window.setTimeout(() => questionCodeMirrorInstance?.focus(), 0);
+    return;
+  }
   const keywordButton = event.target.closest('[data-question-keyword]');
   if (keywordButton) {
     event.preventDefault();
@@ -7523,6 +7651,16 @@ $('questionCard')?.addEventListener('click', (event) => {
 });
 
 
+
+$('questionCard')?.addEventListener('change', (event) => {
+  const select = event.target.closest('[data-question-code-language]');
+  if (!select) return;
+  const question = hydrateQuestionState(currentQuestion());
+  if (!question) return;
+  question.codeLanguage = normalizeQuestionCodeLanguage(select.value) || 'text';
+  question.codeEditorEnabled = true;
+  renderQuestionPanel();
+});
 
 $('questionCard')?.addEventListener('input', (event) => {
   const question = hydrateQuestionState(currentQuestion());

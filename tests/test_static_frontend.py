@@ -540,6 +540,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'question-keyword-link',
             'function openQuestionPracticeFromMenu()',
             'toggleQuestionMode(true)',
+            'function questionCodeMirrorMode(language)',
+            'function initializeQuestionCodeEditor()',
+            'data-question-code-language',
             'function openQuestionImportDialog()',
             'function importQuestionsFromText()',
             'function importedQuestionSetPayload(rawText)',
@@ -649,6 +652,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-import-body', style_css())
         self.assertIn('.question-import-input', style_css())
         self.assertIn('.question-bank-edit-body', style_css())
+        self.assertIn('.question-code-editor .CodeMirror', style_css())
+        self.assertIn('.question-card-grid.has-code-editor', style_css())
+        self.assertIn('codemirror@5.65.16', index_html())
         self.assertIn('.question-inline-toolbar', style_css())
         self.assertIn('question-toolbar-button', index_html())
         self.assertIn('question-toolbar-eyebrow', index_html())
