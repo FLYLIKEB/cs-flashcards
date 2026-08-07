@@ -5839,6 +5839,12 @@ select,
 .question-card-grid.has-code-editor.question-layout-horizontal {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.95fr);
+}
+.question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-code-editor {
+  grid-column: 2 / -1;
+}
 .question-card-grid.has-code-editor.question-layout-horizontal .question-main-stack {
   grid-column: 1;
 }
@@ -6026,6 +6032,9 @@ select,
   }
   .question-card-grid.has-code-editor.question-layout-horizontal .question-code-editor,
   .question-card-grid.has-code-editor.question-layout-horizontal .question-code-workbench > .question-answer-surface {
+    grid-column: auto;
+  }
+  .question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-code-editor {
     grid-column: auto;
   }
 }
@@ -8082,6 +8091,11 @@ body.question-bank-embed .question-panel {
   background: #ffffff;
   box-shadow: none;
 }
+body.question-bank-embed.question-layout-horizontal .question-panel {
+  width: calc(100vw - 24px);
+  max-width: none;
+  margin-inline: 12px;
+}
 
 body.question-bank-embed .question-toolbar {
   position: sticky;
@@ -8289,6 +8303,12 @@ body.question-bank-embed .question-card-grid.has-code-editor.question-layout-hor
 body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal .question-code-workbench > .question-answer-surface {
   grid-column: 3;
 }
+body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.95fr);
+}
+body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-code-editor {
+  grid-column: 2 / -1;
+}
 @media (max-width: 760px) {
   body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal {
     grid-template-columns: minmax(0, 1fr);
@@ -8299,6 +8319,9 @@ body.question-bank-embed .question-card-grid.has-code-editor.question-layout-hor
   }
   body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal .question-code-editor,
   body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal .question-code-workbench > .question-answer-surface {
+    grid-column: auto;
+  }
+  body.question-bank-embed .question-card-grid.has-code-editor.question-layout-horizontal.question-answer-hidden .question-code-editor {
     grid-column: auto;
   }
 }

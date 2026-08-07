@@ -6753,6 +6753,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
       ${gradeHtml}
       ${wrongNoteHtml}
     </div>` : '';
+  const questionAnswerVisible = Boolean(answer);
   const activeQuestionLayout = questionCodeEditorEnabled ? questionLayoutMode() : 'vertical';
   applyQuestionLayoutMode(activeQuestionLayout);
   const mainAnswerHtml = questionCodeEditorEnabled ? '' : answer;
@@ -6850,7 +6851,7 @@ destroyQuestionCodeEditor();
           ${judgmentBadgeHtml}
         </div>
       </div>
-      <div class="question-card-grid${questionCodeEditorEnabled ? ` has-code-editor question-layout-${activeQuestionLayout}` : ''}">
+      <div class="question-card-grid${questionCodeEditorEnabled ? ` has-code-editor question-layout-${activeQuestionLayout} ${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}` : ''}">
         <div class="question-main-stack">
           ${embedTopbarHtml}
           ${editToolbarHtml}
