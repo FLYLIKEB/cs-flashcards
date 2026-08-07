@@ -1574,7 +1574,7 @@ function renderTable() {
   const filterCount = activeFilterEntries().length;
   summary.textContent = bankState.loading
     ? '문제은행을 불러오는 중입니다.'
-    : `총 ${total} · 현재 ${returned} · 필터 ${filterCount}`;
+    : `총 ${total} · 현재 ${returned}문항 · 필터 ${filterCount}`;
   error.textContent = bankState.error || '';
   renderPracticeToggle();
   renderHeader();
