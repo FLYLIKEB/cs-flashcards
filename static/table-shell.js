@@ -75,12 +75,14 @@
         if (!key) return;
         attributes.push(`${escapeHtml(key)}="${escapeHtml(value)}"`);
       });
-      return `<tr class="${escapeHtml(classes.join(' '))}" ${attributes.join(' ')}>${columns.map((column) => {
-        const cellClasses = [];
-        if (column.cellClassName) cellClasses.push(column.cellClassName);
-        const value = row.cells && Object.prototype.hasOwnProperty.call(row.cells, column.key) ? row.cells[column.key] : '—';
-        return `<td${cellClasses.length ? ` class="${escapeHtml(cellClasses.join(' '))}"` : ''}>${value}</td>`;
-      }).join('')}</tr>`;
+return `<tr class="${escapeHtml(classes.join(' '))}" ${attributes.join(' ')}>${columns.map((column) => {
+  const cellClasses = [];
+  if (column.cellClassName) cellClasses.push(column.cellClassName);
+  const value = row.cells && Object.prototype.hasOwnProperty.call(row.cells, column.key) ? row.cells[column.key] : '—';
+  const dataKey = escapeHtml(column.key || '');
+  const dataLabel = escapeHtml(column.label || column.key || '');
+  return `<td${cellClasses.length ? ` class="${escapeHtml(cellClasses.join(' '))}"` : ''} data-column-key="${dataKey}" data-column-label="${dataLabel}">${value}</td>`;
+}).join('')}</tr>`;
     }).join('');
     const minWidth = escapeHtml(options.tableMinWidth || '960px');
     return `<div class="cs-table-wrap"><table class="cs-table" style="min-width:${minWidth}"><thead><tr>${headerHtml}</tr></thead><tbody>${rowHtml}</tbody></table></div>`;
