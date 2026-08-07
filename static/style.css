@@ -8918,3 +8918,109 @@ body.question-bank-embed .question-answer-save-status {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.question-card-grid.question-pane-layout.question-layout-horizontal {
+  grid-template-columns: var(--question-pane-columns, minmax(0, 1fr) 10px minmax(0, 1fr) 10px minmax(0, 1fr));
+  gap: 0;
+  min-height: 0;
+  height: clamp(24rem, 70vh, 52rem);
+  overflow: hidden;
+  align-items: stretch;
+}
+.question-pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: .2rem .5rem .9rem;
+  scrollbar-gutter: stable;
+}
+.question-pane-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .55rem;
+  min-height: 2rem;
+  margin-bottom: .55rem;
+  padding: .2rem 0 .45rem;
+  border-bottom: 1px solid rgba(31, 58, 95, .1);
+  background: rgba(255, 255, 255, .96);
+}
+.question-pane-head strong {
+  color: #334155;
+  font-size: .78rem;
+  letter-spacing: .04em;
+}
+.question-pane-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .35rem;
+}
+.question-pane-resizer {
+  position: relative;
+  z-index: 3;
+  width: 10px;
+  min-height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+  background: transparent;
+}
+.question-pane-resizer::after {
+  content: '';
+  position: absolute;
+  inset: 0 4px;
+  border-radius: 999px;
+  background: rgba(31, 58, 95, .12);
+  transition: background .15s ease, inset .15s ease;
+}
+.question-pane-resizer:hover::after,
+.question-pane-resizer:focus-visible::after {
+  inset: 0 2px;
+  background: var(--accent);
+}
+.question-pane-resizing,
+.question-pane-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+.question-pane-resizing .question-pane {
+  pointer-events: none;
+}
+.question-answer-pane .question-answer {
+  margin-top: 0;
+}
+.question-answer-placeholder {
+  color: #617184;
+}
+.question-answer-placeholder p {
+  margin: .45rem 0 0;
+}
+body.question-bank-embed .question-card-grid.question-pane-layout.question-layout-horizontal {
+  height: 100%;
+  min-height: 0;
+}
+
+@media (max-width: 760px) {
+  .question-card-grid.question-pane-layout.question-layout-horizontal {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .question-pane {
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+    padding-inline: 0;
+  }
+  .question-pane-resizer {
+    display: none;
+  }
+  .question-pane-head {
+    position: static;
+  }
+}

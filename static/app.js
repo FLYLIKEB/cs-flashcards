@@ -118,6 +118,8 @@ const AUDIO_SETTINGS_KEY = 'csFlashcardsAudioSettings:v1';
 const AUDIO_PRESETS_KEY = 'csFlashcardsAudioPresets:v1';
 const PENDING_QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const QUESTION_LAYOUT_MODE_KEY = 'csQuestionLayoutMode:v1';
+const QUESTION_ANSWER_PANE_VISIBLE_KEY = 'csQuestionAnswerPaneVisible:v1';
+const QUESTION_PANE_SIZES_KEY = 'csQuestionPaneSizes:v1';
 
 function questionLayoutMode() {
   return localStorage.getItem(QUESTION_LAYOUT_MODE_KEY) === 'vertical' ? 'vertical' : 'horizontal';
@@ -137,6 +139,80 @@ function setQuestionLayoutMode(mode) {
   const nextMode = mode === 'horizontal' ? 'horizontal' : 'vertical';
   localStorage.setItem(QUESTION_LAYOUT_MODE_KEY, nextMode);
   return applyQuestionLayoutMode(nextMode);
+}
+
+function questionAnswerPaneVisible() {
+  return localStorage.getItem(QUESTION_ANSWER_PANE_VISIBLE_KEY) !== '0';
+}
+
+function setQuestionAnswerPaneVisible(visible) {
+  localStorage.setItem(QUESTION_ANSWER_PANE_VISIBLE_KEY, visible ? '1' : '0');
+  return Boolean(visible);
+}
+
+function questionPaneRatios(count = 3) {
+  const defaults = [0.34, 0.33, 0.33];
+  let saved = [];
+  try {
+    const parsed = JSON.parse(localStorage.getItem(QUESTION_PANE_SIZES_KEY) || '[]');
+    if (Array.isArray(parsed)) saved = parsed.map((value) => Number(value));
+  } catch (_error) {
+    saved = [];
+  }
+  const ratios = defaults.map((fallback, index) => Number.isFinite(saved[index]) && saved[index] > 0 ? saved[index] : fallback);
+  const visible = ratios.slice(0, count);
+  const total = visible.reduce((sum, value) => sum + value, 0) || 1;
+  return visible.map((value) => value / total);
+}
+
+function questionPaneGridStyle(count = 3) {
+  const columns = questionPaneRatios(count).map((ratio) => `minmax(0, ${ratio}fr)`);
+  return `--question-pane-columns: ${columns.join(' 10px ')}`;
+}
+
+function questionPaneResizePointerDown(event) {
+  const resizer = event.target.closest('[data-question-pane-resize]');
+  const grid = resizer?.closest('.question-card-grid.question-layout-horizontal');
+  if (!resizer || !grid) return;
+  const index = Number.parseInt(resizer.dataset.questionPaneResize || '', 10);
+  const panes = [...grid.querySelectorAll(':scope > .question-pane')];
+  if (!Number.isInteger(index) || !panes[index] || !panes[index + 1]) return;
+  event.preventDefault();
+  const handleWidth = 10;
+  const initialSizes = panes.map((pane) => pane.getBoundingClientRect().width);
+  const minWidth = Math.min(180, Math.max(120, (grid.clientWidth - handleWidth * (panes.length - 1)) / (panes.length + 1)));
+  const pairTotal = initialSizes[index] + initialSizes[index + 1];
+  const startX = event.clientX;
+  const update = (moveEvent) => {
+    const delta = moveEvent.clientX - startX;
+    const leftSize = Math.max(minWidth, Math.min(pairTotal - minWidth, initialSizes[index] + delta));
+    const sizes = [...initialSizes];
+    sizes[index] = leftSize;
+    sizes[index + 1] = pairTotal - leftSize;
+    const columns = sizes.map((size) => `${Math.max(0, size)}px`);
+    grid.style.setProperty('--question-pane-columns', columns.join(` ${handleWidth}px `));
+  };
+  const finish = () => {
+    const sizes = panes.map((pane) => pane.getBoundingClientRect().width);
+    const visibleTotal = sizes.reduce((sum, size) => sum + size, 0) || 1;
+    let saved = [0.34, 0.33, 0.33];
+    try {
+      const parsed = JSON.parse(localStorage.getItem(QUESTION_PANE_SIZES_KEY) || '[]');
+      if (Array.isArray(parsed)) saved = saved.map((fallback, savedIndex) => Number.isFinite(Number(parsed[savedIndex])) && Number(parsed[savedIndex]) > 0 ? Number(parsed[savedIndex]) : fallback);
+    } catch (_error) {
+      // Keep defaults when a browser has an invalid preference value.
+    }
+    sizes.forEach((size, paneIndex) => { saved[paneIndex] = size / visibleTotal; });
+    localStorage.setItem(QUESTION_PANE_SIZES_KEY, JSON.stringify(saved));
+    document.body.classList.remove('question-pane-resizing');
+    window.removeEventListener('pointermove', update);
+    window.removeEventListener('pointerup', finish);
+    window.removeEventListener('pointercancel', finish);
+  };
+  document.body.classList.add('question-pane-resizing');
+  window.addEventListener('pointermove', update, {passive: false});
+  window.addEventListener('pointerup', finish, {once: true});
+  window.addEventListener('pointercancel', finish, {once: true});
 }
 
 const QUESTION_SUBANSWER_SEPARATOR = '\n\n--- 소문제 답안 구분 ---\n\n';
@@ -7282,14 +7358,20 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
   const questionAnswerVisible = Boolean(answer);
   const activeQuestionLayout = questionNeedsManualGrading(question) ? questionLayoutMode() : 'vertical';
   const horizontalAnswerLayout = questionNeedsManualGrading(question) && activeQuestionLayout === 'horizontal';
+  const answerPaneVisible = questionAnswerPaneVisible();
+  const horizontalPaneCount = horizontalAnswerLayout ? (answerPaneVisible ? 3 : 2) : 0;
+  const questionPaneStyleAttribute = horizontalAnswerLayout ? ` style="${questionPaneGridStyle(horizontalPaneCount)}"` : '';
+  const answerPaneToggleHtml = horizontalAnswerLayout
+    ? `<button class="question-toolbar-button question-answer-pane-toggle" type="button" data-question-answer-pane-toggle="1" aria-pressed="${answerPaneVisible ? 'true' : 'false'}">${answerPaneVisible ? '정답 섹터 숨기기' : '정답 섹터 보기'}</button>`
+    : '';
   applyQuestionLayoutMode(activeQuestionLayout);
   const mainAnswerHtml = questionCodeEditorEnabled || horizontalAnswerLayout ? '' : answer;
   const sideAnswerDraftHtml = horizontalAnswerLayout && !questionCodeEditorEnabled ? answerDraftHtml : '';
   const sideAnswerHtml = horizontalAnswerLayout && !questionCodeEditorEnabled ? answer : '';
   const codeAnswerHtml = questionCodeEditorEnabled ? answer : '';
   const answerLayoutClass = questionCodeEditorEnabled
-    ? ` has-code-editor question-layout-${activeQuestionLayout} ${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}`
-    : horizontalAnswerLayout ? ' question-general-answer question-layout-horizontal' : '';
+    ? ` has-code-editor question-layout-${activeQuestionLayout} ${horizontalAnswerLayout ? 'question-pane-layout ' : ''}${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}`
+    : horizontalAnswerLayout ? ' question-general-answer question-layout-horizontal question-pane-layout' : '';
 
   const editToolbarHtml = question.questionBankId ? `
     <div class="question-inline-toolbar question-surface">
@@ -7311,6 +7393,29 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
         <span class="question-side-note-label">${state.questionSessionFinishedAt ? '총괄 채점' : '풀이 상태'}</span>
         <p>${escapeHtml(state.questionSessionFinishedAt ? `맞음 ${sessionSummary.correct} · 틀린 표시 ${sessionSummary.wrongCount} · 점수 ${sessionSummary.scorePercent}점` : question.answerRevealed ? '정답과 해설을 확인하고 채점 결과를 남기세요.' : '답안을 먼저 작성한 뒤 정답/해설을 열어 비교하세요.')}</p>
       </div>`;
+  const horizontalQuestionPaneHtml = horizontalAnswerLayout ? `
+        <section class="question-pane question-problem-pane" data-question-pane="problem">
+          ${embedTopbarHtml}
+          ${editToolbarHtml}
+          <div class="question-prompt question-surface">${renderQuestionMarkdown(question.prompt || '문제')}</div>
+          ${bodyHtml}
+          ${questionInfoHtml}
+          ${choiceHtml}
+        </section>
+        <div class="question-pane-resizer" data-question-pane-resize="0" role="separator" aria-label="문제와 나의 답 너비 조절" tabindex="0"></div>
+        <section class="question-pane question-draft-pane" data-question-pane="draft">
+          <div class="question-pane-head"><strong>나의 답</strong><div class="question-pane-head-actions">${answerPaneToggleHtml}</div></div>
+          ${answerDraftHtml}
+          ${answerSaveHtml}
+        </section>
+        ${answerPaneVisible ? `<div class="question-pane-resizer" data-question-pane-resize="1" role="separator" aria-label="나의 답과 정답 너비 조절" tabindex="0"></div>
+        <section class="question-pane question-answer-pane" data-question-pane="answer">
+          <div class="question-pane-head"><strong>정답</strong></div>
+          ${answer || '<div class="question-answer question-answer-placeholder question-surface"><strong>정답/모범답안</strong><p>정답 잠금이 해제되면 여기에 표시됩니다.</p></div>'}
+          ${sideStateHtml}
+          ${reviewBoxHtml}
+        </section>` : ''}
+      ` : '';
   const sessionMeta = [
     state.questionSessionTitle || question.sessionTitle,
     sessionModeLabelText,
@@ -7370,7 +7475,8 @@ destroyQuestionCodeEditor();
           ${judgmentBadgeHtml}
         </div>
       </div>
-      <div class="question-card-grid${answerLayoutClass}">
+      <div class="question-card-grid${answerLayoutClass}"${questionPaneStyleAttribute}>
+        ${horizontalAnswerLayout ? horizontalQuestionPaneHtml : `
         <div class="question-main-stack">
           ${embedTopbarHtml}
           ${editToolbarHtml}
@@ -7378,8 +7484,8 @@ destroyQuestionCodeEditor();
           ${bodyHtml}
           ${questionInfoHtml}
           ${choiceHtml}
-          ${horizontalAnswerLayout ? '' : answerDraftHtml}
-          ${horizontalAnswerLayout || questionCodeEditorEnabled ? '' : answerSaveHtml}
+          ${answerDraftHtml}
+          ${questionCodeEditorEnabled ? '' : answerSaveHtml}
           ${mainAnswerHtml}
         </div>
         <aside class="question-side-stack">
@@ -7392,7 +7498,7 @@ destroyQuestionCodeEditor();
           </div>
           ${sideStateHtml}
           ${reviewBoxHtml}
-        </aside>
+        </aside>`}
       </div>
     </div>
   `;
@@ -8229,6 +8335,7 @@ $('prevQuestionBtn')?.addEventListener('click', () => moveQuestion(-1));
 $('nextQuestionBtn')?.addEventListener('click', () => moveQuestion(1));
 $('revealAnswerBtn')?.addEventListener('click', revealOrFinishQuestion);
 $('openQuestionCardBtn')?.addEventListener('click', openQuestionSourceCard);
+$('questionCard')?.addEventListener('pointerdown', questionPaneResizePointerDown);
 $('questionCard')?.addEventListener('click', (event) => {
   const infoToggle = event.target.closest('[data-question-info-toggle="1"]');
   if (infoToggle) {
@@ -8237,6 +8344,12 @@ $('questionCard')?.addEventListener('click', (event) => {
     const expanded = !guide.hidden;
     guide.hidden = expanded;
     infoToggle.setAttribute('aria-expanded', String(!expanded));
+    return;
+  }
+  const answerPaneToggle = event.target.closest('[data-question-answer-pane-toggle="1"]');
+  if (answerPaneToggle) {
+    setQuestionAnswerPaneVisible(!questionAnswerPaneVisible());
+    renderQuestionPanel();
     return;
   }
   const answerSaveButton = event.target.closest('[data-question-answer-save="1"]');

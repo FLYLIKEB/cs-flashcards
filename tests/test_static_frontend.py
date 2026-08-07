@@ -555,6 +555,10 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'questionSubquestionFormat',
             'question-general-answer',
             'mainAnswerHtml',
+            'question-pane-layout',
+            'questionAnswerPaneVisible',
+            'questionPaneResizePointerDown',
+            'data-question-answer-pane-toggle="1"',
             'function openQuestionImportDialog()',
             'function importQuestionsFromText()',
             'function importedQuestionSetPayload(rawText)',
@@ -678,6 +682,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-card-grid.has-code-editor', style_css())
         self.assertIn('.question-general-answer', style_css())
         self.assertIn('.question-subquestion-code-editor', style_css())
+        self.assertIn('.question-pane', style_css())
+        self.assertIn('.question-pane-resizer', style_css())
+        self.assertIn('.question-pane-resizing', style_css())
         self.assertIn('.question-subquestion-code-list', style_css())
         self.assertIn('codemirror@5.65.16', index_html())
         self.assertIn('cs-flashcards-question-layout', question_bank_js())
