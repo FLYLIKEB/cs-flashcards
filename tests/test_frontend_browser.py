@@ -2751,14 +2751,16 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                 """
                 () => {
                   const input = document.querySelector('#questionAnswerInput');
-                  const before = input.getBoundingClientRect().height;
+                  input.value = '한 줄 답안';
+                  input.dispatchEvent(new Event('input', {bubbles: true}));
+                  const singleLine = input.getBoundingClientRect().height;
                   input.value = Array.from({length: 24}, (_, index) => `답안 ${index + 1}`).join('\\n');
                   input.dispatchEvent(new Event('input', {bubbles: true}));
-                  return {before, after: input.getBoundingClientRect().height};
+                  return {singleLine, multiLine: input.getBoundingClientRect().height};
                 }
                 """
             )
-            self.assertGreater(case['answer_height']['after'], case['answer_height']['before'])
+            self.assertGreater(case['answer_height']['multiLine'], case['answer_height']['singleLine'])
             status = 'passed'
         finally:
             self.record_case(case_id='question-bank-saved-answer-skip-confirm', status=status, observations=case)

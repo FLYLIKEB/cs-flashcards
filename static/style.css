@@ -9105,7 +9105,6 @@ body.question-bank-embed .question-pane-shell .question-pane {
   height: auto;
   overflow-y: hidden;
   box-sizing: border-box;
-  field-sizing: content;
 }
 .question-pane .question-code-editor .CodeMirror {
   height: auto;

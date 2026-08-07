@@ -6469,10 +6469,14 @@ let questionCodeMirrorInstances = [];
 function resizeQuestionAnswerTextarea(textarea) {
   if (!textarea || textarea.classList.contains('question-code-editor-input')) return;
   textarea.rows = 1;
-  textarea.style.height = '0px';
-  textarea.style.overflowY = 'hidden';
-  const minimumHeight = Number.parseFloat(window.getComputedStyle(textarea).minHeight) || 0;
-  textarea.style.height = `${Math.max(minimumHeight, textarea.scrollHeight)}px`;
+  const styles = window.getComputedStyle(textarea);
+  const lineHeight = Number.parseFloat(styles.lineHeight) || 22;
+  const padding = (Number.parseFloat(styles.paddingTop) || 0) + (Number.parseFloat(styles.paddingBottom) || 0) + (Number.parseFloat(styles.borderTopWidth) || 0) + (Number.parseFloat(styles.borderBottomWidth) || 0);
+  const lineCount = Math.max(1, String(textarea.value || '').split(/\r?\n/).length);
+  const minimumHeight = Number.parseFloat(styles.minHeight) || 0;
+  const targetHeight = Math.max(minimumHeight, lineCount * lineHeight + padding);
+  textarea.style.height = `${targetHeight}px`;
+  textarea.style.overflowY = textarea.scrollHeight > targetHeight + 1 ? 'auto' : 'hidden';
 }
 
 function resizeQuestionAnswerTextareas(root = document) {
@@ -6481,9 +6485,9 @@ function resizeQuestionAnswerTextareas(root = document) {
 
 function resizeQuestionCodeEditor(editor) {
   if (!editor) return;
-  const scrollHeight = editor.getScrollInfo().height;
+  const lineHeight = editor.defaultTextHeight();
   const minimumHeight = 2.4 * 16;
-  editor.setSize(null, `${Math.max(minimumHeight, scrollHeight + 16)}px`);
+  editor.setSize(null, `${Math.max(minimumHeight, editor.lineCount() * lineHeight + 16)}px`);
   editor.refresh();
 }
 
