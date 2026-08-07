@@ -112,7 +112,7 @@ const PENDING_QUESTION_BANK_LAUNCH_KEY = 'csPendingQuestionBankLaunch:v1';
 const QUESTION_LAYOUT_MODE_KEY = 'csQuestionLayoutMode:v1';
 
 function questionLayoutMode() {
-  return localStorage.getItem(QUESTION_LAYOUT_MODE_KEY) === 'horizontal' ? 'horizontal' : 'vertical';
+  return localStorage.getItem(QUESTION_LAYOUT_MODE_KEY) === 'vertical' ? 'vertical' : 'horizontal';
 }
 
 function applyQuestionLayoutMode(mode = questionLayoutMode()) {
@@ -160,10 +160,25 @@ function ensureQuestionSubquestionAnswers(question) {
   }
   while (answers.length < labels.length) answers.push('');
   answers = answers.slice(0, labels.length);
+  const defaultFormat = question.codeEditorEnabled ? questionCodeLanguage(question) || 'text' : 'text';
+  let formats = Array.isArray(question.subquestionFormats) ? question.subquestionFormats.map((item) => normalizeQuestionCodeLanguage(item) || defaultFormat) : [];
+  while (formats.length < labels.length) formats.push(defaultFormat);
+  formats = formats.slice(0, labels.length);
+  question.subquestionFormats = formats;
   question.subquestionLabels = labels;
   question.subquestionAnswers = answers;
   question.userAnswer = answers.map((answer, index) => `[소문제 ${labels[index]}]\n${answer}`).join(QUESTION_SUBANSWER_SEPARATOR);
   return answers;
+}
+
+function questionSubquestionFormat(question, index) {
+  ensureQuestionSubquestionAnswers(question);
+  const stored = question?.subquestionFormats?.[index];
+  return normalizeQuestionCodeLanguage(stored) || (question?.codeEditorEnabled ? questionCodeLanguage(question) || 'text' : 'text');
+}
+
+function questionSubquestionFormatOptions(selected) {
+  return Object.entries(QUESTION_CODE_LANGUAGE_LABELS).map(([value, label]) => `<option value="${value}"${value === selected ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('');
 }
 
 function updateQuestionSubquestionAnswer(question, index, value) {
@@ -5973,18 +5988,23 @@ function destroyQuestionCodeEditor() {
 }
 
 function questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml = '', subquestionIndex = null, showControls = true) {
-  const language = questionCodeLanguage(question) || 'text';
   const layoutMode = questionLayoutMode();
   const layoutButtonLabel = layoutMode === 'horizontal' ? '세로 보기' : '가로 보기';
   const isSubquestion = Number.isInteger(subquestionIndex);
+  const language = isSubquestion ? questionSubquestionFormat(question, subquestionIndex) : questionCodeLanguage(question) || 'text';
   const answers = isSubquestion ? ensureQuestionSubquestionAnswers(question) : [];
   const label = isSubquestion ? `소문제 ${question.subquestionLabels[subquestionIndex]}` : '코드 답안';
   const textareaId = isSubquestion && subquestionIndex > 0 ? `questionSubanswerInput-${subquestionIndex + 1}` : 'questionAnswerInput';
   const value = isSubquestion ? answers[subquestionIndex] || '' : question.userAnswer || '';
   const subquestionToggle = !question.subquestionMode ? `<button class="question-toolbar-button" type="button" data-subquestion-toggle="on" ${questionSaveBusy ? 'disabled' : ''}>소문제별 답안</button>` : '';
-  const controlsHtml = showControls ? `<label class="question-code-language-label" for="questionCodeLanguage">언어</label><select id="questionCodeLanguage" class="question-code-language" data-question-code-language aria-label="코드 언어">${questionCodeLanguageOptions(language)}</select><button class="question-toolbar-button" type="button" data-question-layout-toggle aria-pressed="${layoutMode === 'horizontal' ? 'true' : 'false'}">${layoutButtonLabel}</button>${subquestionToggle}<button class="question-toolbar-button" type="button" data-question-code-editor-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>일반 답안</button>` : '';
+  const formatControl = isSubquestion
+    ? `<label class="question-code-language-label" for="questionSubquestionFormat-${subquestionIndex}">형식</label><select id="questionSubquestionFormat-${subquestionIndex}" class="question-code-language" data-question-subquestion-format="${subquestionIndex}" aria-label="소문제 ${question.subquestionLabels[subquestionIndex]} 답안 형식">${questionSubquestionFormatOptions(language)}</select>`
+    : `<label class="question-code-language-label" for="questionCodeLanguage">언어</label><select id="questionCodeLanguage" class="question-code-language" data-question-code-language aria-label="코드 언어">${questionCodeLanguageOptions(language)}</select>`;
+  const sharedControls = showControls ? `<button class="question-toolbar-button" type="button" data-question-layout-toggle aria-pressed="${layoutMode === 'horizontal' ? 'true' : 'false'}">${layoutButtonLabel}</button>${subquestionToggle}<button class="question-toolbar-button" type="button" data-question-code-editor-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>일반 답안</button>` : '';
+  const controlsHtml = `${formatControl}${sharedControls}`;
   const subquestionAttribute = isSubquestion ? ` data-question-subquestion-index="${subquestionIndex}"` : '';
-  return `<div class="question-code-editor question-surface" data-code-editor${subquestionAttribute}><div class="question-code-editor-toolbar"><div><span class="question-answer-label">${label}</span><p class="question-code-editor-hint">${escapeHtml(questionCodeLanguageLabel(language))} · 자동완성 지원</p></div><div class="question-code-editor-actions">${controlsHtml}</div></div><textarea id="${textareaId}" class="question-answer-input question-code-editor-input" rows="16" data-code-language="${language}"${subquestionAttribute} spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${escapeHtml(`${questionCodeLanguageLabel(language)} 코드를 작성하세요.`)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(value)}</textarea><p class="question-code-editor-status">CodeMirror · 문법 강조 · 줄 번호 · Ctrl-Space 자동완성</p>${answerGuideHtml}</div>`;
+  const compactClass = isSubquestion ? ' question-subquestion-code-editor' : '';
+  return `<div class="question-code-editor${compactClass} question-surface" data-code-editor${subquestionAttribute}><div class="question-code-editor-toolbar"><div><span class="question-answer-label">${label}</span><p class="question-code-editor-hint">${escapeHtml(questionCodeLanguageLabel(language))} · 자동완성 지원</p></div><div class="question-code-editor-actions">${controlsHtml}</div></div><textarea id="${textareaId}" class="question-answer-input question-code-editor-input" rows="16" data-code-language="${language}"${subquestionAttribute} spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="${escapeHtml(`${questionCodeLanguageLabel(language)} 코드를 작성하세요.`)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(value)}</textarea><p class="question-code-editor-status">CodeMirror · 문법 강조 · 줄 번호 · Ctrl-Space 자동완성</p>${answerGuideHtml}</div>`;
 }
 
 function initializeQuestionCodeEditor() {
@@ -6017,7 +6037,21 @@ function questionSubquestionDraftHtml(question, questionSaveBusy, answerGuideHtm
   const answers = ensureQuestionSubquestionAnswers(question);
   if (!answers.length) return '';
   const labels = question.subquestionLabels;
-  return `<div class="question-subquestion-draft question-surface"><div class="question-subquestion-head"><div><span class="question-answer-label">소문제별 답안</span><p class="question-code-editor-hint">각 소문제의 답을 따로 작성합니다.</p></div><div class="question-code-editor-actions"><button class="question-toolbar-button" type="button" data-subquestion-add ${questionSaveBusy ? 'disabled' : ''}>소문제 추가</button><button class="question-toolbar-button" type="button" data-subquestion-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>한 칸 답안</button></div></div><div class="question-subquestion-list">${answers.map((answer, index) => `<div class="question-subquestion-item"><div class="question-subquestion-item-head"><label class="question-answer-label" for="${index === 0 ? 'questionAnswerInput' : `questionSubanswerInput-${index + 1}`}">소문제 ${escapeHtml(labels[index])}</label>${answers.length > 1 ? `<button class="question-subquestion-remove" type="button" data-subquestion-remove="${index}" aria-label="소문제 ${escapeHtml(labels[index])} 삭제" ${questionSaveBusy ? 'disabled' : ''}>삭제</button>` : ''}</div><textarea id="${index === 0 ? 'questionAnswerInput' : `questionSubanswerInput-${index + 1}`}" class="question-answer-input question-subanswer-input" data-question-subquestion-index="${index}" rows="${question.type === 'essay' ? 6 : 4}" placeholder="소문제 ${escapeHtml(labels[index])} 답안을 작성하세요." ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(answer)}</textarea></div>`).join('')}</div>${answerGuideHtml}</div>`;
+  const layoutMode = questionLayoutMode();
+  const layoutToggleHtml = `<button class="question-toolbar-button" type="button" data-question-layout-toggle aria-pressed="${layoutMode === 'horizontal' ? 'true' : 'false'}">${layoutMode === 'horizontal' ? '세로 보기' : '가로 보기'}</button>`;
+  const fieldsHtml = answers.map((answer, index) => {
+    const format = questionSubquestionFormat(question, index);
+    const answerId = index === 0 ? 'questionAnswerInput' : `questionSubanswerInput-${index + 1}`;
+    return `<div class="question-subquestion-item"><div class="question-subquestion-item-head"><label class="question-answer-label" for="${answerId}">소문제 ${escapeHtml(labels[index])}</label><div class="question-subquestion-format"><label class="question-code-language-label" for="questionSubquestionFormat-${index}">형식</label><select id="questionSubquestionFormat-${index}" class="question-code-language" data-question-subquestion-format="${index}" aria-label="소문제 ${escapeHtml(labels[index])} 답안 형식">${questionSubquestionFormatOptions(format)}</select>${answers.length > 1 ? `<button class="question-subquestion-remove" type="button" data-subquestion-remove="${index}" aria-label="소문제 ${escapeHtml(labels[index])} 삭제" ${questionSaveBusy ? 'disabled' : ''}>삭제</button>` : ''}</div></div><textarea id="${answerId}" class="question-answer-input question-subanswer-input" data-question-subquestion-index="${index}" rows="${question.type === 'essay' ? 6 : 4}" placeholder="소문제 ${escapeHtml(labels[index])} 답안을 작성하세요." ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(answer)}</textarea></div>`;
+  }).join('');
+  return `<div class="question-subquestion-draft question-surface"><div class="question-subquestion-head"><div><span class="question-answer-label">소문제별 답안</span><p class="question-code-editor-hint">각 소문제의 답과 형식을 따로 지정합니다.</p></div><div class="question-code-editor-actions">${layoutToggleHtml}<button class="question-toolbar-button" type="button" data-subquestion-add ${questionSaveBusy ? 'disabled' : ''}>소문제 추가</button><button class="question-toolbar-button" type="button" data-subquestion-toggle="off" ${questionSaveBusy ? 'disabled' : ''}>한 칸 답안</button></div></div><div class="question-subquestion-list">${fieldsHtml}</div>${answerGuideHtml}</div>`;
+}
+function questionSubquestionTextFieldHtml(question, questionSaveBusy, index, answerGuideHtml = '') {
+  const answers = ensureQuestionSubquestionAnswers(question);
+  const labels = question.subquestionLabels;
+  const format = questionSubquestionFormat(question, index);
+  const answerId = index === 0 ? 'questionAnswerInput' : `questionSubanswerInput-${index + 1}`;
+  return `<div class="question-subquestion-field question-subquestion-text-field question-surface"><div class="question-subquestion-item-head"><label class="question-answer-label" for="${answerId}">소문제 ${escapeHtml(labels[index])}</label><div class="question-subquestion-format"><label class="question-code-language-label" for="questionSubquestionFormat-${index}">형식</label><select id="questionSubquestionFormat-${index}" class="question-code-language" data-question-subquestion-format="${index}" aria-label="소문제 ${escapeHtml(labels[index])} 답안 형식">${questionSubquestionFormatOptions(format)}</select></div></div><textarea id="${answerId}" class="question-answer-input question-subanswer-input" data-question-subquestion-index="${index}" rows="${question.type === 'essay' ? 6 : 4}" placeholder="소문제 ${escapeHtml(labels[index])} 답안을 작성하세요." ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(answers[index] || '')}</textarea>${answerGuideHtml}</div>`;
 }
 
 
@@ -6657,12 +6691,16 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
   const draftPlaceholder = revealLocked
     ? '세트 종료 전까지 정답이 공개되지 않습니다. 실전처럼 답안을 먼저 작성하세요.'
     : '여기에 답안을 적고 정답/해설을 본 뒤 결과를 저장하세요.';
+  const draftLayoutMode = questionLayoutMode();
+  const layoutToggleHtml = questionNeedsManualGrading(question)
+    ? `<button class="question-toolbar-button" type="button" data-question-layout-toggle aria-pressed="${draftLayoutMode === 'horizontal' ? 'true' : 'false'}">${draftLayoutMode === 'horizontal' ? '세로 보기' : '가로 보기'}</button>`
+    : '';
   const questionCodeEditorEnabled = questionNeedsManualGrading(question) && question.codeEditorEnabled;
   const subquestionAnswers = questionNeedsManualGrading(question) && question.subquestionMode ? ensureQuestionSubquestionAnswers(question) : [];
   const hasSubquestionAnswers = subquestionAnswers.length > 0;
   const codeEditorHtml = questionCodeEditorEnabled
     ? (hasSubquestionAnswers
-      ? subquestionAnswers.map((_answer, index) => questionCodeEditorHtml(question, questionSaveBusy, index === subquestionAnswers.length - 1 ? answerGuideHtml : '', index, index === 0)).join('')
+      ? subquestionAnswers.map((_answer, index) => questionSubquestionFormat(question, index) === 'text' ? questionSubquestionTextFieldHtml(question, questionSaveBusy, index, index === subquestionAnswers.length - 1 ? answerGuideHtml : '') : questionCodeEditorHtml(question, questionSaveBusy, index === subquestionAnswers.length - 1 ? answerGuideHtml : '', index, index === 0)).join('')
       : questionCodeEditorHtml(question, questionSaveBusy, answerGuideHtml))
     : '';
   const codeEditorToggleHtml = questionNeedsManualGrading(question) && !questionCodeEditorEnabled
@@ -6673,7 +6711,7 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
     : '';
   const answerDraftHtml = questionCodeEditorEnabled ? '' : hasSubquestionAnswers ? questionSubquestionDraftHtml(question, questionSaveBusy, answerGuideHtml) : questionNeedsManualGrading(question) ? `
     <div class="question-answer-draft question-surface">
-      <div class="question-answer-draft-head"><label class="question-answer-label" for="questionAnswerInput">내 답안</label><div class="question-code-editor-actions">${subquestionToggleHtml}${codeEditorToggleHtml}</div></div>
+      <div class="question-answer-draft-head"><label class="question-answer-label" for="questionAnswerInput">내 답안</label><div class="question-code-editor-actions">${layoutToggleHtml}${subquestionToggleHtml}${codeEditorToggleHtml}</div></div>
       <textarea id="questionAnswerInput" class="question-answer-input" rows="${question.type === 'essay' ? 6 : 4}" placeholder="${escapeHtml(draftPlaceholder)}" ${questionSaveBusy ? 'disabled' : ''}>${escapeHtml(question.userAnswer || '')}</textarea>
       ${answerGuideHtml}
     </div>` : (answerGuideHtml ? `<div class="question-answer-draft question-surface">${answerGuideHtml}</div>` : '');
@@ -6754,10 +6792,15 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
       ${wrongNoteHtml}
     </div>` : '';
   const questionAnswerVisible = Boolean(answer);
-  const activeQuestionLayout = questionCodeEditorEnabled ? questionLayoutMode() : 'vertical';
+  const activeQuestionLayout = questionNeedsManualGrading(question) ? questionLayoutMode() : 'vertical';
+  const horizontalAnswerLayout = questionNeedsManualGrading(question) && activeQuestionLayout === 'horizontal';
   applyQuestionLayoutMode(activeQuestionLayout);
-  const mainAnswerHtml = questionCodeEditorEnabled ? '' : answer;
+  const mainAnswerHtml = questionCodeEditorEnabled || horizontalAnswerLayout ? '' : answer;
+  const sideAnswerDraftHtml = horizontalAnswerLayout && !questionCodeEditorEnabled ? answerDraftHtml : '';
   const codeAnswerHtml = questionCodeEditorEnabled ? answer : '';
+  const answerLayoutClass = questionCodeEditorEnabled
+    ? ` has-code-editor question-layout-${activeQuestionLayout} ${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}`
+    : horizontalAnswerLayout ? ' question-general-answer question-layout-horizontal' : '';
 
   const editToolbarHtml = question.questionBankId ? `
     <div class="question-inline-toolbar question-surface">
@@ -6851,7 +6894,7 @@ destroyQuestionCodeEditor();
           ${judgmentBadgeHtml}
         </div>
       </div>
-      <div class="question-card-grid${questionCodeEditorEnabled ? ` has-code-editor question-layout-${activeQuestionLayout} ${questionAnswerVisible ? 'question-answer-visible' : 'question-answer-hidden'}` : ''}">
+      <div class="question-card-grid${answerLayoutClass}">
         <div class="question-main-stack">
           ${embedTopbarHtml}
           ${editToolbarHtml}
@@ -6859,13 +6902,14 @@ destroyQuestionCodeEditor();
           ${bodyHtml}
           ${questionInfoHtml}
           ${choiceHtml}
-          ${answerDraftHtml}
+          ${horizontalAnswerLayout ? '' : answerDraftHtml}
           ${lockActionHtml}
           ${mainAnswerHtml}
         </div>
         <aside class="question-side-stack">
           <div class="question-code-workbench">
             ${codeEditorHtml}
+            ${sideAnswerDraftHtml}
             ${codeAnswerHtml}
           </div>
           ${sideStateHtml}
@@ -7816,6 +7860,18 @@ $('questionCard')?.addEventListener('click', (event) => {
 
 
 $('questionCard')?.addEventListener('change', (event) => {
+  const subquestionSelect = event.target.closest('[data-question-subquestion-format]');
+  if (subquestionSelect) {
+    const question = hydrateQuestionState(currentQuestion());
+    if (!question) return;
+    const index = Number.parseInt(subquestionSelect.dataset.questionSubquestionFormat || '', 10);
+    if (!Number.isInteger(index)) return;
+    ensureQuestionSubquestionAnswers(question);
+    question.subquestionFormats[index] = normalizeQuestionCodeLanguage(subquestionSelect.value) || 'text';
+    question.codeEditorEnabled = true;
+    renderQuestionPanel();
+    return;
+  }
   const select = event.target.closest('[data-question-code-language]');
   if (!select) return;
   const question = hydrateQuestionState(currentQuestion());

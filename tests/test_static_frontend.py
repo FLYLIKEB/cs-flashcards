@@ -549,6 +549,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
             'questionSubquestionLabels',
             'data-subquestion-add',
             'question-subquestion-draft',
+            'questionSubquestionFormat',
+            'question-general-answer',
             'mainAnswerHtml',
             'function openQuestionImportDialog()',
             'function importQuestionsFromText()',
@@ -661,6 +663,8 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('.question-bank-edit-body', style_css())
         self.assertIn('.question-code-editor .CodeMirror', style_css())
         self.assertIn('.question-card-grid.has-code-editor', style_css())
+        self.assertIn('.question-general-answer', style_css())
+        self.assertIn('.question-subquestion-code-editor', style_css())
         self.assertIn('codemirror@5.65.16', index_html())
         self.assertIn('cs-flashcards-question-layout', question_bank_js())
         self.assertIn('.question-bank-layout-horizontal', table_shell_css())
