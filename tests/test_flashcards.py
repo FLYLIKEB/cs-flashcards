@@ -964,6 +964,11 @@ class FlashcardProgressTests(unittest.TestCase):
                     'answer_guide': '기존 가이드',
                 }, {'id': 'CS-001', 'term': '정규화', 'definition': '중복을 줄이는 설계 기법'}, '더 자세히')
             self.assertIn('이상 현상', result['answer'])
+            request_payload = json.loads(urlopen_mock.call_args.args[0].data.decode('utf-8'))
+            refinement_prompt = request_payload['input'][0]['content'][0]['text']
+            self.assertIn('Use Markdown deliberately', refinement_prompt)
+            self.assertIn('**double asterisks**', refinement_prompt)
+            self.assertIn('fenced code blocks', refinement_prompt)
             self.assertEqual(result['rubric'], ['중복 제거', '이상 현상 방지'])
             self.assertIn('/responses', urlopen_mock.call_args.args[0].full_url)
         finally:

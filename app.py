@@ -2331,9 +2331,13 @@ def rewrite_question_bank_answer_with_codex(
             "answer, and linked flashcard context. Do not invent citations, URLs, or nonexistent standards. For "
             "multiple_choice questions, keep answer as the final correct choice only or an equivalently short final "
             "answer, and put the detail in explanation. For short, subjective, and essay questions, make the answer "
-            "more concrete, study-friendly, and usable as a model answer in Korean. explanation should clarify the "
-            "reasoning, likely pitfalls, and what should be mentioned for scoring. rubric should be a concise Korean "
-            "list of scoring points. answer_guide should be a short Korean writing guide."
+            "more concrete, study-friendly, and usable as a model answer in Korean. Use Markdown deliberately in "
+            "answer, explanation, rubric, and answer_guide: use headings, numbered or bulleted lists, tables, and "
+            "fenced code blocks when they improve readability. Bold important terms, conditions, commands, and "
+            "scoring keywords with **double asterisks**, but do not bold every word. Do not emit raw HTML or wrap "
+            "the entire response in one code fence. explanation should clarify the reasoning, likely pitfalls, and "
+            "what should be mentioned for scoring. rubric should be a concise Korean list of scoring points. "
+            "answer_guide should be a short Korean writing guide."
         ),
         {
             "instruction": str(instruction or "").strip() or "현재 문항의 모범답안과 해설을 더 구체적이고 학습 친화적으로 보강해 주세요.",
