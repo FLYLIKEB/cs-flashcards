@@ -7374,10 +7374,13 @@ return `<li><button class="question-choice${isAnswer ? ' answer' : ''}${isSelect
         <button id="questionAnswerSaveBtn" class="question-toolbar-button${questionDirty ? ' is-primary' : ''}" type="button" data-question-save-answer="1" ${questionSaveBusy || !questionDirty ? 'disabled' : ''}>${state.questionSaving ? '저장 중…' : '답안 저장'}</button>
       </div>
     </div>`;
-  const rubric = Array.isArray(question.rubric) && question.rubric.length ? `
+  const rubricMarkdown = Array.isArray(question.rubric)
+    ? question.rubric.map((item) => String(item || '').replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean).map((item) => `- ${item}`).join('\n')
+    : '';
+  const rubric = rubricMarkdown ? `
     <div class="question-rubric">
       <strong>채점 포인트</strong>
-      <ul>${question.rubric.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+      ${renderQuestionMarkdown(rubricMarkdown)}
     </div>` : '';
   const multipleChoiceAnswerHtml = question.answerRevealed && question.type === 'multiple_choice' && Number.isInteger(question.answer_index) && question.answer_index >= 0 && question.answer_index < choices.length
     ? `<div class="question-answer-choice"><strong>정답 선지</strong><div class="question-answer-choice-value">${renderMarkdownInline(`${question.answer_index + 1}. ${String(choices[question.answer_index] || '')}`)}</div></div>`
