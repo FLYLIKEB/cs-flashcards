@@ -4798,11 +4798,19 @@ class RecruitmentCalendarTests(unittest.TestCase):
         self.assertTrue(any(event['url'].startswith('https://') for event in payload['events']))
         self.assertTrue(any(event['institution']['name'] == '한국주택금융공사' for event in payload['events']))
         bok_apply = next(event for event in payload['events'] if event['id'] == 'bok-2027-apply')
+        self.assertEqual(bok_apply['status'], 'closed')
+        self.assertEqual(bok_apply['status_label'], '마감')
         self.assertFalse(bok_apply['allDay'])
         self.assertEqual(bok_apply['start'], '2026-07-23T10:00:00+09:00')
         self.assertEqual(bok_apply['end'], '2026-08-05T17:00:00+09:00')
         self.assertEqual(bok_apply['extendedProps']['start_time'], '10:00')
         self.assertIn('ctz=Asia%2FSeoul', bok_apply['google_calendar_url'])
+
+        hf_events = {event['id']: event for event in payload['events'] if event['institution']['id'] == 'hf'}
+        self.assertEqual(hf_events['hf-2026-apply']['start'], '2026-07-31T16:00:00+09:00')
+        self.assertEqual(hf_events['hf-2026-written-result']['start_inclusive'], '2026-09-30')
+        self.assertEqual(hf_events['hf-2026-personality']['end_inclusive'], '2026-10-06')
+        self.assertTrue(all('articleNo=600433' in event['url'] for event in hf_events.values()))
 
     def test_build_recruitment_calendar_ics_contains_expected_fields(self):
         content = flashcard_app.build_recruitment_calendar_ics(base_url='https://example.com')

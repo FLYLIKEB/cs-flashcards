@@ -188,6 +188,7 @@ RECRUITMENT_EVENT_TYPE_LABELS = {
     "result": "발표",
 }
 RECRUITMENT_EVENT_STATUS_LABELS = {
+    "closed": "마감",
     "open": "진행 중",
     "planned": "예정",
     "scheduled": "확정",
