@@ -8,6 +8,7 @@ backups/
 vercel-proxy/.vercel/
 
 state/
+state/progress.sqlite
 *.sqlite
 *.sqlite-*
 
