@@ -4810,6 +4810,7 @@ class RecruitmentCalendarTests(unittest.TestCase):
         self.assertEqual(hf_events['hf-2026-apply']['start'], '2026-07-31T16:00:00+09:00')
         self.assertEqual(hf_events['hf-2026-written-result']['start_inclusive'], '2026-09-30')
         self.assertEqual(hf_events['hf-2026-personality']['end_inclusive'], '2026-10-06')
+        self.assertEqual(hf_events['hf-2026-interview-1-result']['start_inclusive'], '2026-10-29')
         self.assertTrue(all('articleNo=600433' in event['url'] for event in hf_events.values()))
 
     def test_build_recruitment_calendar_ics_contains_expected_fields(self):

@@ -421,6 +421,21 @@
       "source_label": "공식 채용공고"
     },
     {
+      "id": "hf-2026-interview-1-result",
+      "institution_id": "hf",
+      "title": "2026 신입직원 1차면접 합격 발표",
+      "summary": "한국주택금융공사 신입직원 채용",
+      "event_type": "result",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-10-29",
+      "end_date": "2026-10-29",
+      "display_label": "1차합격 발표",
+      "description": "공식 채용공고 기준.",
+      "url": "https://hf.go.kr/ko/sub05/sub05_07_03.do?articleNo=600433&mode=view",
+      "source_label": "공식 채용공고"
+    },
+    {
       "id": "hf-2026-interview-2",
       "institution_id": "hf",
       "title": "2026 신입직원 2차면접",
