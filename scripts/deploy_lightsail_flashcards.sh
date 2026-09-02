@@ -211,6 +211,10 @@ if [[ -d "$WIKI_PACKAGE_SRC" ]]; then
   cp "$WIKI_PACKAGE_SRC/README.md" "$TMP_STAGE/wiki_book_seed/README.md"
   cp "$WIKI_PACKAGE_SRC/TOC.md" "$TMP_STAGE/wiki_book_seed/TOC.md"
   cp -R "$WIKI_PACKAGE_SRC/pages" "$TMP_STAGE/wiki_book_seed/"
+  # The wiki workspace may contain local agent state under pages/.omx.
+  # Never ship that state directory or let the SQLite payload guard reject a
+  # otherwise valid application bundle.
+  rm -rf "$TMP_STAGE/wiki_book_seed/pages/.omx"
 else
   echo "경고: 위키 문서 디렉터리를 찾지 못해 위키 시드 없이 배포합니다: $WIKI_PACKAGE_SRC"
 fi

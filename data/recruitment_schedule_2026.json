@@ -12,12 +12,6 @@
   ],
   "institutions": [
     {
-      "id": "bok",
-      "name": "한국은행",
-      "short_name": "한은",
-      "color": "#1d4ed8"
-    },
-    {
       "id": "hf",
       "name": "한국주택금융공사",
       "short_name": "주금공",
@@ -76,8 +70,8 @@
     {
       "id": "phase-sep12",
       "period": "9.12",
-      "headline": "한국은행 필기시험 / 주택금융공사 IT 코딩시험",
-      "focus": "한국은행 기출 회차별 실전 풀이와 주금공 코딩·전산 객관식 감 유지"
+      "headline": "주택금융공사 IT 코딩시험",
+      "focus": "주금공 코딩·전산 객관식 감 유지"
     },
     {
       "id": "phase-sep19",
@@ -99,22 +93,6 @@
     }
   ],
   "dashboard_open": [
-    {
-      "institution_id": "bok",
-      "status": "원서접수 마감",
-      "schedule_summary": "접수 07.23 10:00 ~ 08.05 17:00 마감 / 서류 08.26 전후 / 필기 09.12 / 면접 10~11월 / 잠정합격 11월 중순경",
-      "links": [
-        {
-          "label": "공고",
-          "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037"
-        },
-        {
-          "label": "채용홈",
-          "url": "https://apply.bok.or.kr"
-        }
-      ],
-      "note": "최우선. 2027년도 G5 공고 기준"
-    },
     {
       "institution_id": "hf",
       "status": "접수 마감·후속 전형 진행",
@@ -264,58 +242,11 @@
     },
     {
       "rank": 4,
-      "institution_group": "한은·주금공·예탁원",
+      "institution_group": "주금공·예탁원",
       "reason": "지원은 마감됐지만 9월 필기·코딩 등 확정된 후속 전형이 남아 있다"
     }
   ],
   "events": [
-    {
-      "id": "bok-2027-apply",
-      "institution_id": "bok",
-      "title": "2027년도 G5 원서 접수",
-      "summary": "한국은행 신입 종합기획직원(G5)",
-      "event_type": "apply",
-      "status": "closed",
-      "date_precision": "range",
-      "start_date": "2026-07-23",
-      "end_date": "2026-08-05",
-      "start_time": "10:00",
-      "end_time": "17:00",
-      "display_label": "원서 접수",
-      "description": "한국시각 기준. 컴퓨터공학 포함.",
-      "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037",
-      "source_label": "공고"
-    },
-    {
-      "id": "bok-2027-doc",
-      "institution_id": "bok",
-      "title": "2027년도 G5 서류전형 합격 발표 전후",
-      "summary": "한국은행 신입 종합기획직원(G5)",
-      "event_type": "result",
-      "status": "scheduled",
-      "date_precision": "approximate_day",
-      "start_date": "2026-08-26",
-      "end_date": "2026-08-26",
-      "display_label": "서류발표 전후",
-      "description": "공고문 기준 2026.08.26 전후.",
-      "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037",
-      "source_label": "공고"
-    },
-    {
-      "id": "bok-2027-written",
-      "institution_id": "bok",
-      "title": "2027년도 G5 필기시험",
-      "summary": "한국은행 신입 종합기획직원(G5)",
-      "event_type": "exam",
-      "status": "scheduled",
-      "date_precision": "day",
-      "start_date": "2026-09-12",
-      "end_date": "2026-09-12",
-      "display_label": "필기시험",
-      "description": "A매치 핵심 일정.",
-      "url": "https://www.bok.or.kr/portal/bbs/P0000561/view.do?nttId=11063071&oldMenuNo=201150&menuNo=200037&programType=newsData&depth=200037",
-      "source_label": "공고"
-    },
     {
       "id": "hf-2026-apply",
       "institution_id": "hf",

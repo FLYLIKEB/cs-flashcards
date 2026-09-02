@@ -4797,14 +4797,10 @@ class RecruitmentCalendarTests(unittest.TestCase):
         self.assertTrue(any(event['google_calendar_url'].startswith('https://calendar.google.com/calendar/render?') for event in payload['events']))
         self.assertTrue(any(event['url'].startswith('https://') for event in payload['events']))
         self.assertTrue(any(event['institution']['name'] == '한국주택금융공사' for event in payload['events']))
-        bok_apply = next(event for event in payload['events'] if event['id'] == 'bok-2027-apply')
-        self.assertEqual(bok_apply['status'], 'closed')
-        self.assertEqual(bok_apply['status_label'], '마감')
-        self.assertFalse(bok_apply['allDay'])
-        self.assertEqual(bok_apply['start'], '2026-07-23T10:00:00+09:00')
-        self.assertEqual(bok_apply['end'], '2026-08-05T17:00:00+09:00')
-        self.assertEqual(bok_apply['extendedProps']['start_time'], '10:00')
-        self.assertIn('ctz=Asia%2FSeoul', bok_apply['google_calendar_url'])
+        self.assertFalse(any(event['institution']['id'] == 'bok' for event in payload['events']))
+        kodit_apply = next(event for event in payload['events'] if event['id'] == 'kodit-2026-h2-apply')
+        self.assertEqual(kodit_apply['status'], 'open')
+        self.assertEqual(kodit_apply['end_inclusive'], '2026-09-16')
 
         hf_events = {event['id']: event for event in payload['events'] if event['institution']['id'] == 'hf'}
         self.assertEqual(hf_events['hf-2026-apply']['start'], '2026-07-31T16:00:00+09:00')
@@ -4816,9 +4812,9 @@ class RecruitmentCalendarTests(unittest.TestCase):
     def test_build_recruitment_calendar_ics_contains_expected_fields(self):
         content = flashcard_app.build_recruitment_calendar_ics(base_url='https://example.com')
         self.assertIn('BEGIN:VCALENDAR', content)
-        self.assertIn('UID:bok-2027-apply@cs-flashcards', content)
-        self.assertIn('DTSTART:20260723T010000Z', content)
-        self.assertIn('DTEND:20260805T080000Z', content)
+        self.assertNotIn('UID:bok-2027-apply@cs-flashcards', content)
+        self.assertIn('UID:kodit-2026-h2-apply@cs-flashcards', content)
+        self.assertIn('DTSTART;VALUE=DATE:20260902', content)
         self.assertIn('X-WR-CALNAME:2026 금융공기업 IT 채용 캘린더', content)
         self.assertIn('api/calendar/recruitment.ics', content)
 
