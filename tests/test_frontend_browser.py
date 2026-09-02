@@ -339,6 +339,7 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         cls.temp_root = Path(cls._temp_dir.name)
         cls.progress_db_path = cls.temp_root / 'progress.sqlite'
         source_progress_db = ROOT / 'state' / 'progress.sqlite'
+        seeded_fallback_db = not source_progress_db.exists()
         if source_progress_db.exists():
             shutil.copy2(source_progress_db, cls.progress_db_path)
         else:
@@ -359,6 +360,51 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         cls.difficulty_regression_question_id = 'qb-browser-difficulty-fallback'
         with sqlite3.connect(cls.progress_db_path) as conn:
             now = '2026-08-01T00:00:00Z'
+            if seeded_fallback_db:
+                conn.executemany(
+                    """
+                    INSERT INTO question_bank (
+                        id, fingerprint, card_id, question_type, prompt, body, answer,
+                        explanation, category, difficulty, issuer, source_location,
+                        created_at, updated_at
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    [
+                        (
+                            'qb-browser-base-1',
+                            'fp-browser-base-1',
+                            'CARD-BROWSER-BASE',
+                            'subjective',
+                            '데이터베이스 기본 문제 1',
+                            '데이터베이스 기본 문제 본문 1',
+                            '정답 1',
+                            '해설 1',
+                            '데이터베이스',
+                            '중',
+                            '테스트기관',
+                            '브라우저 기본 fixture',
+                            now,
+                            now,
+                        ),
+                        (
+                            'qb-browser-base-2',
+                            'fp-browser-base-2',
+                            'CARD-BROWSER-BASE',
+                            'subjective',
+                            '데이터베이스 기본 문제 2',
+                            '데이터베이스 기본 문제 본문 2',
+                            '정답 2',
+                            '해설 2',
+                            '데이터베이스',
+                            '중',
+                            '테스트기관',
+                            '브라우저 기본 fixture',
+                            now,
+                            now,
+                        ),
+                    ],
+                )
             conn.execute(
                 """
                 INSERT OR REPLACE INTO cards (card_id, term, category, difficulty, updated_at)
