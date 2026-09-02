@@ -403,6 +403,22 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
                             now,
                             now,
                         ),
+                        (
+                            'qb-browser-base-3',
+                            'fp-browser-base-3',
+                            'CARD-BROWSER-BASE',
+                            'subjective',
+                            '네트워크 기본 문제',
+                            '네트워크 기본 문제 본문',
+                            '네트워크 정답',
+                            '네트워크 해설',
+                            '네트워크',
+                            '하',
+                            '테스트기관',
+                            '브라우저 기본 fixture',
+                            now,
+                            now,
+                        ),
                     ],
                 )
             conn.execute(
