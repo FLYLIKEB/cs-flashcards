@@ -6,11 +6,17 @@
   "description": "2026년 금융공기업 IT 채용 일정의 공식 공고·예비공고·연간 채용계획 기준 데이터입니다. 2026년 9월 2일 기준으로 갱신했습니다.",
   "calendar_intro": "앱 내부 캘린더와 위키 일정 페이지는 이 데이터 파일을 기준으로 렌더링됩니다.",
   "calendar_notes": [
-    "접수 종료된 상반기 공고는 달력에서 제외했습니다.",
+    "접수 종료된 상반기 공고는 달력에서 제외하되, 하반기 추적 대상 기관의 공고 확인 일정은 표시합니다.",
     "월 단위·전후 표현만 공개된 일정은 예정 이벤트로 표시합니다.",
     "Google Calendar 전체 동기화는 ICS 피드를 URL로 추가하는 방식이 가장 안정적입니다."
   ],
   "institutions": [
+    {
+      "id": "fss",
+      "name": "금융감독원",
+      "short_name": "금감원",
+      "color": "#0f4c81"
+    },
     {
       "id": "hf",
       "name": "한국주택금융공사",
@@ -64,14 +70,14 @@
     {
       "id": "phase-sep-apply",
       "period": "9.2 ~ 9.16",
-      "headline": "신보·예보·산업은행 IT·디지털 지원 구간",
-      "focus": "예보 9.11, 산업은행 9.14, 신보 9.16 마감 순으로 지원서 제출"
+      "headline": "금감원·신보·예보·산업은행 IT·디지털 지원 구간",
+      "focus": "금감원 9.7 12시, 예보 9.11 17시, 산업은행 9.14, 신보 9.16 마감 순으로 지원서 제출"
     },
     {
       "id": "phase-sep12",
       "period": "9.12",
-      "headline": "주택금융공사 IT 코딩시험",
-      "focus": "주금공 코딩·전산 객관식 감 유지"
+      "headline": "금감원 1차 필기 / 주택금융공사 IT 코딩시험",
+      "focus": "금감원 1차 필기와 주금공 코딩·전산 객관식을 함께 마무리"
     },
     {
       "id": "phase-sep19",
@@ -82,17 +88,33 @@
     {
       "id": "phase-octnov",
       "period": "10월 ~ 11월",
-      "headline": "예보·신보·산업은행 필기와 주금공·예탁원 면접 진행",
+      "headline": "금감원 2차 필기와 예보·신보·산업은행 필기·면접 진행",
       "focus": "기관별 필기 과목과 면접·코딩 일정을 공고 기준으로 분리 관리"
     },
     {
       "id": "phase-dec",
       "period": "12월",
-      "headline": "신보·예보·산업은행 최종전형 및 입사 예정",
+      "headline": "금감원·신보·예보·산업은행 최종전형 및 입사 예정",
       "focus": "최종 발표·신체검사·신원조사와 입사일은 기관 공지를 재확인"
     }
   ],
   "dashboard_open": [
+    {
+      "institution_id": "fss",
+      "status": "5급 신입 공고 접수 중",
+      "schedule_summary": "IT 17명 등 총 95명 / 접수 08.19 15:00 ~ 09.07 12:00 / 1차 필기 09.12 / 2차 필기 10.17 / 면접 11~12월 / 최종합격 12월 말~2027년 1월 예정",
+      "links": [
+        {
+          "label": "공식 채용공고",
+          "url": "https://www.fss.or.kr/emp/sport/sportWrt/view.do?pbancNo=2026-016&menuNo=800013"
+        },
+        {
+          "label": "금융감독원 채용홈",
+          "url": "https://www.fss.or.kr/emp"
+        }
+      ],
+      "note": "2027년도 종합직원(5급) 공고. IT 17명, 총 95명 이내"
+    },
     {
       "institution_id": "hf",
       "status": "접수 마감·후속 전형 진행",
@@ -227,26 +249,103 @@
   "priorities": [
     {
       "rank": 1,
+      "institution_id": "fss",
+      "reason": "IT 17명 포함 95명 공고가 9월 7일 12시에 가장 먼저 마감된다"
+    },
+    {
+      "rank": 2,
       "institution_id": "kdic",
       "reason": "디지털 2명 포함 신입 공고가 진행 중이며 9월 11일 17시에 마감된다"
     },
     {
-      "rank": 2,
+      "rank": 3,
       "institution_id": "kdb",
       "reason": "IT 10명 포함 5급 신입행원 공고가 9월 14일까지 진행된다"
     },
     {
-      "rank": 3,
-      "institution_id": "kodit",
-      "reason": "ICT 9명·인공지능 6명 등 77명 공고가 9월 16일 16시에 마감된다"
-    },
-    {
       "rank": 4,
-      "institution_group": "주금공·예탁원",
-      "reason": "지원은 마감됐지만 9월 필기·코딩 등 확정된 후속 전형이 남아 있다"
+      "institution_group": "신보·주금공·예탁원",
+      "reason": "신보는 9월 16일까지 접수하고 주금공·예탁원은 9월 후속 전형이 남아 있다"
     }
   ],
   "events": [
+    {
+      "id": "fss-2027-apply",
+      "institution_id": "fss",
+      "title": "2027년도 금융감독원 종합직원(5급) 원서 접수",
+      "summary": "금융감독원 5급 신입직원 95명 이내(IT 17명)",
+      "event_type": "apply",
+      "status": "open",
+      "date_precision": "range",
+      "start_date": "2026-08-19",
+      "end_date": "2026-09-07",
+      "start_time": "15:00",
+      "end_time": "12:00",
+      "display_label": "원서 접수",
+      "description": "공식 채용공고 기준. 2026.09.07 12:00 마감.",
+      "url": "https://www.fss.or.kr/emp/sport/sportWrt/view.do?pbancNo=2026-016&menuNo=800013",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "fss-2027-written-1",
+      "institution_id": "fss",
+      "title": "2027년도 금융감독원 종합직원(5급) 1차 필기",
+      "summary": "금융감독원 5급 신입직원 채용",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-09-12",
+      "end_date": "2026-09-12",
+      "display_label": "1차 필기",
+      "description": "공식 채용 일정 기준.",
+      "url": "https://www.fss.or.kr/emp/sport/sportWrt/view.do?pbancNo=2026-016&menuNo=800013",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "fss-2027-written-2",
+      "institution_id": "fss",
+      "title": "2027년도 금융감독원 종합직원(5급) 2차 필기",
+      "summary": "금융감독원 5급 신입직원 채용",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-10-17",
+      "end_date": "2026-10-17",
+      "display_label": "2차 필기",
+      "description": "공식 채용 일정 기준.",
+      "url": "https://www.fss.or.kr/emp/sport/sportWrt/view.do?pbancNo=2026-016&menuNo=800013",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "fss-2027-interview",
+      "institution_id": "fss",
+      "title": "2027년도 금융감독원 종합직원(5급) 면접전형",
+      "summary": "금융감독원 5급 신입직원 채용",
+      "event_type": "interview",
+      "status": "planned",
+      "date_precision": "window",
+      "start_date": "2026-11-01",
+      "end_date": "2026-12-31",
+      "display_label": "면접 예정",
+      "description": "공식 채용 일정 기준 2026년 11~12월 중 예정.",
+      "url": "https://www.fss.or.kr/emp/sport/sportWrt/view.do?pbancNo=2026-016&menuNo=800013",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "fss-2027-final",
+      "institution_id": "fss",
+      "title": "2027년도 금융감독원 종합직원(5급) 최종합격 발표",
+      "summary": "금융감독원 5급 신입직원 채용",
+      "event_type": "announcement",
+      "status": "planned",
+      "date_precision": "window",
+      "start_date": "2026-12-01",
+      "end_date": "2027-01-31",
+      "display_label": "최종합격 예정",
+      "description": "공식 채용 일정 기준 2026년 12월 말~2027년 1월 중 예정.",
+      "url": "https://www.fss.or.kr/emp/sport/sportWrt/view.do?pbancNo=2026-016&menuNo=800013",
+      "source_label": "공식 채용공고"
+    },
     {
       "id": "hf-2026-apply",
       "institution_id": "hf",
@@ -850,6 +949,21 @@
       "description": "공고 기준 예정일.",
       "url": "https://job.alio.go.kr/mobile2021/recruit/recruitView.do?idx=304398",
       "source_label": "잡알리오 공고"
+    },
+    {
+      "id": "koscom-2026-h2-check",
+      "institution_id": "koscom",
+      "title": "코스콤 2026년 하반기 신입 IT 공고 확인",
+      "summary": "코스콤 공식 채용목록 기준 하반기 신입 공고 미게시",
+      "event_type": "plan",
+      "status": "planned",
+      "date_precision": "month",
+      "start_date": "2026-09-01",
+      "end_date": "2026-09-30",
+      "display_label": "공고 확인",
+      "description": "2026.09.02 공식 채용목록에는 상반기 신입 및 기간제 마감 공고만 확인됩니다. 하반기 공고 게시 여부를 계속 확인합니다.",
+      "url": "https://www.koscom.co.kr/portal/bbs/B0000015/list.do",
+      "source_label": "공식 채용목록 점검"
     },
     {
       "id": "kexim-2026-h2-window",

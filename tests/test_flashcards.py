@@ -4801,6 +4801,10 @@ class RecruitmentCalendarTests(unittest.TestCase):
         kodit_apply = next(event for event in payload['events'] if event['id'] == 'kodit-2026-h2-apply')
         self.assertEqual(kodit_apply['status'], 'open')
         self.assertEqual(kodit_apply['end_inclusive'], '2026-09-16')
+        fss_apply = next(event for event in payload['events'] if event['id'] == 'fss-2027-apply')
+        self.assertEqual(fss_apply['status'], 'open')
+        self.assertEqual(fss_apply['end'], '2026-09-07T12:00:00+09:00')
+        self.assertTrue(any(event['institution']['id'] == 'koscom' for event in payload['events']))
 
         hf_events = {event['id']: event for event in payload['events'] if event['institution']['id'] == 'hf'}
         self.assertEqual(hf_events['hf-2026-apply']['start'], '2026-07-31T16:00:00+09:00')
