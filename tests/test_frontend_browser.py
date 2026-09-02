@@ -4341,6 +4341,8 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             await page.waitForFunction("document.querySelector('#mainTabListBtn').getAttribute('aria-selected') === 'true'")
             case['active_tab_after_keyboard'] = await self.attr(page, '#mainTabListBtn', 'aria-selected')
             await page.waitForFunction("document.querySelectorAll('#eventList [data-event-id]').length > 0")
+            case['completed_mark_count'] = await page.evaluate("document.querySelectorAll('#eventList .event-completion-mark').length")
+            self.assertGreaterEqual(case['completed_mark_count'], 1)
             first_selector = '#eventList [data-event-id]'
             case['first_event_id'] = await page.Jeval(first_selector, '(node) => node.dataset.eventId || ""')
             await page.focus(first_selector)

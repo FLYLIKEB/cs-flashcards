@@ -392,6 +392,7 @@ def load_recruitment_schedule(path: Path | None = None) -> dict[str, Any]:
         event["status_label"] = RECRUITMENT_EVENT_STATUS_LABELS.get(str(event.get("status") or "").strip(), "확인 필요")
         event["date_precision"] = str(event.get("date_precision") or "day").strip() or "day"
         event["display_label"] = str(event.get("display_label") or event["event_type_label"]).strip() or event["event_type_label"]
+        event["completed"] = event.get("completed") is True or event["status"] == "closed"
         events.append(event)
     events.sort(key=lambda item: (item["start_date"], item["end_date"], str(item.get("title") or "")))
 
@@ -474,6 +475,8 @@ def build_recruitment_calendar_payload(*, base_url: str = "") -> dict[str, Any]:
                 "event_type_label": event["event_type_label"],
                 "status": event["status"],
                 "status_label": event["status_label"],
+                "completed": event["completed"],
+                "completed_label": "완료" if event["completed"] else "",
                 "date_precision": event["date_precision"],
                 "date_display": event["date_display"],
                 "start": start_value,
@@ -509,6 +512,7 @@ def build_recruitment_calendar_payload(*, base_url: str = "") -> dict[str, Any]:
                 "extendedProps": {
                     "status": event["status"],
                     "status_label": event["status_label"],
+                    "completed": event["completed"],
                     "date_precision": event["date_precision"],
                     "event_type": event["event_type"],
                     "event_type_label": event["event_type_label"],

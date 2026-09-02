@@ -420,6 +420,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function openDetailDrawer()', calendar_js())
         self.assertIn('function closeDetailDrawer({ restoreFocus = true } = {})', calendar_js())
         self.assertIn("if (event.key === 'Escape' && calendarState.detailOpen)", calendar_js())
+        self.assertIn('function completionMark(event)', calendar_js())
+        self.assertIn('eventContent(arg)', calendar_js())
+        self.assertIn('event-completion-mark', calendar_js())
 
     def test_embedded_question_bank_filters_expose_accessible_names(self):
         for snippet in [

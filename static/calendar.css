@@ -509,6 +509,31 @@ button {
   text-align: left;
 }
 
+.event-row-button.is-completed {
+  background: rgba(240, 253, 244, 0.88);
+}
+
+.event-completion-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 4px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: #166534;
+  font-size: 0.82em;
+  font-weight: 800;
+  line-height: 1;
+  vertical-align: 0.08em;
+}
+
+.event-completion-status {
+  color: #166534 !important;
+  font-weight: 700;
+}
+
 .event-row-button__date,
 .event-row-button__status {
   font-size: 0.78rem;
@@ -822,6 +847,26 @@ button {
 .fc .fc-event-toned .fc-event-title,
 .fc .fc-event-toned .fc-event-time {
   color: var(--text);
+}
+
+.fc .calendar-event-content {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 2px;
+}
+
+.fc .calendar-event-content__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fc .calendar-event-completed {
+  opacity: 0.72;
+}
+
+.fc .calendar-event-completed .event-completion-mark {
+  flex: 0 0 auto;
 }
 
 .fc .fc-daygrid-event-dot {

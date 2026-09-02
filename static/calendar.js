@@ -201,9 +201,16 @@ function applyCalendarEventTone(info) {
   info.el.style.setProperty('--event-border', border);
   info.el.style.setProperty('--event-solid', color);
   info.el.classList.add('fc-event-toned');
+  if (info.event.extendedProps.completed) {
+    info.el.classList.add('calendar-event-completed');
+  }
   if (info.view.type.startsWith('list')) {
     info.el.classList.add('fc-list-event-toned');
   }
+}
+
+function completionMark(event) {
+  return event.completed ? '<span class="event-completion-mark" aria-label="완료">✓</span>' : '';
 }
 
 function allInstitutions() {
@@ -494,13 +501,13 @@ function renderEventList(events = filteredEvents()) {
   container.innerHTML = `
     <div class="event-row-list">
       ${listEvents.map((event) => `
-        <button class="event-row-button${event.id === calendarState.selectedEventId ? ' is-selected' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">
+        <button class="event-row-button${event.id === calendarState.selectedEventId ? ' is-selected' : ''}${event.completed ? ' is-completed' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">
           <span class="event-row-button__date">${escapeHtml(event.date_display)}</span>
           <span class="event-row-button__content">
-            <strong>${escapeHtml(event.list_title || event.title)}</strong>
+            <strong>${completionMark(event)}${escapeHtml(event.list_title || event.title)}</strong>
             <span class="table-note">${escapeHtml(event.institution.short_name)} · ${escapeHtml(event.event_type_label)}${event.summary ? ` · ${escapeHtml(event.summary)}` : ''}</span>
           </span>
-          <span class="event-row-button__status">${escapeHtml(event.status_label)}${event.is_approximate ? ' · 예정' : ''}</span>
+          <span class="event-row-button__status">${completionMark(event)}${escapeHtml(event.completed ? event.completed_label : event.status_label)}${!event.completed && event.is_approximate ? ' · 예정' : ''}</span>
         </button>
       `).join('')}
     </div>
@@ -530,6 +537,7 @@ function renderSelectedEventPeek(event) {
     <div class="selected-event-peek__facts">
       <span>${escapeHtml(event.date_display)}</span>
       <span>${escapeHtml(event.event_type_label)}</span>
+      ${event.completed ? `<span class="event-completion-status">✓ ${escapeHtml(event.completed_label)}</span>` : ''}
       <span>${escapeHtml(event.status_label)}${event.is_approximate ? ' · 예정' : ''}</span>
     </div>
     <p class="selected-event-peek__summary">${escapeHtml(event.summary || event.description || '공고 핵심 내용을 바로 확인한다.')}</p>
@@ -573,6 +581,10 @@ function renderSelectedEvent(event) {
       <div>
         <dt>상태</dt>
         <dd>${escapeHtml(event.status_label)}</dd>
+      </div>
+      <div>
+        <dt>완료 여부</dt>
+        <dd>${event.completed ? `✓ ${escapeHtml(event.completed_label)}` : '미완료'}</dd>
       </div>
     </dl>
     ${event.description ? `<p>${escapeHtml(event.description)}</p>` : ''}
@@ -672,6 +684,28 @@ function initializeCalendar() {
     eventClick(info) {
       info.jsEvent.preventDefault();
       selectEvent(info.event.id, { openDetail: true });
+    },
+    eventContent(arg) {
+      const content = document.createElement('span');
+      content.className = 'calendar-event-content';
+      if (arg.timeText) {
+        const time = document.createElement('span');
+        time.className = 'calendar-event-content__time';
+        time.textContent = arg.timeText;
+        content.append(time);
+      }
+      if (arg.event.extendedProps.completed) {
+        const mark = document.createElement('span');
+        mark.className = 'event-completion-mark';
+        mark.setAttribute('aria-label', '완료');
+        mark.textContent = '✓';
+        content.append(mark);
+      }
+      const title = document.createElement('span');
+      title.className = 'calendar-event-content__title';
+      title.textContent = arg.event.title;
+      content.append(title);
+      return { domNodes: [content] };
     },
     eventDidMount(info) {
       applyCalendarEventTone(info);
