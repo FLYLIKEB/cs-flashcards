@@ -338,7 +338,23 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
         cls._temp_dir = tempfile.TemporaryDirectory(prefix='cs-frontend-browser-')
         cls.temp_root = Path(cls._temp_dir.name)
         cls.progress_db_path = cls.temp_root / 'progress.sqlite'
-        shutil.copy2(ROOT / 'state' / 'progress.sqlite', cls.progress_db_path)
+        source_progress_db = ROOT / 'state' / 'progress.sqlite'
+        if source_progress_db.exists():
+            shutil.copy2(source_progress_db, cls.progress_db_path)
+        else:
+            import app as flashcard_app
+
+            flashcard_app.ensure_progress_db(
+                cls.progress_db_path,
+                seed_rows=[
+                    {
+                        'id': 'CARD-BROWSER-BASE',
+                        'term': '브라우저 기본 카드',
+                        'category': '테스트',
+                        'definition': 'CI 브라우저 테스트용 기본 카드',
+                    }
+                ],
+            )
         cls.difficulty_regression_prompt = 'difficulty fallback browser regression'
         cls.difficulty_regression_question_id = 'qb-browser-difficulty-fallback'
         with sqlite3.connect(cls.progress_db_path) as conn:

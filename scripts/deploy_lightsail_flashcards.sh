@@ -193,7 +193,11 @@ append_env_line "CS_FLASHCARDS_WIKI_GITHUB_TOKEN" "$WIKI_GITHUB_TOKEN"
 append_env_line "CS_FLASHCARDS_WIKI_GITHUB_PATH_PREFIX" "$WIKI_GITHUB_PATH_PREFIX"
 append_env_line "OPENAI_API_KEY" "$OPENAI_API_KEY_VALUE"
 
-verify_sqlite_has_cards "$ROOT_DIR/state/progress.sqlite" "로컬"
+if [[ -f "$ROOT_DIR/state/progress.sqlite" ]]; then
+  verify_sqlite_has_cards "$ROOT_DIR/state/progress.sqlite" "로컬"
+else
+  echo "로컬 progress.sqlite 없음: 원격 DB 보존 배포로 로컬 DB 검증을 생략합니다."
+fi
 mkdir -p "$TMP_STAGE/data"
 cp app.py flashcards_backend.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
