@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "title": "2026 금융공기업 IT 채용 캘린더",
+  "title": "2026 금융권 IT 채용 캘린더",
   "timezone": "Asia/Seoul",
   "last_updated": "2026-09-08",
-  "description": "2026년 금융공기업 IT 채용 일정의 공식 공고·예비공고·연간 채용계획 기준 데이터입니다. 2026년 9월 8일 기준으로 갱신했습니다.",
+  "description": "2026년 금융공기업·시중은행 IT 채용 일정의 공식 공고·예비공고·연간 채용계획 기준 데이터입니다. 2026년 9월 8일 기준으로 갱신했습니다.",
   "calendar_intro": "앱 내부 캘린더와 위키 일정 페이지는 이 데이터 파일을 기준으로 렌더링됩니다.",
   "calendar_notes": [
     "접수 종료된 상반기 공고는 달력에서 제외하되, 하반기 추적 대상 기관의 공고 확인 일정은 표시합니다.",
@@ -58,6 +58,36 @@
       "name": "한국산업은행",
       "short_name": "산은",
       "color": "#dc2626"
+    },
+    {
+      "id": "woori",
+      "name": "우리은행",
+      "short_name": "우리",
+      "color": "#0067ac"
+    },
+    {
+      "id": "kb",
+      "name": "KB국민은행",
+      "short_name": "KB국민",
+      "color": "#776c61"
+    },
+    {
+      "id": "shinhan",
+      "name": "신한은행",
+      "short_name": "신한",
+      "color": "#0046ff"
+    },
+    {
+      "id": "hana",
+      "name": "하나은행",
+      "short_name": "하나",
+      "color": "#008485"
+    },
+    {
+      "id": "nh",
+      "name": "NH농협은행",
+      "short_name": "NH농협",
+      "color": "#009a44"
     }
   ],
   "timeline": [
@@ -172,6 +202,34 @@
         }
       ],
       "note": "2026.09.07 공식 공고 기준. IT 분야는 소프트웨어 개발·운영, IT 인프라 구축·운영"
+    },
+    {
+      "institution_id": "woori",
+      "status": "하반기 신입행원 공고 오늘 마감",
+      "schedule_summary": "TECH(정보보호·IT개발) 포함 7개 부문 / 접수 08.27 ~ 09.08 14:00 / AI역량검사 09.09 ~ 09.11 / 1·2차·최종면접 / 신입행원 연수 11월 ~ 2027.01 예정",
+      "links": [
+        {
+          "label": "공고·지원",
+          "url": "https://jrs.jobkorea.co.kr/wooribank"
+        }
+      ],
+      "note": "2026.09.08 공식 채용페이지 기준. TECH 부문은 IT개발과 정보보호 직무"
+    },
+    {
+      "institution_id": "nh",
+      "status": "5급 신규직원 공고 접수 중",
+      "schedule_summary": "금융·전문 5급 / 접수 09.04 ~ 09.17 17:00 / 온라인 인·적성 09.19 ~ 09.21 / 필기 10.25 / 면접 11월 / 입사 12월 예정",
+      "links": [
+        {
+          "label": "채용홈",
+          "url": "https://nhbank.incruit.com/"
+        },
+        {
+          "label": "전문 공고",
+          "url": "https://nhbank.incruit.com/hire/viewhire.asp?projectid=102"
+        }
+      ],
+      "note": "2026.09.04 공식 공고 기준. 전문 분야에 보안·AI·디지털 포함"
     }
   ],
   "dashboard_watch": [
@@ -219,26 +277,69 @@
         }
       ],
       "note": "2026.09.02 채용공고 목록 진행 공고 0건. 연간계획상 전문직행원(신입) 8~11월 예정"
+    },
+    {
+      "institution_id": "kb",
+      "status": "하반기 신입행원 공고 미확인",
+      "links": [
+        {
+          "label": "채용홈",
+          "url": "https://jobs.kbstar.com/"
+        }
+      ],
+      "note": "2026.09.08 공식 채용페이지에서 하반기 신입행원 진행 공고 미확인"
+    },
+    {
+      "institution_id": "shinhan",
+      "status": "하반기 신입행원 공고 미확인",
+      "links": [
+        {
+          "label": "채용홈",
+          "url": "https://shinhan.recruiter.co.kr/"
+        }
+      ],
+      "note": "2026.09.08 공식 채용홈 추적 대상. 일정은 본공고 확인 후 추가"
+    },
+    {
+      "institution_id": "hana",
+      "status": "하반기 신입행원 공고 미확인",
+      "links": [
+        {
+          "label": "채용홈",
+          "url": "https://hanabank.recruiter.co.kr/"
+        }
+      ],
+      "note": "2026.09.08 공식 채용홈 추적 대상. 일정은 본공고 확인 후 추가"
     }
   ],
   "priorities": [
     {
       "rank": 1,
+      "institution_id": "woori",
+      "reason": "TECH 포함 하반기 신입행원 공고가 9월 8일 14시에 마감된다"
+    },
+    {
+      "rank": 2,
       "institution_id": "kdic",
       "reason": "디지털 2명 포함 신입 공고가 9월 11일 17시에 마감된다"
     },
     {
-      "rank": 2,
+      "rank": 3,
       "institution_id": "kdb",
       "reason": "IT 10명 포함 5급 신입행원 공고가 9월 14일 16시에 마감된다"
     },
     {
-      "rank": 3,
+      "rank": 4,
       "institution_id": "kodit",
       "reason": "ICT·인공지능 포함 신입 공고가 9월 16일 16시에 마감된다"
     },
     {
-      "rank": 4,
+      "rank": 5,
+      "institution_id": "nh",
+      "reason": "보안·AI·디지털 포함 5급 신규직원 공고가 9월 17일 17시에 마감된다"
+    },
+    {
+      "rank": 6,
       "institution_id": "koscom",
       "reason": "IT 신입 공고가 9월 21일 17시에 마감된다"
     }
@@ -837,6 +938,117 @@
       "display_label": "입사 예정",
       "description": "공식 채용공고 기준.",
       "url": "https://www.koscom.co.kr/portal/bbs/B0000015/view.do?menuNo=200386&nttId=30715",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "woori-2026-h2-apply",
+      "institution_id": "woori",
+      "title": "우리은행 2026년 하반기 신입행원 원서 접수",
+      "summary": "TECH(정보보호·IT개발) 포함 7개 부문",
+      "event_type": "apply",
+      "status": "open",
+      "completed": false,
+      "date_precision": "range",
+      "start_date": "2026-08-27",
+      "end_date": "2026-09-08",
+      "end_time": "14:00",
+      "display_label": "원서 접수",
+      "description": "TECH 부문에 IT개발과 정보보호 직무 포함.",
+      "url": "https://jrs.jobkorea.co.kr/wooribank",
+      "source_label": "공식 채용페이지"
+    },
+    {
+      "id": "woori-2026-h2-ai",
+      "institution_id": "woori",
+      "title": "우리은행 2026년 하반기 신입행원 AI역량검사",
+      "summary": "우리은행 하반기 신입행원 채용",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "range",
+      "start_date": "2026-09-09",
+      "end_date": "2026-09-11",
+      "display_label": "AI역량검사",
+      "description": "입행지원서 최종 제출자 대상. 9월 9일 안내 예정.",
+      "url": "https://jrs.jobkorea.co.kr/wooribank",
+      "source_label": "공식 채용페이지"
+    },
+    {
+      "id": "nh-2026-h2-apply",
+      "institution_id": "nh",
+      "title": "NH농협은행 2026년 5급 신규직원 원서 접수",
+      "summary": "금융·전문 5급(보안·AI·디지털 포함)",
+      "event_type": "apply",
+      "status": "open",
+      "completed": false,
+      "date_precision": "range",
+      "start_date": "2026-09-04",
+      "end_date": "2026-09-17",
+      "end_time": "17:00",
+      "display_label": "원서 접수",
+      "description": "금융과 전문 5급 공고 간 중복지원 불가.",
+      "url": "https://nhbank.incruit.com/",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "nh-2026-h2-aptitude-1",
+      "institution_id": "nh",
+      "title": "NH농협은행 2026년 5급 1차 온라인 인·적성평가",
+      "summary": "NH농협은행 5급 신규직원 채용",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "range",
+      "start_date": "2026-09-19",
+      "end_date": "2026-09-21",
+      "start_time": "10:00",
+      "end_time": "17:00",
+      "display_label": "온라인 인·적성평가",
+      "description": "Level 1 온라인 인·적성평가.",
+      "url": "https://nhbank.incruit.com/",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "nh-2026-h2-written",
+      "institution_id": "nh",
+      "title": "NH농협은행 2026년 5급 2차 필기전형",
+      "summary": "NH농협은행 5급 신규직원 채용",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-10-25",
+      "end_date": "2026-10-25",
+      "display_label": "필기전형",
+      "description": "보안·AI·디지털 분야는 온라인 코딩테스트 포함.",
+      "url": "https://nhbank.incruit.com/",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "nh-2026-h2-interview",
+      "institution_id": "nh",
+      "title": "NH농협은행 2026년 5급 3차 면접전형",
+      "summary": "NH농협은행 5급 신규직원 채용",
+      "event_type": "interview",
+      "status": "planned",
+      "date_precision": "month",
+      "start_date": "2026-11-01",
+      "end_date": "2026-11-30",
+      "display_label": "11월 면접 예정",
+      "description": "공식 채용공고 기준 11월 중 예정.",
+      "url": "https://nhbank.incruit.com/",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "nh-2026-h2-onboarding",
+      "institution_id": "nh",
+      "title": "NH농협은행 2026년 5급 신규직원 입사",
+      "summary": "NH농협은행 5급 신규직원 채용",
+      "event_type": "onboarding",
+      "status": "planned",
+      "date_precision": "month",
+      "start_date": "2026-12-01",
+      "end_date": "2026-12-31",
+      "display_label": "12월 입사 예정",
+      "description": "공식 채용공고 기준 12월 예정.",
+      "url": "https://nhbank.incruit.com/",
       "source_label": "공식 채용공고"
     },
     {

@@ -4814,7 +4814,7 @@ class RecruitmentCalendarTests(unittest.TestCase):
         self.assertNotIn('UID:bok-2027-apply@cs-flashcards', content)
         self.assertIn('UID:kodit-2026-h2-apply@cs-flashcards', content)
         self.assertIn('DTSTART;VALUE=DATE:20260902', content)
-        self.assertIn('X-WR-CALNAME:2026 금융공기업 IT 채용 캘린더', content)
+        self.assertIn('X-WR-CALNAME:2026 금융권 IT 채용 캘린더', content)
         self.assertIn('api/calendar/recruitment.ics', content)
 
     def test_read_wiki_page_hydrates_recruitment_schedule_sections(self):
