@@ -497,7 +497,7 @@ button {
 
 .event-row-button {
   display: grid;
-  grid-template-columns: 138px minmax(0, 1fr) auto;
+  grid-template-columns: 28px minmax(0, 1fr);
   gap: 12px;
   align-items: center;
   width: 100%;
@@ -507,6 +507,37 @@ button {
   background: rgba(255, 255, 255, 0.82);
   color: var(--text);
   text-align: left;
+}
+
+.event-row-button__open {
+  display: grid;
+  grid-template-columns: 138px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.event-completion-toggle {
+  align-self: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid #94a3b8;
+  border-radius: 50%;
+  background: #fff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.event-completion-toggle.is-completed {
+  border-color: #15803d;
+  background: #15803d;
 }
 
 .event-row-button.is-completed {
@@ -554,7 +585,7 @@ button {
 }
 
 .event-row-button:hover,
-.event-row-button:focus-visible,
+.event-row-button:has(:focus-visible),
 .event-row-button.is-selected {
   border-color: var(--text);
   outline: none;
@@ -940,6 +971,10 @@ button {
   }
 
   .event-row-button {
+    grid-template-columns: 1fr;
+  }
+
+  .event-row-button__open {
     grid-template-columns: 1fr;
   }
 

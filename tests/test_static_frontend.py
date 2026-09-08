@@ -423,6 +423,9 @@ class StaticFrontendSmokeTests(unittest.TestCase):
         self.assertIn('function completionMark(event)', calendar_js())
         self.assertIn('eventContent(arg)', calendar_js())
         self.assertIn('event-completion-mark', calendar_js())
+        self.assertIn("const CALENDAR_COMPLETION_KEY = 'csFlashcardsCalendarCompletion:v1';", calendar_js())
+        self.assertIn('function toggleEventCompletion(eventId)', calendar_js())
+        self.assertIn('data-completion-event-id=', calendar_js())
 
     def test_embedded_question_bank_filters_expose_accessible_names(self):
         for snippet in [

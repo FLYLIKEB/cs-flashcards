@@ -1,4 +1,5 @@
 const CALENDAR_API_PATH = '/api/calendar/recruitment';
+const CALENDAR_COMPLETION_KEY = 'csFlashcardsCalendarCompletion:v1';
 const COMPACT_CALENDAR_MEDIA = '(max-width: 760px)';
 const EMPTY_SELECTION_TEXT = '달력이나 목록에서 일정을 누르면 상세와 공고 링크를 보여준다.';
 
@@ -211,6 +212,27 @@ function applyCalendarEventTone(info) {
 
 function completionMark(event) {
   return event.completed ? '<span class="event-completion-mark" aria-label="완료">✓</span>' : '';
+}
+
+function savedCompletion() {
+  try {
+    return JSON.parse(window.localStorage.getItem(CALENDAR_COMPLETION_KEY) || '{}');
+  } catch (_error) {
+    return {};
+  }
+}
+
+function toggleEventCompletion(eventId) {
+  const event = (calendarState.payload?.events || []).find((item) => item.id === eventId);
+  if (!event) return;
+  event.completed = !event.completed;
+  event.completed_label = event.completed ? '완료' : '';
+  window.localStorage.setItem(CALENDAR_COMPLETION_KEY, JSON.stringify({ ...savedCompletion(), [eventId]: event.completed }));
+  rerenderCalendar();
+}
+
+function completionToggle(event) {
+  return `<button class="event-completion-toggle${event.completed ? ' is-completed' : ''}" type="button" data-completion-event-id="${escapeHtml(event.id)}" aria-pressed="${event.completed}" aria-label="${escapeHtml(event.list_title || event.title)} ${event.completed ? '완료 해제' : '완료 표시'}">${event.completed ? '✓' : ''}</button>`;
 }
 
 function allInstitutions() {
@@ -501,20 +523,26 @@ function renderEventList(events = filteredEvents()) {
   container.innerHTML = `
     <div class="event-row-list">
       ${listEvents.map((event) => `
-        <button class="event-row-button${event.id === calendarState.selectedEventId ? ' is-selected' : ''}${event.completed ? ' is-completed' : ''}" type="button" data-event-id="${escapeHtml(event.id)}">
+        <div class="event-row-button${event.id === calendarState.selectedEventId ? ' is-selected' : ''}${event.completed ? ' is-completed' : ''}">
+          ${completionToggle(event)}
+          <button class="event-row-button__open" type="button" data-event-id="${escapeHtml(event.id)}">
           <span class="event-row-button__date">${escapeHtml(event.date_display)}</span>
           <span class="event-row-button__content">
             <strong>${completionMark(event)}${escapeHtml(event.list_title || event.title)}</strong>
             <span class="table-note">${escapeHtml(event.institution.short_name)} · ${escapeHtml(event.event_type_label)}${event.summary ? ` · ${escapeHtml(event.summary)}` : ''}</span>
           </span>
           <span class="event-row-button__status">${completionMark(event)}${escapeHtml(event.completed ? event.completed_label : event.status_label)}${!event.completed && event.is_approximate ? ' · 예정' : ''}</span>
-        </button>
+          </button>
+        </div>
       `).join('')}
     </div>
   `;
 
   container.querySelectorAll('[data-event-id]').forEach((element) => {
     element.addEventListener('click', () => selectEvent(element.dataset.eventId || '', { openDetail: true }));
+  });
+  container.querySelectorAll('[data-completion-event-id]').forEach((element) => {
+    element.addEventListener('click', () => toggleEventCompletion(element.dataset.completionEventId || ''));
   });
 }
 
@@ -769,6 +797,13 @@ async function loadCalendar() {
   if (!response.ok) throw new Error('캘린더 데이터를 불러오지 못했다.');
   calendarState.payload = await response.json();
   const payload = calendarState.payload;
+  const completion = savedCompletion();
+  payload.events.forEach((event) => {
+    if (typeof completion[event.id] === 'boolean') {
+      event.completed = completion[event.id];
+      event.completed_label = event.completed ? '완료' : '';
+    }
+  });
 
   calendarState.selectedInstitutions = new Set(allInstitutions());
   calendarState.selectedEventTypes = new Set(allEventTypes());
