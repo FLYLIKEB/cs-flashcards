@@ -1,0 +1,4 @@
+interface:
+  display_name: "기업 자기소개서 작성"
+  short_description: "통합 소재은행을 근거로 기업별 지원서 문항 작성 및 검증"
+  default_prompt: "Use $application-material-writer to draft and verify this company application from the project material bank."
