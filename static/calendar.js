@@ -612,7 +612,7 @@ function renderSelectedEvent(event) {
       </div>
       <div>
         <dt>완료 여부</dt>
-        <dd>${event.completed ? `✓ ${escapeHtml(event.completed_label)}` : '미완료'}</dd>
+        <dd>${completionToggle(event)} ${event.completed ? `✓ ${escapeHtml(event.completed_label)}` : '미완료'}</dd>
       </div>
     </dl>
     ${event.description ? `<p>${escapeHtml(event.description)}</p>` : ''}
@@ -622,6 +622,7 @@ function renderSelectedEvent(event) {
       <a href="${escapeHtml(event.google_calendar_url)}" target="_blank" rel="noopener noreferrer">Google Calendar에 추가</a>
     </div>
   `;
+  detail.querySelector('[data-completion-event-id]')?.addEventListener('click', () => toggleEventCompletion(event.id));
 }
 
 function syncSelectedEventCard() {

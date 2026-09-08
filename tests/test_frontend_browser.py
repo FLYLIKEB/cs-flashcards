@@ -4436,6 +4436,11 @@ class FrontendBrowserHarnessTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(case['drawer_hidden_after_open'])
             case['focused_after_open'] = await page.evaluate('document.activeElement && document.activeElement.id ? document.activeElement.id : ""')
             self.assertEqual(case['focused_after_open'], 'calendarDetailCloseBtn')
+            detail_toggle = '#selectedEventDetail [data-completion-event-id]'
+            detail_pressed_before = await page.Jeval(detail_toggle, '(node) => node.getAttribute("aria-pressed")')
+            await page.click(detail_toggle)
+            detail_pressed_after = await page.Jeval(detail_toggle, '(node) => node.getAttribute("aria-pressed")')
+            self.assertNotEqual(detail_pressed_after, detail_pressed_before)
             await page.keyboard.press('Escape')
             await page.waitForFunction("document.querySelector('#calendarDetailDrawer').hidden === true")
             await page.waitForFunction(
