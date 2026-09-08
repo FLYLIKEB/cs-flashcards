@@ -4796,11 +4796,8 @@ class RecruitmentCalendarTests(unittest.TestCase):
         self.assertGreater(payload['counts']['total_events'], 0)
         self.assertTrue(any(event['google_calendar_url'].startswith('https://calendar.google.com/calendar/render?') for event in payload['events']))
         self.assertTrue(any(event['url'].startswith('https://') for event in payload['events']))
-        self.assertTrue(any(event['institution']['name'] == '한국주택금융공사' for event in payload['events']))
+        self.assertFalse(any(event['institution']['id'] == 'hf' for event in payload['events']))
         self.assertFalse(any(event['institution']['id'] == 'bok' for event in payload['events']))
-        hf_apply = next(event for event in payload['events'] if event['id'] == 'hf-2026-apply')
-        self.assertTrue(hf_apply['completed'])
-        self.assertEqual(hf_apply['completed_label'], '완료')
         kodit_apply = next(event for event in payload['events'] if event['id'] == 'kodit-2026-h2-apply')
         self.assertEqual(kodit_apply['status'], 'open')
         self.assertEqual(kodit_apply['end_inclusive'], '2026-09-16')
@@ -4810,13 +4807,6 @@ class RecruitmentCalendarTests(unittest.TestCase):
         self.assertEqual(fss_apply['end'], '2026-09-07T12:00:00+09:00')
         koscom_apply = next(event for event in payload['events'] if event['id'] == 'koscom-2026-h2-apply')
         self.assertEqual(koscom_apply['end'], '2026-09-21T17:00:00+09:00')
-
-        hf_events = {event['id']: event for event in payload['events'] if event['institution']['id'] == 'hf'}
-        self.assertEqual(hf_events['hf-2026-apply']['start'], '2026-07-31T16:00:00+09:00')
-        self.assertEqual(hf_events['hf-2026-written-result']['start_inclusive'], '2026-09-30')
-        self.assertEqual(hf_events['hf-2026-personality']['end_inclusive'], '2026-10-06')
-        self.assertEqual(hf_events['hf-2026-interview-1-result']['start_inclusive'], '2026-10-29')
-        self.assertTrue(all('articleNo=600433' in event['url'] for event in hf_events.values()))
 
     def test_build_recruitment_calendar_ics_contains_expected_fields(self):
         content = flashcard_app.build_recruitment_calendar_ics(base_url='https://example.com')
@@ -4853,7 +4843,7 @@ class RecruitmentCalendarTests(unittest.TestCase):
                 page = flashcard_app.read_wiki_page('02-01-기본-전제와-일정', book)
             self.assertIn('/calendar', page['html'])
             self.assertIn('/api/calendar/recruitment.ics', page['html'])
-            self.assertIn('한국주택금융공사', page['html'])
+            self.assertIn('코스콤', page['html'])
             self.assertIn('Google Calendar', page['html'])
             self.assertIn('2026.08.01 현재 상태', page['html'])
 
