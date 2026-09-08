@@ -2,8 +2,8 @@
   "schema_version": 1,
   "title": "2026 금융공기업 IT 채용 캘린더",
   "timezone": "Asia/Seoul",
-  "last_updated": "2026-09-02",
-  "description": "2026년 금융공기업 IT 채용 일정의 공식 공고·예비공고·연간 채용계획 기준 데이터입니다. 2026년 9월 2일 기준으로 갱신했습니다.",
+  "last_updated": "2026-09-08",
+  "description": "2026년 금융공기업 IT 채용 일정의 공식 공고·예비공고·연간 채용계획 기준 데이터입니다. 2026년 9월 8일 기준으로 갱신했습니다.",
   "calendar_intro": "앱 내부 캘린더와 위키 일정 페이지는 이 데이터 파일을 기준으로 렌더링됩니다.",
   "calendar_notes": [
     "접수 종료된 상반기 공고는 달력에서 제외하되, 하반기 추적 대상 기관의 공고 확인 일정은 표시합니다.",
@@ -101,7 +101,7 @@
   "dashboard_open": [
     {
       "institution_id": "fss",
-      "status": "5급 신입 공고 접수 중",
+      "status": "5급 신입 공고 접수 마감·필기 예정",
       "schedule_summary": "IT 17명 등 총 95명 / 접수 08.19 15:00 ~ 09.07 12:00 / 1차 필기 09.12 / 2차 필기 10.17 / 면접 11~12월 / 최종합격 12월 말~2027년 1월 예정",
       "links": [
         {
@@ -113,7 +113,7 @@
           "url": "https://www.fss.or.kr/emp"
         }
       ],
-      "note": "2027년도 종합직원(5급) 공고. IT 17명, 총 95명 이내"
+      "note": "2027년도 종합직원(5급) 공고. 2026.09.07 12:00 접수 마감. IT 17명, 총 95명 이내"
     },
     {
       "institution_id": "hf",
@@ -182,6 +182,22 @@
         }
       ],
       "note": "2027년 5급 신입행원(일반) 공고. IT는 필기 IT 과목과 1차면접 코딩역량평가 포함"
+    },
+    {
+      "institution_id": "koscom",
+      "status": "하반기 신입 IT 공고 접수 중",
+      "schedule_summary": "IT 신입 00명 / 접수 09.07 ~ 09.21 17:00 / 서류발표 10.16 / 인성검사 10.16 ~ 10.24 / 온라인 전공필기 10.24 / 면접 11~12월 / 입사 2027.01.01 예정",
+      "links": [
+        {
+          "label": "공식 채용공고",
+          "url": "https://www.koscom.co.kr/portal/bbs/B0000015/view.do?menuNo=200386&nttId=30715"
+        },
+        {
+          "label": "입사지원",
+          "url": "https://koscom.applyin.co.kr"
+        }
+      ],
+      "note": "2026.09.07 공식 공고 기준. IT 분야는 소프트웨어 개발·운영, IT 인프라 구축·운영"
     }
   ],
   "dashboard_watch": [
@@ -216,21 +232,6 @@
       "note": "2026.09.02 공식 채용페이지에는 2026 상반기 신입직원 공고만 확인"
     },
     {
-      "institution_id": "koscom",
-      "status": "하반기 신입 IT 공고 미확인",
-      "links": [
-        {
-          "label": "채용안내",
-          "url": "https://koscom.co.kr/mobile/bbs/B0000015/list.do?menuNo=400073"
-        },
-        {
-          "label": "입사지원",
-          "url": "https://koscom.applyin.co.kr"
-        }
-      ],
-      "note": "2026.09.02 공식 목록에는 2026 제3차 기간제(06.26~07.12) 등 마감 공고만 확인"
-    },
-    {
       "institution_id": "kexim",
       "status": "하반기 채용계획만 공개",
       "links": [
@@ -249,23 +250,23 @@
   "priorities": [
     {
       "rank": 1,
-      "institution_id": "fss",
-      "reason": "IT 17명 포함 95명 공고가 9월 7일 12시에 가장 먼저 마감된다"
+      "institution_id": "kdic",
+      "reason": "디지털 2명 포함 신입 공고가 9월 11일 17시에 마감된다"
     },
     {
       "rank": 2,
-      "institution_id": "kdic",
-      "reason": "디지털 2명 포함 신입 공고가 진행 중이며 9월 11일 17시에 마감된다"
+      "institution_id": "kdb",
+      "reason": "IT 10명 포함 5급 신입행원 공고가 9월 14일 16시에 마감된다"
     },
     {
       "rank": 3,
-      "institution_id": "kdb",
-      "reason": "IT 10명 포함 5급 신입행원 공고가 9월 14일까지 진행된다"
+      "institution_id": "kodit",
+      "reason": "ICT·인공지능 포함 신입 공고가 9월 16일 16시에 마감된다"
     },
     {
       "rank": 4,
-      "institution_group": "신보·주금공·예탁원",
-      "reason": "신보는 9월 16일까지 접수하고 주금공·예탁원은 9월 후속 전형이 남아 있다"
+      "institution_id": "koscom",
+      "reason": "IT 신입 공고가 9월 21일 17시에 마감된다"
     }
   ],
   "events": [
@@ -275,7 +276,8 @@
       "title": "2027년도 금융감독원 종합직원(5급) 원서 접수",
       "summary": "금융감독원 5급 신입직원 95명 이내(IT 17명)",
       "event_type": "apply",
-      "status": "open",
+      "status": "closed",
+      "completed": true,
       "date_precision": "range",
       "start_date": "2026-08-19",
       "end_date": "2026-09-07",
@@ -842,6 +844,8 @@
       "date_precision": "range",
       "start_date": "2026-08-31",
       "end_date": "2026-09-14",
+      "start_time": "17:00",
+      "end_time": "16:00",
       "display_label": "원서 접수",
       "description": "한국산업은행·잡알리오 공고 기준. IT·AI 분야는 채용예정인원의 15배수 내외 서류 선발.",
       "url": "https://job.alio.go.kr/mobile2021/recruit/recruitView.do?idx=304398",
@@ -953,19 +957,81 @@
       "source_label": "잡알리오 공고"
     },
     {
-      "id": "koscom-2026-h2-check",
+      "id": "koscom-2026-h2-apply",
       "institution_id": "koscom",
-      "title": "코스콤 2026년 하반기 신입 IT 공고 확인",
-      "summary": "코스콤 공식 채용목록 기준 하반기 신입 공고 미게시",
-      "event_type": "plan",
-      "status": "planned",
-      "date_precision": "month",
-      "start_date": "2026-09-01",
-      "end_date": "2026-09-30",
-      "display_label": "공고 확인",
-      "description": "2026.09.02 공식 채용목록에는 상반기 신입 및 기간제 마감 공고만 확인됩니다. 하반기 공고 게시 여부를 계속 확인합니다.",
-      "url": "https://www.koscom.co.kr/portal/bbs/B0000015/list.do",
-      "source_label": "공식 채용목록 점검"
+      "title": "코스콤 2026년 하반기 신입직원 원서 접수",
+      "summary": "코스콤 IT 분야 신입직원 00명",
+      "event_type": "apply",
+      "status": "open",
+      "date_precision": "range",
+      "start_date": "2026-09-07",
+      "end_date": "2026-09-21",
+      "start_time": "09:00",
+      "end_time": "17:00",
+      "display_label": "원서 접수",
+      "description": "2026.09.21 17:00 마감. 코스콤 채용 홈페이지 온라인 접수.",
+      "url": "https://www.koscom.co.kr/portal/bbs/B0000015/view.do?menuNo=200386&nttId=30715",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "koscom-2026-h2-doc",
+      "institution_id": "koscom",
+      "title": "코스콤 2026년 하반기 신입직원 서류전형 합격 발표",
+      "summary": "코스콤 IT 분야 신입직원 채용",
+      "event_type": "result",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-10-16",
+      "end_date": "2026-10-16",
+      "display_label": "서류발표",
+      "description": "공식 채용공고 기준.",
+      "url": "https://www.koscom.co.kr/portal/bbs/B0000015/view.do?menuNo=200386&nttId=30715",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "koscom-2026-h2-personality",
+      "institution_id": "koscom",
+      "title": "코스콤 2026년 하반기 신입직원 온라인 인성검사",
+      "summary": "코스콤 IT 분야 신입직원 채용",
+      "event_type": "personality",
+      "status": "scheduled",
+      "date_precision": "range",
+      "start_date": "2026-10-16",
+      "end_date": "2026-10-24",
+      "display_label": "온라인 인성검사",
+      "description": "공식 채용공고 기준.",
+      "url": "https://www.koscom.co.kr/portal/bbs/B0000015/view.do?menuNo=200386&nttId=30715",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "koscom-2026-h2-written",
+      "institution_id": "koscom",
+      "title": "코스콤 2026년 하반기 신입직원 온라인 전공필기",
+      "summary": "코스콤 IT 분야 신입직원 채용",
+      "event_type": "exam",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2026-10-24",
+      "end_date": "2026-10-24",
+      "display_label": "온라인 전공필기",
+      "description": "IT 분야 출제범위: 컴퓨터공학 전공지식(운영체제, 자료구조, 데이터베이스, 소프트웨어공학, 데이터통신, 네트워크, 알고리즘, 코딩, SQL).",
+      "url": "https://www.koscom.co.kr/portal/bbs/B0000015/view.do?menuNo=200386&nttId=30715",
+      "source_label": "공식 채용공고"
+    },
+    {
+      "id": "koscom-2026-h2-onboarding",
+      "institution_id": "koscom",
+      "title": "코스콤 2026년 하반기 신입직원 입사 예정일",
+      "summary": "코스콤 IT 분야 신입직원 채용",
+      "event_type": "onboarding",
+      "status": "scheduled",
+      "date_precision": "day",
+      "start_date": "2027-01-01",
+      "end_date": "2027-01-01",
+      "display_label": "입사 예정",
+      "description": "공식 채용공고 기준.",
+      "url": "https://www.koscom.co.kr/portal/bbs/B0000015/view.do?menuNo=200386&nttId=30715",
+      "source_label": "공식 채용공고"
     },
     {
       "id": "kexim-2026-h2-window",
