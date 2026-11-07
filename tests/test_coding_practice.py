@@ -79,7 +79,25 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
     async def state(self):
         return await self.page.evaluate('(key) => JSON.parse(localStorage.getItem(key))', KEY)
 
+    async def step(self, index):
+        await self.page.click(f'[data-step="{index}"]')
+        await self.page.waitForFunction(
+            '(index) => !document.querySelector(["#readPanel", "#writePanel", "#reviewPanel"][index]).hidden', {}, index,
+        )
+
+    async def open_details(self, selector):
+        if not await self.page.Jeval(selector, '(el) => el.open'):
+            await self.page.click(selector + ' > summary')
+
+    async def choose_problem(self, problem_id):
+        await self.open_details('#curriculum')
+        await self.page.click(f'#problems button:nth-child({problem_id})')
+
     async def fill(self, selector, value):
+        if selector == '#code':
+            await self.step(1)
+        elif selector == '#notes':
+            await self.step(2)
         await self.page.evaluate('''(selector, value) => {
             const input = document.querySelector(selector);
             input.value = value;
@@ -97,23 +115,29 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('return values', await self.page.Jeval('#code', '(el) => el.value'))
         self.assertEqual((await self.state())['records']['1']['started'], initial)
         self.assertEqual(await self.page.Jeval('#timerToggle', '(el) => el.textContent'), '일시정지')
+        await self.step(1)
         await self.page.setViewport({'width': 1440, 'height': 1100})
-        await self.page.screenshot({'path': '/tmp/coding48-java-desktop.png', 'fullPage': True})
+        await self.page.screenshot({'path': '/tmp/coding48-focus-desktop.png', 'fullPage': True})
         await self.page.setViewport({'width': 390, 'height': 844})
+        await self.page.screenshot({'path': '/tmp/coding48-focus-mobile.png', 'fullPage': True})
         self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), await self.page.evaluate("() => Array.from(document.querySelectorAll('body *')).filter(el => el.getBoundingClientRect().right > innerWidth).map(el => [el.tagName, el.id, el.className, el.getBoundingClientRect().right]).slice(0,20)"))
 
     async def test_hint_restart_completion_and_day_filters(self):
+        await self.step(1)
         await self.page.click('#hint')
         self.assertEqual((await self.state())['records']['1']['status'], 'review')
+        await self.step(2)
         await self.page.click('[data-verdict="solved"]')
         self.assertIn('체크리스트', await self.page.Jeval('#result', '(el) => el.textContent'))
         await self.page.click('#restart')
         await self.page.waitForFunction("document.querySelector('#hint').textContent.includes('(0/3)')")
+        await self.step(2)
         for checkbox in await self.page.JJ('#checks input'):
             await checkbox.click()
         await self.page.click('[data-verdict="solved"]')
         self.assertEqual((await self.state())['records']['1']['status'], 'solved')
         self.assertEqual(await self.page.Jeval('#completed', '(el) => el.textContent'), '1 / 30')
+        await self.open_details('#curriculum')
         for day in ('1', '2'):
             await self.page.click(f'[data-filter="{day}"]')
             self.assertEqual(len(await self.page.JJ('#problems button')), 15)
@@ -121,6 +145,7 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(await self.page.JJ('#problems button')), 0)
 
     async def test_answer_marks_review_and_due_review_is_recommended(self):
+        await self.step(1)
         await self.page.click('#answer summary')
         await self.page.waitForFunction("JSON.parse(localStorage.getItem('csCoding48:java:v1'))?.records?.['1']?.answer")
         self.assertEqual((await self.state())['records']['1']['status'], 'review')
@@ -131,9 +156,101 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         }''', KEY)
         await self.page.reload()
         await self.ready()
-        await self.page.click('#problems button:nth-child(2)')
+        await self.choose_problem(2)
+        await self.open_details('#curriculum')
         await self.page.click('#recommend')
         self.assertTrue((await self.page.Jeval('#title', '(el) => el.textContent')).startswith('01.'))
+        self.assertEqual(await self.page.evaluate('document.activeElement.id'), 'stepPrompt')
+        self.assertFalse(await self.page.Jeval('#curriculum', '(el) => el.open'))
+
+    async def test_focus_starts_with_one_step_and_preserves_return_context(self):
+        self.assertEqual(await self.page.Jeval('#timer', '(el) => el.getAttribute("role")'), 'timer')
+        self.assertEqual(await self.page.Jeval('#timer', '(el) => el.getAttribute("aria-live")'), 'off')
+        self.assertTrue(await self.page.Jeval('#writePanel', '(el) => el.getClientRects().length === 0'))
+        self.assertTrue(await self.page.Jeval('#reviewPanel', '(el) => el.getClientRects().length === 0'))
+        self.assertFalse(await self.page.Jeval('#curriculum', '(el) => el.open'))
+        self.assertFalse(await self.page.Jeval('#readPanel', '(el) => el.hidden'))
+        self.assertTrue(await self.page.Jeval('#writePanel', '(el) => el.hidden'))
+        self.assertTrue(await self.page.Jeval('#reviewPanel', '(el) => el.hidden'))
+        self.assertIsNone((await self.state())['records']['1']['started'])
+        await self.page.click('#stageNext')
+        self.assertFalse(await self.page.Jeval('#writePanel', '(el) => el.hidden'))
+        await self.fill('#nextAction', '중복 요청을 건너뛰는 조건부터 작성')
+        await self.page.reload()
+        await self.ready()
+        self.assertFalse(await self.page.Jeval('#writePanel', '(el) => el.hidden'))
+        self.assertEqual(await self.page.Jeval('#nextAction', '(el) => el.value'), '중복 요청을 건너뛰는 조건부터 작성')
+        await self.open_details('#reference')
+        self.assertIn('String[]', await self.page.Jeval('#reference', '(el) => el.textContent'))
+        await self.page.click('#stageNext')
+        self.assertFalse(await self.page.Jeval('#reviewPanel', '(el) => el.hidden'))
+        self.assertEqual((await self.state())['records']['1']['step'], 2)
+
+    async def test_break_pauses_and_resumes_same_draft_without_auto_start(self):
+        await self.fill('#code', 'class Solution { /* 이어서 작성 */ }')
+        await self.fill('#nextAction', 'HashSet 선언 다음부터')
+        await self.page.click('#timerToggle')
+        self.assertIsNotNone((await self.state())['records']['1']['started'])
+        await self.page.click('#breakButton')
+        self.assertTrue((await self.state())['focus']['onBreak'])
+        self.assertIsNone((await self.state())['records']['1']['started'])
+        self.assertTrue(await self.page.Jeval('#workArea', '(el) => el.hidden'))
+        self.assertFalse(await self.page.Jeval('#breakPanel', '(el) => el.hidden'))
+        self.assertIn('HashSet 선언 다음부터', await self.page.Jeval('#returnNote', '(el) => el.textContent'))
+        await self.page.reload()
+        await self.ready()
+        self.assertFalse(await self.page.Jeval('#breakPanel', '(el) => el.hidden'))
+        self.assertIsNone((await self.state())['records']['1']['started'])
+        await self.page.click('#resumeButton')
+        self.assertFalse((await self.state())['focus']['onBreak'])
+        self.assertFalse(await self.page.Jeval('#writePanel', '(el) => el.hidden'))
+        self.assertIn('이어서 작성', await self.page.Jeval('#code', '(el) => el.value'))
+        self.assertIsNone((await self.state())['records']['1']['started'])
+
+    async def test_session_controls_hide_clock_and_expire_without_losing_work(self):
+        await self.open_details('#sessionSettings')
+        await self.page.select('#sessionMinutes', '5')
+        await self.page.click('#hideTimer')
+        self.assertTrue(await self.page.Jeval('#timer', '(el) => el.hidden'))
+        self.assertEqual((await self.state())['focus']['minutes'], 5)
+        self.assertTrue((await self.state())['focus']['hideTimer'])
+        await self.fill('#code', 'class Solution { /* timeout must preserve */ }')
+        await self.page.evaluate("""key => {
+            const state = JSON.parse(localStorage.getItem(key));
+            state.records['1'].elapsed = 299;
+            state.records['1'].started = Date.now() - 2000;
+            localStorage.setItem(key, JSON.stringify(state));
+        }""", KEY)
+        await self.page.reload()
+        await self.ready()
+        await self.page.waitForFunction("JSON.parse(localStorage.getItem('csCoding48:java:v1')).records['1'].started === null")
+        self.assertTrue(await self.page.Jeval('#timer', '(el) => el.hidden'))
+        self.assertIn('timeout must preserve', await self.page.Jeval('#code', '(el) => el.value'))
+        self.assertFalse(await self.page.Jeval('#writePanel', '(el) => el.hidden'))
+        self.assertTrue(await self.page.Jeval('#sessionStatus', '(el) => el.textContent.trim().length > 0'))
+        await self.page.click('#timerToggle')
+        renewed = (await self.state())['records']['1']
+        self.assertIsNotNone(renewed['started'])
+        self.assertLess(renewed['elapsed'], 2)
+        await self.page.click('#timerToggle')
+        self.assertIsNone((await self.state())['records']['1']['started'])
+
+    async def test_invalid_focus_import_preserves_existing_record(self):
+        await self.fill('#nextAction', '이 기록을 유지')
+        before = await self.state()
+        with tempfile.TemporaryDirectory() as directory:
+            for focus in ({'minutes': -5, 'hideTimer': False, 'onBreak': False},
+                          {'minutes': 10, 'hideTimer': 'yes', 'onBreak': False},
+                          {'minutes': 10, 'hideTimer': False, 'onBreak': 'yes'}):
+                with self.subTest(focus=focus):
+                    invalid = deepcopy(before)
+                    invalid['focus'] = focus
+                    path = Path(directory) / 'invalid-focus.json'
+                    path.write_text(json.dumps(invalid))
+                    await self.page.evaluate("document.querySelector('#notice').textContent = ''")
+                    await (await self.page.J('#import')).uploadFile(str(path))
+                    await self.page.waitForFunction("document.querySelector('#notice').textContent.includes('복원 실패')")
+                    self.assertEqual(await self.state(), before)
 
     async def capture_downloads(self):
         await self.page.evaluate("""() => {
@@ -161,7 +278,7 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         total = 0
         for p in problems:
             with self.subTest(problem=p['id']):
-                await self.page.click(f"#problems button:nth-child({p['id']})")
+                await self.choose_problem(p['id'])
                 self.assertEqual(await self.page.Jeval('#code', '(el) => el.value'), p['java']['starter'])
                 await self.fill('#code', p['java']['solution'])
                 await self.page.click('#download')
@@ -189,7 +306,7 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.capture_downloads()
         for problem_id, extra_case in cases.items():
             with self.subTest(problem=problem_id):
-                await self.page.click(f"#problems button:nth-child({problem_id})")
+                await self.choose_problem(problem_id)
                 await self.fill('#code', problems[problem_id - 1]['java']['solution'])
                 await self.page.click('#download')
                 source = await self.page.evaluate('window.downloadedBlob.text()')
@@ -233,6 +350,7 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.Jeval('#legacyCode', '(el) => el.textContent'), legacy_record['code'])
         await self.fill('#notes', 'Java 메모')
         await self.capture_downloads()
+        await self.open_details('.backup-menu')
         await self.page.click('#export')
         backup_text = await self.page.evaluate('window.downloadedBlob.text()')
         backup = json.loads(backup_text)

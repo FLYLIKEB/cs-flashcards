@@ -10,11 +10,15 @@
     return Object.entries(value.records).every(([id, r]) => /^[1-9]\d?$/.test(id) && Number(id) <= 30 && r && typeof r === 'object' &&
       typeof r.code === 'string' && typeof r.notes === 'string' && Array.isArray(r.checks) && r.checks.length === 4 && r.checks.every(v => typeof v === 'boolean') &&
       Number.isFinite(r.elapsed) && r.elapsed >= 0 && Number.isInteger(r.hints) && r.hints >= 0 && r.hints <= 3 && typeof r.answer === 'boolean' &&
-      ['', 'solved', 'review', 'stuck'].includes(r.status) && Number.isFinite(r.due) && (r.started === null || (Number.isFinite(r.started) && r.started > 0)));
+      ['', 'solved', 'review', 'stuck'].includes(r.status) && Number.isFinite(r.due) && (r.started === null || (Number.isFinite(r.started) && r.started > 0)) &&
+      (r.step === undefined || [0,1,2].includes(r.step)) &&
+      (r.nextAction === undefined || (typeof r.nextAction === 'string' && r.nextAction.length <= 500)));
   }
   function validState(value) {
     return validRecords(value) && (value.language === undefined || value.language === 'java') &&
-      (value.pythonRecords === undefined || validRecords({records: value.pythonRecords}));
+      (value.pythonRecords === undefined || validRecords({records: value.pythonRecords})) &&
+      (value.focus === undefined || (value.focus && [5,10,15].includes(value.focus.minutes) &&
+        typeof value.focus.hideTimer === 'boolean' && typeof value.focus.onBreak === 'boolean'));
   }
   function javaState(value) {
     if (value.language === 'java') return value;
@@ -32,18 +36,57 @@
   function problem() { return problems.find(p => p.id === current); }
   function starter(p) { return p.java.starter; }
   function record() {
-    if (!state.records[current]) state.records[current] = {code: starter(problem()), notes: state.pythonRecords?.[current]?.notes || '', checks: [false,false,false,false], elapsed: 0, started: null, hints: 0, answer: false, status: '', due: 0};
-    return state.records[current];
+    if (!state.records[current]) state.records[current] = {code: starter(problem()), notes: state.pythonRecords?.[current]?.notes || '', checks: [false,false,false,false], elapsed: 0, started: null, hints: 0, answer: false, status: '', due: 0, step: 0, nextAction: ''};
+    const r = state.records[current];
+    r.step ??= 0; r.nextAction ??= '';
+    return r;
   }
   function elapsed(r) { return r.elapsed + (r.started ? Math.max(0, Date.now() - r.started) / 1000 : 0); }
   function pause() { const r = record(); r.elapsed = elapsed(r); r.started = null; save(); }
+  const prompts = [
+    '입력과 출력을 한 문장으로 말해 보세요. 지금은 읽기만 하면 됩니다.',
+    '가장 단순한 풀이부터 한 줄씩. 막히면 힌트를 하나만 열어보세요.',
+    '테스트를 실행하고, 왜 이 방법을 골랐는지 한 문장으로 설명해 보세요.'
+  ];
+  function focusSettings() {
+    state.focus ??= {minutes: 10, hideTimer: false, onBreak: false};
+    return state.focus;
+  }
+  function renderFocus() {
+    const r = record(), settings = focusSettings();
+    $('sessionMinutes').value = String(settings.minutes);
+    $('hideTimer').checked = settings.hideTimer;
+    $('timer').hidden = settings.hideTimer;
+    $('breakPanel').hidden = !settings.onBreak;
+    $('workArea').hidden = settings.onBreak;
+    $('breakButton').disabled = settings.onBreak;
+    $('timerToggle').disabled = settings.onBreak;
+    $('sessionMinutes').disabled = settings.onBreak;
+    $('restart').disabled = settings.onBreak;
+    $('returnNote').textContent = r.nextAction || prompts[r.step];
+    $('nextAction').value = r.nextAction;
+    document.querySelectorAll('[data-step]').forEach(button => {
+      if (Number(button.dataset.step) === r.step) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+    ['readPanel','writePanel','reviewPanel'].forEach((id, step) => { $(id).hidden = step !== r.step; });
+    $('stepPrompt').textContent = prompts[r.step];
+    $('stageNext').hidden = r.step === 2;
+    $('stageNext').textContent = r.step === 0 ? '이해했어요 → 코드 쓰기' : '작성했어요 → 확인 · 설명';
+    $('nextProblem').hidden = !r.status;
+  }
+  function changeStep(step) {
+    record().step = step; save(); renderFocus(); $('stepPrompt').focus();
+  }
   function updateClock() {
     if (!problems.length) return;
-    const r = record(), left = Math.max(0, Math.ceil(problem().minutes * 60 - elapsed(r)));
+    const r = record(), left = Math.max(0, Math.ceil(focusSettings().minutes * 60 - elapsed(r)));
     $('timer').textContent = `${String(Math.floor(left / 60)).padStart(2,'0')}:${String(left % 60).padStart(2,'0')}`;
-    $('timer').classList.toggle('expired', left === 0);
-    $('timerToggle').textContent = r.started ? '일시정지' : '시작';
-    if (left === 0 && r.started) { pause(); $('timerToggle').textContent = '시작'; $('result').textContent = '제한시간 종료. 접근을 설명하고, 막혔다면 해설 학습 후 빈 코드로 재도전하세요.'; }
+    $('timerToggle').textContent = r.started ? '일시정지' : left === 0 ? '한 번 더 시작' : '시작';
+    if (left === 0 && r.started) {
+      pause(); $('timerToggle').textContent = '한 번 더 시작';
+      $('sessionStatus').textContent = '한 구간을 마쳤어요. 잠깐 쉬거나, 그대로 이어가도 괜찮아요.';
+    }
   }
   function list() {
     const done = problems.filter(p => state.records[p.id]?.status === 'solved').length;
@@ -63,12 +106,12 @@
   }
   function select(id) {
     if (problems.length && state.records[current]) pause();
-    current = id; state.current = id; render(); save();
+    current = id; state.current = id; focusSettings().onBreak = false; $('curriculum').open = false; $('sessionStatus').textContent = '타이머 없이 시작해도 괜찮아요.'; render(); save(); $('stepPrompt').focus();
   }
   function render() {
     const p = problem(), r = record();
     $('exercise').hidden = false;
-    $('meta').textContent = `DAY ${p.day} / ${p.topic} / ${p.difficulty} / ${p.minutes}분`;
+    $('meta').textContent = `DAY ${p.day} / ${p.topic} / ${p.difficulty} / 권장 풀이 ${p.minutes}분`;
     $('title').textContent = `${String(p.id).padStart(2,'0')}. ${p.title}`;
     $('statement').textContent = p.statement;
     $('examples').replaceChildren();
@@ -77,6 +120,8 @@
       const pre = document.createElement('pre'); pre.textContent = `예제 ${i+1}\n입력: ${example.input}\n출력: ${example.output}`;
       const note = document.createElement('p'); note.textContent = example.explanation; div.append(pre,note); $('examples').append(div);
     });
+    $('referenceStatement').textContent = p.statement;
+    $('referenceExamples').replaceChildren(...Array.from($('examples').children, el => el.cloneNode(true)));
     $('code').value = r.code; $('notes').value = r.notes;
     $('tests').textContent = p.java.testCode;
     const legacy = state.pythonRecords?.[current];
@@ -85,14 +130,14 @@
     $('legacyMeta').textContent = legacy ? `이전 상태: ${{solved:'완료',review:'복습 필요',stuck:'미해결'}[legacy.status] || '미완료'} · 메모: ${legacy.notes || '없음'}` : '';
     $('hints').replaceChildren();
     p.hints.slice(0,r.hints).forEach((hint,i) => { const text = document.createElement('p'); text.textContent = `${i+1}. ${hint}`; $('hints').append(text); });
-    $('hint').textContent = `다음 힌트 보기 (${r.hints}/3)`; $('hint').disabled = r.hints >= 3;
+    $('hint').textContent = `막혔어요 · 힌트 하나 보기 (${r.hints}/3)`; $('hint').disabled = r.hints >= 3;
     $('answer').open = r.answer;
     $('approach').textContent = p.approach; $('complexity').textContent = p.complexity; $('solution').textContent = p.java.solution;
     $('pitfalls').textContent = `주의: ${p.pitfalls.join(' · ')}`; $('explain').textContent = p.explainPrompt;
     $('checks').replaceChildren();
     checklist.forEach((text,i) => { const label = document.createElement('label'), input = document.createElement('input'); input.type = 'checkbox'; input.checked = r.checks[i]; input.onchange = () => { record().checks[i] = input.checked; save(); }; label.append(input,document.createTextNode(text)); $('checks').append(label); });
     $('result').textContent = r.status ? `현재 기록: ${{solved:'독립 풀이 완료',review:'복습 필요',stuck:'미해결'}[r.status]}${r.due ? ' · 복습 예정 ' + new Date(r.due).toLocaleString('ko-KR') : ''}` : '';
-    list(); updateClock();
+    list(); renderFocus(); updateClock();
   }
   function download(name, text, type) {
     const url = window.URL.createObjectURL(new window.Blob([text], {type}));
@@ -101,12 +146,35 @@
   $('code').oninput = () => { record().code = $('code').value; save(); };
   $('code').onkeydown = event => { if (event.key === 'Tab') { event.preventDefault(); const el = $('code'), start = el.selectionStart, end = el.selectionEnd; el.setRangeText('    ',start,end,'end'); el.dispatchEvent(new window.Event('input')); } };
   $('notes').oninput = () => { record().notes = $('notes').value; save(); };
-  $('timerToggle').onclick = () => { const r = record(); if (r.started) pause(); else { r.started = Date.now(); save(); } updateClock(); };
+  $('timerToggle').onclick = () => {
+    const r = record();
+    if (r.started) { pause(); $('sessionStatus').textContent = '멈춰뒀어요. 준비되면 다시 시작하세요.'; }
+    else {
+      if (elapsed(r) >= focusSettings().minutes * 60) r.elapsed = 0;
+      r.started = Date.now(); save(); $('sessionStatus').textContent = '지금 단계만 천천히 해보세요.';
+    }
+    updateClock();
+  };
+  document.querySelectorAll('[data-step]').forEach(button => { button.onclick = () => changeStep(Number(button.dataset.step)); });
+  $('stageNext').onclick = () => changeStep(Math.min(2, record().step + 1));
+  $('nextAction').oninput = () => { record().nextAction = $('nextAction').value; save(); };
+  $('sessionMinutes').onchange = () => {
+    pause(); focusSettings().minutes = Number($('sessionMinutes').value); record().elapsed = 0;
+    save(); updateClock(); $('sessionStatus').textContent = '시간을 바꿨어요. 준비되면 시작하세요.';
+  };
+  $('hideTimer').onchange = () => { focusSettings().hideTimer = $('hideTimer').checked; save(); renderFocus(); };
+  $('breakButton').onclick = () => {
+    pause(); focusSettings().onBreak = true; save(); renderFocus(); updateClock(); $('breakTitle').focus();
+  };
+  $('resumeButton').onclick = () => {
+    focusSettings().onBreak = false; save(); renderFocus();
+    $('sessionStatus').textContent = '돌아왔어요. 타이머는 멈춘 상태예요.'; $('stepPrompt').focus();
+  };
   $('hint').onclick = () => { const r = record(); r.hints = Math.min(3,r.hints+1); r.status = 'review'; r.due = Date.now()+1800000; save(); render(); };
   $('answer').ontoggle = () => { if ($('answer').open && !record().answer) { const r = record(); r.answer = true; r.status = 'review'; r.due = Date.now()+1800000; save(); list(); } };
   $('restart').onclick = () => {
     if (!window.confirm('현재 코드를 비우고 타이머·힌트를 초기화합니다. 오답 메모는 유지합니다. 재풀이할까요?')) return;
-    const r = record(); r.code = starter(problem()); r.elapsed = 0; r.started = null; r.hints = 0; r.answer = false; r.checks = [false,false,false,false]; r.status = 'review'; r.due = Date.now(); save(); render();
+    const r = record(); r.code = starter(problem()); r.elapsed = 0; r.started = null; r.hints = 0; r.answer = false; r.checks = [false,false,false,false]; r.status = 'review'; r.due = Date.now(); r.step = 1; save(); render();
   };
   document.querySelectorAll('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; document.querySelectorAll('[data-filter]').forEach(el => el.setAttribute('aria-pressed',String(el === b))); list(); });
   document.querySelectorAll('[data-verdict]').forEach(b => b.onclick = () => {
@@ -120,6 +188,7 @@
     const next = due || problems.find(p => !state.records[p.id]?.status) || problems.find(p => state.records[p.id]?.status !== 'solved');
     if (next) { select(next.id); $('exercise').scrollIntoView({block:'start'}); } else $('notice').textContent = '30문제 독립 풀이 완료! 시험 전에는 취약했던 문제의 접근법과 경계값을 말로 복기하세요.';
   };
+  $('nextProblem').onclick = () => $('recommend').click();
   $('export').onclick = () => {
     const snapshot = JSON.parse(JSON.stringify(state));
     Object.values(snapshot.records).forEach(r => { r.elapsed = elapsed(r); r.started = null; });
@@ -169,6 +238,7 @@ ${problem().java.testCode}
   fetch('/static/coding-problems.json').then(response => { if (!response.ok) throw new Error('load'); return response.json(); }).then(data => {
     if (!Array.isArray(data) || data.length !== 30 || data.some(p => !p.java?.starter || !p.java?.solution || !p.java?.testCode)) throw new Error('data'); problems = data;
     current = problems.some(p => p.id === state.current) ? state.current : 1;
+    if (focusSettings().onBreak) pause();
     render(); save(); $('restore').disabled = false; window.setInterval(updateClock,1000);
   }).catch(() => { $('notice').textContent = '문제를 불러오지 못했습니다. 연결을 확인하고 새로고침하세요.'; });
 })();
