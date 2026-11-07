@@ -248,3 +248,9 @@ input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); fle
 
 .lesson-stage.is-intro .motion-canvas text { font-size: 24px; font-weight: 500; }
 .lesson-view:has(.is-intro) .lesson-player { width: 100%; max-width: 780px; margin-inline: auto; }
+
+.ambience-options { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 14px; }
+.ambience-options label { display: flex; align-items: center; gap: 8px; }
+#ambienceVolume { width: 160px; min-height: 32px; accent-color: var(--blue); }
+.ambience-options p { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 12px; }
+#ambienceStatus:empty { display: none; }

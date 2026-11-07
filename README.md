@@ -376,3 +376,5 @@ SQL
 AI 음원 가져오기 도구는 `scripts/import_coding_ai_audio.py`, `scripts/import_coding_eleven_lesson.py`, `scripts/import_coding_clova_zip.py`입니다. 기본값은 검증만 수행하며 `--apply`로 반영합니다. ElevenLabs는 원문과 일치하는 생성 기록의 문자 시작 시각을, CLOVA Dubbing은 문장별 MP3의 실제 PCM 길이를 사용해 표시용 자막을 연결합니다. 생성 기록과 다운로드 ZIP은 저장소에 포함하지 않습니다.
 
 문제 소개 원고는 `static/coding-intros.json`입니다. `.venv/bin/python scripts/prepend_coding_intros.py`로 대상 확인 후 `--apply`로 음원·자막·애니메이션 연결을 함께 반영합니다. 이미 같은 소개가 있으면 다시 붙이지 않습니다.
+
+강의를 재생하면 낮은 브라운 노이즈 배경음이 기본 16%로 함께 재생됩니다. **재생 설정 → 잔잔한 배경음**에서 끄거나 크기를 조절할 수 있으며 설정은 기기에 저장됩니다. 강의 정지·버퍼링·탭 전환 때 함께 멈추며, 새로고침만으로 자동재생하지 않습니다. 외부 서비스 없이 직접 만든 29초 반복 음원이며 `scripts/render_coding_ambience.py`로 재생성할 수 있습니다.
