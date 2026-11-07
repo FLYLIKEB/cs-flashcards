@@ -19,13 +19,13 @@
     $('lessonSeek').disabled = !sound || !audio.readyState;
     $('lessonSeek').setAttribute('aria-valuetext', `${clock(time)} / ${clock(duration)}`);
     $('lessonClock').textContent = `${clock(time)} / ${clock(duration)}`;
-    let cueIndex = 0;
+    let cueIndex = 0, cueStart = 0, cueEnd = duration;
     let text = scene?.narration || '';
     if (Array.isArray(cues) && cues.length) {
       const time = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
       const cue = cues.find(item => time >= item.start && time < item.end) ||
         (time >= cues[cues.length - 1].end ? cues[cues.length - 1] : cues[0]);
-      text = cue.text; cueIndex = cues.indexOf(cue);
+      text = cue.text; cueIndex = cues.indexOf(cue); cueStart = cue.start; cueEnd = cue.end;
     }
     window.CodingCode.update(sceneIndex, cueIndex);
     const introducing = !!cues?.length && cueIndex < (scene?.introCueCount || 0);
@@ -35,7 +35,9 @@
     const provider = !introducing && sound?.provenance?.provider;
     $('lessonVoiceCredit').textContent = provider === 'clova' ? 'AI 음성 · CLOVA Dubbing' : provider === 'elevenlabs' ? 'AI 음성 · ElevenLabs' : '';
     $('lessonVoiceCredit').hidden = !['clova', 'elevenlabs'].includes(provider);
-    if ($('lessonSubtitle').textContent !== text) $('lessonSubtitle').textContent = text;
+    window.CodingTypewriter.render($('lessonSubtitle'), text, time, cueStart, cueEnd);
+    const note = $('lessonCodeNote');
+    if (!introducing && note.textContent) window.CodingTypewriter.render(note, note.textContent, time, cueStart, cueEnd);
     $('lessonSubtitleBox').hidden = !subtitlesEnabled || !scene || !sound;
     $('lessonCaption').hidden = introducing || (subtitlesEnabled && !!scene && !!sound);
     $('lessonSubtitles').setAttribute('aria-pressed', String(subtitlesEnabled));

@@ -91,7 +91,9 @@ class MotionDataTests(unittest.TestCase):
 
 class MotionHandler(LessonHandler):
     def do_GET(self):
-        if getattr(self.server, 'motion_unavailable', False) and self.path.startswith('/static/coding-motion-'):
+        if (getattr(self.server, 'motion_unavailable', False)
+                and self.path.startswith('/static/coding-motion-')
+                and self.path.split('?', 1)[0].endswith('.json')):
             self.send_error(503)
             return
         super().do_GET()
@@ -153,7 +155,11 @@ class MotionBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.ready()
 
     async def moving_scene(self):
-        lesson = json.loads((ROOT / 'static/coding-motion-01-15.json').read_text())[0]
+        authored = json.loads((ROOT / 'static/coding-motion-01-15.json').read_text())[0]
+        # Runtime coordinates come from shared layout; source x/y are authoring hints.
+        lesson = await self.page.evaluate('''lesson => ({...lesson,
+            scenes: lesson.scenes.map(scene => window.CodingMotionLayout.prepare(scene))
+        })''', authored)
         for scene_index, scene in enumerate(lesson['scenes']):
             for index, frame in enumerate(scene['frames'][1:], 1):
                 old = {n['id']: n for n in scene['frames'][index - 1]['nodes']}
@@ -217,7 +223,7 @@ class MotionBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.Jeval('#lessonSubtitle', 'el => el.textContent'), cue['text'])
 
     async def test_stack_graph_grid_and_cache_fit_mobile_and_desktop(self):
-        for problem_id in (9, 13, 24, 26, 30):
+        for problem_id in (9, 10, 13, 15, 24, 26, 30):
             await self.select_problem(problem_id)
             for name, width, height in [('desktop', 1440, 900), ('mobile', 390, 844)]:
                 await self.page.setViewport({'width': width, 'height': height})

@@ -7,7 +7,13 @@
   let story = null, clip = null, svg, nodesLayer, edgesLayer, request = 0;
   const elements = new Map();
   let onTick = () => {};
-  const colors = {default: ['#ffffff', '#334155'], blue: ['#1769e0', '#ffffff'], green: ['#d6f5e8', '#116044'], red: ['#ffe2e2', '#a32f39'], muted: ['#e8ecf1', '#7b8795']};
+  const colors = {
+    default: ['var(--motion-default-fill)', 'var(--motion-default-ink)'],
+    blue: ['var(--motion-active-fill)', 'var(--motion-active-ink)'],
+    green: ['var(--motion-success-fill)', 'var(--motion-success-ink)'],
+    red: ['var(--motion-danger-fill)', 'var(--motion-danger-ink)'],
+    muted: ['var(--motion-muted-fill)', 'var(--motion-muted-ink)'],
+  };
   function el(tag, attrs = {}) {
     const node = document.createElementNS(NS, tag);
     for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
@@ -22,59 +28,66 @@
     }
     const frame = story.frames[index], previous = story.frames[Math.max(0, index - 1)];
     const start = clip.cues[frame.cue].start;
-    const span = Math.min(0.85, (clip.cues[frame.cue].end - start) / 2);
+    const end = clip.cues[frame.cue].end;
+    const span = Math.min(0.65, (end - start) / 2);
     const phase = reduce.matches || index === 0 ? 1 : Math.min(1, Math.max(0, (time - start) / span));
     const eased = phase * phase * (3 - 2 * phase);
-    const old = new Map(previous.nodes.map(node => [node.id, node]));
-    const next = new Map(frame.nodes.map(node => [node.id, node]));
-    const positions = new Map();
-    const ids = new Set([...old.keys(), ...next.keys()]);
+    const nodes = window.CodingMotionLayout.transition(previous, frame, eased);
+    const positions = new Map(nodes.map(node => [node.id, node]));
+    const height = frame.nodes[0]?.id === 'problem-introduction' ? 240 : story.height;
+    svg.setAttribute('viewBox', `0 0 640 ${height}`);
+    svg.style.aspectRatio = `640 / ${height}`;
     for (const [id, group] of elements) {
-      if (!ids.has(id)) { group.remove(); elements.delete(id); }
+      if (!positions.has(id)) { group.remove(); elements.delete(id); }
     }
-    for (const id of ids) {
-      const target = next.get(id), source = old.get(id);
-      const node = target || source;
-      const before = source || node;
-      const x = before.x + (node.x - before.x) * eased;
-      const y = before.y + (node.y - before.y) * eased;
-      const w = (before.w || 90) + ((node.w || 90) - (before.w || 90)) * eased;
-      const h = (before.h || 44) + ((node.h || 44) - (before.h || 44)) * eased;
-      positions.set(id, {x, y, w, h});
+    for (const node of nodes) {
+      const {id, x, y, w, h} = node;
       let group = elements.get(id);
       if (!group) {
         group = el('g', {'data-node': id}); group.append(el('rect'), el('text'));
         nodesLayer.append(group); elements.set(id, group);
       }
+      group.dataset.component = node.component || 'introduction';
       group.setAttribute('transform', `translate(${x} ${y})`);
-      group.setAttribute('opacity', !target ? 1 - eased : !source ? eased : 1);
+      group.setAttribute('opacity', node.opacity);
       const [fill, ink] = colors[node.tone] || colors.default;
       const rect = group.firstChild;
-      for (const [key, value] of Object.entries({x: -w / 2, y: -h / 2, width:w, height:h, rx:10, fill, stroke:node.tone === 'blue' ? fill : '#d8e0eb', 'stroke-width':1.5})) rect.setAttribute(key, value);
+      for (const [key, value] of Object.entries({x:-w/2, y:-h/2, width:w, height:h, rx:10,
+        fill:node.container ? 'none' : fill, stroke:node.container ? 'var(--motion-active-fill)' : 'var(--motion-stroke)', 'stroke-width':1.5})) rect.setAttribute(key, value);
       const text = group.lastChild;
       text.setAttribute('fill', ink);
-      if (text.dataset.label !== node.label) {
-        text.dataset.label = node.label; text.replaceChildren();
-        const lines = node.label.split('\n');
+      text.style.fontSize = `${node.fontSize}px`;
+      const lines = node.lines;
+      const full = lines.join('\n');
+      const introducing = id === 'problem-introduction';
+      const visible = introducing ? window.CodingTypewriter.count(full, time, start, end) : Array.from(full).length;
+      const key = `${full}:${visible}`;
+      if (text.dataset.rendered !== key) {
+        text.dataset.rendered = key; text.replaceChildren();
+        let remaining = visible;
         lines.forEach((line, i) => {
-          const lineHeight = id === 'problem-introduction' ? 34 : 24;
-          const span = el('tspan', {x:0, y:(i - (lines.length - 1) / 2) * lineHeight + 7});
-          span.textContent = line; text.append(span);
+          const span = el('tspan', {x:introducing ? -window.CodingMotionLayout.textWidth(line, node.fontSize)/2 : 0,
+            y:(i-(lines.length-1)/2)*node.lineHeight+node.fontSize*.3});
+          if (introducing) span.style.textAnchor = 'start';
+          const chars = window.CodingTypewriter.characters(line);
+          span.textContent = introducing ? chars.slice(0, Math.max(0, remaining)).join('') : line;
+          remaining -= chars.length + 1;
+          text.append(span);
         });
       }
     }
     edgesLayer.replaceChildren();
     for (const edge of frame.edges || []) {
       const a = positions.get(edge.from), b = positions.get(edge.to);
-      if (!a || !b) continue;
+      if (!a || !b || a.opacity < 1 || b.opacity < 1) continue;
       const dx = b.x-a.x, dy = b.y-a.y;
-      const trim = p => 1 / Math.max(Math.abs(dx)/(p.w/2 + 5), Math.abs(dy)/(p.h/2 + 5), 1);
+      const trim = p => 1 / Math.max(Math.abs(dx)/(p.w/2+5), Math.abs(dy)/(p.h/2+5), 1);
       const ta=trim(a), tb=trim(b);
-      edgesLayer.append(el('path', {d:`M ${a.x+dx*ta} ${a.y+dy*ta} L ${b.x-dx*tb} ${b.y-dy*tb}`, fill:'none', stroke:'#7b91ad', 'stroke-width':2.5, 'marker-end':'url(#motionArrow)'}));
-      if (edge.label) {
-        const label = el('text', {x:(a.x+b.x)/2, y:(a.y+b.y)/2-9, class:'motion-edge-label'});
-        label.textContent=edge.label; edgesLayer.append(label);
-      }
+      edgesLayer.append(el('path', {d:`M ${a.x+dx*ta} ${a.y+dy*ta} L ${b.x-dx*tb} ${b.y-dy*tb}`, fill:'none', stroke:'var(--motion-edge)', 'stroke-width':2.5, 'marker-end':'url(#motionArrow)'}));
+    }
+    if (phase === 1) for (const edge of frame.edgeLabels || []) {
+      const label = el('text', {x:edge.x, y:edge.y+edge.fontSize*.3, class:'motion-edge-label'});
+      label.style.fontSize = `${edge.fontSize}px`; label.textContent=edge.label; edgesLayer.append(label);
     }
     svg.dataset.frame = String(index);
     svg.setAttribute('aria-label', frame.nodes.map(n => n.label.replaceAll('\n', ' ')).join(' · '));
@@ -91,12 +104,12 @@
   window.CodingMotion = {
     onTick(callback) { onTick = callback; },
     mount(value, sound) {
-      cancelAnimationFrame(request); request = 0; story = value; clip = sound; elements.clear();
+      cancelAnimationFrame(request); request = 0; story = value ? window.CodingMotionLayout.prepare(value) : null; clip = sound; elements.clear();
       if (!story || !clip?.cues) { story = null; host.classList.remove('has-motion'); return false; }
       host.replaceChildren(); host.classList.add('has-motion');
       svg = el('svg', {viewBox:'0 0 640 240', role:'img', class:'motion-canvas'});
       const defs=el('defs'), marker=el('marker', {id:'motionArrow', viewBox:'0 0 10 10', refX:9, refY:5, markerWidth:5, markerHeight:5, orient:'auto-start-reverse'});
-      marker.append(el('path', {d:'M 0 0 L 10 5 L 0 10 z', fill:'#7b91ad'})); defs.append(marker);
+      marker.append(el('path', {d:'M 0 0 L 10 5 L 0 10 z', fill:'var(--motion-edge)'})); defs.append(marker);
       edgesLayer=el('g', {class:'motion-edges'}); nodesLayer=el('g', {class:'motion-nodes'});
       svg.append(defs, edgesLayer, nodesLayer); host.append(svg); draw(); return true;
     },
