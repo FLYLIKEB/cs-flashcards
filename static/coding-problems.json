@@ -1,0 +1,2357 @@
+[
+  {
+    "id": 1,
+    "title": "중복 요청 ID 제거",
+    "topic": "해시 · 순서 보존",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(ids): 요청 ID 문자열 배열에서 중복을 제거하되 처음 등장한 순서로 반환하세요. 0 ≤ len(ids) ≤ 100000, 각 ID 길이는 1~40입니다. 대소문자는 구별합니다. 입력 배열은 수정하지 마세요.",
+    "examples": [
+      {
+        "input": "solve([\"b\", \"a\", \"b\", \"c\", \"a\"])",
+        "output": "[\"b\", \"a\", \"c\"]",
+        "explanation": "b, a, c가 처음 등장한 순서이며 두 번째 b와 a는 제외합니다."
+      }
+    ],
+    "hints": [
+      "이미 본 ID를 빠르게 확인할 자료구조를 고르세요.",
+      "집합과 출력 배열의 역할을 분리하세요.",
+      "처음 본 ID만 집합과 출력 배열에 추가합니다."
+    ],
+    "approach": "입력을 한 번 순회하며 seen 집합에 없는 ID만 결과에 추가합니다. 집합 자체의 순서에 의존하지 않습니다.",
+    "complexity": "시간 O(n), 공간 O(n); ID 길이는 상한 40.",
+    "solution": "def solve(ids):\n    seen = set()\n    result = []\n    for value in ids:\n        if value not in seen:\n            seen.add(value)\n            result.append(value)\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          [
+            "b",
+            "a",
+            "b",
+            "c",
+            "a"
+          ]
+        ],
+        "expected": [
+          "b",
+          "a",
+          "c"
+        ]
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          [
+            "A",
+            "a",
+            "A"
+          ]
+        ],
+        "expected": [
+          "A",
+          "a"
+        ]
+      }
+    ],
+    "pitfalls": [
+      "집합을 그대로 반환하면 순서 계약을 놓칠 수 있습니다.",
+      "정렬하면 처음 등장한 순서가 사라집니다."
+    ],
+    "explainPrompt": "왜 집합만 반환하지 않았는지, 시간복잡도가 평균 기준인 이유를 설명하세요."
+  },
+  {
+    "id": 2,
+    "title": "목표 금액을 만드는 두 결제",
+    "topic": "해시 · 보수 찾기",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(amounts, target): 서로 다른 두 인덱스 i < j의 합이 target인 쌍을 반환하세요. 여러 쌍이면 j가 가장 작고 그중 i가 가장 작은 [i,j]를 반환합니다. 없으면 []입니다. 0 ≤ n ≤ 100000, 값과 target은 -10^9~10^9 정수입니다.",
+    "examples": [
+      {
+        "input": "solve([4, 2, 4, 6], 8)",
+        "output": "[0, 2]",
+        "explanation": "합이 8인 쌍 중 오른쪽 인덱스가 가장 작은 것은 0번과 2번입니다."
+      }
+    ],
+    "hints": [
+      "현재 값에 필요한 짝은 target에서 현재 값을 뺀 값입니다.",
+      "이전에 본 값의 첫 인덱스를 저장하세요.",
+      "현재 값을 저장하기 전에 짝을 찾으면 자기 자신을 재사용하지 않습니다."
+    ],
+    "approach": "오른쪽 인덱스를 작은 순서로 순회하고, 각 값의 최초 인덱스를 해시에 보관합니다. 최초로 발견한 짝이 동점 규칙도 만족합니다.",
+    "complexity": "시간 O(n), 공간 O(n).",
+    "solution": "def solve(amounts, target):\n    first = {}\n    for j, value in enumerate(amounts):\n        if target - value in first:\n            return [first[target - value], j]\n        first.setdefault(value, j)\n    return []\n",
+    "tests": [
+      {
+        "args": [
+          [
+            4,
+            2,
+            4,
+            6
+          ],
+          8
+        ],
+        "expected": [
+          0,
+          2
+        ]
+      },
+      {
+        "args": [
+          [
+            3,
+            3
+          ],
+          6
+        ],
+        "expected": [
+          0,
+          1
+        ]
+      },
+      {
+        "args": [
+          [
+            1
+          ],
+          2
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          [
+            -2,
+            5,
+            0
+          ],
+          3
+        ],
+        "expected": [
+          0,
+          1
+        ]
+      }
+    ],
+    "pitfalls": [
+      "같은 원소를 두 번 사용하지 마세요.",
+      "중복 값의 첫 인덱스를 덮어쓰지 마세요."
+    ],
+    "explainPrompt": "순회 중 해시에 무엇이 들어 있다는 불변식과 동점 규칙을 설명하세요."
+  },
+  {
+    "id": 3,
+    "title": "가장 많이 발생한 오류 코드",
+    "topic": "빈도 해시 · 동점 규칙",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(codes): 오류 코드 문자열 배열에서 가장 자주 등장한 코드를 반환하세요. 동률이면 사전순으로 작은 코드입니다. 빈 배열은 빈 문자열을 반환합니다. n ≤ 100000, 코드는 소문자 a-z로 된 길이 1~20 문자열입니다.",
+    "examples": [
+      {
+        "input": "solve([\"timeout\", \"error\", \"timeout\", \"error\"])",
+        "output": "\"error\"",
+        "explanation": "error와 timeout은 각각 두 번이며 사전순으로 error가 앞섭니다."
+      }
+    ],
+    "hints": [
+      "코드별 횟수를 세세요.",
+      "최대 빈도뿐 아니라 동점 조건도 고려하세요.",
+      "빈도는 내림차순, 문자열은 오름차순 기준입니다."
+    ],
+    "approach": "빈도를 센 뒤 서로 다른 코드를 한 번 훑으며 빈도가 더 크거나 빈도가 같고 문자열이 더 작은 코드를 선택합니다.",
+    "complexity": "시간 O(n + u), 공간 O(u); 문자열 길이 상한 20, u는 코드 종류 수.",
+    "solution": "def solve(codes):\n    counts = {}\n    for code in codes:\n        counts[code] = counts.get(code, 0) + 1\n    best = ''\n    for code, count in counts.items():\n        if not best or count > counts[best] or (count == counts[best] and code < best):\n            best = code\n    return best\n",
+    "tests": [
+      {
+        "args": [
+          [
+            "timeout",
+            "error",
+            "timeout",
+            "error"
+          ]
+        ],
+        "expected": "error"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": ""
+      },
+      {
+        "args": [
+          [
+            "z",
+            "z",
+            "a"
+          ]
+        ],
+        "expected": "z"
+      }
+    ],
+    "pitfalls": [
+      "첫 등장 순서가 동점 기준이 아닙니다.",
+      "빈 입력에서 max를 호출하지 마세요."
+    ],
+    "explainPrompt": "정렬 없이 동점을 처리하는 비교식을 설명하세요."
+  },
+  {
+    "id": 4,
+    "title": "정렬된 두 이벤트 스트림 병합",
+    "topic": "투 포인터",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(a, b): 오름차순 정수 배열 두 개를 중복을 유지한 오름차순 새 배열로 합치세요. 입력은 수정하지 마세요. len(a)+len(b) ≤ 100000, 값은 -10^9~10^9입니다. 전체를 다시 정렬하지 말고 선형 시간에 해결하세요.",
+    "examples": [
+      {
+        "input": "solve([1, 3, 3], [2, 3, 5])",
+        "output": "[1, 2, 3, 3, 3, 5]",
+        "explanation": "두 배열의 3 세 개를 모두 유지하면서 오름차순으로 합칩니다."
+      }
+    ],
+    "hints": [
+      "두 배열에서 아직 사용하지 않은 첫 위치를 관리하세요.",
+      "더 작은 값을 결과에 넣고 해당 포인터만 이동하세요.",
+      "한쪽이 끝나면 다른 쪽의 남은 값을 붙입니다."
+    ],
+    "approach": "각 배열의 포인터를 한 방향으로만 이동합니다. 포인터 앞의 값들은 이미 결과에 오름차순으로 들어 있다는 불변식을 유지합니다.",
+    "complexity": "시간 O(n+m), 결과 제외 추가 공간 O(1); 반환 배열 O(n+m).",
+    "solution": "def solve(a, b):\n    i = j = 0\n    result = []\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            result.append(a[i])\n            i += 1\n        else:\n            result.append(b[j])\n            j += 1\n    while i < len(a):\n        result.append(a[i])\n        i += 1\n    while j < len(b):\n        result.append(b[j])\n        j += 1\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            3,
+            3
+          ],
+          [
+            2,
+            3,
+            5
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          3,
+          3,
+          3,
+          5
+        ]
+      },
+      {
+        "args": [
+          [],
+          [
+            2
+          ]
+        ],
+        "expected": [
+          2
+        ]
+      },
+      {
+        "args": [
+          [],
+          []
+        ],
+        "expected": []
+      }
+    ],
+    "pitfalls": [
+      "중복을 제거하면 안 됩니다.",
+      "한쪽 배열이 처음부터 비어 있을 수 있습니다."
+    ],
+    "explainPrompt": "정렬 알고리즘보다 병합이 빠른 이유를 입력의 성질과 연결해 설명하세요."
+  },
+  {
+    "id": 5,
+    "title": "구간별 요청 수 빠르게 조회",
+    "topic": "누적합",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(counts, queries): counts의 구간 합을 각 질의 [l,r]에 대해 반환하세요. 양 끝 인덱스를 포함하며 0부터 시작합니다. 1 ≤ n ≤ 100000, 질의 수 ≤ 100000, 0 ≤ counts[i] ≤ 10^6, 모든 질의는 0 ≤ l ≤ r < n입니다.",
+    "examples": [
+      {
+        "input": "solve([2, 0, 3, 5], [[0, 2], [1, 3], [3, 3]])",
+        "output": "[5, 8, 5]",
+        "explanation": "0~2 합은 5, 1~3 합은 8, 3~3 합은 5입니다."
+      }
+    ],
+    "hints": [
+      "질의마다 구간을 순회하면 최악의 경우 너무 느립니다.",
+      "길이 n+1인 누적합을 만들고 첫 값을 0으로 두세요.",
+      "[l,r]의 합은 prefix[r+1] - prefix[l]입니다."
+    ],
+    "approach": "prefix[k]를 처음 k개 원소의 합으로 정의하면 구간 경계가 0인 경우도 같은 식으로 처리됩니다.",
+    "complexity": "시간 O(n+q), 공간 O(n+q); 결과 제외 O(n).",
+    "solution": "def solve(counts, queries):\n    prefix = [0]\n    for count in counts:\n        prefix.append(prefix[-1] + count)\n    return [prefix[r + 1] - prefix[l] for l, r in queries]\n",
+    "tests": [
+      {
+        "args": [
+          [
+            2,
+            0,
+            3,
+            5
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              3,
+              3
+            ]
+          ]
+        ],
+        "expected": [
+          5,
+          8,
+          5
+        ]
+      },
+      {
+        "args": [
+          [
+            0
+          ],
+          [
+            [
+              0,
+              0
+            ]
+          ]
+        ],
+        "expected": [
+          0
+        ]
+      },
+      {
+        "args": [
+          [
+            1,
+            2
+          ],
+          []
+        ],
+        "expected": []
+      }
+    ],
+    "pitfalls": [
+      "양 끝 포함 구간과 반열린 구간을 혼동하지 마세요.",
+      "합계가 원소 하나의 상한보다 훨씬 커질 수 있습니다."
+    ],
+    "explainPrompt": "누적합 배열에서 k의 의미를 말한 뒤 수식을 유도하세요."
+  },
+  {
+    "id": 6,
+    "title": "최대 트래픽 고정 구간",
+    "topic": "고정 슬라이딩 윈도",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(counts, k): 연속한 정확히 k개 원소 합의 최댓값을 반환하세요. 1 ≤ k ≤ n ≤ 100000, 원소는 0~10^6입니다.",
+    "examples": [
+      {
+        "input": "solve([2, 1, 5, 1, 3], 3)",
+        "output": "9",
+        "explanation": "길이 3 창의 합은 8, 7, 9이므로 최댓값은 9입니다."
+      }
+    ],
+    "hints": [
+      "첫 k개의 합을 한 번 구하세요.",
+      "창을 이동할 때 나가는 값과 들어오는 값만 바뀝니다.",
+      "window += counts[right] - counts[right-k]입니다."
+    ],
+    "approach": "첫 창으로 답을 초기화하고 오른쪽 경계를 하나씩 옮기면서 합을 상수 시간에 갱신합니다.",
+    "complexity": "시간 O(n), 공간 O(1).",
+    "solution": "def solve(counts, k):\n    current = sum(counts[i] for i in range(k))\n    best = current\n    for right in range(k, len(counts)):\n        current += counts[right] - counts[right - k]\n        best = max(best, current)\n    return best\n",
+    "tests": [
+      {
+        "args": [
+          [
+            2,
+            1,
+            5,
+            1,
+            3
+          ],
+          3
+        ],
+        "expected": 9
+      },
+      {
+        "args": [
+          [
+            4
+          ],
+          1
+        ],
+        "expected": 4
+      },
+      {
+        "args": [
+          [
+            0,
+            0,
+            0
+          ],
+          2
+        ],
+        "expected": 0
+      }
+    ],
+    "pitfalls": [
+      "첫 창을 답에 반영해야 합니다.",
+      "k=n인 경우 반복문이 실행되지 않습니다."
+    ],
+    "explainPrompt": "각 창의 합을 다시 계산하는 방식과 연산 횟수를 비교하세요."
+  },
+  {
+    "id": 7,
+    "title": "서로 다른 세션의 최장 구간",
+    "topic": "가변 슬라이딩 윈도",
+    "day": 1,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(sessions): 같은 세션 ID가 두 번 나타나지 않는 가장 긴 연속 구간의 길이를 반환하세요. 빈 배열은 0입니다. n ≤ 100000, ID는 길이 1~30 문자열입니다.",
+    "examples": [
+      {
+        "input": "solve([\"a\", \"b\", \"b\", \"a\"])",
+        "output": "2",
+        "explanation": "중복 없는 최장 연속 구간은 [a,b] 또는 [b,a]로 길이 2입니다."
+      }
+    ],
+    "hints": [
+      "오른쪽으로 확장하다 중복이 생기면 왼쪽을 옮기세요.",
+      "각 ID의 가장 최근 인덱스를 저장할 수 있습니다.",
+      "left = max(left, last[id]+1)로 왼쪽이 뒤로 가지 않게 하세요."
+    ],
+    "approach": "창 안의 ID가 모두 서로 다르도록 left를 조정합니다. 최근 인덱스를 이용하면 중복 제거를 한 번의 이동으로 처리할 수 있습니다.",
+    "complexity": "시간 O(n), 공간 O(u); u는 서로 다른 ID 수.",
+    "solution": "def solve(sessions):\n    last = {}\n    left = best = 0\n    for right, sid in enumerate(sessions):\n        if sid in last:\n            left = max(left, last[sid] + 1)\n        last[sid] = right\n        best = max(best, right - left + 1)\n    return best\n",
+    "tests": [
+      {
+        "args": [
+          [
+            "a",
+            "b",
+            "b",
+            "a"
+          ]
+        ],
+        "expected": 2
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            "a",
+            "b",
+            "c",
+            "a",
+            "d"
+          ]
+        ],
+        "expected": 4
+      }
+    ],
+    "pitfalls": [
+      "과거 중복이 현재 창 밖에 있을 때 left를 뒤로 옮기면 안 됩니다.",
+      "부분수열이 아니라 연속 구간입니다."
+    ],
+    "explainPrompt": "a,b,b,a 입력으로 left가 뒤로 움직이면 안 되는 이유를 설명하세요."
+  },
+  {
+    "id": 8,
+    "title": "목표 처리량에 도달하는 최소 구간",
+    "topic": "투 포인터 · 단조성",
+    "day": 1,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(counts, target): 합이 target 이상인 연속 구간의 최소 길이를 반환하세요. 없으면 0입니다. counts는 양의 정수 배열이며 0 ≤ n ≤ 100000, 각 값 ≤ 10^6, 1 ≤ target ≤ 10^12입니다.",
+    "examples": [
+      {
+        "input": "solve([2, 3, 1, 2, 4, 3], 7)",
+        "output": "2",
+        "explanation": "마지막 두 값 [4,3]의 합이 7이며 길이 1로는 목표에 도달하지 못합니다."
+      }
+    ],
+    "hints": [
+      "양수라는 조건 덕분에 오른쪽 확장은 합을 증가시킵니다.",
+      "합이 목표 이상이면 왼쪽을 줄이며 답을 갱신하세요.",
+      "조건을 만족하는 동안 while로 줄여야 최소 길이를 찾습니다."
+    ],
+    "approach": "오른쪽을 확장하고 합이 충분한 동안 왼쪽을 줄입니다. 두 포인터는 각각 최대 n번 이동하므로 중첩 반복문이어도 선형입니다.",
+    "complexity": "시간 O(n), 공간 O(1).",
+    "solution": "def solve(counts, target):\n    left = total = 0\n    best = len(counts) + 1\n    for right, value in enumerate(counts):\n        total += value\n        while total >= target:\n            best = min(best, right - left + 1)\n            total -= counts[left]\n            left += 1\n    return 0 if best > len(counts) else best\n",
+    "tests": [
+      {
+        "args": [
+          [
+            2,
+            3,
+            1,
+            2,
+            4,
+            3
+          ],
+          7
+        ],
+        "expected": 2
+      },
+      {
+        "args": [
+          [
+            1,
+            1
+          ],
+          3
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [],
+          1
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            10
+          ],
+          7
+        ],
+        "expected": 1
+      }
+    ],
+    "pitfalls": [
+      "음수가 허용되면 이 풀이의 단조성이 깨집니다.",
+      "조건을 만족할 때 한 번만 줄이면 최솟값을 놓칠 수 있습니다."
+    ],
+    "explainPrompt": "음수 허용 시 알고리즘이 왜 성립하지 않는지 반례를 들어 설명하세요."
+  },
+  {
+    "id": 9,
+    "title": "설정 문자열의 괄호 검사",
+    "topic": "스택",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(text): 문자 ()[]{}만으로 이루어진 문자열의 괄호가 올바르게 짝지어지고 중첩되었는지 불리언으로 반환하세요. 빈 문자열은 True입니다. 길이 ≤ 100000입니다.",
+    "examples": [
+      {
+        "input": "solve(\"{[()]}\")",
+        "output": "true",
+        "explanation": "세 종류의 괄호가 열린 순서의 역순으로 닫힙니다."
+      }
+    ],
+    "hints": [
+      "가장 최근에 열린 괄호가 먼저 닫혀야 합니다.",
+      "닫는 괄호를 만났는데 스택이 비었으면 실패입니다.",
+      "모든 문자를 처리한 뒤 열린 괄호가 남아도 실패입니다."
+    ],
+    "approach": "여는 괄호를 스택에 넣고 닫는 괄호마다 마지막 여는 괄호와 대응을 검사합니다.",
+    "complexity": "시간 O(n), 공간 O(n).",
+    "solution": "def solve(text):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    stack = []\n    for char in text:\n        if char in '([{':\n            stack.append(char)\n        elif not stack or stack.pop() != pairs[char]:\n            return False\n    return not stack\n",
+    "tests": [
+      {
+        "args": [
+          "{[()]}"
+        ],
+        "expected": true
+      },
+      {
+        "args": [
+          "([)]"
+        ],
+        "expected": false
+      },
+      {
+        "args": [
+          ""
+        ],
+        "expected": true
+      },
+      {
+        "args": [
+          "("
+        ],
+        "expected": false
+      }
+    ],
+    "pitfalls": [
+      "괄호 개수만 같다고 올바른 중첩이 아닙니다.",
+      "마지막에 비어 있는지 검사해야 합니다."
+    ],
+    "explainPrompt": "FIFO 큐가 아니라 LIFO 스택이어야 하는 이유를 설명하세요."
+  },
+  {
+    "id": 10,
+    "title": "다음으로 더 느린 요청",
+    "topic": "단조 스택",
+    "day": 1,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(latencies): 각 요청 뒤에서 처음으로 응답시간이 엄격히 더 큰 요청까지의 인덱스 거리를 반환하세요. 뒤에 없으면 0입니다. n ≤ 100000, 응답시간은 0~10^9 정수입니다.",
+    "examples": [
+      {
+        "input": "solve([30, 20, 20, 40])",
+        "output": "[3, 2, 1, 0]",
+        "explanation": "마지막 40이 앞 세 값보다 처음으로 큰 값이며 거리는 각각 3,2,1입니다."
+      }
+    ],
+    "hints": [
+      "아직 더 큰 값을 만나지 못한 인덱스를 보관하세요.",
+      "현재 값이 스택 꼭대기의 값보다 크면 그 인덱스의 답이 정해집니다.",
+      "동일한 값은 답이 아니므로 엄격한 > 비교를 사용하세요."
+    ],
+    "approach": "응답시간이 비증가하는 인덱스 스택을 유지합니다. 각 인덱스는 한 번 들어가고 한 번 나옵니다.",
+    "complexity": "시간 O(n), 공간 O(n).",
+    "solution": "def solve(latencies):\n    result = [0] * len(latencies)\n    stack = []\n    for i, value in enumerate(latencies):\n        while stack and value > latencies[stack[-1]]:\n            j = stack.pop()\n            result[j] = i - j\n        stack.append(i)\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          [
+            30,
+            20,
+            20,
+            40
+          ]
+        ],
+        "expected": [
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          [
+            3,
+            2,
+            1
+          ]
+        ],
+        "expected": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "pitfalls": [
+      "같은 응답시간은 더 큰 값이 아닙니다.",
+      "값만 저장하면 거리를 계산하기 어렵습니다."
+    ],
+    "explainPrompt": "중첩 while이 O(n²)이 아닌 이유를 각 원소의 push/pop 횟수로 설명하세요."
+  },
+  {
+    "id": 11,
+    "title": "로그에서 최초 임계 시각 찾기",
+    "topic": "이진 탐색 · lower bound",
+    "day": 1,
+    "minutes": 15,
+    "difficulty": "기본",
+    "statement": "함수 solve(times, target): 오름차순 정렬된 정수 배열에서 target 이상인 첫 원소의 인덱스를 반환하세요. 없으면 len(times)입니다. 중복을 허용하며 n ≤ 100000, 값과 target은 -10^9~10^9입니다. O(log n)에 해결하세요.",
+    "examples": [
+      {
+        "input": "solve([1, 2, 2, 5], 2)",
+        "output": "1",
+        "explanation": "2 이상인 첫 값은 인덱스 1의 2입니다."
+      }
+    ],
+    "hints": [
+      "정답 후보 범위를 반열린 [left,right)로 두세요.",
+      "중간 값이 target보다 작으면 그 위치까지 버릴 수 있습니다.",
+      "중간 값이 target 이상이면 right=mid로 첫 위치를 계속 찾으세요."
+    ],
+    "approach": "left 이전은 target 미만, right 이후는 target 이상이라는 경계를 유지합니다. 탐색 종료 시 left가 삽입 위치이자 첫 조건 만족 위치입니다.",
+    "complexity": "시간 O(log(n+1)), 공간 O(1).",
+    "solution": "def solve(times, target):\n    left, right = 0, len(times)\n    while left < right:\n        mid = (left + right) // 2\n        if times[mid] < target:\n            left = mid + 1\n        else:\n            right = mid\n    return left\n",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            2,
+            2,
+            5
+          ],
+          2
+        ],
+        "expected": 1
+      },
+      {
+        "args": [
+          [],
+          4
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            1,
+            3
+          ],
+          4
+        ],
+        "expected": 2
+      },
+      {
+        "args": [
+          [
+            1,
+            3
+          ],
+          0
+        ],
+        "expected": 0
+      }
+    ],
+    "pitfalls": [
+      "값을 찾자마자 반환하면 첫 중복 위치가 아닐 수 있습니다.",
+      "right는 유효 인덱스가 아닌 n으로 시작합니다."
+    ],
+    "explainPrompt": "탐색 구간과 종료 조건을 먼저 정의하고 경계 입력을 설명하세요."
+  },
+  {
+    "id": 12,
+    "title": "점검 시간 구간 합치기",
+    "topic": "정렬 · 구간 병합",
+    "day": 1,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(intervals): [start,end] 정수 구간들을 합치세요. 0 ≤ start < end ≤ 10^9, n ≤ 100000입니다. 겹치거나 끝과 시작이 맞닿으면 합치고 시작순으로 반환하세요. 예: [1,3],[3,5]는 [1,5]. 빈 입력은 []이며 입력은 수정하지 마세요.",
+    "examples": [
+      {
+        "input": "solve([[5, 7], [1, 3], [3, 6]])",
+        "output": "[[1, 7]]",
+        "explanation": "[1,3]과 [3,6]이 맞닿고 [5,7]이 겹치므로 [1,7] 하나가 됩니다."
+      }
+    ],
+    "hints": [
+      "시작 시간을 기준으로 정렬하면 인접한 결과만 비교하면 됩니다.",
+      "새 시작이 마지막 끝 이하이면 합칠 수 있습니다.",
+      "끝은 항상 두 끝의 최댓값으로 갱신하세요."
+    ],
+    "approach": "정렬 후 마지막으로 병합한 구간에 새 구간을 합치거나 새 결과 구간을 만듭니다. 입력 내부 배열도 수정하지 않도록 결과에 복사합니다.",
+    "complexity": "시간 O(n log n), 공간 O(n).",
+    "solution": "def solve(intervals):\n    result = []\n    for start, end in sorted(intervals):\n        if result and start <= result[-1][1]:\n            result[-1][1] = max(result[-1][1], end)\n        else:\n            result.append([start, end])\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              5,
+              7
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              3,
+              6
+            ]
+          ]
+        ],
+        "expected": [
+          [
+            1,
+            7
+          ]
+        ]
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              10
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              12,
+              14
+            ]
+          ]
+        ],
+        "expected": [
+          [
+            1,
+            10
+          ],
+          [
+            12,
+            14
+          ]
+        ]
+      }
+    ],
+    "pitfalls": [
+      "포함되는 작은 구간 때문에 끝을 줄이면 안 됩니다.",
+      "입력 내부 배열을 그대로 결과에 넣고 수정하지 마세요."
+    ],
+    "explainPrompt": "정렬 후 마지막 결과 구간만 보면 충분한 이유를 설명하세요."
+  },
+  {
+    "id": 13,
+    "title": "가장 가까운 서비스까지의 홉 수",
+    "topic": "그래프 · BFS",
+    "day": 1,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(n, edges, start, target): 0~n-1번 서비스 사이의 무방향 연결 edges에서 start부터 target까지 최소 간선 수를 반환하세요. 도달 불가면 -1입니다. 1 ≤ n ≤ 100000, 간선 수 ≤ 200000, 끝점은 유효하며 자기 연결과 중복 간선은 없습니다.",
+    "examples": [
+      {
+        "input": "solve(5, [[0, 1], [1, 2], [0, 3], [3, 2]], 0, 2)",
+        "output": "2",
+        "explanation": "0→1→2 또는 0→3→2로 두 간선만에 도달합니다."
+      }
+    ],
+    "hints": [
+      "모든 연결 비용이 1이므로 BFS를 사용할 수 있습니다.",
+      "방문 처리는 큐에서 뺄 때가 아니라 넣을 때 하세요.",
+      "start==target이면 거리는 0입니다."
+    ],
+    "approach": "인접 리스트와 deque로 너비 우선 탐색합니다. 먼저 발견한 거리가 최단 거리라는 성질을 이용합니다.",
+    "complexity": "시간 O(V+E), 공간 O(V+E).",
+    "solution": "def solve(n, edges, start, target):\n    from collections import deque\n    graph = [[] for _ in range(n)]\n    for a, b in edges:\n        graph[a].append(b)\n        graph[b].append(a)\n    distance = [-1] * n\n    distance[start] = 0\n    queue = deque([start])\n    while queue:\n        node = queue.popleft()\n        if node == target:\n            return distance[node]\n        for nxt in graph[node]:\n            if distance[nxt] == -1:\n                distance[nxt] = distance[node] + 1\n                queue.append(nxt)\n    return -1\n",
+    "tests": [
+      {
+        "args": [
+          5,
+          [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              0,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          0,
+          2
+        ],
+        "expected": 2
+      },
+      {
+        "args": [
+          2,
+          [],
+          0,
+          1
+        ],
+        "expected": -1
+      },
+      {
+        "args": [
+          1,
+          [],
+          0,
+          0
+        ],
+        "expected": 0
+      }
+    ],
+    "pitfalls": [
+      "리스트 pop(0)은 큐 연산을 느리게 만듭니다.",
+      "가중치가 다르면 일반 BFS로 최단 비용을 구할 수 없습니다."
+    ],
+    "explainPrompt": "DFS로 처음 찾은 경로가 최단이라는 보장이 없는 이유를 말하세요."
+  },
+  {
+    "id": 14,
+    "title": "독립 장애 구역 세기",
+    "topic": "격자 · 연결 요소",
+    "day": 1,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(grid): 0과 1로 이루어진 직사각형 격자에서 상하좌우로 연결된 1의 덩어리 개수를 반환하세요. 대각선은 연결이 아닙니다. 행·열은 각각 1~300입니다. 입력 격자를 수정하지 마세요.",
+    "examples": [
+      {
+        "input": "solve([[1, 1, 0], [0, 1, 0], [1, 0, 1]])",
+        "output": "3",
+        "explanation": "좌상단 세 셀, 좌하단 한 셀, 우하단 한 셀로 총 세 구역입니다."
+      }
+    ],
+    "hints": [
+      "방문하지 않은 1을 찾을 때마다 새 구역입니다.",
+      "그 지점에서 이어진 모든 1을 반복 탐색으로 방문 처리하세요.",
+      "큰 구역은 재귀 깊이 한계를 넘을 수 있으므로 명시적 스택을 고려하세요."
+    ],
+    "approach": "전체 셀을 훑으며 새로운 1에서 DFS를 수행합니다. 방문 배열을 별도로 두어 입력을 보존합니다.",
+    "complexity": "시간 O(RC), 공간 O(RC).",
+    "solution": "def solve(grid):\n    rows, cols = len(grid), len(grid[0])\n    visited = set()\n    count = 0\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] != 1 or (r, c) in visited:\n                continue\n            count += 1\n            visited.add((r, c))\n            stack = [(r, c)]\n            while stack:\n                x, y = stack.pop()\n                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):\n                    nx, ny = x + dx, y + dy\n                    if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] == 1 and (nx, ny) not in visited:\n                        visited.add((nx, ny))\n                        stack.append((nx, ny))\n    return count\n",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              1,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              1
+            ]
+          ]
+        ],
+        "expected": 3
+      },
+      {
+        "args": [
+          [
+            [
+              0,
+              0
+            ]
+          ]
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            [
+              1
+            ]
+          ]
+        ],
+        "expected": 1
+      }
+    ],
+    "pitfalls": [
+      "대각선을 연결하면 결과가 달라집니다.",
+      "재귀 DFS는 큰 입력에서 깊이 제한에 걸릴 수 있습니다."
+    ],
+    "explainPrompt": "방문 처리를 언제 하는지와 입력을 보존하는 비용을 설명하세요."
+  },
+  {
+    "id": 15,
+    "title": "1일차 실전: 최근 시간창 요청 제한",
+    "topic": "큐 · 슬라이딩 윈도",
+    "day": 1,
+    "minutes": 25,
+    "difficulty": "중급",
+    "statement": "함수 solve(times, window, limit): 비감소 순서의 요청 시각 배열을 처리해 각 요청의 허용 여부를 반환하세요. 시각 t에서 이전에 허용된 요청 중 (t-window, t]에 속하는 개수가 limit 미만이면 현재 요청을 허용합니다. 거절 요청은 저장하지 않습니다. 같은 시각도 배열 순서대로 처리합니다. 0 ≤ n ≤ 100000, 시각은 0~10^9, window와 limit은 양의 정수입니다.",
+    "examples": [
+      {
+        "input": "solve([0, 0, 1, 10, 10], 10, 2)",
+        "output": "[true, true, false, true, true]",
+        "explanation": "시각 0의 두 요청은 허용, 1은 거절됩니다. 10에서는 시각 0이 창 밖이 되어 두 요청 모두 허용됩니다."
+      }
+    ],
+    "hints": [
+      "시각이 정렬되어 있으므로 오래된 허용 기록부터 제거할 수 있습니다.",
+      "t-window와 정확히 같은 시각은 창 밖입니다.",
+      "거절된 요청을 큐에 넣으면 이후 결과가 달라집니다."
+    ],
+    "approach": "허용된 시각만 deque에 넣습니다. 매 요청마다 창 밖의 기록을 제거한 다음 남은 수로 허용을 판단합니다. 이 문제는 단일 순차 스트림 모델입니다.",
+    "complexity": "시간 O(n), 보조 공간 O(min(n, limit)); 반환 배열 포함 O(n).",
+    "solution": "def solve(times, window, limit):\n    from collections import deque\n    accepted = deque()\n    result = []\n    for t in times:\n        while accepted and accepted[0] <= t - window:\n            accepted.popleft()\n        allowed = len(accepted) < limit\n        result.append(allowed)\n        if allowed:\n            accepted.append(t)\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          [
+            0,
+            0,
+            1,
+            10,
+            10
+          ],
+          10,
+          2
+        ],
+        "expected": [
+          true,
+          true,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "args": [
+          [],
+          5,
+          1
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          3,
+          1
+        ],
+        "expected": [
+          true,
+          false,
+          false,
+          true
+        ]
+      }
+    ],
+    "pitfalls": [
+      "왼쪽 경계는 열린 구간입니다.",
+      "거절 요청도 저장하는 다른 제한 정책과 혼동하지 마세요."
+    ],
+    "explainPrompt": "경계·동시 시각·거절 기록을 먼저 확인하고, 다중 서버에서는 어떤 원자성이 필요한지 설명하세요."
+  },
+  {
+    "id": 16,
+    "title": "가장 느린 요청 K개",
+    "topic": "힙 · Top K",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(latencies, k): 가장 큰 k개 응답시간을 중복을 유지하여 내림차순으로 반환하세요. 0 ≤ k ≤ n ≤ 100000, 값은 0~10^9입니다. 전체 정렬 대신 크기 k 힙을 사용하세요. k=0이면 []입니다.",
+    "examples": [
+      {
+        "input": "solve([5, 1, 5, 3, 9], 3)",
+        "output": "[9, 5, 5]",
+        "explanation": "가장 큰 세 요청은 9,5,5이며 같은 응답시간도 별개 요청입니다."
+      }
+    ],
+    "hints": [
+      "현재까지 가장 큰 k개만 남기면 됩니다.",
+      "최소 힙의 꼭대기는 보관 중인 값에서 가장 작습니다.",
+      "새 값이 꼭대기보다 크면 교체하고 마지막에 힙만 정렬하세요."
+    ],
+    "approach": "크기 k 최소 힙을 유지해 상위 k개 후보만 저장합니다. 반환 순서를 위해 k개를 내림차순 정렬합니다.",
+    "complexity": "시간 O(n log(k+1) + k log(k+1)), 공간 O(k).",
+    "solution": "def solve(latencies, k):\n    import heapq\n    if k == 0:\n        return []\n    heap = []\n    for value in latencies:\n        if len(heap) < k:\n            heapq.heappush(heap, value)\n        elif value > heap[0]:\n            heapq.heapreplace(heap, value)\n    return sorted(heap, reverse=True)\n",
+    "tests": [
+      {
+        "args": [
+          [
+            5,
+            1,
+            5,
+            3,
+            9
+          ],
+          3
+        ],
+        "expected": [
+          9,
+          5,
+          5
+        ]
+      },
+      {
+        "args": [
+          [
+            2
+          ],
+          0
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          [
+            2,
+            1
+          ],
+          2
+        ],
+        "expected": [
+          2,
+          1
+        ]
+      }
+    ],
+    "pitfalls": [
+      "중복도 각각 요청 하나입니다.",
+      "k=0일 때 heap[0]을 읽지 마세요."
+    ],
+    "explainPrompt": "최대 힙 전체 저장과 크기 k 최소 힙의 공간 차이를 설명하세요."
+  },
+  {
+    "id": 17,
+    "title": "필요한 최소 워커 수",
+    "topic": "구간 · 최소 힙",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(jobs): 각 작업은 [start,end) 동안 워커 하나를 점유합니다. 모든 작업을 시작 시각에 시작시키는 최소 워커 수를 반환하세요. 끝난 시각에 바로 재사용할 수 있습니다. 0 ≤ start < end ≤ 10^9, 작업 수 ≤ 100000입니다.",
+    "examples": [
+      {
+        "input": "solve([[0, 5], [2, 7], [5, 8]])",
+        "output": "2",
+        "explanation": "0~5와 2~7은 겹칩니다. 시각 5에는 첫 워커를 재사용하므로 최대 두 대가 필요합니다."
+      }
+    ],
+    "hints": [
+      "작업을 시작순으로 정렬하세요.",
+      "진행 중인 작업 중 가장 먼저 끝나는 시각이 중요합니다.",
+      "새 시작 시각 이하에 끝나는 작업을 모두 제거하고 현재 작업을 넣으세요."
+    ],
+    "approach": "진행 중인 작업의 종료 시각을 최소 힙에 저장합니다. 매 시작 시각의 동시 실행 수 최댓값이 필요한 워커 수입니다.",
+    "complexity": "시간 O(n log n), 공간 O(n).",
+    "solution": "def solve(jobs):\n    import heapq\n    active = []\n    best = 0\n    for start, end in sorted(jobs):\n        while active and active[0] <= start:\n            heapq.heappop(active)\n        heapq.heappush(active, end)\n        best = max(best, len(active))\n    return best\n",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              0,
+              5
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              5,
+              8
+            ]
+          ]
+        ],
+        "expected": 2
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        ],
+        "expected": 1
+      },
+      {
+        "args": [
+          [
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        ],
+        "expected": 3
+      }
+    ],
+    "pitfalls": [
+      "종료 시각과 시작 시각이 같으면 겹치지 않습니다.",
+      "마지막 힙 크기만 반환하면 최대 동시성을 놓칩니다."
+    ],
+    "explainPrompt": "반열린 구간 정의가 <= 비교에 어떻게 반영되는지 설명하세요."
+  },
+  {
+    "id": 18,
+    "title": "순서를 유지하는 배치 용량",
+    "topic": "이진 탐색 · 답 탐색",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(sizes, days): 양의 정수 작업 크기 배열을 순서대로 연속 묶음으로 나누어 최대 days일에 처리합니다. 하루에 한 묶음을 처리하며 그 합은 용량 C 이하여야 합니다. 필요한 최소 정수 C를 반환하세요. 1 ≤ days ≤ n ≤ 100000, 크기는 1~10^6입니다.",
+    "examples": [
+      {
+        "input": "solve([1, 2, 3, 4, 5], 3)",
+        "output": "6",
+        "explanation": "용량 6이면 [1,2,3], [4], [5]로 3일입니다. 용량 5이면 4일이 필요합니다."
+      }
+    ],
+    "hints": [
+      "용량이 커질수록 필요한 날 수는 늘어나지 않습니다.",
+      "최소 후보는 가장 큰 작업, 최대 후보는 전체 합입니다.",
+      "주어진 용량의 가능 여부를 순서대로 탐욕적으로 묶어 검사하세요."
+    ],
+    "approach": "용량에 대한 단조 판정 함수를 만들고 가능한 최소 용량을 이진 탐색합니다. 한 묶음에 가능한 많이 넣어야 주어진 용량에서 날 수가 최소가 됩니다.",
+    "complexity": "시간 O(n log(sum(sizes))), 공간 O(1).",
+    "solution": "def solve(sizes, days):\n    low, high = max(sizes), sum(sizes)\n    while low < high:\n        capacity = (low + high) // 2\n        used, current = 1, 0\n        for size in sizes:\n            if current + size > capacity:\n                used += 1\n                current = 0\n            current += size\n        if used <= days:\n            high = capacity\n        else:\n            low = capacity + 1\n    return low\n",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          3
+        ],
+        "expected": 6
+      },
+      {
+        "args": [
+          [
+            7
+          ],
+          1
+        ],
+        "expected": 7
+      },
+      {
+        "args": [
+          [
+            4,
+            2,
+            8
+          ],
+          3
+        ],
+        "expected": 8
+      }
+    ],
+    "pitfalls": [
+      "순서를 바꾸거나 한 작업을 쪼개면 다른 문제입니다.",
+      "정확히 days가 아니라 최대 days입니다."
+    ],
+    "explainPrompt": "가능 여부가 단조인 이유와 이진 탐색의 양 끝값을 설명하세요."
+  },
+  {
+    "id": 19,
+    "title": "정확히 목표량인 로그 구간 수",
+    "topic": "누적합 · 해시",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(deltas, target): 합이 target인 비어 있지 않은 연속 구간의 개수를 반환하세요. deltas에는 음수·0·양수가 섞일 수 있습니다. n ≤ 100000, 값과 target은 -10^9~10^9입니다.",
+    "examples": [
+      {
+        "input": "solve([1, -1, 1], 1)",
+        "output": "3",
+        "explanation": "첫 [1], 전체 [1,-1,1], 마지막 [1]로 세 구간입니다."
+      }
+    ],
+    "hints": [
+      "두 누적합의 차이가 구간 합입니다.",
+      "현재 누적합 p에서 이전 p-target의 등장 횟수가 필요합니다.",
+      "초기 누적합 0을 한 번 기록하고 조회 후 현재 누적합을 추가하세요."
+    ],
+    "approach": "현재 위치 이전의 누적합별 빈도를 저장합니다. p-target의 빈도만큼 현재 위치에서 끝나는 목표 구간이 존재합니다.",
+    "complexity": "시간 O(n), 공간 O(n).",
+    "solution": "def solve(deltas, target):\n    counts = {0: 1}\n    prefix = answer = 0\n    for value in deltas:\n        prefix += value\n        answer += counts.get(prefix - target, 0)\n        counts[prefix] = counts.get(prefix, 0) + 1\n    return answer\n",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            -1,
+            1
+          ],
+          1
+        ],
+        "expected": 3
+      },
+      {
+        "args": [
+          [
+            0,
+            0,
+            0
+          ],
+          0
+        ],
+        "expected": 6
+      },
+      {
+        "args": [
+          [],
+          0
+        ],
+        "expected": 0
+      }
+    ],
+    "pitfalls": [
+      "음수가 있어 일반적인 합 기반 투 포인터는 쓸 수 없습니다.",
+      "현재 누적합을 먼저 기록하면 빈 구간을 세게 됩니다."
+    ],
+    "explainPrompt": "누적합의 값 대신 빈도가 필요한 이유를 0,0,0 예제로 설명하세요."
+  },
+  {
+    "id": 20,
+    "title": "최소 재시도 비용 경로",
+    "topic": "그래프 · 다익스트라",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(n, edges, start, target): 방향 간선 [u,v,cost]를 따라 start에서 target까지 가는 최소 비용을 반환하세요. 도달 불가면 -1입니다. 1 ≤ n ≤ 100000, 간선 수 ≤ 200000, cost는 0~10^6 정수이며 중복 간선도 허용합니다. 정점 번호는 0~n-1이며 모든 간선 끝점과 start, target은 유효한 정점 번호입니다.",
+    "examples": [
+      {
+        "input": "solve(4, [[0, 1, 8], [0, 2, 2], [2, 1, 1], [1, 3, 3]], 0, 3)",
+        "output": "6",
+        "explanation": "0→2→1→3 비용은 2+1+3=6이며 0→1→3의 11보다 작습니다."
+      }
+    ],
+    "hints": [
+      "가중치가 달라 BFS 대신 최소 거리 후보를 우선 처리해야 합니다.",
+      "힙에 (거리,정점)을 넣으세요.",
+      "꺼낸 거리가 최신 거리와 다르면 오래된 후보이므로 건너뛰세요."
+    ],
+    "approach": "비음수 가중치 조건에서 최소 힙으로 가장 가까운 후보를 꺼내 간선을 완화합니다. 중복 힙 항목은 최신 거리 비교로 무시합니다.",
+    "complexity": "시간 O((V+E) log(V+E)), 공간 O(V+E).",
+    "solution": "def solve(n, edges, start, target):\n    import heapq\n    graph = [[] for _ in range(n)]\n    for u, v, cost in edges:\n        graph[u].append((v, cost))\n    distance = [float('inf')] * n\n    distance[start] = 0\n    heap = [(0, start)]\n    while heap:\n        cost, node = heapq.heappop(heap)\n        if cost != distance[node]:\n            continue\n        if node == target:\n            return cost\n        for nxt, weight in graph[node]:\n            candidate = cost + weight\n            if candidate < distance[nxt]:\n                distance[nxt] = candidate\n                heapq.heappush(heap, (candidate, nxt))\n    return -1\n",
+    "tests": [
+      {
+        "args": [
+          4,
+          [
+            [
+              0,
+              1,
+              8
+            ],
+            [
+              0,
+              2,
+              2
+            ],
+            [
+              2,
+              1,
+              1
+            ],
+            [
+              1,
+              3,
+              3
+            ]
+          ],
+          0,
+          3
+        ],
+        "expected": 6
+      },
+      {
+        "args": [
+          2,
+          [
+            [
+              0,
+              1,
+              1
+            ]
+          ],
+          1,
+          0
+        ],
+        "expected": -1
+      },
+      {
+        "args": [
+          1,
+          [],
+          0,
+          0
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          2,
+          [
+            [
+              0,
+              1,
+              0
+            ]
+          ],
+          0,
+          1
+        ],
+        "expected": 0
+      }
+    ],
+    "pitfalls": [
+      "방향 간선을 양방향으로 만들지 마세요.",
+      "음수 비용에서는 이 알고리즘의 보장이 깨집니다."
+    ],
+    "explainPrompt": "정점을 처음 힙에 넣었을 때 방문 확정하면 안 되는 이유를 설명하세요."
+  },
+  {
+    "id": 21,
+    "title": "의존 작업 실행 순서",
+    "topic": "위상 정렬",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(n, dependencies): 작업은 0~n-1입니다. [a,b]는 a가 끝나야 b를 실행할 수 있다는 뜻입니다. 가능한 실행 순서 중 사전순으로 가장 작은 정수 배열을 반환하세요. 사이클 때문에 불가능하면 []입니다. 1 ≤ n ≤ 100000, 의존 수 ≤ 200000, 중복 쌍은 없습니다.",
+    "examples": [
+      {
+        "input": "solve(4, [[0, 2], [1, 2]])",
+        "output": "[0, 1, 2, 3]",
+        "explanation": "처음 가능한 0,1,3 중 0부터 고르고, 1을 마친 뒤 가능해진 2를 3보다 먼저 고릅니다."
+      }
+    ],
+    "hints": [
+      "진입 차수가 0인 작업만 지금 실행할 수 있습니다.",
+      "사전순 최소를 위해 실행 가능한 작업을 최소 힙에 넣으세요.",
+      "실행한 수가 n보다 작으면 사이클이 있습니다."
+    ],
+    "approach": "Kahn 위상 정렬에서 준비된 정점을 최소 힙으로 선택합니다. 매 단계 가능한 가장 작은 번호를 고르면 사전순 최소가 됩니다.",
+    "complexity": "시간 O(E + V log V), 공간 O(V+E).",
+    "solution": "def solve(n, dependencies):\n    import heapq\n    graph = [[] for _ in range(n)]\n    indegree = [0] * n\n    for a, b in dependencies:\n        graph[a].append(b)\n        indegree[b] += 1\n    ready = [i for i in range(n) if indegree[i] == 0]\n    heapq.heapify(ready)\n    order = []\n    while ready:\n        node = heapq.heappop(ready)\n        order.append(node)\n        for nxt in graph[node]:\n            indegree[nxt] -= 1\n            if indegree[nxt] == 0:\n                heapq.heappush(ready, nxt)\n    return order if len(order) == n else []\n",
+    "tests": [
+      {
+        "args": [
+          4,
+          [
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        ],
+        "expected": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "args": [
+          2,
+          [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ]
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          3,
+          []
+        ],
+        "expected": [
+          0,
+          1,
+          2
+        ]
+      }
+    ],
+    "pitfalls": [
+      "사이클이 있는 부분만 남았을 때 부분 순서를 성공으로 반환하면 안 됩니다.",
+      "일반 큐는 사전순 최소를 보장하지 않습니다."
+    ],
+    "explainPrompt": "진입 차수의 의미와 사이클 탐지가 되는 이유를 설명하세요."
+  },
+  {
+    "id": 22,
+    "title": "최소 작업 패키지 수",
+    "topic": "동적 계획법 · 동전",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(packages, target): 각 양의 정수 패키지 크기를 원하는 만큼 써서 target을 정확히 만드는 최소 개수를 반환하세요. 불가능하면 -1, target=0이면 0입니다. packages는 중복 없는 양의 정수 최대 30개, 크기 ≤ 10000, 0 ≤ target ≤ 10000입니다.",
+    "examples": [
+      {
+        "input": "solve([1, 3, 4], 6)",
+        "output": "2",
+        "explanation": "3+3 두 패키지가 최적입니다. 큰 수부터 고르면 4+1+1로 세 개가 됩니다."
+      }
+    ],
+    "hints": [
+      "큰 패키지부터 고르는 탐욕법이 항상 맞는지 확인하세요.",
+      "dp[x]를 정확히 x를 만드는 최소 개수로 정의하세요.",
+      "dp[x] = min(dp[x-size]+1)이며 dp[0]=0입니다."
+    ],
+    "approach": "금액을 작은 순서로 채우며 마지막에 사용한 패키지 크기별 후보를 비교합니다. 불가능 상태는 충분히 큰 수로 둡니다.",
+    "complexity": "시간 O(target × 종류 수), 공간 O(target).",
+    "solution": "def solve(packages, target):\n    impossible = target + 1\n    dp = [impossible] * (target + 1)\n    dp[0] = 0\n    for amount in range(1, target + 1):\n        for size in packages:\n            if size <= amount:\n                dp[amount] = min(dp[amount], dp[amount - size] + 1)\n    return -1 if dp[target] == impossible else dp[target]\n",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            3,
+            4
+          ],
+          6
+        ],
+        "expected": 2
+      },
+      {
+        "args": [
+          [
+            2
+          ],
+          3
+        ],
+        "expected": -1
+      },
+      {
+        "args": [
+          [
+            2,
+            5
+          ],
+          0
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [],
+          3
+        ],
+        "expected": -1
+      }
+    ],
+    "pitfalls": [
+      "탐욕법은 1,3,4로 6을 만들 때 실패합니다.",
+      "패키지 재사용이 가능한 문제입니다."
+    ],
+    "explainPrompt": "DP 상태·초기값·점화식·계산 순서를 차례로 설명하세요."
+  },
+  {
+    "id": 23,
+    "title": "인접 작업을 피한 최대 이익",
+    "topic": "동적 계획법 · 상태 압축",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(profits): 배열의 인접한 두 작업을 동시에 선택할 수 없을 때 가능한 최대 이익 합을 반환하세요. 아무 작업도 선택하지 않아도 됩니다. n ≤ 100000, 각 이익은 0~10^9입니다.",
+    "examples": [
+      {
+        "input": "solve([2, 7, 9, 3, 1])",
+        "output": "12",
+        "explanation": "인덱스 0,2,4의 이익 2+9+1=12가 최댓값입니다."
+      }
+    ],
+    "hints": [
+      "현재 작업을 선택하면 바로 전 작업은 선택할 수 없습니다.",
+      "현재를 고르지 않는 최적값과 고르는 최적값을 비교하세요.",
+      "직전 두 개의 DP 값만 필요합니다."
+    ],
+    "approach": "앞의 i개 작업 최적값은 앞 i-1개 최적값과 앞 i-2개 최적값+현재 이익 중 큰 값입니다. 두 변수로 공간을 줄입니다.",
+    "complexity": "시간 O(n), 공간 O(1).",
+    "solution": "def solve(profits):\n    previous_two = previous_one = 0\n    for profit in profits:\n        current = max(previous_one, previous_two + profit)\n        previous_two, previous_one = previous_one, current\n    return previous_one\n",
+    "tests": [
+      {
+        "args": [
+          [
+            2,
+            7,
+            9,
+            3,
+            1
+          ]
+        ],
+        "expected": 12
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            5
+          ]
+        ],
+        "expected": 5
+      },
+      {
+        "args": [
+          [
+            0,
+            0
+          ]
+        ],
+        "expected": 0
+      }
+    ],
+    "pitfalls": [
+      "현재 값을 계산하기 전에 이전 상태를 덮어쓰지 마세요.",
+      "이익이 가장 큰 작업부터 고르는 방식은 보장되지 않습니다."
+    ],
+    "explainPrompt": "두 변수 각각이 어느 접두 구간의 최적값인지 설명하세요."
+  },
+  {
+    "id": 24,
+    "title": "격자에서 가능한 배포 경로 수",
+    "topic": "동적 계획법 · 격자",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(blocked): 0은 통과 가능, 1은 막힌 셀입니다. 좌상단에서 우하단까지 오른쪽 또는 아래로만 이동하는 경로 수를 1000000007로 나눈 나머지를 반환하세요. 행·열은 1~200이고 출발·도착이 막힐 수 있습니다.",
+    "examples": [
+      {
+        "input": "solve([[0, 0, 0], [0, 1, 0], [0, 0, 0]])",
+        "output": "2",
+        "explanation": "중앙을 피해 위쪽 가장자리 또는 왼쪽 가장자리로 가는 두 경로가 있습니다."
+      }
+    ],
+    "hints": [
+      "각 셀로 오는 마지막 이동은 위 또는 왼쪽입니다.",
+      "막힌 셀의 경로 수는 0입니다.",
+      "1차원 DP에서 갱신 전 dp[c]는 위, 갱신 후 dp[c-1]은 왼쪽입니다."
+    ],
+    "approach": "첫 시작 위치에 경로 수 1을 두고 행 단위로 갱신합니다. 장애물은 누적 경로를 0으로 끊습니다.",
+    "complexity": "시간 O(RC), 공간 O(C).",
+    "solution": "def solve(blocked):\n    cols = len(blocked[0])\n    dp = [0] * cols\n    dp[0] = 1\n    for row in blocked:\n        for c, cell in enumerate(row):\n            if cell == 1:\n                dp[c] = 0\n            elif c > 0:\n                dp[c] = (dp[c] + dp[c - 1]) % 1000000007\n    return dp[-1]\n",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        "expected": 2
+      },
+      {
+        "args": [
+          [
+            [
+              1
+            ]
+          ]
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            [
+              0
+            ]
+          ]
+        ],
+        "expected": 1
+      },
+      {
+        "args": [
+          [
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        ],
+        "expected": 0
+      }
+    ],
+    "pitfalls": [
+      "막힌 셀의 이전 dp 값을 그대로 두면 경로가 통과합니다.",
+      "시작 셀도 장애물일 수 있습니다."
+    ],
+    "explainPrompt": "1차원 배열 갱신 순서가 왼쪽에서 오른쪽이어야 하는 이유를 설명하세요."
+  },
+  {
+    "id": 25,
+    "title": "커서 기반 다음 페이지",
+    "topic": "정렬 · 이진 탐색",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(records, cursor, limit): records는 고유 정수 ID의 [created_at,id] 레코드 배열이며 정렬되지 않았습니다. (created_at,id) 오름차순으로 정렬하고 cursor보다 사전순으로 엄격히 큰 레코드 중 앞 limit개를 반환하세요. cursor는 [시각,id] 또는 None이며 None은 첫 페이지입니다. n ≤ 100000, 두 값은 0~10^9, 1 ≤ limit ≤ 100입니다. 입력을 수정하지 마세요.",
+    "examples": [
+      {
+        "input": "solve([[10, 3], [9, 1], [10, 2], [11, 4]], [10, 2], 2)",
+        "output": "[[10, 3], [11, 4]]",
+        "explanation": "커서 [10,2] 자신은 제외하고 [10,3], [11,4]를 순서대로 반환합니다."
+      }
+    ],
+    "hints": [
+      "시각만 커서로 쓰면 같은 시각 레코드를 놓칠 수 있습니다.",
+      "시각과 고유 ID를 묶어 전체 순서를 만드세요.",
+      "bisect_right로 커서보다 큰 첫 위치를 구할 수 있습니다."
+    ],
+    "approach": "복합 키로 정렬 후 upper bound를 구해 페이지를 잘라 반환합니다. 메모리 배열 모델이며 실제 DB에서는 복합 인덱스와 조회 조건으로 처리합니다.",
+    "complexity": "시간 O(n log n + log n + limit), 공간 O(n).",
+    "solution": "def solve(records, cursor, limit):\n    from bisect import bisect_right\n    ordered = sorted(records)\n    start = 0 if cursor is None else bisect_right(ordered, cursor)\n    return ordered[start:start + limit]\n",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              10,
+              3
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              10,
+              2
+            ],
+            [
+              11,
+              4
+            ]
+          ],
+          [
+            10,
+            2
+          ],
+          2
+        ],
+        "expected": [
+          [
+            10,
+            3
+          ],
+          [
+            11,
+            4
+          ]
+        ]
+      },
+      {
+        "args": [
+          [],
+          null,
+          3
+        ],
+        "expected": []
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          null,
+          1
+        ],
+        "expected": [
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            1,
+            1
+          ],
+          2
+        ],
+        "expected": []
+      }
+    ],
+    "pitfalls": [
+      "동일 시각의 레코드를 구분할 안정적인 키가 필요합니다.",
+      "커서 자신은 다음 페이지에 다시 포함하지 않습니다."
+    ],
+    "explainPrompt": "동일 시각·삭제된 커서·페이지 사이 삽입이 있을 때 의미와 DB 복합 인덱스를 설명하세요."
+  },
+  {
+    "id": 26,
+    "title": "LRU 캐시 시뮬레이터",
+    "topic": "해시 · 순서 자료구조",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(capacity, operations): operation은 [\"put\",key,value] 또는 [\"get\",key]입니다. get은 있으면 값(정수), 없으면 -1을 반환하며 get 결과만 배열로 모으세요. 성공한 get과 모든 put은 해당 키를 가장 최근 사용으로 만듭니다. 용량 초과 시 가장 오래 사용하지 않은 키를 제거합니다. 0 ≤ capacity ≤ 10000, 연산 수 ≤ 100000, key는 문자열, value는 0~10^9입니다.",
+    "examples": [
+      {
+        "input": "solve(2, [[\"put\", \"a\", 1], [\"put\", \"b\", 2], [\"get\", \"a\"], [\"put\", \"c\", 3], [\"get\", \"b\"], [\"get\", \"c\"]])",
+        "output": "[1, -1, 3]",
+        "explanation": "a 조회 후 b가 가장 오래된 키가 됩니다. c 삽입이 b를 제거하므로 조회 결과는 1,-1,3입니다."
+      }
+    ],
+    "hints": [
+      "키 조회와 사용 순서 갱신을 둘 다 빠르게 해야 합니다.",
+      "Python OrderedDict의 move_to_end와 popitem(last=False)를 살펴보세요.",
+      "기존 키 갱신도 최근 사용이 되며 용량 0도 처리해야 합니다."
+    ],
+    "approach": "OrderedDict 앞을 오래된 키, 뒤를 최근 키로 둡니다. 읽기 성공 및 쓰기마다 뒤로 이동하고 용량을 넘으면 앞을 제거합니다.",
+    "complexity": "평균 연산당 O(1), 전체 O(m), 공간 O(capacity + get 결과 수).",
+    "solution": "def solve(capacity, operations):\n    from collections import OrderedDict\n    cache = OrderedDict()\n    result = []\n    for operation in operations:\n        action, key = operation[:2]\n        if action == 'get':\n            if key in cache:\n                result.append(cache[key])\n                cache.move_to_end(key)\n            else:\n                result.append(-1)\n        else:\n            cache[key] = operation[2]\n            cache.move_to_end(key)\n            if len(cache) > capacity:\n                cache.popitem(last=False)\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          2,
+          [
+            [
+              "put",
+              "a",
+              1
+            ],
+            [
+              "put",
+              "b",
+              2
+            ],
+            [
+              "get",
+              "a"
+            ],
+            [
+              "put",
+              "c",
+              3
+            ],
+            [
+              "get",
+              "b"
+            ],
+            [
+              "get",
+              "c"
+            ]
+          ]
+        ],
+        "expected": [
+          1,
+          -1,
+          3
+        ]
+      },
+      {
+        "args": [
+          0,
+          [
+            [
+              "put",
+              "a",
+              1
+            ],
+            [
+              "get",
+              "a"
+            ]
+          ]
+        ],
+        "expected": [
+          -1
+        ]
+      },
+      {
+        "args": [
+          1,
+          [
+            [
+              "put",
+              "a",
+              1
+            ],
+            [
+              "put",
+              "a",
+              5
+            ],
+            [
+              "get",
+              "a"
+            ]
+          ]
+        ],
+        "expected": [
+          5
+        ]
+      }
+    ],
+    "pitfalls": [
+      "get 성공도 사용 순서를 바꿉니다.",
+      "기존 키 put을 새 키 추가로 계산하지 마세요."
+    ],
+    "explainPrompt": "직접 구현한다면 해시와 이중 연결 리스트를 어떻게 결합할지 설명하세요."
+  },
+  {
+    "id": 27,
+    "title": "만료되는 세션 저장소",
+    "topic": "해시 · 만료 경계",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(ttl, operations): 연산은 [\"set\",time,key,value] 또는 [\"get\",time,key]이며 시각은 비감소 순서입니다. set은 값을 저장하고 만료 시각을 time+ttl로 갱신합니다. get 시각이 만료 시각 미만이면 값을, 이상이면 -1을 반환합니다. get 결과만 배열로 모으세요. ttl은 양의 정수, 연산 수 ≤ 100000, 시각·값은 0~10^9, 키는 문자열입니다. 조회가 TTL을 연장하지 않습니다.",
+    "examples": [
+      {
+        "input": "solve(5, [[\"set\", 0, \"a\", 7], [\"get\", 4, \"a\"], [\"get\", 5, \"a\"]])",
+        "output": "[7, -1]",
+        "explanation": "a는 시각 5에 만료되므로 시각 4에는 7, 시각 5에는 -1입니다."
+      }
+    ],
+    "hints": [
+      "키마다 값과 만료 시각을 함께 저장하세요.",
+      "현재 시각이 만료 시각과 같으면 이미 만료입니다.",
+      "조회하지 않는 만료 키를 즉시 제거할 의무는 없습니다."
+    ],
+    "approach": "키별 (값,만료시각)을 저장하고 조회 시 만료 여부를 검사하는 지연 삭제를 사용합니다. set은 과거 만료 정보를 통째로 덮어씁니다.",
+    "complexity": "평균 시간 O(m), 공간 O(u + get 결과 수); u는 입력에서 설정한 서로 다른 키 수.",
+    "solution": "def solve(ttl, operations):\n    store = {}\n    result = []\n    for operation in operations:\n        action, time, key = operation[:3]\n        if action == 'set':\n            store[key] = (operation[3], time + ttl)\n        elif key in store and time < store[key][1]:\n            result.append(store[key][0])\n        else:\n            store.pop(key, None)\n            result.append(-1)\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          5,
+          [
+            [
+              "set",
+              0,
+              "a",
+              7
+            ],
+            [
+              "get",
+              4,
+              "a"
+            ],
+            [
+              "get",
+              5,
+              "a"
+            ]
+          ]
+        ],
+        "expected": [
+          7,
+          -1
+        ]
+      },
+      {
+        "args": [
+          3,
+          [
+            [
+              "get",
+              0,
+              "x"
+            ]
+          ]
+        ],
+        "expected": [
+          -1
+        ]
+      },
+      {
+        "args": [
+          5,
+          [
+            [
+              "set",
+              0,
+              "a",
+              1
+            ],
+            [
+              "set",
+              4,
+              "a",
+              2
+            ],
+            [
+              "get",
+              5,
+              "a"
+            ],
+            [
+              "get",
+              9,
+              "a"
+            ]
+          ]
+        ],
+        "expected": [
+          2,
+          -1
+        ]
+      }
+    ],
+    "pitfalls": [
+      "조회가 TTL을 연장하는 정책과 혼동하지 마세요.",
+      "지연 삭제는 다시 조회하지 않는 만료 키의 메모리를 남깁니다."
+    ],
+    "explainPrompt": "지연 삭제의 시간·메모리 절충과 주기적 정리 도입 시 고려점을 설명하세요."
+  },
+  {
+    "id": 28,
+    "title": "최종 모의 1: 겹치지 않는 최대 점검 예약",
+    "topic": "그리디 · 구간 선택",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(intervals): 한 대의 장비에서 처리 가능한 겹치지 않는 예약의 최대 개수를 반환하세요. 각 예약은 [start,end)이고 0 ≤ start < end ≤ 10^9, n ≤ 100000입니다. 종료 시각과 다음 시작이 같으면 함께 선택할 수 있습니다. 입력을 수정하지 마세요.",
+    "examples": [
+      {
+        "input": "solve([[0, 6], [1, 2], [2, 3], [3, 4]])",
+        "output": "3",
+        "explanation": "긴 예약 [0,6] 대신 [1,2], [2,3], [3,4]를 선택하면 세 개를 처리합니다."
+      }
+    ],
+    "hints": [
+      "가장 빨리 시작하거나 가장 짧은 예약을 고르면 항상 맞을까요?",
+      "가장 먼저 끝나는 예약은 뒤에 가장 많은 시간을 남깁니다.",
+      "종료순 정렬 후 마지막 종료 이상에서 시작하는 예약을 고르세요."
+    ],
+    "approach": "종료 시각이 가장 빠른 예약부터 선택합니다. 최적해 첫 예약을 가장 빨리 끝나는 예약으로 바꿔도 이후 예약을 막지 않는 교환 논증이 성립합니다.",
+    "complexity": "시간 O(n log n), 공간 O(n) 정렬 복사.",
+    "solution": "def solve(intervals):\n    last_end = -1\n    count = 0\n    for start, end in sorted(intervals, key=lambda pair: pair[1]):\n        if start >= last_end:\n            count += 1\n            last_end = end\n    return count\n",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              0,
+              6
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ]
+          ]
+        ],
+        "expected": 3
+      },
+      {
+        "args": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "args": [
+          [
+            [
+              0,
+              2
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        ],
+        "expected": 2
+      }
+    ],
+    "pitfalls": [
+      "겹치는 예약을 합치는 문제와 다릅니다.",
+      "짧은 예약 순서만으로는 최적을 보장하지 못합니다."
+    ],
+    "explainPrompt": "가장 빨리 끝나는 예약을 먼저 고르는 교환 논증을 말로 설명하세요."
+  },
+  {
+    "id": 29,
+    "title": "최종 모의 2: 서버 그룹 연결 질의",
+    "topic": "유니온 파인드",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(n, operations): 서버 0~n-1에 대해 [\"union\",a,b]는 두 서버 그룹을 합치고 [\"same\",a,b]는 같은 그룹인지 불리언을 반환합니다. same 결과만 배열로 반환하세요. 1 ≤ n ≤ 100000, 연산 수 ≤ 200000, 서버 번호는 유효합니다. 연결은 추가만 됩니다.",
+    "examples": [
+      {
+        "input": "solve(4, [[\"same\", 0, 1], [\"union\", 0, 1], [\"union\", 1, 2], [\"same\", 0, 2], [\"same\", 0, 3]])",
+        "output": "[false, true, false]",
+        "explanation": "처음 0과 1은 다르고, 두 union 뒤 0과 2는 같으며 3은 여전히 별도 그룹입니다."
+      }
+    ],
+    "hints": [
+      "매 질의마다 그래프 전체 탐색을 하면 느립니다.",
+      "각 그룹의 대표를 부모 배열로 관리하세요.",
+      "경로 압축과 크기 기준 합치기를 함께 쓰세요."
+    ],
+    "approach": "대표가 같은지로 연결 여부를 확인합니다. find 중 경로를 압축하고 작은 트리를 큰 트리에 붙여 높이를 제한합니다.",
+    "complexity": "시간 O((n+m) α(n)) 상각, 공간 O(n + same 결과 수).",
+    "solution": "def solve(n, operations):\n    parent = list(range(n))\n    size = [1] * n\n    def find(node):\n        while parent[node] != node:\n            parent[node] = parent[parent[node]]\n            node = parent[node]\n        return node\n    result = []\n    for action, a, b in operations:\n        ra, rb = find(a), find(b)\n        if action == 'same':\n            result.append(ra == rb)\n        elif ra != rb:\n            if size[ra] < size[rb]:\n                ra, rb = rb, ra\n            parent[rb] = ra\n            size[ra] += size[rb]\n    return result\n",
+    "tests": [
+      {
+        "args": [
+          4,
+          [
+            [
+              "same",
+              0,
+              1
+            ],
+            [
+              "union",
+              0,
+              1
+            ],
+            [
+              "union",
+              1,
+              2
+            ],
+            [
+              "same",
+              0,
+              2
+            ],
+            [
+              "same",
+              0,
+              3
+            ]
+          ]
+        ],
+        "expected": [
+          false,
+          true,
+          false
+        ]
+      },
+      {
+        "args": [
+          1,
+          [
+            [
+              "same",
+              0,
+              0
+            ],
+            [
+              "union",
+              0,
+              0
+            ],
+            [
+              "same",
+              0,
+              0
+            ]
+          ]
+        ],
+        "expected": [
+          true,
+          true
+        ]
+      },
+      {
+        "args": [
+          2,
+          []
+        ],
+        "expected": []
+      }
+    ],
+    "pitfalls": [
+      "이미 같은 그룹을 합칠 때 크기를 또 더하지 마세요.",
+      "연결 삭제는 이 기본 자료구조로 처리하지 못합니다."
+    ],
+    "explainPrompt": "단순 부모 배열에서 긴 사슬이 생기는 문제와 두 최적화의 역할을 설명하세요."
+  },
+  {
+    "id": 30,
+    "title": "최종 실전: 의존 배치의 최소 완료 시간",
+    "topic": "위상 정렬 · DAG 동적 계획법",
+    "day": 2,
+    "minutes": 20,
+    "difficulty": "중급",
+    "statement": "함수 solve(durations, dependencies): 작업 i의 실행 시간은 durations[i]입니다. [a,b]는 a 완료 후 b 시작을 뜻합니다. 워커는 무제한이며 모든 선행 작업이 끝나면 즉시 실행할 수 있습니다. 전체 작업의 최소 완료 시간을 반환하세요. 사이클이면 -1입니다. 1 ≤ n ≤ 100000, 실행 시간은 1~10^6, 의존 수 ≤ 200000, 유효한 서로 다른 작업 간 중복 없는 쌍입니다.",
+    "examples": [
+      {
+        "input": "solve([3, 5, 2, 4], [[0, 2], [1, 2], [2, 3]])",
+        "output": "11",
+        "explanation": "0과 1을 병렬로 시작하면 5에 모두 끝납니다. 이후 2가 7에, 3이 11에 완료됩니다."
+      }
+    ],
+    "hints": [
+      "선행 작업 여러 개의 시간은 합이 아니라 가장 늦은 완료 시각이 중요합니다.",
+      "finish[v] = max(finish[v], finish[u]+duration[v])로 갱신하세요.",
+      "위상 순서로 처리하고 처리한 작업 수로 사이클을 검사하세요."
+    ],
+    "approach": "진입 차수 0부터 위상 탐색하며 각 작업의 가장 이른 완료 시각을 갱신합니다. 무제한 병렬 실행의 전체 시간은 DAG의 최장 가중 경로 길이입니다.",
+    "complexity": "시간 O(V+E), 공간 O(V+E).",
+    "solution": "def solve(durations, dependencies):\n    from collections import deque\n    n = len(durations)\n    graph = [[] for _ in range(n)]\n    indegree = [0] * n\n    for a, b in dependencies:\n        graph[a].append(b)\n        indegree[b] += 1\n    finish = durations.copy()\n    queue = deque(i for i in range(n) if indegree[i] == 0)\n    processed = 0\n    while queue:\n        node = queue.popleft()\n        processed += 1\n        for nxt in graph[node]:\n            finish[nxt] = max(finish[nxt], finish[node] + durations[nxt])\n            indegree[nxt] -= 1\n            if indegree[nxt] == 0:\n                queue.append(nxt)\n    return max(finish) if processed == n else -1\n",
+    "tests": [
+      {
+        "args": [
+          [
+            3,
+            5,
+            2,
+            4
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        ],
+        "expected": 11
+      },
+      {
+        "args": [
+          [
+            2,
+            7,
+            3
+          ],
+          []
+        ],
+        "expected": 7
+      },
+      {
+        "args": [
+          [
+            1,
+            2
+          ],
+          [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ]
+        ],
+        "expected": -1
+      },
+      {
+        "args": [
+          [
+            9
+          ],
+          []
+        ],
+        "expected": 9
+      }
+    ],
+    "pitfalls": [
+      "병렬 실행하므로 선행 작업 시간을 무조건 더하면 안 됩니다.",
+      "워커 수 제한이 있으면 다른 스케줄링 문제가 됩니다."
+    ],
+    "explainPrompt": "요구사항 확인→작은 예시→상태 정의→정확성→복잡도→경계 테스트 순서로 3분 안에 설명하세요."
+  }
+]
