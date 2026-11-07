@@ -2,43 +2,49 @@
   {
     "id": 1,
     "title": "중복 요청 ID 제거",
-    "prompt": "Create a premium restrained editorial illustration for a Java algorithm lesson about removing duplicate request IDs while retaining first-seen order. Landscape 3:2. Warm ivory #faf9f5 background, forest teal #285d51 and sage tactile paper and clay objects, soft natural shadows, spacious elegant composition. Show a short orderly conveyor of small request cards bearing simple geometric symbols, with repeated symbol cards gently diverted into a shallow side tray, while three distinct symbol cards continue in original order. Clear concrete analogy, no humans, no text, no letters, no digits, no logos or watermark. Quiet thoughtful educational art.",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-ceebe090-e1c1-4263-9856-c8708a012fcd.png",
-    "path": "static/coding-images/01.png"
+    "prompt": "Create FLAT 2D vector-like educational algorithm diagram, landscape3:2, solid warm ivory background, crisp charcoal outlines, teal highlights and muted coral exclusions. NO3D, NOtexture, NOshadows, NOdecorative objects/plants. Very large legible ASCII text and numbers. Three simple horizontal rows linked by downward arrows. Top row labelled INPUT: five equal outlined array cells containing exactly b, a, b, c, a. Middle row labelled KEEP FIRST: same five cells b,a,b,c,a; first b, first a and c teal, second b (third cell) and second a (fifth cell) muted coral with X marks ABOVE those two cells, do not obscure letters. Bottom row labelled OUTPUT: exactly three teal outlined cells b,a,c. Meaning duplicates removed and first-seen order kept. No other text. Verify exact values and counts.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-f9ed4f5b-8c2b-47cc-8f06-f8d26579b137.png",
+    "path": "static/coding-images/01.png",
+    "style": "flat2d-exact-example"
   },
   {
     "id": 2,
     "title": "목표 금액을 만드는 두 결제",
-    "prompt": "Premium restrained editorial educational illustration, landscape 3:2, warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile paper/clay, soft natural shadows and spacious elegant composition. Concept: choosing exactly two payments that sum to a target amount. Show a beautiful simple balance scale: on one pan two separate small stacks of coin-like discs, on the other one larger stack exactly balancing them, with a few unused stacks gently apart on the table. No currency symbols, text, letters, digits, humans, logos, or watermark. Clear single visual metaphor, not generic tech clutter. Modern calm editorial still life.",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-55fe99a2-9b4b-4bca-a4e7-f5ec13471c2f.png",
-    "path": "static/coding-images/02.png"
+    "prompt": "Flat2D vector-like educational algorithm diagram on solid warm ivory, crisp charcoal outlines, teal highlights, muted coral only for exclusions. Landscape3:2. No3D, shadows, textures, decor, objects or plants. Large legible literal ASCII labels. INPUT row: four cells 4,2,4,6. Above these cells show aligned indices 0,1,2,3, with small label INDEX. Under input show TARGET = 8. Highlight first and third cells teal and connect them with a bracket to equation 4 + 4 = 8. Under equation large label OUTPUT INDICES followed by [0, 2]. Critical: output must be indices [0,2], not values [4,4]. Small footer 'earliest right index: 2'. Spacious clear direct input-selection-output.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-be80d8ef-0621-4dd8-9bd9-91a1a80785a5.png",
+    "path": "static/coding-images/02.png",
+    "style": "flat2d-exact-example"
   },
   {
     "id": 3,
     "title": "가장 많이 발생한 오류 코드",
-    "prompt": "Landscape 3:2 premium editorial illustration for algorithm 'most frequently occurring error code'. Warm ivory #faf9f5 background with forest teal #285d51 and sage clay/paper materials, soft shadows, spacious refined composition. A neat sorting desk with three columns of small ticket tiles: triangle-marked tickets make the clearly tallest stack, circle-marked tickets a medium stack, square-marked tickets a low stack. A delicate sage selection frame gently highlights the tallest triangle stack. Geometric symbols only, no letters, numbers, text, logos or watermark. No generic computer screens. Quiet cohesive tactile educational art.",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-6ffce953-fe96-4ec4-b574-2d64ecaad44e.png",
-    "path": "static/coding-images/03.png"
+    "prompt": "Flat2D vector-like educational algorithm diagram, landscape3:2, solid warm ivory, charcoal crisp outlines, muted teal highlights. NO3D/no shadows/no texture/no decorative objects or plants. Large legible ASCII labels. Top INPUT row four rounded boxes containing exactly timeout, error, timeout, error in that order. Down arrow to a simple COUNT table with exactly two rows: error | 2 and timeout | 2. Below table write 'TIE: alphabetical order' then 'error < timeout'. Down arrow to teal OUTPUT box with exactly error. This explains frequency tie resolved lexicographically, error wins not timeout. Keep clear generous spaces, no extra labels or illustrations.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-ccc04cdf-94d1-4149-8755-6b295b05801e.png",
+    "path": "static/coding-images/03.png",
+    "style": "flat2d-exact-example"
   },
   {
     "id": 4,
     "title": "정렬된 두 이벤트 스트림 병합",
-    "prompt": "Landscape 3:2 premium restrained educational editorial illustration of merging two already sorted event streams into one ordered stream. Warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile clay/paper materials. Two curved shallow channels approach a Y-shaped junction, each carrying ordered small blocks gradually increasing in height; beyond the junction they interleave into one clean row with steadily increasing heights. Use distinct teal and sage blocks to make their origins understandable, retain all blocks. Soft natural shadows, spacious clean composition, no text, digits, letters, logos or watermark. A beautiful simple tangible sorting model rather than a computer screen.",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-b1c16c86-8868-4f73-a51a-c0ab58b7369b.png",
-    "path": "static/coding-images/04.png"
+    "prompt": "Flat2D vector-like educational algorithm diagram, landscape3:2, solid warm ivory background, crisp charcoal outlines and flat teal/sage highlights. NO3D/no shadows/no texture/no objects/decor/plants. Very large legible ASCII numbers. Top heading INPUT. Beneath two side by side array rows: left label A and cells [1][3][3]; right label B and cells [2][3][5]. Two clear arrows converge to central text 'MERGE IN ORDER' and smaller 'keep duplicates'. Down arrow to bottom heading OUTPUT and one row EXACTLY SIX cells [1][2][3][3][3][5]. Three3values must remain, output has6numbers. Large clear cells, ample whitespace. No other imagery.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-9aa62fdb-05ec-4e4a-8ab2-9127f2239718.png",
+    "path": "static/coding-images/04.png",
+    "style": "flat2d-exact-example"
   },
   {
     "id": 5,
     "title": "구간별 요청 수 빠르게 조회",
-    "prompt": "Landscape 3:2 premium editorial educational illustration about quickly counting requests inside a chosen interval, prefix range sums. Warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile clay/paper materials, soft natural shadows, spacious elegant composition. Show an orderly horizontal row of seven shallow square trays holding different quantities of small identical request tokens. A simple translucent sage rectangular bracket surrounds exactly the middle three adjacent trays, and their tokens are represented together in one neat total pile in the foreground. Clear contiguous-range metaphor, no numerical equation, no text, no letters, digits, logos or watermark, no humans or generic technology clutter.",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-a55d9ed2-a4ba-4dec-9655-fe5a213e0294.png",
-    "path": "static/coding-images/05.png"
+    "prompt": "Flat2D educational algorithm diagram, landscape3:2, solid warm ivory, crisp charcoal outlines, restrained flat teal highlight. NO3D, texture, shadows, plants or decorative objects. Large readable ASCII. Top INPUT row exactly four array cells [2][0][3][5], indices0,1,2,3 aligned above. Under row a clear simple table with heading 'RANGE [l,r] | SUM'. Three rows EXACTLY: '[0,2] | 2 + 0 + 3 = 5'; '[1,3] | 0 + 3 + 5 = 8'; '[3,3] | 5 = 5'. Down arrow to teal OUTPUT box '[5, 8, 5]'. Include small phrase 'inclusive endpoints'. Spacious precise input-operation-output diagram, no extra quantities.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-562b42ed-9b07-4ba0-a40a-aa31e17e4244.png",
+    "path": "static/coding-images/05.png",
+    "style": "flat2d-exact-example"
   },
   {
     "id": 6,
     "title": "최대 트래픽 고정 구간",
-    "prompt": "Landscape 3:2 premium restrained editorial educational illustration about finding maximum traffic in a fixed-size sliding window. Warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile clay/paper materials. Single horizontal timeline of nine bar-like towers of request tokens, varying heights; a beautiful light sage open rectangular frame spans exactly three adjacent tallest central towers, showing a fixed-width window selecting the busiest period. A subtle short arrow along the baseline suggests sliding the frame sideways. Soft natural shadows, spacious centered composition, no text, letters, numbers, logos, watermark or computer screen. Calm thoughtful distinctive educational still life.",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-8c5cd879-e135-4f09-ad05-4157937e8380.png",
-    "path": "static/coding-images/06.png"
+    "prompt": "Flat2D vector-like educational algorithm diagram, landscape3:2, solid warm ivory, crisp charcoal outlines and restrained teal highlight. NO3D/no shadows/no texture/no decorative objects/plants. Large legible ASCII labels. Top INPUT row cells [2][1][5][1][3], with 'k = 3'. Middle heading WINDOWS and three explicit horizontal rows: '[2, 1, 5] = 8'; '[1, 5, 1] = 7'; '[5, 1, 3] = 9'. Draw the third row in teal outline to select maximum. Down arrow to large teal OUTPUT box '9'. Exact fixed-length3 sliding windows and sums, no extra values. Clean generous margins and precise educational layout.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-84aa985b-2e9e-4b35-beed-56de6e6f962e.png",
+    "path": "static/coding-images/06.png",
+    "style": "flat2d-exact-example"
   }
 ]

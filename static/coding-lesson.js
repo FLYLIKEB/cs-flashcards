@@ -30,8 +30,8 @@
     window.CodingCode.update(sceneIndex, cueIndex);
     const introducing = !!cues?.length && cueIndex < (scene?.introCueCount || 0);
     const titleCard = !!cues?.length && cueIndex < (scene?.titleCueCount || 0);
-    $('lessonIllustration').hidden = !titleCard || $('lessonIllustration').dataset.failed === 'true';
-    $('lessonCards').hidden = titleCard && !$('lessonIllustration').hidden;
+    $('lessonIllustration').hidden = !introducing || $('lessonIllustration').dataset.failed === 'true';
+    $('lessonCards').hidden = introducing && !$('lessonIllustration').hidden;
     $('lessonStage').classList.toggle('is-intro', introducing);
     if (scene) $('lessonSceneTitle').textContent = titleCard ? `${problemId}번 · ${lessons.find(item => item.id === problemId).title}` : introducing ? '어떤 문제인가요?' : scene.title;
     $('lessonCodePanel').hidden = introducing || !callbacks.getJavaSolution?.(problemId);
@@ -92,7 +92,7 @@
     const scene = lesson.scenes[sceneIndex];
     const illustration = $('lessonIllustration');
     illustration.dataset.failed = 'false';
-    illustration.src = `/static/coding-images/${String(problemId).padStart(2, '0')}.png`;
+    illustration.src = `/static/coding-images/${String(problemId).padStart(2, '0')}.png?v=flat2d`;
     illustration.alt = `${lesson.title} 문제를 표현한 그림`;
     illustration.onerror = () => { illustration.dataset.failed = 'true'; updateSubtitle(); };
     $('lessonNextProblem').hidden = true;

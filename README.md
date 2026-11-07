@@ -383,4 +383,4 @@ AI 음원 가져오기 도구는 `scripts/import_coding_ai_audio.py`, `scripts/i
 
 강의는 자동 재생을 켜면 다음 문제 소개까지 이어지며 30번 문제에서 멈춥니다. 플레이어 아래 `문제 처음부터 보기`로 소개부터 다시 들을 수 있고, 전체 Java 코드는 기본으로 펼쳐집니다. 장면·코드·자료구조 강조 효과는 공통 렌더러와 CSS를 사용합니다.
 
-각 문제의 첫 음성은 문제 번호와 문제명을 읽습니다. 제목 구간에는 `static/coding-images/`의 문제별 ImageGen 그림을 표시하며, `/static/coding-images.html`에서 전체 그림을 볼 수 있습니다. 제목 음성은 로컬 Yuna로 생성하고 기존 설명 음성은 보존합니다.
+각 문제의 첫 음성은 문제 번호와 문제명을 읽습니다. 제목과 문제 소개 구간에는 `static/coding-images/`의 문제별 2D ImageGen 도식을 표시하며, `/static/coding-images.html`에서 전체 그림을 볼 수 있습니다. 제목 음성은 로컬 Yuna로 생성하고 기존 설명 음성은 보존합니다.

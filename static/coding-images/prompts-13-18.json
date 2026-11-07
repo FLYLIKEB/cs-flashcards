@@ -2,49 +2,55 @@
   {
     "id": 13,
     "title": "가장 가까운 서비스까지의 홉 수",
-    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A small network of seven service blocks connected with thin paper bridges, one short two-bridge route between a start block and a destination block highlighted deep teal; longer alternative route recedes in pale sage. A small messenger token moving along the shortest route. Visually clear shortest-hop analogy, centered composition.",
+    "prompt": "Create a landscape 3:2 FLAT TWO-DIMENSIONAL educational algorithm diagram. Solid warm ivory background. Crisp thin charcoal vector-like outlines, teal highlights, muted coral exclusions. Large extremely legible literal digits and ASCII labels only. NO 3D, no perspective, no texture, no shadows, no decorative objects, no characters, no plants. Minimal clean teaching diagram, accurate actual worked example; three clear regions INPUT -> OPERATION -> OUTPUT. INPUT: graph with exactly five circles labeled 0,1,2,3,4. Edges exactly 0--1,1--2,0--3,3--2; node4 isolated. Arrange0 left,2 right,1 topmiddle,3 bottommiddle,4 farbottomright. OPERATION: highlight route0 ->1 ->2 in teal, other edges gray. Label highlighted first and second hops '1' and '2' beside edges. OUTPUT in separate boxed area '2 hops'. No extra edges. Start0 andtarget2.",
     "path": "static/coding-images/13.png",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-86df8259-43b8-4a8d-935a-5b45ead66829.png",
-    "generator": "built-in image_gen"
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-614553c0-3aa0-4fc2-b4e6-0ee62e74b8a5.png",
+    "generator": "built-in image_gen",
+    "style": "flat-2d worked-example diagram"
   },
   {
     "id": 14,
     "title": "독립 장애 구역 세기",
-    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A neat square tiled map on a shallow tray, containing exactly three separated islands of dark teal raised square tiles surrounded by flat pale ivory empty tiles. Tiles within each island share edges; islands have generous clear gaps. Concrete connected-region counting analogy, slight isometric overhead view.",
+    "prompt": "Create a landscape 3:2 FLAT TWO-DIMENSIONAL educational algorithm diagram. Solid warm ivory background. Crisp thin charcoal vector-like outlines, teal highlights, muted coral exclusions. Large extremely legible literal digits and ASCII labels only. NO 3D, no perspective, no texture, no shadows, no decorative objects, no characters, no plants. Minimal clean teaching diagram, accurate actual worked example; three clear regions INPUT -> OPERATION -> OUTPUT. INPUT exact3x3 grid, digits rows '1 1 0' / '0 1 0' / '1 0 1'. OPERATION: identical grid with upper-left three1cells connected as Lshape and teal fill, lower-left single1cell sage fill, lower-right single1cell coral fill. Zero cells ivory. Show only orthogonal adjacency; diagonal1cells remain separate. OUTPUT big boxed '3 components'. Keep both grids exactly3rows3columns and accurate digits.",
     "path": "static/coding-images/14.png",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-e3359d0d-3123-474f-ad94-18957c025d88.png",
-    "generator": "built-in image_gen"
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-8fa7c3c0-5a43-4b98-84dd-370278d0ff6a.png",
+    "generator": "built-in image_gen",
+    "style": "flat-2d worked-example diagram"
   },
   {
     "id": 15,
     "title": "1일차 실전: 최근 시간창 요청 제한",
-    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A calm miniature admission gate with a short row of request tokens passing through a translucent sage time-window frame. Two teal tokens already inside the frame, another waiting outside, older pale token exiting behind. Small simple unnumbered clock beside the frame. Clear sliding-time-window rate-limit analogy without written labels.",
+    "prompt": "Create a landscape 3:2 FLAT TWO-DIMENSIONAL educational algorithm diagram. Solid warm ivory background. Crisp thin charcoal vector-like outlines, teal highlights, muted coral exclusions. Large extremely legible literal digits and ASCII labels only. NO 3D, no perspective, no texture, no shadows, no decorative objects, no characters, no plants. Minimal clean teaching diagram, accurate actual worked example; three clear regions INPUT -> OPERATION -> OUTPUT. INPUT horizontal five cells labeled '0','0','1','10','10'. Above it label 'window = 10, limit = 2'. OPERATION simple two-step diagram: 't = 1' below two accepted0tokens show 'count = 2' and reject1 coral X; 't = 10' two old0tokens outside window gray crossed out, two10tokens accepted teal. Caption ASCII '0 is outside (0,10]'. OUTPUT horizontal fivecells aligned to input labeled 'T','T','F','T','T', F coral,others teal. Preserve duplicate timestamps and exact order.",
     "path": "static/coding-images/15.png",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-d5cf6b22-e23c-4fea-b5e6-8a59f67d74ee.png",
-    "generator": "built-in image_gen"
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-5639535e-7f1f-4b65-82ad-bce02ea6a083.png",
+    "generator": "built-in image_gen",
+    "style": "flat-2d worked-example diagram"
   },
   {
     "id": 16,
     "title": "가장 느린 요청 K개",
-    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. Five elegant hourglasses of visibly different heights in a row representing different response times. The three tallest are gathered in a small deep-teal selection tray, two shorter pale sage hourglasses remain outside. Minimal top-k slow requests analogy, no numerals on hourglasses.",
+    "prompt": "Create a landscape 3:2 FLAT TWO-DIMENSIONAL educational algorithm diagram. Solid warm ivory background. Crisp thin charcoal vector-like outlines, teal highlights, muted coral exclusions. Large extremely legible literal digits and ASCII labels only. NO 3D, no perspective, no texture, no shadows, no decorative objects, no characters, no plants. Minimal clean teaching diagram, accurate actual worked example; three clear regions INPUT -> OPERATION -> OUTPUT. INPUT one horizontal array exactly '[5, 1, 5, 3, 9]'. Label 'K = 3'. OPERATION depict selecting three largest items: the two5cells and9cell teal,1and3cells palegray with coral exclusion strokes. Between the operation and output panels, use ONLY ONE central downward arrow indicating the entire sorting step, labeled 'sort descending'. Absolutely no arrows between individual cells, since values are reordered. OUTPUT exactly '[9, 5, 5]' in large boxed teal cells. Both5values must remain, no mergingduplicates. No hourglasses or objects.",
     "path": "static/coding-images/16.png",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-83abde00-a5a1-4f23-b858-69a65f66c484.png",
-    "generator": "built-in image_gen"
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-44b92856-909c-493e-821b-c1f427d41599.png",
+    "generator": "built-in image_gen",
+    "style": "flat-2d worked-example diagram"
   },
   {
     "id": 17,
     "title": "필요한 최소 워커 수",
-    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. Three miniature worker stations aligned in three clean horizontal lanes, each holding one long rounded task block; task blocks overlap in time across lanes, and one finished block is handing its station to the next task. Small clock icon without numbers. Scheduling concurrent jobs with a minimal number of workers, clear restrained isometric scene.",
+    "prompt": "Create a landscape 3:2 FLAT TWO-DIMENSIONAL educational algorithm diagram. Solid warm ivory background. Crisp thin charcoal vector-like outlines, teal highlights, muted coral exclusions. Large extremely legible literal digits and ASCII labels only. NO 3D, no perspective, no texture, no shadows, no decorative objects, no characters, no plants. Minimal clean teaching diagram, accurate actual worked example; three clear regions INPUT -> OPERATION -> OUTPUT. INPUT text exactly '[0,5)  [2,7)  [5,8)'. OPERATION a precise FLAT timeline with horizontal tick positions0,2,5,7,8 and two rows labeled 'worker 1','worker 2'. Worker1 has teal taskA spanning0to5 then sage taskC spanning5to8, flush at5 withoutoverlap. Worker2 has teal taskB spanning2to7. Vertical dottedline at5 illustratesreuse. Three bars only, show labelsA/B/C insidebars. OUTPUT large boxed '2 workers'. No people.",
     "path": "static/coding-images/17.png",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-1e7c9c71-db50-4cd3-bae4-9bbbcfe95556.png",
-    "generator": "built-in image_gen"
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-5efd1cb1-9e53-41d6-b4a3-e89e84e4d658.png",
+    "generator": "built-in image_gen",
+    "style": "flat-2d worked-example diagram"
   },
   {
     "id": 18,
     "title": "순서를 유지하는 배치 용량",
-    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A conveyor of ordered rectangular parcels with varied sizes entering three equal-capacity open delivery trays one after another. Parcels stay in their original left-to-right order and are grouped into consecutive batches; a subtle horizontal capacity rail aligns the trays. Clear minimum batch capacity analogy, spacious clean isometric editorial illustration.",
+    "prompt": "Create a landscape 3:2 FLAT TWO-DIMENSIONAL educational algorithm diagram. Solid warm ivory background. Crisp thin charcoal vector-like outlines, teal highlights, muted coral exclusions. Large extremely legible literal digits and ASCII labels only. NO 3D, no perspective, no texture, no shadows, no decorative objects, no characters, no plants. Minimal clean teaching diagram, accurate actual worked example; three clear regions INPUT -> OPERATION -> OUTPUT. INPUT five horizontal arraycells '1','2','3','4','5'; label 'days = 3'. OPERATION partition into exactly three consecutive groups '[1,2,3]' '[4]' '[5]'. Belowgroups show 'sum = 6','sum = 4','sum = 5'. Use ONE central downward arrow between whole input and operation panels. No individual cell-to-group arrows, no branching lines. Same order, no sorting. OUTPUT large boxed 'capacity = 6'. Small verification line atbottom 'capacity 5: [1,2] [3] [4] [5] -> 4 days' with mutedcoralX. No physicalpackages.",
     "path": "static/coding-images/18.png",
-    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-4c7ebb83-333f-4419-bb49-4cdf8c45182d.png",
-    "generator": "built-in image_gen"
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-e0d3efd2-d8e8-451c-bf8b-92cfa545f0d3.png",
+    "generator": "built-in image_gen",
+    "style": "flat-2d worked-example diagram"
   }
 ]

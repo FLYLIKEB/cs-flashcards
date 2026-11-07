@@ -2,37 +2,49 @@
   {
     "id": 19,
     "title": "정확히 목표량인 로그 구간 수",
-    "prompt": "Use case: stylized-concept. One landscape 3:2 premium editorial illustration for a coding lesson about counting contiguous log intervals whose total equals a target, including positive and negative changes. On a warm ivory #faf9f5 tabletop, a single horizontal sequence of sculpted paper log tiles with small raised and recessed clay blocks, three delicate teal brackets selecting different contiguous portions that reach the same level on a tiny balanced gauge. Restrained deep forest teal #285d51, sage, ivory. Spacious clean composition, soft studio light, tactile paper/clay, sophisticated educational visual metaphor. No text, no letters, no numbers, no logos, no watermark, no generic tech clutter.",
-    "path": "/static/coding-images/19.png"
+    "prompt": "Create ONE flat 2D educational vector-like diagram, landscape3:2. Solid warm ivory background, crisp charcoal outlines, deep teal highlighting, muted coral excluded values. No3D, no texture, no shadows, no decoration. Large legible exact ASCII labels. Clear three columns headed INPUT, OPERATION, OUTPUT. INPUT shows exactly three equal array cells containing 1, -1, 1 and label target = 1. OPERATION shows exactly THREE separate rows, each repeats those same three cells: row1 highlights ONLY the first 1 in teal and has sum = 1; row2 highlights ALL THREE cells 1,-1,1 in teal and has sum = 1; row3 highlights ONLY the final 1 in teal and has sum = 1. All unselected cells pale gray. This demonstrates three distinct contiguous subarrays. OUTPUT displays large 3 and label matching ranges. Thin arrows connect INPUT -> OPERATION -> OUTPUT. Mathematical fidelity and large readable numbers are paramount. No other content.",
+    "path": "/static/coding-images/19.png",
+    "style": "flat-2d-exact-example",
+    "provider": "built-in-imagegen"
   },
   {
     "id": 20,
     "title": "최소 재시도 비용 경로",
-    "prompt": "Use case: stylized-concept. One landscape 3:2 premium editorial illustration for a coding lesson about the least-cost route between services. On warm ivory #faf9f5, four small sculpted server stations connected by two alternative paper road routes: a direct uphill road with many coin-like toll pebbles, and a longer gently curving deep teal road passing intermediate stations with only a few toll pebbles. A tiny delivery parcel travels the affordable teal route to a destination arch. Deep forest teal #285d51, sage, ivory, tactile clay and paper, restrained sophisticated design, spacious centered composition, soft studio light. No letters, numbers, text, logos, watermark, or extra tech clutter.",
-    "path": "/static/coding-images/20.png"
+    "prompt": "Create ONE flat2D vector educational diagram, landscape3:2, solid ivory background, crisp charcoal outlines, teal chosen path, muted coral rejected path. NO3D, NOshadows, NOtexture, NOdecoration. Large clean ASCII text. Three panels INPUT -> OPERATION -> OUTPUT. INPUT: directed weighted graph with exactly4 circular vertices:0 at left,2 at bottom-middle,1 at top-middle,3 at right. Exactly4 directed arrows:0->1 weight8 (coral),0->2 weight2(teal),2->1 weight1(teal, upward),1->3 weight3(teal). Weight labels beside edges clearly. OPERATION: two lines: '0 -> 2 -> 1 -> 3' and '2 + 1 + 3 = 6' in teal; below '0 -> 1 -> 3' and '8 + 3 = 11' in coral. OUTPUT: very large '6', small 'minimum cost'. All arrows on graph must point the correct direction, no other edges. Mathematical correctness is paramount.",
+    "path": "/static/coding-images/20.png",
+    "style": "flat-2d-exact-example",
+    "provider": "built-in-imagegen"
   },
   {
     "id": 21,
     "title": "의존 작업 실행 순서",
-    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a coding lesson about dependency order of tasks. A small tactile paper-and-clay assembly workflow on a warm ivory #faf9f5 tabletop: two completed upstream task pedestals with simple embossed check symbols feed narrow teal ribbons into a third still-locked task pedestal, which leads to a final finished parcel. A tiny clay hand places the second prerequisite token so the shared gate can unlock. Clear left-to-right prerequisite logic, generous negative space, soft light, deep forest teal #285d51 and sage accents, sophisticated calm visual design. No text, letters, numbers, logos or watermark. No clutter.",
-    "path": "/static/coding-images/21.png"
+    "prompt": "ONE flat2D educational vector diagram landscape3:2. Solid warm ivory background, crisp charcoal outlines, teal highlights, muted coral exclusions; absolutely no3D texture shadows or decorative objects. Large readable ASCII numerals. Three panels INPUT -> OPERATION -> OUTPUT. INPUT contains exactly4 circles labeled0,1,2,3. Exactly TWO arrows:0->2 and1->2. Circle3 isolated with NO edges. OPERATION shows four stacked precise text rows: 'ready [0,1,3] : pick 0', 'ready [1,3] : pick 1', 'ready [2,3] : pick 2', 'ready [3] : pick 3'. Highlight picked values teal. OUTPUT shows large array '[0, 1, 2, 3]' and caption 'smallest valid order'. Diagram illustrates topological sorting always picking smallest ready task. No extra arrows or values; prioritize mathematical accuracy and legibility.",
+    "path": "/static/coding-images/21.png",
+    "style": "flat-2d-exact-example",
+    "provider": "built-in-imagegen"
   },
   {
     "id": 22,
     "title": "최소 작업 패키지 수",
-    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a coding lesson about using the minimum number of work packages to reach an exact target. On warm ivory #faf9f5 tabletop, a long six-unit tray is perfectly filled by exactly two equal deep teal packages, each package spanning three subtle unit grooves. Below it, a secondary pale-sage alternative has one four-unit package and two tiny one-unit packages filling an identical tray, visually contrasting two pieces with three pieces. Tactile paper and matte clay, clean mathematical visual metaphor, soft shadows, deep forest teal #285d51 and sage, generous empty margins. No text, letters, digits, logos, watermark, or decorative clutter.",
-    "path": "/static/coding-images/22.png"
+    "prompt": "ONE flat2D vector-like educational diagram landscape3:2, solid ivory background, crisp charcoal lines, teal selected, muted coral rejected. No3D no shadow no texture no decorative objects. Three panels INPUT -> OPERATION -> OUTPUT. INPUT shows three simple square tokens labeled1,3,4 and text 'target = 6'. OPERATION shows a teal row of two square tokens '3' '+' '3' '=' '6', beneath label '2 packages'; below a coral row '4' '+' '1' '+' '1' '=' '6', beneath label '3 packages'. OUTPUT huge teal '2', caption 'minimum packages'. This contrasts optimal3+3 with greedy4+1+1. Keep exact arithmetic, large highly legible numbers, no extraneous labels.",
+    "path": "/static/coding-images/22.png",
+    "style": "flat-2d-exact-example",
+    "provider": "built-in-imagegen"
   },
   {
     "id": 23,
     "title": "인접 작업을 피한 최대 이익",
-    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a coding lesson about maximizing profit while never selecting neighboring tasks. On warm ivory #faf9f5 tabletop, one orderly row of exactly five small task trays containing coin-like tokens of different stack heights. The first, third and fifth trays are deep forest teal #285d51 and subtly raised to show selection; second and fourth trays are pale sage and unselected, clearly separating selected tasks. Tactile matte clay and paper, sophisticated calm educational metaphor, soft studio shadows, generous empty space, no text, no digits, no letters, no logos, watermark or extra objects.",
-    "path": "/static/coding-images/23.png"
+    "prompt": "ONE flat2D vector educational diagram, landscape3:2. Solid ivory background, crisp charcoal outlines, deep teal selection, muted coral exclusion. No3D, texture, shadows, decorative objects. Three panels INPUT -> OPERATION -> OUTPUT. INPUT shows exactly5 adjacent square array cells reading '2', '7', '9', '3', '1'. OPERATION repeats the same5cells in sameorder: first2, third9 and fifth1 highlighted teal; second7 and fourth3 pale coral with small Xmarks beneath them. Caption 'No adjacent selections'. Below clearly display '2 + 9 + 1 = 12'. OUTPUT enormous teal '12', caption 'maximum profit'. All digits large and unambiguous. Exact input and selection mandatory. White space, no clutter, no extra text.",
+    "path": "/static/coding-images/23.png",
+    "style": "flat-2d-exact-example",
+    "provider": "built-in-imagegen"
   },
   {
     "id": 24,
     "title": "격자에서 가능한 배포 경로 수",
-    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a coding lesson about counting right-and-down deployment paths on a blocked grid. One clearly readable flat three-by-three ivory tile board on warm ivory #faf9f5 tabletop, viewed almost top-down. The exact center tile contains a small raised sage obstacle cube. A small deployment parcel at the top-left cell and a simple receiving platform in the bottom-right cell. Two delicate continuous deep forest teal #285d51 routes hug opposite outer edges, one across the top then down the right, the other down the left then across the bottom, avoiding the center obstacle. Tactile paper/clay material, quiet elegant studio light, generous margin, no text, numbers, letters, logos, watermark or clutter.",
-    "path": "/static/coding-images/24.png"
+    "prompt": "ONE flat2D vector educational diagram landscape3:2. Solid ivory, crisp charcoal grid lines, teal routes, muted coral blocked cell. No3D texture shadows decoration. Three panels INPUT -> OPERATION -> OUTPUT. INPUT exact3by3 grid with cell values rows '0 0 0', '0 1 0', '0 0 0'; center1 coral, all0 ivory. OPERATION shows TWO separate exact3by3 grids side by side, each center cell coral X. First grid route teal arrows connects cell centers top-left -> top-middle -> top-right -> middle-right -> bottom-right. Second grid route teal arrows connects top-left -> middle-left -> bottom-left -> bottom-middle -> bottom-right. Only right or down moves. Caption 'right or down only'. OUTPUT huge teal '2', caption 'valid paths'. No third route, no diagonal, no center crossing. Layout prioritize exact3rows3columns, complete arrows, readable labels.",
+    "path": "/static/coding-images/24.png",
+    "style": "flat-2d-exact-example",
+    "provider": "built-in-imagegen"
   }
 ]

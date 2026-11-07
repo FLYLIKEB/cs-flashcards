@@ -19,9 +19,9 @@ async function setup(problem = 1, scene = 4, savedNextScene = 0) {
     load(){this.currentTime=0;this.ended=false;this.paused=true;},
     pause(){this.paused=true;},play(){this.paused=false;this.ended=false;this.plays++;return Promise.resolve();}});
   const scripts = Array.from({length:30},(_,i)=>({id:i+1,title:`Problem ${i+1}`,scenes:Array.from({length:5},(_,j)=>({
-    title:`Problem ${i+1} scene ${j}`,titleCueCount:j===0?1:0,introCueCount:j===0?1:0,caption:'caption',narration:'explanation',items:['1'],active:0}))}));
+    title:`Problem ${i+1} scene ${j}`,titleCueCount:j===0?1:0,introCueCount:j===0?2:0,caption:'caption',narration:'explanation',items:['1'],active:0}))}));
   const tracks = scripts.map(lesson=>({id:lesson.id,scenes:lesson.scenes.map((_,j)=>({
-    src:`/static/coding-audio/${lesson.id}-${j}.mp3`,duration:10,cues:[{start:0,end:10,text:'explanation'}]}))}));
+    src:`/static/coding-audio/${lesson.id}-${j}.mp3`,duration:10,cues:j===0?[{start:0,end:3,text:'title'},{start:3,end:10,text:'introduction'}]:[{start:0,end:10,text:'explanation'}]}))}));
   const window = {addEventListener(){},clearTimeout(){},setTimeout(){},requestAnimationFrame:f=>f(),
     CodingMotion:{onTick(fn){this.tick=fn;},mount(){return true;},validate(){}},
     CodingCode:{mount(){},update(){},validate(){}},
@@ -44,7 +44,7 @@ async function setup(problem = 1, scene = 4, savedNextScene = 0) {
   assert.equal(nodes.lessonPlay.disabled,false);
   async function play(){nodes.lessonPlay.onclick();await settle();}
   async function end(){audio.currentTime=10;audio.ended=true;audio.paused=true;audio.onended();await settle();}
-  return {nodes,audio,events,play,end,settle,current:()=>current};
+  return {nodes,audio,events,play,end,settle,tick:()=>window.CodingMotion.tick(),current:()=>current};
 }
 
 test('last scene records completion before automatically playing the next problem from its introduction',async()=>{
@@ -100,10 +100,13 @@ test('automatic and manual next reset a previously visited problem to its introd
 
 test('title cue displays the matching image and image failure preserves the title animation',async()=>{
  const s=await setup(7,0);
- assert.equal(s.nodes.lessonIllustration.src,'/static/coding-images/07.png');
+ assert.equal(s.nodes.lessonIllustration.src,'/static/coding-images/07.png?v=flat2d');
  assert.equal(s.nodes.lessonIllustration.hidden,false);
  assert.equal(s.nodes.lessonCards.hidden,true);
  assert.equal(s.nodes.lessonSceneTitle.textContent,'7번 · Problem 7');
+ s.audio.currentTime=4;s.tick();
+ assert.equal(s.nodes.lessonIllustration.hidden,false);
+ assert.equal(s.nodes.lessonSceneTitle.textContent,'어떤 문제인가요?');
  s.nodes.lessonIllustration.onerror();
  assert.equal(s.nodes.lessonIllustration.hidden,true);
  assert.equal(s.nodes.lessonCards.hidden,false);
