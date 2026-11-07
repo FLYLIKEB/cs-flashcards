@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import threading
 import unittest
+from urllib.parse import urlsplit
 
 from pyppeteer import launch
 from tests.test_coding_practice import ROOT, KEY, QuietHandler
@@ -37,6 +38,19 @@ class LessonMediaTests(unittest.TestCase):
                     self.assertLessEqual(len(scene['items']), 5)
                     self.assertIn(scene['active'], range(len(scene['items'])))
                     self.assertGreater(clip['duration'], 1)
+                    cues = clip['cues']
+                    self.assertGreaterEqual(len(cues), 1)
+                    self.assertAlmostEqual(cues[0]['start'], 0, delta=0.02)
+                    previous_end = 0
+                    for cue in cues:
+                        self.assertTrue(cue['text'].strip())
+                        self.assertAlmostEqual(cue['start'], previous_end, delta=0.02)
+                        self.assertGreater(cue['end'], cue['start'])
+                        self.assertLessEqual(cue['end'], clip['duration'] + 0.1)
+                        previous_end = cue['end']
+                    self.assertLessEqual(clip['duration'] - previous_end, 0.5)
+                    self.assertEqual(' '.join(' '.join(c['text'] for c in cues).split()),
+                                     ' '.join(scene['narration'].split()))
                     path = (ROOT / clip['src'].lstrip('/')).resolve()
                     self.assertTrue(path.is_relative_to(ROOT / 'static/coding-audio'))
                     self.assertTrue(path.is_file(), str(path))
@@ -84,6 +98,28 @@ class LessonHandler(QuietHandler):
             self.end_headers()
             self.wfile.write(body)
             return
+        # Match production FileResponse byte ranges so Chrome can seek real MP3s.
+        if urlsplit(self.path).path.endswith('.mp3'):
+            path = Path(self.translate_path(self.path))
+            if path.is_file():
+                body = path.read_bytes()
+                match = re.fullmatch(r'bytes=(\d+)-(\d*)', self.headers.get('Range', ''))
+                start, end = 0, len(body) - 1
+                if match:
+                    start = int(match[1])
+                    end = min(int(match[2]) if match[2] else end, end)
+                    if start > end:
+                        self.send_error(416)
+                        return
+                self.send_response(206 if match else 200)
+                self.send_header('Content-Type', 'audio/mpeg')
+                self.send_header('Accept-Ranges', 'bytes')
+                self.send_header('Content-Length', str(end - start + 1))
+                if match:
+                    self.send_header('Content-Range', f'bytes {start}-{end}/{len(body)}')
+                self.end_headers()
+                self.wfile.write(body[start:end + 1])
+                return
         super().do_GET()
 
 
@@ -148,7 +184,7 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
         playing = await self.audio_state()
         self.assertFalse(playing['muted'])
         self.assertGreater(playing['volume'], 0)
-        self.assertTrue(playing['src'].endswith('.mp3'), playing['src'])
+        self.assertTrue(urlsplit(playing['src']).path.endswith('.mp3'), playing['src'])
         self.assertTrue((await self.state())['records']['1']['lessonAssisted'])
         await self.page.click('#lessonPlay')
         paused = await self.audio_state()
@@ -339,6 +375,71 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await self.state())['records']['1'].get('lessonScene', 0), scene)
         self.assertTrue((await self.audio_state())['paused'])
         self.assertGreater(await self.page.Jeval('#lessonStatus', 'el => el.getBoundingClientRect().height'), 0)
+
+    async def test_subtitles_follow_real_audio_cues_pause_seek_and_speed(self):
+        manifest = json.loads((ROOT / 'static/coding-audio/manifest.json').read_text())
+        cues = manifest['lessons'][0]['scenes'][0]['cues']
+        self.assertGreater(len(cues), 1)
+        self.assertEqual(await self.page.Jeval('#lessonSubtitles', 'el => el.getAttribute("aria-pressed")'), 'true')
+        self.assertFalse(await self.page.Jeval('#lessonSubtitleBox', 'el => el.hidden'))
+        await self.page.waitForFunction('(text) => document.querySelector("#lessonSubtitle").textContent === text', {}, cues[0]['text'])
+        await self.start_audio()
+        await self.page.click('#lessonPlay')
+        for cue in cues:
+            await self.page.Jeval('#lessonAudio', '(el, time) => { el.currentTime = time; }', (cue['start'] + cue['end']) / 2)
+            await self.page.waitForFunction('(text) => document.querySelector("#lessonSubtitle").textContent === text', {}, cue['text'])
+        held = await self.page.Jeval('#lessonSubtitle', 'el => el.textContent')
+        await asyncio.sleep(0.25)
+        self.assertEqual(await self.page.Jeval('#lessonSubtitle', 'el => el.textContent'), held)
+        await self.open_settings()
+        await self.page.select('#lessonRate', '1.5')
+        await self.page.Jeval('#lessonAudio', '(el, time) => { el.currentTime = time; }', max(0, cues[0]['end'] - 0.2))
+        await self.page.click('#lessonPlay')
+        await self.page.waitForFunction('(text) => document.querySelector("#lessonSubtitle").textContent === text', {}, cues[1]['text'])
+        self.assertAlmostEqual((await self.audio_state())['rate'], 1.5)
+        await self.page.click('#lessonPlay')
+        if await self.page.Jeval('#lessonAuto', 'el => el.checked'):
+            await self.page.click('#lessonAuto')
+        await self.page.Jeval('#lessonAudio', 'el => { el.currentTime = el.duration - 0.1; }')
+        await self.page.click('#lessonPlay')
+        await self.page.waitForFunction('document.querySelector("#lessonAudio").ended')
+        self.assertEqual(await self.page.Jeval('#lessonSubtitle', 'el => el.textContent'), cues[-1]['text'])
+
+    async def test_subtitles_toggle_persists_and_new_scene_resets_text(self):
+        await self.page.click('#lessonSubtitles')
+        self.assertTrue(await self.page.Jeval('#lessonSubtitleBox', 'el => el.hidden'))
+        await self.page.reload()
+        await self.ready()
+        self.assertEqual(await self.page.Jeval('#lessonSubtitles', 'el => el.getAttribute("aria-pressed")'), 'false')
+        self.assertTrue(await self.page.Jeval('#lessonSubtitleBox', 'el => el.hidden'))
+        await self.page.click('#lessonSubtitles')
+        first = await self.page.Jeval('#lessonSubtitle', 'el => el.textContent')
+        await self.page.click('#lessonNext')
+        manifest = json.loads((ROOT / 'static/coding-audio/manifest.json').read_text())
+        expected = manifest['lessons'][0]['scenes'][1]['cues'][0]['text']
+        await self.page.waitForFunction('(text) => document.querySelector("#lessonSubtitle").textContent === text', {}, expected)
+        self.assertNotEqual(first, expected)
+        await self.page.setViewport({'width': 1440, 'height': 900})
+        await self.page.screenshot({'path': '/tmp/subtitles-desktop.png', 'fullPage': True})
+        await self.page.setViewport({'width': 390, 'height': 844})
+        self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+        for selector in ('#lessonSubtitleBox', '#lessonPlay'):
+            bounds = await self.page.Jeval(selector, 'el => ({top: el.getBoundingClientRect().top, bottom: el.getBoundingClientRect().bottom})')
+            self.assertGreaterEqual(bounds['top'], 0)
+            self.assertLessEqual(bounds['bottom'], 844, selector)
+        await self.page.screenshot({'path': '/tmp/subtitles-mobile.png', 'fullPage': True})
+
+    async def test_legacy_audio_without_cues_keeps_full_visible_transcript(self):
+        manifest = json.loads((ROOT / 'static/coding-audio/manifest.json').read_text())
+        manifest['lessons'][0]['scenes'][0].pop('cues', None)
+        self.server.manifest_override = (200, manifest)
+        await self.page.reload()
+        await self.ready()
+        narration = json.loads((ROOT / 'static/coding-lessons.json').read_text())[0]['scenes'][0]['narration']
+        self.assertFalse(await self.page.Jeval('#lessonSubtitleBox', 'el => el.hidden'))
+        self.assertEqual(await self.page.Jeval('#lessonSubtitle', 'el => el.textContent'), narration)
+        await self.start_audio()
+        self.assertFalse((await self.audio_state())['paused'])
 
     async def test_lesson_help_is_not_independent_completion(self):
         await self.page.click('#lessonNext')

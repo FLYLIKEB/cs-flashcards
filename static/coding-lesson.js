@@ -4,6 +4,33 @@
   const audio = $('lessonAudio');
   let lessons = null, media = null, loading = null, problemId = 0, sceneIndex = 0;
   let visible = true, playing = false, ticket = 0, callbacks = {}, retryTimer = null;
+  const subtitleKey = 'csCodingLessonSubtitles:v1';
+  let subtitlesEnabled = true;
+  try { subtitlesEnabled = localStorage.getItem(subtitleKey) !== 'off'; } catch (_) { /* Optional display preference. */ }
+  function updateSubtitle() {
+    const scene = lessons?.find(item => item.id === problemId)?.scenes[sceneIndex];
+    const sound = media?.find(item => item.id === problemId)?.scenes[sceneIndex];
+    const cues = sound?.cues;
+    let text = scene?.narration || '';
+    if (Array.isArray(cues) && cues.length) {
+      const time = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+      const cue = cues.find(item => time >= item.start && time < item.end) ||
+        (time >= cues[cues.length - 1].end ? cues[cues.length - 1] : cues[0]);
+      text = cue.text;
+    }
+    if ($('lessonSubtitle').textContent !== text) $('lessonSubtitle').textContent = text;
+    $('lessonSubtitleBox').hidden = !subtitlesEnabled || !scene || !sound;
+    $('lessonCaption').hidden = subtitlesEnabled && !!scene && !!sound;
+    $('lessonSubtitles').setAttribute('aria-pressed', String(subtitlesEnabled));
+    $('lessonSubtitles').setAttribute('aria-label', subtitlesEnabled ? '자막 끄기' : '자막 켜기');
+    $('lessonSubtitles').textContent = subtitlesEnabled ? '자막 켜짐' : '자막 꺼짐';
+  }
+  $('lessonSubtitles').onclick = () => {
+    subtitlesEnabled = !subtitlesEnabled;
+    try { localStorage.setItem(subtitleKey, subtitlesEnabled ? 'on' : 'off'); } catch (_) { /* Keep this tab usable. */ }
+    updateSubtitle();
+  };
+  ['timeupdate', 'seeked', 'loadedmetadata', 'ratechange', 'ended'].forEach(event => audio.addEventListener(event, updateSubtitle));
   function currentReady() { return !!lessons?.find(item => item.id === problemId) && !!media?.find(item => item.id === problemId); }
   function status(message) { $('lessonStatus').textContent = message; $('lessonStatus').classList.toggle('is-error', /못|실패|오류/.test(message)); }
   function controls() {
@@ -30,7 +57,7 @@
       $('lessonCards').replaceChildren(); $('lessonCode').hidden = true; $('lessonNarration').textContent = '';
       $('lessonNextProblem').hidden = true;
       status('음성 생성 중이에요. 준비 상태를 자동으로 확인하고 있어요. 직접 풀기는 지금 이용할 수 있어요.');
-      controls(); return;
+      updateSubtitle(); controls(); return;
     }
     const scene = lesson.scenes[sceneIndex];
     $('lessonNextProblem').hidden = true;
@@ -58,9 +85,10 @@
     });
     $('lessonCode').hidden = !scene.code;
     $('lessonCode').textContent = scene.code || '';
-    audio.src = track.scenes[sceneIndex].src;
+    audio.src = track.scenes[sceneIndex].src + (track.sourceHash ? '?v=' + encodeURIComponent(track.sourceHash) : '');
     audio.playbackRate = Number($('lessonRate').value);
     audio.load();
+    updateSubtitle();
     $('lessonStage').classList.remove('scene-enter');
     window.requestAnimationFrame(() => $('lessonStage').classList.add('scene-enter'));
     status('');
@@ -84,6 +112,14 @@
         if (!sound) continue;
         if (sound.scenes.length !== lesson.scenes.length ||
           sound.scenes.some(item => typeof item.src !== 'string' || !item.src.startsWith('/static/coding-audio/') || !(item.duration > 0))) throw new Error('audio');
+      }
+      for (const sound of manifest.lessons) {
+        for (const scene of sound.scenes) {
+          if (scene.cues !== undefined && (!Array.isArray(scene.cues) || !scene.cues.length ||
+            scene.cues.some((cue, index) => !Number.isFinite(cue.start) || !Number.isFinite(cue.end) ||
+              cue.start < 0 || cue.end <= cue.start || cue.end > scene.duration + 0.1 || typeof cue.text !== 'string' ||
+              !cue.text.trim() || (index && cue.start < scene.cues[index - 1].end - 0.01)))) throw new Error('captions');
+        }
       }
       lessons = script; media = manifest.lessons;
       renderScene();

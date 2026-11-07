@@ -27,12 +27,13 @@
     <div class="lesson-heading"><h1 id="title"></h1><button id="focusView" class="focus-toggle" aria-pressed="false">집중 화면</button></div>
     <nav class="learning-modes" aria-label="학습 방식"><button id="modeLesson" aria-pressed="true">보고 듣기</button><button id="modePractice" aria-pressed="false">직접 풀기</button></nav>
     <section id="lessonPanel" aria-label="소리로 듣는 단계별 강의">
-      <div class="lesson-top"><div id="lessonSegments" class="lesson-segments" aria-label="강의 진행 단계"></div><span id="lessonPosition">준비 중</span></div>
+      <div class="lesson-top"><div id="lessonSegments" class="lesson-segments" aria-label="강의 진행 단계"></div><div class="lesson-top-actions"><span id="lessonPosition">준비 중</span><button id="lessonSubtitles" aria-pressed="true" aria-label="자막 끄기">자막 켜짐</button></div></div>
       <div id="lessonStage" class="lesson-stage">
         <p id="lessonSceneTitle" class="lesson-scene-title" tabindex="-1"></p>
         <div id="lessonCards" class="lesson-cards" aria-label="예제 진행 상황"></div>
         <pre id="lessonCode" hidden></pre>
-        <p id="lessonCaption" class="lesson-caption"></p>
+        <div id="lessonSubtitleBox" class="lesson-subtitle-box"><p id="lessonSubtitle" aria-label="현재 음성 자막" aria-live="off"></p></div>
+        <p id="lessonCaption" class="lesson-caption" hidden></p>
       </div>
       <div class="lesson-controls">
         <button id="lessonPrev" disabled aria-label="이전 장면">← 이전</button>

@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -41,6 +42,37 @@ def audible(path: Path):
         raise ValueError(f'Silent narration: {path}')
 
 
+def sentences(narration: str) -> list[str]:
+    """Keep the spoken text intact while giving each sentence measured boundaries."""
+    return re.split(r'(?<=[.!?])\s+', ' '.join(narration.split()))
+
+
+def pcm_duration(path: Path) -> float:
+    data = json.loads(run(['ffprobe', '-v', 'error', '-show_streams', '-of', 'json', str(path)]).stdout)
+    stream = next(s for s in data['streams'] if s['codec_type'] == 'audio')
+    numerator, denominator = map(int, stream['time_base'].split('/'))
+    seconds = int(stream['duration_ts']) * numerator / denominator
+    if not math.isfinite(seconds) or seconds <= 0:
+        raise ValueError(f'Invalid sentence duration: {path}')
+    return seconds
+
+
+def verify_cues(scene: dict, narration: str):
+    cues = scene['cues']
+    if not cues or ' '.join(cue['text'] for cue in cues) != ' '.join(narration.split()):
+        raise ValueError('Subtitle text does not match narration')
+    previous_end = 0
+    for cue in cues:
+        start, end = cue['start'], cue['end']
+        if not math.isfinite(start) or not math.isfinite(end) or abs(start - previous_end) > 0.001:
+            raise ValueError('Subtitle cues must be contiguous from zero')
+        if end <= start or end > scene['duration'] + 0.001:
+            raise ValueError('Subtitle cue outside clip bounds')
+        previous_end = end
+    if abs(previous_end - scene['duration']) > 0.001:
+        raise ValueError('Subtitle cues must cover the clip')
+
+
 def fingerprint(lesson: dict) -> str:
     digest = hashlib.sha256(Path(__file__).read_bytes())
     digest.update(json.dumps(lesson, ensure_ascii=False, sort_keys=True).encode())
@@ -55,6 +87,7 @@ def render(lesson: dict, prior: dict | None, force: bool) -> dict:
                 cached = OUTPUT / f"{lesson['id']:02d}-{index:02d}.mp3"
                 actual = verify(cached)
                 audible(cached)
+                verify_cues(scene, lesson['scenes'][index - 1]['narration'])
                 if abs(actual - scene['duration']) > 0.1:
                     raise ValueError('Cached duration mismatch')
             return prior
@@ -68,16 +101,29 @@ def render(lesson: dict, prior: dict | None, force: bool) -> dict:
             if not isinstance(narration, str) or not narration.strip():
                 raise ValueError(f"Missing narration: {lesson['id']}/{index}")
             name = f"{lesson['id']:02d}-{index:02d}.mp3"
-            text, sound, encoded = work / 'speech.txt', work / 'speech.aiff', work / name
-            text.write_text(narration, encoding='utf-8')
-            run(['say', '-v', VOICE, '-r', str(RATE), '-f', str(text), '-o', str(sound)], timeout=120)
-            run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(sound),
+            text, encoded = work / 'speech.txt', work / name
+            cues, parts, elapsed = [], [], 0.0
+            for number, sentence in enumerate(sentences(narration)):
+                sound = work / f'sentence-{number:03d}.aiff'
+                text.write_text(sentence, encoding='utf-8')
+                run(['say', '-v', VOICE, '-r', str(RATE), '-f', str(text), '-o', str(sound)], timeout=120)
+                start = elapsed
+                elapsed += pcm_duration(sound)
+                cues.append({'start': round(start, 3), 'end': round(elapsed, 3), 'text': sentence})
+                parts.append(f"file '{sound.name}'")
+            concat = work / 'sentences.txt'
+            concat.write_text('\n'.join(parts) + '\n', encoding='utf-8')
+            run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
+                 '-f', 'concat', '-safe', '0', '-i', str(concat),
                  '-c:a', 'libmp3lame', '-b:a', '64k', '-ar', '24000', '-ac', '1',
                  '-af', 'apad=pad_dur=0.25', str(encoded)], timeout=60)
             seconds = verify(encoded)
             audible(encoded)
+            cues[-1]['end'] = round(seconds, 3)
+            clip = {'src': f'/static/coding-audio/{name}', 'duration': round(seconds, 3), 'cues': cues}
+            verify_cues(clip, narration)
             shutil.move(str(encoded), OUTPUT / name)
-            scenes.append({'src': f'/static/coding-audio/{name}', 'duration': round(seconds, 3)})
+            scenes.append(clip)
     return {'id': lesson['id'], 'scenes': scenes, 'sourceHash': source_hash}
 
 
@@ -110,7 +156,7 @@ def main():
         for future in as_completed(futures):
             lesson = future.result()
             entries[lesson['id']] = lesson
-            output = {'version': 1, 'voice': VOICE, 'rate': RATE,
+            output = {'version': 2, 'voice': VOICE, 'rate': RATE,
                       'lessons': sorted(entries.values(), key=lambda p: p['id'])}
             temporary = OUTPUT / 'manifest.tmp'
             temporary.write_text(json.dumps(output, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

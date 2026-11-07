@@ -178,3 +178,18 @@ input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); fle
 @media (prefers-reduced-motion:no-preference) {
   button { transition: background-color .12s; }
 }
+
+.lesson-top-actions { display: flex; align-items: center; gap: 12px; }
+#lessonSubtitles { min-height: 44px; padding: 8px 10px; background: transparent; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; white-space: nowrap; }
+#lessonSubtitles[aria-pressed=true] { background: var(--blue-light); color: #175bba; border-color: transparent; }
+.lesson-subtitle-box { min-height: 3.5em; display: flex; align-items: center; }
+#lessonSubtitle { margin: 0; color: var(--text); font-size: 17px; font-weight: 500; line-height: 1.8; letter-spacing: -.25px; word-break: keep-all; overflow-wrap: anywhere; }
+@media (max-width:600px) {
+  .lesson-top { gap: 8px; }
+  .lesson-top-actions { gap: 8px; }
+  .lesson-segments { gap: 4px; }
+  .lesson-segments span { width: 14px; }
+  #lessonSubtitles { font-size: 11px; padding: 8px; }
+  .lesson-subtitle-box { min-height: 5.4em; }
+  #lessonSubtitle { font-size: 16px; }
+}
