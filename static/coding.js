@@ -12,10 +12,14 @@
       Number.isFinite(r.elapsed) && r.elapsed >= 0 && Number.isInteger(r.hints) && r.hints >= 0 && r.hints <= 3 && typeof r.answer === 'boolean' &&
       ['', 'solved', 'review', 'stuck'].includes(r.status) && Number.isFinite(r.due) && (r.started === null || (Number.isFinite(r.started) && r.started > 0)) &&
       (r.step === undefined || [0,1,2].includes(r.step)) &&
+      (r.lessonScene === undefined || [0,1,2,3,4].includes(r.lessonScene)) &&
+      (r.lessonWatched === undefined || typeof r.lessonWatched === 'boolean') &&
+      (r.lessonAssisted === undefined || typeof r.lessonAssisted === 'boolean') &&
+      (r.lessonHeard === undefined || (Array.isArray(r.lessonHeard) && r.lessonHeard.length <= 5 && r.lessonHeard.every(i => [0,1,2,3,4].includes(i)))) &&
       (r.nextAction === undefined || (typeof r.nextAction === 'string' && r.nextAction.length <= 500)));
   }
   function validState(value) {
-    return validRecords(value) && (value.language === undefined || value.language === 'java') &&
+    return validRecords(value) && (value.learningMode === undefined || ['lesson','practice'].includes(value.learningMode)) && (value.language === undefined || value.language === 'java') &&
       (value.pythonRecords === undefined || validRecords({records: value.pythonRecords})) &&
       (value.focus === undefined || (value.focus && [5,10,15].includes(value.focus.minutes) &&
         typeof value.focus.hideTimer === 'boolean' && typeof value.focus.onBreak === 'boolean'));
@@ -75,6 +79,20 @@
     $('stageNext').textContent = r.step === 0 ? '이해했어요 → 코드 쓰기' : '작성했어요 → 확인 · 설명';
     $('nextProblem').hidden = !r.status;
   }
+  function applyMode() {
+    const mode = state.learningMode || (focusSettings().onBreak ? 'practice' : 'lesson');
+    $('lessonPanel').hidden = mode !== 'lesson';
+    $('practicePanel').hidden = mode !== 'practice';
+    $('modeLesson').setAttribute('aria-pressed', String(mode === 'lesson'));
+    $('modePractice').setAttribute('aria-pressed', String(mode === 'practice'));
+    $('restart').hidden = mode !== 'practice';
+    window.CodingLesson.setVisible(mode === 'lesson');
+  }
+  function changeMode(mode) {
+    pause(); state.learningMode = mode; save(); applyMode(); updateClock();
+  }
+  $('modeLesson').onclick = () => changeMode('lesson');
+  $('modePractice').onclick = () => changeMode('practice');
   function changeStep(step) {
     record().step = step; save(); renderFocus(); $('stepPrompt').focus();
   }
@@ -106,7 +124,7 @@
   }
   function select(id) {
     if (problems.length && state.records[current]) pause();
-    current = id; state.current = id; focusSettings().onBreak = false; $('curriculum').open = false; $('sessionStatus').textContent = '타이머 없이 시작해도 괜찮아요.'; render(); save(); $('stepPrompt').focus();
+    current = id; state.current = id; focusSettings().onBreak = false; $('curriculum').open = false; $('sessionStatus').textContent = '타이머 없이 시작해도 괜찮아요.'; render(); save(); ($('lessonPanel').hidden ? $('stepPrompt') : $('lessonSceneTitle')).focus();
   }
   function render() {
     const p = problem(), r = record();
@@ -138,6 +156,7 @@
     checklist.forEach((text,i) => { const label = document.createElement('label'), input = document.createElement('input'); input.type = 'checkbox'; input.checked = r.checks[i]; input.onchange = () => { record().checks[i] = input.checked; save(); }; label.append(input,document.createTextNode(text)); $('checks').append(label); });
     $('result').textContent = r.status ? `현재 기록: ${{solved:'독립 풀이 완료',review:'복습 필요',stuck:'미해결'}[r.status]}${r.due ? ' · 복습 예정 ' + new Date(r.due).toLocaleString('ko-KR') : ''}` : '';
     list(); renderFocus(); updateClock();
+    window.CodingLesson.setProblem(p.id, r.lessonScene || 0); applyMode();
   }
   function download(name, text, type) {
     const url = window.URL.createObjectURL(new window.Blob([text], {type}));
@@ -174,12 +193,12 @@
   $('answer').ontoggle = () => { if ($('answer').open && !record().answer) { const r = record(); r.answer = true; r.status = 'review'; r.due = Date.now()+1800000; save(); list(); } };
   $('restart').onclick = () => {
     if (!window.confirm('현재 코드를 비우고 타이머·힌트를 초기화합니다. 오답 메모는 유지합니다. 재풀이할까요?')) return;
-    const r = record(); r.code = starter(problem()); r.elapsed = 0; r.started = null; r.hints = 0; r.answer = false; r.checks = [false,false,false,false]; r.status = 'review'; r.due = Date.now(); r.step = 1; save(); render();
+    const r = record(); r.code = starter(problem()); r.elapsed = 0; r.started = null; r.hints = 0; r.answer = false; r.lessonAssisted = false; r.checks = [false,false,false,false]; r.status = 'review'; r.due = Date.now(); r.step = 1; save(); render();
   };
   document.querySelectorAll('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; document.querySelectorAll('[data-filter]').forEach(el => el.setAttribute('aria-pressed',String(el === b))); list(); });
   document.querySelectorAll('[data-verdict]').forEach(b => b.onclick = () => {
     const r = record();
-    if (b.dataset.verdict === 'solved' && (r.hints || r.answer || !r.checks.every(Boolean))) { $('result').textContent = '체크리스트를 모두 확인하세요. 힌트·해설을 봤다면 “빈 코드로 재풀이” 후 도움 없이 풀어야 완료할 수 있습니다.'; return; }
+    if (b.dataset.verdict === 'solved' && (r.hints || r.answer || r.lessonAssisted || !r.checks.every(Boolean))) { $('result').textContent = '체크리스트를 모두 확인하세요. 강의·힌트·해설을 봤다면 “빈 코드로 재풀이” 후 도움 없이 풀어야 완료할 수 있습니다.'; return; }
     pause(); r.status = b.dataset.verdict; r.due = r.status === 'solved' ? 0 : Date.now()+1800000; save(); render();
   });
   $('recommend').onclick = () => {
@@ -201,6 +220,7 @@
       if (file.size > 5000000) throw new Error('size');
       const parsed = JSON.parse(await file.text()); if (!validState(parsed)) throw new Error('format');
       if (!window.confirm('이 브라우저의 현재 코테 기록을 백업 내용으로 바꿀까요?')) return;
+      window.CodingLesson.pause();
       state = javaState(parsed); Object.values(state.records).forEach(r => { r.started = null; }); storageError = false; current = problems.some(p => p.id === state.current) ? state.current : 1; save(); render();
       if (!storageError) $('notice').textContent = '학습 기록을 복원했습니다.';
     } catch (_) { $('notice').textContent = '복원 실패: 올바른 학습 기록 JSON(5MB 이하)을 선택하세요. 현재 기록은 유지됩니다.'; }
@@ -238,7 +258,20 @@ ${problem().java.testCode}
   fetch('/static/coding-problems.json').then(response => { if (!response.ok) throw new Error('load'); return response.json(); }).then(data => {
     if (!Array.isArray(data) || data.length !== 30 || data.some(p => !p.java?.starter || !p.java?.solution || !p.java?.testCode)) throw new Error('data'); problems = data;
     current = problems.some(p => p.id === state.current) ? state.current : 1;
-    if (focusSettings().onBreak) pause();
+    window.CodingLesson.init({
+      onNextLesson() { if (current >= 30) return false; select(current + 1); return true; },
+      onProgress(scene) { record().lessonScene = scene; save(); },
+      onCompletedScene(scene) {
+        const r = record(); r.lessonHeard = [...new Set([...(r.lessonHeard || []), scene])];
+        r.lessonWatched = r.lessonHeard.length === 5; save();
+      },
+      onAssisted() {
+        const r = record(); r.lessonAssisted = true;
+        if (r.status !== 'solved') { r.status = 'review'; r.due = Date.now() + 1800000; }
+        save(); list();
+      },
+    });
+    if (focusSettings().onBreak || state.learningMode !== 'practice') pause();
     render(); save(); $('restore').disabled = false; window.setInterval(updateClock,1000);
   }).catch(() => { $('notice').textContent = '문제를 불러오지 못했습니다. 연결을 확인하고 새로고침하세요.'; });
 })();

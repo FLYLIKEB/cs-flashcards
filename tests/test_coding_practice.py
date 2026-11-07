@@ -75,6 +75,8 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
 
     async def ready(self):
         await self.page.waitForFunction("document.querySelectorAll('#problems button').length === 30")
+        if await self.page.Jeval('#practicePanel', 'el => el.hidden'):
+            await self.page.click('#modePractice')
 
     async def state(self):
         return await self.page.evaluate('(key) => JSON.parse(localStorage.getItem(key))', KEY)

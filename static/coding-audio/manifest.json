@@ -1,0 +1,787 @@
+{
+  "version": 1,
+  "voice": "Yuna",
+  "rate": 185,
+  "lessons": [
+    {
+      "id": 1,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/01-01.mp3",
+          "duration": 15.283
+        },
+        {
+          "src": "/static/coding-audio/01-02.mp3",
+          "duration": 14.168
+        },
+        {
+          "src": "/static/coding-audio/01-03.mp3",
+          "duration": 15.398
+        },
+        {
+          "src": "/static/coding-audio/01-04.mp3",
+          "duration": 15.118
+        },
+        {
+          "src": "/static/coding-audio/01-05.mp3",
+          "duration": 15.359
+        }
+      ],
+      "sourceHash": "fbf91be02e659b93079bbc567bccbd1db5d4315f1f4bda4c96505e11bbc344e9"
+    },
+    {
+      "id": 2,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/02-01.mp3",
+          "duration": 14.767
+        },
+        {
+          "src": "/static/coding-audio/02-02.mp3",
+          "duration": 15.684
+        },
+        {
+          "src": "/static/coding-audio/02-03.mp3",
+          "duration": 15.213
+        },
+        {
+          "src": "/static/coding-audio/02-04.mp3",
+          "duration": 15.655
+        },
+        {
+          "src": "/static/coding-audio/02-05.mp3",
+          "duration": 14.317
+        }
+      ],
+      "sourceHash": "eb6e921944dabd896f3ab63f6424820615a0cdf14dc7819018f9fa2a654f44ad"
+    },
+    {
+      "id": 3,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/03-01.mp3",
+          "duration": 14.375
+        },
+        {
+          "src": "/static/coding-audio/03-02.mp3",
+          "duration": 15.103
+        },
+        {
+          "src": "/static/coding-audio/03-03.mp3",
+          "duration": 15.324
+        },
+        {
+          "src": "/static/coding-audio/03-04.mp3",
+          "duration": 14.925
+        },
+        {
+          "src": "/static/coding-audio/03-05.mp3",
+          "duration": 15.619
+        }
+      ],
+      "sourceHash": "4eadf6658673c9b17648d500c511223fa6e5950c9f0ee34966243c6daa48f4cc"
+    },
+    {
+      "id": 4,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/04-01.mp3",
+          "duration": 14.743
+        },
+        {
+          "src": "/static/coding-audio/04-02.mp3",
+          "duration": 14.217
+        },
+        {
+          "src": "/static/coding-audio/04-03.mp3",
+          "duration": 14.528
+        },
+        {
+          "src": "/static/coding-audio/04-04.mp3",
+          "duration": 15.945
+        },
+        {
+          "src": "/static/coding-audio/04-05.mp3",
+          "duration": 15.567
+        }
+      ],
+      "sourceHash": "ee1164f9f2c86da5b0119864813953ef80ecb2bbb9336da99c059899c368ee9d"
+    },
+    {
+      "id": 5,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/05-01.mp3",
+          "duration": 15.122
+        },
+        {
+          "src": "/static/coding-audio/05-02.mp3",
+          "duration": 15.562
+        },
+        {
+          "src": "/static/coding-audio/05-03.mp3",
+          "duration": 14.946
+        },
+        {
+          "src": "/static/coding-audio/05-04.mp3",
+          "duration": 15.765
+        },
+        {
+          "src": "/static/coding-audio/05-05.mp3",
+          "duration": 15.452
+        }
+      ],
+      "sourceHash": "1f1d1ccbd65866728102020e9d93c5e951dc29f9dd7846c9b98daabf14ab162b"
+    },
+    {
+      "id": 6,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/06-01.mp3",
+          "duration": 15.05
+        },
+        {
+          "src": "/static/coding-audio/06-02.mp3",
+          "duration": 15.045
+        },
+        {
+          "src": "/static/coding-audio/06-03.mp3",
+          "duration": 15.893
+        },
+        {
+          "src": "/static/coding-audio/06-04.mp3",
+          "duration": 15.864
+        },
+        {
+          "src": "/static/coding-audio/06-05.mp3",
+          "duration": 14.662
+        }
+      ],
+      "sourceHash": "63ea067d96bd2aefb8553d561d8686d456f4a64abf191273767b46b782422784"
+    },
+    {
+      "id": 7,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/07-01.mp3",
+          "duration": 15.317
+        },
+        {
+          "src": "/static/coding-audio/07-02.mp3",
+          "duration": 14.691
+        },
+        {
+          "src": "/static/coding-audio/07-03.mp3",
+          "duration": 15.098
+        },
+        {
+          "src": "/static/coding-audio/07-04.mp3",
+          "duration": 16.409
+        },
+        {
+          "src": "/static/coding-audio/07-05.mp3",
+          "duration": 16.746
+        }
+      ],
+      "sourceHash": "e85f77ddb93ff3e24f2d387ef34bff0975f8a673c5ed6dd72bdba9005dfd6bc1"
+    },
+    {
+      "id": 8,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/08-01.mp3",
+          "duration": 15.798
+        },
+        {
+          "src": "/static/coding-audio/08-02.mp3",
+          "duration": 15.272
+        },
+        {
+          "src": "/static/coding-audio/08-03.mp3",
+          "duration": 15.376
+        },
+        {
+          "src": "/static/coding-audio/08-04.mp3",
+          "duration": 16.189
+        },
+        {
+          "src": "/static/coding-audio/08-05.mp3",
+          "duration": 16.532
+        }
+      ],
+      "sourceHash": "110bc39158806df0623851b024a2175da983d13e8aa5d80a87dcc324b5089e2d"
+    },
+    {
+      "id": 9,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/09-01.mp3",
+          "duration": 15.063
+        },
+        {
+          "src": "/static/coding-audio/09-02.mp3",
+          "duration": 13.924
+        },
+        {
+          "src": "/static/coding-audio/09-03.mp3",
+          "duration": 14.848
+        },
+        {
+          "src": "/static/coding-audio/09-04.mp3",
+          "duration": 15.11
+        },
+        {
+          "src": "/static/coding-audio/09-05.mp3",
+          "duration": 15.416
+        }
+      ],
+      "sourceHash": "e4d995b75304264cef487be27538333748ce8cf04b933b8d9b33f6fb394789aa"
+    },
+    {
+      "id": 10,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/10-01.mp3",
+          "duration": 16.038
+        },
+        {
+          "src": "/static/coding-audio/10-02.mp3",
+          "duration": 15.781
+        },
+        {
+          "src": "/static/coding-audio/10-03.mp3",
+          "duration": 14.504
+        },
+        {
+          "src": "/static/coding-audio/10-04.mp3",
+          "duration": 15.966
+        },
+        {
+          "src": "/static/coding-audio/10-05.mp3",
+          "duration": 16.01
+        }
+      ],
+      "sourceHash": "e6f6ee9914bdde7a2844953934066fe98910bd794f535e7a394cf00b19b79e38"
+    },
+    {
+      "id": 11,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/11-01.mp3",
+          "duration": 15.565
+        },
+        {
+          "src": "/static/coding-audio/11-02.mp3",
+          "duration": 15.65
+        },
+        {
+          "src": "/static/coding-audio/11-03.mp3",
+          "duration": 16.229
+        },
+        {
+          "src": "/static/coding-audio/11-04.mp3",
+          "duration": 16.596
+        },
+        {
+          "src": "/static/coding-audio/11-05.mp3",
+          "duration": 14.326
+        }
+      ],
+      "sourceHash": "4bab1f9e8862378a0b1cdd57f2073600df465f4e99186e1631df5081f2fd41df"
+    },
+    {
+      "id": 12,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/12-01.mp3",
+          "duration": 16.142
+        },
+        {
+          "src": "/static/coding-audio/12-02.mp3",
+          "duration": 16.357
+        },
+        {
+          "src": "/static/coding-audio/12-03.mp3",
+          "duration": 15.534
+        },
+        {
+          "src": "/static/coding-audio/12-04.mp3",
+          "duration": 16.119
+        },
+        {
+          "src": "/static/coding-audio/12-05.mp3",
+          "duration": 16.084
+        }
+      ],
+      "sourceHash": "d9a694eec4503d193765ceef03b9c6d1b325c89d6606c584bd32cb94b389e299"
+    },
+    {
+      "id": 13,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/13-01.mp3",
+          "duration": 15.329
+        },
+        {
+          "src": "/static/coding-audio/13-02.mp3",
+          "duration": 15.835
+        },
+        {
+          "src": "/static/coding-audio/13-03.mp3",
+          "duration": 15.329
+        },
+        {
+          "src": "/static/coding-audio/13-04.mp3",
+          "duration": 14.802
+        },
+        {
+          "src": "/static/coding-audio/13-05.mp3",
+          "duration": 15.773
+        }
+      ],
+      "sourceHash": "dc2a2e2f0298aead29cf78c06bec4c305f85f8001769c43c0c4f6d1d3330ab9c"
+    },
+    {
+      "id": 14,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/14-01.mp3",
+          "duration": 15.035
+        },
+        {
+          "src": "/static/coding-audio/14-02.mp3",
+          "duration": 16.525
+        },
+        {
+          "src": "/static/coding-audio/14-03.mp3",
+          "duration": 15.267
+        },
+        {
+          "src": "/static/coding-audio/14-04.mp3",
+          "duration": 15.863
+        },
+        {
+          "src": "/static/coding-audio/14-05.mp3",
+          "duration": 15.997
+        }
+      ],
+      "sourceHash": "08fce7b8db61a42076a5ca43e2025cc1f9cf9ed9eab56bf166ce7770705e0e79"
+    },
+    {
+      "id": 15,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/15-01.mp3",
+          "duration": 15.852
+        },
+        {
+          "src": "/static/coding-audio/15-02.mp3",
+          "duration": 14.894
+        },
+        {
+          "src": "/static/coding-audio/15-03.mp3",
+          "duration": 15.921
+        },
+        {
+          "src": "/static/coding-audio/15-04.mp3",
+          "duration": 15.644
+        },
+        {
+          "src": "/static/coding-audio/15-05.mp3",
+          "duration": 16.984
+        }
+      ],
+      "sourceHash": "03f264c263a855a127832e50f11753a5e41dc414ac338b05d943ae263f1e848b"
+    },
+    {
+      "id": 16,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/16-01.mp3",
+          "duration": 16.792
+        },
+        {
+          "src": "/static/coding-audio/16-02.mp3",
+          "duration": 14.407
+        },
+        {
+          "src": "/static/coding-audio/16-03.mp3",
+          "duration": 15.015
+        },
+        {
+          "src": "/static/coding-audio/16-04.mp3",
+          "duration": 16.213
+        },
+        {
+          "src": "/static/coding-audio/16-05.mp3",
+          "duration": 15.41
+        }
+      ],
+      "sourceHash": "983462fc28feef7bee5fae5ead6a055c827eefec58fb517bf6ccf3943ede7df8"
+    },
+    {
+      "id": 17,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/17-01.mp3",
+          "duration": 15.562
+        },
+        {
+          "src": "/static/coding-audio/17-02.mp3",
+          "duration": 15.886
+        },
+        {
+          "src": "/static/coding-audio/17-03.mp3",
+          "duration": 15.828
+        },
+        {
+          "src": "/static/coding-audio/17-04.mp3",
+          "duration": 16.618
+        },
+        {
+          "src": "/static/coding-audio/17-05.mp3",
+          "duration": 16.154
+        }
+      ],
+      "sourceHash": "37a0ff2877e94636bc6dd5939a9da68cf290d3210478ef53fe355b76fc09def2"
+    },
+    {
+      "id": 18,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/18-01.mp3",
+          "duration": 15.966
+        },
+        {
+          "src": "/static/coding-audio/18-02.mp3",
+          "duration": 15.234
+        },
+        {
+          "src": "/static/coding-audio/18-03.mp3",
+          "duration": 16.479
+        },
+        {
+          "src": "/static/coding-audio/18-04.mp3",
+          "duration": 16.175
+        },
+        {
+          "src": "/static/coding-audio/18-05.mp3",
+          "duration": 16.804
+        }
+      ],
+      "sourceHash": "30cd4c6ace56cd8bbc868dfd007b0f6d3d987b1542b3a1975f06b0c85840f9d6"
+    },
+    {
+      "id": 19,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/19-01.mp3",
+          "duration": 16.468
+        },
+        {
+          "src": "/static/coding-audio/19-02.mp3",
+          "duration": 16.34
+        },
+        {
+          "src": "/static/coding-audio/19-03.mp3",
+          "duration": 16.327
+        },
+        {
+          "src": "/static/coding-audio/19-04.mp3",
+          "duration": 16.918
+        },
+        {
+          "src": "/static/coding-audio/19-05.mp3",
+          "duration": 16.325
+        }
+      ],
+      "sourceHash": "1b21a2a04c60f912ef7f5df9ad2a5e5828718d2721f3fffcee3d245cfea474c0"
+    },
+    {
+      "id": 20,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/20-01.mp3",
+          "duration": 15.55
+        },
+        {
+          "src": "/static/coding-audio/20-02.mp3",
+          "duration": 15.614
+        },
+        {
+          "src": "/static/coding-audio/20-03.mp3",
+          "duration": 15.039
+        },
+        {
+          "src": "/static/coding-audio/20-04.mp3",
+          "duration": 14.859
+        },
+        {
+          "src": "/static/coding-audio/20-05.mp3",
+          "duration": 16.641
+        }
+      ],
+      "sourceHash": "ccb2a6414cf16db7449d2089fae77ae48c510ebbaa14f66056d006dc2d7d80a3"
+    },
+    {
+      "id": 21,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/21-01.mp3",
+          "duration": 15.353
+        },
+        {
+          "src": "/static/coding-audio/21-02.mp3",
+          "duration": 15.766
+        },
+        {
+          "src": "/static/coding-audio/21-03.mp3",
+          "duration": 15.724
+        },
+        {
+          "src": "/static/coding-audio/21-04.mp3",
+          "duration": 15.339
+        },
+        {
+          "src": "/static/coding-audio/21-05.mp3",
+          "duration": 16.651
+        }
+      ],
+      "sourceHash": "37d4b84b09830750f71d9da2a1ec7c1db62aac686bf7ab4b430a2489db298b08"
+    },
+    {
+      "id": 22,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/22-01.mp3",
+          "duration": 15.291
+        },
+        {
+          "src": "/static/coding-audio/22-02.mp3",
+          "duration": 15.098
+        },
+        {
+          "src": "/static/coding-audio/22-03.mp3",
+          "duration": 16.339
+        },
+        {
+          "src": "/static/coding-audio/22-04.mp3",
+          "duration": 17.746
+        },
+        {
+          "src": "/static/coding-audio/22-05.mp3",
+          "duration": 16.78
+        }
+      ],
+      "sourceHash": "c90b5d1cad102a391a6d640e0c4b281b132edff267b22fa4878c5e31aa1ef377"
+    },
+    {
+      "id": 23,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/23-01.mp3",
+          "duration": 15.77
+        },
+        {
+          "src": "/static/coding-audio/23-02.mp3",
+          "duration": 15.626
+        },
+        {
+          "src": "/static/coding-audio/23-03.mp3",
+          "duration": 15.429
+        },
+        {
+          "src": "/static/coding-audio/23-04.mp3",
+          "duration": 15.989
+        },
+        {
+          "src": "/static/coding-audio/23-05.mp3",
+          "duration": 16.212
+        }
+      ],
+      "sourceHash": "74c7c07cc5b80ffe515ffe590054b32e86d9239ca8fb1c7a7719cbc508b118ca"
+    },
+    {
+      "id": 24,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/24-01.mp3",
+          "duration": 15.12
+        },
+        {
+          "src": "/static/coding-audio/24-02.mp3",
+          "duration": 15.324
+        },
+        {
+          "src": "/static/coding-audio/24-03.mp3",
+          "duration": 15.352
+        },
+        {
+          "src": "/static/coding-audio/24-04.mp3",
+          "duration": 15.908
+        },
+        {
+          "src": "/static/coding-audio/24-05.mp3",
+          "duration": 16.049
+        }
+      ],
+      "sourceHash": "79f0c36e4d5457000c27362f7ca70f76cea80c41d4e0b9ba94db20e5811fd908"
+    },
+    {
+      "id": 25,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/25-01.mp3",
+          "duration": 15.492
+        },
+        {
+          "src": "/static/coding-audio/25-02.mp3",
+          "duration": 15.677
+        },
+        {
+          "src": "/static/coding-audio/25-03.mp3",
+          "duration": 16.442
+        },
+        {
+          "src": "/static/coding-audio/25-04.mp3",
+          "duration": 16.641
+        },
+        {
+          "src": "/static/coding-audio/25-05.mp3",
+          "duration": 17.64
+        }
+      ],
+      "sourceHash": "5f971d1378b9afa7a6be15de03751d0cc366f7709704e0eda6e3c9f5004244a2"
+    },
+    {
+      "id": 26,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/26-01.mp3",
+          "duration": 14.563
+        },
+        {
+          "src": "/static/coding-audio/26-02.mp3",
+          "duration": 15.695
+        },
+        {
+          "src": "/static/coding-audio/26-03.mp3",
+          "duration": 15.735
+        },
+        {
+          "src": "/static/coding-audio/26-04.mp3",
+          "duration": 16.771
+        },
+        {
+          "src": "/static/coding-audio/26-05.mp3",
+          "duration": 16.581
+        }
+      ],
+      "sourceHash": "7e316755a25e4507b1ac6ca9509a39d9c21f1c054193bda2e8ef070e857bf364"
+    },
+    {
+      "id": 27,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/27-01.mp3",
+          "duration": 15.212
+        },
+        {
+          "src": "/static/coding-audio/27-02.mp3",
+          "duration": 15.642
+        },
+        {
+          "src": "/static/coding-audio/27-03.mp3",
+          "duration": 15.247
+        },
+        {
+          "src": "/static/coding-audio/27-04.mp3",
+          "duration": 15.724
+        },
+        {
+          "src": "/static/coding-audio/27-05.mp3",
+          "duration": 17.429
+        }
+      ],
+      "sourceHash": "44d9471663f3cfebebb7c523e3ce5f8ae4172f791b30e4c716571d909896823c"
+    },
+    {
+      "id": 28,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/28-01.mp3",
+          "duration": 16.2
+        },
+        {
+          "src": "/static/coding-audio/28-02.mp3",
+          "duration": 16.122
+        },
+        {
+          "src": "/static/coding-audio/28-03.mp3",
+          "duration": 17.054
+        },
+        {
+          "src": "/static/coding-audio/28-04.mp3",
+          "duration": 16.782
+        },
+        {
+          "src": "/static/coding-audio/28-05.mp3",
+          "duration": 17.442
+        }
+      ],
+      "sourceHash": "d8a991b67dfdb43d908aa3c8756d048fb7401743db83b78736191df2871bc1e2"
+    },
+    {
+      "id": 29,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/29-01.mp3",
+          "duration": 16.002
+        },
+        {
+          "src": "/static/coding-audio/29-02.mp3",
+          "duration": 15.301
+        },
+        {
+          "src": "/static/coding-audio/29-03.mp3",
+          "duration": 15.487
+        },
+        {
+          "src": "/static/coding-audio/29-04.mp3",
+          "duration": 16.642
+        },
+        {
+          "src": "/static/coding-audio/29-05.mp3",
+          "duration": 16.803
+        }
+      ],
+      "sourceHash": "f0b5db1b54d89214e851bdc5c8497f8ee63617e12d2cd5d50b2697d1c253f316"
+    },
+    {
+      "id": 30,
+      "scenes": [
+        {
+          "src": "/static/coding-audio/30-01.mp3",
+          "duration": 16.839
+        },
+        {
+          "src": "/static/coding-audio/30-02.mp3",
+          "duration": 15.84
+        },
+        {
+          "src": "/static/coding-audio/30-03.mp3",
+          "duration": 17.129
+        },
+        {
+          "src": "/static/coding-audio/30-04.mp3",
+          "duration": 15.12
+        },
+        {
+          "src": "/static/coding-audio/30-05.mp3",
+          "duration": 17.41
+        }
+      ],
+      "sourceHash": "ed97b67079ae71f4246408e117234cedcf5b8fef50fc91807f69199529fb34e7"
+    }
+  ]
+}
