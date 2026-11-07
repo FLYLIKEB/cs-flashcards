@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "중복 요청 ID 제거",
+    "prompt": "Create a premium restrained editorial illustration for a Java algorithm lesson about removing duplicate request IDs while retaining first-seen order. Landscape 3:2. Warm ivory #faf9f5 background, forest teal #285d51 and sage tactile paper and clay objects, soft natural shadows, spacious elegant composition. Show a short orderly conveyor of small request cards bearing simple geometric symbols, with repeated symbol cards gently diverted into a shallow side tray, while three distinct symbol cards continue in original order. Clear concrete analogy, no humans, no text, no letters, no digits, no logos or watermark. Quiet thoughtful educational art.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-ceebe090-e1c1-4263-9856-c8708a012fcd.png",
+    "path": "static/coding-images/01.png"
+  },
+  {
+    "id": 2,
+    "title": "목표 금액을 만드는 두 결제",
+    "prompt": "Premium restrained editorial educational illustration, landscape 3:2, warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile paper/clay, soft natural shadows and spacious elegant composition. Concept: choosing exactly two payments that sum to a target amount. Show a beautiful simple balance scale: on one pan two separate small stacks of coin-like discs, on the other one larger stack exactly balancing them, with a few unused stacks gently apart on the table. No currency symbols, text, letters, digits, humans, logos, or watermark. Clear single visual metaphor, not generic tech clutter. Modern calm editorial still life.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-55fe99a2-9b4b-4bca-a4e7-f5ec13471c2f.png",
+    "path": "static/coding-images/02.png"
+  },
+  {
+    "id": 3,
+    "title": "가장 많이 발생한 오류 코드",
+    "prompt": "Landscape 3:2 premium editorial illustration for algorithm 'most frequently occurring error code'. Warm ivory #faf9f5 background with forest teal #285d51 and sage clay/paper materials, soft shadows, spacious refined composition. A neat sorting desk with three columns of small ticket tiles: triangle-marked tickets make the clearly tallest stack, circle-marked tickets a medium stack, square-marked tickets a low stack. A delicate sage selection frame gently highlights the tallest triangle stack. Geometric symbols only, no letters, numbers, text, logos or watermark. No generic computer screens. Quiet cohesive tactile educational art.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-6ffce953-fe96-4ec4-b574-2d64ecaad44e.png",
+    "path": "static/coding-images/03.png"
+  },
+  {
+    "id": 4,
+    "title": "정렬된 두 이벤트 스트림 병합",
+    "prompt": "Landscape 3:2 premium restrained educational editorial illustration of merging two already sorted event streams into one ordered stream. Warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile clay/paper materials. Two curved shallow channels approach a Y-shaped junction, each carrying ordered small blocks gradually increasing in height; beyond the junction they interleave into one clean row with steadily increasing heights. Use distinct teal and sage blocks to make their origins understandable, retain all blocks. Soft natural shadows, spacious clean composition, no text, digits, letters, logos or watermark. A beautiful simple tangible sorting model rather than a computer screen.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-b1c16c86-8868-4f73-a51a-c0ab58b7369b.png",
+    "path": "static/coding-images/04.png"
+  },
+  {
+    "id": 5,
+    "title": "구간별 요청 수 빠르게 조회",
+    "prompt": "Landscape 3:2 premium editorial educational illustration about quickly counting requests inside a chosen interval, prefix range sums. Warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile clay/paper materials, soft natural shadows, spacious elegant composition. Show an orderly horizontal row of seven shallow square trays holding different quantities of small identical request tokens. A simple translucent sage rectangular bracket surrounds exactly the middle three adjacent trays, and their tokens are represented together in one neat total pile in the foreground. Clear contiguous-range metaphor, no numerical equation, no text, no letters, digits, logos or watermark, no humans or generic technology clutter.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-a55d9ed2-a4ba-4dec-9655-fe5a213e0294.png",
+    "path": "static/coding-images/05.png"
+  },
+  {
+    "id": 6,
+    "title": "최대 트래픽 고정 구간",
+    "prompt": "Landscape 3:2 premium restrained editorial educational illustration about finding maximum traffic in a fixed-size sliding window. Warm ivory #faf9f5 backdrop, forest teal #285d51 and sage tactile clay/paper materials. Single horizontal timeline of nine bar-like towers of request tokens, varying heights; a beautiful light sage open rectangular frame spans exactly three adjacent tallest central towers, showing a fixed-width window selecting the busiest period. A subtle short arrow along the baseline suggests sliding the frame sideways. Soft natural shadows, spacious centered composition, no text, letters, numbers, logos, watermark or computer screen. Calm thoughtful distinctive educational still life.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-623d-7072-93a8-163aa6efe3dc/exec-8c5cd879-e135-4f09-ad05-4157937e8380.png",
+    "path": "static/coding-images/06.png"
+  }
+]

@@ -63,7 +63,7 @@ test('edge labels stay clear of cards and each other, and all scene heights rema
  }
 });
 test('authored array indices stay aligned and horizontal stack entries retain their x ordering',()=>{
- const input=byId[10].scenes[0].frames[2],frame=layout.prepare({frames:[input]}).frames[0];
+ const input=byId[10].scenes[0].frames.find(f=>f.nodes.some(n=>n.id==='value0')),frame=layout.prepare({frames:[input]}).frames[0];
  for(let i=0;i<4;i++)assert.equal(frame.nodes.find(n=>n.id===`value${i}`).x,frame.nodes.find(n=>n.id===`answer${i}`).x);
  const before=input.nodes.filter(n=>/^pos/.test(n.id)).sort((a,b)=>a.x-b.x).map(n=>n.id);
  assert.deepEqual(frame.nodes.filter(n=>/^pos/.test(n.id)).sort((a,b)=>a.x-b.x).map(n=>n.id),before);

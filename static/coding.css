@@ -285,3 +285,6 @@ a { color: var(--blue); }
   .lesson-controls button:active, .lesson-restart:active { box-shadow: inset 0 0 0 2px var(--line); }
   @keyframes lesson-reveal { from { opacity: .35; } to { opacity: 1; } }
 }
+
+.lesson-illustration { display: block; width: min(100%, 480px); aspect-ratio: 3 / 2; object-fit: contain; margin: 12px auto; border-radius: 16px; }
+.lesson-illustration[hidden], .lesson-cards[hidden] { display: none; }

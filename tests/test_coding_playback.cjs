@@ -18,12 +18,12 @@ async function setup(problem = 1, scene = 4, savedNextScene = 0) {
   Object.assign(audio, {currentTime:0,duration:10,readyState:4,paused:true,ended:false,plays:0,
     load(){this.currentTime=0;this.ended=false;this.paused=true;},
     pause(){this.paused=true;},play(){this.paused=false;this.ended=false;this.plays++;return Promise.resolve();}});
-  const scripts = Array.from({length:30},(_,i)=>({id:i+1,scenes:Array.from({length:5},(_,j)=>({
-    title:`Problem ${i+1} scene ${j}`,caption:'caption',narration:'explanation',items:['1'],active:0}))}));
+  const scripts = Array.from({length:30},(_,i)=>({id:i+1,title:`Problem ${i+1}`,scenes:Array.from({length:5},(_,j)=>({
+    title:`Problem ${i+1} scene ${j}`,titleCueCount:j===0?1:0,introCueCount:j===0?1:0,caption:'caption',narration:'explanation',items:['1'],active:0}))}));
   const tracks = scripts.map(lesson=>({id:lesson.id,scenes:lesson.scenes.map((_,j)=>({
     src:`/static/coding-audio/${lesson.id}-${j}.mp3`,duration:10,cues:[{start:0,end:10,text:'explanation'}]}))}));
   const window = {addEventListener(){},clearTimeout(){},setTimeout(){},requestAnimationFrame:f=>f(),
-    CodingMotion:{onTick(){},mount(){return true;},validate(){}},
+    CodingMotion:{onTick(fn){this.tick=fn;},mount(){return true;},validate(){}},
     CodingCode:{mount(){},update(){},validate(){}},
     CodingTypewriter:{render(node,text){node.textContent=text;}}};
   const document = {getElementById:id=>nodes[id],createElement:element,addEventListener(){}};
@@ -95,4 +95,19 @@ test('automatic and manual next reset a previously visited problem to its introd
     assert.equal(s.current(),2);assert.equal(s.audio.src,'/static/coding-audio/2-0.mp3');
     assert.equal(s.audio.currentTime,0);assert.equal(s.audio.paused,false);
   }
+});
+
+
+test('title cue displays the matching image and image failure preserves the title animation',async()=>{
+ const s=await setup(7,0);
+ assert.equal(s.nodes.lessonIllustration.src,'/static/coding-images/07.png');
+ assert.equal(s.nodes.lessonIllustration.hidden,false);
+ assert.equal(s.nodes.lessonCards.hidden,true);
+ assert.equal(s.nodes.lessonSceneTitle.textContent,'7번 · Problem 7');
+ s.nodes.lessonIllustration.onerror();
+ assert.equal(s.nodes.lessonIllustration.hidden,true);
+ assert.equal(s.nodes.lessonCards.hidden,false);
+ s.nodes.lessonNext.onclick();await s.settle();
+ assert.equal(s.nodes.lessonIllustration.hidden,true);
+ assert.equal(s.nodes.lessonCards.hidden,false);
 });

@@ -32,6 +32,16 @@ class NarrationAuthoringTests(unittest.TestCase):
         intro_count = sum(scene.get('introCueCount', 0) for lesson in lessons for scene in lesson['scenes'])
         self.assertEqual(total - intro_count, 620, 'Original explanations must remain intact')
 
+    def test_each_problem_starts_with_its_name_before_the_existing_introduction(self):
+        lessons = json.loads((ROOT / 'static/coding-lessons.json').read_text())
+        introductions = {item['id']: item for item in json.loads((ROOT / 'static/coding-intros.json').read_text())}
+        for lesson in lessons:
+            with self.subTest(problem=lesson['id']):
+                scene = lesson['scenes'][0]
+                self.assertEqual(scene['titleCueCount'], 1)
+                self.assertEqual(scene['segments'][0]['text'], f"{lesson['id']}번 문제. {lesson['title']}.")
+                self.assertEqual(scene['segments'][1:scene['introCueCount']], introductions[lesson['id']]['segments'])
+
     def test_example_tokens_are_literal_in_subtitles(self):
         lessons = {item['id']: item for item in json.loads((ROOT / 'static/coding-lessons.json').read_text())}
         requests = lessons[1]['scenes'][0]['narration']

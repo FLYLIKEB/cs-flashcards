@@ -4,6 +4,7 @@
 Default: validate the authored introductions and print the pending lesson IDs.
 --apply: synthesize local Yuna introductions, verify every output, then install JSON.
 An already applied introduction is skipped; changed introductions fail closed.
+--titles prepends one spoken problem name before the existing introduction.
 """
 from __future__ import annotations
 
@@ -31,11 +32,32 @@ DATA = ['coding-lessons.json', 'coding-audio/manifest.json',
 def pending_intro(lesson: dict, intro: dict) -> bool:
     parts = intro.get('segments')
     renderer.narration_segments({'segments': parts, 'narration': ' '.join(p['text'] for p in parts or [])})
-    count = lesson['scenes'][0].get('introCueCount', 0)
+    scene = lesson['scenes'][0]
+    title_count = scene.get('titleCueCount', 0)
+    count = scene.get('introCueCount', 0) - title_count
     if count:
-        if lesson['scenes'][0]['segments'][:count] != parts:
+        if scene['segments'][title_count:title_count + count] != parts:
             raise ValueError(f"Lesson {lesson['id']} already has a different introduction")
         return False
+    return True
+
+
+def title_segment(lesson: dict) -> dict:
+    title = lesson['title']
+    speech = title.replace('ID', '아이디').replace('LRU', '엘 알 유').replace('K개', '케이 개')
+    speech = speech.replace('1일차', '일 일차').replace('모의 1:', '모의 일.').replace('모의 2:', '모의 이.').replace(':', '.')
+    return {'text': f"{lesson['id']}번 문제. {title}.",
+            'speech': f"{lesson['id']}번 문제. {speech}."}
+
+
+def pending_title(lesson: dict, intro: dict) -> bool:
+    scene = lesson['scenes'][0]
+    if scene.get('titleCueCount', 0):
+        if scene['titleCueCount'] != 1 or scene['segments'][0] != intro['segments'][0]:
+            raise ValueError(f"Lesson {lesson['id']} already has a different title")
+        return False
+    if not scene.get('introCueCount'):
+        raise ValueError('Apply the authored introduction before the title')
     return True
 
 
@@ -62,15 +84,15 @@ def prepend_data(lesson: dict, track: dict, story: dict, links: dict,
     starts.extend(offset + cue['start'] for cue in old['cues'])
     scene['segments'] = deepcopy(parts) + scene['segments']
     scene['narration'] = ' '.join(p['text'] for p in scene['segments'])
-    scene['introCueCount'] = len(parts)
+    scene['introCueCount'] = scene.get('introCueCount', 0) + len(parts)
     cues = importer.make_cues(scene, starts, duration)
     audio_hash = hashlib.sha256(encoded.read_bytes()).hexdigest()
     provenance = deepcopy(old.get('provenance', {'provider': 'local', 'voice': 'Yuna'}))
     provenance.update({'audioHash': audio_hash,
                        'speechHash': importer.digest([p['speech'] for p in scene['segments']]),
                        'timing': 'measured-introduction-and-preserved-cues',
-                       'introProvider': 'local', 'introVoice': 'Yuna', 'introCueCount': len(parts),
-                       'explanationSrc': old['src']})
+                       'introProvider': 'local', 'introVoice': 'Yuna', 'introCueCount': scene['introCueCount'],
+                       'explanationSrc': provenance.get('explanationSrc', old['src'])})
     name = f"{lesson['id']:02d}-01-{audio_hash[:12]}.mp3"
     track['scenes'][0] = {'src': f'/static/coding-audio/{name}', 'duration': round(duration, 3),
                           'cues': cues, 'provenance': provenance}
@@ -121,6 +143,7 @@ def render_intro(parts: list[dict], source: Path, output: Path, work: Path) -> l
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--titles', action='store_true', help='Prepend each problem name before its introduction')
     args = parser.parse_args()
     paths = [ROOT / 'static' / name for name in DATA]
     originals = {p: p.read_bytes() for p in paths}
@@ -130,7 +153,10 @@ def main():
     intros = json.loads(intro_bytes)
     if [i['id'] for i in intros] != [lesson['id'] for lesson in lessons]:
         raise ValueError('Introductions must match the complete lesson sequence')
-    pending = [(lesson, intro) for lesson, intro in zip(lessons, intros) if pending_intro(lesson, intro)]
+    if args.titles:
+        intros = [{'id': lesson['id'], 'segments': [title_segment(lesson)]} for lesson in lessons]
+    check = pending_title if args.titles else pending_intro
+    pending = [(lesson, intro) for lesson, intro in zip(lessons, intros) if check(lesson, intro)]
     print(f'Pending introductions: {[lesson["id"] for lesson, _ in pending]}', flush=True)
     if not args.apply or not pending:
         return
@@ -147,6 +173,12 @@ def main():
             encoded = work / 'encoded.mp3'
             durations = render_intro(intro['segments'], source, encoded, work)
             prepend_data(lesson, track, stories[lesson['id']], links[lesson['id']], intro['segments'], durations, encoded)
+            if args.titles:
+                lesson['scenes'][0]['titleCueCount'] = 1
+                track['scenes'][0]['provenance']['titleCueCount'] = 1
+                track['scenes'][0]['provenance']['timing'] = 'measured-title-introduction-and-preserved-cues'
+                links[lesson['id']]['scenes'][0]['cues'][0]['note'] = '이번에 볼 문제예요.'
+                track['sourceHash'] = importer.fingerprint(lesson, track['scenes'])
             name = Path(track['scenes'][0]['src']).name
             encoded.rename(work / name)
             media_files.append(name)

@@ -53,6 +53,30 @@ class IntroAudioTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'different introduction'):
             intros.pending_intro(self.lesson, {'segments': [dict(self.parts[0], text='다른 문제예요.')]})
 
+    def test_title_keeps_introduction_count_body_provenance_and_idempotence(self):
+        self.lesson['title'] = '중복 요청 ID 제거'
+        self.lesson['scenes'][0]['introCueCount'] = 2
+        self.track['scenes'][0]['provenance']['explanationSrc'] = '/static/coding-audio/body.mp3'
+        part = intros.title_segment(self.lesson)
+        self.assertEqual(part['text'], '1번 문제. 중복 요청 ID 제거.')
+        self.assertIn('아이디', part['speech'])
+        self.assertTrue(intros.pending_title(self.lesson, {'segments': [part]}))
+        before = deepcopy(self.lesson['scenes'][0]['segments'])
+        with tempfile.TemporaryDirectory() as directory:
+            audio = Path(directory) / 'title.mp3'
+            audio.write_bytes(b'title audio')
+            with patch.object(intros.renderer, 'verify', return_value=7.0):
+                intros.prepend_data(self.lesson, self.track, self.story, self.links, [part], [2], audio)
+        scene = self.lesson['scenes'][0]
+        scene['titleCueCount'] = 1
+        self.assertEqual(scene['introCueCount'], 3)
+        self.assertEqual(scene['segments'][1:], before)
+        self.assertEqual(self.track['scenes'][0]['provenance']['explanationSrc'], '/static/coding-audio/body.mp3')
+        self.assertFalse(intros.pending_title(self.lesson, {'segments': [part]}))
+        self.assertFalse(intros.pending_intro(self.lesson, {'segments': before}))
+        with self.assertRaisesRegex(ValueError, 'different title'):
+            intros.pending_title(self.lesson, {'segments': [dict(part, text='changed')]})
+
     def test_unmeasured_or_truncated_audio_is_rejected_before_data_changes(self):
         before = deepcopy(self.lesson)
         with patch.object(intros.renderer, 'verify', return_value=5.5):

@@ -29,8 +29,11 @@
     }
     window.CodingCode.update(sceneIndex, cueIndex);
     const introducing = !!cues?.length && cueIndex < (scene?.introCueCount || 0);
+    const titleCard = !!cues?.length && cueIndex < (scene?.titleCueCount || 0);
+    $('lessonIllustration').hidden = !titleCard || $('lessonIllustration').dataset.failed === 'true';
+    $('lessonCards').hidden = titleCard && !$('lessonIllustration').hidden;
     $('lessonStage').classList.toggle('is-intro', introducing);
-    if (scene) $('lessonSceneTitle').textContent = introducing ? '어떤 문제인가요?' : scene.title;
+    if (scene) $('lessonSceneTitle').textContent = titleCard ? `${problemId}번 · ${lessons.find(item => item.id === problemId).title}` : introducing ? '어떤 문제인가요?' : scene.title;
     $('lessonCodePanel').hidden = introducing || !callbacks.getJavaSolution?.(problemId);
     const provider = !introducing && sound?.provenance?.provider;
     $('lessonVoiceCredit').textContent = provider === 'clova' ? 'AI 음성 · CLOVA Dubbing' : provider === 'elevenlabs' ? 'AI 음성 · ElevenLabs' : '';
@@ -87,6 +90,11 @@
       updateSubtitle(); controls(); return;
     }
     const scene = lesson.scenes[sceneIndex];
+    const illustration = $('lessonIllustration');
+    illustration.dataset.failed = 'false';
+    illustration.src = `/static/coding-images/${String(problemId).padStart(2, '0')}.png`;
+    illustration.alt = `${lesson.title} 문제를 표현한 그림`;
+    illustration.onerror = () => { illustration.dataset.failed = 'true'; updateSubtitle(); };
     $('lessonNextProblem').hidden = true;
     const duration = Math.round(track.scenes.reduce((sum, item) => sum + item.duration, 0));
     $('lessonPosition').textContent = `${sceneIndex + 1} / ${lesson.scenes.length} · 전체 ${Math.floor(duration / 60)}분 ${duration % 60}초`;

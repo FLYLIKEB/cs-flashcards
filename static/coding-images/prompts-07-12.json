@@ -1,0 +1,50 @@
+[
+  {
+    "id": 7,
+    "title": "서로 다른 세션의 최장 구간",
+    "subject": "A horizontal row of small tactile session tokens with distinct embossed geometric symbols. A thin deep-teal rectangular window surrounds a continuous group of three tokens whose symbols are all different; repeated-symbol tokens sit outside the window. Clear visual metaphor of the longest contiguous nonrepeating session window.",
+    "prompt": "Use case: scientific-educational. Asset: introduction illustration for a Java coding lesson. Premium restrained editorial illustration, sculptural matte clay and subtle paper materials, warm ivory seamless background #faf9f5, deep forest teal #285d51 and muted sage palette, soft natural studio shadows. Spacious centered composition, single clear concept, landscape 3:2. Sophisticated quiet design for adult learners. No text, no logos, no watermark, no busy tech clutter. Subject: Exactly five tokens in a horizontal row, embossed symbols from left to right: circle, circle, square, diamond, diamond. A thin deep teal window precisely encloses tokens two through four, the circle-square-diamond group, which is the longest contiguous group without repeated symbols. The first circle and final diamond are outside. No other tokens.",
+    "path": "static/coding-images/07.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-879c-7ba2-a579-7a0af89d65ba/exec-b61ad278-927b-4b19-a207-6172df0dfc3c.png"
+  },
+  {
+    "id": 8,
+    "title": "목표 처리량에 도달하는 최소 구간",
+    "subject": "A horizontal row of six small stacks of smooth counters representing request counts, with the last two adjacent taller stacks enclosed together in a snug teal frame. A simple nearby balance scale shows those two stacks reaching a target weight. Concrete metaphor of the shortest adjacent interval meeting a throughput target, spacious and readable.",
+    "prompt": "Use case: scientific-educational. Asset: introduction illustration for a Java coding lesson. Premium restrained editorial illustration, sculptural matte clay and subtle paper materials, warm ivory seamless background #faf9f5, deep forest teal #285d51 and muted sage palette, soft natural studio shadows. Spacious centered composition, single clear concept, landscape 3:2. Sophisticated quiet design for adult learners. No text, no logos, no watermark, no busy tech clutter. Subject: A horizontal row of six small stacks of smooth counters representing request counts, with the last two adjacent taller stacks enclosed together in a snug teal frame. A simple nearby balance scale shows those two stacks reaching a target weight. Concrete metaphor of the shortest adjacent interval meeting a throughput target, spacious and readable.",
+    "path": "static/coding-images/08.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-879c-7ba2-a579-7a0af89d65ba/exec-5341ba89-9863-4a48-9528-b9dd11dfe595.png"
+  },
+  {
+    "id": 9,
+    "title": "설정 문자열의 괄호 검사",
+    "subject": "Three nested pairs of sculptural bracket shapes: outer curly braces, middle square brackets, inner round parentheses. All six pieces fit symmetrically like a precisely nested puzzle, with a small neat stack of three matching tiles beside them. Clear metaphor for correctly matched nested brackets. Bracket shapes are physical objects, no written words.",
+    "prompt": "Use case: scientific-educational. Asset: introduction illustration for a Java coding lesson. Premium restrained editorial illustration, sculptural matte clay and subtle paper materials, warm ivory seamless background #faf9f5, deep forest teal #285d51 and muted sage palette, soft natural studio shadows. Spacious centered composition, single clear concept, landscape 3:2. Sophisticated quiet design for adult learners. No text, no logos, no watermark, no busy tech clutter. Subject: Three nested pairs of sculptural bracket shapes: outer curly braces, middle square brackets, inner round parentheses. All six pieces fit symmetrically like a precisely nested puzzle, with a small neat stack of three matching tiles beside them. Clear metaphor for correctly matched nested brackets. Bracket shapes are physical objects, no written words.",
+    "path": "static/coding-images/09.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-879c-7ba2-a579-7a0af89d65ba/exec-db104aff-0a1c-45c4-9962-0dfadaddda44.png"
+  },
+  {
+    "id": 10,
+    "title": "다음으로 더 느린 요청",
+    "subject": "Four sculptural upright latency columns arranged left to right: medium height, short height, same short height, then a much taller dark-teal column. Three delicate curved tracks from the first three columns converge toward the final tall column, visually showing their next greater response time. No numbers, no axes, no written labels.",
+    "prompt": "Use case: scientific-educational. Asset: introduction illustration for a Java coding lesson. Premium restrained editorial illustration, sculptural matte clay and subtle paper materials, warm ivory seamless background #faf9f5, deep forest teal #285d51 and muted sage palette, soft natural studio shadows. Spacious centered composition, single clear concept, landscape 3:2. Sophisticated quiet design for adult learners. No text, no logos, no watermark, no busy tech clutter. Subject: Four sculptural upright latency columns arranged left to right: medium height, short height, same short height, then a much taller dark-teal column. Three delicate curved tracks from the first three columns converge toward the final tall column, visually showing their next greater response time. No numbers, no axes, no written labels.",
+    "path": "static/coding-images/10.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-879c-7ba2-a579-7a0af89d65ba/exec-41490aed-0412-4109-b27c-93b54c9ce565.png"
+  },
+  {
+    "id": 11,
+    "title": "로그에서 최초 임계 시각 찾기",
+    "subject": "An ascending row of minimalist log-entry cards on a desk, marked only with simple progressively higher bars. A thin horizontal target threshold ribbon crosses the row; the first card reaching the ribbon is deep teal and gently spotlighted, with a small magnifying glass resting above it. Clear metaphor of first sorted log value meeting a threshold.",
+    "prompt": "Use case: scientific-educational. Asset: introduction illustration for a Java coding lesson. Premium restrained editorial illustration, sculptural matte clay and subtle paper materials, warm ivory seamless background #faf9f5, deep forest teal #285d51 and muted sage palette, soft natural studio shadows. Spacious centered composition, single clear concept, landscape 3:2. Sophisticated quiet design for adult learners. No text, no logos, no watermark, no busy tech clutter. Subject: An ascending row of minimalist log-entry cards on a desk, marked only with simple progressively higher bars. A thin horizontal target threshold ribbon crosses the row; the first card reaching the ribbon is deep teal and gently spotlighted, with a small magnifying glass resting above it. Clear metaphor of first sorted log value meeting a threshold.",
+    "path": "static/coding-images/11.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-879c-7ba2-a579-7a0af89d65ba/exec-7f25697b-c614-40ca-961b-664f69355b05.png"
+  },
+  {
+    "id": 12,
+    "title": "점검 시간 구간 합치기",
+    "subject": "Three short tactile paper timeline ribbons, staggered and overlapping at their endpoints, merging into one clean long deep-teal ribbon below. A few tiny maintenance wrench objects nearby give scheduled maintenance context. Clear metaphor for joining overlapping and touching time intervals; no written text, no numbers.",
+    "prompt": "Use case: scientific-educational. Asset: introduction illustration for a Java coding lesson. Premium restrained editorial illustration, sculptural matte clay and subtle paper materials, warm ivory seamless background #faf9f5, deep forest teal #285d51 and muted sage palette, soft natural studio shadows. Spacious centered composition, single clear concept, landscape 3:2. Sophisticated quiet design for adult learners. No text, no logos, no watermark, no busy tech clutter. Subject: Three short tactile paper timeline ribbons, staggered and overlapping at their endpoints, merging into one clean long deep-teal ribbon below. A few tiny maintenance wrench objects nearby give scheduled maintenance context. Clear metaphor for joining overlapping and touching time intervals; no written text, no numbers.",
+    "path": "static/coding-images/12.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-879c-7ba2-a579-7a0af89d65ba/exec-79b95e78-1639-4bf0-bac4-b83cb6e5a877.png"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": 13,
+    "title": "가장 가까운 서비스까지의 홉 수",
+    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A small network of seven service blocks connected with thin paper bridges, one short two-bridge route between a start block and a destination block highlighted deep teal; longer alternative route recedes in pale sage. A small messenger token moving along the shortest route. Visually clear shortest-hop analogy, centered composition.",
+    "path": "static/coding-images/13.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-86df8259-43b8-4a8d-935a-5b45ead66829.png",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": 14,
+    "title": "독립 장애 구역 세기",
+    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A neat square tiled map on a shallow tray, containing exactly three separated islands of dark teal raised square tiles surrounded by flat pale ivory empty tiles. Tiles within each island share edges; islands have generous clear gaps. Concrete connected-region counting analogy, slight isometric overhead view.",
+    "path": "static/coding-images/14.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-e3359d0d-3123-474f-ad94-18957c025d88.png",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": 15,
+    "title": "1일차 실전: 최근 시간창 요청 제한",
+    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A calm miniature admission gate with a short row of request tokens passing through a translucent sage time-window frame. Two teal tokens already inside the frame, another waiting outside, older pale token exiting behind. Small simple unnumbered clock beside the frame. Clear sliding-time-window rate-limit analogy without written labels.",
+    "path": "static/coding-images/15.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-d5cf6b22-e23c-4fea-b5e6-8a59f67d74ee.png",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": 16,
+    "title": "가장 느린 요청 K개",
+    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. Five elegant hourglasses of visibly different heights in a row representing different response times. The three tallest are gathered in a small deep-teal selection tray, two shorter pale sage hourglasses remain outside. Minimal top-k slow requests analogy, no numerals on hourglasses.",
+    "path": "static/coding-images/16.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-83abde00-a5a1-4f23-b858-69a65f66c484.png",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": 17,
+    "title": "필요한 최소 워커 수",
+    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. Three miniature worker stations aligned in three clean horizontal lanes, each holding one long rounded task block; task blocks overlap in time across lanes, and one finished block is handing its station to the next task. Small clock icon without numbers. Scheduling concurrent jobs with a minimal number of workers, clear restrained isometric scene.",
+    "path": "static/coding-images/17.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-1e7c9c71-db50-4cd3-bae4-9bbbcfe95556.png",
+    "generator": "built-in image_gen"
+  },
+  {
+    "id": 18,
+    "title": "순서를 유지하는 배치 용량",
+    "prompt": "Landscape 3:2 premium restrained editorial illustration for a backend coding lesson. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and cut paper material, soft studio shadows, spacious clean single concept, precise crafted objects, no text, letters, numbers, logos or watermark. A conveyor of ordered rectangular parcels with varied sizes entering three equal-capacity open delivery trays one after another. Parcels stay in their original left-to-right order and are grouped into consecutive batches; a subtle horizontal capacity rail aligns the trays. Clear minimum batch capacity analogy, spacious clean isometric editorial illustration.",
+    "path": "static/coding-images/18.png",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-a6a6-74e3-8b14-b8bd5fafd56d/exec-4c7ebb83-333f-4419-bb49-4cdf8c45182d.png",
+    "generator": "built-in image_gen"
+  }
+]

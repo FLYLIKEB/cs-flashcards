@@ -1,0 +1,44 @@
+[
+  {
+    "id": 25,
+    "prompt": "Use case: stylized-concept. Create a landscape 3:2 premium restrained editorial illustration for a Java backend coding lesson about cursor pagination: an orderly row of thick paper record cards extending along a shallow curved tray, a forest-teal bookmark cursor between the already seen pale cards and the next small batch of sage cards being lifted together. Concrete visual analogy of selecting records strictly after a cursor. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and paper materials, soft studio light, spacious clean single concept. No text, letters, numbers, logos, watermark, screens, generic tech clutter. Composed centrally with generous negative space.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-dd86-7ab2-82a6-a17d88b37d4f/exec-171373c7-5595-4f39-9966-c1e97f7df4e1.png",
+    "path": "static/coding-images/25.png",
+    "title": "커서 기반 다음 페이지"
+  },
+  {
+    "id": 26,
+    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for Java backend lesson LRU cache: a small elegant shelf with only three snug cubbies for clay tokens, a recently touched deep-teal token being moved to the front while the oldest pale token slides gently out the far end, one fresh sage token approaching. Make the limited capacity and recency order visually obvious, a single concrete still-life analogy. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay and paper materials, soft studio light, spacious clean central composition. No text, letters, numbers, logos, watermark, screens or generic tech clutter.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-dd86-7ab2-82a6-a17d88b37d4f/exec-91baccb9-10d8-43cb-a6fd-7eb2cfdacb97.png",
+    "path": "static/coding-images/26.png",
+    "title": "LRU 캐시 시뮬레이터"
+  },
+  {
+    "id": 27,
+    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a backend lesson about expiring session storage TTL. Show a small clay storage tray holding three plain key-shaped session tokens, each paired with a tiny hourglass. One forest-teal token has a still-running hourglass and stays solid; another pale token beside an empty hourglass gently crumbles into a few fine grains outside the tray. One concise concrete still-life metaphor for time-limited validity. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay/paper material, soft studio light, spacious clean central composition. No text, numbers, letters, logos, watermark, screens or generic tech clutter.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-dd86-7ab2-82a6-a17d88b37d4f/exec-65f1469a-49e6-4824-af2c-e2ae13484337.png",
+    "path": "static/coding-images/27.png",
+    "title": "만료되는 세션 저장소"
+  },
+  {
+    "id": 28,
+    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a coding lesson selecting the maximum number of nonoverlapping maintenance appointments. Show a miniature single elegant machine beside a long paper timeline rail. Several short forest-teal and sage clay reservation blocks fit neatly end-to-end on one rail without overlap. A too-long pale block rests unused below. Quiet concrete metaphor of fitting compatible appointments for one machine. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay/paper material, soft studio light, spacious clean central composition. No text, numbers, letters, logos, watermark, clocks with numerals, screens or generic tech clutter.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-dd86-7ab2-82a6-a17d88b37d4f/exec-51c29f9d-7976-4679-8995-635f09a39153.png",
+    "path": "static/coding-images/28.png",
+    "title": "최종 모의 1: 겹치지 않는 최대 점검 예약"
+  },
+  {
+    "id": 29,
+    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a backend coding lesson union-find server groups. Show two small clusters of rounded clay miniature server towers on separate low circular paper islands; within each island towers are joined by short sage cables. One clearly visible deep forest-teal cable bridge joins the two islands into a single connected group. A third tiny isolated tower sits far away to show distinction. Elegant concrete network-group metaphor, no chaotic wiring. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, matte clay/paper material, soft studio lighting, spacious central composition. No text, letters, numbers, logos, watermark, screens or generic sci-fi clutter.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-dd86-7ab2-82a6-a17d88b37d4f/exec-640a9d21-bb70-4e05-87e1-a9d239efb1bc.png",
+    "path": "static/coding-images/29.png",
+    "title": "최종 모의 2: 서버 그룹 연결 질의"
+  },
+  {
+    "id": 30,
+    "prompt": "Use case: stylized-concept. Landscape 3:2 premium restrained editorial illustration for a coding lesson dependency batch minimum completion time. A clean miniature branching assembly workflow made of thick clay task blocks on an ivory tabletop: one starting block splits into two parallel paths of different lengths, the paths join into one final completed block. Thin paper ribbons link blocks with clear forward arrow ends, the longer critical path is deep forest teal and shorter parallel path sage. A small plain hourglass beside the final block symbolizes total completion time. No crossing connections; single clear concrete still life, not a dense diagram. Warm ivory background #faf9f5, deep forest teal #285d51 and sage, tasteful matte clay/paper material, soft studio light, spacious central composition. No text, numbers, letters, logos, watermark, screens or generic tech clutter.",
+    "source": "/Users/jwp/.codex/generated_images/01a1b63b-dd86-7ab2-82a6-a17d88b37d4f/exec-68e4fddf-a5bf-4715-9ec0-e1aacc458579.png",
+    "path": "static/coding-images/30.png",
+    "title": "최종 실전: 의존 배치의 최소 완료 시간"
+  }
+]
