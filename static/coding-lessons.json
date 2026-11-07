@@ -1010,13 +1010,13 @@
       {
         "title": "시작점은 앞으로만",
         "caption": "Math.max로 이미 지나간 위치를 무시",
-        "narration": "맵에서 같은 ID의 이전 위치를 찾았다고, 시작점을 무조건 바꾸지는 마세요. 이전 위치가 현재 창보다 왼쪽이면, 이미 제외된 값이라 시작점을 유지하면 돼요. Java에서는 현재 시작점과 이전 위치 다음 중 더 큰 쪽을 선택하면 이 규칙을 지킬 수 있어요. 그다음에는 현재 위치를 이 ID의 마지막 등장 위치로 갱신해 주세요.",
+        "narration": "맵에서 같은 ID의 이전 위치를 찾았다고, 시작점을 무조건 바꾸지는 마세요. 이전 위치가 현재 창보다 왼쪽이면, 이미 제외된 값이라 시작점을 유지하면 돼요. Java에서는 현재 시작점과 이전 위치 다음 중 더 큰 쪽을 선택하면 이 규칙을 지킬 수 있어요. 참고로 이 코드는 put으로 이전 위치를 받으면서 현재 위치도 함께 기록해요.",
         "items": [
           "left는 감소하지 않음",
           "마지막 위치 갱신"
         ],
         "active": 0,
-        "code": "left = Math.max(left, last.getOrDefault(id, -1) + 1);\nlast.put(id, right);\nbest = Math.max(best, right - left + 1);",
+        "code": "Integer previous = last.put(sessions[right], right);\nif (previous != null) left = Math.max(left, previous + 1);\nbest = Math.max(best, right - left + 1);",
         "segments": [
           {
             "text": "맵에서 같은 ID의 이전 위치를 찾았다고, 시작점을 무조건 바꾸지는 마세요.",
@@ -1031,8 +1031,8 @@
             "speech": "자바에서는 현재 시작점과 이전 위치 다음 중 더 큰 쪽을 선택하면 이 규칙을 지킬 수 있어요."
           },
           {
-            "text": "그다음에는 현재 위치를 이 ID의 마지막 등장 위치로 갱신해 주세요.",
-            "speech": "그다음에는 현재 위치를 이 아이디의 마지막 등장 위치로 갱신해 주세요."
+            "text": "참고로 이 코드는 put으로 이전 위치를 받으면서 현재 위치도 함께 기록해요.",
+            "speech": "참고로 이 코드는 풋으로 이전 위치를 받으면서 현재 위치도 함께 기록해요."
           }
         ]
       },

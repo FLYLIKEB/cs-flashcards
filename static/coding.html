@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>한 문제씩 · 코테 훈련</title><link rel="icon" href="/static/favicon.svg">
-  <link rel="stylesheet" href="/static/coding.css"><script defer src="/static/coding-motion.js"></script><script defer src="/static/coding-lesson.js"></script><script defer src="/static/coding.js"></script>
+  <link rel="stylesheet" href="/static/coding.css"><script defer src="/static/coding-motion.js"></script><script defer src="/static/coding-code.js"></script><script defer src="/static/coding-lesson.js"></script><script defer src="/static/coding.js"></script>
 </head>
 <body>
 <header class="app-header">
@@ -28,10 +28,11 @@
     <nav class="learning-modes" aria-label="학습 방식"><button id="modeLesson" aria-pressed="true">보고 듣기</button><button id="modePractice" aria-pressed="false">직접 풀기</button></nav>
     <section id="lessonPanel" aria-label="소리로 듣는 단계별 강의">
       <div class="lesson-top"><div id="lessonSegments" class="lesson-segments" aria-label="강의 진행 단계"></div><div class="lesson-top-actions"><span id="lessonPosition">준비 중</span><button id="lessonSubtitles" aria-pressed="true" aria-label="자막 끄기">자막 켜짐</button></div></div>
+      <div class="lesson-view">
+      <div class="lesson-player">
       <div id="lessonStage" class="lesson-stage">
         <p id="lessonSceneTitle" class="lesson-scene-title" tabindex="-1"></p>
         <div id="lessonCards" class="lesson-cards" aria-label="예제 진행 상황"></div>
-        <pre id="lessonCode" hidden></pre>
         <div id="lessonSubtitleBox" class="lesson-subtitle-box"><p id="lessonSubtitle" aria-label="현재 음성 자막" aria-live="off"></p></div>
         <p id="lessonCaption" class="lesson-caption" hidden></p>
       </div>
@@ -40,6 +41,14 @@
         <button id="lessonPrev" disabled aria-label="이전 장면">← 이전</button>
         <button id="lessonPlay" class="primary play-button" disabled>설명 재생</button>
         <button id="lessonNext" disabled aria-label="다음 장면">다음 →</button>
+      </div>
+      </div>
+      <aside id="lessonCodePanel" class="lesson-code-panel" aria-label="설명과 연결된 Java 코드" hidden>
+        <div class="code-heading"><strong>설명과 연결된 Java</strong><span id="lessonCodeRange"></span></div>
+        <p id="lessonCodeNote"></p>
+        <pre id="lessonCode" aria-label="현재 설명에 해당하는 코드" hidden></pre>
+        <details id="lessonFullCode"><summary>전체 코드에서 보기</summary><pre id="lessonCodeSource" tabindex="0" aria-label="Java 전체 코드, 현재 설명 줄 강조"></pre></details>
+      </aside>
       </div>
       <details id="lessonSettings" class="lesson-settings"><summary>재생 설정 <span class="settings-hint">속도 · 반복</span></summary><div class="lesson-options"><button id="lessonRepeat" disabled>이 장면 다시</button><label for="lessonRate">속도 <select id="lessonRate"><option value="0.85">0.85배</option><option value="1" selected>1배</option><option value="1.25">1.25배</option><option value="1.5">1.5배</option></select></label><label><input id="lessonAuto" type="checkbox" checked> 자동으로 다음 장면</label></div><p class="keyboard-note">빈 화면에서 Space로 재생·정지할 수 있어요.</p></details>
       <button id="lessonNextProblem" class="primary" hidden>다음 강의 듣기 →</button>

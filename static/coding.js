@@ -273,6 +273,7 @@ ${problem().java.testCode}
     if (!Array.isArray(data) || data.length !== 30 || data.some(p => !p.java?.starter || !p.java?.solution || !p.java?.testCode)) throw new Error('data'); problems = data;
     current = problems.some(p => p.id === state.current) ? state.current : 1;
     window.CodingLesson.init({
+      getJavaSolution(id) { return problems.find(item => item.id === id)?.java.solution || ""; },
       onNextLesson() { if (current >= 30) return false; select(current + 1); return true; },
       onProgress(scene) { record().lessonScene = scene; save(); },
       onCompletedScene(scene) {

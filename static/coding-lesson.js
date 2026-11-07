@@ -2,7 +2,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const audio = $('lessonAudio');
-  let motion = [], lessons = null, media = null, loading = null, problemId = 0, sceneIndex = 0;
+  let codeLinks = [], motion = [], lessons = null, media = null, loading = null, problemId = 0, sceneIndex = 0;
   let visible = true, playing = false, ticket = 0, callbacks = {}, retryTimer = null;
   const subtitleKey = 'csCodingLessonSubtitles:v1';
   let subtitlesEnabled = true;
@@ -19,13 +19,15 @@
     $('lessonSeek').disabled = !sound || !audio.readyState;
     $('lessonSeek').setAttribute('aria-valuetext', `${clock(time)} / ${clock(duration)}`);
     $('lessonClock').textContent = `${clock(time)} / ${clock(duration)}`;
+    let cueIndex = 0;
     let text = scene?.narration || '';
     if (Array.isArray(cues) && cues.length) {
       const time = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
       const cue = cues.find(item => time >= item.start && time < item.end) ||
         (time >= cues[cues.length - 1].end ? cues[cues.length - 1] : cues[0]);
-      text = cue.text;
+      text = cue.text; cueIndex = cues.indexOf(cue);
     }
+    window.CodingCode.update(sceneIndex, cueIndex);
     if ($('lessonSubtitle').textContent !== text) $('lessonSubtitle').textContent = text;
     $('lessonSubtitleBox').hidden = !subtitlesEnabled || !scene || !sound;
     $('lessonCaption').hidden = subtitlesEnabled && !!scene && !!sound;
@@ -67,7 +69,7 @@
       $('lessonPosition').textContent = '강의 준비 중';
       $('lessonSceneTitle').textContent = '이 강의의 음성을 준비하고 있어요';
       $('lessonCaption').textContent = '완성되면 이 화면에서 바로 재생할 수 있어요.';
-      window.CodingMotion.mount(null);
+      window.CodingMotion.mount(null); window.CodingCode.mount(null, null);
       $('lessonCards').replaceChildren(); $('lessonCode').hidden = true; $('lessonNarration').textContent = '';
       $('lessonNextProblem').hidden = true;
       status('음성 생성 중이에요. 준비 상태를 자동으로 확인하고 있어요. 직접 풀기는 지금 이용할 수 있어요.');
@@ -99,8 +101,7 @@
       if (index === scene.active) item.setAttribute('aria-label', '현재 단계: ' + text);
       $('lessonCards').append(item);
     });
-    $('lessonCode').hidden = !scene.code;
-    $('lessonCode').textContent = scene.code || '';
+    window.CodingCode.mount(callbacks.getJavaSolution?.(problemId), codeLinks.find(item => item.id === problemId));
     audio.src = track.scenes[sceneIndex].src + (track.sourceHash ? '?v=' + encodeURIComponent(track.sourceHash) : '');
     audio.playbackRate = Number($('lessonRate').value);
     audio.load();
@@ -108,22 +109,22 @@
     $('lessonStage').classList.remove('scene-enter');
     window.requestAnimationFrame(() => $('lessonStage').classList.add('scene-enter'));
     status('');
-    if (visible && sceneIndex > 0) callbacks.onAssisted?.();
+    if (visible && (sceneIndex > 0 || codeLinks.some(item => item.id === problemId))) callbacks.onAssisted?.();
     controls();
   }
   async function load() {
     if (loading) return loading;
     window.clearTimeout(retryTimer);
     status('장면과 한국어 음성을 준비하고 있어요.');
-    loading = Promise.all(['/static/coding-lessons.json', '/static/coding-audio/manifest.json', '/static/coding-motion-01-15.json', '/static/coding-motion-16-30.json'].map(async url => {
+    loading = Promise.all(['/static/coding-lessons.json', '/static/coding-audio/manifest.json', '/static/coding-motion-01-15.json', '/static/coding-motion-16-30.json', '/static/coding-code-links-01-15.json', '/static/coding-code-links-16-30.json'].map(async url => {
       let response;
       try { response = await fetch(url, {cache: 'no-store'}); }
-      catch (error) { if (url.includes('coding-motion-')) return []; throw error; }
+      catch (error) { if ((url.includes('coding-motion-') || url.includes('coding-code-links-'))) return []; throw error; }
       if (response.status === 404) return url.includes('manifest') ? {lessons: []} : [];
-      if (!response.ok) { if (url.includes('coding-motion-')) return []; throw new Error('load'); }
+      if (!response.ok) { if ((url.includes('coding-motion-') || url.includes('coding-code-links-'))) return []; throw new Error('load'); }
       try { return await response.json(); }
-      catch (error) { if (url.includes('coding-motion-')) return []; throw error; }
-    })).then(([script, manifest, first, second]) => {
+      catch (error) { if ((url.includes('coding-motion-') || url.includes('coding-code-links-'))) return []; throw error; }
+    })).then(([script, manifest, first, second, codeFirst, codeSecond]) => {
       if (!Array.isArray(script) || !Array.isArray(manifest.lessons)) throw new Error('format');
       for (const lesson of script) {
         const sound = manifest.lessons.find(item => item.id === lesson.id);
@@ -143,6 +144,9 @@
       const storyboard = [...(Array.isArray(first) ? first : []), ...(Array.isArray(second) ? second : [])];
       try { window.CodingMotion.validate(storyboard, script, manifest.lessons); motion = storyboard; }
       catch (_) { motion = []; }
+      const links = [...(Array.isArray(codeFirst) ? codeFirst : []), ...(Array.isArray(codeSecond) ? codeSecond : [])];
+      try { window.CodingCode.validate(links, script, callbacks.getJavaSolution); codeLinks = links; }
+      catch (_) { codeLinks = []; }
       lessons = script; media = manifest.lessons;
       renderScene();
       if (!motion.find(item => item.id === problemId)) status('애니메이션을 불러오지 못했어요. 음성과 자막은 재생할 수 있어요. 화면을 새로고침하면 다시 불러옵니다.');
@@ -180,6 +184,7 @@
     renderScene();
     if (keepPlaying) play();
   }
+  $('lessonFullCode').addEventListener('toggle', () => { if (visible && $('lessonFullCode').open) callbacks.onAssisted?.(); });
   $('lessonPlay').onclick = () => {
     if (playing) { pause(); status('멈춘 곳부터 이어 들을 수 있어요.'); }
     else play();
@@ -223,7 +228,7 @@
     setVisible(value) {
       visible = value;
       if (!visible) pause();
-      else if (sceneIndex > 0 && lessons) callbacks.onAssisted?.();
+      else if (lessons && (sceneIndex > 0 || codeLinks.some(item => item.id === problemId))) callbacks.onAssisted?.();
       controls();
       if (visible && !currentReady() && !loading) load();
     },
