@@ -67,6 +67,7 @@
     $('lessonNext').disabled = !ready || sceneIndex === lesson.scenes.length - 1;
     $('lessonRepeat').disabled = !ready;
     $('lessonIntro').disabled = !ready;
+    $('lessonRestart').disabled = !ready;
   }
   function pause() {
     ticket++; playing = false; audio.pause(); controls();
@@ -199,11 +200,16 @@
     if (playing) { pause(); status('멈춘 곳부터 이어 들을 수 있어요.'); }
     else play();
   };
-  $('lessonNextProblem').onclick = () => { if (callbacks.onNextLesson?.()) play(); };
+  function nextProblem() {
+    if (!callbacks.onNextLesson?.()) return false;
+    changeScene(0, true);
+    return true;
+  }
+  $('lessonNextProblem').onclick = nextProblem;
   $('lessonPrev').onclick = () => changeScene(sceneIndex - 1, playing);
   $('lessonNext').onclick = () => changeScene(sceneIndex + 1, playing);
   $('lessonRepeat').onclick = () => changeScene(sceneIndex, true);
-  $('lessonIntro').onclick = () => changeScene(0, true);
+  $('lessonIntro').onclick = $('lessonRestart').onclick = () => changeScene(0, true);
   $('lessonRate').onchange = () => { audio.playbackRate = Number($('lessonRate').value); };
   audio.onended = () => {
     if (!visible || !playing) return;
@@ -211,8 +217,9 @@
     const lesson = lessons.find(item => item.id === problemId);
     if (sceneIndex === lesson.scenes.length - 1) {
       callbacks.onProgress?.(sceneIndex, true); controls();
+      if ($('lessonAuto').checked && nextProblem()) return;
       $('lessonNextProblem').hidden = problemId === 30;
-      status('마지막 장면을 들었어요. 다시 듣거나, 원하면 직접 풀어보세요.');
+      status(problemId === 30 ? '30문제를 모두 들었어요. 수고했어요!' : '마지막 장면을 들었어요. 다시 듣거나 다음 문제로 넘어갈 수 있어요.');
     } else if ($('lessonAuto').checked) changeScene(sceneIndex + 1, true);
     else { controls(); status('이 장면을 다 들었어요. 준비되면 다음 장면을 눌러주세요.'); }
   };

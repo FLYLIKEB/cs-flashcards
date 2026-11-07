@@ -32,7 +32,7 @@
       $('lessonCode').replaceChildren();
       $('lessonCodeRange').textContent = '';
       $('lessonCodeNote').textContent = '';
-      $('lessonFullCode').open = false;
+      $('lessonFullCode').open = true;
     },
     update(sceneIndex, cueIndex) {
       const key = `${sceneIndex}:${cueIndex}`;

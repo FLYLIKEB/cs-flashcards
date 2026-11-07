@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>한 문제씩 · 코테 훈련</title><link rel="icon" href="/static/favicon.svg">
-  <link rel="stylesheet" href="/static/coding.css"><script defer src="/static/coding-typewriter.js"></script><script defer src="/static/coding-motion-layout.js"></script><script defer src="/static/coding-motion.js"></script><script defer src="/static/coding-code.js"></script><script defer src="/static/coding-lesson.js"></script><script defer src="/static/coding.js"></script><script defer src="/static/coding-ambience.js"></script>
+  <link rel="stylesheet" href="/static/coding.css?v=20261107-playthrough"><script defer src="/static/coding-typewriter.js"></script><script defer src="/static/coding-motion-layout.js"></script><script defer src="/static/coding-motion.js?v=20261107-playthrough"></script><script defer src="/static/coding-code.js?v=20261107-playthrough"></script><script defer src="/static/coding-lesson.js?v=20261107-playthrough"></script><script defer src="/static/coding.js"></script><script defer src="/static/coding-ambience.js"></script>
 </head>
 <body>
 <header class="app-header">
@@ -42,15 +42,16 @@
         <button id="lessonPlay" class="primary play-button" disabled>설명 재생</button>
         <button id="lessonNext" disabled aria-label="다음 장면">다음 →</button>
       </div>
+      <button id="lessonRestart" class="lesson-restart" disabled>↺ 문제 처음부터 보기</button>
       </div>
       <aside id="lessonCodePanel" class="lesson-code-panel" aria-label="설명과 연결된 Java 코드" hidden>
         <div class="code-heading"><strong>설명과 연결된 Java</strong><span id="lessonCodeRange"></span></div>
         <p id="lessonCodeNote"></p>
         <pre id="lessonCode" aria-label="현재 설명에 해당하는 코드" hidden></pre>
-        <details id="lessonFullCode"><summary>전체 코드에서 보기</summary><pre id="lessonCodeSource" tabindex="0" aria-label="Java 전체 코드, 현재 설명 줄 강조"></pre></details>
+        <details id="lessonFullCode" open><summary>전체 코드에서 보기</summary><pre id="lessonCodeSource" tabindex="0" aria-label="Java 전체 코드, 현재 설명 줄 강조"></pre></details>
       </aside>
       </div>
-      <details id="lessonSettings" class="lesson-settings"><summary>재생 설정 <span class="settings-hint">속도 · 반복 · 배경음</span></summary><div class="lesson-options"><label><input id="lessonTyping" type="checkbox" checked> 글자 타이핑</label><button id="lessonIntro" disabled>문제 소개부터 듣기</button><button id="lessonRepeat" disabled>이 장면 다시</button><label for="lessonRate">속도 <select id="lessonRate"><option value="0.85">0.85배</option><option value="1" selected>1배</option><option value="1.25">1.25배</option><option value="1.5">1.5배</option></select></label><label><input id="lessonAuto" type="checkbox" checked> 자동으로 다음 장면</label></div><div class="ambience-options"><label><input id="ambienceEnabled" type="checkbox" checked> 잔잔한 피아노 BGM</label><label for="ambienceVolume">크기 <output id="ambienceLevel" for="ambienceVolume">16%</output></label><input id="ambienceVolume" type="range" min="0" max="30" value="16" aria-label="배경음 크기"><p>부드러운 전자피아노와 은은한 화음이에요. 강의와 함께 재생되고 멈춰요.</p><p id="ambienceStatus" role="status"></p></div><p class="keyboard-note">빈 화면에서 Space로 재생·정지할 수 있어요. <a href="/static/coding-voice-preview.html">AI 목소리 미리 듣기</a></p></details>
+      <details id="lessonSettings" class="lesson-settings"><summary>재생 설정 <span class="settings-hint">속도 · 반복 · 배경음</span></summary><div class="lesson-options"><label><input id="lessonTyping" type="checkbox" checked> 글자 타이핑</label><button id="lessonIntro" disabled>문제 소개부터 듣기</button><button id="lessonRepeat" disabled>이 장면 다시</button><label for="lessonRate">속도 <select id="lessonRate"><option value="0.85">0.85배</option><option value="1" selected>1배</option><option value="1.25">1.25배</option><option value="1.5">1.5배</option></select></label><label><input id="lessonAuto" type="checkbox" checked> 다음 장면 · 문제 자동 재생</label></div><div class="ambience-options"><label><input id="ambienceEnabled" type="checkbox" checked> 잔잔한 피아노 BGM</label><label for="ambienceVolume">크기 <output id="ambienceLevel" for="ambienceVolume">16%</output></label><input id="ambienceVolume" type="range" min="0" max="30" value="16" aria-label="배경음 크기"><p>부드러운 전자피아노와 은은한 화음이에요. 강의와 함께 재생되고 멈춰요.</p><p id="ambienceStatus" role="status"></p></div><p class="keyboard-note">빈 화면에서 Space로 재생·정지할 수 있어요. <a href="/static/coding-voice-preview.html">AI 목소리 미리 듣기</a></p></details>
       <button id="lessonNextProblem" class="primary" hidden>다음 강의 듣기 →</button>
       <p id="lessonStatus" role="status"></p>
       <audio id="lessonAudio" preload="metadata"></audio>

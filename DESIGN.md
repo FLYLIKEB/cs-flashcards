@@ -30,3 +30,8 @@ Replace noise with an offline instrumental loop; retain saved volume/on-off pref
 
 ## Open questions
 - [ ] Preferred work interval and timer visibility — user; adjustable controls avoid blocking implementation.
+
+### 연속 강의와 공통 효과
+- 자동 재생은 다음 장면과 다음 문제의 소개까지 이어지며 30번에서 종료한다.
+- 플레이어 아래 문제 처음부터 보기 버튼은 소개부터 즉시 재생한다. 전체 Java 코드는 문제를 열 때 기본 펼침이다.
+- 장면 페이드, 코드 강조 전환, 데이터 카드 색 전환과 활성 테두리는 공통 렌더러/CSS에서 적용한다. 위치·크기를 추가로 움직이지 않으며 동작 줄이기를 존중한다.

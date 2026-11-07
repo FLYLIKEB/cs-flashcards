@@ -200,7 +200,7 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.select_problem(20)
         await self.scene(3)
         await self.page.setViewport({'width': 1440, 'height': 900})
-        await self.page.click('#lessonFullCode > summary')
+        self.assertTrue(await self.page.Jeval('#lessonFullCode', 'el => el.open'))
         await self.page.evaluate('window.scrollTo(0, 0)')
         before_y = await self.page.evaluate('scrollY')
         cues = tracks()[20]['scenes'][3]['cues']
@@ -225,7 +225,7 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_code_exposure_is_assistance_not_independent_completion(self):
         await self.seek_body(1)
-        await self.page.click('#lessonFullCode > summary')
+        self.assertTrue(await self.page.Jeval('#lessonFullCode', 'el => el.open'))
         await self.page.waitForFunction('(key) => JSON.parse(localStorage.getItem(key)).records[1].lessonAssisted', {}, KEY)
         await self.page.click('#modePractice')
         await self.page.click('[data-step="2"]')
@@ -245,7 +245,7 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.seek_body(1)
         self.assertEqual(await self.current_lines(), [])
         self.assertIn('불러오지 못', await self.page.Jeval('#lessonCodeNote', 'el => el.textContent'))
-        await self.page.click('#lessonFullCode > summary')
+        self.assertTrue(await self.page.Jeval('#lessonFullCode', 'el => el.open'))
         source = content('coding-problems.json')[1]['java']['solution'].rstrip().splitlines()
         self.assertEqual(await self.page.JJeval('#lessonCodeSource code', 'els => els.map(el => el.textContent)'), source)
         await self.page.click('#lessonPlay')

@@ -48,12 +48,13 @@
         nodesLayer.append(group); elements.set(id, group);
       }
       group.dataset.component = node.component || 'introduction';
+      group.dataset.tone = node.tone || 'default';
       group.setAttribute('transform', `translate(${x} ${y})`);
       group.setAttribute('opacity', node.opacity);
       const [fill, ink] = colors[node.tone] || colors.default;
       const rect = group.firstChild;
       for (const [key, value] of Object.entries({x:-w/2, y:-h/2, width:w, height:h, rx:10,
-        fill:node.container ? 'none' : fill, stroke:node.container ? 'var(--motion-active-fill)' : 'var(--motion-stroke)', 'stroke-width':1.5})) rect.setAttribute(key, value);
+        fill:node.container ? 'none' : fill, stroke:node.container ? 'var(--motion-active-fill)' : 'var(--motion-stroke)', 'stroke-width':node.tone === 'blue' && !reduce.matches ? 1.5 + 2 * Math.max(0, 1 - (time-start)/.65) : 1.5})) rect.setAttribute(key, value);
       const text = group.lastChild;
       text.setAttribute('fill', ink);
       text.style.fontSize = `${node.fontSize}px`;

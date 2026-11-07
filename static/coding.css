@@ -273,3 +273,15 @@ input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); fle
 
 input[type=checkbox] { accent-color: var(--blue); }
 a { color: var(--blue); }
+
+/* Shared lesson effects: no layout movement or per-problem animation rules. */
+.lesson-restart { display: block; margin: 10px auto 0; background: transparent; color: var(--secondary); font-size: 13px; min-height: 44px; }
+@media (prefers-reduced-motion: no-preference) {
+  .lesson-stage.scene-enter { animation: lesson-reveal 260ms ease-out both; }
+  .code-row { transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease; }
+  .lesson-segments span { transition: background-color 220ms ease; }
+  .motion-nodes rect { transition: fill 180ms ease, stroke 180ms ease; }
+  .lesson-controls button, .lesson-restart { transition: background-color 160ms ease, box-shadow 160ms ease; }
+  .lesson-controls button:active, .lesson-restart:active { box-shadow: inset 0 0 0 2px var(--line); }
+  @keyframes lesson-reveal { from { opacity: .35; } to { opacity: 1; } }
+}
