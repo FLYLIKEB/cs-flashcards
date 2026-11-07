@@ -1,19 +1,28 @@
 (() => {
   'use strict';
-  const key = 'csCoding48:v1';
+  const key = 'csCoding48:java:v1';
+  const legacyKey = 'csCoding48:v1';
   const $ = id => document.getElementById(id);
   const checklist = ['입출력과 제약을 내 말로 확인했다', '단순 풀이와 개선 이유를 설명했다', '테스트를 실행하고 경계값을 확인했다', '시간·공간 복잡도를 설명했다'];
-  let problems = [], current = 1, filter = 'all', state = {records: {}}, storageError = false;
-  function validState(value) {
+  let problems = [], current = 1, filter = 'all', state = {language: 'java', records: {}, pythonRecords: {}}, storageError = false;
+  function validRecords(value) {
     if (!value || typeof value !== 'object' || !value.records || typeof value.records !== 'object' || Array.isArray(value.records)) return false;
     return Object.entries(value.records).every(([id, r]) => /^[1-9]\d?$/.test(id) && Number(id) <= 30 && r && typeof r === 'object' &&
       typeof r.code === 'string' && typeof r.notes === 'string' && Array.isArray(r.checks) && r.checks.length === 4 && r.checks.every(v => typeof v === 'boolean') &&
       Number.isFinite(r.elapsed) && r.elapsed >= 0 && Number.isInteger(r.hints) && r.hints >= 0 && r.hints <= 3 && typeof r.answer === 'boolean' &&
       ['', 'solved', 'review', 'stuck'].includes(r.status) && Number.isFinite(r.due) && (r.started === null || (Number.isFinite(r.started) && r.started > 0)));
   }
+  function validState(value) {
+    return validRecords(value) && (value.language === undefined || value.language === 'java') &&
+      (value.pythonRecords === undefined || validRecords({records: value.pythonRecords}));
+  }
+  function javaState(value) {
+    if (value.language === 'java') return value;
+    return {language: 'java', current: value.current, records: {}, pythonRecords: value.records};
+  }
   try {
-    const raw = localStorage.getItem(key);
-    if (raw) { const parsed = JSON.parse(raw); if (!validState(parsed)) throw new Error('invalid'); state = parsed; }
+    const raw = localStorage.getItem(key) || localStorage.getItem(legacyKey);
+    if (raw) { const parsed = JSON.parse(raw); if (!validState(parsed)) throw new Error('invalid'); state = javaState(parsed); }
   } catch (_) { storageError = true; $('notice').textContent = '저장 기록을 읽지 못했습니다. 기존 기록 보호를 위해 자동 저장을 중지했습니다. 백업을 복원하거나 새 기록을 다운로드하세요.'; }
   function save() {
     if (storageError) return;
@@ -21,9 +30,9 @@
     catch (_) { storageError = true; $('notice').textContent = '브라우저 저장에 실패했습니다. 페이지를 닫기 전에 학습 기록을 백업하세요.'; }
   }
   function problem() { return problems.find(p => p.id === current); }
-  function starter(p) { return (p.solution.match(/^def solve\([^\n]+/m) || ['def solve():'])[0] + '\n    # 여기에 풀이를 작성하세요\n    pass\n'; }
+  function starter(p) { return p.java.starter; }
   function record() {
-    if (!state.records[current]) state.records[current] = {code: starter(problem()), notes: '', checks: [false,false,false,false], elapsed: 0, started: null, hints: 0, answer: false, status: '', due: 0};
+    if (!state.records[current]) state.records[current] = {code: starter(problem()), notes: state.pythonRecords?.[current]?.notes || '', checks: [false,false,false,false], elapsed: 0, started: null, hints: 0, answer: false, status: '', due: 0};
     return state.records[current];
   }
   function elapsed(r) { return r.elapsed + (r.started ? Math.max(0, Date.now() - r.started) / 1000 : 0); }
@@ -69,12 +78,16 @@
       const note = document.createElement('p'); note.textContent = example.explanation; div.append(pre,note); $('examples').append(div);
     });
     $('code').value = r.code; $('notes').value = r.notes;
-    $('tests').textContent = JSON.stringify(p.tests, null, 2);
+    $('tests').textContent = p.java.testCode;
+    const legacy = state.pythonRecords?.[current];
+    $('legacyPanel').hidden = !legacy;
+    $('legacyCode').textContent = legacy?.code || '';
+    $('legacyMeta').textContent = legacy ? `이전 상태: ${{solved:'완료',review:'복습 필요',stuck:'미해결'}[legacy.status] || '미완료'} · 메모: ${legacy.notes || '없음'}` : '';
     $('hints').replaceChildren();
     p.hints.slice(0,r.hints).forEach((hint,i) => { const text = document.createElement('p'); text.textContent = `${i+1}. ${hint}`; $('hints').append(text); });
     $('hint').textContent = `다음 힌트 보기 (${r.hints}/3)`; $('hint').disabled = r.hints >= 3;
     $('answer').open = r.answer;
-    $('approach').textContent = p.approach; $('complexity').textContent = p.complexity; $('solution').textContent = p.solution;
+    $('approach').textContent = p.approach; $('complexity').textContent = p.complexity; $('solution').textContent = p.java.solution;
     $('pitfalls').textContent = `주의: ${p.pitfalls.join(' · ')}`; $('explain').textContent = p.explainPrompt;
     $('checks').replaceChildren();
     checklist.forEach((text,i) => { const label = document.createElement('label'), input = document.createElement('input'); input.type = 'checkbox'; input.checked = r.checks[i]; input.onchange = () => { record().checks[i] = input.checked; save(); }; label.append(input,document.createTextNode(text)); $('checks').append(label); });
@@ -110,7 +123,7 @@
   $('export').onclick = () => {
     const snapshot = JSON.parse(JSON.stringify(state));
     Object.values(snapshot.records).forEach(r => { r.elapsed = elapsed(r); r.started = null; });
-    download('coding48-progress.json', JSON.stringify(snapshot,null,2), 'application/json');
+    download('coding48-java-progress.json', JSON.stringify(snapshot,null,2), 'application/json');
   };
   $('restore').onclick = () => $('import').click();
   $('import').onchange = async event => {
@@ -119,19 +132,43 @@
       if (file.size > 5000000) throw new Error('size');
       const parsed = JSON.parse(await file.text()); if (!validState(parsed)) throw new Error('format');
       if (!window.confirm('이 브라우저의 현재 코테 기록을 백업 내용으로 바꿀까요?')) return;
-      state = parsed; Object.values(state.records).forEach(r => { r.started = null; }); storageError = false; current = problems.some(p => p.id === state.current) ? state.current : 1; save(); render();
+      state = javaState(parsed); Object.values(state.records).forEach(r => { r.started = null; }); storageError = false; current = problems.some(p => p.id === state.current) ? state.current : 1; save(); render();
       if (!storageError) $('notice').textContent = '학습 기록을 복원했습니다.';
     } catch (_) { $('notice').textContent = '복원 실패: 올바른 학습 기록 JSON(5MB 이하)을 선택하세요. 현재 기록은 유지됩니다.'; }
     event.target.value = '';
   };
   $('download').onclick = () => {
-    const payload = JSON.stringify(problem().tests);
-    const runner = '\n\n# 제공 테스트: 추가 경계값도 직접 확인하세요.\nif __name__ == "__main__":\n    import json\n    tests = json.loads(' + JSON.stringify(payload) + ')\n    failures = 0\n    for i, case in enumerate(tests, 1):\n        try:\n            actual = solve(*case["args"])\n            assert actual == case["expected"], f"expected={case[\'expected\']!r}, actual={actual!r}"\n            print(f"PASS {i}")\n        except Exception as error:\n            failures += 1\n            print(f"FAIL {i}: {error}")\n    raise SystemExit(1 if failures else 0)\n';
-    download(`coding-${String(current).padStart(2,'0')}.py`, record().code+runner, 'text/x-python');
+    const runner = `
+public class Main {
+    private static int failures = 0;
+    private static String display(Object value) {
+        return Arrays.deepToString(new Object[]{value});
+    }
+    private static void check(Supplier<Object> run, Object expected, String name) {
+        try {
+            Object actual = run.get();
+            if (!Objects.deepEquals(actual, expected)) {
+                failures++;
+                System.out.println("FAIL " + name + ": expected=" + display(expected) + ", actual=" + display(actual));
+            } else {
+                System.out.println("PASS " + name);
+            }
+        } catch (Throwable error) {
+            failures++;
+            System.out.println("FAIL " + name + ": " + error);
+        }
+    }
+    public static void main(String[] args) {
+${problem().java.testCode}
+        if (failures > 0) System.exit(1);
+    }
+}
+`;
+    download('Main.java', 'import java.util.*;\nimport java.util.function.Supplier;\n\n' + record().code + '\n' + runner, 'text/x-java-source');
   };
   fetch('/static/coding-problems.json').then(response => { if (!response.ok) throw new Error('load'); return response.json(); }).then(data => {
-    if (!Array.isArray(data) || data.length !== 30) throw new Error('data'); problems = data;
+    if (!Array.isArray(data) || data.length !== 30 || data.some(p => !p.java?.starter || !p.java?.solution || !p.java?.testCode)) throw new Error('data'); problems = data;
     current = problems.some(p => p.id === state.current) ? state.current : 1;
-    render(); $('restore').disabled = false; window.setInterval(updateClock,1000);
+    render(); save(); $('restore').disabled = false; window.setInterval(updateClock,1000);
   }).catch(() => { $('notice').textContent = '문제를 불러오지 못했습니다. 연결을 확인하고 새로고침하세요.'; });
 })();

@@ -5,7 +5,6 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 import subprocess
-import sys
 from pathlib import Path
 import tempfile
 import threading
@@ -14,7 +13,8 @@ import unittest
 from pyppeteer import launch
 
 ROOT = Path(__file__).resolve().parents[1]
-KEY = 'csCoding48:v1'
+KEY = 'csCoding48:java:v1'
+LEGACY_KEY = 'csCoding48:v1'
 
 
 class CodingCurriculumTests(unittest.TestCase):
@@ -87,7 +87,7 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         }''', selector, value)
 
     async def test_drafts_timer_and_mobile_layout_survive_reload(self):
-        await self.fill('#code', 'def solve(values):\n    return values\n')
+        await self.fill('#code', 'class Solution { public static String[] solve(String[] values) { return values; } }')
         await self.fill('#notes', '중복과 빈 입력 확인')
         await self.page.click('#timerToggle')
         initial = (await self.state())['records']['1']['started']
@@ -98,7 +98,7 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await self.state())['records']['1']['started'], initial)
         self.assertEqual(await self.page.Jeval('#timerToggle', '(el) => el.textContent'), '일시정지')
         await self.page.setViewport({'width': 1440, 'height': 1100})
-        await self.page.screenshot({'path': '/tmp/coding48-desktop.png', 'fullPage': True})
+        await self.page.screenshot({'path': '/tmp/coding48-java-desktop.png', 'fullPage': True})
         await self.page.setViewport({'width': 390, 'height': 844})
         self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), await self.page.evaluate("() => Array.from(document.querySelectorAll('body *')).filter(el => el.getBoundingClientRect().right > innerWidth).map(el => [el.tagName, el.id, el.className, el.getBoundingClientRect().right]).slice(0,20)"))
 
@@ -122,7 +122,7 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_answer_marks_review_and_due_review_is_recommended(self):
         await self.page.click('#answer summary')
-        await self.page.waitForFunction("JSON.parse(localStorage.getItem('csCoding48:v1'))?.records?.['1']?.answer")
+        await self.page.waitForFunction("JSON.parse(localStorage.getItem('csCoding48:java:v1'))?.records?.['1']?.answer")
         self.assertEqual((await self.state())['records']['1']['status'], 'review')
         await self.page.evaluate('''key => {
             const state = JSON.parse(localStorage.getItem(key));
@@ -135,22 +135,128 @@ class CodingBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.page.click('#recommend')
         self.assertTrue((await self.page.Jeval('#title', '(el) => el.textContent')).startswith('01.'))
 
-    async def test_downloaded_python_runner_executes_reference_and_reports_failure(self):
-        problems = json.loads((ROOT / 'static/coding-problems.json').read_text())
+    async def capture_downloads(self):
         await self.page.evaluate("""() => {
             const create = URL.createObjectURL.bind(URL);
             URL.createObjectURL = blob => { window.downloadedBlob = blob; return create(blob); };
+            HTMLAnchorElement.prototype.click = function () { window.downloadedName = this.download; };
         }""")
-        for code, returncode in ((problems[0]['solution'], 0), ('def solve(*args):\n    return object()\n', 1)):
-            await self.fill('#code', code)
-            await self.page.click('#download')
-            script = await self.page.evaluate('window.downloadedBlob.text()')
-            with tempfile.TemporaryDirectory() as directory:
-                path = Path(directory) / 'solution.py'
-                path.write_text(script)
-                result = subprocess.run([sys.executable, str(path)], capture_output=True, text=True, timeout=5)
-            self.assertEqual(result.returncode, returncode, result.stdout + result.stderr)
-            self.assertIn('PASS' if returncode == 0 else 'FAIL', result.stdout)
+
+    def compile_and_run(self, source):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'Main.java'
+            path.write_text(source)
+            compiled = subprocess.run(
+                ['javac', '--release', '17', '-encoding', 'UTF-8', str(path)],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(compiled.returncode, 0, compiled.stdout + compiled.stderr)
+            return subprocess.run(
+                ['java', '-cp', directory, 'Main'], capture_output=True, text=True, timeout=10,
+            )
+
+    async def test_all_downloaded_java_solutions_compile_and_pass(self):
+        problems = json.loads((ROOT / 'static/coding-problems.json').read_text())
+        await self.capture_downloads()
+        total = 0
+        for p in problems:
+            with self.subTest(problem=p['id']):
+                await self.page.click(f"#problems button:nth-child({p['id']})")
+                self.assertEqual(await self.page.Jeval('#code', '(el) => el.value'), p['java']['starter'])
+                await self.fill('#code', p['java']['solution'])
+                await self.page.click('#download')
+                self.assertEqual(await self.page.evaluate('window.downloadedName'), 'Main.java')
+                source = await self.page.evaluate('window.downloadedBlob.text()')
+                result = await asyncio.to_thread(self.compile_and_run, source)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                passed = sum(line.startswith('PASS') for line in result.stdout.splitlines())
+                self.assertEqual(passed, len(p['tests']), result.stdout)
+                total += passed
+        self.assertEqual(total, sum(len(p['tests']) for p in problems))
+        self.assertGreaterEqual(total, 101)
+
+    async def test_java_long_results_do_not_overflow(self):
+        problems = json.loads((ROOT / 'static/coding-problems.json').read_text())
+        cases = {
+            5: 'int[] a = new int[3000]; Arrays.fill(a, 1000000); check(() -> Solution.solve(a, new int[][]{{0, 2999}}), new long[]{3000000000L}, "overflow");',
+            6: 'int[] a = new int[3000]; Arrays.fill(a, 1000000); check(() -> Solution.solve(a, 3000), 3000000000L, "overflow");',
+            18: 'int[] a = new int[3000]; Arrays.fill(a, 1000000); check(() -> Solution.solve(a, 1), 3000000000L, "overflow");',
+            19: 'check(() -> Solution.solve(new int[65536], 0L), 2147516416L, "overflow");',
+            20: 'int[][] e = new int[3000][3]; for (int i = 0; i < 3000; i++) e[i] = new int[]{i, i+1, 1000000}; check(() -> Solution.solve(3001, e, 0, 3000), 3000000000L, "overflow");',
+            23: 'int[] a = new int[5]; Arrays.fill(a, 1000000000); check(() -> Solution.solve(a), 3000000000L, "overflow");',
+            30: 'int[] a = new int[3001]; Arrays.fill(a, 1000000); int[][] e = new int[3000][2]; for (int i = 0; i < 3000; i++) e[i] = new int[]{i, i+1}; check(() -> Solution.solve(a, e), 3001000000L, "overflow");',
+        }
+        await self.capture_downloads()
+        for problem_id, extra_case in cases.items():
+            with self.subTest(problem=problem_id):
+                await self.page.click(f"#problems button:nth-child({problem_id})")
+                await self.fill('#code', problems[problem_id - 1]['java']['solution'])
+                await self.page.click('#download')
+                source = await self.page.evaluate('window.downloadedBlob.text()')
+                anchor = 'public static void main(String[] args) {'
+                self.assertIn(anchor, source)
+                source = source.replace(anchor, anchor + '\n' + extra_case, 1)
+                result = await asyncio.to_thread(self.compile_and_run, source)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn('PASS overflow', result.stdout)
+
+    async def test_java_runner_rejects_wrong_answer_and_exception(self):
+        await self.capture_downloads()
+        for body in ('return new String[0];', 'throw new IllegalStateException("test failure");'):
+            with self.subTest(body=body):
+                await self.fill('#code', 'class Solution { public static String[] solve(String[] ids) { ' + body + ' } }')
+                await self.page.click('#download')
+                source = await self.page.evaluate('window.downloadedBlob.text()')
+                result = await asyncio.to_thread(self.compile_and_run, source)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn('FAIL', result.stdout)
+
+    async def test_python_records_remain_archived_and_java_backup_round_trips(self):
+        legacy_record = {
+            'code': 'def solve(ids):\n    return list(dict.fromkeys(ids))\n',
+            'notes': '기존 Python 메모', 'checks': [True] * 4, 'elapsed': 125,
+            'started': None, 'hints': 0, 'answer': False, 'status': 'solved', 'due': 0,
+        }
+        legacy = {'records': {'1': legacy_record}, 'current': 1}
+        raw = json.dumps(legacy)
+        await self.page.evaluate("""(key, legacyKey, raw) => {
+            localStorage.removeItem(key);
+            localStorage.setItem(legacyKey, raw);
+        }""", KEY, LEGACY_KEY, raw)
+        await self.page.reload()
+        await self.ready()
+        self.assertEqual(await self.page.evaluate('(key) => localStorage.getItem(key)', LEGACY_KEY), raw)
+        self.assertTrue(await self.page.Jeval('#code', "el => el.value.includes('class Solution')"))
+        self.assertEqual(await self.page.Jeval('#notes', '(el) => el.value'), legacy_record['notes'])
+        self.assertEqual(await self.page.Jeval('#completed', '(el) => el.textContent'), '0 / 30')
+        self.assertFalse(await self.page.Jeval('#legacyPanel', '(el) => el.hidden'))
+        self.assertEqual(await self.page.Jeval('#legacyCode', '(el) => el.textContent'), legacy_record['code'])
+        await self.fill('#notes', 'Java 메모')
+        await self.capture_downloads()
+        await self.page.click('#export')
+        backup_text = await self.page.evaluate('window.downloadedBlob.text()')
+        backup = json.loads(backup_text)
+        self.assertEqual(backup['language'], 'java')
+        self.assertEqual(backup['pythonRecords']['1'], legacy_record)
+        self.assertEqual(backup['records']['1']['notes'], 'Java 메모')
+        await self.page.reload()
+        await self.ready()
+        self.assertEqual(await self.page.Jeval('#notes', '(el) => el.value'), 'Java 메모')
+        self.assertEqual(await self.page.Jeval('#legacyCode', '(el) => el.textContent'), legacy_record['code'])
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'backup.json'
+            path.write_text(backup_text)
+            await self.fill('#notes', '덮어쓸 메모')
+            await (await self.page.J('#import')).uploadFile(str(path))
+            await self.page.waitForFunction("document.querySelector('#notes').value === 'Java 메모'")
+            self.assertEqual((await self.state())['pythonRecords']['1'], legacy_record)
+            old_path = Path(directory) / 'python-backup.json'
+            old_path.write_text(raw)
+            await (await self.page.J('#import')).uploadFile(str(old_path))
+            await self.page.waitForFunction("document.querySelector('#notes').value === '기존 Python 메모'")
+            self.assertTrue(await self.page.Jeval('#code', "el => el.value.includes('class Solution')"))
+            self.assertEqual((await self.state())['pythonRecords']['1'], legacy_record)
+            self.assertEqual(await self.page.evaluate('(key) => localStorage.getItem(key)', LEGACY_KEY), raw)
 
     async def test_invalid_import_preserves_draft_and_valid_restore(self):
         await self.fill('#notes', '보존할 메모')

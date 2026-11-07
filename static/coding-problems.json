@@ -6,10 +6,10 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(ids): 요청 ID 문자열 배열에서 중복을 제거하되 처음 등장한 순서로 반환하세요. 0 ≤ len(ids) ≤ 100000, 각 ID 길이는 1~40입니다. 대소문자는 구별합니다. 입력 배열은 수정하지 마세요.",
+    "statement": "Java 메서드: String[] solve(String[] ids)\n 요청 ID 문자열 배열에서 중복을 제거하되 처음 등장한 순서로 반환하세요. 0 ≤ ids.length ≤ 100000, 각 ID 길이는 1~40입니다. 대소문자는 구별합니다. 입력 배열은 수정하지 마세요.",
     "examples": [
       {
-        "input": "solve([\"b\", \"a\", \"b\", \"c\", \"a\"])",
+        "input": "solve(new String[]{\"b\", \"a\", \"b\", \"c\", \"a\"})",
         "output": "[\"b\", \"a\", \"c\"]",
         "explanation": "b, a, c가 처음 등장한 순서이며 두 번째 b와 a는 제외합니다."
       }
@@ -63,7 +63,12 @@
       "집합을 그대로 반환하면 순서 계약을 놓칠 수 있습니다.",
       "정렬하면 처음 등장한 순서가 사라집니다."
     ],
-    "explainPrompt": "왜 집합만 반환하지 않았는지, 시간복잡도가 평균 기준인 이유를 설명하세요."
+    "explainPrompt": "왜 집합만 반환하지 않았는지, 시간복잡도가 평균 기준인 이유를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static String[] solve(String[] ids) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static String[] solve(String[] ids) {\n        Set<String> seen = new HashSet<>();\n        List<String> result = new ArrayList<>();\n        for (String id : ids) if (seen.add(id)) result.add(id);\n        return result.toArray(new String[0]);\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new String[]{\"b\", \"a\", \"b\", \"c\", \"a\"}), new String[]{\"b\", \"a\", \"c\"}, \"case 1\");\ncheck(() -> Solution.solve(new String[]{}), new String[]{}, \"case 2\");\ncheck(() -> Solution.solve(new String[]{\"A\", \"a\", \"A\"}), new String[]{\"A\", \"a\"}, \"case 3\");"
+    }
   },
   {
     "id": 2,
@@ -72,10 +77,10 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(amounts, target): 서로 다른 두 인덱스 i < j의 합이 target인 쌍을 반환하세요. 여러 쌍이면 j가 가장 작고 그중 i가 가장 작은 [i,j]를 반환합니다. 없으면 []입니다. 0 ≤ n ≤ 100000, 값과 target은 -10^9~10^9 정수입니다.",
+    "statement": "Java 메서드: int[] solve(int[] amounts, int target)\n 서로 다른 두 인덱스 i < j의 합이 target인 쌍을 반환하세요. 여러 쌍이면 j가 가장 작고 그중 i가 가장 작은 [i,j]를 반환합니다. 없으면 []입니다. 0 ≤ n ≤ 100000, 값과 target은 -10^9~10^9 정수입니다.",
     "examples": [
       {
-        "input": "solve([4, 2, 4, 6], 8)",
+        "input": "solve(new int[]{4, 2, 4, 6}, 8)",
         "output": "[0, 2]",
         "explanation": "합이 8인 쌍 중 오른쪽 인덱스가 가장 작은 것은 0번과 2번입니다."
       }
@@ -145,7 +150,12 @@
       "같은 원소를 두 번 사용하지 마세요.",
       "중복 값의 첫 인덱스를 덮어쓰지 마세요."
     ],
-    "explainPrompt": "순회 중 해시에 무엇이 들어 있다는 불변식과 동점 규칙을 설명하세요."
+    "explainPrompt": "순회 중 해시에 무엇이 들어 있다는 불변식과 동점 규칙을 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[] solve(int[] amounts, int target) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[] solve(int[] amounts, int target) {\n        Map<Integer, Integer> first = new HashMap<>();\n        for (int j = 0; j < amounts.length; j++) {\n            Integer i = first.get(target - amounts[j]);\n            if (i != null) return new int[]{i, j};\n            first.putIfAbsent(amounts[j], j);\n        }\n        return new int[0];\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{4, 2, 4, 6}, 8), new int[]{0, 2}, \"case 1\");\ncheck(() -> Solution.solve(new int[]{3, 3}, 6), new int[]{0, 1}, \"case 2\");\ncheck(() -> Solution.solve(new int[]{1}, 2), new int[]{}, \"case 3\");\ncheck(() -> Solution.solve(new int[]{-2, 5, 0}, 3), new int[]{0, 1}, \"case 4\");"
+    }
   },
   {
     "id": 3,
@@ -154,10 +164,10 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(codes): 오류 코드 문자열 배열에서 가장 자주 등장한 코드를 반환하세요. 동률이면 사전순으로 작은 코드입니다. 빈 배열은 빈 문자열을 반환합니다. n ≤ 100000, 코드는 소문자 a-z로 된 길이 1~20 문자열입니다.",
+    "statement": "Java 메서드: String solve(String[] codes)\n 오류 코드 문자열 배열에서 가장 자주 등장한 코드를 반환하세요. 동률이면 사전순으로 작은 코드입니다. 빈 배열은 빈 문자열을 반환합니다. n ≤ 100000, 코드는 소문자 a-z로 된 길이 1~20 문자열입니다.",
     "examples": [
       {
-        "input": "solve([\"timeout\", \"error\", \"timeout\", \"error\"])",
+        "input": "solve(new String[]{\"timeout\", \"error\", \"timeout\", \"error\"})",
         "output": "\"error\"",
         "explanation": "error와 timeout은 각각 두 번이며 사전순으로 error가 앞섭니다."
       }
@@ -201,9 +211,14 @@
     ],
     "pitfalls": [
       "첫 등장 순서가 동점 기준이 아닙니다.",
-      "빈 입력에서 max를 호출하지 마세요."
+      "빈 배열이면 빈 문자열을 반환하세요."
     ],
-    "explainPrompt": "정렬 없이 동점을 처리하는 비교식을 설명하세요."
+    "explainPrompt": "정렬 없이 동점을 처리하는 비교식을 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static String solve(String[] codes) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static String solve(String[] codes) {\n        Map<String, Integer> counts = new HashMap<>();\n        for (String code : codes) counts.merge(code, 1, Integer::sum);\n        String best = \"\";\n        for (String code : counts.keySet()) {\n            if (best.isEmpty() || counts.get(code) > counts.get(best)\n                || (counts.get(code).equals(counts.get(best)) && code.compareTo(best) < 0)) best = code;\n        }\n        return best;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new String[]{\"timeout\", \"error\", \"timeout\", \"error\"}), \"error\", \"case 1\");\ncheck(() -> Solution.solve(new String[]{}), \"\", \"case 2\");\ncheck(() -> Solution.solve(new String[]{\"z\", \"z\", \"a\"}), \"z\", \"case 3\");"
+    }
   },
   {
     "id": 4,
@@ -212,10 +227,10 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(a, b): 오름차순 정수 배열 두 개를 중복을 유지한 오름차순 새 배열로 합치세요. 입력은 수정하지 마세요. len(a)+len(b) ≤ 100000, 값은 -10^9~10^9입니다. 전체를 다시 정렬하지 말고 선형 시간에 해결하세요.",
+    "statement": "Java 메서드: int[] solve(int[] a, int[] b)\n 오름차순 정수 배열 두 개를 중복을 유지한 오름차순 새 배열로 합치세요. 입력은 수정하지 마세요. a.length+b.length ≤ 100000, 값은 -10^9~10^9입니다. 전체를 다시 정렬하지 말고 선형 시간에 해결하세요.",
     "examples": [
       {
-        "input": "solve([1, 3, 3], [2, 3, 5])",
+        "input": "solve(new int[]{1, 3, 3}, new int[]{2, 3, 5})",
         "output": "[1, 2, 3, 3, 3, 5]",
         "explanation": "두 배열의 3 세 개를 모두 유지하면서 오름차순으로 합칩니다."
       }
@@ -274,7 +289,12 @@
       "중복을 제거하면 안 됩니다.",
       "한쪽 배열이 처음부터 비어 있을 수 있습니다."
     ],
-    "explainPrompt": "정렬 알고리즘보다 병합이 빠른 이유를 입력의 성질과 연결해 설명하세요."
+    "explainPrompt": "정렬 알고리즘보다 병합이 빠른 이유를 입력의 성질과 연결해 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[] solve(int[] a, int[] b) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[] solve(int[] a, int[] b) {\n        int[] result = new int[a.length + b.length];\n        int i = 0, j = 0, k = 0;\n        while (i < a.length && j < b.length) result[k++] = a[i] <= b[j] ? a[i++] : b[j++];\n        while (i < a.length) result[k++] = a[i++];\n        while (j < b.length) result[k++] = b[j++];\n        return result;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{1, 3, 3}, new int[]{2, 3, 5}), new int[]{1, 2, 3, 3, 3, 5}, \"case 1\");\ncheck(() -> Solution.solve(new int[]{}, new int[]{2}), new int[]{2}, \"case 2\");\ncheck(() -> Solution.solve(new int[]{}, new int[]{}), new int[]{}, \"case 3\");"
+    }
   },
   {
     "id": 5,
@@ -283,10 +303,10 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(counts, queries): counts의 구간 합을 각 질의 [l,r]에 대해 반환하세요. 양 끝 인덱스를 포함하며 0부터 시작합니다. 1 ≤ n ≤ 100000, 질의 수 ≤ 100000, 0 ≤ counts[i] ≤ 10^6, 모든 질의는 0 ≤ l ≤ r < n입니다.",
+    "statement": "Java 메서드: long[] solve(int[] counts, int[][] queries)\n counts의 구간 합을 각 질의 [l,r]에 대해 반환하세요. 양 끝 인덱스를 포함하며 0부터 시작합니다. 1 ≤ n ≤ 100000, 질의 수 ≤ 100000, 0 ≤ counts[i] ≤ 10^6, 모든 질의는 0 ≤ l ≤ r < n입니다.",
     "examples": [
       {
-        "input": "solve([2, 0, 3, 5], [[0, 2], [1, 3], [3, 3]])",
+        "input": "solve(new int[]{2, 0, 3, 5}, new int[][]{new int[]{0, 2}, new int[]{1, 3}, new int[]{3, 3}})",
         "output": "[5, 8, 5]",
         "explanation": "0~2 합은 5, 1~3 합은 8, 3~3 합은 5입니다."
       }
@@ -358,9 +378,15 @@
     ],
     "pitfalls": [
       "양 끝 포함 구간과 반열린 구간을 혼동하지 마세요.",
-      "합계가 원소 하나의 상한보다 훨씬 커질 수 있습니다."
+      "합계가 원소 하나의 상한보다 훨씬 커질 수 있습니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "누적합 배열에서 k의 의미를 말한 뒤 수식을 유도하세요."
+    "explainPrompt": "누적합 배열에서 k의 의미를 말한 뒤 수식을 유도하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static long[] solve(int[] counts, int[][] queries) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static long[] solve(int[] counts, int[][] queries) {\n        long[] prefix = new long[counts.length + 1];\n        for (int i = 0; i < counts.length; i++) prefix[i + 1] = prefix[i] + counts[i];\n        long[] result = new long[queries.length];\n        for (int i = 0; i < queries.length; i++) result[i] = prefix[queries[i][1] + 1] - prefix[queries[i][0]];\n        return result;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{2, 0, 3, 5}, new int[][]{new int[]{0, 2}, new int[]{1, 3}, new int[]{3, 3}}), new long[]{5L, 8L, 5L}, \"case 1\");\ncheck(() -> Solution.solve(new int[]{0}, new int[][]{new int[]{0, 0}}), new long[]{0L}, \"case 2\");\ncheck(() -> Solution.solve(new int[]{1, 2}, new int[][]{}), new long[]{}, \"case 3\");"
+    }
   },
   {
     "id": 6,
@@ -369,10 +395,10 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(counts, k): 연속한 정확히 k개 원소 합의 최댓값을 반환하세요. 1 ≤ k ≤ n ≤ 100000, 원소는 0~10^6입니다.",
+    "statement": "Java 메서드: long solve(int[] counts, int k)\n 연속한 정확히 k개 원소 합의 최댓값을 반환하세요. 1 ≤ k ≤ n ≤ 100000, 원소는 0~10^6입니다.",
     "examples": [
       {
-        "input": "solve([2, 1, 5, 1, 3], 3)",
+        "input": "solve(new int[]{2, 1, 5, 1, 3}, 3)",
         "output": "9",
         "explanation": "길이 3 창의 합은 8, 7, 9이므로 최댓값은 9입니다."
       }
@@ -422,9 +448,15 @@
     ],
     "pitfalls": [
       "첫 창을 답에 반영해야 합니다.",
-      "k=n인 경우 반복문이 실행되지 않습니다."
+      "k=n인 경우 반복문이 실행되지 않습니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "각 창의 합을 다시 계산하는 방식과 연산 횟수를 비교하세요."
+    "explainPrompt": "각 창의 합을 다시 계산하는 방식과 연산 횟수를 비교하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static long solve(int[] counts, int k) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static long solve(int[] counts, int k) {\n        long current = 0;\n        for (int i = 0; i < k; i++) current += counts[i];\n        long best = current;\n        for (int right = k; right < counts.length; right++) {\n            current += counts[right] - counts[right - k];\n            best = Math.max(best, current);\n        }\n        return best;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{2, 1, 5, 1, 3}, 3), 9L, \"case 1\");\ncheck(() -> Solution.solve(new int[]{4}, 1), 4L, \"case 2\");\ncheck(() -> Solution.solve(new int[]{0, 0, 0}, 2), 0L, \"case 3\");"
+    }
   },
   {
     "id": 7,
@@ -433,10 +465,10 @@
     "day": 1,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(sessions): 같은 세션 ID가 두 번 나타나지 않는 가장 긴 연속 구간의 길이를 반환하세요. 빈 배열은 0입니다. n ≤ 100000, ID는 길이 1~30 문자열입니다.",
+    "statement": "Java 메서드: int solve(String[] sessions)\n 같은 세션 ID가 두 번 나타나지 않는 가장 긴 연속 구간의 길이를 반환하세요. 빈 배열은 0입니다. n ≤ 100000, ID는 길이 1~30 문자열입니다.",
     "examples": [
       {
-        "input": "solve([\"a\", \"b\", \"b\", \"a\"])",
+        "input": "solve(new String[]{\"a\", \"b\", \"b\", \"a\"})",
         "output": "2",
         "explanation": "중복 없는 최장 연속 구간은 [a,b] 또는 [b,a]로 길이 2입니다."
       }
@@ -484,7 +516,12 @@
       "과거 중복이 현재 창 밖에 있을 때 left를 뒤로 옮기면 안 됩니다.",
       "부분수열이 아니라 연속 구간입니다."
     ],
-    "explainPrompt": "a,b,b,a 입력으로 left가 뒤로 움직이면 안 되는 이유를 설명하세요."
+    "explainPrompt": "a,b,b,a 입력으로 left가 뒤로 움직이면 안 되는 이유를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(String[] sessions) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(String[] sessions) {\n        Map<String, Integer> last = new HashMap<>();\n        int left = 0, best = 0;\n        for (int right = 0; right < sessions.length; right++) {\n            Integer previous = last.put(sessions[right], right);\n            if (previous != null) left = Math.max(left, previous + 1);\n            best = Math.max(best, right - left + 1);\n        }\n        return best;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new String[]{\"a\", \"b\", \"b\", \"a\"}), 2, \"case 1\");\ncheck(() -> Solution.solve(new String[]{}), 0, \"case 2\");\ncheck(() -> Solution.solve(new String[]{\"a\", \"b\", \"c\", \"a\", \"d\"}), 4, \"case 3\");"
+    }
   },
   {
     "id": 8,
@@ -493,10 +530,10 @@
     "day": 1,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(counts, target): 합이 target 이상인 연속 구간의 최소 길이를 반환하세요. 없으면 0입니다. counts는 양의 정수 배열이며 0 ≤ n ≤ 100000, 각 값 ≤ 10^6, 1 ≤ target ≤ 10^12입니다.",
+    "statement": "Java 메서드: int solve(int[] counts, long target)\n 합이 target 이상인 연속 구간의 최소 길이를 반환하세요. 없으면 0입니다. counts는 양의 정수 배열이며 0 ≤ n ≤ 100000, 각 값 ≤ 10^6, 1 ≤ target ≤ 10^12입니다.",
     "examples": [
       {
-        "input": "solve([2, 3, 1, 2, 4, 3], 7)",
+        "input": "solve(new int[]{2, 3, 1, 2, 4, 3}, 7L)",
         "output": "2",
         "explanation": "마지막 두 값 [4,3]의 합이 7이며 길이 1로는 목표에 도달하지 못합니다."
       }
@@ -553,9 +590,15 @@
     ],
     "pitfalls": [
       "음수가 허용되면 이 풀이의 단조성이 깨집니다.",
-      "조건을 만족할 때 한 번만 줄이면 최솟값을 놓칠 수 있습니다."
+      "조건을 만족할 때 한 번만 줄이면 최솟값을 놓칠 수 있습니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "음수 허용 시 알고리즘이 왜 성립하지 않는지 반례를 들어 설명하세요."
+    "explainPrompt": "음수 허용 시 알고리즘이 왜 성립하지 않는지 반례를 들어 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int[] counts, long target) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int[] counts, long target) {\n        int left = 0, best = counts.length + 1;\n        long total = 0;\n        for (int right = 0; right < counts.length; right++) {\n            total += counts[right];\n            while (total >= target) {\n                best = Math.min(best, right - left + 1);\n                total -= counts[left++];\n            }\n        }\n        return best > counts.length ? 0 : best;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{2, 3, 1, 2, 4, 3}, 7L), 2, \"case 1\");\ncheck(() -> Solution.solve(new int[]{1, 1}, 3L), 0, \"case 2\");\ncheck(() -> Solution.solve(new int[]{}, 1L), 0, \"case 3\");\ncheck(() -> Solution.solve(new int[]{10}, 7L), 1, \"case 4\");"
+    }
   },
   {
     "id": 9,
@@ -564,7 +607,7 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(text): 문자 ()[]{}만으로 이루어진 문자열의 괄호가 올바르게 짝지어지고 중첩되었는지 불리언으로 반환하세요. 빈 문자열은 True입니다. 길이 ≤ 100000입니다.",
+    "statement": "Java 메서드: boolean solve(String text)\n 문자 ()[]{}만으로 이루어진 문자열의 괄호가 올바르게 짝지어지고 중첩되었는지 불리언으로 반환하세요. 빈 문자열은 true입니다. 길이 ≤ 100000입니다.",
     "examples": [
       {
         "input": "solve(\"{[()]}\")",
@@ -610,7 +653,12 @@
       "괄호 개수만 같다고 올바른 중첩이 아닙니다.",
       "마지막에 비어 있는지 검사해야 합니다."
     ],
-    "explainPrompt": "FIFO 큐가 아니라 LIFO 스택이어야 하는 이유를 설명하세요."
+    "explainPrompt": "FIFO 큐가 아니라 LIFO 스택이어야 하는 이유를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static boolean solve(String text) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static boolean solve(String text) {\n        Deque<Character> stack = new ArrayDeque<>();\n        for (int i = 0; i < text.length(); i++) {\n            char ch = text.charAt(i);\n            if (ch == '(' || ch == '[' || ch == '{') stack.push(ch);\n            else {\n                if (stack.isEmpty()) return false;\n                char open = stack.pop();\n                if ((ch == ')' && open != '(') || (ch == ']' && open != '[') || (ch == '}' && open != '{')) return false;\n            }\n        }\n        return stack.isEmpty();\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(\"{[()]}\"), true, \"case 1\");\ncheck(() -> Solution.solve(\"([)]\"), false, \"case 2\");\ncheck(() -> Solution.solve(\"\"), true, \"case 3\");\ncheck(() -> Solution.solve(\"(\"), false, \"case 4\");"
+    }
   },
   {
     "id": 10,
@@ -619,10 +667,10 @@
     "day": 1,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(latencies): 각 요청 뒤에서 처음으로 응답시간이 엄격히 더 큰 요청까지의 인덱스 거리를 반환하세요. 뒤에 없으면 0입니다. n ≤ 100000, 응답시간은 0~10^9 정수입니다.",
+    "statement": "Java 메서드: int[] solve(int[] latencies)\n 각 요청 뒤에서 처음으로 응답시간이 엄격히 더 큰 요청까지의 인덱스 거리를 반환하세요. 뒤에 없으면 0입니다. n ≤ 100000, 응답시간은 0~10^9 정수입니다.",
     "examples": [
       {
-        "input": "solve([30, 20, 20, 40])",
+        "input": "solve(new int[]{30, 20, 20, 40})",
         "output": "[3, 2, 1, 0]",
         "explanation": "마지막 40이 앞 세 값보다 처음으로 큰 값이며 거리는 각각 3,2,1입니다."
       }
@@ -677,7 +725,12 @@
       "같은 응답시간은 더 큰 값이 아닙니다.",
       "값만 저장하면 거리를 계산하기 어렵습니다."
     ],
-    "explainPrompt": "중첩 while이 O(n²)이 아닌 이유를 각 원소의 push/pop 횟수로 설명하세요."
+    "explainPrompt": "중첩 while이 O(n²)이 아닌 이유를 각 원소의 push/pop 횟수로 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[] solve(int[] latencies) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[] solve(int[] latencies) {\n        int[] result = new int[latencies.length];\n        Deque<Integer> stack = new ArrayDeque<>();\n        for (int i = 0; i < latencies.length; i++) {\n            while (!stack.isEmpty() && latencies[i] > latencies[stack.peek()]) {\n                int j = stack.pop();\n                result[j] = i - j;\n            }\n            stack.push(i);\n        }\n        return result;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{30, 20, 20, 40}), new int[]{3, 2, 1, 0}, \"case 1\");\ncheck(() -> Solution.solve(new int[]{}), new int[]{}, \"case 2\");\ncheck(() -> Solution.solve(new int[]{3, 2, 1}), new int[]{0, 0, 0}, \"case 3\");"
+    }
   },
   {
     "id": 11,
@@ -686,10 +739,10 @@
     "day": 1,
     "minutes": 15,
     "difficulty": "기본",
-    "statement": "함수 solve(times, target): 오름차순 정렬된 정수 배열에서 target 이상인 첫 원소의 인덱스를 반환하세요. 없으면 len(times)입니다. 중복을 허용하며 n ≤ 100000, 값과 target은 -10^9~10^9입니다. O(log n)에 해결하세요.",
+    "statement": "Java 메서드: int solve(int[] times, int target)\n 오름차순 정렬된 정수 배열에서 target 이상인 첫 원소의 인덱스를 반환하세요. 없으면 times.length입니다. 중복을 허용하며 n ≤ 100000, 값과 target은 -10^9~10^9입니다. O(log n)에 해결하세요.",
     "examples": [
       {
-        "input": "solve([1, 2, 2, 5], 2)",
+        "input": "solve(new int[]{1, 2, 2, 5}, 2)",
         "output": "1",
         "explanation": "2 이상인 첫 값은 인덱스 1의 2입니다."
       }
@@ -747,7 +800,12 @@
       "값을 찾자마자 반환하면 첫 중복 위치가 아닐 수 있습니다.",
       "right는 유효 인덱스가 아닌 n으로 시작합니다."
     ],
-    "explainPrompt": "탐색 구간과 종료 조건을 먼저 정의하고 경계 입력을 설명하세요."
+    "explainPrompt": "탐색 구간과 종료 조건을 먼저 정의하고 경계 입력을 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int[] times, int target) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int[] times, int target) {\n        int left = 0, right = times.length;\n        while (left < right) {\n            int mid = left + (right - left) / 2;\n            if (times[mid] < target) left = mid + 1;\n            else right = mid;\n        }\n        return left;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{1, 2, 2, 5}, 2), 1, \"case 1\");\ncheck(() -> Solution.solve(new int[]{}, 4), 0, \"case 2\");\ncheck(() -> Solution.solve(new int[]{1, 3}, 4), 2, \"case 3\");\ncheck(() -> Solution.solve(new int[]{1, 3}, 0), 0, \"case 4\");"
+    }
   },
   {
     "id": 12,
@@ -756,10 +814,10 @@
     "day": 1,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(intervals): [start,end] 정수 구간들을 합치세요. 0 ≤ start < end ≤ 10^9, n ≤ 100000입니다. 겹치거나 끝과 시작이 맞닿으면 합치고 시작순으로 반환하세요. 예: [1,3],[3,5]는 [1,5]. 빈 입력은 []이며 입력은 수정하지 마세요.",
+    "statement": "Java 메서드: int[][] solve(int[][] intervals)\n [start,end] 정수 구간들을 합치세요. 0 ≤ start < end ≤ 10^9, n ≤ 100000입니다. 겹치거나 끝과 시작이 맞닿으면 합치고 시작순으로 반환하세요. 예: [1,3],[3,5]는 [1,5]. 빈 입력은 []이며 입력은 수정하지 마세요.",
     "examples": [
       {
-        "input": "solve([[5, 7], [1, 3], [3, 6]])",
+        "input": "solve(new int[][]{new int[]{5, 7}, new int[]{1, 3}, new int[]{3, 6}})",
         "output": "[[1, 7]]",
         "explanation": "[1,3]과 [3,6]이 맞닿고 [5,7]이 겹치므로 [1,7] 하나가 됩니다."
       }
@@ -836,7 +894,12 @@
       "포함되는 작은 구간 때문에 끝을 줄이면 안 됩니다.",
       "입력 내부 배열을 그대로 결과에 넣고 수정하지 마세요."
     ],
-    "explainPrompt": "정렬 후 마지막 결과 구간만 보면 충분한 이유를 설명하세요."
+    "explainPrompt": "정렬 후 마지막 결과 구간만 보면 충분한 이유를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[][] solve(int[][] intervals) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[][] solve(int[][] intervals) {\n        int[][] ordered = intervals.clone();\n        Arrays.sort(ordered, Comparator.comparingInt(a -> a[0]));\n        List<int[]> result = new ArrayList<>();\n        for (int[] interval : ordered) {\n            if (!result.isEmpty() && interval[0] <= result.get(result.size() - 1)[1]) {\n                int[] last = result.get(result.size() - 1);\n                last[1] = Math.max(last[1], interval[1]);\n            } else result.add(interval.clone());\n        }\n        return result.toArray(new int[0][]);\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[][]{new int[]{5, 7}, new int[]{1, 3}, new int[]{3, 6}}), new int[][]{new int[]{1, 7}}, \"case 1\");\ncheck(() -> Solution.solve(new int[][]{}), new int[][]{}, \"case 2\");\ncheck(() -> Solution.solve(new int[][]{new int[]{1, 10}, new int[]{2, 3}, new int[]{12, 14}}), new int[][]{new int[]{1, 10}, new int[]{12, 14}}, \"case 3\");"
+    }
   },
   {
     "id": 13,
@@ -845,10 +908,10 @@
     "day": 1,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(n, edges, start, target): 0~n-1번 서비스 사이의 무방향 연결 edges에서 start부터 target까지 최소 간선 수를 반환하세요. 도달 불가면 -1입니다. 1 ≤ n ≤ 100000, 간선 수 ≤ 200000, 끝점은 유효하며 자기 연결과 중복 간선은 없습니다.",
+    "statement": "Java 메서드: int solve(int n, int[][] edges, int start, int target)\n 0~n-1번 서비스 사이의 무방향 연결 edges에서 start부터 target까지 최소 간선 수를 반환하세요. 도달 불가면 -1입니다. 1 ≤ n ≤ 100000, 간선 수 ≤ 200000, 끝점은 유효하며 자기 연결과 중복 간선은 없습니다.",
     "examples": [
       {
-        "input": "solve(5, [[0, 1], [1, 2], [0, 3], [3, 2]], 0, 2)",
+        "input": "solve(5, new int[][]{new int[]{0, 1}, new int[]{1, 2}, new int[]{0, 3}, new int[]{3, 2}}, 0, 2)",
         "output": "2",
         "explanation": "0→1→2 또는 0→3→2로 두 간선만에 도달합니다."
       }
@@ -858,7 +921,7 @@
       "방문 처리는 큐에서 뺄 때가 아니라 넣을 때 하세요.",
       "start==target이면 거리는 0입니다."
     ],
-    "approach": "인접 리스트와 deque로 너비 우선 탐색합니다. 먼저 발견한 거리가 최단 거리라는 성질을 이용합니다.",
+    "approach": "인접 리스트와 ArrayDeque로 너비 우선 탐색합니다. 먼저 발견한 거리가 최단 거리라는 성질을 이용합니다.",
     "complexity": "시간 O(V+E), 공간 O(V+E).",
     "solution": "def solve(n, edges, start, target):\n    from collections import deque\n    graph = [[] for _ in range(n)]\n    for a, b in edges:\n        graph[a].append(b)\n        graph[b].append(a)\n    distance = [-1] * n\n    distance[start] = 0\n    queue = deque([start])\n    while queue:\n        node = queue.popleft()\n        if node == target:\n            return distance[node]\n        for nxt in graph[node]:\n            if distance[nxt] == -1:\n                distance[nxt] = distance[node] + 1\n                queue.append(nxt)\n    return -1\n",
     "tests": [
@@ -908,10 +971,15 @@
       }
     ],
     "pitfalls": [
-      "리스트 pop(0)은 큐 연산을 느리게 만듭니다.",
+      "ArrayList.remove(0)은 매번 원소를 옮기므로 큐에는 ArrayDeque를 사용하세요.",
       "가중치가 다르면 일반 BFS로 최단 비용을 구할 수 없습니다."
     ],
-    "explainPrompt": "DFS로 처음 찾은 경로가 최단이라는 보장이 없는 이유를 말하세요."
+    "explainPrompt": "DFS로 처음 찾은 경로가 최단이라는 보장이 없는 이유를 말하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int n, int[][] edges, int start, int target) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int n, int[][] edges, int start, int target) {\n        List<List<Integer>> graph = new ArrayList<>();\n        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());\n        for (int[] edge : edges) {\n            graph.get(edge[0]).add(edge[1]);\n            graph.get(edge[1]).add(edge[0]);\n        }\n        int[] distance = new int[n];\n        Arrays.fill(distance, -1);\n        distance[start] = 0;\n        Deque<Integer> queue = new ArrayDeque<>();\n        queue.addLast(start);\n        while (!queue.isEmpty()) {\n            int node = queue.removeFirst();\n            if (node == target) return distance[node];\n            for (int next : graph.get(node)) if (distance[next] == -1) {\n                distance[next] = distance[node] + 1;\n                queue.addLast(next);\n            }\n        }\n        return -1;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(5, new int[][]{new int[]{0, 1}, new int[]{1, 2}, new int[]{0, 3}, new int[]{3, 2}}, 0, 2), 2, \"case 1\");\ncheck(() -> Solution.solve(2, new int[][]{}, 0, 1), -1, \"case 2\");\ncheck(() -> Solution.solve(1, new int[][]{}, 0, 0), 0, \"case 3\");"
+    }
   },
   {
     "id": 14,
@@ -920,10 +988,10 @@
     "day": 1,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(grid): 0과 1로 이루어진 직사각형 격자에서 상하좌우로 연결된 1의 덩어리 개수를 반환하세요. 대각선은 연결이 아닙니다. 행·열은 각각 1~300입니다. 입력 격자를 수정하지 마세요.",
+    "statement": "Java 메서드: int solve(int[][] grid)\n 0과 1로 이루어진 직사각형 격자에서 상하좌우로 연결된 1의 덩어리 개수를 반환하세요. 대각선은 연결이 아닙니다. 행·열은 각각 1~300입니다. 입력 격자를 수정하지 마세요.",
     "examples": [
       {
-        "input": "solve([[1, 1, 0], [0, 1, 0], [1, 0, 1]])",
+        "input": "solve(new int[][]{new int[]{1, 1, 0}, new int[]{0, 1, 0}, new int[]{1, 0, 1}})",
         "output": "3",
         "explanation": "좌상단 세 셀, 좌하단 한 셀, 우하단 한 셀로 총 세 구역입니다."
       }
@@ -985,7 +1053,12 @@
       "대각선을 연결하면 결과가 달라집니다.",
       "재귀 DFS는 큰 입력에서 깊이 제한에 걸릴 수 있습니다."
     ],
-    "explainPrompt": "방문 처리를 언제 하는지와 입력을 보존하는 비용을 설명하세요."
+    "explainPrompt": "방문 처리를 언제 하는지와 입력을 보존하는 비용을 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int[][] grid) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int[][] grid) {\n        int rows = grid.length, cols = grid[0].length, count = 0;\n        boolean[][] visited = new boolean[rows][cols];\n        int[] dr = {1, -1, 0, 0}, dc = {0, 0, 1, -1};\n        Deque<Integer> stack = new ArrayDeque<>();\n        for (int r = 0; r < rows; r++) for (int c = 0; c < cols; c++) {\n            if (grid[r][c] != 1 || visited[r][c]) continue;\n            count++;\n            visited[r][c] = true;\n            stack.push(r * cols + c);\n            while (!stack.isEmpty()) {\n                int cell = stack.pop(), x = cell / cols, y = cell % cols;\n                for (int d = 0; d < 4; d++) {\n                    int nx = x + dr[d], ny = y + dc[d];\n                    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && grid[nx][ny] == 1 && !visited[nx][ny]) {\n                        visited[nx][ny] = true;\n                        stack.push(nx * cols + ny);\n                    }\n                }\n            }\n        }\n        return count;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[][]{new int[]{1, 1, 0}, new int[]{0, 1, 0}, new int[]{1, 0, 1}}), 3, \"case 1\");\ncheck(() -> Solution.solve(new int[][]{new int[]{0, 0}}), 0, \"case 2\");\ncheck(() -> Solution.solve(new int[][]{new int[]{1}}), 1, \"case 3\");"
+    }
   },
   {
     "id": 15,
@@ -994,10 +1067,10 @@
     "day": 1,
     "minutes": 25,
     "difficulty": "중급",
-    "statement": "함수 solve(times, window, limit): 비감소 순서의 요청 시각 배열을 처리해 각 요청의 허용 여부를 반환하세요. 시각 t에서 이전에 허용된 요청 중 (t-window, t]에 속하는 개수가 limit 미만이면 현재 요청을 허용합니다. 거절 요청은 저장하지 않습니다. 같은 시각도 배열 순서대로 처리합니다. 0 ≤ n ≤ 100000, 시각은 0~10^9, window와 limit은 양의 정수입니다.",
+    "statement": "Java 메서드: boolean[] solve(int[] times, long window, int limit)\n 비감소 순서의 요청 시각 배열을 처리해 각 요청의 허용 여부를 반환하세요. 시각 t에서 이전에 허용된 요청 중 (t-window, t]에 속하는 개수가 limit 미만이면 현재 요청을 허용합니다. 거절 요청은 저장하지 않습니다. 같은 시각도 배열 순서대로 처리합니다. 0 ≤ n ≤ 100000, 시각은 0~10^9, window와 limit은 양의 정수입니다. window는 1~10^12, limit은 1~10^9 범위입니다.",
     "examples": [
       {
-        "input": "solve([0, 0, 1, 10, 10], 10, 2)",
+        "input": "solve(new int[]{0, 0, 1, 10, 10}, 10L, 2)",
         "output": "[true, true, false, true, true]",
         "explanation": "시각 0의 두 요청은 허용, 1은 거절됩니다. 10에서는 시각 0이 창 밖이 되어 두 요청 모두 허용됩니다."
       }
@@ -1007,7 +1080,7 @@
       "t-window와 정확히 같은 시각은 창 밖입니다.",
       "거절된 요청을 큐에 넣으면 이후 결과가 달라집니다."
     ],
-    "approach": "허용된 시각만 deque에 넣습니다. 매 요청마다 창 밖의 기록을 제거한 다음 남은 수로 허용을 판단합니다. 이 문제는 단일 순차 스트림 모델입니다.",
+    "approach": "허용된 시각만 ArrayDeque에 넣습니다. 매 요청마다 창 밖의 기록을 제거한 다음 남은 수로 허용을 판단합니다. 이 문제는 단일 순차 스트림 모델입니다.",
     "complexity": "시간 O(n), 보조 공간 O(min(n, limit)); 반환 배열 포함 O(n).",
     "solution": "def solve(times, window, limit):\n    from collections import deque\n    accepted = deque()\n    result = []\n    for t in times:\n        while accepted and accepted[0] <= t - window:\n            accepted.popleft()\n        allowed = len(accepted) < limit\n        result.append(allowed)\n        if allowed:\n            accepted.append(t)\n    return result\n",
     "tests": [
@@ -1062,7 +1135,12 @@
       "왼쪽 경계는 열린 구간입니다.",
       "거절 요청도 저장하는 다른 제한 정책과 혼동하지 마세요."
     ],
-    "explainPrompt": "경계·동시 시각·거절 기록을 먼저 확인하고, 다중 서버에서는 어떤 원자성이 필요한지 설명하세요."
+    "explainPrompt": "경계·동시 시각·거절 기록을 먼저 확인하고, 다중 서버에서는 어떤 원자성이 필요한지 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static boolean[] solve(int[] times, long window, int limit) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static boolean[] solve(int[] times, long window, int limit) {\n        Deque<Integer> accepted = new ArrayDeque<>();\n        boolean[] result = new boolean[times.length];\n        for (int i = 0; i < times.length; i++) {\n            int time = times[i];\n            while (!accepted.isEmpty() && accepted.peekFirst() <= time - window) accepted.removeFirst();\n            result[i] = accepted.size() < limit;\n            if (result[i]) accepted.addLast(time);\n        }\n        return result;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{0, 0, 1, 10, 10}, 10L, 2), new boolean[]{true, true, false, true, true}, \"case 1\");\ncheck(() -> Solution.solve(new int[]{}, 5L, 1), new boolean[]{}, \"case 2\");\ncheck(() -> Solution.solve(new int[]{1, 2, 3, 4}, 3L, 1), new boolean[]{true, false, false, true}, \"case 3\");"
+    }
   },
   {
     "id": 16,
@@ -1071,10 +1149,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(latencies, k): 가장 큰 k개 응답시간을 중복을 유지하여 내림차순으로 반환하세요. 0 ≤ k ≤ n ≤ 100000, 값은 0~10^9입니다. 전체 정렬 대신 크기 k 힙을 사용하세요. k=0이면 []입니다.",
+    "statement": "Java 메서드: int[] solve(int[] latencies, int k)\n 가장 큰 k개 응답시간을 중복을 유지하여 내림차순으로 반환하세요. 0 ≤ k ≤ n ≤ 100000, 값은 0~10^9입니다. 전체 정렬 대신 크기 k 힙을 사용하세요. k=0이면 []입니다.",
     "examples": [
       {
-        "input": "solve([5, 1, 5, 3, 9], 3)",
+        "input": "solve(new int[]{5, 1, 5, 3, 9}, 3)",
         "output": "[9, 5, 5]",
         "explanation": "가장 큰 세 요청은 9,5,5이며 같은 응답시간도 별개 요청입니다."
       }
@@ -1132,7 +1210,12 @@
       "중복도 각각 요청 하나입니다.",
       "k=0일 때 heap[0]을 읽지 마세요."
     ],
-    "explainPrompt": "최대 힙 전체 저장과 크기 k 최소 힙의 공간 차이를 설명하세요."
+    "explainPrompt": "최대 힙 전체 저장과 크기 k 최소 힙의 공간 차이를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[] solve(int[] latencies, int k) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[] solve(int[] latencies, int k) {\n        if (k == 0) return new int[0];\n        PriorityQueue<Integer> heap = new PriorityQueue<>();\n        for (int value : latencies) {\n            if (heap.size() < k) heap.add(value);\n            else if (value > heap.peek()) { heap.remove(); heap.add(value); }\n        }\n        int[] result = new int[k];\n        for (int i = k - 1; i >= 0; i--) result[i] = heap.remove();\n        return result;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{5, 1, 5, 3, 9}, 3), new int[]{9, 5, 5}, \"case 1\");\ncheck(() -> Solution.solve(new int[]{2}, 0), new int[]{}, \"case 2\");\ncheck(() -> Solution.solve(new int[]{2, 1}, 2), new int[]{2, 1}, \"case 3\");"
+    }
   },
   {
     "id": 17,
@@ -1141,10 +1224,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(jobs): 각 작업은 [start,end) 동안 워커 하나를 점유합니다. 모든 작업을 시작 시각에 시작시키는 최소 워커 수를 반환하세요. 끝난 시각에 바로 재사용할 수 있습니다. 0 ≤ start < end ≤ 10^9, 작업 수 ≤ 100000입니다.",
+    "statement": "Java 메서드: int solve(int[][] jobs)\n 각 작업은 [start,end) 동안 워커 하나를 점유합니다. 모든 작업을 시작 시각에 시작시키는 최소 워커 수를 반환하세요. 끝난 시각에 바로 재사용할 수 있습니다. 0 ≤ start < end ≤ 10^9, 작업 수 ≤ 100000입니다.",
     "examples": [
       {
-        "input": "solve([[0, 5], [2, 7], [5, 8]])",
+        "input": "solve(new int[][]{new int[]{0, 5}, new int[]{2, 7}, new int[]{5, 8}})",
         "output": "2",
         "explanation": "0~5와 2~7은 겹칩니다. 시각 5에는 첫 워커를 재사용하므로 최대 두 대가 필요합니다."
       }
@@ -1222,7 +1305,12 @@
       "종료 시각과 시작 시각이 같으면 겹치지 않습니다.",
       "마지막 힙 크기만 반환하면 최대 동시성을 놓칩니다."
     ],
-    "explainPrompt": "반열린 구간 정의가 <= 비교에 어떻게 반영되는지 설명하세요."
+    "explainPrompt": "반열린 구간 정의가 <= 비교에 어떻게 반영되는지 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int[][] jobs) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int[][] jobs) {\n        int[][] ordered = jobs.clone();\n        Arrays.sort(ordered, Comparator.comparingInt(a -> a[0]));\n        PriorityQueue<Integer> active = new PriorityQueue<>();\n        int best = 0;\n        for (int[] job : ordered) {\n            while (!active.isEmpty() && active.peek() <= job[0]) active.remove();\n            active.add(job[1]);\n            best = Math.max(best, active.size());\n        }\n        return best;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[][]{new int[]{0, 5}, new int[]{2, 7}, new int[]{5, 8}}), 2, \"case 1\");\ncheck(() -> Solution.solve(new int[][]{}), 0, \"case 2\");\ncheck(() -> Solution.solve(new int[][]{new int[]{1, 2}, new int[]{2, 3}}), 1, \"case 3\");\ncheck(() -> Solution.solve(new int[][]{new int[]{0, 2}, new int[]{0, 2}, new int[]{0, 2}}), 3, \"case 4\");"
+    }
   },
   {
     "id": 18,
@@ -1231,10 +1319,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(sizes, days): 양의 정수 작업 크기 배열을 순서대로 연속 묶음으로 나누어 최대 days일에 처리합니다. 하루에 한 묶음을 처리하며 그 합은 용량 C 이하여야 합니다. 필요한 최소 정수 C를 반환하세요. 1 ≤ days ≤ n ≤ 100000, 크기는 1~10^6입니다.",
+    "statement": "Java 메서드: long solve(int[] sizes, int days)\n 양의 정수 작업 크기 배열을 순서대로 연속 묶음으로 나누어 최대 days일에 처리합니다. 하루에 한 묶음을 처리하며 그 합은 용량 C 이하여야 합니다. 필요한 최소 정수 C를 반환하세요. 1 ≤ days ≤ n ≤ 100000, 크기는 1~10^6입니다.",
     "examples": [
       {
-        "input": "solve([1, 2, 3, 4, 5], 3)",
+        "input": "solve(new int[]{1, 2, 3, 4, 5}, 3)",
         "output": "6",
         "explanation": "용량 6이면 [1,2,3], [4], [5]로 3일입니다. 용량 5이면 4일이 필요합니다."
       }
@@ -1284,9 +1372,15 @@
     ],
     "pitfalls": [
       "순서를 바꾸거나 한 작업을 쪼개면 다른 문제입니다.",
-      "정확히 days가 아니라 최대 days입니다."
+      "정확히 days가 아니라 최대 days입니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "가능 여부가 단조인 이유와 이진 탐색의 양 끝값을 설명하세요."
+    "explainPrompt": "가능 여부가 단조인 이유와 이진 탐색의 양 끝값을 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static long solve(int[] sizes, int days) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static long solve(int[] sizes, int days) {\n        long low = 0, high = 0;\n        for (int size : sizes) { low = Math.max(low, size); high += size; }\n        while (low < high) {\n            long capacity = low + (high - low) / 2;\n            int used = 1;\n            long current = 0;\n            for (int size : sizes) {\n                if (current + size > capacity) { used++; current = 0; }\n                current += size;\n            }\n            if (used <= days) high = capacity;\n            else low = capacity + 1;\n        }\n        return low;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{1, 2, 3, 4, 5}, 3), 6L, \"case 1\");\ncheck(() -> Solution.solve(new int[]{7}, 1), 7L, \"case 2\");\ncheck(() -> Solution.solve(new int[]{4, 2, 8}, 3), 8L, \"case 3\");"
+    }
   },
   {
     "id": 19,
@@ -1295,10 +1389,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(deltas, target): 합이 target인 비어 있지 않은 연속 구간의 개수를 반환하세요. deltas에는 음수·0·양수가 섞일 수 있습니다. n ≤ 100000, 값과 target은 -10^9~10^9입니다.",
+    "statement": "Java 메서드: long solve(int[] deltas, long target)\n 합이 target인 비어 있지 않은 연속 구간의 개수를 반환하세요. deltas에는 음수·0·양수가 섞일 수 있습니다. n ≤ 100000, 값과 target은 -10^9~10^9입니다.",
     "examples": [
       {
-        "input": "solve([1, -1, 1], 1)",
+        "input": "solve(new int[]{1, -1, 1}, 1L)",
         "output": "3",
         "explanation": "첫 [1], 전체 [1,-1,1], 마지막 [1]로 세 구간입니다."
       }
@@ -1344,9 +1438,15 @@
     ],
     "pitfalls": [
       "음수가 있어 일반적인 합 기반 투 포인터는 쓸 수 없습니다.",
-      "현재 누적합을 먼저 기록하면 빈 구간을 세게 됩니다."
+      "현재 누적합을 먼저 기록하면 빈 구간을 세게 됩니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "누적합의 값 대신 빈도가 필요한 이유를 0,0,0 예제로 설명하세요."
+    "explainPrompt": "누적합의 값 대신 빈도가 필요한 이유를 0,0,0 예제로 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static long solve(int[] deltas, long target) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static long solve(int[] deltas, long target) {\n        Map<Long, Integer> counts = new HashMap<>();\n        counts.put(0L, 1);\n        long prefix = 0, answer = 0;\n        for (int value : deltas) {\n            prefix += value;\n            answer += counts.getOrDefault(prefix - target, 0);\n            counts.merge(prefix, 1, Integer::sum);\n        }\n        return answer;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{1, -1, 1}, 1L), 3L, \"case 1\");\ncheck(() -> Solution.solve(new int[]{0, 0, 0}, 0L), 6L, \"case 2\");\ncheck(() -> Solution.solve(new int[]{}, 0L), 0L, \"case 3\");"
+    }
   },
   {
     "id": 20,
@@ -1355,10 +1455,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(n, edges, start, target): 방향 간선 [u,v,cost]를 따라 start에서 target까지 가는 최소 비용을 반환하세요. 도달 불가면 -1입니다. 1 ≤ n ≤ 100000, 간선 수 ≤ 200000, cost는 0~10^6 정수이며 중복 간선도 허용합니다. 정점 번호는 0~n-1이며 모든 간선 끝점과 start, target은 유효한 정점 번호입니다.",
+    "statement": "Java 메서드: long solve(int n, int[][] edges, int start, int target)\n 방향 간선 [u,v,cost]를 따라 start에서 target까지 가는 최소 비용을 반환하세요. 도달 불가면 -1입니다. 1 ≤ n ≤ 100000, 간선 수 ≤ 200000, cost는 0~10^6 정수이며 중복 간선도 허용합니다. 정점 번호는 0~n-1이며 모든 간선 끝점과 start, target은 유효한 정점 번호입니다.",
     "examples": [
       {
-        "input": "solve(4, [[0, 1, 8], [0, 2, 2], [2, 1, 1], [1, 3, 3]], 0, 3)",
+        "input": "solve(4, new int[][]{new int[]{0, 1, 8}, new int[]{0, 2, 2}, new int[]{2, 1, 1}, new int[]{1, 3, 3}}, 0, 3)",
         "output": "6",
         "explanation": "0→2→1→3 비용은 2+1+3=6이며 0→1→3의 11보다 작습니다."
       }
@@ -1444,9 +1544,15 @@
     ],
     "pitfalls": [
       "방향 간선을 양방향으로 만들지 마세요.",
-      "음수 비용에서는 이 알고리즘의 보장이 깨집니다."
+      "음수 비용에서는 이 알고리즘의 보장이 깨집니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "정점을 처음 힙에 넣었을 때 방문 확정하면 안 되는 이유를 설명하세요."
+    "explainPrompt": "정점을 처음 힙에 넣었을 때 방문 확정하면 안 되는 이유를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static long solve(int n, int[][] edges, int start, int target) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static long solve(int n, int[][] edges, int start, int target) {\n        List<List<int[]>> graph = new ArrayList<>();\n        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());\n        for (int[] edge : edges) graph.get(edge[0]).add(new int[]{edge[1], edge[2]});\n        long[] distance = new long[n];\n        Arrays.fill(distance, Long.MAX_VALUE);\n        distance[start] = 0;\n        PriorityQueue<long[]> heap = new PriorityQueue<>(Comparator.comparingLong(a -> a[0]));\n        heap.add(new long[]{0, start});\n        while (!heap.isEmpty()) {\n            long[] candidate = heap.remove();\n            long cost = candidate[0];\n            int node = (int) candidate[1];\n            if (cost != distance[node]) continue;\n            if (node == target) return cost;\n            for (int[] edge : graph.get(node)) {\n                long nextCost = cost + edge[1];\n                if (nextCost < distance[edge[0]]) {\n                    distance[edge[0]] = nextCost;\n                    heap.add(new long[]{nextCost, edge[0]});\n                }\n            }\n        }\n        return -1L;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(4, new int[][]{new int[]{0, 1, 8}, new int[]{0, 2, 2}, new int[]{2, 1, 1}, new int[]{1, 3, 3}}, 0, 3), 6L, \"case 1\");\ncheck(() -> Solution.solve(2, new int[][]{new int[]{0, 1, 1}}, 1, 0), -1L, \"case 2\");\ncheck(() -> Solution.solve(1, new int[][]{}, 0, 0), 0L, \"case 3\");\ncheck(() -> Solution.solve(2, new int[][]{new int[]{0, 1, 0}}, 0, 1), 0L, \"case 4\");"
+    }
   },
   {
     "id": 21,
@@ -1455,10 +1561,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(n, dependencies): 작업은 0~n-1입니다. [a,b]는 a가 끝나야 b를 실행할 수 있다는 뜻입니다. 가능한 실행 순서 중 사전순으로 가장 작은 정수 배열을 반환하세요. 사이클 때문에 불가능하면 []입니다. 1 ≤ n ≤ 100000, 의존 수 ≤ 200000, 중복 쌍은 없습니다.",
+    "statement": "Java 메서드: int[] solve(int n, int[][] dependencies)\n 작업은 0~n-1입니다. [a,b]는 a가 끝나야 b를 실행할 수 있다는 뜻입니다. 가능한 실행 순서 중 사전순으로 가장 작은 정수 배열을 반환하세요. 사이클 때문에 불가능하면 []입니다. 1 ≤ n ≤ 100000, 의존 수 ≤ 200000, 중복 쌍은 없습니다.",
     "examples": [
       {
-        "input": "solve(4, [[0, 2], [1, 2]])",
+        "input": "solve(4, new int[][]{new int[]{0, 2}, new int[]{1, 2}})",
         "output": "[0, 1, 2, 3]",
         "explanation": "처음 가능한 0,1,3 중 0부터 고르고, 1을 마친 뒤 가능해진 2를 3보다 먼저 고릅니다."
       }
@@ -1525,7 +1631,12 @@
       "사이클이 있는 부분만 남았을 때 부분 순서를 성공으로 반환하면 안 됩니다.",
       "일반 큐는 사전순 최소를 보장하지 않습니다."
     ],
-    "explainPrompt": "진입 차수의 의미와 사이클 탐지가 되는 이유를 설명하세요."
+    "explainPrompt": "진입 차수의 의미와 사이클 탐지가 되는 이유를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[] solve(int n, int[][] dependencies) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[] solve(int n, int[][] dependencies) {\n        List<List<Integer>> graph = new ArrayList<>();\n        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());\n        int[] indegree = new int[n];\n        for (int[] edge : dependencies) { graph.get(edge[0]).add(edge[1]); indegree[edge[1]]++; }\n        PriorityQueue<Integer> ready = new PriorityQueue<>();\n        for (int i = 0; i < n; i++) if (indegree[i] == 0) ready.add(i);\n        int[] order = new int[n];\n        int count = 0;\n        while (!ready.isEmpty()) {\n            int node = ready.remove();\n            order[count++] = node;\n            for (int next : graph.get(node)) if (--indegree[next] == 0) ready.add(next);\n        }\n        return count == n ? order : new int[0];\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(4, new int[][]{new int[]{0, 2}, new int[]{1, 2}}), new int[]{0, 1, 2, 3}, \"case 1\");\ncheck(() -> Solution.solve(2, new int[][]{new int[]{0, 1}, new int[]{1, 0}}), new int[]{}, \"case 2\");\ncheck(() -> Solution.solve(3, new int[][]{}), new int[]{0, 1, 2}, \"case 3\");"
+    }
   },
   {
     "id": 22,
@@ -1534,10 +1645,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(packages, target): 각 양의 정수 패키지 크기를 원하는 만큼 써서 target을 정확히 만드는 최소 개수를 반환하세요. 불가능하면 -1, target=0이면 0입니다. packages는 중복 없는 양의 정수 최대 30개, 크기 ≤ 10000, 0 ≤ target ≤ 10000입니다.",
+    "statement": "Java 메서드: int solve(int[] packages, int target)\n 각 양의 정수 패키지 크기를 원하는 만큼 써서 target을 정확히 만드는 최소 개수를 반환하세요. 불가능하면 -1, target=0이면 0입니다. packages는 중복 없는 양의 정수 최대 30개, 크기 ≤ 10000, 0 ≤ target ≤ 10000입니다.",
     "examples": [
       {
-        "input": "solve([1, 3, 4], 6)",
+        "input": "solve(new int[]{1, 3, 4}, 6)",
         "output": "2",
         "explanation": "3+3 두 패키지가 최적입니다. 큰 수부터 고르면 4+1+1로 세 개가 됩니다."
       }
@@ -1593,7 +1704,12 @@
       "탐욕법은 1,3,4로 6을 만들 때 실패합니다.",
       "패키지 재사용이 가능한 문제입니다."
     ],
-    "explainPrompt": "DP 상태·초기값·점화식·계산 순서를 차례로 설명하세요."
+    "explainPrompt": "DP 상태·초기값·점화식·계산 순서를 차례로 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int[] packages, int target) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int[] packages, int target) {\n        int impossible = target + 1;\n        int[] dp = new int[target + 1];\n        Arrays.fill(dp, impossible);\n        dp[0] = 0;\n        for (int amount = 1; amount <= target; amount++) {\n            for (int size : packages) if (size <= amount) dp[amount] = Math.min(dp[amount], dp[amount - size] + 1);\n        }\n        return dp[target] == impossible ? -1 : dp[target];\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{1, 3, 4}, 6), 2, \"case 1\");\ncheck(() -> Solution.solve(new int[]{2}, 3), -1, \"case 2\");\ncheck(() -> Solution.solve(new int[]{2, 5}, 0), 0, \"case 3\");\ncheck(() -> Solution.solve(new int[]{}, 3), -1, \"case 4\");"
+    }
   },
   {
     "id": 23,
@@ -1602,10 +1718,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(profits): 배열의 인접한 두 작업을 동시에 선택할 수 없을 때 가능한 최대 이익 합을 반환하세요. 아무 작업도 선택하지 않아도 됩니다. n ≤ 100000, 각 이익은 0~10^9입니다.",
+    "statement": "Java 메서드: long solve(int[] profits)\n 배열의 인접한 두 작업을 동시에 선택할 수 없을 때 가능한 최대 이익 합을 반환하세요. 아무 작업도 선택하지 않아도 됩니다. n ≤ 100000, 각 이익은 0~10^9입니다.",
     "examples": [
       {
-        "input": "solve([2, 7, 9, 3, 1])",
+        "input": "solve(new int[]{2, 7, 9, 3, 1})",
         "output": "12",
         "explanation": "인덱스 0,2,4의 이익 2+9+1=12가 최댓값입니다."
       }
@@ -1657,9 +1773,15 @@
     ],
     "pitfalls": [
       "현재 값을 계산하기 전에 이전 상태를 덮어쓰지 마세요.",
-      "이익이 가장 큰 작업부터 고르는 방식은 보장되지 않습니다."
+      "이익이 가장 큰 작업부터 고르는 방식은 보장되지 않습니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "두 변수 각각이 어느 접두 구간의 최적값인지 설명하세요."
+    "explainPrompt": "두 변수 각각이 어느 접두 구간의 최적값인지 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static long solve(int[] profits) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static long solve(int[] profits) {\n        long previousTwo = 0, previousOne = 0;\n        for (int profit : profits) {\n            long current = Math.max(previousOne, previousTwo + profit);\n            previousTwo = previousOne;\n            previousOne = current;\n        }\n        return previousOne;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{2, 7, 9, 3, 1}), 12L, \"case 1\");\ncheck(() -> Solution.solve(new int[]{}), 0L, \"case 2\");\ncheck(() -> Solution.solve(new int[]{5}), 5L, \"case 3\");\ncheck(() -> Solution.solve(new int[]{0, 0}), 0L, \"case 4\");"
+    }
   },
   {
     "id": 24,
@@ -1668,10 +1790,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(blocked): 0은 통과 가능, 1은 막힌 셀입니다. 좌상단에서 우하단까지 오른쪽 또는 아래로만 이동하는 경로 수를 1000000007로 나눈 나머지를 반환하세요. 행·열은 1~200이고 출발·도착이 막힐 수 있습니다.",
+    "statement": "Java 메서드: int solve(int[][] blocked)\n 0은 통과 가능, 1은 막힌 셀입니다. 좌상단에서 우하단까지 오른쪽 또는 아래로만 이동하는 경로 수를 1000000007로 나눈 나머지를 반환하세요. 행·열은 1~200이고 출발·도착이 막힐 수 있습니다.",
     "examples": [
       {
-        "input": "solve([[0, 0, 0], [0, 1, 0], [0, 0, 0]])",
+        "input": "solve(new int[][]{new int[]{0, 0, 0}, new int[]{0, 1, 0}, new int[]{0, 0, 0}})",
         "output": "2",
         "explanation": "중앙을 피해 위쪽 가장자리 또는 왼쪽 가장자리로 가는 두 경로가 있습니다."
       }
@@ -1744,7 +1866,12 @@
       "막힌 셀의 이전 dp 값을 그대로 두면 경로가 통과합니다.",
       "시작 셀도 장애물일 수 있습니다."
     ],
-    "explainPrompt": "1차원 배열 갱신 순서가 왼쪽에서 오른쪽이어야 하는 이유를 설명하세요."
+    "explainPrompt": "1차원 배열 갱신 순서가 왼쪽에서 오른쪽이어야 하는 이유를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int[][] blocked) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int[][] blocked) {\n        int[] dp = new int[blocked[0].length];\n        dp[0] = 1;\n        for (int[] row : blocked) for (int c = 0; c < row.length; c++) {\n            if (row[c] == 1) dp[c] = 0;\n            else if (c > 0) dp[c] = (dp[c] + dp[c - 1]) % 1_000_000_007;\n        }\n        return dp[dp.length - 1];\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[][]{new int[]{0, 0, 0}, new int[]{0, 1, 0}, new int[]{0, 0, 0}}), 2, \"case 1\");\ncheck(() -> Solution.solve(new int[][]{new int[]{1}}), 0, \"case 2\");\ncheck(() -> Solution.solve(new int[][]{new int[]{0}}), 1, \"case 3\");\ncheck(() -> Solution.solve(new int[][]{new int[]{0, 1, 0}}), 0, \"case 4\");"
+    }
   },
   {
     "id": 25,
@@ -1753,10 +1880,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(records, cursor, limit): records는 고유 정수 ID의 [created_at,id] 레코드 배열이며 정렬되지 않았습니다. (created_at,id) 오름차순으로 정렬하고 cursor보다 사전순으로 엄격히 큰 레코드 중 앞 limit개를 반환하세요. cursor는 [시각,id] 또는 None이며 None은 첫 페이지입니다. n ≤ 100000, 두 값은 0~10^9, 1 ≤ limit ≤ 100입니다. 입력을 수정하지 마세요.",
+    "statement": "Java 메서드: int[][] solve(int[][] records, int[] cursor, int limit)\n records는 고유 정수 ID의 [created_at,id] 레코드 배열이며 정렬되지 않았습니다. (created_at,id) 오름차순으로 정렬하고 cursor보다 사전순으로 엄격히 큰 레코드 중 앞 limit개를 반환하세요. cursor는 [시각,id] 또는 null이며 null은 첫 페이지입니다. n ≤ 100000, 두 값은 0~10^9, 1 ≤ limit ≤ 100입니다. 입력을 수정하지 마세요.",
     "examples": [
       {
-        "input": "solve([[10, 3], [9, 1], [10, 2], [11, 4]], [10, 2], 2)",
+        "input": "solve(new int[][]{new int[]{10, 3}, new int[]{9, 1}, new int[]{10, 2}, new int[]{11, 4}}, new int[]{10, 2}, 2)",
         "output": "[[10, 3], [11, 4]]",
         "explanation": "커서 [10,2] 자신은 제외하고 [10,3], [11,4]를 순서대로 반환합니다."
       }
@@ -1764,7 +1891,7 @@
     "hints": [
       "시각만 커서로 쓰면 같은 시각 레코드를 놓칠 수 있습니다.",
       "시각과 고유 ID를 묶어 전체 순서를 만드세요.",
-      "bisect_right로 커서보다 큰 첫 위치를 구할 수 있습니다."
+      "복합 키 비교로 upper bound 이진 탐색을 구현하면 커서보다 큰 첫 위치를 구할 수 있습니다."
     ],
     "approach": "복합 키로 정렬 후 upper bound를 구해 페이지를 잘라 반환합니다. 메모리 배열 모델이며 실제 DB에서는 복합 인덱스와 조회 조건으로 처리합니다.",
     "complexity": "시간 O(n log n + log n + limit), 공간 O(n).",
@@ -1858,7 +1985,12 @@
       "동일 시각의 레코드를 구분할 안정적인 키가 필요합니다.",
       "커서 자신은 다음 페이지에 다시 포함하지 않습니다."
     ],
-    "explainPrompt": "동일 시각·삭제된 커서·페이지 사이 삽입이 있을 때 의미와 DB 복합 인덱스를 설명하세요."
+    "explainPrompt": "동일 시각·삭제된 커서·페이지 사이 삽입이 있을 때 의미와 DB 복합 인덱스를 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[][] solve(int[][] records, int[] cursor, int limit) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[][] solve(int[][] records, int[] cursor, int limit) {\n        int[][] ordered = records.clone();\n        Comparator<int[]> order = Comparator.<int[]>comparingInt(a -> a[0]).thenComparingInt(a -> a[1]);\n        Arrays.sort(ordered, order);\n        int left = 0, right = ordered.length;\n        if (cursor != null) {\n            while (left < right) {\n                int mid = left + (right - left) / 2;\n                if (order.compare(ordered[mid], cursor) <= 0) left = mid + 1;\n                else right = mid;\n            }\n        }\n        int end = Math.min(ordered.length, left + limit);\n        int[][] result = new int[end - left][];\n        for (int i = left; i < end; i++) result[i - left] = ordered[i].clone();\n        return result;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[][]{new int[]{10, 3}, new int[]{9, 1}, new int[]{10, 2}, new int[]{11, 4}}, new int[]{10, 2}, 2), new int[][]{new int[]{10, 3}, new int[]{11, 4}}, \"case 1\");\ncheck(() -> Solution.solve(new int[][]{}, null, 3), new int[][]{}, \"case 2\");\ncheck(() -> Solution.solve(new int[][]{new int[]{1, 1}, new int[]{1, 2}}, null, 1), new int[][]{new int[]{1, 1}}, \"case 3\");\ncheck(() -> Solution.solve(new int[][]{new int[]{1, 1}}, new int[]{1, 1}, 2), new int[][]{}, \"case 4\");"
+    }
   },
   {
     "id": 26,
@@ -1867,20 +1999,20 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(capacity, operations): operation은 [\"put\",key,value] 또는 [\"get\",key]입니다. get은 있으면 값(정수), 없으면 -1을 반환하며 get 결과만 배열로 모으세요. 성공한 get과 모든 put은 해당 키를 가장 최근 사용으로 만듭니다. 용량 초과 시 가장 오래 사용하지 않은 키를 제거합니다. 0 ≤ capacity ≤ 10000, 연산 수 ≤ 100000, key는 문자열, value는 0~10^9입니다.",
+    "statement": "Java 메서드: int[] solve(int capacity, String[][] operations)\n operation은 [\"put\",key,value] 또는 [\"get\",key]입니다. get은 있으면 값(정수), 없으면 -1을 반환하며 get 결과만 배열로 모으세요. 성공한 get과 모든 put은 해당 키를 가장 최근 사용으로 만듭니다. 용량 초과 시 가장 오래 사용하지 않은 키를 제거합니다. 0 ≤ capacity ≤ 10000, 연산 수 ≤ 100000, key는 문자열, value는 0~10^9입니다.\noperations는 String[][]입니다. 연산명·키뿐 아니라 시각·값·서버 번호도 문자열로 전달하며 Integer.parseInt 또는 Long.parseLong으로 변환하세요.",
     "examples": [
       {
-        "input": "solve(2, [[\"put\", \"a\", 1], [\"put\", \"b\", 2], [\"get\", \"a\"], [\"put\", \"c\", 3], [\"get\", \"b\"], [\"get\", \"c\"]])",
+        "input": "solve(2, new String[][]{new String[]{\"put\", \"a\", \"1\"}, new String[]{\"put\", \"b\", \"2\"}, new String[]{\"get\", \"a\"}, new String[]{\"put\", \"c\", \"3\"}, new String[]{\"get\", \"b\"}, new String[]{\"get\", \"c\"}})",
         "output": "[1, -1, 3]",
         "explanation": "a 조회 후 b가 가장 오래된 키가 됩니다. c 삽입이 b를 제거하므로 조회 결과는 1,-1,3입니다."
       }
     ],
     "hints": [
       "키 조회와 사용 순서 갱신을 둘 다 빠르게 해야 합니다.",
-      "Python OrderedDict의 move_to_end와 popitem(last=False)를 살펴보세요.",
+      "LinkedHashMap의 accessOrder=true 옵션은 get과 put 시 접근 순서를 갱신합니다.",
       "기존 키 갱신도 최근 사용이 되며 용량 0도 처리해야 합니다."
     ],
-    "approach": "OrderedDict 앞을 오래된 키, 뒤를 최근 키로 둡니다. 읽기 성공 및 쓰기마다 뒤로 이동하고 용량을 넘으면 앞을 제거합니다.",
+    "approach": "LinkedHashMap을 accessOrder=true로 생성하면 성공한 get과 put이 키를 가장 최근 위치로 이동시킵니다. 용량을 넘으면 keySet 반복자의 첫 키를 제거합니다.",
     "complexity": "평균 연산당 O(1), 전체 O(m), 공간 O(capacity + get 결과 수).",
     "solution": "def solve(capacity, operations):\n    from collections import OrderedDict\n    cache = OrderedDict()\n    result = []\n    for operation in operations:\n        action, key = operation[:2]\n        if action == 'get':\n            if key in cache:\n                result.append(cache[key])\n                cache.move_to_end(key)\n            else:\n                result.append(-1)\n        else:\n            cache[key] = operation[2]\n            cache.move_to_end(key)\n            if len(cache) > capacity:\n                cache.popitem(last=False)\n    return result\n",
     "tests": [
@@ -1971,7 +2103,12 @@
       "get 성공도 사용 순서를 바꿉니다.",
       "기존 키 put을 새 키 추가로 계산하지 마세요."
     ],
-    "explainPrompt": "직접 구현한다면 해시와 이중 연결 리스트를 어떻게 결합할지 설명하세요."
+    "explainPrompt": "직접 구현한다면 해시와 이중 연결 리스트를 어떻게 결합할지 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[] solve(int capacity, String[][] operations) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[] solve(int capacity, String[][] operations) {\n        LinkedHashMap<String, Integer> cache = new LinkedHashMap<>(16, 0.75f, true);\n        List<Integer> result = new ArrayList<>();\n        for (String[] operation : operations) {\n            String key = operation[1];\n            if (operation[0].equals(\"get\")) result.add(cache.getOrDefault(key, -1));\n            else {\n                cache.put(key, Integer.parseInt(operation[2]));\n                if (cache.size() > capacity) {\n                    Iterator<String> oldest = cache.keySet().iterator();\n                    oldest.next();\n                    oldest.remove();\n                }\n            }\n        }\n        return result.stream().mapToInt(Integer::intValue).toArray();\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(2, new String[][]{new String[]{\"put\", \"a\", \"1\"}, new String[]{\"put\", \"b\", \"2\"}, new String[]{\"get\", \"a\"}, new String[]{\"put\", \"c\", \"3\"}, new String[]{\"get\", \"b\"}, new String[]{\"get\", \"c\"}}), new int[]{1, -1, 3}, \"case 1\");\ncheck(() -> Solution.solve(0, new String[][]{new String[]{\"put\", \"a\", \"1\"}, new String[]{\"get\", \"a\"}}), new int[]{-1}, \"case 2\");\ncheck(() -> Solution.solve(1, new String[][]{new String[]{\"put\", \"a\", \"1\"}, new String[]{\"put\", \"a\", \"5\"}, new String[]{\"get\", \"a\"}}), new int[]{5}, \"case 3\");"
+    }
   },
   {
     "id": 27,
@@ -1980,10 +2117,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(ttl, operations): 연산은 [\"set\",time,key,value] 또는 [\"get\",time,key]이며 시각은 비감소 순서입니다. set은 값을 저장하고 만료 시각을 time+ttl로 갱신합니다. get 시각이 만료 시각 미만이면 값을, 이상이면 -1을 반환합니다. get 결과만 배열로 모으세요. ttl은 양의 정수, 연산 수 ≤ 100000, 시각·값은 0~10^9, 키는 문자열입니다. 조회가 TTL을 연장하지 않습니다.",
+    "statement": "Java 메서드: int[] solve(long ttl, String[][] operations)\n 연산은 [\"set\",time,key,value] 또는 [\"get\",time,key]이며 시각은 비감소 순서입니다. set은 값을 저장하고 만료 시각을 time+ttl로 갱신합니다. get 시각이 만료 시각 미만이면 값을, 이상이면 -1을 반환합니다. get 결과만 배열로 모으세요. ttl은 양의 정수, 연산 수 ≤ 100000, 시각·값은 0~10^9, 키는 문자열입니다. 조회가 TTL을 연장하지 않습니다.\noperations는 String[][]입니다. 연산명·키뿐 아니라 시각·값·서버 번호도 문자열로 전달하며 Integer.parseInt 또는 Long.parseLong으로 변환하세요. ttl은 1~10^12 범위이며 만료 시각은 long으로 계산하세요.",
     "examples": [
       {
-        "input": "solve(5, [[\"set\", 0, \"a\", 7], [\"get\", 4, \"a\"], [\"get\", 5, \"a\"]])",
+        "input": "solve(5L, new String[][]{new String[]{\"set\", \"0\", \"a\", \"7\"}, new String[]{\"get\", \"4\", \"a\"}, new String[]{\"get\", \"5\", \"a\"}})",
         "output": "[7, -1]",
         "explanation": "a는 시각 5에 만료되므로 시각 4에는 7, 시각 5에는 -1입니다."
       }
@@ -2077,7 +2214,12 @@
       "조회가 TTL을 연장하는 정책과 혼동하지 마세요.",
       "지연 삭제는 다시 조회하지 않는 만료 키의 메모리를 남깁니다."
     ],
-    "explainPrompt": "지연 삭제의 시간·메모리 절충과 주기적 정리 도입 시 고려점을 설명하세요."
+    "explainPrompt": "지연 삭제의 시간·메모리 절충과 주기적 정리 도입 시 고려점을 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int[] solve(long ttl, String[][] operations) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int[] solve(long ttl, String[][] operations) {\n        Map<String, long[]> store = new HashMap<>();\n        List<Integer> result = new ArrayList<>();\n        for (String[] operation : operations) {\n            long time = Long.parseLong(operation[1]);\n            String key = operation[2];\n            if (operation[0].equals(\"set\")) store.put(key, new long[]{Long.parseLong(operation[3]), time + ttl});\n            else {\n                long[] entry = store.get(key);\n                if (entry != null && time < entry[1]) result.add((int) entry[0]);\n                else { store.remove(key); result.add(-1); }\n            }\n        }\n        return result.stream().mapToInt(Integer::intValue).toArray();\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(5L, new String[][]{new String[]{\"set\", \"0\", \"a\", \"7\"}, new String[]{\"get\", \"4\", \"a\"}, new String[]{\"get\", \"5\", \"a\"}}), new int[]{7, -1}, \"case 1\");\ncheck(() -> Solution.solve(3L, new String[][]{new String[]{\"get\", \"0\", \"x\"}}), new int[]{-1}, \"case 2\");\ncheck(() -> Solution.solve(5L, new String[][]{new String[]{\"set\", \"0\", \"a\", \"1\"}, new String[]{\"set\", \"4\", \"a\", \"2\"}, new String[]{\"get\", \"5\", \"a\"}, new String[]{\"get\", \"9\", \"a\"}}), new int[]{2, -1}, \"case 3\");"
+    }
   },
   {
     "id": 28,
@@ -2086,10 +2228,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(intervals): 한 대의 장비에서 처리 가능한 겹치지 않는 예약의 최대 개수를 반환하세요. 각 예약은 [start,end)이고 0 ≤ start < end ≤ 10^9, n ≤ 100000입니다. 종료 시각과 다음 시작이 같으면 함께 선택할 수 있습니다. 입력을 수정하지 마세요.",
+    "statement": "Java 메서드: int solve(int[][] intervals)\n 한 대의 장비에서 처리 가능한 겹치지 않는 예약의 최대 개수를 반환하세요. 각 예약은 [start,end)이고 0 ≤ start < end ≤ 10^9, n ≤ 100000입니다. 종료 시각과 다음 시작이 같으면 함께 선택할 수 있습니다. 입력을 수정하지 마세요.",
     "examples": [
       {
-        "input": "solve([[0, 6], [1, 2], [2, 3], [3, 4]])",
+        "input": "solve(new int[][]{new int[]{0, 6}, new int[]{1, 2}, new int[]{2, 3}, new int[]{3, 4}})",
         "output": "3",
         "explanation": "긴 예약 [0,6] 대신 [1,2], [2,3], [3,4]를 선택하면 세 개를 처리합니다."
       }
@@ -2156,7 +2298,12 @@
       "겹치는 예약을 합치는 문제와 다릅니다.",
       "짧은 예약 순서만으로는 최적을 보장하지 못합니다."
     ],
-    "explainPrompt": "가장 빨리 끝나는 예약을 먼저 고르는 교환 논증을 말로 설명하세요."
+    "explainPrompt": "가장 빨리 끝나는 예약을 먼저 고르는 교환 논증을 말로 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static int solve(int[][] intervals) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static int solve(int[][] intervals) {\n        int[][] ordered = intervals.clone();\n        Arrays.sort(ordered, Comparator.comparingInt(a -> a[1]));\n        int lastEnd = -1, count = 0;\n        for (int[] interval : ordered) if (interval[0] >= lastEnd) {\n            count++;\n            lastEnd = interval[1];\n        }\n        return count;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[][]{new int[]{0, 6}, new int[]{1, 2}, new int[]{2, 3}, new int[]{3, 4}}), 3, \"case 1\");\ncheck(() -> Solution.solve(new int[][]{}), 0, \"case 2\");\ncheck(() -> Solution.solve(new int[][]{new int[]{0, 2}, new int[]{0, 2}, new int[]{2, 4}}), 2, \"case 3\");"
+    }
   },
   {
     "id": 29,
@@ -2165,10 +2312,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(n, operations): 서버 0~n-1에 대해 [\"union\",a,b]는 두 서버 그룹을 합치고 [\"same\",a,b]는 같은 그룹인지 불리언을 반환합니다. same 결과만 배열로 반환하세요. 1 ≤ n ≤ 100000, 연산 수 ≤ 200000, 서버 번호는 유효합니다. 연결은 추가만 됩니다.",
+    "statement": "Java 메서드: boolean[] solve(int n, String[][] operations)\n 서버 0~n-1에 대해 [\"union\",a,b]는 두 서버 그룹을 합치고 [\"same\",a,b]는 같은 그룹인지 불리언을 반환합니다. same 결과만 배열로 반환하세요. 1 ≤ n ≤ 100000, 연산 수 ≤ 200000, 서버 번호는 유효합니다. 연결은 추가만 됩니다.\noperations는 String[][]입니다. 연산명·키뿐 아니라 시각·값·서버 번호도 문자열로 전달하며 Integer.parseInt 또는 Long.parseLong으로 변환하세요.",
     "examples": [
       {
-        "input": "solve(4, [[\"same\", 0, 1], [\"union\", 0, 1], [\"union\", 1, 2], [\"same\", 0, 2], [\"same\", 0, 3]])",
+        "input": "solve(4, new String[][]{new String[]{\"same\", \"0\", \"1\"}, new String[]{\"union\", \"0\", \"1\"}, new String[]{\"union\", \"1\", \"2\"}, new String[]{\"same\", \"0\", \"2\"}, new String[]{\"same\", \"0\", \"3\"}})",
         "output": "[false, true, false]",
         "explanation": "처음 0과 1은 다르고, 두 union 뒤 0과 2는 같으며 3은 여전히 별도 그룹입니다."
       }
@@ -2257,7 +2404,12 @@
       "이미 같은 그룹을 합칠 때 크기를 또 더하지 마세요.",
       "연결 삭제는 이 기본 자료구조로 처리하지 못합니다."
     ],
-    "explainPrompt": "단순 부모 배열에서 긴 사슬이 생기는 문제와 두 최적화의 역할을 설명하세요."
+    "explainPrompt": "단순 부모 배열에서 긴 사슬이 생기는 문제와 두 최적화의 역할을 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static boolean[] solve(int n, String[][] operations) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static boolean[] solve(int n, String[][] operations) {\n        int[] parent = new int[n], size = new int[n];\n        for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }\n        List<Boolean> result = new ArrayList<>();\n        for (String[] operation : operations) {\n            int a = find(parent, Integer.parseInt(operation[1]));\n            int b = find(parent, Integer.parseInt(operation[2]));\n            if (operation[0].equals(\"same\")) result.add(a == b);\n            else if (a != b) {\n                if (size[a] < size[b]) { int temp = a; a = b; b = temp; }\n                parent[b] = a;\n                size[a] += size[b];\n            }\n        }\n        boolean[] answer = new boolean[result.size()];\n        for (int i = 0; i < answer.length; i++) answer[i] = result.get(i);\n        return answer;\n    }\n    private static int find(int[] parent, int node) {\n        while (parent[node] != node) {\n            parent[node] = parent[parent[node]];\n            node = parent[node];\n        }\n        return node;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(4, new String[][]{new String[]{\"same\", \"0\", \"1\"}, new String[]{\"union\", \"0\", \"1\"}, new String[]{\"union\", \"1\", \"2\"}, new String[]{\"same\", \"0\", \"2\"}, new String[]{\"same\", \"0\", \"3\"}}), new boolean[]{false, true, false}, \"case 1\");\ncheck(() -> Solution.solve(1, new String[][]{new String[]{\"same\", \"0\", \"0\"}, new String[]{\"union\", \"0\", \"0\"}, new String[]{\"same\", \"0\", \"0\"}}), new boolean[]{true, true}, \"case 2\");\ncheck(() -> Solution.solve(2, new String[][]{}), new boolean[]{}, \"case 3\");"
+    }
   },
   {
     "id": 30,
@@ -2266,10 +2418,10 @@
     "day": 2,
     "minutes": 20,
     "difficulty": "중급",
-    "statement": "함수 solve(durations, dependencies): 작업 i의 실행 시간은 durations[i]입니다. [a,b]는 a 완료 후 b 시작을 뜻합니다. 워커는 무제한이며 모든 선행 작업이 끝나면 즉시 실행할 수 있습니다. 전체 작업의 최소 완료 시간을 반환하세요. 사이클이면 -1입니다. 1 ≤ n ≤ 100000, 실행 시간은 1~10^6, 의존 수 ≤ 200000, 유효한 서로 다른 작업 간 중복 없는 쌍입니다.",
+    "statement": "Java 메서드: long solve(int[] durations, int[][] dependencies)\n 작업 i의 실행 시간은 durations[i]입니다. [a,b]는 a 완료 후 b 시작을 뜻합니다. 워커는 무제한이며 모든 선행 작업이 끝나면 즉시 실행할 수 있습니다. 전체 작업의 최소 완료 시간을 반환하세요. 사이클이면 -1입니다. 1 ≤ n ≤ 100000, 실행 시간은 1~10^6, 의존 수 ≤ 200000, 유효한 서로 다른 작업 간 중복 없는 쌍입니다.",
     "examples": [
       {
-        "input": "solve([3, 5, 2, 4], [[0, 2], [1, 2], [2, 3]])",
+        "input": "solve(new int[]{3, 5, 2, 4}, new int[][]{new int[]{0, 2}, new int[]{1, 2}, new int[]{2, 3}})",
         "output": "11",
         "explanation": "0과 1을 병렬로 시작하면 5에 모두 끝납니다. 이후 2가 7에, 3이 11에 완료됩니다."
       }
@@ -2350,8 +2502,14 @@
     ],
     "pitfalls": [
       "병렬 실행하므로 선행 작업 시간을 무조건 더하면 안 됩니다.",
-      "워커 수 제한이 있으면 다른 스케줄링 문제가 됩니다."
+      "워커 수 제한이 있으면 다른 스케줄링 문제가 됩니다.",
+      "누적 합계·경로 비용·정답 개수가 int 범위를 넘을 수 있으므로 long을 사용하세요."
     ],
-    "explainPrompt": "요구사항 확인→작은 예시→상태 정의→정확성→복잡도→경계 테스트 순서로 3분 안에 설명하세요."
+    "explainPrompt": "요구사항 확인→작은 예시→상태 정의→정확성→복잡도→경계 테스트 순서로 3분 안에 설명하세요.",
+    "java": {
+      "starter": "class Solution {\n    public static long solve(int[] durations, int[][] dependencies) {\n        // 여기에 풀이를 작성하세요.\n        throw new UnsupportedOperationException(\"아직 구현하지 않았습니다\");\n    }\n}\n",
+      "solution": "class Solution {\n    public static long solve(int[] durations, int[][] dependencies) {\n        int n = durations.length;\n        List<List<Integer>> graph = new ArrayList<>();\n        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());\n        int[] indegree = new int[n];\n        for (int[] edge : dependencies) { graph.get(edge[0]).add(edge[1]); indegree[edge[1]]++; }\n        long[] finish = new long[n];\n        Deque<Integer> queue = new ArrayDeque<>();\n        for (int i = 0; i < n; i++) {\n            finish[i] = durations[i];\n            if (indegree[i] == 0) queue.addLast(i);\n        }\n        int processed = 0;\n        long answer = 0;\n        while (!queue.isEmpty()) {\n            int node = queue.removeFirst();\n            processed++;\n            answer = Math.max(answer, finish[node]);\n            for (int next : graph.get(node)) {\n                finish[next] = Math.max(finish[next], finish[node] + durations[next]);\n                if (--indegree[next] == 0) queue.addLast(next);\n            }\n        }\n        return processed == n ? answer : -1L;\n    }\n}\n",
+      "testCode": "check(() -> Solution.solve(new int[]{3, 5, 2, 4}, new int[][]{new int[]{0, 2}, new int[]{1, 2}, new int[]{2, 3}}), 11L, \"case 1\");\ncheck(() -> Solution.solve(new int[]{2, 7, 3}, new int[][]{}), 7L, \"case 2\");\ncheck(() -> Solution.solve(new int[]{1, 2}, new int[][]{new int[]{0, 1}, new int[]{1, 0}}), -1L, \"case 3\");\ncheck(() -> Solution.solve(new int[]{9}, new int[][]{}), 9L, \"case 4\");"
+    }
   }
 ]
