@@ -47,6 +47,22 @@ def sentences(narration: str) -> list[str]:
     return re.split(r'(?<=[.!?])\s+', ' '.join(narration.split()))
 
 
+def narration_segments(scene: dict) -> list[dict]:
+    """Display code literally while giving TTS an explicitly authored reading."""
+    segments = scene.get('segments')
+    if segments is None:
+        return [{'text': text, 'speech': text} for text in sentences(scene['narration'])]
+    if not isinstance(segments, list) or not segments:
+        raise ValueError('Narration needs at least one paired segment')
+    if any(not isinstance(item, dict) or
+           any(not isinstance(item.get(key), str) or not item[key].strip()
+               for key in ('text', 'speech')) for item in segments):
+        raise ValueError('Every subtitle needs a nonempty spoken reading')
+    if ' '.join(item['text'] for item in segments) != scene['narration']:
+        raise ValueError('Display transcript must match subtitle segments')
+    return segments
+
+
 def pcm_duration(path: Path) -> float:
     data = json.loads(run(['ffprobe', '-v', 'error', '-show_streams', '-of', 'json', str(path)]).stdout)
     stream = next(s for s in data['streams'] if s['codec_type'] == 'audio')
@@ -80,6 +96,8 @@ def fingerprint(lesson: dict) -> str:
 
 
 def render(lesson: dict, prior: dict | None, force: bool) -> dict:
+    for scene in lesson['scenes']:
+        narration_segments(scene)
     source_hash = fingerprint(lesson)
     if not force and prior and prior.get('sourceHash') == source_hash and len(prior.get('scenes', [])) == len(lesson['scenes']):
         try:
@@ -103,13 +121,13 @@ def render(lesson: dict, prior: dict | None, force: bool) -> dict:
             name = f"{lesson['id']:02d}-{index:02d}.mp3"
             text, encoded = work / 'speech.txt', work / name
             cues, parts, elapsed = [], [], 0.0
-            for number, sentence in enumerate(sentences(narration)):
+            for number, segment in enumerate(narration_segments(scene)):
                 sound = work / f'sentence-{number:03d}.aiff'
-                text.write_text(sentence, encoding='utf-8')
+                text.write_text(segment['speech'], encoding='utf-8')
                 run(['say', '-v', VOICE, '-r', str(RATE), '-f', str(text), '-o', str(sound)], timeout=120)
                 start = elapsed
                 elapsed += pcm_duration(sound)
-                cues.append({'start': round(start, 3), 'end': round(elapsed, 3), 'text': sentence})
+                cues.append({'start': round(start, 3), 'end': round(elapsed, 3), 'text': segment['text']})
                 parts.append(f"file '{sound.name}'")
             concat = work / 'sentences.txt'
             concat.write_text('\n'.join(parts) + '\n', encoding='utf-8')
