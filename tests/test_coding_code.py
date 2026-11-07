@@ -53,7 +53,8 @@ class CodeLinkDataTests(unittest.TestCase):
                             self.assertLessEqual(number, len(lines))
                             self.assertRegex(lines[number - 1], r'[^\s{};]')
                     total += 1
-        self.assertEqual(total, 620)
+        intro_count = sum(scene.get('introCueCount', 0) for lesson in lessons.values() for scene in lesson['scenes'])
+        self.assertEqual(total - intro_count, 620)
 
     def test_operation_explanations_point_to_the_operation_not_arbitrary_progress(self):
         links, problems = code_links(), content('coding-problems.json')
@@ -111,7 +112,7 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.errors, [])
 
     async def ready(self):
-        await self.page.waitForFunction('document.querySelector("#lessonAudio").readyState >= 1 && !document.querySelector("#lessonPlay").disabled && !document.querySelector("#lessonCodePanel").hidden')
+        await self.page.waitForFunction('document.querySelector("#lessonAudio").readyState >= 1 && !document.querySelector("#lessonPlay").disabled')
 
     async def select_problem(self, number):
         await self.page.evaluate('(n) => document.querySelectorAll("#problems button")[n - 1].click()', number)
@@ -129,6 +130,13 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
 
     async def current_lines(self, selector='#lessonCode'):
         return await self.page.JJeval(selector + ' .is-current', 'els => els.map(el => Number(el.dataset.line))')
+
+    async def seek_body(self, problem_id, scene=0):
+        cue_index = content('coding-lessons.json')[problem_id]['scenes'][scene].get('introCueCount', 0)
+        cue = tracks()[problem_id]['scenes'][scene]['cues'][cue_index]
+        await self.seek((cue['start'] + cue['end']) / 2)
+        await self.page.waitForFunction('!document.querySelector("#lessonCodePanel").hidden')
+        return cue_index
 
     async def assert_cue(self, problem_id, scene, cue):
         expected = code_links()[problem_id]['scenes'][scene]['cues'][cue]
@@ -164,7 +172,29 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.assert_cue(2, 3, 0)
         self.assertTrue(await self.page.Jeval('#lessonAudio', 'el => el.paused'))
         await self.select_problem(1)
-        await self.assert_cue(1, 0, 0)
+        body_cue = await self.seek_body(1)
+        await self.assert_cue(1, 0, body_cue)
+
+    async def test_problem_intro_hides_code_until_body_and_seek_back_restores_intro(self):
+        scene = content('coding-lessons.json')[1]['scenes'][0]
+        intro_count = scene['introCueCount']
+        cues = tracks()[1]['scenes'][0]['cues']
+        self.assertGreater(intro_count, 0)
+        self.assertLess(intro_count, len(cues))
+        self.assertTrue(await self.page.Jeval('#lessonCodePanel', 'el => el.hidden'))
+        self.assertEqual(await self.page.Jeval('#lessonSceneTitle', 'el => el.textContent'), '어떤 문제인가요?')
+        self.assertEqual(await self.page.Jeval('#lessonSubtitle', 'el => el.textContent'), cues[0]['text'])
+        await self.seek(cues[intro_count]['start'] - 0.05)
+        self.assertTrue(await self.page.Jeval('#lessonCodePanel', 'el => el.hidden'))
+        await self.seek(cues[intro_count]['start'])
+        await self.page.waitForFunction('!document.querySelector("#lessonCodePanel").hidden')
+        self.assertEqual(await self.page.Jeval('#lessonSceneTitle', 'el => el.textContent'), scene['title'])
+        await self.assert_cue(1, 0, intro_count)
+        await self.seek(0)
+        self.assertTrue(await self.page.Jeval('#lessonCodePanel', 'el => el.hidden'))
+        self.assertEqual(await self.page.Jeval('#lessonSceneTitle', 'el => el.textContent'), '어떤 문제인가요?')
+        self.assertEqual(await self.page.Jeval('#lessonSubtitle', 'el => el.textContent'), cues[0]['text'])
+        self.assertTrue(await self.page.Jeval('#lessonAudio', 'el => el.paused'))
 
     async def test_full_source_follows_only_inside_its_scroll_container(self):
         await self.select_problem(20)
@@ -194,6 +224,7 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.page.screenshot({'path': '/tmp/code-follow-mobile.png', 'fullPage': True})
 
     async def test_code_exposure_is_assistance_not_independent_completion(self):
+        await self.seek_body(1)
         await self.page.click('#lessonFullCode > summary')
         await self.page.waitForFunction('(key) => JSON.parse(localStorage.getItem(key)).records[1].lessonAssisted', {}, KEY)
         await self.page.click('#modePractice')
@@ -211,6 +242,7 @@ class CodeFollowBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.server.code_unavailable = True
         await self.page.reload()
         await self.ready()
+        await self.seek_body(1)
         self.assertEqual(await self.current_lines(), [])
         self.assertIn('불러오지 못', await self.page.Jeval('#lessonCodeNote', 'el => el.textContent'))
         await self.page.click('#lessonFullCode > summary')

@@ -29,7 +29,8 @@ class NarrationAuthoringTests(unittest.TestCase):
                                      [cue['text'] for cue in manifest[lesson['id']]['scenes'][index]['cues']])
                     self.assertTrue(all(len(part['text']) <= 100 for part in segments))
                     total += len(segments)
-        self.assertEqual(total, 620, 'Existing sentence events must keep their motion cue indices')
+        intro_count = sum(scene.get('introCueCount', 0) for lesson in lessons for scene in lesson['scenes'])
+        self.assertEqual(total - intro_count, 620, 'Original explanations must remain intact')
 
     def test_example_tokens_are_literal_in_subtitles(self):
         lessons = {item['id']: item for item in json.loads((ROOT / 'static/coding-lessons.json').read_text())}

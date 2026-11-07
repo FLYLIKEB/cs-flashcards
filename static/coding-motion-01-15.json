@@ -8,6 +8,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "요청 ID가 들어온 순서대로 담긴 배열을\n받아, 중복 요청을 한 번씩만 남기는\n문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "처음 나온 순서를 지킨 새 배열을\n반환하고, 대문자와 소문자는 서로 다른\nID로 봅니다.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "request0",
                 "label": "b",
                 "x": 90,
@@ -92,7 +122,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "request0",
@@ -179,7 +209,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "request0",
@@ -1665,6 +1695,51 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "결제 금액 배열과 목표 금액을 받아,\n합이 목표와 같은 서로 다른 두 결제의\n위치를 찾는 문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "여러 쌍이면 오른쪽 위치가 가장 앞선\n쌍을, 거기서도 같으면 왼쪽 위치가 앞선\n쌍을 반환해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "짝이 없으면 빈 배열을 반환합니다.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 3,
+            "nodes": [
+              {
                 "id": "v0",
                 "label": "4",
                 "x": 100,
@@ -1767,7 +1842,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 4,
             "nodes": [
               {
                 "id": "v0",
@@ -1872,7 +1947,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 5,
             "nodes": [
               {
                 "id": "v0",
@@ -1977,7 +2052,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 6,
             "nodes": [
               {
                 "id": "v0",
@@ -3592,6 +3667,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "오류 코드들이 담긴 배열에서, 가장 많이\n발생한 코드 하나를 골라 반환하는\n문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "횟수가 같으면 사전순으로 앞선 코드를\n고르고, 입력이 비어 있으면 빈 문자열을\n반환해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "timeout",
                 "label": "timeout",
                 "x": 170,
@@ -3640,7 +3745,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "timeout",
@@ -3691,7 +3796,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "timeout",
@@ -3742,7 +3847,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "timeout",
@@ -4619,6 +4724,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "이미 작은 수부터 정렬된 배열 두 개를\n받아, 같은 순서의 새 배열 하나로\n합치는 문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "같은 값도 모두 남기고 원본은 바꾸지\n않으며, 원소 수에 비례하는 시간 안에\n끝내야 해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "a0",
                 "label": "1",
                 "x": 220,
@@ -4712,7 +4847,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "a0",
@@ -4808,7 +4943,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "a0",
@@ -4904,7 +5039,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "a0",
@@ -6552,6 +6687,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "요청 수 배열과 여러 조회 구간을 받아,\n각 구간의 요청 수를 모두 더해 반환하는\n문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "구간의 양 끝도 포함해요. 예를 들어\n[0, 2]라면 0번부터 2번까지\n더합니다.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "src0",
                 "label": "2",
                 "x": 180,
@@ -6654,7 +6819,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "src0",
@@ -6759,7 +6924,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "src0",
@@ -8761,6 +8926,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "시간순 요청 수 배열에서, 연속한 정확히\nk개의 합이 가장 큰 구간을 찾는\n문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "중간 값을 건너뛸 수 없고, 반환할 답은\n구간의 위치가 아니라 그 합입니다.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "window",
                 "label": "",
                 "x": 85.0,
@@ -8863,7 +9058,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "window",
@@ -8968,7 +9163,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "window",
@@ -9073,7 +9268,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "window",
@@ -10781,6 +10976,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "세션 ID 배열에서, 같은 ID가 한\n번도 겹치지 않는 가장 긴 연속 구간의\n길이를 구해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "중간 항목을 빼고 이어 붙일 수 없으며,\n빈 배열의 답은 0이에요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "window",
                 "label": "",
                 "x": 85.0,
@@ -10874,7 +11099,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "window",
@@ -10970,7 +11195,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "window",
@@ -12582,6 +12807,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "양수로 된 처리량 배열과 목표량을 받아,\n합이 목표 이상인 가장 짧은 연속 구간의\n길이를 구해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "목표와 정확히 같지 않아도 괜찮고,\n가능한 구간이 없으면 0을 반환합니다.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "window",
                 "label": "",
                 "x": 85.0,
@@ -12693,7 +12948,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "window",
@@ -12807,7 +13062,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "window",
@@ -12921,7 +13176,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "window",
@@ -14899,6 +15154,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "소괄호·대괄호·중괄호로만 된 문자열을\n받아, 괄호가 올바른지 참이나 거짓으로\n답하는 문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "종류별 짝뿐 아니라 열고 닫는 순서도\n맞아야 하고, 빈 문자열은 올바른 것으로\n봅니다.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "base",
                 "label": "STACK",
                 "x": 200,
@@ -14947,7 +15232,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "base",
@@ -15013,7 +15298,7 @@
             ]
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "base",
@@ -15073,7 +15358,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "base",
@@ -16043,6 +16328,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "요청들의 응답시간 배열을 받아, 각 요청\n뒤에서 처음으로 더 오래 걸린 요청까지의\n거리를 구해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "거리는 배열 위치의 차이이고, 같은\n응답시간은 제외하며, 뒤에 더 큰 값이\n없으면 0이에요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "value0",
                 "label": "30",
                 "x": 115,
@@ -16154,7 +16469,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "value0",
@@ -16268,7 +16583,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "value0",
@@ -16382,7 +16697,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "value0",
@@ -18462,6 +18777,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "정렬된 시각 배열에서 기준 시각 이상인\n값이 처음 나오는 위치를 찾는 문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "같은 값이 여러 개면 가장 앞의 위치를,\n조건에 맞는 값이 없으면 배열 길이를\n반환해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "v0",
                 "label": "1",
                 "x": 105,
@@ -18537,7 +18882,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "v0",
@@ -18615,7 +18960,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "v0",
@@ -18693,7 +19038,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "v0",
@@ -20080,6 +20425,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "점검 시작과 끝 시각으로 된 여러 구간을\n받아, 겹치는 구간들을 합쳐 반환하는\n문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "끝과 시작이 맞닿아도 합치고, 원본을\n바꾸지 않은 채 결과를 시작 시각 순서로\n정리해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "merged",
                 "label": "1–3",
                 "x": 218,
@@ -20182,7 +20557,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "merged",
@@ -20287,7 +20662,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "merged",
@@ -20392,7 +20767,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "merged",
@@ -22262,6 +22637,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "서비스 사이의 양방향 연결과 출발·목표\n서비스를 받아, 최소 몇 번 연결을\n건너야 하는지 구해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "연결 한 번은 모두 같은 비용이며,\n목표에 갈 수 없으면 -1을 반환합니다.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "g0",
                 "label": "0 거리 0",
                 "x": 120,
@@ -22349,7 +22754,7 @@
             ]
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "g0",
@@ -22439,7 +22844,7 @@
             ]
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "g0",
@@ -23934,6 +24339,36 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "0과 1로 된 격자에서, 1인 칸들이\n서로 이어진 덩어리가 몇 개인지 세는\n문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "상하좌우로 닿아야 같은 덩어리이고,\n대각선은 제외하며 원본 격자는 바꾸지\n않아요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
                 "id": "cell0",
                 "label": "1",
                 "x": 220,
@@ -24045,7 +24480,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 3,
             "nodes": [
               {
                 "id": "cell0",
@@ -24159,7 +24594,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 4,
             "nodes": [
               {
                 "id": "cell0",
@@ -24284,7 +24719,7 @@
             ]
           },
           {
-            "cue": 3,
+            "cue": 5,
             "nodes": [
               {
                 "id": "cell0",
@@ -26358,6 +26793,51 @@
             "cue": 0,
             "nodes": [
               {
+                "id": "problem-introduction",
+                "label": "요청 시각과 제한 시간·횟수를 받아, 각\n요청을 받을지 거절할지 순서대로 판단하는\n문제예요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 1,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "최근 시간 범위에 허용한 요청이 한도보다\n적을 때만 새 요청을 받아요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 2,
+            "nodes": [
+              {
+                "id": "problem-introduction",
+                "label": "범위의 맨 왼쪽 시각과 거절한 요청은\n세지 않고, 같은 시각의 요청도 하나씩\n처리해요.",
+                "x": 320,
+                "y": 120,
+                "w": 600,
+                "h": 224,
+                "tone": "default"
+              }
+            ],
+            "edges": []
+          },
+          {
+            "cue": 3,
+            "nodes": [
+              {
                 "id": "req0",
                 "label": "t=0",
                 "x": 90,
@@ -26433,7 +26913,7 @@
             "edges": []
           },
           {
-            "cue": 1,
+            "cue": 4,
             "nodes": [
               {
                 "id": "req0",
@@ -26511,7 +26991,7 @@
             "edges": []
           },
           {
-            "cue": 2,
+            "cue": 5,
             "nodes": [
               {
                 "id": "req0",
@@ -26589,7 +27069,7 @@
             "edges": []
           },
           {
-            "cue": 3,
+            "cue": 6,
             "nodes": [
               {
                 "id": "req0",

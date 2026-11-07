@@ -7,31 +7,45 @@
       "id": 1,
       "scenes": [
         {
-          "src": "/static/coding-audio/01-01-395f84eaa25c.mp3",
-          "duration": 17.398,
+          "src": "/static/coding-audio/01-01-715fd73f77cb.mp3",
+          "duration": 29.741,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.96,
+              "end": 6.163,
+              "text": "요청 ID가 들어온 순서대로 담긴 배열을 받아, 중복 요청을 한 번씩만 남기는 문제예요."
+            },
+            {
+              "start": 6.163,
+              "end": 12.344,
+              "text": "처음 나온 순서를 지킨 새 배열을 반환하고, 대문자와 소문자는 서로 다른 ID로 봅니다."
+            },
+            {
+              "start": 12.344,
+              "end": 18.304,
               "text": "화면의 요청 ID는 b, a, b, c, a 순서로 들어와요."
             },
             {
-              "start": 5.96,
-              "end": 11.92,
+              "start": 18.304,
+              "end": 24.264,
               "text": "같은 요청을 2번 처리하면 안 되지만, 먼저 들어온 순서는 그대로 지켜야 해요."
             },
             {
-              "start": 11.92,
-              "end": 17.398,
+              "start": 24.264,
+              "end": 29.741,
               "text": "정렬하면 도착 순서가 바뀌니, 처음 본 요청만 결과로 옮긴다고 생각해 보세요."
             }
           ],
           "provenance": {
             "provider": "elevenlabs",
             "voice": "Yun",
-            "audioHash": "395f84eaa25cce8f1bcc2609ab4ed672e26bc2c59051cc60d7353e35d6ce7640",
-            "speechHash": "e2b661b547dec5bbc8e274655ade2304f67a98f94d8b917b3b4c7fa3b10c17ff",
-            "timing": "character-alignment"
+            "audioHash": "715fd73f77cb0350f6b2a6e7044d8fe76bf0d0217278cab887f422da3e6247bc",
+            "speechHash": "9c9d5a9cec888e5525185d7a3a19c2a5173b07b694a46ee8851ea1d9b4122908",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/01-01-395f84eaa25c.mp3"
           }
         },
         {
@@ -172,43 +186,62 @@
           }
         }
       ],
-      "sourceHash": "c952f31e0f82fafaafb7c4fa7f0706519fca562e4ad207438bf107c28f5ed9f5",
+      "sourceHash": "1529df346d0fb5d3d61c91fd0bcd9f71d578bc1c1c4d257cad0d8069efd22ccf",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 2,
       "scenes": [
         {
-          "src": "/static/coding-audio/02-01-6ab70201fea7.mp3",
-          "duration": 22.36,
+          "src": "/static/coding-audio/02-01-476d9d6ca94f.mp3",
+          "duration": 37.977,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.72,
+              "end": 6.599,
+              "text": "결제 금액 배열과 목표 금액을 받아, 합이 목표와 같은 서로 다른 두 결제의 위치를 찾는 문제예요."
+            },
+            {
+              "start": 6.599,
+              "end": 13.377,
+              "text": "여러 쌍이면 오른쪽 위치가 가장 앞선 쌍을, 거기서도 같으면 왼쪽 위치가 앞선 쌍을 반환해요."
+            },
+            {
+              "start": 13.377,
+              "end": 15.617,
+              "text": "짝이 없으면 빈 배열을 반환합니다."
+            },
+            {
+              "start": 15.617,
+              "end": 20.337,
               "text": "결제 금액 [4, 2, 4, 6]에서 합이 8이 되는 짝을 찾아볼게요."
             },
             {
-              "start": 4.72,
-              "end": 12.2,
+              "start": 20.337,
+              "end": 27.817,
               "text": "반환할 것은 금액이 아니라, 각 결제가 배열의 어디에 있는지를 나타내는 인덱스예요."
             },
             {
-              "start": 12.2,
-              "end": 16.16,
+              "start": 27.817,
+              "end": 31.777,
               "text": "같은 위치의 결제 1개를 2번 사용해서는 안 돼요."
             },
             {
-              "start": 16.16,
-              "end": 22.36,
+              "start": 31.777,
+              "end": 37.977,
               "text": "왼쪽부터 보면서, 현재 금액과 더해 8이 되는 값이 앞에 있었는지 찾아보세요."
             }
           ],
           "provenance": {
             "provider": "elevenlabs",
             "voice": "Yun",
-            "audioHash": "6ab70201fea75bc000cee0e66848c412a478b8587e070dbf56362eeb2e5b54d3",
-            "speechHash": "d3af2623187ad4edb9cbde87d506f9cfff8f5e66738b37c27729eae008cb47d7",
-            "timing": "character-alignment"
+            "audioHash": "476d9d6ca94fb79db86839e2514d76c86c6812b6041783e48d4cc5319e0c27f0",
+            "speechHash": "c7ef49ea740b3e2fbcfb0e3cbb6cee652dd4bddd5690dc283b7863718fcf8209",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 3,
+            "explanationSrc": "/static/coding-audio/02-01-6ab70201fea7.mp3"
           }
         },
         {
@@ -344,43 +377,57 @@
           }
         }
       ],
-      "sourceHash": "1e26ce867fee5fc92d47c0a09a5f845c03f21726b7b22c1b87061e756738f23b",
+      "sourceHash": "719ed4917e1eea32a71fc92f8949961297e1f754cfeff876b83530c3ba11efd9",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 3,
       "scenes": [
         {
-          "src": "/static/coding-audio/03-01-a8c6eeac8eab.mp3",
-          "duration": 22.16,
+          "src": "/static/coding-audio/03-01-756ad131597f.mp3",
+          "duration": 33.973,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.52,
+              "end": 5.919,
+              "text": "오류 코드들이 담긴 배열에서, 가장 많이 발생한 코드 하나를 골라 반환하는 문제예요."
+            },
+            {
+              "start": 5.919,
+              "end": 11.813,
+              "text": "횟수가 같으면 사전순으로 앞선 코드를 고르고, 입력이 비어 있으면 빈 문자열을 반환해요."
+            },
+            {
+              "start": 11.813,
+              "end": 17.333,
               "text": "오류 코드가 timeout, error, timeout, error 순서로 들어와요."
             },
             {
-              "start": 5.52,
-              "end": 11.04,
+              "start": 17.333,
+              "end": 22.853,
               "text": "둘 다 2번씩 나왔으므로, 횟수만으로는 어느 코드를 고를지 정할 수 없어요."
             },
             {
-              "start": 11.04,
-              "end": 17.28,
+              "start": 22.853,
+              "end": 29.093,
               "text": "이럴 때 사용할 규칙이 있어요: 횟수가 같으면 사전순으로 앞선 코드를 골라요."
             },
             {
-              "start": 17.28,
-              "end": 22.16,
+              "start": 29.093,
+              "end": 33.973,
               "text": "error가 사전순으로 앞서므로, 이번 예제의 답은 error여야 해요."
             }
           ],
           "provenance": {
             "provider": "elevenlabs",
             "voice": "Yun",
-            "audioHash": "a8c6eeac8eab87c890856b547439f62fa2ef15083c2f4c86021f2a311e2254bd",
-            "speechHash": "05a0d4e857212cad54982837933388f77cecce8d0288006a94539766596eb66b",
-            "timing": "character-alignment"
+            "audioHash": "756ad131597fe271744dbc5851a97d7e200749346f150a6781f6b379b67e0fa7",
+            "speechHash": "780c4ac14af0156cf8a73483f72c8c331f2bb09f603481faa98056396471d5ad",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/03-01-a8c6eeac8eab.mp3"
           }
         },
         {
@@ -516,43 +563,57 @@
           }
         }
       ],
-      "sourceHash": "1ecd4758e79ed7e1bfc05f174f084ee7f8f23a09b7e45924ef9fd161dbbf11bb",
+      "sourceHash": "88d53934a2965cf4c760f8e4390398873818dd51f84cf19667c0cb0f3633304a",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 4,
       "scenes": [
         {
-          "src": "/static/coding-audio/04-01-c194d312b576.mp3",
-          "duration": 20.56,
+          "src": "/static/coding-audio/04-01-19b5869e0079.mp3",
+          "duration": 32.741,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.64,
+              "end": 5.966,
+              "text": "이미 작은 수부터 정렬된 배열 두 개를 받아, 같은 순서의 새 배열 하나로 합치는 문제예요."
+            },
+            {
+              "start": 5.966,
+              "end": 12.181,
+              "text": "같은 값도 모두 남기고 원본은 바꾸지 않으며, 원소 수에 비례하는 시간 안에 끝내야 해요."
+            },
+            {
+              "start": 12.181,
+              "end": 16.821,
               "text": "첫 배열은 [1, 3, 3], 두 번째 배열은 [2, 3, 5]예요."
             },
             {
-              "start": 4.64,
-              "end": 9.36,
+              "start": 16.821,
+              "end": 21.541,
               "text": "각 배열 안에서는 이미 작은 값부터 정렬되어 있어요."
             },
             {
-              "start": 9.36,
-              "end": 14.24,
+              "start": 21.541,
+              "end": 26.421,
               "text": "이 순서를 활용하면, 합친 뒤 처음부터 다시 정렬할 필요가 없어요."
             },
             {
-              "start": 14.24,
-              "end": 20.56,
+              "start": 26.421,
+              "end": 32.741,
               "text": "두 배열의 맨 앞을 비교해 작은 값을 결과로 보내면, 결과도 작은 순서로 쌓여요."
             }
           ],
           "provenance": {
             "provider": "elevenlabs",
             "voice": "Yun",
-            "audioHash": "c194d312b576d43a4dada8ade3f10349a04d103ca60ffc46758748fee9c7b66e",
-            "speechHash": "a6f8ab3586cf993b5cb9d1b109a0bc4f9c6b3b5fe965da77e52c0bcb8ed20eae",
-            "timing": "character-alignment"
+            "audioHash": "19b5869e0079c519c607af4ad1c7a39760889d3bbde709630e519b7139a1fdad",
+            "speechHash": "413ffd13edb0cb1e63ae05dbe12322bd8b73e40b3c526e1c00bae28107dec7f4",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/04-01-c194d312b576.mp3"
           }
         },
         {
@@ -693,38 +754,52 @@
           }
         }
       ],
-      "sourceHash": "f86d36a82a6e91def6972f3ec560a2cc92e07522e6ce943f3e1d6feb82e91d78",
+      "sourceHash": "4e65c0946bb140a6dbf1d4a90d81c6e08c69cdc0c18dc2a4425c4095ab825ceb",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 5,
       "scenes": [
         {
-          "src": "/static/coding-audio/05-01-845b1bba8160.mp3",
-          "duration": 17.6,
+          "src": "/static/coding-audio/05-01-103753ec57a3.mp3",
+          "duration": 29.549,
           "cues": [
             {
               "start": 0.0,
-              "end": 6.0,
+              "end": 5.873,
+              "text": "요청 수 배열과 여러 조회 구간을 받아, 각 구간의 요청 수를 모두 더해 반환하는 문제예요."
+            },
+            {
+              "start": 5.873,
+              "end": 11.949,
+              "text": "구간의 양 끝도 포함해요. 예를 들어 [0, 2]라면 0번부터 2번까지 더합니다."
+            },
+            {
+              "start": 11.949,
+              "end": 17.949,
               "text": "요청 수 [2, 0, 3, 5]에서 여러 구간의 합을 구해 볼게요."
             },
             {
-              "start": 6.0,
-              "end": 10.84,
+              "start": 17.949,
+              "end": 22.789,
               "text": "구간마다 값을 다시 더하면, 겹치는 부분을 여러 번 계산하게 돼요."
             },
             {
-              "start": 10.84,
-              "end": 17.6,
+              "start": 22.789,
+              "end": 29.549,
               "text": "앞에서부터의 합을 미리 저장하면, 원하는 구간은 누적합 2개의 차이로 바로 구할 수 있어요."
             }
           ],
           "provenance": {
             "provider": "elevenlabs",
             "voice": "Yun",
-            "audioHash": "845b1bba81600676ddbc72b5d992aac76908bc39aacbb417f97a1469f9b833ba",
-            "speechHash": "b3852b97d6ae4d719422136ab4c6f7eae8b9c485f3643d4d30b42b6bb744a811",
-            "timing": "character-alignment"
+            "audioHash": "103753ec57a3a950cbffe0b2fdbc260d9c89e8d82286e40e8abec2224d0f1728",
+            "speechHash": "41f53f987cef213d2838e5b20737dc2f1ef7ea3c197fcc67a36c849ba5528653",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/05-01-845b1bba8160.mp3"
           }
         },
         {
@@ -865,37 +940,58 @@
           }
         }
       ],
-      "sourceHash": "aa583cfe48fa119150803bf23d70d9f36d54579844bc87ead43214b8fc01427c",
+      "sourceHash": "234108c8d198f646244ca351bc612ac9ab8d1c7ff4a8c16715a9916d8aaa9f11",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 6,
       "scenes": [
         {
-          "src": "/static/coding-audio/06-01.mp3",
-          "duration": 17.304,
+          "src": "/static/coding-audio/06-01-04ccddbc7ddb.mp3",
+          "duration": 28.64,
           "cues": [
             {
               "start": 0.0,
-              "end": 3.617,
+              "end": 6.023,
+              "text": "시간순 요청 수 배열에서, 연속한 정확히 k개의 합이 가장 큰 구간을 찾는 문제예요."
+            },
+            {
+              "start": 6.023,
+              "end": 11.337,
+              "text": "중간 값을 건너뛸 수 없고, 반환할 답은 구간의 위치가 아니라 그 합입니다."
+            },
+            {
+              "start": 11.337,
+              "end": 14.954,
               "text": "화면의 요청 수는 [2, 1, 5, 1, 3]이에요."
             },
             {
-              "start": 3.617,
-              "end": 8.061,
+              "start": 14.954,
+              "end": 19.398,
               "text": "연속한 3칸의 합을 비교해서, 그중 가장 큰 값을 찾을 거예요."
             },
             {
-              "start": 8.061,
-              "end": 11.704,
+              "start": 19.398,
+              "end": 23.041,
               "text": "이번 문제에서는 창의 길이를 항상 3칸으로 유지해야 해요."
             },
             {
-              "start": 11.704,
-              "end": 17.304,
+              "start": 23.041,
+              "end": 28.64,
               "text": "3칸짜리 창을 배열 위에 올리고, 오른쪽으로 1칸씩 민다고 생각해 보세요."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "04ccddbc7ddb6e70681cb92283236b5e4b5008a780d37e13ba4f884a4353bdf8",
+            "speechHash": "889746ead530e4053ee2c6305ee8749436fabc9f16fb6fbd599e8f0f181e7dbf",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/06-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/06-02.mp3",
@@ -997,31 +1093,53 @@
           ]
         }
       ],
-      "sourceHash": "8720eff59e01825b72e18849ff9d6491e71fd67c9f15fac38905074174fe20a8"
+      "sourceHash": "ba547a6001e692094999c059efbeee4c5ada9bf9c8b230990c78c339c1a3e007",
+      "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 7,
       "scenes": [
         {
-          "src": "/static/coding-audio/07-01.mp3",
-          "duration": 15.312,
+          "src": "/static/coding-audio/07-01-4a45037c032b.mp3",
+          "duration": 26.092,
           "cues": [
             {
               "start": 0.0,
-              "end": 3.748,
+              "end": 6.244,
+              "text": "세션 ID 배열에서, 같은 ID가 한 번도 겹치지 않는 가장 긴 연속 구간의 길이를 구해요."
+            },
+            {
+              "start": 6.244,
+              "end": 10.78,
+              "text": "중간 항목을 빼고 이어 붙일 수 없으며, 빈 배열의 답은 0이에요."
+            },
+            {
+              "start": 10.78,
+              "end": 14.528,
               "text": "세션 ID가 [a, b, b, a] 순서로 들어와요."
             },
             {
-              "start": 3.748,
-              "end": 9.538,
+              "start": 14.528,
+              "end": 20.318,
               "text": "중간을 건너뛸 수 없고, 고른 연속 구간 안에 같은 ID가 2번 들어가면 안 돼요."
             },
             {
-              "start": 9.538,
-              "end": 15.312,
+              "start": 20.318,
+              "end": 26.092,
               "text": "매번 구간을 새로 검사하는 대신, 중복 없는 창이 어디서 시작하는지 기억해 보세요."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "4a45037c032b4d1c04e852daf47df363edee5b990232a9739415e0de89b4edd5",
+            "speechHash": "4d8b9109d84af18c647c04c34015d7203d923fce3dbe59775a06d3b9299a0477",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/07-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/07-02.mp3",
@@ -1133,36 +1251,58 @@
           ]
         }
       ],
-      "sourceHash": "0c206c71fa7a76047f972674a0851b38f05082870688fddbb795fae741ff23f9"
+      "sourceHash": "e028c7c31888cf6400155d50b718e4a8be601148745e6f20122fded48c4daae7",
+      "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 8,
       "scenes": [
         {
-          "src": "/static/coding-audio/08-01.mp3",
-          "duration": 19.074,
+          "src": "/static/coding-audio/08-01-d0c0248d5e31.mp3",
+          "duration": 31.028,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.959,
+              "end": 6.592,
+              "text": "양수로 된 처리량 배열과 목표량을 받아, 합이 목표 이상인 가장 짧은 연속 구간의 길이를 구해요."
+            },
+            {
+              "start": 6.592,
+              "end": 11.954,
+              "text": "목표와 정확히 같지 않아도 괜찮고, 가능한 구간이 없으면 0을 반환합니다."
+            },
+            {
+              "start": 11.954,
+              "end": 16.913,
               "text": "배열 [2, 3, 1, 2, 4, 3]에서 목표 합 7을 채워 볼게요."
             },
             {
-              "start": 4.959,
-              "end": 9.889,
+              "start": 16.913,
+              "end": 21.843,
               "text": "합이 7 이상인 연속 구간 중에서, 길이가 가장 짧은 구간을 찾아야 해요."
             },
             {
-              "start": 9.889,
-              "end": 13.765,
+              "start": 21.843,
+              "end": 25.719,
               "text": "이 방법을 쓰려면 모든 값이 양수라는 조건이 중요해요."
             },
             {
-              "start": 13.765,
-              "end": 19.074,
+              "start": 25.719,
+              "end": 31.028,
               "text": "양수이므로 오른쪽에 넣으면 합이 커지고, 왼쪽에서 빼면 합이 작아져요."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "d0c0248d5e3185b425b3ce133917e7c22d3d1f1c74d7d260aaeca0811b1562e1",
+            "speechHash": "2dee2cfa712b2263a8eff1206a0414d43ebd85a325c611ad561a50fd4cdb23c5",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/08-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/08-02.mp3",
@@ -1279,42 +1419,57 @@
           ]
         }
       ],
-      "sourceHash": "8aa24426ddf82df0203a27a3e1cbe53bf563f29be04e80d1641949b3e9607d8e"
+      "sourceHash": "9897d0029d1471c6a86fa666bb78302e6f06f11b5343003db3c41a4ce7bc17ab",
+      "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 9,
       "scenes": [
         {
-          "src": "/static/coding-audio/09-01-116573e311ec.mp3",
-          "duration": 20.601,
+          "src": "/static/coding-audio/09-01-819d51aaa134.mp3",
+          "duration": 33.578,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.951,
+              "end": 7.056,
+              "text": "소괄호·대괄호·중괄호로만 된 문자열을 받아, 괄호가 올바른지 참이나 거짓으로 답하는 문제예요."
+            },
+            {
+              "start": 7.056,
+              "end": 12.976,
+              "text": "종류별 짝뿐 아니라 열고 닫는 순서도 맞아야 하고, 빈 문자열은 올바른 것으로 봅니다."
+            },
+            {
+              "start": 12.976,
+              "end": 17.927,
               "text": "화면처럼 {, [, ( 순서로 괄호를 열었다고 생각해 보세요."
             },
             {
-              "start": 4.951,
-              "end": 10.977,
+              "start": 17.927,
+              "end": 23.953,
               "text": "닫을 때는 반대로 ), ], } 순서여야 안쪽 괄호부터 짝이 맞아요."
             },
             {
-              "start": 10.977,
-              "end": 15.095,
+              "start": 23.953,
+              "end": 28.071,
               "text": "여는 괄호와 닫는 괄호의 개수만 같다고 정답은 아니에요."
             },
             {
-              "start": 15.095,
-              "end": 20.601,
+              "start": 28.071,
+              "end": 33.578,
               "text": "가장 최근에 연 괄호가 무엇인지 기억해야, 다음 닫는 괄호와 비교할 수 있어요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "116573e311ec2ebe2bc783d906c21be877929a40a3fb99ff9c127915fe7ec6f1",
-            "speechHash": "380e68dd1b16e41c02890c70748719cd66906ffdc013928965f02d2869c91217",
-            "timing": "measured-segments"
+            "audioHash": "819d51aaa1347cd5909ecf97d15e4da320babec930facac0a321ca304d1dd905",
+            "speechHash": "472324cf3a62faa3a7d899c7e3c4a77d61fcce53aef8cb3efad138b43496635a",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/09-01-116573e311ec.mp3"
           }
         },
         {
@@ -1450,43 +1605,57 @@
           }
         }
       ],
-      "sourceHash": "46dffb113d82667761c0f58503b9c16ee12ddd2ee22c8ab1a3d5f5fe1f0aed35",
+      "sourceHash": "ae03603a544c827e8c76d92bdd2be67a91a429b1da54f5da82f9c85adfd9f14f",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 10,
       "scenes": [
         {
-          "src": "/static/coding-audio/10-01-d3007d9bb91a.mp3",
-          "duration": 19.506,
+          "src": "/static/coding-audio/10-01-e8c9be2bbaab.mp3",
+          "duration": 32.337,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.761,
+              "end": 6.476,
+              "text": "요청들의 응답시간 배열을 받아, 각 요청 뒤에서 처음으로 더 오래 걸린 요청까지의 거리를 구해요."
+            },
+            {
+              "start": 6.476,
+              "end": 12.831,
+              "text": "거리는 배열 위치의 차이이고, 같은 응답시간은 제외하며, 뒤에 더 큰 값이 없으면 0이에요."
+            },
+            {
+              "start": 12.831,
+              "end": 17.592,
               "text": "응답시간 [30, 20, 20, 40]을 왼쪽부터 살펴볼게요."
             },
             {
-              "start": 4.761,
-              "end": 10.397,
+              "start": 17.592,
+              "end": 23.228,
               "text": "각 위치에서 오른쪽의 첫 더 큰 값까지, 인덱스가 얼마나 떨어졌는지 구해야 해요."
             },
             {
-              "start": 10.397,
-              "end": 15.295,
+              "start": 23.228,
+              "end": 28.126,
               "text": "20 다음의 20처럼 같은 값은, 더 큰 값을 찾았다고 볼 수 없어요."
             },
             {
-              "start": 15.295,
-              "end": 19.506,
+              "start": 28.126,
+              "end": 32.337,
               "text": "아직 답을 못 찾은 위치를 대기 명단처럼 스택에 쌓아 두세요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "d3007d9bb91aedf40fb19a94782239248c3cd3a16294fba8f826b6f38ebb5fc3",
-            "speechHash": "3ad73fee28e9ea2a3ee91ac8f998db40f94da19d0205996693159e136f726a25",
-            "timing": "measured-segments"
+            "audioHash": "e8c9be2bbaab2aa30e50b80b5d8876e4a02b4d3b1baab42df0681834e815569c",
+            "speechHash": "3c54a4208aab2a20f020e871743f9c70e84c654a6a44ce665047616658451bbf",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/10-01-d3007d9bb91a.mp3"
           }
         },
         {
@@ -1627,43 +1796,57 @@
           }
         }
       ],
-      "sourceHash": "95a5e41f9c5f4d48ed1c7e6207264251f395777d2a648ea214cd314c9c175ae0",
+      "sourceHash": "756a7f5a0e25a0599a707cc9282bc5c5a11857ddc0bda185bb9d2b18b600f503",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 11,
       "scenes": [
         {
-          "src": "/static/coding-audio/11-01-a3eddce02c1e.mp3",
-          "duration": 19.082,
+          "src": "/static/coding-audio/11-01-11d30aa4aacc.mp3",
+          "duration": 30.871,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.474,
+              "end": 5.446,
+              "text": "정렬된 시각 배열에서 기준 시각 이상인 값이 처음 나오는 위치를 찾는 문제예요."
+            },
+            {
+              "start": 5.446,
+              "end": 11.789,
+              "text": "같은 값이 여러 개면 가장 앞의 위치를, 조건에 맞는 값이 없으면 배열 길이를 반환해요."
+            },
+            {
+              "start": 11.789,
+              "end": 16.263,
               "text": "배열 [1, 2, 2, 5]에서 기준값 2를 찾아볼게요."
             },
             {
-              "start": 4.474,
-              "end": 9.18,
+              "start": 16.263,
+              "end": 20.969,
               "text": "아무 2나 찾는 게 아니라, 값이 2 이상이 되는 첫 위치를 찾는 문제예요."
             },
             {
-              "start": 9.18,
-              "end": 13.685,
+              "start": 20.969,
+              "end": 25.474,
               "text": "인덱스는 0부터 세므로, 답은 첫 2가 있는 인덱스 1이에요."
             },
             {
-              "start": 13.685,
-              "end": 19.082,
+              "start": 25.474,
+              "end": 30.871,
               "text": "즉, 기준에 못 미치는 값과 기준을 만족하는 값 사이의 경계를 찾으면 됩니다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "a3eddce02c1ee23e841bd76d8eac3349ee5ef39aa4b3a6fcd690eee8f5fb5f64",
-            "speechHash": "c232f498a497795fd100d40e97ce483833b240b0b334f451fc5380d11341a606",
-            "timing": "measured-segments"
+            "audioHash": "11d30aa4aaccefaaa25645a44152401af09333146697e9522281f46f3eb5bfce",
+            "speechHash": "fcd81638fc7ccc89a73c2e82862f946ef670af0645edb11313012e10f5e8dfaf",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/11-01-a3eddce02c1e.mp3"
           }
         },
         {
@@ -1804,43 +1987,57 @@
           }
         }
       ],
-      "sourceHash": "248e344af2c08e4ec3572d7cd472ae1f8be5ecd802cf0a59bce244c65050543c",
+      "sourceHash": "2356e18178aaa0fdc2d78f14ddbf6e2136c811fe2a29fb75779184926fdc34b0",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 12,
       "scenes": [
         {
-          "src": "/static/coding-audio/12-01-fd33f1f0396a.mp3",
-          "duration": 21.76,
+          "src": "/static/coding-audio/12-01-e35d9a81c078.mp3",
+          "duration": 34.04,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.913,
+              "end": 6.105,
+              "text": "점검 시작과 끝 시각으로 된 여러 구간을 받아, 겹치는 구간들을 합쳐 반환하는 문제예요."
+            },
+            {
+              "start": 6.105,
+              "end": 12.28,
+              "text": "끝과 시작이 맞닿아도 합치고, 원본을 바꾸지 않은 채 결과를 시작 시각 순서로 정리해요."
+            },
+            {
+              "start": 12.28,
+              "end": 18.193,
               "text": "점검 구간 [5, 7], [1, 3], [3, 6]을 하나씩 살펴볼게요."
             },
             {
-              "start": 5.913,
-              "end": 10.953,
+              "start": 18.193,
+              "end": 23.233,
               "text": "입력 순서로는 시작점이 뒤섞여 있어, 무엇과 겹치는지 보기 어려워요."
             },
             {
-              "start": 10.953,
-              "end": 17.33,
+              "start": 23.233,
+              "end": 29.61,
               "text": "시작 시각으로 정렬하면 [1, 3], [3, 6], [5, 7] 순서가 됩니다."
             },
             {
-              "start": 17.33,
-              "end": 21.76,
+              "start": 29.61,
+              "end": 34.04,
               "text": "이제 새 구간이 올 때, 직전에 만든 결과 구간과만 비교하면 돼요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "fd33f1f0396af5190a1eb472f2d597621826d8b68a0c3b3bd3fff6f8b3e1a920",
-            "speechHash": "ca4bcd6b52cb2b02817c1fc05fdcd3d2b6956ea3e13bbe130178378bbbc12cd1",
-            "timing": "measured-segments"
+            "audioHash": "e35d9a81c0780e6248689dab4bf2e49878fb90fa849c23402d432292b9622667",
+            "speechHash": "e75156c850e7bc1a847fdd5d76c2661f4615453ed7f4aa342d74833179c70ad4",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/12-01-fd33f1f0396a.mp3"
           }
         },
         {
@@ -1986,38 +2183,52 @@
           }
         }
       ],
-      "sourceHash": "ae3662dc9b0610dde2e588b55369cbfdcd67e31c851b2c27963476f8766f6c7b",
+      "sourceHash": "8852171a5e5d270b21d281dc8bcff27205344324d4c1cc247a7170575b0beacf",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 13,
       "scenes": [
         {
-          "src": "/static/coding-audio/13-01-ad98f59baf08.mp3",
-          "duration": 14.368,
+          "src": "/static/coding-audio/13-01-100cba04dd00.mp3",
+          "duration": 27.111,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.698,
+              "end": 7.254,
+              "text": "서비스 사이의 양방향 연결과 출발·목표 서비스를 받아, 최소 몇 번 연결을 건너야 하는지 구해요."
+            },
+            {
+              "start": 7.254,
+              "end": 12.743,
+              "text": "연결 한 번은 모두 같은 비용이며, 목표에 갈 수 없으면 -1을 반환합니다."
+            },
+            {
+              "start": 12.743,
+              "end": 17.441,
               "text": "서비스 0에서 2까지 가려면, 최소 몇 번 연결을 건너야 할까요?"
             },
             {
-              "start": 4.698,
-              "end": 9.152,
+              "start": 17.441,
+              "end": 21.895,
               "text": "0은 1과 3에 연결되고, 1과 3은 각각 2로 이어져 있어요."
             },
             {
-              "start": 9.152,
-              "end": 14.368,
+              "start": 21.895,
+              "end": 27.111,
               "text": "모든 연결의 이동 비용이 같으니, 가까운 곳부터 한 층씩 확인하면 됩니다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "ad98f59baf081536505012a660a2be4fe54c123c758600324ba056b19a761fec",
-            "speechHash": "b65d692c99cac842c89f01e061b21c0dc4d7415006be8e97324f86bc9af9ea18",
-            "timing": "measured-segments"
+            "audioHash": "100cba04dd005003f998a9e4c38e86cee0d578048db44c045b8214e13475c757",
+            "speechHash": "f3326ef3088e56a530ea65d8b04386557c8e6fe6dd3bac854785e9d0a9de4054",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/13-01-ad98f59baf08.mp3"
           }
         },
         {
@@ -2148,43 +2359,57 @@
           }
         }
       ],
-      "sourceHash": "2fdfe960c89a81509387f30d970e939421e05fba89de22907ce917cd9b0a9c67",
+      "sourceHash": "95d4b4a2730acd9f8dab390239a74c771a60d5f5a153faf4164da0428d74322c",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 14,
       "scenes": [
         {
-          "src": "/static/coding-audio/14-01-c85eaa3b53b6.mp3",
-          "duration": 20.607,
+          "src": "/static/coding-audio/14-01-82f1cdd7add9.mp3",
+          "duration": 31.922,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.566,
+              "end": 5.628,
+              "text": "0과 1로 된 격자에서, 1인 칸들이 서로 이어진 덩어리가 몇 개인지 세는 문제예요."
+            },
+            {
+              "start": 5.628,
+              "end": 11.315,
+              "text": "상하좌우로 닿아야 같은 덩어리이고, 대각선은 제외하며 원본 격자는 바꾸지 않아요."
+            },
+            {
+              "start": 11.315,
+              "end": 15.881,
               "text": "격자에서 값 1은 장애가 난 칸, 값 0은 장애가 없는 칸이에요."
             },
             {
-              "start": 4.566,
-              "end": 10.456,
+              "start": 15.881,
+              "end": 21.771,
               "text": "세 줄은 각각 [1, 1, 0], [0, 1, 0], [1, 0, 1]입니다."
             },
             {
-              "start": 10.456,
-              "end": 15.62,
+              "start": 21.771,
+              "end": 26.935,
               "text": "1인 칸은 5개지만, 서로 이어진 덩어리로 묶으면 장애 구역은 3개예요."
             },
             {
-              "start": 15.62,
-              "end": 20.607,
+              "start": 26.935,
+              "end": 31.922,
               "text": "이 문제는 상하좌우만 연결하므로, 대각선으로 닿은 칸은 다른 구역입니다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "c85eaa3b53b6ce852fe79ed28b7b68b61503080bb21c6d2a999fdbf0985c2f17",
-            "speechHash": "130dc2f9b3218408bc45179ef6ef396bd692db8b18046303ddb7a21b6587da6e",
-            "timing": "measured-segments"
+            "audioHash": "82f1cdd7add93965af479d0b0333e7044aacfcf4f5833feb3db7242e26f654e2",
+            "speechHash": "5af385be01a2ea50a4ce3092b02006cf710b1f7961175a95de67ae66317bfa70",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/14-01-c85eaa3b53b6.mp3"
           }
         },
         {
@@ -2325,43 +2550,62 @@
           }
         }
       ],
-      "sourceHash": "6bb98eb8ed16c482918bc68f1f6b7b07747fa12c7598d6adf0a6db34b1f228f2",
+      "sourceHash": "de6c9d0a219b9025996367f5fecb995e4fa96839973ee0e0984c8e6cb3516595",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 15,
       "scenes": [
         {
-          "src": "/static/coding-audio/15-01-fc012ab086af.mp3",
-          "duration": 19.058,
+          "src": "/static/coding-audio/15-01-ef479501eba6.mp3",
+          "duration": 36.465,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.027,
+              "end": 6.917,
+              "text": "요청 시각과 제한 시간·횟수를 받아, 각 요청을 받을지 거절할지 순서대로 판단하는 문제예요."
+            },
+            {
+              "start": 6.917,
+              "end": 11.496,
+              "text": "최근 시간 범위에 허용한 요청이 한도보다 적을 때만 새 요청을 받아요."
+            },
+            {
+              "start": 11.496,
+              "end": 17.407,
+              "text": "범위의 맨 왼쪽 시각과 거절한 요청은 세지 않고, 같은 시각의 요청도 하나씩 처리해요."
+            },
+            {
+              "start": 17.407,
+              "end": 21.434,
               "text": "요청이 들어온 시각은 [0, 0, 1, 10, 10]이에요."
             },
             {
-              "start": 4.027,
-              "end": 9.19,
+              "start": 21.434,
+              "end": 26.597,
               "text": "최근 10초 안에 허용한 요청이 2개 미만일 때만, 새 요청을 받습니다."
             },
             {
-              "start": 9.19,
-              "end": 14.057,
+              "start": 26.597,
+              "end": 31.464,
               "text": "거절한 요청은 실제로 허용한 적이 없으므로, 제한 횟수에 넣지 않아요."
             },
             {
-              "start": 14.057,
-              "end": 19.058,
+              "start": 31.464,
+              "end": 36.465,
               "text": "큐에는 현재 시간창 안에 남아 있는 허용 요청만 보관한다고 생각해 보세요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "fc012ab086af2bb1f7a145f8455ea35ebaedebe10479c1d50cf552b08f5060b8",
-            "speechHash": "ee725c2546bd5109c0139e4f7f6fc814f26c5775a52e8a5578922d6df7895104",
-            "timing": "measured-segments"
+            "audioHash": "ef479501eba619990b74d4ac6760ab77762e04008eba52941cb1a2bfddf17e3f",
+            "speechHash": "ffdb695e3f4df6aea0a4eba5aa8bf855838a2a0396f21db6db79d147750ad415",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 3,
+            "explanationSrc": "/static/coding-audio/15-01-fc012ab086af.mp3"
           }
         },
         {
@@ -2507,43 +2751,57 @@
           }
         }
       ],
-      "sourceHash": "e4fc891848612d9af65ad452224680bf4c7dac8aac286b4e0d2e6d2bbd835405",
+      "sourceHash": "e81d5811ee73fdd22a68d73e6b649a0989ed587323b92e1679f8c3b23718db13",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 16,
       "scenes": [
         {
-          "src": "/static/coding-audio/16-01-0c9d55b4c939.mp3",
-          "duration": 21.602,
+          "src": "/static/coding-audio/16-01-6fb4c5b176aa.mp3",
+          "duration": 32.924,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.595,
+              "end": 5.722,
+              "text": "응답시간 배열에서 가장 느린 요청 k개를 골라, 큰 값부터 반환하는 문제예요."
+            },
+            {
+              "start": 5.722,
+              "end": 11.322,
+              "text": "같은 응답시간도 별개 요청이므로 모두 세고, k가 0이면 빈 배열을 반환해요."
+            },
+            {
+              "start": 11.322,
+              "end": 16.917,
               "text": "응답시간 [5, 1, 5, 3, 9]에서 가장 큰 값 3개를 찾아볼게요."
             },
             {
-              "start": 5.595,
-              "end": 10.404,
+              "start": 16.917,
+              "end": 21.726,
               "text": "중복된 응답도 각각 세므로, 정답은 [9, 5, 5]예요."
             },
             {
-              "start": 10.404,
-              "end": 16.137,
+              "start": 21.726,
+              "end": 27.459,
               "text": "전체를 계속 정렬하는 대신, 지금까지 본 값 중 상위 3개만 보관해 봅시다."
             },
             {
-              "start": 16.137,
-              "end": 21.602,
+              "start": 27.459,
+              "end": 32.924,
               "text": "후보 중 최솟값을 빨리 알 수 있으면, 새 값을 넣을지 쉽게 결정할 수 있어요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "0c9d55b4c93980d0bd5af7f699a6b741168174430bf727c7894d1440a06943d1",
-            "speechHash": "f4476196360b51f18d2333ea45a41094379d88a809df7f4da6e6e9c881acd1c9",
-            "timing": "measured-segments"
+            "audioHash": "6fb4c5b176aa20244e5a0ac620c98eb64f19d1f60defae6ebfd3bb882d2b8c25",
+            "speechHash": "1f4954a573d41f4ee90d9f967f8f67a38900aafdbe7604d6f4c421025584c90e",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/16-01-0c9d55b4c939.mp3"
           }
         },
         {
@@ -2689,43 +2947,57 @@
           }
         }
       ],
-      "sourceHash": "38c8f3e91c0a1ad2bb5cd578e2f28bb49ad363b391e56de683da83a22972ac76",
+      "sourceHash": "80dfad0d00f6fadcc2c81c8163384f0d67e3bcb07d978e1cb8f9451b58abd79f",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 17,
       "scenes": [
         {
-          "src": "/static/coding-audio/17-01-4033787c90cb.mp3",
-          "duration": 19.905,
+          "src": "/static/coding-audio/17-01-68466c7bab85.mp3",
+          "duration": 32.382,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.015,
+              "end": 6.349,
+              "text": "작업마다 시작과 종료 시각이 주어질 때, 모든 작업을 제시간에 시작할 최소 워커 수를 구해요."
+            },
+            {
+              "start": 6.349,
+              "end": 12.477,
+              "text": "워커 하나는 한 번에 한 작업만 맡지만, 작업이 끝난 시각에는 바로 다른 작업에 쓸 수 있어요."
+            },
+            {
+              "start": 12.477,
+              "end": 16.492,
               "text": "작업 구간은 [0, 5), [2, 7), [5, 8)이에요."
             },
             {
-              "start": 4.015,
-              "end": 9.26,
+              "start": 16.492,
+              "end": 21.737,
               "text": "각 작업은 기다렸다가 실행할 수 없고, 정해진 시작 시각에 바로 시작해야 합니다."
             },
             {
-              "start": 9.26,
-              "end": 14.837,
+              "start": 21.737,
+              "end": 27.314,
               "text": "그래서 동시에 진행 중인 작업 수가 가장 많을 때, 그만큼의 워커가 필요해요."
             },
             {
-              "start": 14.837,
-              "end": 19.905,
+              "start": 27.314,
+              "end": 32.382,
               "text": "작업이 끝나면 워커를 돌려받아, 다음 작업에 다시 쓴다고 생각해 보세요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "4033787c90cbe1d5c572249bd87919f7a51e4224fb863b80f5a15dfc4891d579",
-            "speechHash": "9b829b0424b068e3bfa5c49afa13191f99eea7be90d7a9952a3fe09679c34fd5",
-            "timing": "measured-segments"
+            "audioHash": "68466c7bab85766c2c1451dc0750860fdf4aebcf5ac5d37ceccb47797740353d",
+            "speechHash": "8e396d84508d91d35670de1be5840545aa0d27e92ef12112a1162ada19e94d6e",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/17-01-4033787c90cb.mp3"
           }
         },
         {
@@ -2861,43 +3133,57 @@
           }
         }
       ],
-      "sourceHash": "bde7183176f141149cb2ac34d858ab25174302cdbdd41446550296c867008334",
+      "sourceHash": "cc37de9fdf1205fbb2d593624dd64c40c6dc4c46c8e3ecb4468bc14c1ab4036c",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 18,
       "scenes": [
         {
-          "src": "/static/coding-audio/18-01-b2dae734dada.mp3",
-          "duration": 20.204,
+          "src": "/static/coding-audio/18-01-6994112e9d98.mp3",
+          "duration": 32.67,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.516,
+              "end": 6.035,
+              "text": "작업 크기 배열과 마감 일수가 주어질 때, 마감 안에 처리할 수 있는 최소 하루 용량을 구해요."
+            },
+            {
+              "start": 6.035,
+              "end": 12.466,
+              "text": "작업을 쪼개거나 순서를 바꿀 수 없고, 매일 이어진 작업들을 묶어 그 합이 용량 이하여야 해요."
+            },
+            {
+              "start": 12.466,
+              "end": 17.982,
               "text": "작업 크기 [1, 2, 3, 4, 5]를 입력 순서대로 3일 안에 처리하려고 해요."
             },
             {
-              "start": 5.516,
-              "end": 9.593,
+              "start": 17.982,
+              "end": 22.059,
               "text": "매일 사용할 수 있는 용량을 얼마로 잡아야 가장 작을까요?"
             },
             {
-              "start": 9.593,
-              "end": 14.569,
+              "start": 22.059,
+              "end": 27.035,
               "text": "용량을 하나 정해 보면, 그 용량으로 마감 안에 처리할 수 있는지 확인할 수 있어요."
             },
             {
-              "start": 14.569,
-              "end": 20.204,
+              "start": 27.035,
+              "end": 32.67,
               "text": "어떤 용량에서 가능했다면 더 큰 용량에서도 가능하다는 점이 탐색의 핵심입니다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "b2dae734dada2be76b500e8013412edaae73715f89a5b299b3c17330ef53ee26",
-            "speechHash": "db81b8fff86a511a08581e76acbd8d374b366c1c163d2b9816f5a6d8d551d52c",
-            "timing": "measured-segments"
+            "audioHash": "6994112e9d98e5af52ef21f5754bfa1b56c5d7a975af63775375c7e58729baec",
+            "speechHash": "5002000364eea45c834b4612e65c603e0ea16447a091d640e99ad643a6887c06",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/18-01-b2dae734dada.mp3"
           }
         },
         {
@@ -3038,43 +3324,57 @@
           }
         }
       ],
-      "sourceHash": "3e8a1e5b1556efad41f1966e4fc61934968bf4f382b1e456e0ab1144f1e30de5",
+      "sourceHash": "709e4d282629c648500beccbaaab5991bf10cb5df5c6a3bf2fef44bb8360c37a",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 19,
       "scenes": [
         {
-          "src": "/static/coding-audio/19-01-8b22f44e5a5f.mp3",
-          "duration": 20.786,
+          "src": "/static/coding-audio/19-01-c7de12c70c10.mp3",
+          "duration": 32.306,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.556,
+              "end": 6.337,
+              "text": "로그 변화량 배열에서, 합이 목표량과 정확히 같은 연속 구간이 몇 개인지 구하는 문제예요."
+            },
+            {
+              "start": 6.337,
+              "end": 11.519,
+              "text": "변화량에는 음수와 0도 들어갈 수 있고, 아무 값도 없는 빈 구간은 세지 않아요."
+            },
+            {
+              "start": 11.519,
+              "end": 17.075,
               "text": "로그 변화량 [1, -1, 1]에서 합이 정확히 1인 연속 구간을 찾아볼게요."
             },
             {
-              "start": 5.556,
-              "end": 10.878,
+              "start": 17.075,
+              "end": 22.397,
               "text": "첫 1, 마지막 1, 배열 전체의 합이 모두 1이므로, 답은 3개 구간입니다."
             },
             {
-              "start": 10.878,
-              "end": 16.041,
+              "start": 22.397,
+              "end": 27.56,
               "text": "음수를 더하면 합이 줄어들 수 있어, 창을 늘리면 합도 커진다고 볼 수 없어요."
             },
             {
-              "start": 16.041,
-              "end": 20.786,
+              "start": 27.56,
+              "end": 32.306,
               "text": "대신 앞에서부터 더한 누적합이 이전에 몇 번 나왔는지 기록해 봅시다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "8b22f44e5a5f3d6a505b238a58e72b8830d148196a98d269249afca47b8ff708",
-            "speechHash": "5d0a289d2d3e0c316c7a3850689b7451de9a8c7fb89a70b39dda2f1117236028",
-            "timing": "measured-segments"
+            "audioHash": "c7de12c70c102f1449e1c1bd8ce5db8ec5539cf00eade342ece73cb41dbfc3fd",
+            "speechHash": "f570e4df606a968180e2426ddbd519f9e5e17b5bf1ed2957a541c62f65c05308",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/19-01-8b22f44e5a5f.mp3"
           }
         },
         {
@@ -3220,43 +3520,57 @@
           }
         }
       ],
-      "sourceHash": "c67e41a32f55de9dfdbf4f69581f83b69941f15d640c1781897c904b883e85ee",
+      "sourceHash": "1232cd86fe26776e8566777848340a11beae5123f325c874fd0446a502920a9b",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 20,
       "scenes": [
         {
-          "src": "/static/coding-audio/20-01-4fffd7cf5198.mp3",
-          "duration": 20.76,
+          "src": "/static/coding-audio/20-01-c0b998580e49.mp3",
+          "duration": 33.722,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.323,
+              "end": 6.395,
+              "text": "이동 방향과 비용이 적힌 연결들을 받아, 출발점에서 목표까지 가는 최소 총비용을 구해요."
+            },
+            {
+              "start": 6.395,
+              "end": 12.961,
+              "text": "화살표 방향으로만 이동할 수 있고, 비용은 음수가 아니며, 갈 수 없으면 -1을 반환해요."
+            },
+            {
+              "start": 12.961,
+              "end": 18.284,
               "text": "정점 0에서 정점 3까지, 비용이 가장 적게 드는 경로를 찾아볼게요."
             },
             {
-              "start": 5.323,
-              "end": 11.148,
+              "start": 18.284,
+              "end": 24.109,
               "text": "0에서 1로 바로 가면 비용이 8이지만, 2를 거쳐 가면 2 + 1 = 3이에요."
             },
             {
-              "start": 11.148,
-              "end": 15.406,
+              "start": 24.109,
+              "end": 28.367,
               "text": "연결을 적게 건너는 길이 반드시 더 싼 길은 아니라는 뜻입니다."
             },
             {
-              "start": 15.406,
-              "end": 20.76,
+              "start": 28.367,
+              "end": 33.722,
               "text": "그래서 지금까지 발견한 후보 중, 누적 비용이 가장 작은 곳부터 확인해요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "4fffd7cf51988f042cc8ca06468a68c9953c1d96fcb09d35ab533f52d23f7579",
-            "speechHash": "9aefb41459b5b24bf8c322513e9c9cfb0b2dcb1d3fad1770f479a40d312fc6e3",
-            "timing": "measured-segments"
+            "audioHash": "c0b998580e49f9e7dd84746c4f4ed33fa42f3f9ea6863a12ea8692d4bdec9535",
+            "speechHash": "e1bf356aa671d673a6045fa8e0fc2ea708e2f6ef220c4efa48bd176b26826931",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/20-01-4fffd7cf5198.mp3"
           }
         },
         {
@@ -3392,43 +3706,57 @@
           }
         }
       ],
-      "sourceHash": "51786ed6c6b2525023268655ca50b1ecbbb7b4bd1c25ae0ace1c65cc271ae557",
+      "sourceHash": "33759ec0b017fb539efbd0ac23b1ec08cb6d99e769cc0e6a4ccb2f1a7a0cdb49",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 21,
       "scenes": [
         {
-          "src": "/static/coding-audio/21-01-aa25c61166ba.mp3",
-          "duration": 20.491,
+          "src": "/static/coding-audio/21-01-898bb7afec21.mp3",
+          "duration": 33.988,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.018,
+              "end": 6.093,
+              "text": "먼저 끝내야 할 작업 관계를 받아, 그 조건을 지키는 전체 실행 순서를 반환하는 문제예요."
+            },
+            {
+              "start": 6.093,
+              "end": 13.498,
+              "text": "여러 순서가 가능하면 앞 번호부터 비교해 가장 작은 순서를 고르고, 서로 기다려 실행이 불가능하면 빈 배열이에요."
+            },
+            {
+              "start": 13.498,
+              "end": 18.516,
               "text": "화살표를 보면 작업 0과 1이 모두 끝나야 작업 2를 시작할 수 있어요."
             },
             {
-              "start": 5.018,
-              "end": 9.325,
+              "start": 18.516,
+              "end": 22.823,
               "text": "작업 3은 기다릴 선행 작업이 없으니 바로 실행할 수 있어요."
             },
             {
-              "start": 9.325,
-              "end": 15.486,
+              "start": 22.823,
+              "end": 28.984,
               "text": "조건을 지키는 순서가 여러 개라면, 앞쪽 번호부터 비교해 가장 작은 순서를 원해요."
             },
             {
-              "start": 15.486,
-              "end": 20.491,
+              "start": 28.984,
+              "end": 33.988,
               "text": "그래서 지금 실행 가능한 작업 중 가장 작은 번호를 하나씩 고르면 됩니다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "aa25c61166bac657477a67e6e80575515645cef8b44956f98f2c8f77e8a1052f",
-            "speechHash": "d0df7d96e378ccb483ed5c7dc599d6f8ac60b03797637dcc89525c9beeccd3fb",
-            "timing": "measured-segments"
+            "audioHash": "898bb7afec21fc578eaab3fd67752e7b7a1b540345b612854142e49e79c87456",
+            "speechHash": "6dc43685e10a1f217fa432781418576ecb57750973468684e7a96307ced9d9f3",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/21-01-aa25c61166ba.mp3"
           }
         },
         {
@@ -3569,43 +3897,57 @@
           }
         }
       ],
-      "sourceHash": "b1629bbd092e8b4d8da84681e41980323275a5156c5e4710dd690bb168f2fd3e",
+      "sourceHash": "3e4becdf9bbd70395e7269ef26baa1040e3402a417765c7469eaf906f327eb0b",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 22,
       "scenes": [
         {
-          "src": "/static/coding-audio/22-01-3cd186a7a514.mp3",
-          "duration": 19.306,
+          "src": "/static/coding-audio/22-01-14a9ac035190.mp3",
+          "duration": 32.194,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.529,
+              "end": 6.476,
+              "text": "사용할 수 있는 패키지 크기들과 목표량을 받아, 합을 정확히 맞출 최소 패키지 개수를 구해요."
+            },
+            {
+              "start": 6.476,
+              "end": 12.888,
+              "text": "같은 크기를 여러 번 써도 되고, 만들 수 없으면 -1, 목표가 0이면 0을 반환해요."
+            },
+            {
+              "start": 12.888,
+              "end": 17.417,
               "text": "크기 1, 3, 4인 패키지로 정확히 6을 만드는 상황을 볼게요."
             },
             {
-              "start": 4.529,
-              "end": 9.484,
+              "start": 17.417,
+              "end": 22.372,
               "text": "가장 큰 4부터 고르면 1이 2개 더 필요해서, 총 3개를 쓰게 돼요."
             },
             {
-              "start": 9.484,
-              "end": 14.009,
+              "start": 22.372,
+              "end": 26.897,
               "text": "그런데 3을 2개 고르면 6이 되니, 2개만으로도 충분해요."
             },
             {
-              "start": 14.009,
-              "end": 19.306,
+              "start": 26.897,
+              "end": 32.194,
               "text": "이런 차이를 놓치지 않도록, 작은 목표의 최소 개수부터 차례로 계산해 봅시다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "3cd186a7a5148f2c46e23bd410dbbe0eccd09a31e9a56b1df12ef58bca5b7767",
-            "speechHash": "d244f54f68ba47e9592760eee5aa967f80ba749b2f6c431d6be35c9ac8575ddb",
-            "timing": "measured-segments"
+            "audioHash": "14a9ac03519020ec53a7ac9addbbaa36ee6c92de3bd757c099a62c7965e0cab8",
+            "speechHash": "e2c6280d565356be4699c55c14c588f4bfaababc179fcf95e2ce54633b956d62",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/22-01-3cd186a7a514.mp3"
           }
         },
         {
@@ -3746,43 +4088,57 @@
           }
         }
       ],
-      "sourceHash": "5eeb0c5e6ba1a9ca83b5360001810654930919af00423510e921d4b3f4eec451",
+      "sourceHash": "c2cc9ebdb32e38cb8e7f417965261881b03079c75cbf34b44973186b8f4072e2",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 23,
       "scenes": [
         {
-          "src": "/static/coding-audio/23-01-22fb1bc3f9ba.mp3",
-          "duration": 20.072,
+          "src": "/static/coding-audio/23-01-71a625b72ad9.mp3",
+          "duration": 32.583,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.562,
+              "end": 6.535,
+              "text": "작업별 이익 배열에서, 바로 옆의 두 작업을 함께 고르지 않고 얻을 수 있는 최대 이익 합을 구해요."
+            },
+            {
+              "start": 6.535,
+              "end": 12.511,
+              "text": "사이에 다른 작업이 있는 작업들은 함께 골라도 되고, 아무 작업도 선택하지 않아도 괜찮아요."
+            },
+            {
+              "start": 12.511,
+              "end": 17.073,
               "text": "작업의 이익이 왼쪽부터 2, 7, 9, 3, 1인 예제를 볼게요."
             },
             {
-              "start": 4.562,
-              "end": 8.952,
+              "start": 17.073,
+              "end": 21.463,
               "text": "조건은 서로 이웃한 작업 2개를 함께 선택할 수 없다는 거예요."
             },
             {
-              "start": 8.952,
-              "end": 14.954,
+              "start": 21.463,
+              "end": 27.465,
               "text": "각 위치에서 현재 작업을 고를 때와 건너뛸 때, 어느 쪽 이익이 큰지만 비교해 봅시다."
             },
             {
-              "start": 14.954,
-              "end": 20.072,
+              "start": 27.465,
+              "end": 32.583,
               "text": "현재 작업을 고른다면 바로 이전 작업은 제외해야 한다는 점이 중요해요."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "22fb1bc3f9ba455f976ce611f2b405870495bbc8876db8899c5e2f8782c4fd6a",
-            "speechHash": "a3868e4d639a9e10d30006ea1426dfc0f5b926ea9f011a64d813afbeb425ccd8",
-            "timing": "measured-segments"
+            "audioHash": "71a625b72ad91320e44df17aab96e0bd003a6524cea25c378d7de56796dc0b19",
+            "speechHash": "50a4056d98632f1908aaad1b3ae7981a2d7543a272957b6d1669e6d3164ced6d",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/23-01-22fb1bc3f9ba.mp3"
           }
         },
         {
@@ -3928,43 +4284,57 @@
           }
         }
       ],
-      "sourceHash": "f1f3666b5d184c9177dbfef382a4a1a1b025ec71c18645dcc6bf7a2ed7f489f0",
+      "sourceHash": "ce9d375fcb39d403d26055a805009c3a7c095046e7afe5f042ecc0cc3fead2b0",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 24,
       "scenes": [
         {
-          "src": "/static/coding-audio/24-01-5ebb9fb23110.mp3",
-          "duration": 20.022,
+          "src": "/static/coding-audio/24-01-e86e864d4cbb.mp3",
+          "duration": 32.766,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.097,
+              "end": 6.255,
+              "text": "막힌 칸이 표시된 격자에서, 왼쪽 위부터 오른쪽 아래까지 가는 경로가 몇 개인지 구해요."
+            },
+            {
+              "start": 6.255,
+              "end": 12.744,
+              "text": "오른쪽이나 아래로만 움직이고 막힌 칸은 피하며, 경로 수를 1,000,000,007로 나눈 나머지를 반환해요."
+            },
+            {
+              "start": 12.744,
+              "end": 16.841,
               "text": "3 × 3 격자에서 가운데 칸이 막힌 그림을 볼게요."
             },
             {
-              "start": 4.097,
-              "end": 8.713,
+              "start": 16.841,
+              "end": 21.457,
               "text": "오른쪽이나 아래로만 이동해서 오른쪽 아래 도착점에 가야 해요."
             },
             {
-              "start": 8.713,
-              "end": 14.365,
+              "start": 21.457,
+              "end": 27.109,
               "text": "한 칸에 도착하기 직전을 생각하면, 위에서 내려오거나 왼쪽에서 오는 경우뿐이에요."
             },
             {
-              "start": 14.365,
-              "end": 20.022,
+              "start": 27.109,
+              "end": 32.766,
               "text": "그래서 위쪽 경로 수와 왼쪽 경로 수를 더하면, 현재 칸까지의 경로 수가 됩니다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "5ebb9fb231100c106643e04dcaf40782b1a4c0ce3c7bd02023bde9f31d909030",
-            "speechHash": "22f406d27c845db40d7159d391038d1413cc35fd85068233e747ded1d7334074",
-            "timing": "measured-segments"
+            "audioHash": "e86e864d4cbb312452828e7a58c0307f1c4ab957bba3a9f26f19ae1d29d1f056",
+            "speechHash": "799b0087f87271fb336bdee6065634481f9ea74e6d5b8bcd28dc87f55a53136e",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/24-01-5ebb9fb23110.mp3"
           }
         },
         {
@@ -4100,48 +4470,62 @@
           }
         }
       ],
-      "sourceHash": "995da466d05092ca31570e1dd1e6a693af983874b5ff12eb82a34edcd8e639b9",
+      "sourceHash": "5ce56fced99236df66d7833893f2df9a65f0e6d5378edc64b750594c33b93ae4",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 25,
       "scenes": [
         {
-          "src": "/static/coding-audio/25-01-d043a8272625.mp3",
-          "duration": 23.078,
+          "src": "/static/coding-audio/25-01-a20df83a1d91.mp3",
+          "duration": 36.435,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.178,
+              "end": 6.394,
+              "text": "시각과 ID가 담긴 레코드들에서, 마지막으로 본 위치 다음의 한 페이지를 가져오는 문제예요."
+            },
+            {
+              "start": 6.394,
+              "end": 13.357,
+              "text": "시각이 같으면 ID 순서로 비교하고, 마지막 항목 자신은 제외해 최대 정해진 개수만큼 반환해요."
+            },
+            {
+              "start": 13.357,
+              "end": 17.535,
               "text": "레코드 하나는 시각과 ID를 함께 가진 쌍이라고 보면 돼요."
             },
             {
-              "start": 4.178,
-              "end": 9.254,
+              "start": 17.535,
+              "end": 22.611,
               "text": "마지막으로 본 위치인 커서는 시각 10, ID 2, 즉 [10, 2]예요."
             },
             {
-              "start": 9.254,
-              "end": 13.164,
+              "start": 22.611,
+              "end": 26.521,
               "text": "이 위치 다음부터 항목 2개를 가져오는 상황을 볼게요."
             },
             {
-              "start": 13.164,
-              "end": 18.459,
+              "start": 26.521,
+              "end": 31.816,
               "text": "같은 시각에 여러 항목이 있을 수 있으니, 시각만으로는 앞뒤를 구분할 수 없어요."
             },
             {
-              "start": 18.459,
-              "end": 23.078,
+              "start": 31.816,
+              "end": 36.435,
               "text": "시각을 먼저 비교하고, 같으면 ID까지 비교해 순서를 정합니다."
             }
           ],
           "provenance": {
             "provider": "clova",
             "voice": "아라",
-            "audioHash": "d043a8272625c12857b16f3e11afb6b24e773b54b2357e77d2a8883af629228f",
-            "speechHash": "2e603dd61ac6c88a9e6b7c1196ba691f04a03f93267783a97df5a5bb245ea74e",
-            "timing": "measured-segments"
+            "audioHash": "a20df83a1d915f85e9f94f623dc4844eb2c486ea3498d03e710c598f291d8609",
+            "speechHash": "39f310dd65c7a7fc3157c2a9d46c6b44d2f9ab9341594d30e2bb55ca0e161200",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/25-01-d043a8272625.mp3"
           }
         },
         {
@@ -4277,37 +4661,63 @@
           }
         }
       ],
-      "sourceHash": "62f6e1264239fa2e618d20d656c11b3b8171ec0ad650fea3a44b2b4b2717d809",
+      "sourceHash": "0dc36ebd2ca652f36152c16fcbba25ffd4396013396cc0f364f70780cadd522e",
       "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 26,
       "scenes": [
         {
-          "src": "/static/coding-audio/26-01.mp3",
-          "duration": 19.139,
+          "src": "/static/coding-audio/26-01-823b5b43b050.mp3",
+          "duration": 35.318,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.384,
+              "end": 7.046,
+              "text": "정해진 용량의 캐시에 저장·조회 명령을 순서대로 실행하고, 조회 결과만 배열로 반환하는 문제예요."
+            },
+            {
+              "start": 7.046,
+              "end": 13.638,
+              "text": "저장하거나 조회에 성공하면 최근 사용이 되고, 용량을 넘으면 가장 오래 안 쓴 항목을 지워요."
+            },
+            {
+              "start": 13.638,
+              "end": 16.179,
+              "text": "없는 키를 조회하면 -1이에요."
+            },
+            {
+              "start": 16.179,
+              "end": 20.563,
               "text": "항목을 2개까지 담을 수 있는 캐시에 a와 b를 넣어 볼게요."
             },
             {
-              "start": 4.384,
-              "end": 10.187,
+              "start": 20.563,
+              "end": 26.366,
               "text": "a를 한 번 읽은 다음 c를 새로 넣으면, 공간을 만들기 위해 누구를 지워야 할까요?"
             },
             {
-              "start": 10.187,
-              "end": 14.383,
+              "start": 26.366,
+              "end": 30.562,
               "text": "방금 읽은 a는 남기고, 더 오래 사용하지 않은 b를 지워야 해요."
             },
             {
-              "start": 14.383,
-              "end": 19.139,
+              "start": 30.562,
+              "end": 35.318,
               "text": "저장할 때뿐 아니라 읽을 때도 사용 순서가 바뀐다는 점이 핵심입니다."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "823b5b43b0505dc020f9747a101a1172d0231eddec610d2fd690a73cd82d51f3",
+            "speechHash": "bf8becd1f1f38afcfa0070d23bba3c64f0c825dcfb2c3818a3732422dc2bd392",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 3,
+            "explanationSrc": "/static/coding-audio/26-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/26-02.mp3",
@@ -4419,36 +4829,58 @@
           ]
         }
       ],
-      "sourceHash": "da0e06baecad6e6c057ba49690ccb39bc0d39ab159ddca5b58fe4a6d0e9a8665"
+      "sourceHash": "bb8e0c458f85cd5345320dad1883c3e2bbba502c9c3b7634a010e149433e39f6",
+      "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 27,
       "scenes": [
         {
-          "src": "/static/coding-audio/27-01.mp3",
-          "duration": 19.072,
+          "src": "/static/coding-audio/27-01-eba8b8beefb2.mp3",
+          "duration": 32.821,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.502,
+              "end": 6.639,
+              "text": "유효 시간이 있는 세션 저장소에 저장·조회 명령을 실행하고, 조회 결과만 반환하는 문제예요."
+            },
+            {
+              "start": 6.639,
+              "end": 13.748,
+              "text": "다시 저장하면 만료 시각도 갱신되지만 조회는 연장하지 않으며, 만료됐거나 없는 키는 -1이에요."
+            },
+            {
+              "start": 13.748,
+              "end": 18.25,
               "text": "시각 0에 키 a의 값 7을 저장하고, 유효 시간은 5로 정해 볼게요."
             },
             {
-              "start": 4.502,
-              "end": 9.666,
+              "start": 18.25,
+              "end": 23.414,
               "text": "만료 시각은 저장 시각에 유효 시간을 더한 0 + 5 = 5예요."
             },
             {
-              "start": 9.666,
-              "end": 14.122,
+              "start": 23.414,
+              "end": 27.87,
               "text": "조회할 때는 현재 시각이 만료 시각보다 이른지만 확인하면 돼요."
             },
             {
-              "start": 14.122,
-              "end": 19.072,
+              "start": 27.87,
+              "end": 32.821,
               "text": "조회는 읽기만 하는 동작이므로, 그 자체로 유효 시간이 늘어나지는 않아요."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "eba8b8beefb255931cd80bbcaa61c5dc7c24e95c7944e38702bb4dffe591c6c9",
+            "speechHash": "f1b5700a6d08f53c19f5d223caae77667ef0958b873fb8e0bb428b577f46c55b",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/27-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/27-02.mp3",
@@ -4560,36 +4992,58 @@
           ]
         }
       ],
-      "sourceHash": "1318111da337381cc517a6977a542639ce1ff8a4b4540823e354d4b69c08d671"
+      "sourceHash": "8809b82c9d195df6fb7c2c01ef6fba686de820b15ccc3e28dcce304882109f28",
+      "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 28,
       "scenes": [
         {
-          "src": "/static/coding-audio/28-01.mp3",
-          "duration": 23.656,
+          "src": "/static/coding-audio/28-01-5b13f6b607de.mp3",
+          "duration": 36.538,
           "cues": [
             {
               "start": 0.0,
-              "end": 7.73,
+              "end": 6.394,
+              "text": "시작과 종료 시각이 있는 예약들 중, 한 장비에서 겹치지 않게 처리할 최대 예약 개수를 구해요."
+            },
+            {
+              "start": 6.394,
+              "end": 12.882,
+              "text": "예약 하나가 끝난 시각에 다음 예약을 시작해도 되며, 고르는 것은 총시간이 아니라 예약 개수예요."
+            },
+            {
+              "start": 12.882,
+              "end": 20.612,
               "text": "예약 구간이 [0, 6), [1, 2), [2, 3), [3, 4)인 예제를 볼게요."
             },
             {
-              "start": 7.73,
-              "end": 13.202,
+              "start": 20.612,
+              "end": 26.084,
               "text": "가장 먼저 시작하는 긴 예약을 고르면, 그동안 겹치는 다른 예약은 받기 어려워요."
             },
             {
-              "start": 13.202,
-              "end": 18.571,
+              "start": 26.084,
+              "end": 31.453,
               "text": "반대로 빨리 끝나는 예약을 차례로 고르면, 이 예제에서는 3개를 처리할 수 있어요."
             },
             {
-              "start": 18.571,
-              "end": 23.656,
+              "start": 31.453,
+              "end": 36.538,
               "text": "그래서 이번 문제의 선택 기준은 시작이나 길이가 아니라 종료 시각입니다."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "5b13f6b607de68aa571e09f32cb686af67717e91b22926824ce4d3fd5961a7eb",
+            "speechHash": "8eb9335c0f74ef11d6b254049dc96a7875afe5cc9dcaa5cb1fe7308cb06e2fc1",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/28-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/28-02.mp3",
@@ -4706,36 +5160,58 @@
           ]
         }
       ],
-      "sourceHash": "9a869115443d64ee1290e4ab6163157816be6923589d3310b83d0a0443293852"
+      "sourceHash": "cf0a1eca0db715389b447b843f9b3a62a6896836fb939eade2c73de983c409ed",
+      "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 29,
       "scenes": [
         {
-          "src": "/static/coding-audio/29-01.mp3",
-          "duration": 19.66,
+          "src": "/static/coding-audio/29-01-3af01264361b.mp3",
+          "duration": 32.15,
           "cues": [
             {
               "start": 0.0,
-              "end": 4.99,
+              "end": 5.965,
+              "text": "서버 그룹을 합치거나 두 서버가 같은 그룹인지 묻는 명령을 순서대로 처리하는 문제예요."
+            },
+            {
+              "start": 5.965,
+              "end": 12.491,
+              "text": "처음에는 서버마다 별도 그룹이고, 합친 그룹은 나누지 않으며, 같은지 물은 결과만 반환해요."
+            },
+            {
+              "start": 12.491,
+              "end": 17.481,
               "text": "서버 0, 1, 2, 3이 각각 별도 그룹으로 시작하는 그림을 볼게요."
             },
             {
-              "start": 4.99,
-              "end": 9.62,
+              "start": 17.481,
+              "end": 22.111,
               "text": "서버를 연결한 뒤, 두 서버가 같은 그룹인지 여러 번 확인하려고 해요."
             },
             {
-              "start": 9.62,
-              "end": 14.75,
+              "start": 22.111,
+              "end": 27.241,
               "text": "매번 모든 연결을 따라가지 않도록, 각 그룹을 대표하는 서버를 기억해 둡시다."
             },
             {
-              "start": 14.75,
-              "end": 19.66,
+              "start": 27.241,
+              "end": 32.15,
               "text": "두 서버의 대표가 같다면, 같은 그룹이라고 바로 판단할 수 있어요."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "3af01264361b8e579736e779aca3a0af6016a35471a33370166796414fe5a7ed",
+            "speechHash": "6d476c675c6d623b9443e61b9674c6665da4f5f9504d33def250174e16458233",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 2,
+            "explanationSrc": "/static/coding-audio/29-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/29-02.mp3",
@@ -4837,36 +5313,63 @@
           ]
         }
       ],
-      "sourceHash": "7a5c3c7be9fb01f906896b142d40ef3dfcc453ad65f28526603297d731a40de0"
+      "sourceHash": "d7e993839efb3f17aabccf1516429949190ce4bc6ad9126fc4d5bab295dd0eae",
+      "sourceHashKind": "ai-import-v1"
     },
     {
       "id": 30,
       "scenes": [
         {
-          "src": "/static/coding-audio/30-01.mp3",
-          "duration": 21.822,
+          "src": "/static/coding-audio/30-01-6e96c057cd32.mp3",
+          "duration": 38.786,
           "cues": [
             {
               "start": 0.0,
-              "end": 5.455,
+              "end": 6.494,
+              "text": "각 작업의 실행 시간과 선행 관계를 받아, 모든 작업을 끝낼 수 있는 가장 빠른 시각을 구해요."
+            },
+            {
+              "start": 6.494,
+              "end": 12.807,
+              "text": "워커 수는 무제한이라 준비된 작업들은 동시에 실행할 수 있지만, 선행 작업은 모두 끝나야 해요."
+            },
+            {
+              "start": 12.807,
+              "end": 16.963,
+              "text": "작업끼리 서로 기다려 끝낼 수 없다면 -1을 반환합니다."
+            },
+            {
+              "start": 16.963,
+              "end": 22.418,
               "text": "작업 0부터 3까지의 실행 시간이 각각 3, 5, 2, 4인 예제를 볼게요."
             },
             {
-              "start": 5.455,
-              "end": 10.445,
+              "start": 22.418,
+              "end": 27.408,
               "text": "작업 0과 1이 끝나야 2를 시작하고, 2가 끝나야 3을 시작할 수 있어요."
             },
             {
-              "start": 10.445,
-              "end": 15.633,
+              "start": 27.408,
+              "end": 32.596,
               "text": "워커는 충분하므로, 서로 기다릴 필요가 없는 작업 0과 1은 동시에 시작해요."
             },
             {
-              "start": 15.633,
-              "end": 21.822,
+              "start": 32.596,
+              "end": 38.786,
               "text": "그래서 실행 시간을 전부 더하지 말고, 각 작업이 가장 일찍 끝날 시각을 계산해야 해요."
             }
-          ]
+          ],
+          "provenance": {
+            "provider": "local",
+            "voice": "Yuna",
+            "audioHash": "6e96c057cd32883489dfc4073798cc8f7295bcdd52756802f8f83299aa945031",
+            "speechHash": "2b93b67559b6547e4df3494e496a969ce1bb5dc430cca5dc7135033273acf41b",
+            "timing": "measured-introduction-and-preserved-cues",
+            "introProvider": "local",
+            "introVoice": "Yuna",
+            "introCueCount": 3,
+            "explanationSrc": "/static/coding-audio/30-01.mp3"
+          }
         },
         {
           "src": "/static/coding-audio/30-02.mp3",
@@ -4973,7 +5476,8 @@
           ]
         }
       ],
-      "sourceHash": "68c7c2bf178137daad0584e7af15caa5de188b1362250f9065c3eb591f645b72"
+      "sourceHash": "9e7ce4d7e57e5d47f668f00401fad56957441ff4af870c73b3a94047ba017927",
+      "sourceHashKind": "ai-import-v1"
     }
   ]
 }

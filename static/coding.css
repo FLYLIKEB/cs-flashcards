@@ -235,3 +235,16 @@ input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue); fle
   .lesson-code-panel { padding: 16px 12px; border-radius: 16px; }
   #lessonCode { font-size: 12px; }
 }
+
+/* Keep spoken explanations centered; preserve Java indentation. */
+.lesson-scene-title, .lesson-caption, #lessonSubtitle, #lessonNarration,
+#lessonCodeNote { text-align: center; }
+.lesson-subtitle-box { justify-content: center; }
+#lessonSubtitle { width: 100%; }
+.lesson-view:has(.is-intro) { grid-template-columns: minmax(0, 1fr); }
+.lesson-stage.is-intro { max-width: 780px; margin-inline: auto; }
+
+#title { flex: 1; text-align: center; }
+
+.lesson-stage.is-intro .motion-canvas text { font-size: 24px; font-weight: 500; }
+.lesson-view:has(.is-intro) .lesson-player { width: 100%; max-width: 780px; margin-inline: auto; }

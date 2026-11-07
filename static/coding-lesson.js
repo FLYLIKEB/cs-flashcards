@@ -28,9 +28,16 @@
       text = cue.text; cueIndex = cues.indexOf(cue);
     }
     window.CodingCode.update(sceneIndex, cueIndex);
+    const introducing = !!cues?.length && cueIndex < (scene?.introCueCount || 0);
+    $('lessonStage').classList.toggle('is-intro', introducing);
+    if (scene) $('lessonSceneTitle').textContent = introducing ? '어떤 문제인가요?' : scene.title;
+    $('lessonCodePanel').hidden = introducing || !callbacks.getJavaSolution?.(problemId);
+    const provider = !introducing && sound?.provenance?.provider;
+    $('lessonVoiceCredit').textContent = provider === 'clova' ? 'AI 음성 · CLOVA Dubbing' : provider === 'elevenlabs' ? 'AI 음성 · ElevenLabs' : '';
+    $('lessonVoiceCredit').hidden = !['clova', 'elevenlabs'].includes(provider);
     if ($('lessonSubtitle').textContent !== text) $('lessonSubtitle').textContent = text;
     $('lessonSubtitleBox').hidden = !subtitlesEnabled || !scene || !sound;
-    $('lessonCaption').hidden = subtitlesEnabled && !!scene && !!sound;
+    $('lessonCaption').hidden = introducing || (subtitlesEnabled && !!scene && !!sound);
     $('lessonSubtitles').setAttribute('aria-pressed', String(subtitlesEnabled));
     $('lessonSubtitles').setAttribute('aria-label', subtitlesEnabled ? '자막 끄기' : '자막 켜기');
     $('lessonSubtitles').textContent = subtitlesEnabled ? '자막 켜짐' : '자막 꺼짐';
@@ -57,6 +64,7 @@
     $('lessonPrev').disabled = !ready || sceneIndex === 0;
     $('lessonNext').disabled = !ready || sceneIndex === lesson.scenes.length - 1;
     $('lessonRepeat').disabled = !ready;
+    $('lessonIntro').disabled = !ready;
   }
   function pause() {
     ticket++; playing = false; audio.pause(); controls();
@@ -64,10 +72,6 @@
   function renderScene() {
     const lesson = lessons?.find(item => item.id === problemId);
     const track = media?.find(item => item.id === problemId);
-    const voice = track?.scenes[sceneIndex]?.provenance;
-    $('lessonVoiceCredit').hidden = !voice;
-    $('lessonVoiceCredit').textContent = voice?.provider === 'clova'
-      ? 'AI 음성 · CLOVA Dubbing' : voice?.provider === 'elevenlabs' ? 'AI 음성 · ElevenLabs' : '';
     if (!lesson || !track) {
       pause(); audio.removeAttribute('src'); audio.load();
       $('lessonPosition').textContent = '강의 준비 중';
@@ -197,6 +201,7 @@
   $('lessonPrev').onclick = () => changeScene(sceneIndex - 1, playing);
   $('lessonNext').onclick = () => changeScene(sceneIndex + 1, playing);
   $('lessonRepeat').onclick = () => changeScene(sceneIndex, true);
+  $('lessonIntro').onclick = () => changeScene(0, true);
   $('lessonRate').onchange = () => { audio.playbackRate = Number($('lessonRate').value); };
   audio.onended = () => {
     if (!visible || !playing) return;

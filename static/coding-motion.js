@@ -57,7 +57,8 @@
         text.dataset.label = node.label; text.replaceChildren();
         const lines = node.label.split('\n');
         lines.forEach((line, i) => {
-          const span = el('tspan', {x:0, y:(i - (lines.length - 1) / 2) * 24 + 7});
+          const lineHeight = id === 'problem-introduction' ? 34 : 24;
+          const span = el('tspan', {x:0, y:(i - (lines.length - 1) / 2) * lineHeight + 7});
           span.textContent = line; text.append(span);
         });
       }
