@@ -64,6 +64,10 @@
   function renderScene() {
     const lesson = lessons?.find(item => item.id === problemId);
     const track = media?.find(item => item.id === problemId);
+    const voice = track?.scenes[sceneIndex]?.provenance;
+    $('lessonVoiceCredit').hidden = !voice;
+    $('lessonVoiceCredit').textContent = voice?.provider === 'clova'
+      ? 'AI 음성 · CLOVA Dubbing' : voice?.provider === 'elevenlabs' ? 'AI 음성 · ElevenLabs' : '';
     if (!lesson || !track) {
       pause(); audio.removeAttribute('src'); audio.load();
       $('lessonPosition').textContent = '강의 준비 중';

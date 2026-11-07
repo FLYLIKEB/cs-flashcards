@@ -36,7 +36,7 @@
         <div id="lessonSubtitleBox" class="lesson-subtitle-box"><p id="lessonSubtitle" aria-label="현재 음성 자막" aria-live="off"></p></div>
         <p id="lessonCaption" class="lesson-caption" hidden></p>
       </div>
-      <div class="lesson-timeline"><label for="lessonSeek">이 장면 <span id="lessonClock">0:00 / 0:00</span></label><input id="lessonSeek" type="range" min="0" max="1" value="0" step="0.01" aria-label="이 장면 재생 위치" disabled></div>
+      <div class="lesson-timeline"><label for="lessonSeek"><span>이 장면</span><span id="lessonVoiceCredit" class="lesson-voice-credit" hidden></span><span id="lessonClock">0:00 / 0:00</span></label><input id="lessonSeek" type="range" min="0" max="1" value="0" step="0.01" aria-label="이 장면 재생 위치" disabled></div>
       <div class="lesson-controls">
         <button id="lessonPrev" disabled aria-label="이전 장면">← 이전</button>
         <button id="lessonPlay" class="primary play-button" disabled>설명 재생</button>
@@ -50,7 +50,7 @@
         <details id="lessonFullCode"><summary>전체 코드에서 보기</summary><pre id="lessonCodeSource" tabindex="0" aria-label="Java 전체 코드, 현재 설명 줄 강조"></pre></details>
       </aside>
       </div>
-      <details id="lessonSettings" class="lesson-settings"><summary>재생 설정 <span class="settings-hint">속도 · 반복</span></summary><div class="lesson-options"><button id="lessonRepeat" disabled>이 장면 다시</button><label for="lessonRate">속도 <select id="lessonRate"><option value="0.85">0.85배</option><option value="1" selected>1배</option><option value="1.25">1.25배</option><option value="1.5">1.5배</option></select></label><label><input id="lessonAuto" type="checkbox" checked> 자동으로 다음 장면</label></div><p class="keyboard-note">빈 화면에서 Space로 재생·정지할 수 있어요.</p></details>
+      <details id="lessonSettings" class="lesson-settings"><summary>재생 설정 <span class="settings-hint">속도 · 반복</span></summary><div class="lesson-options"><button id="lessonRepeat" disabled>이 장면 다시</button><label for="lessonRate">속도 <select id="lessonRate"><option value="0.85">0.85배</option><option value="1" selected>1배</option><option value="1.25">1.25배</option><option value="1.5">1.5배</option></select></label><label><input id="lessonAuto" type="checkbox" checked> 자동으로 다음 장면</label></div><p class="keyboard-note">빈 화면에서 Space로 재생·정지할 수 있어요. <a href="/static/coding-voice-preview.html">AI 목소리 미리 듣기</a></p></details>
       <button id="lessonNextProblem" class="primary" hidden>다음 강의 듣기 →</button>
       <p id="lessonStatus" role="status"></p>
       <audio id="lessonAudio" preload="metadata"></audio>

@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>강의 목소리 비교</title><link rel="stylesheet" href="/static/coding.css"><style>
+main {max-width:720px;padding-top:36px} h1{margin:20px 0 12px} .voice-intro{color:var(--secondary);margin:0 0 28px} .voice-option{padding:22px 0;border-top:1px solid var(--line)} .voice-option h2{font-size:18px;margin:0 0 6px}.voice-option p{font-size:14px;color:var(--secondary);margin:0 0 16px}audio{width:100%;display:block} .voice-script{padding:20px;background:var(--surface);border-radius:16px;margin-top:24px;font-size:15px;line-height:1.9}.voice-note{font-size:13px;color:var(--muted);margin-top:24px}
+</style></head><body><main><a href="/coding">← 강의로 돌아가기</a><h1>어떤 목소리가 더 편한가요?</h1><p class="voice-intro">같은 설명을 두 목소리로 들어보세요.</p>
+<section class="voice-option"><h2>새로운 AI 음성 · Yun</h2><p>장면 전체를 이어 읽는 ElevenLabs 생성 음성</p><audio id="aiVoice" controls preload="metadata" src="/static/coding-audio-preview/yun-sample.mp3"></audio></section>
+<section class="voice-option"><h2>현재 강의 음성 · Yuna</h2><p>문장별로 합성한 macOS 기본 음성</p><audio id="originalVoice" controls preload="metadata" src="/static/coding-audio-preview/yuna-original.mp3"></audio></section>
+<div class="voice-script">화면의 요청 ID는 b, a, b, c, a 순서로 들어와요. 같은 요청을 2번 처리하면 안 되지만, 먼저 들어온 순서는 그대로 지켜야 해요. 정렬하면 도착 순서가 바뀌니, 처음 본 요청만 결과로 옮긴다고 생각해 보세요.</div>
+<p class="voice-note">첫 장면의 두 목소리를 비교할 수 있어요. 강의에서는 전환이 끝난 장면부터 AI 음성이 재생됩니다.</p>
+<script>const players=[...document.querySelectorAll('audio')];players.forEach(player=>player.addEventListener('play',()=>players.forEach(other=>{if(other!==player)other.pause()})));document.addEventListener('visibilitychange',()=>{if(document.hidden)players.forEach(player=>player.pause())});window.addEventListener('pagehide',()=>players.forEach(player=>player.pause()));</script>
+</main></body></html>

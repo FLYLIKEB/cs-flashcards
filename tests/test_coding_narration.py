@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from scripts import render_coding_lesson_audio as renderer
+from scripts import import_coding_ai_audio as importer
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -16,7 +17,10 @@ class NarrationAuthoringTests(unittest.TestCase):
             (ROOT / 'static/coding-audio/manifest.json').read_text())['lessons']}
         total = 0
         for lesson in lessons:
-            self.assertEqual(manifest[lesson['id']]['sourceHash'], renderer.fingerprint(lesson))
+            entry = manifest[lesson['id']]
+            expected_hash = (importer.fingerprint(lesson, entry['scenes'])
+                             if entry.get('sourceHashKind') == 'ai-import-v1' else renderer.fingerprint(lesson))
+            self.assertEqual(entry['sourceHash'], expected_hash)
             for index, scene in enumerate(lesson['scenes']):
                 with self.subTest(lesson=lesson['id'], scene=index):
                     self.assertIn('segments', scene)

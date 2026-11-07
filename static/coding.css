@@ -85,6 +85,7 @@ h1 { font-size: 29px; font-weight: 750; line-height: 1.35; letter-spacing: -1px;
 .lesson-cards[data-layout=sequence] .lesson-card { min-width: 0; font: 600 24px/1.4 ui-monospace,SFMono-Regular,monospace; }
 .lesson-card.active { color: #fff; background: var(--blue); box-shadow: 0 0 0 3px #1769e015; }
 .lesson-caption { margin: 0; color: var(--secondary); font-size: 17px; line-height: 1.65; letter-spacing: -.25px; overflow-wrap: anywhere; }
+.lesson-voice-credit { color: var(--secondary); font-size: 11px; }
 #lessonCode { margin: 0; padding: 18px 20px; background: #202632; color: #f2f5fa; font-size: 14px; line-height: 1.85; border-radius: 14px; }
 .lesson-controls { display: grid; grid-template-columns: 92px minmax(0,1fr) 92px; align-items: center; gap: 14px; margin: 18px 0 0; }
 .lesson-controls > button { min-height: 52px; border-radius: 14px; font-size: 15px; }
