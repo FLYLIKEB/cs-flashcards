@@ -19,7 +19,7 @@
       (r.nextAction === undefined || (typeof r.nextAction === 'string' && r.nextAction.length <= 500)));
   }
   function validState(value) {
-    return validRecords(value) && (value.learningMode === undefined || ['lesson','practice'].includes(value.learningMode)) && (value.language === undefined || value.language === 'java') &&
+    return validRecords(value) && (value.quietView === undefined || typeof value.quietView === 'boolean') && (value.learningMode === undefined || ['lesson','practice'].includes(value.learningMode)) && (value.language === undefined || value.language === 'java') &&
       (value.pythonRecords === undefined || validRecords({records: value.pythonRecords})) &&
       (value.focus === undefined || (value.focus && [5,10,15].includes(value.focus.minutes) &&
         typeof value.focus.hideTimer === 'boolean' && typeof value.focus.onBreak === 'boolean'));
@@ -79,6 +79,18 @@
     $('stageNext').textContent = r.step === 0 ? '이해했어요 → 코드 쓰기' : '작성했어요 → 확인 · 설명';
     $('nextProblem').hidden = !r.status;
   }
+  function applyQuietView() {
+    document.body.classList.toggle('quiet-view', !!state.quietView);
+    $('focusView').setAttribute('aria-pressed', String(!!state.quietView));
+    $('focusView').textContent = state.quietView ? '집중 끝내기' : '집중 화면';
+    if (state.quietView) $('curriculum').open = false;
+  }
+  $('focusView').onclick = () => { state.quietView = !state.quietView; applyQuietView(); save(); };
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && state.quietView) {
+      state.quietView = false; applyQuietView(); save(); $('focusView').focus();
+    }
+  });
   function applyMode() {
     const mode = state.learningMode || (focusSettings().onBreak ? 'practice' : 'lesson');
     $('lessonPanel').hidden = mode !== 'lesson';
@@ -86,6 +98,8 @@
     $('modeLesson').setAttribute('aria-pressed', String(mode === 'lesson'));
     $('modePractice').setAttribute('aria-pressed', String(mode === 'practice'));
     $('restart').hidden = mode !== 'practice';
+    $('meta').textContent = mode === 'lesson' ? problem().topic : `${problem().topic} · 권장 풀이 ${problem().minutes}분`;
+    applyQuietView();
     window.CodingLesson.setVisible(mode === 'lesson');
   }
   function changeMode(mode) {

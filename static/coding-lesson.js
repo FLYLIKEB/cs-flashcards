@@ -5,12 +5,13 @@
   let lessons = null, media = null, loading = null, problemId = 0, sceneIndex = 0;
   let visible = true, playing = false, ticket = 0, callbacks = {}, retryTimer = null;
   function currentReady() { return !!lessons?.find(item => item.id === problemId) && !!media?.find(item => item.id === problemId); }
-  function status(message) { $('lessonStatus').textContent = message; }
+  function status(message) { $('lessonStatus').textContent = message; $('lessonStatus').classList.toggle('is-error', /못|실패|오류/.test(message)); }
   function controls() {
     const lesson = lessons?.find(item => item.id === problemId);
     const ready = !!lesson && !!media?.find(item => item.id === problemId);
     $('lessonPlay').disabled = !visible || (!ready && !!loading);
-    $('lessonPlay').textContent = playing ? '일시정지' : ready ? '소리 켜고 재생' : loading ? '음성 준비 중' : '강의 다시 불러오기';
+    $('lessonPlay').textContent = playing ? '일시정지' : ready ? '설명 재생' : loading ? '음성 준비 중' : '강의 다시 불러오기';
+    $('lessonPlay').classList.toggle('is-playing', playing);
     $('lessonPrev').disabled = !ready || sceneIndex === 0;
     $('lessonNext').disabled = !ready || sceneIndex === lesson.scenes.length - 1;
     $('lessonRepeat').disabled = !ready;
@@ -33,11 +34,21 @@
     }
     const scene = lesson.scenes[sceneIndex];
     $('lessonNextProblem').hidden = true;
-    $('lessonPosition').textContent = `${sceneIndex + 1} / ${lesson.scenes.length} 장면 · ${Math.ceil(track.scenes.reduce((sum, item) => sum + item.duration, 0) / 60)}분 강의`;
+    const duration = Math.round(track.scenes.reduce((sum, item) => sum + item.duration, 0));
+    $('lessonPosition').textContent = `${sceneIndex + 1} / ${lesson.scenes.length} · 전체 ${Math.floor(duration / 60)}분 ${duration % 60}초`;
+    $('lessonSegments').replaceChildren();
+    lesson.scenes.forEach((_, index) => {
+      const segment = document.createElement('span');
+      segment.setAttribute('aria-label', `${index + 1}번째 장면`);
+      if (index === sceneIndex) segment.setAttribute('aria-current', 'step');
+      $('lessonSegments').append(segment);
+    });
     $('lessonSceneTitle').textContent = scene.title;
     $('lessonCaption').textContent = scene.caption;
     $('lessonNarration').textContent = scene.narration;
     $('lessonCards').replaceChildren();
+    $('lessonCards').dataset.layout = scene.items.every(text => text.length <= 4 && !text.includes('\n')) ? 'sequence' : 'states';
+    $('lessonCards').style.setProperty('--item-count', scene.items.length);
     scene.items.forEach((text, index) => {
       const item = document.createElement('div');
       item.className = 'lesson-card' + (index === scene.active ? ' active' : '');
@@ -52,7 +63,7 @@
     audio.load();
     $('lessonStage').classList.remove('scene-enter');
     window.requestAnimationFrame(() => $('lessonStage').classList.add('scene-enter'));
-    status('재생을 누르면 이 장면을 소리로 설명해 드려요.');
+    status('');
     if (visible && sceneIndex > 0) callbacks.onAssisted?.();
     controls();
   }
@@ -97,7 +108,7 @@
     try {
       await audio.play();
       if (stamp !== ticket || !visible) return;
-      playing = true; controls(); status('설명 중이에요. 기기 음량을 조절해서 편하게 들어주세요.');
+      playing = true; controls(); status('설명을 듣고 있어요.');
     } catch (_) {
       if (stamp !== ticket) return;
       playing = false; controls(); status('소리를 재생하지 못했어요. 재생 버튼을 다시 눌러주세요. 기기 음량과 연결도 확인해 주세요.');
@@ -111,7 +122,7 @@
     if (keepPlaying) play();
   }
   $('lessonPlay').onclick = () => {
-    if (playing) { pause(); status('잠깐 멈췄어요. 재생을 누르면 이어서 설명해요.'); }
+    if (playing) { pause(); status('멈춘 곳부터 이어 들을 수 있어요.'); }
     else play();
   };
   $('lessonNextProblem').onclick = () => { if (callbacks.onNextLesson?.()) play(); };
@@ -136,6 +147,12 @@
   };
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && playing) { pause(); status('다른 화면으로 이동해서 멈췄어요. 돌아오면 재생을 눌러주세요.'); }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.code !== 'Space' || event.repeat || event.altKey || event.ctrlKey || event.metaKey || !visible ||
+      event.target.isContentEditable || event.target.closest?.('input, textarea, select, button, summary, a')) return;
+    event.preventDefault();
+    if (!$('lessonPlay').disabled) $('lessonPlay').click();
   });
   window.addEventListener('pagehide', pause);
   window.CodingLesson = {

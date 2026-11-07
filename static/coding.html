@@ -6,27 +6,28 @@
   <link rel="stylesheet" href="/static/coding.css"><script defer src="/static/coding-lesson.js"></script><script defer src="/static/coding.js"></script>
 </head>
 <body>
-<header>
-  <a href="/">← CS 학습</a><span>JAVA · 한 문제씩</span>
-  <details class="backup-menu"><summary>기록 관리</summary><div><button id="export">학습 기록 백업</button><button id="restore" disabled>복원</button></div></details>
+<header class="app-header">
+  <a href="/" aria-label="CS 학습으로 돌아가기">←</a><span class="app-name">코테 클래스</span>
+  <details class="backup-menu"><summary>저장 · 복원</summary><div><button id="export">학습 기록 백업</button><button id="restore" disabled>복원</button></div></details>
   <input id="import" type="file" accept="application/json" hidden>
 </header>
 <main>
-  <section class="intro"><p class="eyebrow">보고 듣는 Java 코테</p><h1>먼저 듣고, 이해부터.</h1><p>재생을 누르면 한국어 설명과 예제가 한 장면씩 이어져요.</p></section>
+  <div class="utility-row">
   <details id="curriculum">
-    <summary>전체 문제 · 진행 상황 보기</summary>
+    <summary>강의 목록 <span class="list-count">30</span></summary>
     <div class="curriculum-summary"><strong id="completed">0 / 30</strong><span>Java 독립 풀이 완료</span><progress id="progress" max="30" value="0"></progress><span id="reviewCount">복습할 문제 0개</span><button id="recommend">다음 문제 추천</button></div>
     <p class="muted">오늘 1–15번 · 내일 16–30번. 마지막 3문제는 힌트 없이 설명하며 풀어보세요. 한 번에 다 하지 않아도 됩니다.</p>
     <div class="filters" aria-label="문제 필터"><button data-filter="all" aria-pressed="true">전체</button><button data-filter="1">Day 1</button><button data-filter="2">Day 2</button><button data-filter="review">복습</button></div>
     <nav id="problems" aria-label="문제 목록"></nav>
   </details>
-  <p id="notice" role="status">코드와 메모는 이 브라우저에 자동 저장돼요.</p>
+  <span class="course-label">JAVA · 코딩 인터뷰</span>
+  </div>
   <article id="exercise" class="exercise" hidden>
     <div class="problem-top"><span id="meta"></span><button id="restart">빈 코드로 재풀이</button></div>
-    <h2 id="title"></h2>
+    <div class="lesson-heading"><h1 id="title"></h1><button id="focusView" class="focus-toggle" aria-pressed="false">집중 화면</button></div>
     <nav class="learning-modes" aria-label="학습 방식"><button id="modeLesson" aria-pressed="true">보고 듣기</button><button id="modePractice" aria-pressed="false">직접 풀기</button></nav>
     <section id="lessonPanel" aria-label="소리로 듣는 단계별 강의">
-      <div class="lesson-top"><span id="lessonPosition">강의 준비 중</span><span>한국어 음성 해설</span></div>
+      <div class="lesson-top"><div id="lessonSegments" class="lesson-segments" aria-label="강의 진행 단계"></div><span id="lessonPosition">준비 중</span></div>
       <div id="lessonStage" class="lesson-stage">
         <p id="lessonSceneTitle" class="lesson-scene-title" tabindex="-1"></p>
         <div id="lessonCards" class="lesson-cards" aria-label="예제 진행 상황"></div>
@@ -35,15 +36,15 @@
       </div>
       <div class="lesson-controls">
         <button id="lessonPrev" disabled aria-label="이전 장면">← 이전</button>
-        <button id="lessonPlay" class="primary" disabled>소리 켜고 시작</button>
+        <button id="lessonPlay" class="primary play-button" disabled>설명 재생</button>
         <button id="lessonNext" disabled aria-label="다음 장면">다음 →</button>
       </div>
-      <div class="lesson-options"><button id="lessonRepeat" disabled>이 장면 다시</button><label for="lessonRate">속도 <select id="lessonRate"><option value="0.85">0.85배</option><option value="1" selected>1배</option><option value="1.25">1.25배</option><option value="1.5">1.5배</option></select></label><label><input id="lessonAuto" type="checkbox" checked> 설명 끝나면 다음 장면</label></div>
+      <details id="lessonSettings" class="lesson-settings"><summary>재생 설정 <span class="settings-hint">속도 · 반복</span></summary><div class="lesson-options"><button id="lessonRepeat" disabled>이 장면 다시</button><label for="lessonRate">속도 <select id="lessonRate"><option value="0.85">0.85배</option><option value="1" selected>1배</option><option value="1.25">1.25배</option><option value="1.5">1.5배</option></select></label><label><input id="lessonAuto" type="checkbox" checked> 자동으로 다음 장면</label></div><p class="keyboard-note">빈 화면에서 Space로 재생·정지할 수 있어요.</p></details>
       <button id="lessonNextProblem" class="primary" hidden>다음 강의 듣기 →</button>
-      <p id="lessonStatus" role="status">재생 버튼을 누르면 소리가 나옵니다. 기기 음량도 확인해 주세요.</p>
+      <p id="lessonStatus" role="status"></p>
       <audio id="lessonAudio" preload="metadata"></audio>
-      <details class="lesson-transcript"><summary>이 장면의 설명 글로 보기</summary><p id="lessonNarration" class="preserve"></p></details>
-      <p class="muted">시청은 풀이 완료와 별도로 기록돼요. 듣고 이해한 뒤, 원할 때 ‘직접 풀기’로 넘어가세요.</p>
+      <details class="lesson-transcript"><summary>설명 읽기</summary><p id="lessonNarration" class="preserve"></p></details>
+
     </section>
     <div id="practicePanel" hidden>
     <div class="session-tools">
@@ -81,5 +82,6 @@
     </div>
     </div>
   </article>
+  <p id="notice" role="status">이 기기에 자동 저장</p>
 </main>
 </body></html>

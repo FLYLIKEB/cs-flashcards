@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import threading
 import unittest
 
@@ -131,6 +132,10 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
         return await self.page.Jeval('#lessonAudio', '''el => ({paused: el.paused, time: el.currentTime,
             muted: el.muted, volume: el.volume, src: el.currentSrc, rate: el.playbackRate})''')
 
+    async def open_settings(self):
+        if not await self.page.Jeval('#lessonSettings', 'el => el.open'):
+            await self.page.click('#lessonSettings > summary')
+
     async def start_audio(self):
         await self.page.click('#lessonPlay')
         await self.page.waitForFunction("!document.querySelector('#lessonAudio').paused && document.querySelector('#lessonAudio').currentTime > 0.2")
@@ -150,6 +155,7 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(paused['paused'])
         await asyncio.sleep(0.25)
         self.assertAlmostEqual((await self.audio_state())['time'], paused['time'], delta=0.08)
+        await self.open_settings()
         options = await self.page.JJeval('#lessonRate option', 'els => els.map(el => el.value)')
         rate = '1.5' if '1.5' in options else options[-1]
         await self.page.select('#lessonRate', rate)
@@ -159,6 +165,71 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.page.setViewport({'width': 390, 'height': 844})
         self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'))
         await self.page.screenshot({'path': '/tmp/coding48-lessons-mobile.png', 'fullPage': True})
+
+    async def test_first_scene_is_above_fold_and_settings_are_secondary(self):
+        self.assertFalse(await self.page.Jeval('#lessonSettings', 'el => el.open'))
+        self.assertEqual(len(await self.page.JJ('#lessonSegments span')), 5)
+        self.assertEqual(len(await self.page.JJ('#lessonSegments [aria-current="step"]')), 1)
+        for name, width, height in [('desktop', 1440, 900), ('mobile', 390, 844)]:
+            await self.page.setViewport({'width': width, 'height': height})
+            await self.page.evaluate('window.scrollTo(0, 0)')
+            for selector in ('#title', '#lessonSceneTitle', '#lessonCards', '#lessonPlay'):
+                box = await self.page.Jeval(selector, '(el) => { const r = el.getBoundingClientRect(); return {top:r.top,bottom:r.bottom,width:r.width,height:r.height}; }')
+                self.assertGreater(box['height'], 0, (name, selector, box))
+                self.assertGreaterEqual(box['top'], 0, (name, selector, box))
+                self.assertLessEqual(box['bottom'], height, (name, selector, box))
+            self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+            await self.page.waitForFunction("getComputedStyle(document.querySelector('#lessonStage')).opacity === '1'")
+            await self.page.screenshot({'path': f'/tmp/refined-{name}-first.png', 'fullPage': True})
+        for _ in range(3):
+            await self.page.click('#lessonNext')
+        await self.page.waitForFunction("!document.querySelector('#lessonCode').hidden")
+        self.assertEqual(await self.page.JJeval('#lessonSegments span', "els => els.findIndex(el => el.getAttribute('aria-current') === 'step')"), 3)
+        for name, width, height in [('desktop', 1440, 900), ('mobile', 390, 844)]:
+            await self.page.setViewport({'width': width, 'height': height})
+            await self.page.evaluate('window.scrollTo(0, 0)')
+            await self.page.waitForFunction("getComputedStyle(document.querySelector('#lessonStage')).opacity === '1'")
+            await self.page.screenshot({'path': f'/tmp/refined-{name}-java.png', 'fullPage': True})
+
+    async def test_quiet_view_persists_and_keyboard_keeps_audio_under_control(self):
+        await self.page.setViewport({'width': 1440, 'height': 900})
+        await self.start_audio()
+        await self.page.click('#focusView')
+        self.assertTrue(await self.page.evaluate("document.body.classList.contains('quiet-view')"))
+        self.assertTrue((await self.state())['quietView'])
+        self.assertEqual(await self.page.Jeval('#focusView', 'el => el.getAttribute("aria-pressed")'), 'true')
+        for selector in ('.app-header', '#curriculum', '.learning-modes'):
+            self.assertEqual(await self.page.Jeval(selector, 'el => el.getBoundingClientRect().height'), 0, selector)
+        self.assertGreater(await self.page.Jeval('#focusView', 'el => el.getBoundingClientRect().height'), 0)
+        self.assertFalse((await self.audio_state())['paused'])
+        await self.page.screenshot({'path': '/tmp/refined-quiet.png', 'fullPage': True})
+        await self.page.reload()
+        await self.ready()
+        self.assertTrue(await self.page.evaluate("document.body.classList.contains('quiet-view')"))
+        self.assertTrue((await self.audio_state())['paused'])
+        await self.page.keyboard.press('Escape')
+        self.assertFalse(await self.page.evaluate("document.body.classList.contains('quiet-view')"))
+        self.assertFalse((await self.state())['quietView'])
+        await self.page.evaluate('document.activeElement.blur()')
+        await self.page.keyboard.press('Space')
+        await self.page.waitForFunction("!document.querySelector('#lessonAudio').paused && document.querySelector('#lessonAudio').currentTime > 0.2")
+        await self.page.keyboard.press('Space')
+        self.assertTrue((await self.audio_state())['paused'])
+        await self.page.click('#modePractice')
+        await self.page.focus('#nextAction')
+        await self.page.keyboard.press('Space')
+        self.assertEqual(await self.page.Jeval('#nextAction', 'el => el.value'), ' ')
+        self.assertTrue((await self.audio_state())['paused'])
+
+    async def test_invalid_quiet_view_backup_does_not_replace_records(self):
+        before = await self.state()
+        invalid = {**before, 'quietView': 'yes'}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'invalid-quiet.json'
+            path.write_text(json.dumps(invalid))
+            await (await self.page.J('#import')).uploadFile(str(path))
+            await self.page.waitForFunction("document.querySelector('#notice').textContent.includes('복원 실패')")
+        self.assertEqual(await self.state(), before)
 
     async def test_rapid_play_pause_does_not_restart_from_stale_play_promise(self):
         await self.start_audio()
@@ -194,6 +265,7 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotEqual(await self.page.Jeval('#lessonAudio', 'el => el.src'), first_source)
 
     async def test_auto_advance_uses_audio_end_and_can_be_disabled(self):
+        await self.open_settings()
         if not await self.page.Jeval('#lessonAuto', 'el => el.checked'):
             await self.page.click('#lessonAuto')
         await self.start_audio()
@@ -209,6 +281,7 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
         await self.page.waitForFunction("!document.querySelector('#lessonAudio').paused && document.querySelector('#lessonAudio').currentTime < 2")
 
     async def test_watched_requires_every_scene_not_just_skipping_to_last(self):
+        await self.open_settings()
         if await self.page.Jeval('#lessonAuto', 'el => el.checked'):
             await self.page.click('#lessonAuto')
         for _ in range(4):
@@ -258,12 +331,14 @@ class LessonBrowserTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_audio_error_does_not_silently_advance(self):
         await self.start_audio()
+        await self.page.click('#focusView')
         scene = (await self.state())['records']['1'].get('lessonScene', 0)
         await self.page.Jeval('#lessonAudio', "el => { el.src = '/static/no-such-lesson-audio.mp3'; el.load(); }")
         await self.page.waitForFunction("document.querySelector('#lessonAudio').error !== null")
         await self.page.waitForFunction("/실패|오류|못|불러/.test(document.querySelector('#lessonStatus').textContent)")
         self.assertEqual((await self.state())['records']['1'].get('lessonScene', 0), scene)
         self.assertTrue((await self.audio_state())['paused'])
+        self.assertGreater(await self.page.Jeval('#lessonStatus', 'el => el.getBoundingClientRect().height'), 0)
 
     async def test_lesson_help_is_not_independent_completion(self):
         await self.page.click('#lessonNext')
