@@ -35,7 +35,8 @@
     $('lessonStage').classList.toggle('is-intro', introducing);
     if (scene) $('lessonSceneTitle').textContent = titleCard ? `${problemId}번 · ${lessons.find(item => item.id === problemId).title}` : introducing ? '어떤 문제인가요?' : scene.title;
     $('lessonCodePanel').hidden = introducing || !callbacks.getJavaSolution?.(problemId);
-    const provider = !introducing && sound?.provenance?.provider;
+    const provenance = sound?.provenance;
+    const provider = introducing ? provenance?.introProvider || provenance?.provider : provenance?.provider;
     $('lessonVoiceCredit').textContent = provider === 'clova' ? 'AI 음성 · CLOVA Dubbing' : provider === 'elevenlabs' ? 'AI 음성 · ElevenLabs' : '';
     $('lessonVoiceCredit').hidden = !['clova', 'elevenlabs'].includes(provider);
     window.CodingTypewriter.render($('lessonSubtitle'), text, time, cueStart, cueEnd);

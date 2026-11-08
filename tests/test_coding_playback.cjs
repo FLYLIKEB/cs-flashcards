@@ -44,7 +44,7 @@ async function setup(problem = 1, scene = 4, savedNextScene = 0) {
   assert.equal(nodes.lessonPlay.disabled,false);
   async function play(){nodes.lessonPlay.onclick();await settle();}
   async function end(){audio.currentTime=10;audio.ended=true;audio.paused=true;audio.onended();await settle();}
-  return {nodes,audio,events,play,end,settle,tick:()=>window.CodingMotion.tick(),current:()=>current};
+  return {nodes,audio,events,tracks,play,end,settle,tick:()=>window.CodingMotion.tick(),current:()=>current};
 }
 
 test('last scene records completion before automatically playing the next problem from its introduction',async()=>{
@@ -113,4 +113,17 @@ test('title cue displays the matching image and image failure preserves the titl
  s.nodes.lessonNext.onclick();await s.settle();
  assert.equal(s.nodes.lessonIllustration.hidden,true);
  assert.equal(s.nodes.lessonCards.hidden,false);
+});
+
+
+test('voice credit follows the introduction provider rather than the preserved body provider',async()=>{
+ const s=await setup(1,0);
+ s.tracks[0].scenes[0].provenance={provider:'elevenlabs',introProvider:'clova'};s.tick();
+ assert.equal(s.nodes.lessonVoiceCredit.textContent,'AI 음성 · CLOVA Dubbing');
+ assert.equal(s.nodes.lessonVoiceCredit.hidden,false);
+ s.tracks[0].scenes[0].provenance.introProvider='local';s.tick();
+ assert.equal(s.nodes.lessonVoiceCredit.hidden,true);
+ s.tracks[0].scenes[1].provenance={provider:'elevenlabs'};
+ s.nodes.lessonNext.onclick();await s.settle();
+ assert.equal(s.nodes.lessonVoiceCredit.textContent,'AI 음성 · ElevenLabs');
 });

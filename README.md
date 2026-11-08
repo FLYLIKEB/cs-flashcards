@@ -384,3 +384,5 @@ AI 음원 가져오기 도구는 `scripts/import_coding_ai_audio.py`, `scripts/i
 강의는 자동 재생을 켜면 다음 문제 소개까지 이어지며 30번 문제에서 멈춥니다. 플레이어 아래 `문제 처음부터 보기`로 소개부터 다시 들을 수 있고, 전체 Java 코드는 기본으로 펼쳐집니다. 장면·코드·자료구조 강조 효과는 공통 렌더러와 CSS를 사용합니다.
 
 각 문제의 첫 음성은 문제 번호와 문제명을 읽습니다. 제목과 문제 소개 구간에는 `static/coding-images/`의 문제별 2D ImageGen 도식을 표시하며, `/static/coding-images.html`에서 전체 그림을 볼 수 있습니다. 제목 음성은 로컬 Yuna로 생성하고 기존 설명 음성은 보존합니다.
+
+기본 음성이 남은 부분만 CLOVA로 교체할 때는 `.venv/bin/python scripts/import_coding_pending_clova.py plan`으로 문장 순서표를 만듭니다. 각 배치의 문장별 MP3 ZIP을 내려받은 뒤 `import --plan ... --batch N --zip ... --report ...`로 먼저 검증하고, 같은 인자에 `--apply --confirm-order`를 더해 반영합니다. 기존 AI 본문·자막 간격을 보존하며, 이 도구 자체는 음성을 생성하거나 외부 API를 호출하지 않습니다.
