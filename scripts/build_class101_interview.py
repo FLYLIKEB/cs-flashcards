@@ -101,7 +101,7 @@ def build(root=ROOT):
             markdown.extend([f"### {number}. {question}", answers[number]])
             cards.append(f'''<details id="question-{number}">
 <summary><span class="number">Q{number:03}</span><span class="preview">{preview}</span><span class="indicator" aria-hidden="true">+</span></summary>
-<div class="answer"><p class="answer-label">답변 초안</p>{body}</div></details>''')
+<div class="answer"><div class="listen-actions" aria-label="{number}번 음성 듣기"><button type="button" data-listen="question" data-question="{number}">질문 듣기</button><button type="button" data-listen="answer" data-question="{number}">답변 듣기</button><button type="button" data-listen="from-here" data-question="{number}">여기부터 연속 듣기</button></div><p class="answer-label">답변 초안</p>{body}</div></details>''')
         sections.append(f'<section id="category-{index}" aria-labelledby="heading-{index}"><h2 id="heading-{index}">{title}<small>10문항</small></h2>{"".join(cards)}</section>')
 
     page = '''<!doctype html>
@@ -147,6 +147,18 @@ details[open] .indicator::after { content:"−"; font-size:22px; }
 .confirmation { padding:12px 14px; border-left:3px solid #bda471; background:#f7f3e9; color:#655438; font-size:14px; margin-top:16px; }
 code { background:#eef2ee; padding:2px 5px; border-radius:4px; font-size:.9em; }
 footer { padding-top:0; font-size:13px; color:var(--muted); }
+.audio-player { position:sticky; top:0; z-index:2; max-width:1096px; margin:0 auto 24px; padding:14px 18px; background:#edf2ed; border:1px solid #c5d4c8; border-radius:10px; }
+.audio-options,.audio-transport,.listen-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.audio-options label { font-size:14px; }
+.audio-options select { min-height:44px; border:1px solid var(--line); border-radius:6px; padding:8px; background:white; color:var(--ink); font:inherit; }
+.audio-transport { margin-top:8px; }
+.audio-transport audio { width:280px; max-width:100%; height:44px; }
+#listen-status { display:block; font-size:14px; color:var(--accent); margin-top:8px; }
+.listen-actions { margin-bottom:16px; }
+.listen-actions button { font-size:13px; padding:8px 11px; }
+details.is-speaking { border:2px solid var(--accent); }
+section[id] { scroll-margin-top:240px; }
+nav { top:220px; }
 @media(max-width:760px) {
  header,main,footer { padding-left:20px; padding-right:20px; }
  header { padding-top:32px; }
@@ -157,8 +169,11 @@ footer { padding-top:0; font-size:13px; color:var(--muted); }
  h2 { font-size:18px; }
  .preview,.answer { font-size:16px; }
  summary { padding:15px 14px; gap:10px; }
+ .audio-player { position:static; margin:0 20px 24px; }
+ .audio-transport audio { width:100%; }
+ section[id] { scroll-margin-top:24px; }
 }
-@media print { nav,.tools,footer { display:none; } main { display:block; } details { break-inside:avoid; } }
+@media print { nav,.tools,footer,.audio-player,.listen-actions { display:none; } main { display:block; } details { break-inside:avoid; } }
 </style>
 </head>
 <body>
@@ -168,6 +183,15 @@ footer { padding-top:0; font-size:13px; color:var(--muted); }
 <p class="intro">박지우 이력서 × 클래스101 PP 팀<br>10개 분야 · 질문을 누르면 답변 초안이 펼쳐집니다.</p>
 <div class="tools"><button type="button" id="expand">모두 펼치기</button><button type="button" id="collapse">모두 접기</button><a class="download" href="answers.md" download>질문·답변 Markdown</a><a class="download" href="questions.md" download>질문만 저장</a></div>
 </header>
+<aside class="audio-player" aria-label="면접 음성 플레이어">
+<div class="audio-options">
+<label for="listen-mode">연속 재생</label><select id="listen-mode"><option value="both">질문 → 답변</option><option value="question">질문만</option><option value="answer">답변만</option></select>
+<label for="playback-rate">속도</label><select id="playback-rate"><option value="0.8">0.8배</option><option value="1" selected>1배</option><option value="1.2">1.2배</option><option value="1.5">1.5배</option></select>
+<button type="button" id="listen-all">전체 연속 듣기</button>
+</div>
+<div class="audio-transport"><audio id="interview-audio" controls preload="none" aria-label="현재 질문 또는 답변 음성"></audio><button type="button" id="listen-prev" disabled>이전 음성</button><button type="button" id="listen-pause" disabled>일시정지</button><button type="button" id="listen-next" disabled>다음 음성</button><button type="button" id="listen-stop" disabled>정지</button></div>
+<output id="listen-status" role="status">질문과 답변을 개별 또는 연속으로 들을 수 있습니다. 확인 메모는 읽지 않습니다.</output>
+</aside>
 <main><nav aria-label="질문 분야"><p>분야 바로가기</p>__NAV__</nav><div>__SECTIONS__</div></main>
 <footer>이력서와 채용공고를 바탕으로 작성한 예상 질문과 답변 초안입니다. 확인 메모는 실제 이력과 대조하고, 설계 제안은 실제 구현 경험과 구분해 설명하세요.</footer>
 <script>
@@ -175,6 +199,7 @@ const questions = document.querySelectorAll('details');
 document.getElementById('expand').addEventListener('click', () => questions.forEach(item => { item.open = true; }));
 document.getElementById('collapse').addEventListener('click', () => questions.forEach(item => { item.open = false; }));
 </script>
+<script src="audio-player.js" defer></script>
 </body>
 </html>
 '''

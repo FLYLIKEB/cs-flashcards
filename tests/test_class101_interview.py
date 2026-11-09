@@ -80,6 +80,11 @@ class InterviewGenerationTests(unittest.TestCase):
         self.assertEqual((self.root / "questions.md").read_text(encoding="utf-8"), self.source)
         self.assertIn('href="answers.md" download', document)
         self.assertIn('href="questions.md" download', document)
+        self.assertEqual(document.count('data-listen="question"'), 100)
+        self.assertEqual(document.count('data-listen="answer"'), 100)
+        self.assertEqual(document.count('data-listen="from-here"'), 100)
+        self.assertIn('id="interview-audio" controls preload="none"', document)
+        self.assertIn('src="audio-player.js" defer', document)
         self.assertNotIn('details[open] .preview { display:none;', document)
 
     def test_missing_answer_rejected_before_outputs(self):
