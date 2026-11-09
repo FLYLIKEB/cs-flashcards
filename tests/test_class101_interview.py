@@ -23,12 +23,14 @@ class InterviewPage(HTMLParser):
         self.summary = None
         self.answer_count = 0
         self.confirmation_count = 0
+        self.in_question = False
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
-        if tag == "details":
+        if tag == "details" and attrs.get("id", "").startswith("question-"):
+            self.in_question = True
             self.ids.append(attrs["id"])
-        if tag == "summary":
+        if tag == "summary" and self.in_question:
             self.summary = ""
         if attrs.get("class") == "answer":
             self.answer_count += 1
@@ -40,9 +42,11 @@ class InterviewPage(HTMLParser):
             self.summary += data
 
     def handle_endtag(self, tag):
-        if tag == "summary":
+        if tag == "summary" and self.summary is not None:
             self.summaries.append(self.summary)
             self.summary = None
+        if tag == "details":
+            self.in_question = False
 
 
 class InterviewGenerationTests(unittest.TestCase):
@@ -133,6 +137,9 @@ class InterviewGenerationTests(unittest.TestCase):
         self.assertIn('id="interview-audio" controls preload="none"', document)
         self.assertIn('src="audio-player.js" defer', document)
         self.assertIn('src="reading-highlight.js" defer', document)
+        self.assertIn('src="focus-study.js" defer', document)
+        self.assertIn('href="interview.css"', document)
+        self.assertIn('id="question-picker"', document)
         self.assertIn('id="sentence-timings"', document)
         self.assertIn('id="follow-reading" checked', document)
         self.assertNotIn('class="draft-note"', document)

@@ -151,122 +151,69 @@ def build(root=ROOT):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>클래스101 · 면접 질문 100</title>
 <link rel="preload" href="fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
-<style>
-@font-face { font-family:"Pretendard Variable"; src:url("fonts/PretendardVariable.woff2") format("woff2"); font-weight:45 920; font-style:normal; font-display:swap; }
-:root { color-scheme: light; --bg:#f6f5f1; --ink:#202d2a; --muted:#5a6863; --line:#d9ded8; --accent:#215f4e; }
-* { box-sizing:border-box; font-family:"Pretendard Variable",sans-serif; }
-body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.7 "Pretendard Variable",sans-serif; }
-header,main,footer { max-width:1160px; margin:auto; padding:32px; }
-header { padding-top:56px; padding-bottom:28px; }
-.eyebrow { margin:0 0 10px; color:var(--accent); font-size:13px; font-weight:700; letter-spacing:.08em; }
-h1 { margin:0; font-size:clamp(28px,4vw,42px); line-height:1.3; letter-spacing:-.04em; }
-.intro { color:var(--muted); margin:14px 0 20px; }
-.tools { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-button,.download { min-height:44px; padding:9px 15px; border:1px solid var(--line); border-radius:8px; background:white; color:var(--ink); font:inherit; font-size:14px; cursor:pointer; text-decoration:none; }
-button:first-child { background:var(--accent); color:white; border-color:var(--accent); }
-button:hover,.download:hover { filter:brightness(.95); }
-:focus-visible { outline:3px solid #b05d22; outline-offset:4px; }
-main { display:grid; grid-template-columns:235px minmax(0,1fr); gap:40px; padding-top:8px; }
-nav { position:sticky; top:24px; align-self:start; }
-nav p { margin:0 0 12px; color:var(--muted); font-size:13px; }
-nav a { display:block; padding:10px 8px; color:var(--muted); text-decoration:none; font-size:14px; border-radius:6px; }
-nav a:hover { background:#e8ede7; color:var(--accent); }
-section { margin:0 0 40px; scroll-margin-top:24px; }
-h2 { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:20px; margin:0 0 16px; line-height:1.5; letter-spacing:-.03em; }
-h2 small { font-size:12px; color:var(--muted); font-weight:400; letter-spacing:0; }
-details { background:#fff; border:1px solid var(--line); border-radius:10px; margin:8px 0; overflow:hidden; }
-summary { display:flex; align-items:center; gap:12px; min-height:64px; padding:16px 18px; cursor:pointer; list-style:none; }
-summary::-webkit-details-marker { display:none; }
-.number { flex-shrink:0; font-size:12px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
-.preview { min-width:0; font-size:16px; line-height:1.7; word-break:keep-all; overflow-wrap:anywhere; }
-.indicator { flex-shrink:0; margin-left:auto; font-size:22px; line-height:1; color:var(--muted); }
-details[open] { border-color:#9db9ad; }
-details[open] .indicator { font-size:0; }
-details[open] .indicator::after { content:"−"; font-size:22px; }
-.answer { margin:0 18px 22px; padding-top:14px; border-top:1px solid var(--line); font-size:16px; line-height:1.85; overflow-wrap:anywhere; word-break:keep-all; }
-.answer p { margin:0 0 14px; }
-.answer .answer-label { color:var(--accent); font-size:12px; font-weight:700; margin-bottom:10px; }
-.answer .answer-keywords { padding:10px 12px; background:#edf2ed; border-radius:6px; font-size:14px; color:var(--accent); }
-strong { font-weight:750; }
-[data-underline-id] { user-select:text; -webkit-user-select:text; }
-.user-underline { text-decoration:underline; text-decoration-color:#b05d22; text-decoration-thickness:2px; text-underline-offset:4px; }
-.speech-sentence { border-radius:3px; transition:background-color .25s ease, color .25s ease; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
-.speech-sentence.is-reading { background-color:#e5f2d9; color:#183f32; text-decoration:underline; text-decoration-color:#397851; text-decoration-thickness:2px; text-underline-offset:5px; background-image:linear-gradient(90deg,#b8dca980 var(--reading-progress,0%),transparent var(--reading-progress,0%)); }
-.speech-sentence.is-reading .user-underline { text-decoration-color:#b05d22; }
-#follow-reading { accent-color:var(--accent); width:17px; height:17px; vertical-align:middle; }
-@media(prefers-reduced-motion:reduce) { .speech-sentence { transition:none; } }
-#underline-tools { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:5; width:max-content; max-width:calc(100% - 24px); padding:10px; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 4px 24px #202d2a26; }
-#underline-tools:not([hidden]) { display:flex; flex-wrap:wrap; gap:8px; }
-#underline-status { display:block; flex-basis:100%; font-size:12px; color:var(--muted); }
-.confirmation { padding:12px 14px; border-left:3px solid #bda471; background:#f7f3e9; color:#655438; font-size:14px; margin-top:16px; }
-code { background:#eef2ee; padding:2px 5px; border-radius:4px; font-size:.9em; }
-footer { padding-top:0; font-size:13px; color:var(--muted); }
-.audio-player { position:sticky; top:0; z-index:2; max-width:1096px; margin:0 auto 24px; padding:14px 18px; background:#edf2ed; border:1px solid #c5d4c8; border-radius:10px; }
-.audio-options,.audio-transport,.listen-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-.audio-options label { font-size:14px; }
-.audio-options select { min-height:44px; border:1px solid var(--line); border-radius:6px; padding:8px; background:white; color:var(--ink); font:inherit; }
-.audio-transport { margin-top:8px; }
-.audio-transport audio { width:280px; max-width:100%; height:44px; }
-#listen-status { display:block; font-size:14px; color:var(--accent); margin-top:8px; }
-.listen-actions { margin-bottom:16px; }
-.listen-actions button { font-size:13px; padding:8px 11px; }
-details.is-speaking { border:2px solid var(--accent); }
-section[id] { scroll-margin-top:240px; }
-nav { top:220px; }
-@media(max-width:760px) {
- header,main,footer { padding-left:20px; padding-right:20px; }
- header { padding-top:32px; }
- main { display:block; }
- nav { position:static; display:flex; overflow-x:auto; gap:8px; padding-bottom:18px; margin-bottom:20px; }
- nav p { display:none; }
- nav a { white-space:nowrap; border:1px solid var(--line); background:white; }
- h2 { font-size:18px; }
- .preview,.answer { font-size:16px; }
- summary { padding:15px 14px; gap:10px; }
- .audio-player { position:static; margin:0 20px 24px; }
- .audio-transport audio { width:100%; }
- section[id] { scroll-margin-top:24px; }
-}
-@media print { nav,.tools,footer,.audio-player,.listen-actions,#underline-tools { display:none; } main { display:block; } details { break-inside:avoid; } }
-</style>
+<link rel="stylesheet" href="interview.css">
 </head>
 <body>
 <nav aria-label="면접 연습 화면" style="display:flex;flex-wrap:wrap;gap:8px;width:min(800px,calc(100% - 48px));margin:20px auto 0;font-family:sans-serif">
 <a href="./" aria-current="page" style="padding:10px 16px;min-height:44px;box-sizing:border-box;border:1px solid #275c48;border-radius:10px;background:#275c48;color:white;text-decoration:none">면접 답변 연습</a>
 <a href="whiteboard.html" style="padding:10px 16px;min-height:44px;box-sizing:border-box;border:1px solid #275c48;border-radius:10px;background:white;color:#275c48;text-decoration:none">화이트보드 알고리즘</a>
 </nav>
-<header>
-<p class="eyebrow">CLASS101 · PAYMENTS &amp; PAYOUTS</p>
-<h1>면접 질문 100</h1>
-<p class="intro">박지우 이력서 × 클래스101 PP 팀<br>10개 분야 · 질문을 누르면 핵심 키워드와 답변이 펼쳐집니다.</p>
-<div class="tools"><button type="button" id="expand">모두 펼치기</button><button type="button" id="collapse">모두 접기</button><a class="download" href="answers.md" download>질문·답변 Markdown</a><a class="download" href="questions.md" download>질문만 저장</a></div>
-<p class="intro">질문이나 답변에서 글자를 선택하면 밑줄을 추가하거나 지울 수 있습니다. 밑줄은 이 브라우저에 저장됩니다.</p>
+<header class="page-header">
+<div><p class="eyebrow">CLASS101 · PP TEAM</p><h1>면접 연습</h1></div>
+<button type="button" id="focus-break" hidden>잠깐 쉬기</button>
 </header>
+<details id="library-panel" class="library">
+<summary>문항 고르기<span>목록 · 보기 설정 · 자료</span></summary>
+<div class="library-body">
+<label for="question-picker">바로 이동</label><select id="question-picker">__PICKER__</select>
+<nav aria-label="질문 분야">__NAV__</nav>
+<div class="tools"><button type="button" id="focus-mode" aria-pressed="true">전체 목록 보기</button><button type="button" id="expand">모두 펼치기</button><button type="button" id="collapse">모두 접기</button><a class="download" href="answers.md" download>질문·답변 Markdown</a><a class="download" href="questions.md" download>질문만 저장</a></div>
+<p class="help">글자를 선택하면 밑줄을 긋거나 지울 수 있습니다. 밑줄과 연습 위치는 이 브라우저에 저장됩니다.</p>
+</div></details>
+<section id="break-panel" class="break-panel" aria-labelledby="break-title" hidden>
+<p class="eyebrow">잠깐 멈춰도 괜찮아요</p><h2 id="break-title">돌아오면 여기서 이어가세요.</h2>
+<p id="break-context"></p><p>음성은 멈춰 두었습니다. 준비되면 아래 버튼을 눌러 주세요.</p>
+<button type="button" id="focus-resume" class="primary">이어서 연습하기</button>
+</section>
+<main id="study-main">
+<div id="focus-controls" hidden>
+<div class="focus-meta"><span id="focus-category"></span><span id="focus-position">1 / 100</span></div>
+<div class="practice-progress"><progress id="focus-progress" max="100" value="0" aria-label="연습 표시한 문항 수"></progress><span id="focus-completed">연습 표시 0개</span></div>
+<p id="focus-hint" role="status">먼저 질문을 읽고 내 말로 답해 보세요.</p>
+<div class="focus-listen"><button type="button" id="focus-listen-question">질문 듣기</button><button type="button" id="focus-listen-answer">답변 듣기</button></div>
+</div>
+<div id="question-content">__SECTIONS__</div>
+<div id="focus-actions" hidden>
+<div class="study-steps"><button type="button" id="focus-prev">이전</button><button type="button" id="focus-reveal" class="primary">답변 보기</button><button type="button" id="focus-next">다음 문항 →</button></div>
+<button type="button" id="focus-done" aria-pressed="false">이 문항 연습했어요</button>
+</div>
+</main>
 <aside class="audio-player" aria-label="면접 음성 플레이어">
+<div class="audio-transport"><audio id="interview-audio" controls preload="none" aria-label="현재 질문 또는 답변 음성"></audio><button type="button" id="listen-pause" disabled>일시정지</button></div>
+<output id="listen-status" role="status">질문이나 답변을 선택해 들어보세요.</output>
+<details class="audio-settings"><summary>연속 듣기 · 음성 설정</summary>
 <div class="audio-options">
 <label for="listen-mode">연속 재생</label><select id="listen-mode"><option value="both">질문 → 답변</option><option value="question">질문만</option><option value="answer">답변만</option></select>
 <label for="playback-rate">속도</label><select id="playback-rate"><option value="0.8">0.8배</option><option value="1" selected>1배</option><option value="1.2">1.2배</option><option value="1.5">1.5배</option></select>
-<button type="button" id="listen-all">전체 연속 듣기</button>
-<label><input type="checkbox" id="follow-reading" checked>재생 위치 따라가기</label>
+<label class="follow-option"><input type="checkbox" id="follow-reading" checked>재생 위치 따라가기</label>
 </div>
-<div class="audio-transport"><audio id="interview-audio" controls preload="none" aria-label="현재 질문 또는 답변 음성"></audio><button type="button" id="listen-prev" disabled>이전 음성</button><button type="button" id="listen-pause" disabled>일시정지</button><button type="button" id="listen-next" disabled>다음 음성</button><button type="button" id="listen-stop" disabled>정지</button></div>
-<output id="listen-status" role="status">한국어 음성으로 질문과 답변을 개별 또는 연속으로 들을 수 있습니다.</output>
+<div class="audio-options"><button type="button" id="focus-listen-from-here">현재 문항부터 연속 듣기</button><button type="button" id="listen-all">전체 연속 듣기</button><button type="button" id="listen-prev" disabled>이전 음성</button><button type="button" id="listen-next" disabled>다음 음성</button><button type="button" id="listen-stop" disabled>정지</button></div>
+</details>
 </aside>
-<main><nav aria-label="질문 분야"><p>분야 바로가기</p>__NAV__</nav><div>__SECTIONS__</div></main>
-<footer>이력서와 채용공고를 바탕으로 작성한 예상 질문과 답변입니다.</footer>
+<footer><p id="focus-save-status" role="status">현재 위치는 이 브라우저에 저장됩니다.</p><p>박지우 이력서 · 클래스101 PP 팀 면접 준비</p></footer>
 <div id="underline-tools" role="group" aria-label="선택한 글자 밑줄" hidden><button type="button" id="underline-add">밑줄 긋기</button><button type="button" id="underline-remove">밑줄 지우기</button><output id="underline-status" role="status">선택한 글자에 적용합니다.</output></div>
-<script>
-const questions = document.querySelectorAll('details');
-document.getElementById('expand').addEventListener('click', () => questions.forEach(item => { item.open = true; }));
-document.getElementById('collapse').addEventListener('click', () => questions.forEach(item => { item.open = false; }));
-</script>
+
 <script src="audio-player.js" defer></script>
 <script src="underline.js" defer></script>
 <script type="application/json" id="sentence-timings">__TIMINGS__</script>
+<script src="focus-study.js" defer></script>
 <script src="reading-highlight.js" defer></script>
 </body>
 </html>
 '''
+    picker = "".join(f'<option value="{number}">{number:03}. {html.escape(question.replace("`", ""))}</option>'
+                     for _, questions in groups for number, question in questions)
+    page = page.replace("__PICKER__", picker)
     page = page.replace("__NAV__", "".join(navigation)).replace("__SECTIONS__", "".join(sections))
     manifest = root / "audio" / "manifest.json"
     timings = {}

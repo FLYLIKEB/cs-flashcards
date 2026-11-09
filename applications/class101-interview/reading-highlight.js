@@ -41,8 +41,9 @@
   function followSentence(element) {
     if (!follow?.checked || audio.paused || window.getSelection()?.toString()) return;
     const rect = element.getBoundingClientRect();
+    if (rect.bottom <= rect.top) return;
     const player = document.querySelector('.audio-player')?.getBoundingClientRect();
-    const top = Math.max(16, player?.bottom > 0 ? player.bottom + 16 : 16);
+    const top = Math.max(16, player?.top <= 0 && player.bottom > 0 ? player.bottom + 16 : 16);
     if (rect.top >= top && rect.bottom <= window.innerHeight - 24) return;
     window.scrollBy({ top: rect.top - top,
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });

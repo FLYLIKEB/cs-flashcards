@@ -35,10 +35,11 @@ function setup() {
     'question-001': [{ start: 1, end: 4 }] }) };
   const card = { querySelector: selector => selector.includes('"question"') ? question
     : sentences[Number(selector.match(/data-sentence="(\d+)"/)[1])] };
+  const playerRect = { top: 0, bottom: 160 };
   const document = {
     getElementById: id => ({ 'interview-audio': audio, 'sentence-timings': data, 'follow-reading': follow,
       'question-1': card })[id],
-    querySelector: () => ({ getBoundingClientRect: () => ({ bottom: 160 }) }),
+    querySelector: () => ({ getBoundingClientRect: () => playerRect }),
   };
   const scrolls = [];
   const frames = new Map();
@@ -50,7 +51,7 @@ function setup() {
     requestAnimationFrame: callback => { frames.set(++frameId, callback); return frameId; },
     cancelAnimationFrame: id => frames.delete(id) };
   vm.runInNewContext(fs.readFileSync('applications/class101-interview/reading-highlight.js', 'utf8'), { document, window });
-  return { audio, follow, sentences, question, window, scrolls, span, frames,
+  return { audio, follow, sentences, question, window, scrolls, span, frames, playerRect,
     emit: (event, time = audio.currentTime) => { audio.currentTime = time; listeners[event](); } };
 }
 
@@ -105,6 +106,16 @@ test('stop, error and unrecognized sources clear the highlight', () => {
   const s = setup(); s.emit('timeupdate', 2);
   s.audio.src = ''; s.emit('timeupdate');
   assert.equal(s.sentences[0].classes.has('is-reading'), false);
+});
+
+test('a player below the text and a collapsed answer do not cause incorrect following', () => {
+  const s = setup();
+  s.playerRect.top = 800; s.playerRect.bottom = 960;
+  s.emit('timeupdate', 2);
+  assert.equal(s.scrolls[0].top, 684);
+  s.sentences[1].getBoundingClientRect = () => ({ top: 0, bottom: 0 });
+  s.emit('timeupdate', 4);
+  assert.equal(s.scrolls.length, 1);
 });
 
 test('animation uses media time, stops when paused, and respects reduced motion', () => {
