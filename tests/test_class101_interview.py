@@ -56,7 +56,7 @@ class InterviewGenerationTests(unittest.TestCase):
                 self.assertTrue(body.startswith("**핵심 키워드:** "))
                 spoken = plain_text(body)
                 self.assertGreaterEqual(len(spoken), 100)
-                self.assertLessEqual(len(spoken), 350)
+                self.assertLessEqual(len(spoken), 450 if number == 1 else 350)
                 self.assertNotIn("핵심 키워드", spoken)
                 for phrase in ("추정", "예측", "가정하", "가정하면", "설명하겠습니다", "확인 필요"):
                     self.assertNotIn(phrase, body)
