@@ -1,6 +1,7 @@
 """Build the standalone interview Q&A page from Markdown sources."""
 
 import html
+import json
 from pathlib import Path
 import re
 
@@ -96,6 +97,7 @@ def sentence_markdown(body):
 
 def render_answer(body, number=None):
     blocks = []
+    sentence_index = 0
     for paragraph in re.split(r"\n\s*\n", body):
         lines = paragraph.splitlines()
         if all(line.startswith(">") for line in lines):
@@ -105,7 +107,11 @@ def render_answer(body, number=None):
             blocks.append(f'<p class="answer-keywords">{inline(" ".join(lines))}</p>')
         else:
             # Preserve the separating space in textContent for saved underline offsets.
-            sentences = "<br> ".join(inline(sentence) for sentence in sentence_lines(" ".join(lines)))
+            spans = []
+            for sentence in sentence_lines(" ".join(lines)):
+                spans.append(f'<span class="speech-sentence" data-speech-kind="answer" data-sentence="{sentence_index}">{inline(sentence)}</span>')
+                sentence_index += 1
+            sentences = "<br> ".join(spans)
             blocks.append(f'<p>{sentences}</p>')
     if number is not None:
         blocks = [block.replace("<p", f'<p data-underline-id="{number}-answer-{index}"', 1)
@@ -128,7 +134,8 @@ def build(root=ROOT):
         navigation.append(f'<a href="#category-{index}">{title}</a>')
         cards = []
         for number, question in questions:
-            preview = inline(question)
+            preview = " ".join(f'<span class="speech-sentence" data-speech-kind="question" data-sentence="{i}">{inline(sentence)}</span>'
+                               for i, sentence in enumerate(sentence_lines(question)))
             emphasized = emphasize_keywords(answers[number])
             body = render_answer(emphasized, number)
             markdown.extend([f"### {number}. {question}", sentence_markdown(emphasized)])
@@ -181,6 +188,11 @@ details[open] .indicator::after { content:"−"; font-size:22px; }
 strong { font-weight:750; }
 [data-underline-id] { user-select:text; -webkit-user-select:text; }
 .user-underline { text-decoration:underline; text-decoration-color:#b05d22; text-decoration-thickness:2px; text-underline-offset:4px; }
+.speech-sentence { border-radius:3px; transition:background-color .25s ease, color .25s ease; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+.speech-sentence.is-reading { background-color:#e5f2d9; color:#183f32; text-decoration:underline; text-decoration-color:#397851; text-decoration-thickness:2px; text-underline-offset:5px; background-image:linear-gradient(90deg,#b8dca980 var(--reading-progress,0%),transparent var(--reading-progress,0%)); }
+.speech-sentence.is-reading .user-underline { text-decoration-color:#b05d22; }
+#follow-reading { accent-color:var(--accent); width:17px; height:17px; vertical-align:middle; }
+@media(prefers-reduced-motion:reduce) { .speech-sentence { transition:none; } }
 #underline-tools { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:5; width:max-content; max-width:calc(100% - 24px); padding:10px; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 4px 24px #202d2a26; }
 #underline-tools:not([hidden]) { display:flex; flex-wrap:wrap; gap:8px; }
 #underline-status { display:block; flex-basis:100%; font-size:12px; color:var(--muted); }
@@ -229,6 +241,7 @@ nav { top:220px; }
 <label for="listen-mode">연속 재생</label><select id="listen-mode"><option value="both">질문 → 답변</option><option value="question">질문만</option><option value="answer">답변만</option></select>
 <label for="playback-rate">속도</label><select id="playback-rate"><option value="0.8">0.8배</option><option value="1" selected>1배</option><option value="1.2">1.2배</option><option value="1.5">1.5배</option></select>
 <button type="button" id="listen-all">전체 연속 듣기</button>
+<label><input type="checkbox" id="follow-reading" checked>재생 위치 따라가기</label>
 </div>
 <div class="audio-transport"><audio id="interview-audio" controls preload="none" aria-label="현재 질문 또는 답변 음성"></audio><button type="button" id="listen-prev" disabled>이전 음성</button><button type="button" id="listen-pause" disabled>일시정지</button><button type="button" id="listen-next" disabled>다음 음성</button><button type="button" id="listen-stop" disabled>정지</button></div>
 <output id="listen-status" role="status">한국어 음성으로 질문과 답변을 개별 또는 연속으로 들을 수 있습니다.</output>
@@ -243,10 +256,18 @@ document.getElementById('collapse').addEventListener('click', () => questions.fo
 </script>
 <script src="audio-player.js" defer></script>
 <script src="underline.js" defer></script>
+<script type="application/json" id="sentence-timings">__TIMINGS__</script>
+<script src="reading-highlight.js" defer></script>
 </body>
 </html>
 '''
     page = page.replace("__NAV__", "".join(navigation)).replace("__SECTIONS__", "".join(sections))
+    manifest = root / "audio" / "manifest.json"
+    timings = {}
+    if manifest.exists():
+        timings = {f'{track["type"]}-{track["id"]:03}': track.get("sentences", [])
+                   for track in json.loads(manifest.read_text(encoding="utf-8"))["tracks"]}
+    page = page.replace("__TIMINGS__", json.dumps(timings).replace("<", "\\u003c"))
     (root / "index.html").write_text(page, encoding="utf-8")
     (root / "answers.md").write_text("\n\n".join(markdown) + "\n", encoding="utf-8")
     print("Built 100 question-and-answer toggles in 10 categories")

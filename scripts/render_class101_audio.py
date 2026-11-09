@@ -3,7 +3,7 @@
 
 Run: python3 scripts/render_class101_audio.py [--verify-only] [--force]
 Manifest schema: {version, voice, rate, tracks: [{id, type, text, speech,
-sourceHash, duration, path}]}; paths are relative to the interview page.
+sourceHash, duration, path, sentences: [{start, end}]}]}; paths are relative to the interview page.
 Confirmation notes and keyword labels are not narrated. The text field preserves the plain-text
 answer; speech additionally includes the question number and pronunciation aids.
 """
@@ -20,9 +20,9 @@ import subprocess
 import tempfile
 
 try:
-    from .build_class101_interview import ROOT, parse_answers, parse_questions
+    from .build_class101_interview import ROOT, parse_answers, parse_questions, sentence_lines
 except ImportError:
-    from build_class101_interview import ROOT, parse_answers, parse_questions
+    from build_class101_interview import ROOT, parse_answers, parse_questions, sentence_lines
 
 
 OUTPUT = ROOT / "audio"
@@ -69,7 +69,7 @@ def source_tracks():
                                       ("answer", "답변", answers[number])):
                 text = plain_text(body)
                 speech = pronounce(f"{number}번 {label}. {text}")
-                fingerprint = json.dumps([speech, VOICE, RATE, "mp3-48k-mono-v1"],
+                fingerprint = json.dumps([speech, VOICE, RATE, "mp3-48k-mono-sentences-v2"],
                                          ensure_ascii=False).encode()
                 tracks.append({"id": number, "type": kind, "text": text,
                                "speech": speech,
@@ -102,6 +102,22 @@ def verify(path):
     return seconds
 
 
+def validate_timings(track, timings, duration):
+    if not isinstance(timings, list) or len(timings) != len(sentence_lines(track["text"])):
+        raise ValueError(f"Missing sentence timing: {track['path']}")
+    previous_end = 0
+    for timing in timings:
+        if not isinstance(timing, dict):
+            raise ValueError(f"Invalid sentence timing: {track['path']}")
+        start, end = timing.get("start"), timing.get("end")
+        if (not isinstance(start, (int, float)) or not isinstance(end, (int, float))
+                or not math.isfinite(start) or not math.isfinite(end)
+                or start < previous_end or end <= start or end > duration):
+            raise ValueError(f"Invalid sentence timing: {track['path']}")
+        previous_end = end
+    return timings
+
+
 def render(track, prior, force, verify_only):
     destination = ROOT / track["path"]
     cached = prior and prior.get("sourceHash") == track["sourceHash"] and destination.exists()
@@ -109,22 +125,46 @@ def render(track, prior, force, verify_only):
         raise ValueError(f"Missing or stale audio: {destination}")
     if cached and not force:
         try:
-            return {**track, "duration": verify(destination)}
+            duration = verify(destination)
+            timings = validate_timings(track, prior.get("sentences"), duration)
+            return {**track, "duration": duration, "sentences": timings}
         except (ValueError, subprocess.SubprocessError):
             if verify_only:
                 raise
     with tempfile.TemporaryDirectory(prefix=".render-", dir=OUTPUT) as temporary:
         folder = Path(temporary)
-        (folder / "speech.txt").write_text(track["speech"], encoding="utf-8")
-        run(["say", "-v", VOICE, "-r", str(RATE), "-f", str(folder / "speech.txt"),
-             "-o", str(folder / "speech.aiff")])
+        label = "질문" if track["type"] == "question" else "답변"
+        segments = [f"{track['id']}번 {label}.", *sentence_lines(track["text"])]
+        timings = []
+        sample_count = 0
+        # Concatenate identical PCM formats, then encode once. Timings come from
+        # actual samples rather than text length or per-segment MP3 padding.
+        with (folder / "speech.pcm").open("wb") as joined:
+            for index, segment in enumerate(segments):
+                (folder / "segment.txt").write_text(pronounce(segment), encoding="utf-8")
+                run(["say", "-v", VOICE, "-r", str(RATE), "-f", str(folder / "segment.txt"),
+                     "-o", str(folder / "segment.aiff")])
+                run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
+                     "-i", str(folder / "segment.aiff"), "-ac", "1", "-ar", "24000",
+                     "-f", "s16le", str(folder / "segment.pcm")])
+                pcm = (folder / "segment.pcm").read_bytes()
+                if not pcm or len(pcm) % 2:
+                    raise ValueError(f"Invalid PCM segment: {track['path']}")
+                # ffprobe serializes duration to six decimal places; match that
+                # precision so sub-microsecond rounding is not a bounds error.
+                start = round(sample_count / 24000, 6)
+                sample_count += len(pcm) // 2
+                if index:
+                    timings.append({"start": start, "end": round(sample_count / 24000, 6)})
+                joined.write(pcm)
         encoded = folder / "speech.mp3"
         run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
-             "-i", str(folder / "speech.aiff"), "-map_metadata", "-1", "-ac", "1",
+             "-f", "s16le", "-ar", "24000", "-ac", "1", "-i", str(folder / "speech.pcm"), "-map_metadata", "-1", "-ac", "1",
              "-ar", "24000", "-codec:a", "libmp3lame", "-b:a", "48k", str(encoded)])
         duration = verify(encoded)
+        validate_timings(track, timings, duration)
         encoded.replace(destination)
-    return {**track, "duration": duration}
+    return {**track, "duration": duration, "sentences": timings}
 
 
 def main():
@@ -145,7 +185,7 @@ def main():
     previous = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
     prior = {(t["id"], t["type"]): t for t in previous.get("tracks", [])}
     results = {}
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=8) as pool:
         jobs = [pool.submit(render, t, prior.get((t["id"], t["type"])),
                             args.force, args.verify_only) for t in tracks]
         for count, job in enumerate(as_completed(jobs), 1):
@@ -154,7 +194,7 @@ def main():
             if count % 20 == 0:
                 print(f"Validated {count}/200 tracks", flush=True)
     ordered = [results[(t["id"], t["type"])] for t in tracks]
-    manifest = {"version": 1, "voice": VOICE, "rate": RATE, "tracks": ordered}
+    manifest = {"version": 2, "voice": VOICE, "rate": RATE, "tracks": ordered}
     if not args.verify_only:
         temporary = OUTPUT / ".manifest.tmp"
         temporary.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
