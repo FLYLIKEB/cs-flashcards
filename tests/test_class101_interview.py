@@ -45,6 +45,17 @@ class InterviewPage(HTMLParser):
 
 
 class InterviewGenerationTests(unittest.TestCase):
+    def test_published_answers_are_complete_without_confirmation_notes(self):
+        source_root = ROOT / "applications/class101-interview"
+        answers = parse_answers([source_root / name for name in (
+            "answers-01-30.md", "answers-31-60.md", "answers-61-100.md",
+        )])
+        for number, body in answers.items():
+            with self.subTest(number=number):
+                self.assertGreaterEqual(len(body), 180)
+                self.assertNotIn("확인 메모", body)
+                self.assertFalse(any(line.startswith(">") for line in body.splitlines()))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -85,6 +96,8 @@ class InterviewGenerationTests(unittest.TestCase):
         self.assertEqual(document.count('data-listen="from-here"'), 100)
         self.assertIn('id="interview-audio" controls preload="none"', document)
         self.assertIn('src="audio-player.js" defer', document)
+        self.assertIn('class="draft-note"', document)
+        self.assertIn('가정을 포함하며', markdown)
         self.assertNotIn('details[open] .preview { display:none;', document)
 
     def test_missing_answer_rejected_before_outputs(self):

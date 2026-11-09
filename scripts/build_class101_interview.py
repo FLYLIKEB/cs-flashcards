@@ -87,7 +87,7 @@ def build(root=ROOT):
         "answers-01-30.md", "answers-31-60.md", "answers-61-100.md",
     )])
     markdown = ["# 클래스101 PP 팀 면접 예상 질문과 답변 100개",
-                "답변 초안입니다. 확인 메모는 실제 이력과 대조해 보완하세요. 설계 제안은 실제 구현 경험과 구분해 설명합니다."]
+                "면접 연습용 답변입니다. 이력서에 없는 구현 세부사항과 동기는 기술 맥락에 맞춘 가정을 포함하며, 검증된 경력 사실을 뜻하지 않습니다."]
     navigation = []
     sections = []
     for index, (title, questions) in enumerate(groups, 1):
@@ -119,6 +119,7 @@ header { padding-top:56px; padding-bottom:28px; }
 .eyebrow { margin:0 0 10px; color:var(--accent); font-size:13px; font-weight:700; letter-spacing:.08em; }
 h1 { margin:0; font-size:clamp(28px,4vw,42px); line-height:1.3; letter-spacing:-.04em; }
 .intro { color:var(--muted); margin:14px 0 20px; }
+.draft-note { color:var(--muted); font-size:13px; margin:0 0 20px; }
 .tools { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
 button,.download { min-height:44px; padding:9px 15px; border:1px solid var(--line); border-radius:8px; background:white; color:var(--ink); font:inherit; font-size:14px; cursor:pointer; text-decoration:none; }
 button:first-child { background:var(--accent); color:white; border-color:var(--accent); }
@@ -181,6 +182,7 @@ nav { top:220px; }
 <p class="eyebrow">CLASS101 · PAYMENTS &amp; PAYOUTS</p>
 <h1>면접 질문 100</h1>
 <p class="intro">박지우 이력서 × 클래스101 PP 팀<br>10개 분야 · 질문을 누르면 답변 초안이 펼쳐집니다.</p>
+<p class="draft-note">면접 연습용 답변입니다. 이력서에 없는 구현 세부사항과 동기는 기술 맥락에 맞춘 가정을 포함하며, 검증된 경력 사실을 뜻하지 않습니다.</p>
 <div class="tools"><button type="button" id="expand">모두 펼치기</button><button type="button" id="collapse">모두 접기</button><a class="download" href="answers.md" download>질문·답변 Markdown</a><a class="download" href="questions.md" download>질문만 저장</a></div>
 </header>
 <aside class="audio-player" aria-label="면접 음성 플레이어">
@@ -190,10 +192,10 @@ nav { top:220px; }
 <button type="button" id="listen-all">전체 연속 듣기</button>
 </div>
 <div class="audio-transport"><audio id="interview-audio" controls preload="none" aria-label="현재 질문 또는 답변 음성"></audio><button type="button" id="listen-prev" disabled>이전 음성</button><button type="button" id="listen-pause" disabled>일시정지</button><button type="button" id="listen-next" disabled>다음 음성</button><button type="button" id="listen-stop" disabled>정지</button></div>
-<output id="listen-status" role="status">질문과 답변을 개별 또는 연속으로 들을 수 있습니다. 확인 메모는 읽지 않습니다.</output>
+<output id="listen-status" role="status">한국어 음성으로 질문과 답변을 개별 또는 연속으로 들을 수 있습니다.</output>
 </aside>
 <main><nav aria-label="질문 분야"><p>분야 바로가기</p>__NAV__</nav><div>__SECTIONS__</div></main>
-<footer>이력서와 채용공고를 바탕으로 작성한 예상 질문과 답변 초안입니다. 확인 메모는 실제 이력과 대조하고, 설계 제안은 실제 구현 경험과 구분해 설명하세요.</footer>
+<footer>이력서와 채용공고를 바탕으로 작성한 예상 질문과 답변입니다.</footer>
 <script>
 const questions = document.querySelectorAll('details');
 document.getElementById('expand').addEventListener('click', () => questions.forEach(item => { item.open = true; }));
