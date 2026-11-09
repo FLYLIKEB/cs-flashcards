@@ -76,6 +76,8 @@ def render_answer(body):
         if all(line.startswith(">") for line in lines):
             text = " ".join(line.removeprefix(">").strip() for line in lines)
             blocks.append(f'<aside class="confirmation">{inline(text)}</aside>')
+        elif paragraph.startswith("**핵심 키워드:**"):
+            blocks.append(f'<p class="answer-keywords">{inline(" ".join(lines))}</p>')
         else:
             blocks.append(f'<p>{inline(" ".join(lines))}</p>')
     return "".join(blocks)
@@ -87,7 +89,7 @@ def build(root=ROOT):
         "answers-01-30.md", "answers-31-60.md", "answers-61-100.md",
     )])
     markdown = ["# 클래스101 PP 팀 면접 예상 질문과 답변 100개",
-                "면접 연습용 답변입니다. 이력서에 없는 구현 세부사항과 동기는 기술 맥락에 맞춘 가정을 포함하며, 검증된 경력 사실을 뜻하지 않습니다."]
+                "질문별 핵심 키워드와 면접 답변을 정리했습니다."]
     navigation = []
     sections = []
     for index, (title, questions) in enumerate(groups, 1):
@@ -101,7 +103,7 @@ def build(root=ROOT):
             markdown.extend([f"### {number}. {question}", answers[number]])
             cards.append(f'''<details id="question-{number}">
 <summary><span class="number">Q{number:03}</span><span class="preview">{preview}</span><span class="indicator" aria-hidden="true">+</span></summary>
-<div class="answer"><div class="listen-actions" aria-label="{number}번 음성 듣기"><button type="button" data-listen="question" data-question="{number}">질문 듣기</button><button type="button" data-listen="answer" data-question="{number}">답변 듣기</button><button type="button" data-listen="from-here" data-question="{number}">여기부터 연속 듣기</button></div><p class="answer-label">답변 초안</p>{body}</div></details>''')
+<div class="answer"><div class="listen-actions" aria-label="{number}번 음성 듣기"><button type="button" data-listen="question" data-question="{number}">질문 듣기</button><button type="button" data-listen="answer" data-question="{number}">답변 듣기</button><button type="button" data-listen="from-here" data-question="{number}">여기부터 연속 듣기</button></div><p class="answer-label">답변</p>{body}</div></details>''')
         sections.append(f'<section id="category-{index}" aria-labelledby="heading-{index}"><h2 id="heading-{index}">{title}<small>10문항</small></h2>{"".join(cards)}</section>')
 
     page = '''<!doctype html>
@@ -119,7 +121,6 @@ header { padding-top:56px; padding-bottom:28px; }
 .eyebrow { margin:0 0 10px; color:var(--accent); font-size:13px; font-weight:700; letter-spacing:.08em; }
 h1 { margin:0; font-size:clamp(28px,4vw,42px); line-height:1.3; letter-spacing:-.04em; }
 .intro { color:var(--muted); margin:14px 0 20px; }
-.draft-note { color:var(--muted); font-size:13px; margin:0 0 20px; }
 .tools { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
 button,.download { min-height:44px; padding:9px 15px; border:1px solid var(--line); border-radius:8px; background:white; color:var(--ink); font:inherit; font-size:14px; cursor:pointer; text-decoration:none; }
 button:first-child { background:var(--accent); color:white; border-color:var(--accent); }
@@ -145,6 +146,7 @@ details[open] .indicator::after { content:"−"; font-size:22px; }
 .answer { margin:0 18px 22px; padding-top:14px; border-top:1px solid var(--line); font-size:16px; line-height:1.85; overflow-wrap:anywhere; word-break:keep-all; }
 .answer p { margin:0 0 14px; }
 .answer .answer-label { color:var(--accent); font-size:12px; font-weight:700; margin-bottom:10px; }
+.answer .answer-keywords { padding:10px 12px; background:#edf2ed; border-radius:6px; font-size:14px; color:var(--accent); }
 .confirmation { padding:12px 14px; border-left:3px solid #bda471; background:#f7f3e9; color:#655438; font-size:14px; margin-top:16px; }
 code { background:#eef2ee; padding:2px 5px; border-radius:4px; font-size:.9em; }
 footer { padding-top:0; font-size:13px; color:var(--muted); }
@@ -181,8 +183,7 @@ nav { top:220px; }
 <header>
 <p class="eyebrow">CLASS101 · PAYMENTS &amp; PAYOUTS</p>
 <h1>면접 질문 100</h1>
-<p class="intro">박지우 이력서 × 클래스101 PP 팀<br>10개 분야 · 질문을 누르면 답변 초안이 펼쳐집니다.</p>
-<p class="draft-note">면접 연습용 답변입니다. 이력서에 없는 구현 세부사항과 동기는 기술 맥락에 맞춘 가정을 포함하며, 검증된 경력 사실을 뜻하지 않습니다.</p>
+<p class="intro">박지우 이력서 × 클래스101 PP 팀<br>10개 분야 · 질문을 누르면 핵심 키워드와 답변이 펼쳐집니다.</p>
 <div class="tools"><button type="button" id="expand">모두 펼치기</button><button type="button" id="collapse">모두 접기</button><a class="download" href="answers.md" download>질문·답변 Markdown</a><a class="download" href="questions.md" download>질문만 저장</a></div>
 </header>
 <aside class="audio-player" aria-label="면접 음성 플레이어">

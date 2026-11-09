@@ -4,7 +4,7 @@
 Run: python3 scripts/render_class101_audio.py [--verify-only] [--force]
 Manifest schema: {version, voice, rate, tracks: [{id, type, text, speech,
 sourceHash, duration, path}]}; paths are relative to the interview page.
-Confirmation notes are not narrated. The text field preserves the plain-text
+Confirmation notes and keyword labels are not narrated. The text field preserves the plain-text
 answer; speech additionally includes the question number and pronunciation aids.
 """
 
@@ -46,7 +46,7 @@ PRONUNCIATIONS = {
 
 def plain_text(body):
     body = " ".join(line.strip() for line in body.splitlines()
-                    if not line.lstrip().startswith(">"))
+                    if not line.lstrip().startswith((">", "**핵심 키워드:**")))
     body = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", body)
     return " ".join(body.replace("`", "").replace("**", "").split())
 

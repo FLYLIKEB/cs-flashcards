@@ -8,7 +8,8 @@ import re
 import tempfile
 import unittest
 
-from scripts.build_class101_interview import build, inline, parse_answers, parse_questions
+from scripts.build_class101_interview import build, inline, parse_answers, parse_questions, render_answer
+from scripts.render_class101_audio import plain_text
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,9 +53,20 @@ class InterviewGenerationTests(unittest.TestCase):
         )])
         for number, body in answers.items():
             with self.subTest(number=number):
-                self.assertGreaterEqual(len(body), 180)
+                self.assertTrue(body.startswith("**핵심 키워드:** "))
+                spoken = plain_text(body)
+                self.assertGreaterEqual(len(spoken), 100)
+                self.assertLessEqual(len(spoken), 350)
+                self.assertNotIn("핵심 키워드", spoken)
+                for phrase in ("추정", "예측", "가정하", "가정하면", "설명하겠습니다", "확인 필요"):
+                    self.assertNotIn(phrase, body)
                 self.assertNotIn("확인 메모", body)
                 self.assertFalse(any(line.startswith(">") for line in body.splitlines()))
+
+    def test_keywords_are_visible_but_not_narrated(self):
+        answer = "**핵심 키워드:** `SQL` · 멱등성 · 원자성\n\n동일 요청은 한 번만 처리하겠습니다."
+        self.assertIn('class="answer-keywords"', render_answer(answer))
+        self.assertEqual(plain_text(answer), "동일 요청은 한 번만 처리하겠습니다.")
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -96,8 +108,7 @@ class InterviewGenerationTests(unittest.TestCase):
         self.assertEqual(document.count('data-listen="from-here"'), 100)
         self.assertIn('id="interview-audio" controls preload="none"', document)
         self.assertIn('src="audio-player.js" defer', document)
-        self.assertIn('class="draft-note"', document)
-        self.assertIn('가정을 포함하며', markdown)
+        self.assertNotIn('class="draft-note"', document)
         self.assertNotIn('details[open] .preview { display:none;', document)
 
     def test_missing_answer_rejected_before_outputs(self):
