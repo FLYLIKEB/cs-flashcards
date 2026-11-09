@@ -40,3 +40,8 @@ Replace noise with an offline instrumental loop; retain saved volume/on-off pref
 - 30문제 모두 첫 음성 구간은 문제 번호와 문제명이다. 제목과 문제 소개 구간에는 문제별 ImageGen 그림을 공통 이미지 컴포넌트로 유지하고, 풀이 설명이 시작되면 자료구조 애니메이션으로 이어진다.
 - 그림은 아이보리 바탕의 평면 2D 도식으로, 실제 예제의 숫자·배열·방향 화살표로 입력과 결과를 직접 표현한다. 3D 재질·그림자·장식 소품을 사용하지 않는다. 선택 항목은 딥그린, 제외 항목은 절제된 코럴로 구분한다. 이미지 로딩 실패 시 기존 제목 애니메이션을 유지한다.
 - `/static/coding-images.html`에서 30문제를 모아 보고 원본 크기로 열 수 있다.
+
+
+## Whiteboard interview extension · 2026-11-09
+
+Active surface: `applications/class101-interview/whiteboard.html`. A visible button-style navigation link separates algorithm preparation from the existing answer/audio practice; the builder preserves this link. Reuse the calm Pretendard/off-white/teal design, native disclosures, visible keyboard focus and 44px controls. Provide eight explicitly predicted practice problems with examples, clarifying questions, baseline and improved solutions, board traces, pseudocode, invariants, complexity, edge cases and spoken explanations. Source notes distinguish official process descriptions from unverified current executive questions. Static HTML/CSS works without JavaScript, does not touch SQLite or saved study records, and code scrolls within the page at mobile widths. Acceptance: navigation both ways, eight readable disclosures, correct examples and no mobile overflow.

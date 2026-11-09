@@ -231,6 +231,10 @@ nav { top:220px; }
 </style>
 </head>
 <body>
+<nav aria-label="면접 연습 화면" style="display:flex;flex-wrap:wrap;gap:8px;width:min(800px,calc(100% - 48px));margin:20px auto 0;font-family:sans-serif">
+<a href="./" aria-current="page" style="padding:10px 16px;min-height:44px;box-sizing:border-box;border:1px solid #275c48;border-radius:10px;background:#275c48;color:white;text-decoration:none">면접 답변 연습</a>
+<a href="whiteboard.html" style="padding:10px 16px;min-height:44px;box-sizing:border-box;border:1px solid #275c48;border-radius:10px;background:white;color:#275c48;text-decoration:none">화이트보드 알고리즘</a>
+</nav>
 <header>
 <p class="eyebrow">CLASS101 · PAYMENTS &amp; PAYOUTS</p>
 <h1>면접 질문 100</h1>
