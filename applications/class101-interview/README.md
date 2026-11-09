@@ -14,6 +14,7 @@ python3 -m http.server 8765 --bind 127.0.0.1 --directory applications/class101-i
 - 각 문항은 **핵심 키워드 3~5개 + 면접에서 말하기 쉬운 구어체 답변**으로 구성합니다. 필요한 기술 용어는 남기고 일상적인 설명과 예시로 풀었으며, 한 문장마다 줄을 나눕니다. 경험 질문은 이력서의 성과를, 설계 질문은 선택할 기술과 이유를 중심으로 답합니다.
 - 기술 개념을 복습할 공식 문서는 [참고 자료](references.md)에 모았습니다.
 - 별도 설치나 외부 네트워크 요청 없이 동작합니다.
+- 글꼴은 [Pretendard v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9)의 가변 웹폰트를 로컬에서 불러옵니다. 폰트 파일과 SIL Open Font License는 `fonts/`에 포함했습니다.
 
 ## 키워드와 밑줄
 
