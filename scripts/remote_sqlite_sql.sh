@@ -73,7 +73,9 @@ if [[ -z "$SQL_TEXT" ]]; then
     echo "실행할 SQL이 없습니다. --sql 또는 stdin으로 SQL을 제공하세요." >&2
     exit 1
   fi
-  SQL_TEXT="$(cat)"
+  # A sentinel prevents command substitution from stripping trailing newlines.
+  SQL_TEXT="$(cat && printf '.')"
+  SQL_TEXT="${SQL_TEXT%.}"
 fi
 
 if [[ -z "$(printf '%s' "$SQL_TEXT" | tr -d '[:space:]')" ]]; then
@@ -192,9 +194,10 @@ SQL_TEXT="$(python3 - <<'PY' "$SQL_B64"
 import base64
 import sys
 
-sys.stdout.write(base64.b64decode(sys.argv[1]).decode('utf-8'))
+sys.stdout.write(base64.b64decode(sys.argv[1]).decode('utf-8') + '.')
 PY
 )"
+SQL_TEXT="${SQL_TEXT%.}"
 if [[ ! -f "$REMOTE_DB_PATH" ]]; then
   echo "원격 SQLite 파일이 없습니다: $REMOTE_DB_PATH" >&2
   exit 1

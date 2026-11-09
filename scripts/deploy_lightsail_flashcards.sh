@@ -175,6 +175,24 @@ ensure_stage_has_no_sqlite_payload() {
 
 
 
+stage_interview_assets() {
+  local source_dir="$1"
+  local stage_dir="$2"
+  local question_number padded_number
+  mkdir -p "$stage_dir/audio" "$stage_dir/fonts"
+  # Ship only the mobile site, never the surrounding application materials or render scratch files.
+  local asset
+  for asset in index.html interview.css audio-player.js underline.js reading-highlight.js focus-study.js questions.md answers.md whiteboard.html whiteboard.css; do
+    cp "$source_dir/$asset" "$stage_dir/$asset"
+  done
+  cp "$source_dir/fonts/PretendardVariable.woff2" "$source_dir/fonts/LICENSE.txt" "$stage_dir/fonts/"
+  cp "$source_dir/audio/manifest.json" "$stage_dir/audio/"
+  for ((question_number=1; question_number<=100; question_number++)); do
+    printf -v padded_number '%03d' "$question_number"
+    cp "$source_dir/audio/question-$padded_number.mp3" "$source_dir/audio/answer-$padded_number.mp3" "$stage_dir/audio/"
+  done
+}
+
 TMP_ARCHIVE="$(mktemp -t cs-flashcards.XXXXXX.tar.gz)"
 REMOTE_ARCHIVE="/tmp/cs-flashcards-$(date +%Y%m%dT%H%M%S)-$$.tar.gz"
 TMP_STAGE="$(mktemp -d -t cs-flashcards-stage.XXXXXX)"
@@ -201,6 +219,7 @@ fi
 mkdir -p "$TMP_STAGE/data"
 cp app.py flashcards_backend.py question_generator.py requirements.txt "$TMP_STAGE/"
 cp -R static "$TMP_STAGE/"
+stage_interview_assets "$ROOT_DIR/applications/class101-interview" "$TMP_STAGE/applications/class101-interview"
 cp data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
 echo "원격 state/progress.sqlite 보호: 배포 번들에 SQLite 파일을 포함하지 않습니다."
 

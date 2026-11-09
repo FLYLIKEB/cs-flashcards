@@ -71,6 +71,7 @@ PROGRESS_DB_MUST_EXIST_ENV = "CS_FLASHCARD_PROGRESS_DB_MUST_EXIST"
 BACKUP_DIR = Path(os.environ.get("CS_FLASHCARD_BACKUP_DIR", ROOT / "backups")).expanduser().resolve()
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+INTERVIEW_DIR = ROOT / "applications" / "class101-interview"
 PUBLIC_WIKI_ASSET_DIR = STATIC_DIR / "wiki-assets"
 PUBLIC_AUTH_BYPASS_PREFIXES = (
     "/public/wiki-assets",
@@ -738,6 +739,7 @@ def render_recruitment_schedule_wiki_page(markdown_text: str) -> str:
 
 app = FastAPI(title="CS Encyclopedia Flashcards", version="1.0.0")
 app.mount("/static", StaticFiles(directory=STATIC_DIR, check_dir=False), name="static")
+app.mount("/interview", StaticFiles(directory=INTERVIEW_DIR, html=True, check_dir=False), name="interview")
 app.mount("/public/wiki-assets", StaticFiles(directory=PUBLIC_WIKI_ASSET_DIR, check_dir=False), name="public-wiki-assets")
 
 
