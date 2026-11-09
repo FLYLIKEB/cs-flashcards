@@ -69,7 +69,20 @@ def inline(text):
     return "".join(parts)
 
 
-def render_answer(body):
+def emphasize_keywords(body):
+    match = re.match(r"\*\*핵심 키워드:\*\* ([^\n]+)", body)
+    if not match:
+        return body
+    keywords = [word.strip().strip("`*") for word in match[1].split(" · ")]
+    pattern = re.compile("|".join(re.escape(word) for word in sorted(keywords, key=len, reverse=True) if word))
+    # Keep existing Markdown tokens intact, including URLs and explicit emphasis.
+    parts = re.split(r"(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https://[^\s)]+\))", body[match.end():])
+    emphasized = "".join(part if index % 2 else pattern.sub(lambda m: f"**{m[0]}**", part)
+                         for index, part in enumerate(parts))
+    return "**핵심 키워드:** " + " · ".join(f"**{word}**" for word in keywords) + emphasized
+
+
+def render_answer(body, number=None):
     blocks = []
     for paragraph in re.split(r"\n\s*\n", body):
         lines = paragraph.splitlines()
@@ -80,6 +93,9 @@ def render_answer(body):
             blocks.append(f'<p class="answer-keywords">{inline(" ".join(lines))}</p>')
         else:
             blocks.append(f'<p>{inline(" ".join(lines))}</p>')
+    if number is not None:
+        blocks = [block.replace("<p", f'<p data-underline-id="{number}-answer-{index}"', 1)
+                  if block.startswith("<p") else block for index, block in enumerate(blocks)]
     return "".join(blocks)
 
 
@@ -99,10 +115,11 @@ def build(root=ROOT):
         cards = []
         for number, question in questions:
             preview = inline(question)
-            body = render_answer(answers[number])
-            markdown.extend([f"### {number}. {question}", answers[number]])
+            emphasized = emphasize_keywords(answers[number])
+            body = render_answer(emphasized, number)
+            markdown.extend([f"### {number}. {question}", emphasized])
             cards.append(f'''<details id="question-{number}">
-<summary><span class="number">Q{number:03}</span><span class="preview">{preview}</span><span class="indicator" aria-hidden="true">+</span></summary>
+<summary><span class="number">Q{number:03}</span><span class="preview" data-underline-id="{number}-question">{preview}</span><span class="indicator" aria-hidden="true">+</span></summary>
 <div class="answer"><div class="listen-actions" aria-label="{number}번 음성 듣기"><button type="button" data-listen="question" data-question="{number}">질문 듣기</button><button type="button" data-listen="answer" data-question="{number}">답변 듣기</button><button type="button" data-listen="from-here" data-question="{number}">여기부터 연속 듣기</button></div><p class="answer-label">답변</p>{body}</div></details>''')
         sections.append(f'<section id="category-{index}" aria-labelledby="heading-{index}"><h2 id="heading-{index}">{title}<small>10문항</small></h2>{"".join(cards)}</section>')
 
@@ -147,6 +164,12 @@ details[open] .indicator::after { content:"−"; font-size:22px; }
 .answer p { margin:0 0 14px; }
 .answer .answer-label { color:var(--accent); font-size:12px; font-weight:700; margin-bottom:10px; }
 .answer .answer-keywords { padding:10px 12px; background:#edf2ed; border-radius:6px; font-size:14px; color:var(--accent); }
+strong { font-weight:750; }
+[data-underline-id] { user-select:text; -webkit-user-select:text; }
+.user-underline { text-decoration:underline; text-decoration-color:#b05d22; text-decoration-thickness:2px; text-underline-offset:4px; }
+#underline-tools { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:5; width:max-content; max-width:calc(100% - 24px); padding:10px; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 4px 24px #202d2a26; }
+#underline-tools:not([hidden]) { display:flex; flex-wrap:wrap; gap:8px; }
+#underline-status { display:block; flex-basis:100%; font-size:12px; color:var(--muted); }
 .confirmation { padding:12px 14px; border-left:3px solid #bda471; background:#f7f3e9; color:#655438; font-size:14px; margin-top:16px; }
 code { background:#eef2ee; padding:2px 5px; border-radius:4px; font-size:.9em; }
 footer { padding-top:0; font-size:13px; color:var(--muted); }
@@ -176,7 +199,7 @@ nav { top:220px; }
  .audio-transport audio { width:100%; }
  section[id] { scroll-margin-top:24px; }
 }
-@media print { nav,.tools,footer,.audio-player,.listen-actions { display:none; } main { display:block; } details { break-inside:avoid; } }
+@media print { nav,.tools,footer,.audio-player,.listen-actions,#underline-tools { display:none; } main { display:block; } details { break-inside:avoid; } }
 </style>
 </head>
 <body>
@@ -185,6 +208,7 @@ nav { top:220px; }
 <h1>면접 질문 100</h1>
 <p class="intro">박지우 이력서 × 클래스101 PP 팀<br>10개 분야 · 질문을 누르면 핵심 키워드와 답변이 펼쳐집니다.</p>
 <div class="tools"><button type="button" id="expand">모두 펼치기</button><button type="button" id="collapse">모두 접기</button><a class="download" href="answers.md" download>질문·답변 Markdown</a><a class="download" href="questions.md" download>질문만 저장</a></div>
+<p class="intro">질문이나 답변에서 글자를 선택하면 밑줄을 추가하거나 지울 수 있습니다. 밑줄은 이 브라우저에 저장됩니다.</p>
 </header>
 <aside class="audio-player" aria-label="면접 음성 플레이어">
 <div class="audio-options">
@@ -197,12 +221,14 @@ nav { top:220px; }
 </aside>
 <main><nav aria-label="질문 분야"><p>분야 바로가기</p>__NAV__</nav><div>__SECTIONS__</div></main>
 <footer>이력서와 채용공고를 바탕으로 작성한 예상 질문과 답변입니다.</footer>
+<div id="underline-tools" role="group" aria-label="선택한 글자 밑줄" hidden><button type="button" id="underline-add">밑줄 긋기</button><button type="button" id="underline-remove">밑줄 지우기</button><output id="underline-status" role="status">선택한 글자에 적용합니다.</output></div>
 <script>
 const questions = document.querySelectorAll('details');
 document.getElementById('expand').addEventListener('click', () => questions.forEach(item => { item.open = true; }));
 document.getElementById('collapse').addEventListener('click', () => questions.forEach(item => { item.open = false; }));
 </script>
 <script src="audio-player.js" defer></script>
+<script src="underline.js" defer></script>
 </body>
 </html>
 '''

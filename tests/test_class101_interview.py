@@ -8,7 +8,7 @@ import re
 import tempfile
 import unittest
 
-from scripts.build_class101_interview import build, inline, parse_answers, parse_questions, render_answer
+from scripts.build_class101_interview import build, emphasize_keywords, inline, parse_answers, parse_questions, render_answer
 from scripts.render_class101_audio import plain_text
 
 
@@ -67,6 +67,18 @@ class InterviewGenerationTests(unittest.TestCase):
         answer = "**핵심 키워드:** `SQL` · 멱등성 · 원자성\n\n동일 요청은 한 번만 처리하겠습니다."
         self.assertIn('class="answer-keywords"', render_answer(answer))
         self.assertEqual(plain_text(answer), "동일 요청은 한 번만 처리하겠습니다.")
+
+    def test_keyword_emphasis_preserves_speech_and_inline_markup(self):
+        body = "**핵심 키워드:** SQL · 멱등성\n\nSQL과 멱등성을 사용하고 `SQL`과 **멱등성**을 확인합니다. [SQL](https://example.com/SQL)"
+        marked = emphasize_keywords(body)
+        self.assertIn("**SQL**과 **멱등성**을", marked)
+        self.assertIn("`SQL`과 **멱등성**", marked)
+        self.assertIn("[SQL](https://example.com/SQL)", marked)
+        self.assertEqual(plain_text(body), plain_text(marked))
+        self.assertEqual(emphasize_keywords(marked), marked)
+        rendered = render_answer(marked, 1)
+        self.assertIn('data-underline-id="1-answer-1"', rendered)
+        self.assertIn('<strong>SQL</strong>', rendered)
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
