@@ -8,7 +8,7 @@ import re
 import tempfile
 import unittest
 
-from scripts.build_class101_interview import build, emphasize_keywords, inline, parse_answers, parse_questions, render_answer
+from scripts.build_class101_interview import build, emphasize_keywords, inline, parse_answers, parse_questions, render_answer, sentence_markdown
 from scripts.render_class101_audio import plain_text
 
 
@@ -67,6 +67,16 @@ class InterviewGenerationTests(unittest.TestCase):
         answer = "**핵심 키워드:** `SQL` · 멱등성 · 원자성\n\n동일 요청은 한 번만 처리하겠습니다."
         self.assertIn('class="answer-keywords"', render_answer(answer))
         self.assertEqual(plain_text(answer), "동일 요청은 한 번만 처리하겠습니다.")
+
+    def test_sentence_breaks_preserve_words_and_saved_underline_offsets(self):
+        body = "**핵심 키워드:** Node.js · 성능\n\nNode.js에서 1.5배 개선했습니다. **성능**을 검증했습니다. 다음 단계입니다."
+        rendered = render_answer(body, 1)
+        self.assertEqual(rendered.count("<br> "), 2)
+        self.assertIn("Node.js에서 1.5배", rendered)
+        self.assertIn("했습니다.  \n**성능**", sentence_markdown(body))
+        self.assertEqual(plain_text(sentence_markdown(body)), plain_text(body))
+        self.assertEqual(re.sub(r"<[^>]+>", "", rendered),
+                         "핵심 키워드: Node.js · 성능Node.js에서 1.5배 개선했습니다. 성능을 검증했습니다. 다음 단계입니다.")
 
     def test_keyword_emphasis_preserves_speech_and_inline_markup(self):
         body = "**핵심 키워드:** SQL · 멱등성\n\nSQL과 멱등성을 사용하고 `SQL`과 **멱등성**을 확인합니다. [SQL](https://example.com/SQL)"

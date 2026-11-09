@@ -82,6 +82,18 @@ def emphasize_keywords(body):
     return "**핵심 키워드:** " + " · ".join(f"**{word}**" for word in keywords) + emphasized
 
 
+def sentence_lines(text):
+    return re.split(r"(?<=[.!?]) +(?=\S)", text)
+
+
+def sentence_markdown(body):
+    return "\n\n".join(
+        paragraph if paragraph.startswith(("**핵심 키워드:**", ">"))
+        else "  \n".join(sentence_lines(" ".join(paragraph.splitlines())))
+        for paragraph in re.split(r"\n\s*\n", body)
+    )
+
+
 def render_answer(body, number=None):
     blocks = []
     for paragraph in re.split(r"\n\s*\n", body):
@@ -92,7 +104,9 @@ def render_answer(body, number=None):
         elif paragraph.startswith("**핵심 키워드:**"):
             blocks.append(f'<p class="answer-keywords">{inline(" ".join(lines))}</p>')
         else:
-            blocks.append(f'<p>{inline(" ".join(lines))}</p>')
+            # Preserve the separating space in textContent for saved underline offsets.
+            sentences = "<br> ".join(inline(sentence) for sentence in sentence_lines(" ".join(lines)))
+            blocks.append(f'<p>{sentences}</p>')
     if number is not None:
         blocks = [block.replace("<p", f'<p data-underline-id="{number}-answer-{index}"', 1)
                   if block.startswith("<p") else block for index, block in enumerate(blocks)]
@@ -117,7 +131,7 @@ def build(root=ROOT):
             preview = inline(question)
             emphasized = emphasize_keywords(answers[number])
             body = render_answer(emphasized, number)
-            markdown.extend([f"### {number}. {question}", emphasized])
+            markdown.extend([f"### {number}. {question}", sentence_markdown(emphasized)])
             cards.append(f'''<details id="question-{number}">
 <summary><span class="number">Q{number:03}</span><span class="preview" data-underline-id="{number}-question">{preview}</span><span class="indicator" aria-hidden="true">+</span></summary>
 <div class="answer"><div class="listen-actions" aria-label="{number}번 음성 듣기"><button type="button" data-listen="question" data-question="{number}">질문 듣기</button><button type="button" data-listen="answer" data-question="{number}">답변 듣기</button><button type="button" data-listen="from-here" data-question="{number}">여기부터 연속 듣기</button></div><p class="answer-label">답변</p>{body}</div></details>''')
