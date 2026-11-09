@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>클래스101 · 면접 질문 100</title>
+<style>
+:root { color-scheme: light; --bg:#f6f5f1; --ink:#202d2a; --muted:#5a6863; --line:#d9ded8; --accent:#215f4e; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.7 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; }
+header,main,footer { max-width:1160px; margin:auto; padding:32px; }
+header { padding-top:56px; padding-bottom:28px; }
+.eyebrow { margin:0 0 10px; color:var(--accent); font-size:13px; font-weight:700; letter-spacing:.08em; }
+h1 { margin:0; font-size:clamp(28px,4vw,42px); line-height:1.3; letter-spacing:-.04em; }
+.intro { color:var(--muted); margin:14px 0 20px; }
+.tools { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+button,.download { min-height:44px; padding:9px 15px; border:1px solid var(--line); border-radius:8px; background:white; color:var(--ink); font:inherit; font-size:14px; cursor:pointer; text-decoration:none; }
+button:first-child { background:var(--accent); color:white; border-color:var(--accent); }
+button:hover,.download:hover { filter:brightness(.95); }
+:focus-visible { outline:3px solid #b05d22; outline-offset:4px; }
+main { display:grid; grid-template-columns:235px minmax(0,1fr); gap:40px; padding-top:8px; }
+nav { position:sticky; top:24px; align-self:start; }
+nav p { margin:0 0 12px; color:var(--muted); font-size:13px; }
+nav a { display:block; padding:10px 8px; color:var(--muted); text-decoration:none; font-size:14px; border-radius:6px; }
+nav a:hover { background:#e8ede7; color:var(--accent); }
+section { margin:0 0 40px; scroll-margin-top:24px; }
+h2 { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:20px; margin:0 0 16px; line-height:1.5; letter-spacing:-.03em; }
+h2 small { font-size:12px; color:var(--muted); font-weight:400; letter-spacing:0; }
+details { background:#fff; border:1px solid var(--line); border-radius:10px; margin:8px 0; overflow:hidden; }
+summary { display:flex; align-items:center; gap:12px; min-height:64px; padding:16px 18px; cursor:pointer; list-style:none; }
+summary::-webkit-details-marker { display:none; }
+.number { flex-shrink:0; font-size:12px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+.preview { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:15px; }
+.indicator { margin-left:auto; font-size:22px; line-height:1; color:var(--muted); }
+details[open] { border-color:#9db9ad; }
+details[open] summary { min-height:48px; padding-bottom:0; }
+details[open] .preview { display:none; }
+details[open] .indicator { font-size:0; }
+details[open] .indicator::after { content:"−"; font-size:22px; }
+.question { margin:10px 18px 22px; font-size:18px; line-height:1.85; overflow-wrap:anywhere; word-break:keep-all; }
+code { background:#eef2ee; padding:2px 5px; border-radius:4px; font-size:.9em; }
+footer { padding-top:0; font-size:13px; color:var(--muted); }
+@media(max-width:760px) {
+ header,main,footer { padding-left:20px; padding-right:20px; }
+ header { padding-top:32px; }
+ main { display:block; }
+ nav { position:static; display:flex; overflow-x:auto; gap:8px; padding-bottom:18px; margin-bottom:20px; }
+ nav p { display:none; }
+ nav a { white-space:nowrap; border:1px solid var(--line); background:white; }
+ h2 { font-size:18px; }
+ .question { font-size:17px; }
+ summary { padding:15px 14px; gap:10px; }
+}
+@media print { nav,.tools,footer { display:none; } main { display:block; } details { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<header>
+<p class="eyebrow">CLASS101 · PAYMENTS &amp; PAYOUTS</p>
+<h1>면접 질문 100</h1>
+<p class="intro">박지우 이력서 × 클래스101 PP 팀<br>10개 분야 · 질문을 눌러 펼치고, 하나씩 생각해 보세요.</p>
+<div class="tools"><button type="button" id="expand">모두 펼치기</button><button type="button" id="collapse">모두 접기</button><a class="download" href="questions.md" download>Markdown 저장</a></div>
+</header>
+<main><nav aria-label="질문 분야"><p>분야 바로가기</p><a href="#category-1">1. 지원 동기·경력·직무 적합성</a><a href="#category-2">2. 성능 최적화·JPA·캐싱</a><a href="#category-3">3. 주문·재고·트랜잭션·동시성</a><a href="#category-4">4. 결제·멱등성·취소·환불</a><a href="#category-5">5. 정산·금액 계산·대사</a><a href="#category-6">6. 데이터 모델링·API·도메인 이관</a><a href="#category-7">7. 대용량 배치·비동기 처리·자동화</a><a href="#category-8">8. 실시간 시스템·분산 처리·장애 복구</a><a href="#category-9">9. 테스트·모니터링·보안·운영</a><a href="#category-10">10. 기술 선택·협업·주도성·비즈니스 판단</a></nav><div><section id="category-1" aria-labelledby="heading-1"><h2 id="heading-1">1. 지원 동기·경력·직무 적합성<small>10문항</small></h2><details id="question-1">
+<summary><span class="number">Q001</span><span class="preview">본인의 경력 중 클래스101 PP 팀과 가장 밀접하게 연결되는 경험을 중심으로 자기소개해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">본인의 경력 중 클래스101 PP 팀과 가장 밀접하게 연결되는 경험을 중심으로 자기소개해 주세요.</p></details><details id="question-2">
+<summary><span class="number">Q002</span><span class="preview">커머스 백엔드 경험을 바탕으로 클래스101의 결제·주문·정산 업무에 지원한 이유는 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">커머스 백엔드 경험을 바탕으로 클래스101의 결제·주문·정산 업무에 지원한 이유는 무엇인가요?</p></details><details id="question-3">
+<summary><span class="number">Q003</span><span class="preview">B마트 상품 전시 도메인과 결제·정산 도메인은 개발 시 우선순위가 어떻게 다르다고 생각하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">B마트 상품 전시 도메인과 결제·정산 도메인은 개발 시 우선순위가 어떻게 다르다고 생각하나요?</p></details><details id="question-4">
+<summary><span class="number">Q004</span><span class="preview">공고의 ‘경력 3년 이상 또는 그에 준하는 역량’을 어떤 경험과 결과로 설명할 수 있나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">공고의 ‘경력 3년 이상 또는 그에 준하는 역량’을 어떤 경험과 결과로 설명할 수 있나요?</p></details><details id="question-5">
+<summary><span class="number">Q005</span><span class="preview">우아한형제들 퇴사 이후 개인 프로젝트를 진행한 배경과, 다시 조직에서 일하려는 이유는 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">우아한형제들 퇴사 이후 개인 프로젝트를 진행한 배경과, 다시 조직에서 일하려는 이유는 무엇인가요?</p></details><details id="question-6">
+<summary><span class="number">Q006</span><span class="preview">여러 개인 프로젝트 중 기술적으로 가장 깊게 관여한 프로젝트는 무엇이며, 직접 구현한 범위는 어디까지인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">여러 개인 프로젝트 중 기술적으로 가장 깊게 관여한 프로젝트는 무엇이며, 직접 구현한 범위는 어디까지인가요?</p></details><details id="question-7">
+<summary><span class="number">Q007</span><span class="preview">개인 프로젝트에서 개발한 주문·결제 기능은 실제 사용자와 거래를 대상으로 어느 수준까지 운영했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">개인 프로젝트에서 개발한 주문·결제 기능은 실제 사용자와 거래를 대상으로 어느 수준까지 운영했나요?</p></details><details id="question-8">
+<summary><span class="number">Q008</span><span class="preview">직접적인 정산 시스템 경험이 없다면, 입사 후 어떤 지식과 업무부터 익히겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">직접적인 정산 시스템 경험이 없다면, 입사 후 어떤 지식과 업무부터 익히겠나요?</p></details><details id="question-9">
+<summary><span class="number">Q009</span><span class="preview">콘텐츠 제작자이자 서비스 개발자로서의 경험이 크리에이터 정산 서비스를 이해하는 데 어떻게 도움이 될까요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">콘텐츠 제작자이자 서비스 개발자로서의 경험이 크리에이터 정산 서비스를 이해하는 데 어떻게 도움이 될까요?</p></details><details id="question-10">
+<summary><span class="number">Q010</span><span class="preview">PP 팀에 합류한 첫 3개월 동안 어떤 방식으로 도메인을 익히고 기여하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">PP 팀에 합류한 첫 3개월 동안 어떤 방식으로 도메인을 익히고 기여하겠나요?</p></details></section><section id="category-2" aria-labelledby="heading-2"><h2 id="heading-2">2. 성능 최적화·JPA·캐싱<small>10문항</small></h2><details id="question-11">
+<summary><span class="number">Q011</span><span class="preview">B마트 배너 API의 응답시간이 909ms였던 핵심 원인은 무엇이었으며, 어떻게 찾아냈나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">B마트 배너 API의 응답시간이 909ms였던 핵심 원인은 무엇이었으며, 어떻게 찾아냈나요?</p></details><details id="question-12">
+<summary><span class="number">Q012</span><span class="preview">배너 API 응답시간을 18ms로 개선하기 위해 적용한 변경 사항과 각각의 기여도를 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">배너 API 응답시간을 18ms로 개선하기 위해 적용한 변경 사항과 각각의 기여도를 설명해 주세요.</p></details><details id="question-13">
+<summary><span class="number">Q013</span><span class="preview">TPS 1,000이라는 부하 조건은 어떻게 만들었으며, 개선 전후의 데이터·인프라·캐시 조건은 같았나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">TPS 1,000이라는 부하 조건은 어떻게 만들었으며, 개선 전후의 데이터·인프라·캐시 조건은 같았나요?</p></details><details id="question-14">
+<summary><span class="number">Q014</span><span class="preview">909ms와 18ms는 평균값인가요, 특정 백분위 지연시간인가요? 오류율과 p95·p99는 어떻게 달라졌나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">909ms와 18ms는 평균값인가요, 특정 백분위 지연시간인가요? 오류율과 p95·p99는 어떻게 달라졌나요?</p></details><details id="question-15">
+<summary><span class="number">Q015</span><span class="preview">배너 API에 사용한 캐시의 저장 위치, 키, 만료 시간과 무효화 정책은 어떻게 정했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">배너 API에 사용한 캐시의 저장 위치, 키, 만료 시간과 무효화 정책은 어떻게 정했나요?</p></details><details id="question-16">
+<summary><span class="number">Q016</span><span class="preview">캐시가 동시에 만료되거나 캐시 서버가 장애를 일으키면 원본 데이터베이스를 어떻게 보호하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">캐시가 동시에 만료되거나 캐시 서버가 장애를 일으키면 원본 데이터베이스를 어떻게 보호하겠나요?</p></details><details id="question-17">
+<summary><span class="number">Q017</span><span class="preview">추천 카탈로그 API의 TPS 23% 증가와 응답시간 20% 단축은 어떤 병목을 해결한 결과인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">추천 카탈로그 API의 TPS 23% 증가와 응답시간 20% 단축은 어떤 병목을 해결한 결과인가요?</p></details><details id="question-18">
+<summary><span class="number">Q018</span><span class="preview">속닥속닥에서 쿼리 수를 5,000개에서 6개로 줄인 조회 구조와 개선 방법을 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">속닥속닥에서 쿼리 수를 5,000개에서 6개로 줄인 조회 구조와 개선 방법을 설명해 주세요.</p></details><details id="question-19">
+<summary><span class="number">Q019</span><span class="preview">컬렉션 조회에서 fetch join, 배치 조회, DTO projection을 어떤 기준으로 선택하나요? 페이지네이션이 있으면 판단이 달라지나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">컬렉션 조회에서 fetch join, 배치 조회, DTO projection을 어떤 기준으로 선택하나요? 페이지네이션이 있으면 판단이 달라지나요?</p></details><details id="question-20">
+<summary><span class="number">Q020</span><span class="preview">상품 전시 API에서 효과적이었던 캐싱을 결제 상태나 정산 금액 조회에 적용한다면 어떤 제약을 두겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">상품 전시 API에서 효과적이었던 캐싱을 결제 상태나 정산 금액 조회에 적용한다면 어떤 제약을 두겠나요?</p></details></section><section id="category-3" aria-labelledby="heading-3"><h2 id="heading-3">3. 주문·재고·트랜잭션·동시성<small>10문항</small></h2><details id="question-21">
+<summary><span class="number">Q021</span><span class="preview">옥화당에서 장바구니부터 주문 생성, 재고 예약, 결제 완료까지의 상태 전이를 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">옥화당에서 장바구니부터 주문 생성, 재고 예약, 결제 완료까지의 상태 전이를 설명해 주세요.</p></details><details id="question-22">
+<summary><span class="number">Q022</span><span class="preview">재고를 결제 완료 시점에 차감하지 않고 예약하는 구조를 선택한 이유는 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">재고를 결제 완료 시점에 차감하지 않고 예약하는 구조를 선택한 이유는 무엇인가요?</p></details><details id="question-23">
+<summary><span class="number">Q023</span><span class="preview">재고 예약에 비관적 잠금을 선택한 이유는 무엇이며, 낙관적 잠금이나 조건부 UPDATE와 비교했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">재고 예약에 비관적 잠금을 선택한 이유는 무엇이며, 낙관적 잠금이나 조건부 UPDATE와 비교했나요?</p></details><details id="question-24">
+<summary><span class="number">Q024</span><span class="preview">재고가 1개 남은 상품에 주문 요청 100개가 동시에 들어오면, 구현한 시스템은 어떻게 처리하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">재고가 1개 남은 상품에 주문 요청 100개가 동시에 들어오면, 구현한 시스템은 어떻게 처리하나요?</p></details><details id="question-25">
+<summary><span class="number">Q025</span><span class="preview">여러 상품이 포함된 주문에서 일부 상품의 재고만 부족하면 트랜잭션과 예약 상태를 어떻게 처리하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">여러 상품이 포함된 주문에서 일부 상품의 재고만 부족하면 트랜잭션과 예약 상태를 어떻게 처리하나요?</p></details><details id="question-26">
+<summary><span class="number">Q026</span><span class="preview">여러 상품의 재고를 잠글 때 발생할 수 있는 데드락을 어떻게 예방하고 재시도하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">여러 상품의 재고를 잠글 때 발생할 수 있는 데드락을 어떻게 예방하고 재시도하겠나요?</p></details><details id="question-27">
+<summary><span class="number">Q027</span><span class="preview">재고 예약이 만료되는 순간 결제 성공 통지가 도착하면 어떤 기준으로 주문 상태를 결정하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">재고 예약이 만료되는 순간 결제 성공 통지가 도착하면 어떤 기준으로 주문 상태를 결정하겠나요?</p></details><details id="question-28">
+<summary><span class="number">Q028</span><span class="preview">주문 처리에서 사용한 트랜잭션 격리 수준은 무엇이며, 그 수준에서 발생할 수 있는 이상 현상은 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">주문 처리에서 사용한 트랜잭션 격리 수준은 무엇이며, 그 수준에서 발생할 수 있는 이상 현상은 무엇인가요?</p></details><details id="question-29">
+<summary><span class="number">Q029</span><span class="preview">Spring의 @Transactional이 기대대로 동작하지 않는 대표적인 상황을 본인의 코드 사례와 연결해 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">Spring의 <code>@Transactional</code>이 기대대로 동작하지 않는 대표적인 상황을 본인의 코드 사례와 연결해 설명해 주세요.</p></details><details id="question-30">
+<summary><span class="number">Q030</span><span class="preview">주문·결제·재고가 서로 다른 서비스와 데이터베이스로 분리된다면, 부분 실패를 어떻게 처리하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">주문·결제·재고가 서로 다른 서비스와 데이터베이스로 분리된다면, 부분 실패를 어떻게 처리하겠나요?</p></details></section><section id="category-4" aria-labelledby="heading-4"><h2 id="heading-4">4. 결제·멱등성·취소·환불<small>10문항</small></h2><details id="question-31">
+<summary><span class="number">Q031</span><span class="preview">옥화당의 결제 준비 멱등 처리는 어떤 중복 요청을 막기 위한 것이며, 멱등 키는 어떻게 만들었나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">옥화당의 결제 준비 멱등 처리는 어떤 중복 요청을 막기 위한 것이며, 멱등 키는 어떻게 만들었나요?</p></details><details id="question-32">
+<summary><span class="number">Q032</span><span class="preview">같은 멱등 키로 결제 준비 요청이 동시에 도착해도 한 번만 처리되도록 어떻게 보장했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">같은 멱등 키로 결제 준비 요청이 동시에 도착해도 한 번만 처리되도록 어떻게 보장했나요?</p></details><details id="question-33">
+<summary><span class="number">Q033</span><span class="preview">같은 멱등 키에 서로 다른 주문 금액이나 상품 정보가 들어오면 어떻게 응답해야 하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">같은 멱등 키에 서로 다른 주문 금액이나 상품 정보가 들어오면 어떻게 응답해야 하나요?</p></details><details id="question-34">
+<summary><span class="number">Q034</span><span class="preview">PG에서는 결제가 승인됐지만 서버가 응답을 받기 전에 타임아웃이 발생하면 어떻게 복구하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">PG에서는 결제가 승인됐지만 서버가 응답을 받기 전에 타임아웃이 발생하면 어떻게 복구하겠나요?</p></details><details id="question-35">
+<summary><span class="number">Q035</span><span class="preview">결제 성공 웹훅이 중복되거나 순서가 뒤바뀌어 도착하면 어떻게 처리하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">결제 성공 웹훅이 중복되거나 순서가 뒤바뀌어 도착하면 어떻게 처리하겠나요?</p></details><details id="question-36">
+<summary><span class="number">Q036</span><span class="preview">클라이언트가 전달한 결제 금액과 PG 승인 금액, 서버의 주문 금액은 어느 단계에서 어떻게 검증하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">클라이언트가 전달한 결제 금액과 PG 승인 금액, 서버의 주문 금액은 어느 단계에서 어떻게 검증하나요?</p></details><details id="question-37">
+<summary><span class="number">Q037</span><span class="preview">외부 PG 호출을 데이터베이스 트랜잭션 안에 포함하면 어떤 문제가 생기며, 어떻게 경계를 나누겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">외부 PG 호출을 데이터베이스 트랜잭션 안에 포함하면 어떤 문제가 생기며, 어떻게 경계를 나누겠나요?</p></details><details id="question-38">
+<summary><span class="number">Q038</span><span class="preview">부분 취소가 여러 번 발생하는 주문에서 누적 환불액이 실제 결제액을 초과하지 않도록 어떻게 보장하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">부분 취소가 여러 번 발생하는 주문에서 누적 환불액이 실제 결제액을 초과하지 않도록 어떻게 보장하겠나요?</p></details><details id="question-39">
+<summary><span class="number">Q039</span><span class="preview">쿠폰·프로모션·캐시·카드가 함께 사용된 주문의 일부 상품을 환불할 때, 환불 금액과 수단별 배분은 어떻게 설계하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">쿠폰·프로모션·캐시·카드가 함께 사용된 주문의 일부 상품을 환불할 때, 환불 금액과 수단별 배분은 어떻게 설계하겠나요?</p></details><details id="question-40">
+<summary><span class="number">Q040</span><span class="preview">정기결제 갱신일에 중복 실행, 결제 실패, 재시도가 발생하더라도 이용권과 청구 상태가 일치하도록 어떻게 설계하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">정기결제 갱신일에 중복 실행, 결제 실패, 재시도가 발생하더라도 이용권과 청구 상태가 일치하도록 어떻게 설계하겠나요?</p></details></section><section id="category-5" aria-labelledby="heading-5"><h2 id="heading-5">5. 정산·금액 계산·대사<small>10문항</small></h2><details id="question-41">
+<summary><span class="number">Q041</span><span class="preview">클래스101에서 결제 완료부터 크리에이터 정산과 출금까지의 흐름을 설계한다면 어떤 데이터와 상태가 필요할까요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">클래스101에서 결제 완료부터 크리에이터 정산과 출금까지의 흐름을 설계한다면 어떤 데이터와 상태가 필요할까요?</p></details><details id="question-42">
+<summary><span class="number">Q042</span><span class="preview">결제 금액, 매출 금액, 정산 예정 금액, 출금 가능 금액을 왜 구분해야 하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">결제 금액, 매출 금액, 정산 예정 금액, 출금 가능 금액을 왜 구분해야 하나요?</p></details><details id="question-43">
+<summary><span class="number">Q043</span><span class="preview">금액 계산에 double을 사용하면 어떤 문제가 생기며, Java와 MySQL에서 각각 어떤 자료형을 선택하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">금액 계산에 <code>double</code>을 사용하면 어떤 문제가 생기며, Java와 MySQL에서 각각 어떤 자료형을 선택하겠나요?</p></details><details id="question-44">
+<summary><span class="number">Q044</span><span class="preview">수수료·세금·공제 계산에서 반올림 단위와 적용 순서를 어떻게 정하고 일관되게 유지하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">수수료·세금·공제 계산에서 반올림 단위와 적용 순서를 어떻게 정하고 일관되게 유지하겠나요?</p></details><details id="question-45">
+<summary><span class="number">Q045</span><span class="preview">다중화폐 거래에서 결제 통화와 정산 통화가 다르다면 환율과 환산 시점을 어떻게 기록하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">다중화폐 거래에서 결제 통화와 정산 통화가 다르다면 환율과 환산 시점을 어떻게 기록하겠나요?</p></details><details id="question-46">
+<summary><span class="number">Q046</span><span class="preview">수수료율이나 정산 계약이 변경되어도 과거 정산 결과를 재현하려면 어떤 정보를 보관해야 하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">수수료율이나 정산 계약이 변경되어도 과거 정산 결과를 재현하려면 어떤 정보를 보관해야 하나요?</p></details><details id="question-47">
+<summary><span class="number">Q047</span><span class="preview">정산이 확정되거나 이미 출금된 거래에 환불이 발생하면 어떻게 반영하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">정산이 확정되거나 이미 출금된 거래에 환불이 발생하면 어떻게 반영하겠나요?</p></details><details id="question-48">
+<summary><span class="number">Q048</span><span class="preview">금융 거래 기록을 수정 가능한 잔액 필드만으로 관리하는 방식과, 변경 이력을 누적하는 원장 방식은 어떤 차이가 있나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">금융 거래 기록을 수정 가능한 잔액 필드만으로 관리하는 방식과, 변경 이력을 누적하는 원장 방식은 어떤 차이가 있나요?</p></details><details id="question-49">
+<summary><span class="number">Q049</span><span class="preview">PG 거래 내역과 내부 결제·정산 데이터가 일치하는지 확인하는 대사 작업을 어떻게 설계하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">PG 거래 내역과 내부 결제·정산 데이터가 일치하는지 확인하는 대사 작업을 어떻게 설계하겠나요?</p></details><details id="question-50">
+<summary><span class="number">Q050</span><span class="preview">크리에이터가 “입금액이 예상보다 적다”고 문의하면 어떤 데이터와 계산 이력을 따라가며 원인을 설명하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">크리에이터가 “입금액이 예상보다 적다”고 문의하면 어떤 데이터와 계산 이력을 따라가며 원인을 설명하겠나요?</p></details></section><section id="category-6" aria-labelledby="heading-6"><h2 id="heading-6">6. 데이터 모델링·API·도메인 이관<small>10문항</small></h2><details id="question-51">
+<summary><span class="number">Q051</span><span class="preview">주문, 결제 시도, 승인, 취소, 환불을 하나의 테이블로 관리하는 방식과 분리하는 방식의 장단점은 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">주문, 결제 시도, 승인, 취소, 환불을 하나의 테이블로 관리하는 방식과 분리하는 방식의 장단점은 무엇인가요?</p></details><details id="question-52">
+<summary><span class="number">Q052</span><span class="preview">상품명·가격·할인 정책이 변경돼도 과거 주문을 정확히 조회하려면 주문 데이터에 무엇을 저장해야 하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">상품명·가격·할인 정책이 변경돼도 과거 주문을 정확히 조회하려면 주문 데이터에 무엇을 저장해야 하나요?</p></details><details id="question-53">
+<summary><span class="number">Q053</span><span class="preview">결제 상태와 주문 상태를 분리해야 하는 이유는 무엇이며, 허용되지 않는 상태 조합은 어떻게 막겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">결제 상태와 주문 상태를 분리해야 하는 이유는 무엇이며, 허용되지 않는 상태 조합은 어떻게 막겠나요?</p></details><details id="question-54">
+<summary><span class="number">Q054</span><span class="preview">재시도 가능한 결제·환불 API의 요청 형식, 응답 코드, 오류 정보를 어떻게 설계하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">재시도 가능한 결제·환불 API의 요청 형식, 응답 코드, 오류 정보를 어떻게 설계하겠나요?</p></details><details id="question-55">
+<summary><span class="number">Q055</span><span class="preview">거래 내역이 지속적으로 추가되는 상황에서 중복이나 누락을 줄이는 페이지네이션을 어떻게 구현하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">거래 내역이 지속적으로 추가되는 상황에서 중복이나 누락을 줄이는 페이지네이션을 어떻게 구현하겠나요?</p></details><details id="question-56">
+<summary><span class="number">Q056</span><span class="preview">결제·정산 데이터에 MySQL과 MongoDB 중 무엇을 선택하겠으며, 판단 기준은 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">결제·정산 데이터에 MySQL과 MongoDB 중 무엇을 선택하겠으며, 판단 기준은 무엇인가요?</p></details><details id="question-57">
+<summary><span class="number">Q057</span><span class="preview">정산 명세 조회에 GraphQL을 도입한다면 어떤 이점과 위험을 검토하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">정산 명세 조회에 GraphQL을 도입한다면 어떤 이점과 위험을 검토하겠나요?</p></details><details id="question-58">
+<summary><span class="number">Q058</span><span class="preview">B마트 전시 API 92개를 이관할 때 대상 목록, 호출 의존성, 이관 순서를 어떻게 관리했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">B마트 전시 API 92개를 이관할 때 대상 목록, 호출 의존성, 이관 순서를 어떻게 관리했나요?</p></details><details id="question-59">
+<summary><span class="number">Q059</span><span class="preview">API 이관 전후의 동작 호환성과 데이터 일치를 어떻게 검증했고, 트래픽 전환과 롤백은 어떻게 준비했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">API 이관 전후의 동작 호환성과 데이터 일치를 어떻게 검증했고, 트래픽 전환과 롤백은 어떻게 준비했나요?</p></details><details id="question-60">
+<summary><span class="number">Q060</span><span class="preview">대량의 결제 데이터가 있는 테이블의 스키마를 변경해야 한다면 서비스 중단 없이 어떤 순서로 진행하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">대량의 결제 데이터가 있는 테이블의 스키마를 변경해야 한다면 서비스 중단 없이 어떤 순서로 진행하겠나요?</p></details></section><section id="category-7" aria-labelledby="heading-7"><h2 id="heading-7">7. 대용량 배치·비동기 처리·자동화<small>10문항</small></h2><details id="question-61">
+<summary><span class="number">Q061</span><span class="preview">100만 건 대상 할인 알림 배치의 전체 처리 구조와 본인이 맡은 부분을 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">100만 건 대상 할인 알림 배치의 전체 처리 구조와 본인이 맡은 부분을 설명해 주세요.</p></details><details id="question-62">
+<summary><span class="number">Q062</span><span class="preview">해당 배치의 입력 데이터를 읽을 때 어떤 조회 방식을 사용했으며, 메모리 사용량과 데이터 누락을 어떻게 관리했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">해당 배치의 입력 데이터를 읽을 때 어떤 조회 방식을 사용했으며, 메모리 사용량과 데이터 누락을 어떻게 관리했나요?</p></details><details id="question-63">
+<summary><span class="number">Q063</span><span class="preview">Spring Batch의 청크 크기와 트랜잭션 범위를 어떤 기준으로 정했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">Spring Batch의 청크 크기와 트랜잭션 범위를 어떤 기준으로 정했나요?</p></details><details id="question-64">
+<summary><span class="number">Q064</span><span class="preview">배치가 70만 건 처리 후 중단되면, 이미 처리한 대상에게 중복 알림을 보내지 않고 어떻게 재시작하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">배치가 70만 건 처리 후 중단되면, 이미 처리한 대상에게 중복 알림을 보내지 않고 어떻게 재시작하나요?</p></details><details id="question-65">
+<summary><span class="number">Q065</span><span class="preview">배치 작업 두 개가 동일 대상을 동시에 처리하지 않도록 어떤 장치를 두었나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">배치 작업 두 개가 동일 대상을 동시에 처리하지 않도록 어떤 장치를 두었나요?</p></details><details id="question-66">
+<summary><span class="number">Q066</span><span class="preview">알림 전송 API에 요청 제한이 있거나 일시적인 오류가 발생하면 재시도 간격과 최대 횟수를 어떻게 정하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">알림 전송 API에 요청 제한이 있거나 일시적인 오류가 발생하면 재시도 간격과 최대 횟수를 어떻게 정하나요?</p></details><details id="question-67">
+<summary><span class="number">Q067</span><span class="preview">반드시 처리해야 할 정산 항목 하나가 계속 실패한다면, 전체 배치를 중단할지 해당 항목을 격리할지 어떻게 판단하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">반드시 처리해야 할 정산 항목 하나가 계속 실패한다면, 전체 배치를 중단할지 해당 항목을 격리할지 어떻게 판단하겠나요?</p></details><details id="question-68">
+<summary><span class="number">Q068</span><span class="preview">데이터베이스 반영은 성공했지만 후속 이벤트 발행이 실패하는 문제를 어떻게 해결하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">데이터베이스 반영은 성공했지만 후속 이벤트 발행이 실패하는 문제를 어떻게 해결하겠나요?</p></details><details id="question-69">
+<summary><span class="number">Q069</span><span class="preview">20여 개 팀·100여 개 워크플로우를 위한 Slack 통합 솔루션에서 공통화한 부분과 팀별로 남겨둔 부분은 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">20여 개 팀·100여 개 워크플로우를 위한 Slack 통합 솔루션에서 공통화한 부분과 팀별로 남겨둔 부분은 무엇인가요?</p></details><details id="question-70">
+<summary><span class="number">Q070</span><span class="preview">할인 알림 배치의 경험을 일별 정산 배치에 적용한다면 정확성 검증과 완료 판정 기준을 어떻게 강화하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">할인 알림 배치의 경험을 일별 정산 배치에 적용한다면 정확성 검증과 완료 판정 기준을 어떻게 강화하겠나요?</p></details></section><section id="category-8" aria-labelledby="heading-8"><h2 id="heading-8">8. 실시간 시스템·분산 처리·장애 복구<small>10문항</small></h2><details id="question-71">
+<summary><span class="number">Q071</span><span class="preview">고산운에서 방별 작업 직렬화가 필요했던 구체적인 경쟁 상태와 해결 방법을 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">고산운에서 방별 작업 직렬화가 필요했던 구체적인 경쟁 상태와 해결 방법을 설명해 주세요.</p></details><details id="question-72">
+<summary><span class="number">Q072</span><span class="preview">방별 작업 직렬화는 단일 프로세스 안에서만 유효한가요? 서버가 여러 대가 되면 어떻게 보장하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">방별 작업 직렬화는 단일 프로세스 안에서만 유효한가요? 서버가 여러 대가 되면 어떻게 보장하겠나요?</p></details><details id="question-73">
+<summary><span class="number">Q073</span><span class="preview">스냅샷 캐시와 실제 진행 상태가 어긋나지 않도록 어떤 기준으로 스냅샷을 생성하고 갱신했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">스냅샷 캐시와 실제 진행 상태가 어긋나지 않도록 어떤 기준으로 스냅샷을 생성하고 갱신했나요?</p></details><details id="question-74">
+<summary><span class="number">Q074</span><span class="preview">상태 저장 중 프로세스가 종료되면, 복원 후 중복 실행이나 데이터 손실을 어떻게 처리하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">상태 저장 중 프로세스가 종료되면, 복원 후 중복 실행이나 데이터 손실을 어떻게 처리하나요?</p></details><details id="question-75">
+<summary><span class="number">Q075</span><span class="preview">선립:티버스에서 WebSocket 재연결 후 클라이언트가 놓친 상태를 어떻게 복구했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">선립:티버스에서 WebSocket 재연결 후 클라이언트가 놓친 상태를 어떻게 복구했나요?</p></details><details id="question-76">
+<summary><span class="number">Q076</span><span class="preview">여러 사용자가 같은 좌석을 동시에 선택하는 문제와, 같은 재고를 동시에 구매하는 문제는 무엇이 같고 다른가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">여러 사용자가 같은 좌석을 동시에 선택하는 문제와, 같은 재고를 동시에 구매하는 문제는 무엇이 같고 다른가요?</p></details><details id="question-77">
+<summary><span class="number">Q077</span><span class="preview">Cloudflare Durable Objects를 선택한 이유는 무엇이며, 방별 상태 관리에서 얻는 이점과 제약은 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">Cloudflare Durable Objects를 선택한 이유는 무엇이며, 방별 상태 관리에서 얻는 이점과 제약은 무엇인가요?</p></details><details id="question-78">
+<summary><span class="number">Q078</span><span class="preview">메시지 빈도와 좌표 검증은 서버의 어느 단계에서 수행했으며, 정상 사용자의 요청을 잘못 차단하지 않도록 어떻게 조정했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">메시지 빈도와 좌표 검증은 서버의 어느 단계에서 수행했으며, 정상 사용자의 요청을 잘못 차단하지 않도록 어떻게 조정했나요?</p></details><details id="question-79">
+<summary><span class="number">Q079</span><span class="preview">웹과 API를 동일 릴리스로 배포해도 이전 웹 클라이언트가 남을 수 있는데, 버전 호환성은 어떻게 처리하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">웹과 API를 동일 릴리스로 배포해도 이전 웹 클라이언트가 남을 수 있는데, 버전 호환성은 어떻게 처리하겠나요?</p></details><details id="question-80">
+<summary><span class="number">Q080</span><span class="preview">이러한 실시간 시스템 경험을 결제·정산에 적용할 때, 재사용할 수 있는 원칙과 더 엄격하게 바꿔야 할 원칙은 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">이러한 실시간 시스템 경험을 결제·정산에 적용할 때, 재사용할 수 있는 원칙과 더 엄격하게 바꿔야 할 원칙은 무엇인가요?</p></details></section><section id="category-9" aria-labelledby="heading-9"><h2 id="heading-9">9. 테스트·모니터링·보안·운영<small>10문항</small></h2><details id="question-81">
+<summary><span class="number">Q081</span><span class="preview">MDC 기반 SQL 진입점 로깅은 어떤 정보를 남기며, 기존 SQL 로그만으로는 찾기 어려웠던 문제를 어떻게 해결했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">MDC 기반 SQL 진입점 로깅은 어떤 정보를 남기며, 기존 SQL 로그만으로는 찾기 어려웠던 문제를 어떻게 해결했나요?</p></details><details id="question-82">
+<summary><span class="number">Q082</span><span class="preview">비동기 작업이나 스레드 풀을 사용할 때 MDC 정보가 유실되거나 다른 요청에 섞이지 않도록 어떻게 처리하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">비동기 작업이나 스레드 풀을 사용할 때 MDC 정보가 유실되거나 다른 요청에 섞이지 않도록 어떻게 처리하나요?</p></details><details id="question-83">
+<summary><span class="number">Q083</span><span class="preview">장애 원인 파악 시간이 25분에서 9분으로 줄었다는 결과는 어떤 사례와 측정 기준으로 확인했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">장애 원인 파악 시간이 25분에서 9분으로 줄었다는 결과는 어떤 사례와 측정 기준으로 확인했나요?</p></details><details id="question-84">
+<summary><span class="number">Q084</span><span class="preview">속닥속닥의 테스트 425개 실행 시간을 3분에서 45초로 줄인 원인은 무엇이며, 테스트 격리는 어떻게 유지했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">속닥속닥의 테스트 425개 실행 시간을 3분에서 45초로 줄인 원인은 무엇이며, 테스트 격리는 어떻게 유지했나요?</p></details><details id="question-85">
+<summary><span class="number">Q085</span><span class="preview">결제 멱등성과 재고 동시성 테스트를 작성한다면 어떤 경쟁 상황과 불변 조건을 검증하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">결제 멱등성과 재고 동시성 테스트를 작성한다면 어떤 경쟁 상황과 불변 조건을 검증하겠나요?</p></details><details id="question-86">
+<summary><span class="number">Q086</span><span class="preview">PG 타임아웃, 중복 웹훅, 데이터베이스 장애를 테스트 환경에서 어떻게 재현하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">PG 타임아웃, 중복 웹훅, 데이터베이스 장애를 테스트 환경에서 어떻게 재현하겠나요?</p></details><details id="question-87">
+<summary><span class="number">Q087</span><span class="preview">결제·정산 시스템의 운영 대시보드에 어떤 기술 지표와 비즈니스 지표를 표시하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">결제·정산 시스템의 운영 대시보드에 어떤 기술 지표와 비즈니스 지표를 표시하겠나요?</p></details><details id="question-88">
+<summary><span class="number">Q088</span><span class="preview">API 오류율은 정상이지만 일부 정산이 누락되는 장애를 어떻게 탐지하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">API 오류율은 정상이지만 일부 정산이 누락되는 장애를 어떻게 탐지하겠나요?</p></details><details id="question-89">
+<summary><span class="number">Q089</span><span class="preview">결제·정산 로그에서 민감정보 노출을 막으면서도 추적 가능성을 확보하려면 무엇을 기록하고 무엇을 가려야 하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">결제·정산 로그에서 민감정보 노출을 막으면서도 추적 가능성을 확보하려면 무엇을 기록하고 무엇을 가려야 하나요?</p></details><details id="question-90">
+<summary><span class="number">Q090</span><span class="preview">운영자가 환불하거나 정산 금액을 조정하는 관리 기능에 어떤 권한 통제와 감사 기록을 적용하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">운영자가 환불하거나 정산 금액을 조정하는 관리 기능에 어떤 권한 통제와 감사 기록을 적용하겠나요?</p></details></section><section id="category-10" aria-labelledby="heading-10"><h2 id="heading-10">10. 기술 선택·협업·주도성·비즈니스 판단<small>10문항</small></h2><details id="question-91">
+<summary><span class="number">Q091</span><span class="preview">Java·Spring 실무 경험이 있는데도 개인 프로젝트에서 NestJS·Next.js를 선택한 이유는 무엇인가요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">Java·Spring 실무 경험이 있는데도 개인 프로젝트에서 NestJS·Next.js를 선택한 이유는 무엇인가요?</p></details><details id="question-92">
+<summary><span class="number">Q092</span><span class="preview">Java·Spring과 TypeScript·NestJS를 모두 사용한 경험을 바탕으로, 금액과 거래 상태를 다루는 서비스에서 각각 주의할 점을 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">Java·Spring과 TypeScript·NestJS를 모두 사용한 경험을 바탕으로, 금액과 거래 상태를 다루는 서비스에서 각각 주의할 점을 설명해 주세요.</p></details><details id="question-93">
+<summary><span class="number">Q093</span><span class="preview">“취소한 주문의 쿠폰을 복원해 달라”는 요구를 받으면 구현 전에 어떤 정책과 예외 상황을 확인하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">“취소한 주문의 쿠폰을 복원해 달라”는 요구를 받으면 구현 전에 어떤 정책과 예외 상황을 확인하겠나요?</p></details><details id="question-94">
+<summary><span class="number">Q094</span><span class="preview">출시 일정이 촉박한 결제 기능에서 반드시 지켜야 할 조건과 나중으로 미룰 수 있는 범위는 어떻게 구분하나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">출시 일정이 촉박한 결제 기능에서 반드시 지켜야 할 조건과 나중으로 미룰 수 있는 범위는 어떻게 구분하나요?</p></details><details id="question-95">
+<summary><span class="number">Q095</span><span class="preview">문제의 특성을 고려해 익숙한 기술이나 복잡한 구조를 일부러 선택하지 않은 경험이 있나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">문제의 특성을 고려해 익숙한 기술이나 복잡한 구조를 일부러 선택하지 않은 경험이 있나요?</p></details><details id="question-96">
+<summary><span class="number">Q096</span><span class="preview">코드 리뷰에서 동료와 트랜잭션 범위나 데이터 모델에 대한 의견이 갈렸을 때 어떻게 합의하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">코드 리뷰에서 동료와 트랜잭션 범위나 데이터 모델에 대한 의견이 갈렸을 때 어떻게 합의하겠나요?</p></details><details id="question-97">
+<summary><span class="number">Q097</span><span class="preview">사내 기술 블로그와 서버개발그룹 밋업에서 공유한 내용은 무엇이며, 받은 피드백이 실제 코드나 운영 방식에 영향을 주었나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">사내 기술 블로그와 서버개발그룹 밋업에서 공유한 내용은 무엇이며, 받은 피드백이 실제 코드나 운영 방식에 영향을 주었나요?</p></details><details id="question-98">
+<summary><span class="number">Q098</span><span class="preview">요청받은 기능 구현을 넘어 스스로 문제를 발견하고 끝까지 해결한 경험을 설명해 주세요.</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">요청받은 기능 구현을 넘어 스스로 문제를 발견하고 끝까지 해결한 경험을 설명해 주세요.</p></details><details id="question-99">
+<summary><span class="number">Q099</span><span class="preview">본인의 설계나 판단이 잘못됐던 경험은 무엇이며, 이를 어떻게 알아차리고 수정했나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">본인의 설계나 판단이 잘못됐던 경험은 무엇이며, 이를 어떻게 알아차리고 수정했나요?</p></details><details id="question-100">
+<summary><span class="number">Q100</span><span class="preview">크리에이터의 빠른 정산 요구와 재무 담당자의 정확성·검증 요구가 충돌한다면, 어떤 근거와 절차로 해결책을 제안하겠나요?</span><span class="indicator" aria-hidden="true">+</span></summary>
+<p class="question">크리에이터의 빠른 정산 요구와 재무 담당자의 정확성·검증 요구가 충돌한다면, 어떤 근거와 절차로 해결책을 제안하겠나요?</p></details></section></div></main>
+<footer>이력서와 채용공고를 바탕으로 구성한 예상 질문입니다. 실제 출제된 면접 질문은 아닙니다.</footer>
+<script>
+const questions = document.querySelectorAll('details');
+document.getElementById('expand').addEventListener('click', () => questions.forEach(item => { item.open = true; }));
+document.getElementById('collapse').addEventListener('click', () => questions.forEach(item => { item.open = false; }));
+</script>
+</body>
+</html>
