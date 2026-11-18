@@ -28,6 +28,15 @@ class UcleContentTests(unittest.TestCase):
         self.assertIn('우리 회사를 알게 된 경로', questions[0]['question'])
         self.assertIn('1년 뒤', questions[-1]['question'])
 
+    def test_priority_tiers_cover_all_questions_and_categories(self):
+        questions = builder.load_questions()
+        levels = builder.load_priorities(questions)
+        self.assertEqual(set(levels), set(range(1, 201)))
+        for category in range(1, 10):
+            self.assertEqual({levels[q['id']] for q in questions if q['category'] == category}, {1, 2, 3})
+        html = (SITE / 'index.html').read_text()
+        self.assertEqual(len(re.findall(r'data-priority="[123]"', html)), 200)
+
     def test_inline_emphasis_escapes_html_including_bold_content(self):
         rendered = builder.bold('안녕 **<img src=x onerror="alert(1)">** & <script>bad</script>')
         self.assertIn('<strong>&lt;img', rendered)
@@ -52,7 +61,7 @@ class UcleContentTests(unittest.TestCase):
     def test_generation_is_reproducible_and_readable_without_javascript(self):
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp)
-            for filename in ('source.md', 'template.html', *ANSWER_FILES):
+            for filename in ('source.md', 'priorities.json', 'template.html', *ANSWER_FILES):
                 shutil.copyfile(SITE / filename, target / filename)
             with mock.patch.object(builder, 'SITE', target), contextlib.redirect_stdout(io.StringIO()):
                 builder.build()
@@ -84,7 +93,7 @@ class UcleContentTests(unittest.TestCase):
         block = re.search(r'^mkdir -p "\$TMP_STAGE/applications/ucle-interview"\nfor asset .*?\ndone\ncp -R .*?ucle-interview/"$',
                           script, flags=re.M | re.S)
         self.assertIsNotNone(block)
-        expected = {'index.html', 'study.css', 'study.js', 'audio-player.js', 'source.md', 'answers.md'}
+        expected = {'index.html', 'study.css', 'study.js', 'audio-player.js', 'stack-basics.html', 'source.md', 'answers.md'}
         with tempfile.TemporaryDirectory() as tmp:
             root, stage = Path(tmp) / 'root', Path(tmp) / 'stage'
             source = root / 'applications' / 'ucle-interview'
@@ -111,7 +120,7 @@ class UcleAuthTests(unittest.IsolatedAsyncioTestCase):
     request = remote_helpers.InterviewRemoteTests.request
 
     async def test_page_and_content_require_existing_authentication(self):
-        for filename in ('', 'study.js', 'study.css', 'audio-player.js', 'source.md', 'answers.md'):
+        for filename in ('', 'study.js', 'study.css', 'audio-player.js', 'stack-basics.html', 'source.md', 'answers.md'):
             with self.subTest(filename=filename):
                 status, headers, _ = await self.request('/ucle-interview/' + filename)
                 self.assertEqual(status, 401)

@@ -152,3 +152,71 @@ test('invalid manifest timing stops playback and cannot advance', async () => {
   assert.equal(s.nodes['voice-play'].textContent, '다시 듣기');
   s.audio.end(); assert.deepEqual(s.selections, []);
 });
+
+
+test('direct navigation continues active audio from the new question even with auto-next off', async () => {
+  const s = setup({ saved: { rate: 1.5, automatic: false } });
+  s.nodes['voice-play'].click(); await flush();
+  s.audio.currentTime = 2.4;
+  s.emit({ current: 3 }, 'navigate');
+  assert.equal(s.audio.src, 'audio/question-003.mp3');
+  assert.equal(s.audio.currentTime, 0);
+  assert.equal(s.audio.paused, false);
+  assert.equal(s.audio.plays, 2);
+  assert.equal(s.audio.playbackRate, 1.5);
+  assert.equal(s.reveals.at(-1), 0);
+  await flush();
+  s.emit({ current: 1 }, 'navigate'); await flush();
+  assert.equal(s.audio.src, 'audio/question-001.mp3');
+  assert.equal(s.audio.plays, 3);
+  s.emit({ current: 1 }, 'navigate');
+  assert.equal(s.audio.plays, 3); // selecting the current question is not a restart
+  s.audio.end();
+  assert.deepEqual(s.selections, []); // automatic advance remains disabled
+});
+
+test('idle, paused, ended and failed navigation never starts playback', async () => {
+  const idle = setup(); idle.emit({ current: 3 }, 'navigate');
+  assert.equal(idle.audio.plays, 0);
+  for (const state of ['paused', 'ended', 'error']) {
+    const s = setup({ saved: { automatic: false } });
+    s.nodes['voice-play'].click(); await flush();
+    if (state === 'paused') s.audio.pause();
+    else if (state === 'ended') s.audio.end();
+    else { s.audio.error = { code: 3 }; s.audio.emit('error'); }
+    s.emit({ current: 3 }, 'navigate'); await flush();
+    assert.equal(s.audio.plays, 1, state);
+    assert.equal(s.audio.paused, true, state);
+    assert.equal(s.audio.src, undefined, state);
+  }
+});
+
+test('rapid next gestures replace pending audio and ignore old rejected or fulfilled play promises', async () => {
+  const pending = [deferred(), deferred(), deferred()];
+  const s = setup({ play: audio => pending[audio.plays - 1].promise });
+  s.nodes['voice-play'].click();
+  s.emit({ current: 3 }, 'navigate');
+  s.emit({ current: 7 }, 'navigate');
+  assert.equal(s.audio.plays, 3);
+  assert.equal(s.audio.src, 'audio/question-007.mp3');
+  pending[0].reject(Error('abandoned source'));
+  pending[1].resolve();
+  pending[2].resolve(); await flush();
+  assert.equal(s.audio.paused, false);
+  assert.match(s.nodes['voice-status'].textContent, /7번/);
+  assert.equal(s.nodes['voice-play'].textContent, '일시정지');
+  assert.deepEqual(s.selections, []);
+});
+
+test('explicit filters stop active listening even when resulting IDs are unchanged', async () => {
+  const s = setup(); s.nodes['voice-play'].click(); await flush();
+  s.emit({}, 'filter');
+  assert.equal(s.audio.paused, true);
+  assert.equal(s.audio.src, undefined);
+  s.emit({ current: 3 }, 'navigate');
+  assert.equal(s.audio.plays, 1);
+  s.nodes['voice-play'].click(); await flush();
+  s.emit({ current: 7, paused: true }, 'navigate');
+  assert.equal(s.audio.paused, true);
+  assert.equal(s.audio.plays, 2);
+});

@@ -108,6 +108,42 @@ class UcleBrowserTests(unittest.IsolatedAsyncioTestCase):
         await page.screenshot({'path': '/tmp/ucle-mobile.png', 'fullPage': True})
         self.assertEqual(self.errors, [])
 
+    async def test_priority_category_filters_and_playing_next_continue(self):
+        page = self.page
+        for category in range(1, 10):
+            await page.select('#category', str(category))
+            for priority in range(1, 4):
+                await page.select('#priority', str(priority))
+                self.assertGreater(await page.evaluate('UcleStudy.snapshot().ids.length'), 0)
+                self.assertTrue(await page.evaluate("""() => UcleStudy.snapshot().ids.every(id => {
+                    const card = document.getElementById(`question-${id}`);
+                    return card.dataset.category === document.querySelector('#category').value
+                        && card.dataset.priority === document.querySelector('#priority').value;
+                })"""))
+        await page.select('#category', '1')
+        await page.select('#priority', '1')
+        selected = await page.evaluate('UcleStudy.snapshot().ids')
+        current = await page.evaluate('UcleStudy.snapshot().current')
+        next_id = selected[selected.index(current) + 1]
+        await page.click('#voice-auto')
+        await page.click('#voice-play')
+        await page.waitForFunction('document.querySelector("#voice-audio").currentTime > 0')
+        await page.click('#next')
+        await page.waitForFunction('(id) => UcleStudy.snapshot().current === id && !document.querySelector("#voice-audio").paused && document.querySelector("#voice-audio").currentTime > 0', {}, next_id)
+        self.assertIn(f'question-{next_id:03}.mp3', await page.Jeval('#voice-audio', 'el => el.currentSrc'))
+        await page.click('#voice-play')
+        await page.click('#next')
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        await page.click('#voice-play')
+        await page.waitForFunction('document.querySelector("#voice-audio").currentTime > 0')
+        await page.select('#priority', '2')
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        await page.reload()
+        self.assertEqual(await page.Jeval('#priority', 'el => el.value'), '2')
+        self.assertEqual(await page.Jeval('#category', 'el => el.value'), '1')
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        self.assertEqual(self.errors, [])
+
     async def test_real_audio_progress_seek_autonext_break_and_reload(self):
         page = self.page
         self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
@@ -143,6 +179,21 @@ class UcleBrowserTests(unittest.IsolatedAsyncioTestCase):
         await page.reload()
         self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
         self.assertEqual(await page.Jeval('#voice-rate', 'el => el.value'), '1.5')
+        self.assertEqual(self.errors, [])
+
+    async def test_stack_basics_is_separate_readable_page_on_mobile(self):
+        page = self.page
+        await page.click('header a[href="stack-basics.html"]')
+        await page.waitForSelector('details')
+        self.assertGreaterEqual(await page.evaluate('document.querySelectorAll("details").length'), 24)
+        self.assertGreater(await page.evaluate("() => Array.from(document.links).filter(a => a.href.startsWith('https://')).length"), 10)
+        await page.setJavaScriptEnabled(False)
+        await page.reload()
+        await page.click('details summary')
+        self.assertTrue(await page.Jeval('details', 'el => el.open'))
+        for width in (390, 1440):
+            await page.setViewport({'width': width, 'height': 844})
+            self.assertTrue(await page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
         self.assertEqual(self.errors, [])
 
     async def test_no_javascript_fallback(self):

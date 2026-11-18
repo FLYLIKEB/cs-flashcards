@@ -182,10 +182,16 @@
     }
   });
   study.subscribe(state => {
-    const changed = state.current !== previous.current || state.ids.join(',') !== previous.ids.join(',');
+    const questionChanged = state.current !== previous.current;
+    const changed = questionChanged || state.ids.join(',') !== previous.ids.join(',');
     previous = state;
-    if (state.reason !== 'audio' && (changed || state.paused)) {
-      stop(state.paused ? '쉬는 동안 음성도 멈췄어요.' : '질문이 바뀌었어요. 재생을 누르면 여기부터 들어요.');
+    if (state.paused || state.reason === 'filter') {
+      stop(state.paused ? '쉬는 동안 음성도 멈췄어요.' : '연습 범위가 바뀌었어요. 재생을 누르면 여기부터 들어요.');
+    } else if (state.reason === 'navigate' && questionChanged && wanted) {
+      // A direct next/previous/picker gesture continues the user's active listening intent.
+      start(true);
+    } else if (state.reason !== 'audio' && changed) {
+      stop('질문이 바뀌었어요. 재생을 누르면 여기부터 들어요.');
     } else controls();
   });
   window.addEventListener('pagehide', () => { if (track || wanted) pause(); });

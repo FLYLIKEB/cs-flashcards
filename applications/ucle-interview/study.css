@@ -200,3 +200,7 @@ body {
 .voice-settings label { display: flex; align-items: center; gap: 6px; }
 .voice-settings input { min-height: auto; width: 20px; height: 20px; accent-color: var(--accent); }
 #voice-status { font-size: 14px; margin: 8px 0 0; }
+
+.priority-badge { display: inline-block; background: #edf3ee; padding: 1px 8px; border-radius: 6px; color: var(--accent); font-weight: 700; }
+.scope-filters { margin: 16px 0 0; font-size: 15px; }
+.scope-help { grid-column: 1 / -1; color: var(--muted); font-size: 13px; margin: 0; }

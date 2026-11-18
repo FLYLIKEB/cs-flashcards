@@ -2,14 +2,18 @@
 <html lang="ko">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>유클 CTO 커피챗 · 한 질문씩</title><link rel="stylesheet" href="study.css"><script defer src="study.js"></script><script defer src="audio-player.js"></script></head>
 <body>
-<header><a href="/">← CS 학습 홈</a><span>커피챗 준비 · 200문항</span></header>
+<header><a href="/">← CS 학습 홈</a><a href="stack-basics.html">기술스택 키워드 기초 →</a></header>
 <main>
 <h1>유클 CTO 커피챗</h1>
 <p class="intro">지금은 <strong>한 질문만.</strong> 정답을 외우기보다 내 말로 이야기해 보세요.</p>
 <noscript><p>아래에서 모든 질문과 답변을 읽을 수 있습니다. 이어하기 기능은 JavaScript가 필요합니다.</p></noscript>
 <div id="controls" hidden>
-<details id="library"><summary>문항 고르기 · 분야 / 검색 / 다시 볼 질문</summary>
-<div class="filters"><label>연습 범위<select id="mode"><option value="all">전체 200문항</option><option value="essential">먼저 볼 핵심 15문항</option><option value="review">다시 볼 질문</option></select></label><label>분야<select id="category"><option value="all">모든 분야</option>@@OPTIONS@@</select></label><label>질문·답변 검색<input id="search" type="search" placeholder="예: 캐시, 결제, 자기소개"></label><label>바로 이동<select id="picker"></select></label></div>
+<div id="scope-filters" class="filters scope-filters">
+<label>우선순위<select id="priority"><option value="all">전체 우선순위</option><option value="1">1순위 · 먼저 준비</option><option value="2">2순위 · 기본 다지기</option><option value="3">3순위 · 심화</option></select></label><label>분야<select id="category"><option value="all">모든 분야</option>@@OPTIONS@@</select></label>
+<p class="scope-help">커피챗 준비 순서예요. 우선순위와 분야를 함께 골라 볼 수 있어요.</p>
+</div>
+<details id="library"><summary>문항 고르기 · 검색 / 다시 볼 질문</summary>
+<div class="filters"><label>연습 범위<select id="mode"><option value="all">전체 200문항</option><option value="essential">먼저 볼 핵심 15문항</option><option value="review">다시 볼 질문</option></select></label><label>질문·답변 검색<input id="search" type="search" placeholder="예: 캐시, 결제, 자기소개"></label><label>바로 이동<select id="picker"></select></label></div>
 <p>핵심 문항은 지원 동기, 대표 경험, 설계, 역질문을 고르게 연습하도록 골랐어요.</p>
 <a href="answers.md" download>쉬운 답변 전체 내려받기</a> · <a href="source.md">원본 자료</a>
 </details>

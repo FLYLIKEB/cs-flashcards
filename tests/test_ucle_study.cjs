@@ -22,12 +22,12 @@ function setup(saved, blocked = false) {
       focus() {},
     };
   }
-  for (const id of ['controls', 'mode', 'category', 'search', 'saved', 'workspace', 'library', 'pause',
+  for (const id of ['controls', 'scope-filters', 'priority', 'mode', 'category', 'search', 'saved', 'workspace', 'library', 'pause',
     'break-panel', 'empty', 'actions', 'position', 'session', 'checkpoint', 'picker', 'prev', 'next',
     'reveal', 'done', 'review', 'rest', 'resume', 'more', 'break-title']) nodes[id] = element(id);
   const cards = Array.from({ length: 6 }, (_, index) => {
     const card = element(`question-${index + 1}`);
-    card.dataset = { id: String(index + 1), category: index < 3 ? '1' : '2' };
+    card.dataset = { id: String(index + 1), category: index < 3 ? '1' : '2', priority: String(index % 3 + 1) };
     card.textContent = index < 3 ? '지원 동기' : '결제 설계';
     card.heading = element(); card.heading.textContent = card.textContent;
     card.steps = [1, 2, 3].map(step => { const el = element(); el.dataset = { step: String(step) }; return el; });
@@ -59,7 +59,7 @@ test('corrupt persisted values return usable defaults', () => {
   const state = normalize({ current: 999, step: '3', done: [1, 1, '2', 0, 200], review: [2, 2, 201],
     batch: [1, 1, 2, 3, 4, 5, 6], mode: 'bad', category: '10', query: 42, paused: 'true' }, ids);
   assert.deepEqual(state, { current: 1, step: 0, done: [1, 200], review: [2], batch: [1, 2, 3, 4, 5],
-    mode: 'all', category: 'all', query: '', paused: false });
+    mode: 'all', category: 'all', priority: 'all', query: '', paused: false });
 });
 
 test('valid position, filters and break survive normalization; query is bounded', () => {
@@ -143,4 +143,20 @@ test('malformed or unavailable storage still allows study with truthful failure 
   blocked.nodes.next.click();
   assert.equal(blocked.cards[1].hidden, false);
   assert.match(blocked.nodes.saved.textContent, /저장할 수 없어요/);
+});
+
+test('priority and category intersect and saved v1 progress migrates without losing marks', () => {
+  const s = setup({ current: 4, done: [4], review: [4] });
+  assert.equal(s.state().priority, 'all');
+  s.nodes.priority.value = '2'; s.nodes.priority.emit('change');
+  assert.deepEqual(s.nodes.picker.children.map(x => x.value), ['2', '5']);
+  s.nodes.category.value = '2'; s.nodes.category.emit('change');
+  assert.deepEqual(s.nodes.picker.children.map(x => x.value), ['5']);
+  const restored = setup(s.state());
+  assert.equal(restored.state().priority, '2');
+  assert.equal(restored.state().category, '2');
+  assert.equal(restored.state().current, 5);
+  assert.deepEqual(restored.state().done, [4]);
+  assert.deepEqual(restored.state().review, [4]);
+  assert.equal(normalize({priority: '4'}, ids).priority, 'all');
 });

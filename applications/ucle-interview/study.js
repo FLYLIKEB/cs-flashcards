@@ -10,6 +10,7 @@
       step: [0, 1, 2, 3].includes(s.step) ? s.step : 0,
       done: validIds(s.done), review: validIds(s.review), batch: validIds(s.batch).slice(0, 5),
       mode: ['all', 'essential', 'review'].includes(s.mode) ? s.mode : 'all',
+      priority: ['all', '1', '2', '3'].includes(s.priority) ? s.priority : 'all',
       category: typeof s.category === 'string' && /^(all|[1-9])$/.test(s.category) ? s.category : 'all',
       query: typeof s.query === 'string' ? s.query.slice(0, 200) : '',
       paused: s.paused === true,
@@ -28,6 +29,7 @@
   $('controls').hidden = false;
   $('mode').value = state.mode;
   $('category').value = state.category;
+  $('priority').value = state.priority;
   $('search').value = state.query;
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); storageError = false; }
@@ -41,6 +43,7 @@
     return cards.filter(card => {
       const id = Number(card.dataset.id);
       return (state.mode === 'all' || (state.mode === 'essential' ? ESSENTIAL.includes(id) : state.review.includes(id)))
+        && (state.priority === 'all' || card.dataset.priority === state.priority)
         && (state.category === 'all' || card.dataset.category === state.category)
         && (!query || card.textContent.toLocaleLowerCase().includes(query));
     });
@@ -66,6 +69,7 @@
     }
     $('workspace').hidden = state.paused;
     $('library').hidden = state.paused;
+    $('scope-filters').hidden = state.paused;
     $('pause').hidden = state.paused;
     $('break-panel').hidden = !state.paused;
     $('empty').hidden = !!current;
@@ -76,7 +80,7 @@
     $('picker').replaceChildren(...visible.map(card => {
       const option = document.createElement('option');
       option.value = card.dataset.id;
-      option.textContent = `${card.dataset.id}. ${card.querySelector('h2').textContent}`;
+      option.textContent = `${card.dataset.priority}순위 · ${card.dataset.id}. ${card.querySelector('h2').textContent}`;
       option.selected = Number(card.dataset.id) === state.current;
       return option;
     }));
@@ -92,7 +96,7 @@
     save();
     for (const listener of subscribers) listener({ ...snapshot(), reason });
   }
-  function move(id) { state.current = id; state.step = 0; render(); focusQuestion(); }
+  function move(id) { state.current = id; state.step = 0; render('navigate'); focusQuestion(); }
   function pause() { state.paused = true; render(); $('break-title').focus(); }
   $('reveal').addEventListener('click', () => { state.step = (state.step + 1) % 4; render(); });
   for (const [name, delta] of [['prev', -1], ['next', 1]]) {
@@ -103,11 +107,11 @@
     });
   }
   $('picker').addEventListener('change', event => { move(Number(event.target.value)); $('library').open = false; });
-  for (const name of ['mode', 'category', 'search']) {
+  for (const name of ['mode', 'category', 'priority', 'search']) {
     $(name).addEventListener(name === 'search' ? 'input' : 'change', event => {
       state[name === 'search' ? 'query' : name] = event.target.value;
       state.step = 0;
-      render();
+      render('filter');
     });
   }
   for (const name of ['done', 'review']) {

@@ -29,8 +29,26 @@ def load_questions():
     return questions
 
 
+PRIORITY_LABELS = {1: '1순위 · 먼저 준비', 2: '2순위 · 기본 다지기', 3: '3순위 · 심화'}
+
+
+def load_priorities(questions):
+    groups = json.loads((SITE / 'priorities.json').read_text())
+    if set(groups) != {'1', '2', '3'} or not all(isinstance(values, list) for values in groups.values()):
+        raise ValueError('Expected three priority tiers')
+    values = [qid for group in groups.values() for qid in group]
+    if any(type(qid) is not int for qid in values) or sorted(values) != list(range(1, 201)):
+        raise ValueError('Priorities must cover 1–200 exactly once')
+    priorities = {qid: int(level) for level, group in groups.items() for qid in group}
+    for category in range(1, 10):
+        if {priorities[q['id']] for q in questions if q['category'] == category} != {1, 2, 3}:
+            raise ValueError('Every category must include all three priorities')
+    return priorities
+
+
 def build():
     questions = load_questions()
+    priorities = load_priorities(questions)
     answers = []
     for filename in ('answers-001-070.json', 'answers-071-140.json', 'answers-141-200.json'):
         answers.extend(json.loads((SITE / filename).read_text()))
@@ -50,8 +68,8 @@ def build():
         paragraphs = ''.join(f'<p>{bold(p)}</p>' for p in answer['answer'])
         caution = f'<p class="caution">{bold(answer["caution"])}</p>' if answer.get('caution') else ''
         label = '이렇게 물어보세요' if qid >= 191 else '이렇게 말해보세요'
-        cards.append(f'''<article class="card" id="question-{qid}" data-id="{qid}" data-category="{question['category']}">
-<p class="category">{html.escape(question['category_name'])} · {qid}번</p>
+        cards.append(f'''<article class="card" id="question-{qid}" data-id="{qid}" data-category="{question['category']}" data-priority="{priorities[qid]}">
+<p class="category">{html.escape(question['category_name'])} · {qid}번 <span class="priority-badge">{PRIORITY_LABELS[priorities[qid]]}</span></p>
 <h2 tabindex="-1">{bold(question['question'])}</h2>
 <div class="answer-step" data-step="1"><h3>한 줄 핵심</h3><p>{bold(answer['summary'])}</p><div class="keywords">{keywords}</div></div>
 <div class="answer-step spoken" data-step="2"><h3>{label}</h3>{paragraphs}{caution}</div>
