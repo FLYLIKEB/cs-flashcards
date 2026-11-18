@@ -22,7 +22,7 @@ function setup(saved, blocked = false) {
       focus() {},
     };
   }
-  for (const id of ['controls', 'scope-filters', 'priority', 'mode', 'category', 'search', 'saved', 'workspace', 'library', 'pause',
+  for (const id of ['question-map', 'question-list', 'question-browser', 'question-count', 'controls', 'scope-filters', 'priority', 'mode', 'category', 'search', 'saved', 'workspace', 'library', 'pause',
     'break-panel', 'empty', 'actions', 'position', 'session', 'checkpoint', 'picker', 'prev', 'next',
     'reveal', 'done', 'review', 'rest', 'resume', 'more', 'break-title']) nodes[id] = element(id);
   const cards = Array.from({ length: 6 }, (_, index) => {
@@ -159,4 +159,16 @@ test('priority and category intersect and saved v1 progress migrates without los
   assert.deepEqual(restored.state().done, [4]);
   assert.deepEqual(restored.state().review, [4]);
   assert.equal(normalize({priority: '4'}, ids).priority, 'all');
+});
+
+ test('question overview includes every question and follows selection and filters', () => {
+  const s = setup();
+  assert.equal(s.nodes['question-map'].children.length, 6);
+  assert.equal(s.nodes['question-list'].children.length, 6);
+  s.nodes['question-map'].children[4].click();
+  assert.equal(s.state().current, 5);
+  assert.equal(s.nodes['question-list'].children[4].getAttribute('aria-current'), 'true');
+  s.nodes.priority.value = '1'; s.nodes.priority.emit('change');
+  assert.equal(s.nodes['question-map'].children.filter(el => !el.hidden).length, 2);
+  assert.equal(s.nodes['question-count'].textContent, '2문항');
 });

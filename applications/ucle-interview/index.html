@@ -5,7 +5,7 @@
 <header><a href="/">← CS 학습 홈</a><a href="stack-basics.html">기술스택 키워드 기초 →</a></header>
 <main>
 <h1>유클 CTO 커피챗</h1>
-<p class="intro">지금은 <strong>한 질문만.</strong> 정답을 외우기보다 내 말로 이야기해 보세요.</p>
+<p class="intro"><strong>전체 질문을 한눈에.</strong> 번호나 제목을 누르면 바로 이어서 연습해요.</p>
 <noscript><p>아래에서 모든 질문과 답변을 읽을 수 있습니다. 이어하기 기능은 JavaScript가 필요합니다.</p></noscript>
 <div id="controls" hidden>
 <div id="scope-filters" class="filters scope-filters">
@@ -23,13 +23,16 @@
 </div>
 <section id="break-panel" hidden aria-labelledby="break-title"><h2 id="break-title" tabindex="-1">여기까지 해도 괜찮아요.</h2><p>지금 보던 질문을 남겨 두었어요. 준비되면 돌아오세요.</p><button id="resume" class="primary" type="button">보던 질문 이어하기</button></section>
 <div id="workspace">
+<aside id="question-browser" hidden aria-label="전체 질문 목록"><h2>질문 한눈에 <span id="question-count"></span></h2><div id="question-map" aria-label="질문 번호 바로 이동"></div><div id="question-list" aria-label="질문 제목 목록"></div></aside>
+<div id="study-detail">
 <section id="voice-panel" aria-label="음성으로 한 질문씩 듣기" hidden>
+<details id="voice-details" open><summary>음성 재생 · 접기 / 펼치기</summary>
 <p class="voice-intro"><strong>질문 → 답변 → 쉬운 풀이</strong><br>한 번 재생하면 다음 질문까지 이어서 들려드려요.</p>
 <div class="voice-buttons"><button id="voice-play" class="primary" type="button">음성으로 시작하기</button><button id="voice-restart" type="button">이 질문 처음부터</button></div>
 <audio id="voice-audio" controls preload="none" aria-label="현재 질문 음성"></audio>
 <div class="voice-settings"><label><input id="voice-auto" type="checkbox" checked> 다음 질문 자동재생</label><label>배속 <select id="voice-rate"><option value="0.8">0.8배</option><option value="1" selected>1배</option><option value="1.2">1.2배</option><option value="1.5">1.5배</option></select></label></div>
 <p id="voice-status" role="status">재생 버튼을 누르면 현재 질문부터 시작해요.</p>
-</section>
+</details></section>
 <p id="empty" hidden>해당하는 질문이 없어요. 문항 고르기에서 범위나 검색어를 바꿔 보세요.</p>
 <div id="cards"><article class="card" id="question-1" data-id="1" data-category="1" data-priority="1">
 <p class="category">지원 동기 · 커리어 전환 · 포지션 적합성 · 1번 <span class="priority-badge">1순위 · 먼저 준비</span></p>
@@ -1437,7 +1440,7 @@
 <nav aria-label="질문 이동"><button id="prev" type="button">← 이전</button><button id="next" type="button">다음 질문 →</button></nav>
 </div>
 <aside id="checkpoint" hidden><p><strong>5문항을 연습했어요.</strong> 잠깐 쉬거나, 다음 5문항을 이어가도 좋아요.</p><button id="more" type="button">다음 5문항 시작</button><button id="rest" type="button">잠깐 쉬기</button></aside>
-</div>
+</div></div>
 <footer>원본: 2026.11.18 예상질문 자료 · 실제 출제 문항이 아닌 연습용입니다.<br>회사 현황과 일정은 원본 작성 시점 기준이에요. 연습 표시는 이 브라우저에만 저장됩니다.</footer>
 </main>
 </body></html>

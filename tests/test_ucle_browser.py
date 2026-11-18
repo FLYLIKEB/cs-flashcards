@@ -196,6 +196,27 @@ class UcleBrowserTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(await page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
         self.assertEqual(self.errors, [])
 
+    async def test_compact_overview_and_collapsing_audio_keeps_playing(self):
+        page = self.page
+        await page.setViewport({'width': 1440, 'height': 900})
+        self.assertEqual(await page.Jeval('#question-map', 'el => el.children.length'), 200)
+        self.assertEqual(await page.Jeval('#question-list', 'el => el.children.length'), 200)
+        self.assertLess(await page.Jeval('#question-map', 'el => el.getBoundingClientRect().bottom'), 900)
+        await page.click('#voice-play')
+        await page.waitForFunction('!document.querySelector("#voice-audio").paused')
+        await page.click('#voice-details summary')
+        self.assertFalse(await page.Jeval('#voice-details', 'el => el.open'))
+        self.assertFalse(await page.Jeval('#voice-audio', 'el => el.paused'))
+        await page.click('#question-map button:nth-child(200)')
+        await page.waitForFunction('document.querySelector("#voice-audio").currentSrc.includes("question-200.mp3") && !document.querySelector("#voice-audio").paused')
+        self.assertEqual(await page.Jeval('#question-map button:nth-child(200)', 'el => el.getAttribute("aria-current")'), 'true')
+        await page.screenshot({'path': '/tmp/ucle-compact-desktop.png'})
+        await page.setViewport({'width': 390, 'height': 844})
+        self.assertFalse(await page.evaluate('document.documentElement.scrollWidth > innerWidth'))
+        self.assertLess(await page.Jeval('#question-map', 'el => el.getBoundingClientRect().height'), 300)
+        await page.screenshot({'path': '/tmp/ucle-compact-mobile.png'})
+        self.assertFalse(self.errors)
+
     async def test_no_javascript_fallback(self):
         await self.page.setJavaScriptEnabled(False)
         await self.page.reload()

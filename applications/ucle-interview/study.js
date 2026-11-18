@@ -22,6 +22,23 @@
   const cards = [...document.querySelectorAll('.card')];
   const ids = cards.map(card => Number(card.dataset.id));
   const subscribers = new Set();
+  const questionLinks = cards.map(card => {
+    const id = Number(card.dataset.id);
+    const makeButton = (text, label) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = text;
+      button.setAttribute('aria-label', label);
+      button.title = label;
+      button.addEventListener('click', () => move(id));
+      return button;
+    };
+    const label = `${id}. ${card.querySelector('h2').textContent}`;
+    return { card, number: makeButton(String(id), label), title: makeButton(`${card.dataset.priority}순위 · ${label}`, label) };
+  });
+  $('question-map').replaceChildren(...questionLinks.map(link => link.number));
+  $('question-list').replaceChildren(...questionLinks.map(link => link.title));
+  $('question-browser').hidden = false;
   let state;
   let storageError = false;
   try { state = normalize(JSON.parse(localStorage.getItem(KEY)), ids); }
@@ -50,7 +67,7 @@
   }
   function focusQuestion() {
     const card = document.getElementById(`question-${state.current}`);
-    if (card && !card.hidden) card.querySelector('h2').focus();
+    if (card && !card.hidden) card.querySelector('h2').focus({ preventScroll: true });
   }
   function snapshot() {
     return { current: state.current, paused: state.paused, ids: filtered().map(card => Number(card.dataset.id)) };
@@ -63,6 +80,13 @@
     }
     const index = visible.findIndex(card => Number(card.dataset.id) === state.current);
     const current = visible[index];
+    $('question-count').textContent = `${visible.length}문항`;
+    for (const link of questionLinks) {
+      for (const button of [link.number, link.title]) {
+        button.hidden = !visible.includes(link.card);
+        button.setAttribute('aria-current', String(link.card === current));
+      }
+    }
     for (const card of cards) {
       card.hidden = card !== current;
       for (const step of card.querySelectorAll('[data-step]')) step.hidden = Number(step.dataset.step) > state.step;
