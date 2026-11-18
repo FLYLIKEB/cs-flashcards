@@ -27,7 +27,7 @@ class UcleBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(self.stop_server)
         for _ in range(100):
             try:
-                await asyncio.to_thread(urlopen, self.url + '/ucle-interview/', timeout=1)
+                await asyncio.to_thread(urlopen, self.url + '/ucle-interview/index.html', timeout=1)
                 break
             except HTTPError as error:
                 if error.code == 401:
@@ -48,7 +48,7 @@ class UcleBrowserTests(unittest.IsolatedAsyncioTestCase):
         self.page.on('pageerror', lambda error: self.errors.append(str(error)))
         token = base64.b64encode(b'cs:ucle-browser-test').decode()
         await self.page.setExtraHTTPHeaders({'Authorization': 'Basic ' + token})
-        await self.page.goto(self.url + '/ucle-interview/')
+        await self.page.goto(self.url + '/ucle-interview/index.html')
         await self.page.waitForSelector('#controls:not([hidden])')
 
     def stop_server(self):

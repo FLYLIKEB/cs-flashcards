@@ -98,7 +98,7 @@ class UcleContentTests(unittest.TestCase):
             self.assertEqual({p.name for p in staged.iterdir()}, expected)
 
     def test_home_has_new_menu(self):
-        self.assertIn('href="/ucle-interview/"', (ROOT / 'static/index.html').read_text())
+        self.assertIn('href="/ucle-interview/index.html"', (ROOT / 'static/index.html').read_text())
 
 
 class UcleAuthTests(unittest.IsolatedAsyncioTestCase):
