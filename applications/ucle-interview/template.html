@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>유클 CTO 커피챗 · 한 질문씩</title><link rel="stylesheet" href="study.css"><script defer src="study.js"></script></head>
+<body>
+<header><a href="/">← CS 학습 홈</a><span>커피챗 준비 · 200문항</span></header>
+<main>
+<h1>유클 CTO 커피챗</h1>
+<p class="intro">지금은 <strong>한 질문만.</strong> 정답을 외우기보다 내 말로 이야기해 보세요.</p>
+<noscript><p>아래에서 모든 질문과 답변을 읽을 수 있습니다. 이어하기 기능은 JavaScript가 필요합니다.</p></noscript>
+<div id="controls" hidden>
+<details id="library"><summary>문항 고르기 · 분야 / 검색 / 다시 볼 질문</summary>
+<div class="filters"><label>연습 범위<select id="mode"><option value="all">전체 200문항</option><option value="essential">먼저 볼 핵심 15문항</option><option value="review">다시 볼 질문</option></select></label><label>분야<select id="category"><option value="all">모든 분야</option>@@OPTIONS@@</select></label><label>질문·답변 검색<input id="search" type="search" placeholder="예: 캐시, 결제, 자기소개"></label><label>바로 이동<select id="picker"></select></label></div>
+<p>핵심 문항은 지원 동기, 대표 경험, 설계, 역질문을 고르게 연습하도록 골랐어요.</p>
+<a href="answers.md" download>쉬운 답변 전체 내려받기</a> · <a href="source.md">원본 자료</a>
+</details>
+<div class="status"><span id="position" role="status"></span><button id="pause" type="button">잠깐 쉬기</button></div>
+<p id="session">이번에는 5문항만 연습해 봐요. 언제 쉬어도 괜찮아요.</p>
+<p id="saved" class="muted" role="status"></p>
+</div>
+<section id="break-panel" hidden aria-labelledby="break-title"><h2 id="break-title" tabindex="-1">여기까지 해도 괜찮아요.</h2><p>지금 보던 질문을 남겨 두었어요. 준비되면 돌아오세요.</p><button id="resume" class="primary" type="button">보던 질문 이어하기</button></section>
+<div id="workspace">
+<p id="empty" hidden>해당하는 질문이 없어요. 문항 고르기에서 범위나 검색어를 바꿔 보세요.</p>
+<div id="cards">@@CARDS@@</div>
+<div id="actions" hidden>
+<button id="reveal" class="primary" type="button" aria-expanded="false">1. 한 줄 핵심 보기</button>
+<div class="assessment"><button id="done" type="button" aria-pressed="false">이 문항 연습했어요</button><button id="review" type="button" aria-pressed="false">다시 볼 질문에 담기</button></div>
+<nav aria-label="질문 이동"><button id="prev" type="button">← 이전</button><button id="next" type="button">다음 질문 →</button></nav>
+</div>
+<aside id="checkpoint" hidden><p><strong>5문항을 연습했어요.</strong> 잠깐 쉬거나, 다음 5문항을 이어가도 좋아요.</p><button id="more" type="button">다음 5문항 시작</button><button id="rest" type="button">잠깐 쉬기</button></aside>
+</div>
+<footer>원본: 2026.11.18 예상질문 자료 · 실제 출제 문항이 아닌 연습용입니다.<br>회사 현황과 일정은 원본 작성 시점 기준이에요. 연습 표시는 이 브라우저에만 저장됩니다.</footer>
+</main>
+</body></html>

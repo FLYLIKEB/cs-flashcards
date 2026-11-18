@@ -739,6 +739,7 @@ def render_recruitment_schedule_wiki_page(markdown_text: str) -> str:
 
 app = FastAPI(title="CS Encyclopedia Flashcards", version="1.0.0")
 app.mount("/static", StaticFiles(directory=STATIC_DIR, check_dir=False), name="static")
+app.mount("/ucle-interview", StaticFiles(directory=ROOT / "applications" / "ucle-interview", html=True, check_dir=False), name="ucle-interview")
 app.mount("/interview", StaticFiles(directory=INTERVIEW_DIR, html=True, check_dir=False), name="interview")
 app.mount("/public/wiki-assets", StaticFiles(directory=PUBLIC_WIKI_ASSET_DIR, check_dir=False), name="public-wiki-assets")
 
