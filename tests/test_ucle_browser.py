@@ -108,6 +108,43 @@ class UcleBrowserTests(unittest.IsolatedAsyncioTestCase):
         await page.screenshot({'path': '/tmp/ucle-mobile.png', 'fullPage': True})
         self.assertEqual(self.errors, [])
 
+    async def test_real_audio_progress_seek_autonext_break_and_reload(self):
+        page = self.page
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        await page.click('#voice-play')
+        await page.waitForFunction('document.querySelector("#voice-audio").currentTime > 0', timeout=15000)
+        await page.waitForFunction('Number.isFinite(document.querySelector("#voice-audio").duration)')
+        await page.click('#voice-play')
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        await page.select('#voice-rate', '1.5')
+        self.assertEqual(await page.Jeval('#voice-audio', 'el => el.playbackRate'), 1.5)
+        await page.click('#voice-play')
+        await page.evaluate("""async () => {
+            const data = await (await fetch('audio/manifest.json')).json();
+            const section = data.tracks.find(track => track.id === 1).sections.find(section => section.step === 3);
+            document.querySelector('#voice-audio').currentTime = section.start + 0.1;
+        }""")
+        await page.waitForFunction("document.getElementById('question-1').querySelectorAll('[data-step]')[2].hidden === false")
+        await page.Jeval('#voice-audio', 'el => { el.currentTime = el.duration - 0.15; }')
+        await page.waitForFunction('!document.querySelector("#question-2").hidden', timeout=15000)
+        await page.waitForFunction('document.querySelector("#voice-audio").currentTime > 0')
+        self.assertEqual(await page.evaluate('JSON.parse(localStorage.getItem("ucle-interview-study-v1")).done.length'), 0)
+        await page.click('#pause')
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        await page.click('#resume')
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        await page.click('#library summary')
+        await page.select('#picker', '200')
+        await page.click('#voice-play')
+        await page.waitForFunction('document.querySelector("#voice-audio").currentTime > 0')
+        await page.Jeval('#voice-audio', 'el => { el.currentTime = el.duration - 0.15; }')
+        await page.waitForFunction('document.querySelector("#voice-audio").ended', timeout=15000)
+        self.assertFalse(await page.Jeval('#question-200', 'el => el.hidden'))
+        await page.reload()
+        self.assertTrue(await page.Jeval('#voice-audio', 'el => el.paused'))
+        self.assertEqual(await page.Jeval('#voice-rate', 'el => el.value'), '1.5')
+        self.assertEqual(self.errors, [])
+
     async def test_no_javascript_fallback(self):
         await self.page.setJavaScriptEnabled(False)
         await self.page.reload()

@@ -221,9 +221,10 @@ cp app.py flashcards_backend.py question_generator.py requirements.txt "$TMP_STA
 cp -R static "$TMP_STAGE/"
 stage_interview_assets "$ROOT_DIR/applications/class101-interview" "$TMP_STAGE/applications/class101-interview"
 mkdir -p "$TMP_STAGE/applications/ucle-interview"
-for asset in index.html study.css study.js source.md answers.md; do
+for asset in index.html study.css study.js audio-player.js source.md answers.md; do
   cp "$ROOT_DIR/applications/ucle-interview/$asset" "$TMP_STAGE/applications/ucle-interview/"
 done
+cp -R "$ROOT_DIR/applications/ucle-interview/audio" "$TMP_STAGE/applications/ucle-interview/"
 cp data/recruitment_schedule_2026.json "$TMP_STAGE/data/"
 echo "원격 state/progress.sqlite 보호: 배포 번들에 SQLite 파일을 포함하지 않습니다."
 

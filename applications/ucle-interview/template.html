@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>유클 CTO 커피챗 · 한 질문씩</title><link rel="stylesheet" href="study.css"><script defer src="study.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>유클 CTO 커피챗 · 한 질문씩</title><link rel="stylesheet" href="study.css"><script defer src="study.js"></script><script defer src="audio-player.js"></script></head>
 <body>
 <header><a href="/">← CS 학습 홈</a><span>커피챗 준비 · 200문항</span></header>
 <main>
@@ -19,6 +19,13 @@
 </div>
 <section id="break-panel" hidden aria-labelledby="break-title"><h2 id="break-title" tabindex="-1">여기까지 해도 괜찮아요.</h2><p>지금 보던 질문을 남겨 두었어요. 준비되면 돌아오세요.</p><button id="resume" class="primary" type="button">보던 질문 이어하기</button></section>
 <div id="workspace">
+<section id="voice-panel" aria-label="음성으로 한 질문씩 듣기" hidden>
+<p class="voice-intro"><strong>질문 → 답변 → 쉬운 풀이</strong><br>한 번 재생하면 다음 질문까지 이어서 들려드려요.</p>
+<div class="voice-buttons"><button id="voice-play" class="primary" type="button">음성으로 시작하기</button><button id="voice-restart" type="button">이 질문 처음부터</button></div>
+<audio id="voice-audio" controls preload="none" aria-label="현재 질문 음성"></audio>
+<div class="voice-settings"><label><input id="voice-auto" type="checkbox" checked> 다음 질문 자동재생</label><label>배속 <select id="voice-rate"><option value="0.8">0.8배</option><option value="1" selected>1배</option><option value="1.2">1.2배</option><option value="1.5">1.5배</option></select></label></div>
+<p id="voice-status" role="status">재생 버튼을 누르면 현재 질문부터 시작해요.</p>
+</section>
 <p id="empty" hidden>해당하는 질문이 없어요. 문항 고르기에서 범위나 검색어를 바꿔 보세요.</p>
 <div id="cards">@@CARDS@@</div>
 <div id="actions" hidden>

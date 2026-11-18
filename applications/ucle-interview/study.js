@@ -20,6 +20,7 @@
   const $ = id => document.getElementById(id);
   const cards = [...document.querySelectorAll('.card')];
   const ids = cards.map(card => Number(card.dataset.id));
+  const subscribers = new Set();
   let state;
   let storageError = false;
   try { state = normalize(JSON.parse(localStorage.getItem(KEY)), ids); }
@@ -48,7 +49,10 @@
     const card = document.getElementById(`question-${state.current}`);
     if (card && !card.hidden) card.querySelector('h2').focus();
   }
-  function render() {
+  function snapshot() {
+    return { current: state.current, paused: state.paused, ids: filtered().map(card => Number(card.dataset.id)) };
+  }
+  function render(reason = 'manual') {
     const visible = filtered();
     if (visible.length && !visible.some(card => Number(card.dataset.id) === state.current)) {
       state.current = Number(visible[0].dataset.id);
@@ -86,6 +90,7 @@
     $('done').textContent = state.done.includes(state.current) ? '연습했어요 ✓ · 취소' : '이 문항 연습했어요';
     $('review').textContent = state.review.includes(state.current) ? '다시 볼 질문 ✓ · 빼기' : '다시 볼 질문에 담기';
     save();
+    for (const listener of subscribers) listener({ ...snapshot(), reason });
   }
   function move(id) { state.current = id; state.step = 0; render(); focusQuestion(); }
   function pause() { state.paused = true; render(); $('break-title').focus(); }
@@ -120,5 +125,24 @@
   $('rest').addEventListener('click', pause);
   $('resume').addEventListener('click', () => { state.paused = false; render(); focusQuestion(); });
   $('more').addEventListener('click', () => { state.batch = []; render(); focusQuestion(); });
+  globalThis.UcleStudy = {
+    snapshot,
+    select(id) {
+      if (state.paused || !snapshot().ids.includes(id)) return false;
+      state.current = id;
+      state.step = 0;
+      render('audio');
+      return true;
+    },
+    reveal(step) {
+      if (![0, 1, 2, 3].includes(step) || state.step === step) return;
+      state.step = step;
+      render('audio');
+    },
+    subscribe(listener) {
+      subscribers.add(listener);
+      return () => subscribers.delete(listener);
+    },
+  };
   render();
 })();

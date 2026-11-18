@@ -81,21 +81,25 @@ class UcleContentTests(unittest.TestCase):
 
     def test_deployment_stages_only_required_assets(self):
         script = (ROOT / 'scripts/deploy_lightsail_flashcards.sh').read_text()
-        block = re.search(r'^mkdir -p "\$TMP_STAGE/applications/ucle-interview"\nfor asset .*?\ndone$',
+        block = re.search(r'^mkdir -p "\$TMP_STAGE/applications/ucle-interview"\nfor asset .*?\ndone\ncp -R .*?ucle-interview/"$',
                           script, flags=re.M | re.S)
         self.assertIsNotNone(block)
-        expected = {'index.html', 'study.css', 'study.js', 'source.md', 'answers.md'}
+        expected = {'index.html', 'study.css', 'study.js', 'audio-player.js', 'source.md', 'answers.md'}
         with tempfile.TemporaryDirectory() as tmp:
             root, stage = Path(tmp) / 'root', Path(tmp) / 'stage'
             source = root / 'applications' / 'ucle-interview'
             source.mkdir(parents=True)
             for filename in expected | {'template.html', 'answers-001-070.json', 'progress.sqlite'}:
                 (source / filename).write_text('fixture')
+            (source / 'audio').mkdir()
+            (source / 'audio/manifest.json').write_text('{}')
+            (source / 'audio/question-001.mp3').write_bytes(b'fixture')
             result = subprocess.run(['bash', '-c', 'set -euo pipefail\nROOT_DIR="$1"\nTMP_STAGE="$2"\n' + block[0],
                                      'ucle-packaging-test', str(root), str(stage)], capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             staged = stage / 'applications' / 'ucle-interview'
-            self.assertEqual({p.name for p in staged.iterdir()}, expected)
+            self.assertEqual({p.name for p in staged.iterdir()}, expected | {'audio'})
+            self.assertEqual({p.name for p in (staged / 'audio').iterdir()}, {'manifest.json', 'question-001.mp3'})
 
     def test_home_has_new_menu(self):
         self.assertIn('href="/ucle-interview/index.html"', (ROOT / 'static/index.html').read_text())
@@ -107,7 +111,7 @@ class UcleAuthTests(unittest.IsolatedAsyncioTestCase):
     request = remote_helpers.InterviewRemoteTests.request
 
     async def test_page_and_content_require_existing_authentication(self):
-        for filename in ('', 'study.js', 'study.css', 'source.md', 'answers.md'):
+        for filename in ('', 'study.js', 'study.css', 'audio-player.js', 'source.md', 'answers.md'):
             with self.subTest(filename=filename):
                 status, headers, _ = await self.request('/ucle-interview/' + filename)
                 self.assertEqual(status, 401)
@@ -116,6 +120,20 @@ class UcleAuthTests(unittest.IsolatedAsyncioTestCase):
                                                      headers=[(b'authorization', remote_helpers.BASIC_AUTH)])
                 self.assertEqual(status, 200)
                 self.assertEqual(body, (SITE / (filename or 'index.html')).read_bytes())
+
+    async def test_audio_assets_require_auth_and_support_ranges(self):
+        status, _, _ = await self.request('/ucle-interview/audio/manifest.json')
+        self.assertEqual(status, 401)
+        for number in (1, 200):
+            path = f'audio/question-{number:03}.mp3'
+            status, _, _ = await self.request('/ucle-interview/' + path)
+            self.assertEqual(status, 401)
+            status, headers, body = await self.request('/ucle-interview/' + path, headers=[
+                (b'authorization', remote_helpers.BASIC_AUTH), (b'range', b'bytes=0-31')])
+            self.assertEqual(status, 206)
+            self.assertEqual(body, (SITE / path).read_bytes()[:32])
+            self.assertEqual(headers[b'content-type'], b'audio/mpeg')
+            self.assertEqual(headers[b'accept-ranges'], b'bytes')
 
     async def test_cookie_authentication_and_mount_boundaries(self):
         _, headers, _ = await self.request('/ucle-interview/',
